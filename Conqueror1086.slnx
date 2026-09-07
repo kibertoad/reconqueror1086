@@ -1,6 +1,7 @@
 <Solution>
   <Project Path="src/Conqueror.Core/Conqueror.Core.csproj" />
   <Project Path="src/Conqueror.Game/Conqueror.Game.csproj" />
+  <Project Path="src/Conqueror.Resources/Conqueror.Resources.csproj" />
   <Project Path="tests/Conqueror.Specs/Conqueror.Specs.csproj" />
   <Project Path="tools/Conqueror.Inspect/Conqueror.Inspect.csproj" />
   <Project Path="tools/Conqueror.Import/Conqueror.Import.csproj" />

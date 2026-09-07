@@ -2,6 +2,7 @@
   <PropertyGroup><OutputType>WinExe</OutputType></PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Conqueror.Core/Conqueror.Core.csproj" />
+    <ProjectReference Include="../Conqueror.Resources/Conqueror.Resources.csproj" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.5.1" />
   </ItemGroup>
 </Project>

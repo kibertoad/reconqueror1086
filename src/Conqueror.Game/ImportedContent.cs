@@ -1,3 +1,4 @@
+using Conqueror.Resources;
 using System.Text.Json;
 
 namespace Conqueror.Game;
@@ -26,7 +27,7 @@ public sealed class ImportedContentCatalog
             if (!File.Exists(manifestPath)) continue;
             try
             {
-                var manifest = JsonSerializer.Deserialize<ImportManifest>(File.ReadAllText(manifestPath));
+                var manifest = ImportManifest.Read(manifestPath);
                 if (manifest is { Version: 1 }) return new ImportedContentCatalog(root!, manifest);
             }
             catch (JsonException) { }
@@ -55,6 +56,4 @@ public sealed class ImportedContentCatalog
         return File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
     }
 
-    private sealed record ImportManifest(int Version, string? SourceImageSha256, ImportedAsset[]? Assets);
-    private sealed record ImportedAsset(string Id, string Path, string Kind, long Size, string Sha256);
 }

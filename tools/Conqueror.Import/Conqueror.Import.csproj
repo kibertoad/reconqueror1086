@@ -1,4 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup><OutputType>Exe</OutputType></PropertyGroup>
-  <ItemGroup><ProjectReference Include="../Conqueror.Inspect/Conqueror.Inspect.csproj" /></ItemGroup>
+  <ItemGroup><ProjectReference Include="../../src/Conqueror.Resources/Conqueror.Resources.csproj" /></ItemGroup>
 </Project>

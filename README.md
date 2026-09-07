@@ -43,6 +43,7 @@ dotnet run --project tests/Conqueror.Specs
 
 The specification runner checks the externally documented balance values and core campaign invariants without requiring a graphics device.
 It reports every `PASS`/`FAIL`, prints one compact summary, and returns a normal nonzero process exit code on failure rather than throwing an application exception.
+Unexpected fixture or parser errors are caught by the runner and reported as a concise failed check. The import and inspection utilities use the same clean command-line error boundary.
 
 ## Inspecting the owned original
 
@@ -51,3 +52,5 @@ The read-only `tools/Conqueror.Inspect` utility inventories the mixed-mode GOG C
 ## Original media
 
 The project is playable without copyrighted media. The GOG installation remains the reference for future audiovisual adapters. `C1086.GOB`, the raw CD tracks, Smacker movies, and CD audio are intentionally not copied into this repository. See `docs/fidelity.md` for the fidelity ledger and remaining audiovisual work.
+
+The complete phased backlog and acceptance criteria are tracked in [`docs/implementation-plan.md`](docs/implementation-plan.md).

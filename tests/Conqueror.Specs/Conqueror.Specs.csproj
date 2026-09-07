@@ -3,5 +3,6 @@
   <ItemGroup>
     <ProjectReference Include="../../src/Conqueror.Core/Conqueror.Core.csproj" />
     <ProjectReference Include="../../src/Conqueror.Game/Conqueror.Game.csproj" />
+    <ProjectReference Include="../../src/Conqueror.Resources/Conqueror.Resources.csproj" />
   </ItemGroup>
 </Project>

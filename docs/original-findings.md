@@ -42,6 +42,17 @@ These hashes identify the evidence source and are not claims that every retail o
 | Castle skirmish uses `SKIRMISH.RES`, `SKIRMISH.CSF`, and `SKIRMISH.PCX`. | Literal resource names in `CONQUER.EXE`. | Confirmed |
 | The configured original supports a `WAR_MODE` setting and the shipped CD configuration uses `640`. | Extracted `CONQUER.INI` in the hashed disc image. | Confirmed for this disc configuration |
 
+## Resource archive findings
+
+| Finding | Evidence | Confidence |
+| --- | --- | --- |
+| `C1086.GOB` and the scene `.RES` files use the same indexed Dynamix container family. | Both begin with `.RES`, followed by a little-endian directory offset whose target begins with a plausible entry count. | Confirmed for the hashed build |
+| Directory records are 52 bytes: a 32-byte null-padded name followed by two 32-bit fields, stored size, expanded size, and data offset. | All 486 GOB records and representative 222-entry scene archives fit exactly within their files; every tested extent remains before the directory. | Confirmed structure; semantics of the first two fields remain provisional |
+| An entry with equal stored and expanded sizes is stored byte-for-byte. | Representative entries have equal lengths and readable resource payloads; synthetic parser tests verify bounded extraction. | Corroborated pending broader format sampling |
+| A first field value of `1` proves a specific LZW variant. | Size inequality and external Dynamix format research suggest compression, but no decoded-output comparison exists yet. | Provisional; the implementation does not decode or label the algorithm |
+
+The hashed `C1086.GOB` contains 486 directory entries, 10 of which have equal stored and expanded sizes. Across the GOB and 99 imported scene archives, the installer currently extracts 1,785 equal-size entries byte-for-byte. Extensions such as `.CSF` are retained as unknown resources until their semantics are demonstrated; filename extensions alone are not treated as proof that an entry is dialogue, audio, or animation.
+
 ## Promotion rule
 
 A provisional value is promoted only when we can cite one of: an unambiguous static table and its code reference, a decoded resource with known semantics, a controlled repeated in-game observation, or agreement between executable behavior and independent documentation. Every promotion should update this file, `docs/fidelity.md`, and the relevant executable specification together.

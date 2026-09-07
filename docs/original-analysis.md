@@ -14,7 +14,7 @@ The first argument is the installed-game directory, the second is an output dire
 
 End users should use `Install Original Resources.bat` instead. It runs `tools/Conqueror.Import`, extracts owned SMK/RES/CSF/PCX/PCC/LOW/audio resources into ignored `UserContent`, copies the owned GOB archive, converts Red Book CD audio losslessly to runtime-loadable PCM WAV, and records every installed file in `manifest.json`. MonoGame's runtime stream loader requires PCM RIFF data; compressed Ogg/MP3 support normally goes through the build-time content pipeline, while FLAC would require an additional decoder.
 
-The importer and runtime catalog are format-neutral: assets are addressed by original path and kind, and the game rejects manifest paths that escape `UserContent`. The current runtime plays imported CD audio and can open any installed asset stream. SMK playback and decoding the long CSF/PCC/RES/GOB dialogue and image formats are still adapter work; the presence of a raw imported asset must not be reported as equivalent to displaying or playing it. On the hashed GOG build, an end-to-end import produced 2,464 catalog entries: 2,131 movies, 233 audio entries (including five CDDA WAVs), 99 resource containers, and one GOB archive.
+The importer and runtime catalog are format-neutral: assets are addressed by original path and kind, and the game rejects manifest paths that escape `UserContent`. The current runtime plays imported CD audio and can open any installed asset stream. SMK playback and decoding the long CSF/PCC/RES/GOB dialogue and image formats are still adapter work; the presence of a raw imported asset must not be reported as equivalent to displaying or playing it. On the hashed GOG build, an end-to-end import produced 4,249 catalog entries: 2,131 movies, 233 audio entries (including five CDDA WAVs), 1 image candidate, 1,883 other resources, and one GOB archive. Of those, 1,785 are byte-stored entries extracted from the GOB and 99 scene containers; compressed entries remain cataloged only in their owning archives.
 
 ## What it does
 
@@ -24,6 +24,7 @@ The importer and runtime catalog are format-neutral: assets are addressed by ori
 4. Writes a complete CD manifest and SHA-256 provenance hashes.
 5. Locally extracts small executable/configuration artifacts useful for inspection.
 6. Searches printable strings in `CONQUER.EXE` and the installed `C1086.GOB`, recording byte offsets for follow-up analysis.
+7. Parses the bounded top-level Dynamix archive directory and reports names, flags, sizes, and offsets. Only entries whose stored and expanded sizes match are currently decoded byte-for-byte.
 
 Generated manifests, reports, and artifacts under `analysis/original` are ignored by Git. Do not commit or redistribute them. Only derived facts, implementation code, and short evidence notes belong in the repository.
 

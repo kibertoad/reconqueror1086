@@ -1,8 +1,9 @@
-using System.Buffers.Binary;
+using Conqueror.Resources;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
 
+try
+{
 var install = args.Length > 0 ? Path.GetFullPath(args[0]) : @"C:\GOG Games\Conqueror AD1086";
 var output = args.Length > 1 ? Path.GetFullPath(args[1]) : Path.GetFullPath(Path.Combine("analysis", "original"));
 var imagePath = Path.Combine(install, "game.gog");
@@ -54,8 +55,27 @@ if (terms.Length > 0)
             hits.AppendLine($"0x{offset:X8}  {Path.GetFileName(target)}  {value}");
     File.WriteAllText(Path.Combine(output, "string-hits.txt"), hits.ToString());
 }
-Console.WriteLine($"Indexed {files.Length} CD files and extracted {extracted} inspectable artifacts to {output}.");
+var gobEntries = 0;
+var gobStoredEntries = 0;
+var gobPath = Path.Combine(install, "C1086.GOB");
+if (File.Exists(gobPath))
+{
+    var gob = new DynamixArchive(gobPath);
+    gobEntries = gob.Entries.Count;
+    gobStoredEntries = gob.Entries.Count(x => x.IsStored);
+    var directory = new StringBuilder("# Index  Flags  Stored  Expanded  Offset  Name\n");
+    foreach (var entry in gob.Entries)
+        directory.AppendLine($"{entry.Index,5}  {entry.Flags,5}  {entry.StoredSize,10}  {entry.ExpandedSize,10}  0x{entry.Offset:X8}  {entry.Name}");
+    File.WriteAllText(Path.Combine(output, "gob-directory.txt"), directory.ToString());
+}
+Console.WriteLine($"Indexed {files.Length} CD files, {gobEntries} GOB entries ({gobStoredEntries} stored), and extracted {extracted} inspectable artifacts to {output}.");
 return 0;
+}
+catch (Exception error) when (error is IOException or UnauthorizedAccessException or InvalidDataException or ArgumentException or OverflowException)
+{
+    Console.Error.WriteLine($"Original-data inspection failed: {error.Message}");
+    return 1;
+}
 
 static string SafeName(string name) => string.Concat(name.Where(c => char.IsLetterOrDigit(c) || c is '.' or '_' or '-'));
 static string Hash(string path)
@@ -84,124 +104,4 @@ static IEnumerable<(long Offset, string Value)> PrintableStrings(string path)
         }
     }
     if (bytes.Count >= 4) yield return (start, Encoding.ASCII.GetString(bytes.ToArray()));
-}
-
-public sealed record CueTrack(int Number, string Mode, int StartSector);
-
-public static class CueSheet
-{
-    public static int DataTrackSectors(IEnumerable<string> lines)
-    {
-        var nextTrack = false;
-        foreach (var line in lines)
-        {
-            if (Regex.IsMatch(line, @"^\s*TRACK\s+02\s+", RegexOptions.IgnoreCase)) { nextTrack = true; continue; }
-            if (!nextTrack) continue;
-            var match = Regex.Match(line, @"INDEX\s+01\s+(\d+):(\d+):(\d+)", RegexOptions.IgnoreCase);
-            if (match.Success)
-                return (int.Parse(match.Groups[1].Value) * 60 + int.Parse(match.Groups[2].Value)) * 75 + int.Parse(match.Groups[3].Value);
-        }
-        throw new InvalidDataException("Could not locate track 2 start in cue sheet.");
-    }
-
-    public static CueTrack[] Tracks(IEnumerable<string> lines)
-    {
-        var result = new List<CueTrack>();
-        var number = 0;
-        var mode = "";
-        foreach (var line in lines)
-        {
-            var track = Regex.Match(line, @"^\s*TRACK\s+(\d+)\s+(\S+)", RegexOptions.IgnoreCase);
-            if (track.Success) { number = int.Parse(track.Groups[1].Value); mode = track.Groups[2].Value; continue; }
-            var index = Regex.Match(line, @"INDEX\s+01\s+(\d+):(\d+):(\d+)", RegexOptions.IgnoreCase);
-            if (number > 0 && index.Success)
-            {
-                var sector = (int.Parse(index.Groups[1].Value) * 60 + int.Parse(index.Groups[2].Value)) * 75 + int.Parse(index.Groups[3].Value);
-                result.Add(new CueTrack(number, mode, sector));
-                number = 0;
-            }
-        }
-        return result.ToArray();
-    }
-}
-
-public sealed class RawMode1Image : IDisposable
-{
-    private const int RawSector = 2352;
-    private const int PayloadOffset = 16;
-    private const int PayloadSize = 2048;
-    private readonly FileStream _stream;
-    public int SectorCount { get; }
-
-    public RawMode1Image(string path, int sectorCount)
-    {
-        _stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-        SectorCount = sectorCount;
-    }
-
-    public byte[] Read(long offset, int count)
-    {
-        if (offset < 0 || count < 0 || offset + count > (long)SectorCount * PayloadSize) throw new EndOfStreamException();
-        var result = new byte[count];
-        var written = 0;
-        while (written < count)
-        {
-            var logical = offset + written;
-            var sector = logical / PayloadSize;
-            var within = (int)(logical % PayloadSize);
-            var take = Math.Min(count - written, PayloadSize - within);
-            _stream.Position = sector * RawSector + PayloadOffset + within;
-            _stream.ReadExactly(result.AsSpan(written, take));
-            written += take;
-        }
-        return result;
-    }
-
-    public void Dispose() => _stream.Dispose();
-}
-
-public sealed record IsoFile(string Path, uint Extent, uint Size);
-
-public sealed class Iso9660
-{
-    private const int Sector = 2048;
-    private readonly RawMode1Image _image;
-    private readonly List<IsoFile> _files = [];
-    public IReadOnlyList<IsoFile> Files => _files;
-
-    public Iso9660(RawMode1Image image)
-    {
-        _image = image;
-        var descriptor = image.Read(16L * Sector, Sector);
-        if (descriptor[0] != 1 || Encoding.ASCII.GetString(descriptor, 1, 5) != "CD001") throw new InvalidDataException("Track 1 is not an ISO-9660 primary volume.");
-        var root = ParseRecord(descriptor.AsSpan(156), "");
-        ReadDirectory(root, "", new HashSet<uint>());
-    }
-
-    public byte[] ReadFile(IsoFile file) => _image.Read((long)file.Extent * Sector, checked((int)file.Size));
-
-    private void ReadDirectory(IsoFile directory, string prefix, HashSet<uint> visited)
-    {
-        if (!visited.Add(directory.Extent)) return;
-        var bytes = ReadFile(directory);
-        for (var offset = 0; offset < bytes.Length;)
-        {
-            var length = bytes[offset];
-            if (length == 0) { offset = (offset / Sector + 1) * Sector; continue; }
-            if (offset + length > bytes.Length) break;
-            var record = bytes.AsSpan(offset, length);
-            var nameLength = record[32];
-            var rawName = Encoding.ASCII.GetString(record.Slice(33, nameLength));
-            offset += length;
-            if (rawName is "\0" or "\u0001") continue;
-            var name = rawName.Split(';')[0].TrimEnd('.');
-            var entry = ParseRecord(record, prefix.Length == 0 ? name : $"{prefix}/{name}");
-            if ((record[25] & 2) != 0) ReadDirectory(entry, entry.Path, visited); else _files.Add(entry);
-        }
-    }
-
-    private static IsoFile ParseRecord(ReadOnlySpan<byte> record, string path) => new(
-        path,
-        BinaryPrimitives.ReadUInt32LittleEndian(record.Slice(2, 4)),
-        BinaryPrimitives.ReadUInt32LittleEndian(record.Slice(10, 4)));
 }

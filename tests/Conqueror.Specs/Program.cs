@@ -1,5 +1,8 @@
 using Conqueror.Core;
 using Conqueror.Game;
+using Conqueror.Resources;
+using System.Buffers.Binary;
+using System.Text;
 using System.Text.Json;
 
 var passed = 0;
@@ -9,6 +12,9 @@ void Check(bool condition, string name)
     if (condition) { Console.WriteLine("PASS  " + name); passed++; }
     else { Console.Error.WriteLine("FAIL  " + name); failed++; }
 }
+
+try
+{
 
 Check(Balance.Crops[CropType.Vegetables] == new CropBalance(1, 10, 10), "vegetable balance");
 Check(Balance.Crops[CropType.Beans].HarvestRevenueAt50 == 25, "bean harvest balance");
@@ -23,6 +29,57 @@ var rewardItems = Balance.Courtships.SelectMany(x => x.Rewards).Where(x => x.Ite
 Check(Balance.Victories[VictoryKind.Dragon].RequiredItems.All(rewardItems.Contains), "victory items obtainable from definitions");
 Check(Balance.Strategy == new StrategicDefinition(80, 98, 9), "strategic warfare definitions");
 Check(Balance.TournamentOpponents.Length == 5 && Balance.TournamentOpponents.All(x => x.Wager is >= 20 and <= 80 && x.Swordsmen + x.Halberdiers + x.Knights == 8), "tournament opponent definitions valid");
+
+string[] syntheticCue =
+[
+    "FILE \"disc.bin\" BINARY", "  TRACK 01 MODE1/2352", "    INDEX 01 00:00:00",
+    "  TRACK 02 AUDIO", "    INDEX 01 00:02:00", "  TRACK 03 AUDIO", "    INDEX 01 00:03:10"
+];
+var cueTracks = CueSheet.Tracks(syntheticCue);
+Check(CueSheet.DataTrackSectors(syntheticCue) == 150 && cueTracks.Length == 3 && cueTracks[2].StartSector == 235, "cue sheet parses data and audio boundaries");
+Check(Throws<InvalidDataException>(() => CueSheet.Tracks(["not a cue sheet"])), "invalid cue sheet fails cleanly");
+
+var cddaBytes = Enumerable.Range(0, CddaWave.BytesPerSector * 2).Select(x => (byte)(x % 251)).ToArray();
+using (var cddaSource = new MemoryStream(cddaBytes))
+using (var wave = new MemoryStream())
+{
+    CddaWave.Write(cddaSource, wave, 1, 1);
+    var bytes = wave.ToArray();
+    Check(bytes.Length == CddaWave.BytesPerSector + 44 && Encoding.ASCII.GetString(bytes, 0, 4) == "RIFF" && Encoding.ASCII.GetString(bytes, 8, 4) == "WAVE", "CDDA writer creates PCM RIFF header");
+    Check(bytes[44] == cddaBytes[CddaWave.BytesPerSector] && BinaryPrimitives.ReadInt32LittleEndian(bytes.AsSpan(40, 4)) == CddaWave.BytesPerSector, "CDDA writer preserves exact sector samples");
+}
+
+var isoPath = Path.Combine(Path.GetTempPath(), $"conqueror-iso-{Guid.NewGuid():N}.bin");
+try
+{
+    File.WriteAllBytes(isoPath, CreateSyntheticRawIso());
+    using var rawImage = new RawMode1Image(isoPath, 20);
+    var syntheticIso = new Iso9660(rawImage);
+    var textFile = syntheticIso.Files.Single();
+    Check(textFile.Path == "TEST.TXT" && Encoding.ASCII.GetString(syntheticIso.ReadFile(textFile)) == "DATA", "synthetic raw ISO is traversed and read");
+    Check(Throws<EndOfStreamException>(() => rawImage.Read(20L * 2048, 1)), "raw image rejects reads past data track");
+}
+finally
+{
+    if (File.Exists(isoPath)) File.Delete(isoPath);
+}
+
+var resPath = Path.Combine(Path.GetTempPath(), $"conqueror-res-{Guid.NewGuid():N}.res");
+try
+{
+    File.WriteAllBytes(resPath, CreateSyntheticDynamixArchive());
+    var archive = new DynamixArchive(resPath);
+    var entry = archive.Entries.Single();
+    Check(entry.Name == "Greeting" && entry.IsStored && entry.Offset == 8 && Encoding.ASCII.GetString(archive.ReadDecoded(entry)) == "HELLO", "Dynamix archive directory and stored entry decode");
+    var corrupt = File.ReadAllBytes(resPath);
+    BinaryPrimitives.WriteUInt32LittleEndian(corrupt.AsSpan(13 + 4 + 48, 4), uint.MaxValue);
+    File.WriteAllBytes(resPath, corrupt);
+    Check(Throws<InvalidDataException>(() => new DynamixArchive(resPath)), "Dynamix archive rejects out-of-bounds entry");
+}
+finally
+{
+    if (File.Exists(resPath)) File.Delete(resPath);
+}
 
 var campaign = new Campaign(Campaign.NewFromTemplate(1));
 Check(campaign.State.Player.Wealth == 490, "Ronald starting wealth");
@@ -181,6 +238,73 @@ finally
     if (Directory.Exists(contentRoot)) Directory.Delete(contentRoot, true);
 }
 
+}
+catch (Exception error)
+{
+    Console.Error.WriteLine($"FAIL  unexpected {error.GetType().Name}: {error.Message}");
+    failed++;
+}
+
 Console.WriteLine();
 Console.WriteLine($"Result: {passed} passed, {failed} failed, {passed + failed} total.");
 Environment.ExitCode = failed == 0 ? 0 : 1;
+
+static bool Throws<T>(Action action) where T : Exception
+{
+    try { action(); return false; }
+    catch (T) { return true; }
+}
+
+static byte[] CreateSyntheticRawIso()
+{
+    const int rawSector = 2352;
+    const int payloadOffset = 16;
+    const int payloadSize = 2048;
+    var raw = new byte[20 * rawSector];
+    var pvd = new byte[payloadSize];
+    pvd[0] = 1; Encoding.ASCII.GetBytes("CD001").CopyTo(pvd, 1); pvd[6] = 1;
+    WriteIsoRecord(pvd, 156, 17, payloadSize, 2, [0]);
+    CopyPayload(raw, 16, pvd);
+
+    var directory = new byte[payloadSize];
+    var offset = WriteIsoRecord(directory, 0, 17, payloadSize, 2, [0]);
+    offset += WriteIsoRecord(directory, offset, 17, payloadSize, 2, [1]);
+    WriteIsoRecord(directory, offset, 18, 4, 0, Encoding.ASCII.GetBytes("TEST.TXT;1"));
+    CopyPayload(raw, 17, directory);
+    CopyPayload(raw, 18, Encoding.ASCII.GetBytes("DATA"));
+    return raw;
+
+    static void CopyPayload(byte[] target, int sector, byte[] payload) => Buffer.BlockCopy(payload, 0, target, sector * rawSector + payloadOffset, payload.Length);
+}
+
+static int WriteIsoRecord(byte[] target, int offset, uint extent, int size, byte flags, byte[] name)
+{
+    var length = 33 + name.Length + (name.Length % 2 == 0 ? 1 : 0);
+    target[offset] = (byte)length;
+    BinaryPrimitives.WriteUInt32LittleEndian(target.AsSpan(offset + 2, 4), extent);
+    BinaryPrimitives.WriteUInt32BigEndian(target.AsSpan(offset + 6, 4), extent);
+    BinaryPrimitives.WriteUInt32LittleEndian(target.AsSpan(offset + 10, 4), (uint)size);
+    BinaryPrimitives.WriteUInt32BigEndian(target.AsSpan(offset + 14, 4), (uint)size);
+    target[offset + 25] = flags;
+    BinaryPrimitives.WriteUInt16LittleEndian(target.AsSpan(offset + 28, 2), 1);
+    BinaryPrimitives.WriteUInt16BigEndian(target.AsSpan(offset + 30, 2), 1);
+    target[offset + 32] = (byte)name.Length;
+    name.CopyTo(target, offset + 33);
+    return length;
+}
+
+static byte[] CreateSyntheticDynamixArchive()
+{
+    const int directoryOffset = 13;
+    var bytes = new byte[directoryOffset + 4 + 52];
+    ".RES"u8.CopyTo(bytes);
+    BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(4, 4), directoryOffset);
+    "HELLO"u8.CopyTo(bytes.AsSpan(8, 5));
+    BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(directoryOffset, 4), 1);
+    var record = bytes.AsSpan(directoryOffset + 4, 52);
+    "Greeting"u8.CopyTo(record);
+    BinaryPrimitives.WriteUInt32LittleEndian(record.Slice(40, 4), 5);
+    BinaryPrimitives.WriteUInt32LittleEndian(record.Slice(44, 4), 5);
+    BinaryPrimitives.WriteUInt32LittleEndian(record.Slice(48, 4), 8);
+    return bytes;
+}
