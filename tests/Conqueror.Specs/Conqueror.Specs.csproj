@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Conqueror.Core/Conqueror.Core.csproj" />
+    <ProjectReference Include="../../src/Conqueror.Game/Conqueror.Game.csproj" />
+  </ItemGroup>
+</Project>

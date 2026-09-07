@@ -1,0 +1,137 @@
+namespace Conqueror.Core;
+
+public sealed record CropBalance(int Cost, int NormalRevenueAt50, int HarvestRevenueAt50, int Serfs = 5);
+public sealed record ForestBalance(int Cost, int RevenueAt50, int Serfs);
+public sealed record UnitBalance(int PriceAt50, int PriceAt100, int UpkeepAt50, int UpkeepAt100);
+public sealed record EquipmentBalance(string Name, int BuyPrice, int Armor, int Power, bool Shop = true, EquipmentSlot Slot = EquipmentSlot.Weapon);
+public sealed record BuildingDefinition(BuildingKind Kind, string Name, int Cost, int ProductivityBonus, bool Repeatable = false);
+public sealed record CourtshipReward(int Win, int Wealth = 0, string? Item = null);
+public sealed record CourtshipDefinition(string Name, bool CourtAble, int MinHonor, int? MaxPiety, bool FameWaivesPiety, int MarriageWins, CourtshipReward[] Rewards);
+public sealed record VictoryDefinition(VictoryKind Kind, int LocationIndex, int RequiredFiefs, int RequiredArmy, int RequiredStrength, string[] RequiredItems);
+public sealed record GrowthBand(double MinimumCapacity, double MonthlyRate);
+public sealed record StrategicDefinition(int SpyCost, int InterceptionPercent, int MinimumFieldArmy);
+public sealed record TournamentOpponentDefinition(string Name, int Wager, int JoustTolerance, int Swordsmen, int Halberdiers, int Knights);
+
+public static class Balance
+{
+    public const int StartingYear = 1086;
+    public const int StartingAge = 18;
+    public const int FinalAge = 30;
+    public const int StartingCustomWealth = 240;
+    public const int MaxLoan = 200;
+    public const decimal LoanInterest = 0.50m;
+    public static readonly StrategicDefinition Strategy = new(80, 98, 9);
+
+    public static readonly TournamentOpponentDefinition[] TournamentOpponents =
+    [
+        new("Simon", 20, 20, 3, 3, 2),
+        new("Richard", 35, 18, 2, 3, 3),
+        new("Gerard", 50, 16, 3, 2, 3),
+        new("Gilbert", 65, 14, 3, 3, 2),
+        new("Hugh", 80, 12, 2, 3, 3)
+    ];
+
+    public static readonly IReadOnlyDictionary<CropType, CropBalance> Crops = new Dictionary<CropType, CropBalance>
+    {
+        [CropType.Grain] = new(1, 2, 25), [CropType.Beans] = new(1, 2, 25),
+        [CropType.Vegetables] = new(1, 10, 10), [CropType.Fruit] = new(5, 5, 5)
+    };
+
+    public static readonly IReadOnlyDictionary<ForestIndustry, ForestBalance> Forest = new Dictionary<ForestIndustry, ForestBalance>
+    {
+        [ForestIndustry.Timber] = new(5, 5, 5), [ForestIndustry.IronMine] = new(400, 15, 10),
+        [ForestIndustry.CoalMine] = new(400, 31, 10), [ForestIndustry.GoldMine] = new(400, 36, 10),
+        [ForestIndustry.SilverMine] = new(400, 15, 10)
+    };
+
+    public static readonly IReadOnlyDictionary<UnitType, UnitBalance> Units = new Dictionary<UnitType, UnitBalance>
+    {
+        [UnitType.Swordsmen] = new(28, 20, 12, 8),
+        [UnitType.Halberdiers] = new(23, 15, 8, 5),
+        [UnitType.Knights] = new(32, 24, 16, 10)
+    };
+
+    public static readonly IReadOnlyDictionary<UnitType, UnitType> Counters = new Dictionary<UnitType, UnitType>
+    {
+        [UnitType.Swordsmen] = UnitType.Halberdiers,
+        [UnitType.Halberdiers] = UnitType.Knights,
+        [UnitType.Knights] = UnitType.Swordsmen
+    };
+
+    public static readonly GrowthBand[] PopulationGrowth =
+    [
+        new(1.00, .07), new(.50, .06), new(.36, .05), new(.29, .04),
+        new(.21, .03), new(double.Epsilon, .01), new(0, -.017)
+    ];
+
+    public static readonly CharacterTemplate[] Templates =
+    [
+        new("Chaunce Norman", new(8, 8, 8, 8, 8), 240),
+        new("Ronald DeMille", new(9, 8, 8, 10, 10), 490),
+        new("Hayward Tussle", new(20, 20, 8, 16, 10), 740),
+        new("Spencer Goodman", new(18, 16, 18, 19, 20), 1240),
+        new("Mordred Knatchbull", new(18, 17, 0, 15, 0), 1240),
+        new("Simon Hakluyt", new(7, 4, 4, 7, 2), 240)
+    ];
+
+    public static readonly IReadOnlyDictionary<BuildingKind, BuildingDefinition> Buildings = new Dictionary<BuildingKind, BuildingDefinition>
+    {
+        [BuildingKind.House] = new(BuildingKind.House, "House", 5, 0, true),
+        [BuildingKind.Church] = new(BuildingKind.Church, "Church", 100, 15),
+        [BuildingKind.Monastery] = new(BuildingKind.Monastery, "Monastery", 150, 15),
+        [BuildingKind.Steward] = new(BuildingKind.Steward, "Steward", 20, 10),
+        [BuildingKind.Beadle] = new(BuildingKind.Beadle, "Beadle", 10, 5),
+        [BuildingKind.Priest] = new(BuildingKind.Priest, "Priest", 10, 5),
+        [BuildingKind.ServantRoom] = new(BuildingKind.ServantRoom, "Servant Room", 50, 0),
+        [BuildingKind.Woodward] = new(BuildingKind.Woodward, "Woodward", 10, 5)
+    };
+
+    public static readonly EquipmentBalance[] Equipment =
+    [
+        new("Kingslayer Sword", 4000, 0, 182), new("Mercenary's Sword", 2800, 0, 174),
+        new("Bishop's Sword", 3200, 0, 171), new("Thruster's Sword", 1500, 0, 143),
+        new("Armor-Ripping Sword", 850, 0, 144), new("Defender's Sword", 900, 0, 130),
+        new("Knight's Sword", 700, 0, 129), new("Irish Sword", 500, 0, 131),
+        new("Battle Sword", 500, 0, 122), new("Danish Sword", 450, 0, 113),
+        new("General Sword", 300, 0, 99), new("Heavy Crossbow", 0, 0, 143, false),
+        new("Light Crossbow", 0, 0, 130, false), new("Spiked Mace", 90, 0, 138),
+        new("Flanged Mace", 100, 0, 103), new("Battle Axe", 300, 0, 122),
+        new("Horseman's Axe", 210, 0, 97), new("Saxon Axe", 120, 0, 82),
+        new("Basic Axe", 122, 0, 81), new("War Hammer", 100, 0, 101),
+        new("Hammer", 130, 0, 85), new("Stiletto Dagger", 34, 0, 68),
+        new("Thruster's Dagger", 44, 0, 61), new("Fighter's Dagger", 0, 0, 60, false),
+        new("Decorative Dagger", 100, 0, 34),
+        new("Full Plate", 5000, 35, 0, Slot: EquipmentSlot.Body), new("Half Plate", 3000, 30, 0, Slot: EquipmentSlot.Body),
+        new("Quarter Plate", 1600, 25, 0, Slot: EquipmentSlot.Body), new("Chain Hauberk", 1800, 20, 0, Slot: EquipmentSlot.Body),
+        new("Chain Tunic", 1200, 15, 0, Slot: EquipmentSlot.Body), new("Leather", 800, 10, 0, Slot: EquipmentSlot.Body), new("Gambeson", 400, 5, 0, Slot: EquipmentSlot.Body),
+        new("Heraldic Shield", 600, 10, 0, Slot: EquipmentSlot.Shield), new("Norman Shield", 200, 10, 0, Slot: EquipmentSlot.Shield),
+        new("Decorative Shield", 300, 5, 0, Slot: EquipmentSlot.Shield), new("Saxon Shield", 120, 5, 0, Slot: EquipmentSlot.Shield),
+        new("Tilting Shield", 50, 0, 0, Slot: EquipmentSlot.Shield), new("Great War Helm", 300, 15, 0, Slot: EquipmentSlot.Helm),
+        new("War Helm", 180, 10, 0, Slot: EquipmentSlot.Helm), new("Norman Helm", 120, 5, 0, Slot: EquipmentSlot.Helm), new("Footman's Helm", 60, 0, 0, Slot: EquipmentSlot.Helm)
+    ];
+
+    public static readonly CourtshipDefinition[] Courtships =
+    [
+        new("Adela", false, 0, null, false, 0, []),
+        new("Jane", true, 8, null, false, 6,
+        [new(1, Item:"Medallion"), new(2, Item:"Decorative Dagger"), new(3, Item:"Defender's Sword"), new(4, Item:"Hammer"), new(5, Item:"Dragon Slaying Lance")]),
+        new("Anna Lisa", true, 8, 15, true, 3, [new(1, 5), new(2, 10)]),
+        new("Victoria", true, 8, 15, false, 7,
+        [new(3, Item:"Thruster's Dagger"), new(5, Item:"Saxon Axe"), new(6, Item:"Dragon Stone")]),
+        new("Wendessa", true, 8, null, false, 7,
+        [new(3, Item:"Dragon Stone"), new(4, Item:"Knight's Sword"), new(5, Item:"Shield of St. George")]),
+        new("Valetta", true, 8, null, false, 5, [new(5, Item:"Dragon Slaying Armor")])
+    ];
+
+    public static readonly IReadOnlyDictionary<VictoryKind, VictoryDefinition> Victories = new Dictionary<VictoryKind, VictoryDefinition>
+    {
+        [VictoryKind.Crown] = new(VictoryKind.Crown, 1, 0, 1, 0, []),
+        [VictoryKind.Dragon] = new(VictoryKind.Dragon, World.Locations.Length - 1, 0, 0, 16,
+            ["Dragon Slaying Armor", "Shield of St. George", "Dragon Slaying Lance"])
+    };
+
+    public static int ScaleFrom50(int at50, int at100, int productivity) =>
+        productivity <= 50 ? at50 : (int)Math.Round(at50 + (at100 - at50) * ((productivity - 50) / 50d));
+
+    public static UnitType Counter(UnitType type) => Counters[type];
+}

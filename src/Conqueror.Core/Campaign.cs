@@ -1,0 +1,496 @@
+using System.Text.Json;
+
+namespace Conqueror.Core;
+
+public sealed class Campaign
+{
+    public CampaignState State { get; private set; }
+    private readonly Random _random;
+
+    public Campaign(CampaignState? state = null, int seed = 1086)
+    {
+        State = state ?? NewFromTemplate(1);
+        _random = new Random(seed);
+        EnsureStrategicState();
+    }
+
+    public static CampaignState NewFromTemplate(int index)
+    {
+        var template = Balance.Templates[Math.Clamp(index, 0, Balance.Templates.Length - 1)];
+        return new CampaignState { Player = new Player { Name = "Sir " + template.Name, Stats = template.Stats, Wealth = template.Wealth } };
+    }
+
+    public static CampaignState NewCustom(string name, int seed)
+    {
+        var r = new Random(seed);
+        int Roll() => r.Next(2, 13);
+        return new CampaignState { Player = new Player { Name = name, Stats = new(Roll(), Roll(), Roll(), Roll(), Roll()), Wealth = Balance.StartingCustomWealth } };
+    }
+
+    public bool AnswerDilemma(int choice)
+    {
+        if (State.YouthDilemmasAnswered >= Youth.Dilemmas.Length || choice is < 0 or > 2) return false;
+        var answer = Youth.Dilemmas[State.YouthDilemmasAnswered].Choices[choice];
+        var s = State.Player.Stats;
+        var d = answer.Delta;
+        State.Player.Stats = new CharacterStats(s.Strength + d.Strength, s.Dexterity + d.Dexterity, s.Piety + d.Piety, s.Stamina + d.Stamina, s.Honor + d.Honor).Clamp();
+        State.Player.Wealth += answer.Wealth;
+        if (answer.Item is not null) State.Player.Inventory.Items.Add(answer.Item);
+        State.YouthDilemmasAnswered++;
+        Log($"Youth: {answer.Text}.");
+        return true;
+    }
+
+    public int TravelTo(int location)
+    {
+        if (location < 0 || location >= World.Locations.Length || State.PendingEnemyArmy is not null) return 0;
+        var origin = State.CurrentLocation;
+        var days = World.TravelDays(State.CurrentLocation, location);
+        AdvanceDays(days);
+        State.PreviousLocation = origin;
+        State.CurrentLocation = location;
+        Log($"Arrived at {World.Locations[location].Name} after {days} days.");
+        if (days > 0 && State.Player.Army.Total > 0 && IsHostileStronghold(location) && GarrisonAt(location) > 0
+            && _random.Next(100) < Balance.Strategy.InterceptionPercent)
+        {
+            State.PendingFieldLocation = location;
+            State.PendingEnemyArmy = CreateArmy(GarrisonAt(location));
+            Log($"The garrison of {World.Locations[location].Name} intercepts your army.");
+        }
+        return days;
+    }
+
+    public bool HasPendingFieldBattle => State.PendingEnemyArmy is not null;
+
+    public bool CanStartFieldBattle => HasPendingFieldBattle
+        || (IsHostileStronghold(State.CurrentLocation) && GarrisonAt(State.CurrentLocation) > 0);
+
+    public int GarrisonAt(int location) => State.GarrisonStrength.GetValueOrDefault(location);
+
+    public bool HasGarrisonIntel(int location) => location == 0 || State.ConqueredLocations.Contains(location) || State.SpiedLocations.Contains(location);
+
+    public bool SendSpy(int location)
+    {
+        if (!IsHostileStronghold(location) || State.SpiedLocations.Contains(location)
+            || !Spend(Balance.Strategy.SpyCost, $"spy sent to {World.Locations[location].Name}")) return false;
+        State.SpiedLocations.Add(location);
+        Log($"The spy reports {GarrisonAt(location)} soldiers guarding {World.Locations[location].Name}.");
+        return true;
+    }
+
+    public bool StartSiege(int location)
+    {
+        if (location <= 0 || location >= World.Locations.Length || location != State.CurrentLocation || State.Player.Army.Total == 0
+            || State.ConqueredLocations.Contains(location) || State.PendingEnemyArmy is not null) return false;
+        var target = World.Locations[location];
+        if (target.Kind is not (LocationKind.Castle or LocationKind.London)) return false;
+        State.PendingSiegeLocation = location;
+        return true;
+    }
+
+    public bool IsTournamentHere => State.CurrentLocation == World.TournamentIndex(State.Date);
+    private int CurrentTournamentToken => State.Date.Year * 12 + State.Date.Month;
+
+    private void RefreshTournament()
+    {
+        if (State.TournamentToken == CurrentTournamentToken) return;
+        State.TournamentToken = CurrentTournamentToken;
+        State.JoustsThisTournament = 0;
+        State.SkirmishedThisTournament = false;
+    }
+
+    public bool Spend(int amount, string reason)
+    {
+        if (amount < 0 || State.Player.Wealth < amount) return false;
+        State.Player.Wealth -= amount;
+        Log($"Spent {amount}s: {reason}.");
+        return true;
+    }
+
+    public bool Borrow(int amount)
+    {
+        if (amount <= 0 || amount > Balance.MaxLoan || State.Player.Debt != 0) return false;
+        State.Player.Wealth += amount;
+        State.Player.Debt = amount + (int)(amount * Balance.LoanInterest);
+        Log($"Borrowed {amount}s; {State.Player.Debt}s due at harvest.");
+        return true;
+    }
+
+    public bool Donate(int amount = 15)
+    {
+        if (!Spend(amount, "church donation")) return false;
+        State.Player.Stats = State.Player.Stats with { Piety = Math.Min(20, State.Player.Stats.Piety + 1) };
+        return true;
+    }
+
+    public bool Plant(CropType crop)
+    {
+        var f = State.Player.Home;
+        var rule = Balance.Crops[crop];
+        if (State.Date.Month != 3 || f.AvailableSerfs < rule.Serfs || !Spend(rule.Cost, $"plant {crop}")) return false;
+        f.Crops[crop]++;
+        return true;
+    }
+
+    public bool DevelopForest(ForestIndustry industry)
+    {
+        var f = State.Player.Home;
+        var rule = Balance.Forest[industry];
+        if (f.AvailableSerfs < rule.Serfs || !Spend(rule.Cost, industry.ToString())) return false;
+        f.Forest[industry]++;
+        return true;
+    }
+
+    public bool Recruit(UnitType type)
+    {
+        var f = State.Player.Home;
+        var price = Balance.ScaleFrom50(Balance.Units[type].PriceAt50, Balance.Units[type].PriceAt100, f.Productivity());
+        if (!Spend(price, $"recruit {type}")) return false;
+        State.Player.Army.Units[type]++;
+        return true;
+    }
+
+    public bool BuyEquipment(string name)
+    {
+        var item = Balance.Equipment.FirstOrDefault(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        if (item is null || !item.Shop || item.BuyPrice <= 0 || State.Player.Inventory.Items.Contains(item.Name) || !Spend(item.BuyPrice, item.Name)) return false;
+        var inventory = State.Player.Inventory;
+        inventory.Items.Add(item.Name);
+        inventory.Equip(item);
+        return true;
+    }
+
+    public bool SellEquipment(string name)
+    {
+        var item = Balance.Equipment.FirstOrDefault(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        var inventory = State.Player.Inventory;
+        if (item is null || item.BuyPrice <= 0 || !inventory.Items.Remove(item.Name)) return false;
+        State.Player.Wealth += item.BuyPrice * 3 / 4;
+        if (inventory.Weapon.Equals(item.Name, StringComparison.OrdinalIgnoreCase) || inventory.Armor.Equals(item.Name, StringComparison.OrdinalIgnoreCase)
+            || inventory.Shield.Equals(item.Name, StringComparison.OrdinalIgnoreCase) || inventory.Helm.Equals(item.Name, StringComparison.OrdinalIgnoreCase)) inventory.Unequip(item.Slot);
+        Log($"Sold {item.Name} for {item.BuyPrice * 3 / 4}s.");
+        return true;
+    }
+
+    public int Retreat()
+    {
+        var army = State.Player.Army;
+        var losses = army.Total == 0 ? 0 : Math.Clamp((int)Math.Ceiling(army.Total * (.50 + _random.NextDouble() * .25)), 1, army.Total);
+        army.RemoveUnits(losses);
+        Log($"Retreat cost {losses} soldiers.");
+        return losses;
+    }
+
+    public bool Build(string building)
+    {
+        var definition = Balance.Buildings.Values.FirstOrDefault(x => x.Name.Equals(building, StringComparison.OrdinalIgnoreCase));
+        return definition is not null && Build(definition.Kind);
+    }
+
+    public bool Build(BuildingKind kind)
+    {
+        if (!Balance.Buildings.TryGetValue(kind, out var definition)) return false;
+        var fief = State.Player.Home;
+        if ((!definition.Repeatable && fief.Has(kind)) || !Spend(definition.Cost, definition.Name)) return false;
+        fief.Add(kind);
+        return true;
+    }
+
+    public void AdvanceDays(int days)
+    {
+        for (var i = 0; i < days && State.Victory == VictoryKind.None; i++)
+        {
+            var previousMonth = State.Date.Month;
+            var previousYear = State.Date.Year;
+            State.Date = State.Date.AddDays(1);
+            if (State.Date.Month != previousMonth) SettleMonth();
+            if (State.Date.Year != previousYear)
+            {
+                State.Player.Age++;
+                if (State.Player.Age >= Balance.FinalAge) { State.Victory = VictoryKind.Defeat; Log("Your thirtieth birthday arrives before your destiny is fulfilled."); }
+            }
+        }
+    }
+
+    public void SettleMonth()
+    {
+        var p = State.Player;
+        var f = p.Home;
+        var july = State.Date.Month == 7;
+        var productivity = f.Productivity(july);
+        var revenue = f.Crops.Sum(x => x.Value * (july ? Balance.Crops[x.Key].HarvestRevenueAt50 : Balance.Crops[x.Key].NormalRevenueAt50));
+        revenue += f.Forest.Sum(x => x.Value * Balance.Forest[x.Key].RevenueAt50);
+        revenue = (int)Math.Round(revenue * productivity / 50d);
+        revenue += (int)Math.Round(f.Population * f.TaxRate / 1200d);
+        var upkeep = p.Army.Units.Sum(x => x.Value * Balance.ScaleFrom50(Balance.Units[x.Key].UpkeepAt50, Balance.Units[x.Key].UpkeepAt100, productivity));
+        p.Wealth += revenue - upkeep;
+
+        var capacity = Math.Min(f.Houses, f.FoodTiles) * 100;
+        var ratio = f.Population == 0 ? 0 : Math.Clamp(capacity / (double)Math.Ceiling(f.Population * 1.07 / 100d) / 100d, 0, 1);
+        var growthRate = Balance.PopulationGrowth.First(x => ratio >= x.MinimumCapacity).MonthlyRate;
+        growthRate *= productivity / 50d;
+        if (f.TaxRate > 10) growthRate *= .93;
+        f.Population = Math.Max(0, (int)Math.Round(f.Population * (1 + growthRate)));
+
+        if (july && p.Debt > 0)
+        {
+            if (p.Wealth >= p.Debt) { p.Wealth -= p.Debt; Log($"Repaid {p.Debt}s to the moneylender."); }
+            else { Log("The moneylender sends Drogo to collect the harvest debt."); }
+            p.Debt = 0;
+        }
+        Log($"Month settled: +{revenue}s revenue, -{upkeep}s upkeep, {productivity}% productivity.");
+    }
+
+    public BattleResult FightFieldBattle(Army enemy)
+    {
+        var result = Combat.Resolve(State.Player.Army, enemy, _random);
+        State.Player.SwordExperience += result.Won ? 2 : 1;
+        if (result.Won) State.Player.Fame++;
+        Log(result.Summary);
+        return result;
+    }
+
+    public FieldBattleSession CreateFieldBattle()
+    {
+        var location = State.PendingFieldLocation >= 0 ? State.PendingFieldLocation : State.CurrentLocation;
+        var strength = GarrisonAt(location);
+        if (State.PendingEnemyArmy is null && (!IsHostileStronghold(location) || strength <= 0))
+            throw new InvalidOperationException("There is no hostile field army here.");
+        var enemy = State.PendingEnemyArmy ?? CreateArmy(Math.Max(Balance.Strategy.MinimumFieldArmy, strength));
+        State.PendingFieldLocation = location;
+        State.PendingEnemyArmy = enemy;
+        return new FieldBattleSession(State.Player.Army, enemy, State.Date.DayOfYear + State.CurrentLocation * 37);
+    }
+
+    public FieldBattleOutcome FinishFieldBattle(FieldBattleSession battle)
+    {
+        var survivors = battle.FriendlySurvivors();
+        foreach (var type in Enum.GetValues<UnitType>()) State.Player.Army.Units[type] = survivors.Units[type];
+        var enemySurvivors = battle.EnemySurvivors();
+        if (State.PendingFieldLocation >= 0) State.GarrisonStrength[State.PendingFieldLocation] = enemySurvivors.Total;
+        State.Player.SwordExperience += battle.Outcome == FieldBattleOutcome.Victory ? 2 : 1;
+        if (battle.Outcome == FieldBattleOutcome.Victory) { State.Player.Fame++; Log("Your army holds the field."); }
+        else
+        {
+            if (battle.Outcome == FieldBattleOutcome.Withdrawn) Retreat();
+            else Log("Your army is defeated in the field.");
+            State.CurrentLocation = State.PreviousLocation;
+            Log($"Your survivors fall back to {World.Locations[State.CurrentLocation].Name}.");
+        }
+        State.PendingFieldLocation = -1;
+        State.PendingEnemyArmy = null;
+        return battle.Outcome;
+    }
+
+    public void WinSiege()
+    {
+        if (State.PendingSiegeLocation >= 0)
+        {
+            State.ConqueredLocations.Add(State.PendingSiegeLocation);
+            State.GarrisonStrength[State.PendingSiegeLocation] = 0;
+        }
+        var captured = State.PendingSiegeLocation >= 0 ? World.Locations[State.PendingSiegeLocation] : null;
+        State.PendingSiegeLocation = -1;
+        State.CastlesConquered++;
+        State.Player.Fiefs++;
+        State.Player.Villages += captured?.Villages ?? _random.Next(1, 4);
+        State.Player.Fame += 2;
+        State.Player.SwordExperience += 5;
+        State.Player.Stats = State.Player.Stats with { Strength = Math.Min(20, State.Player.Stats.Strength + 1) };
+        var spoils = _random.Next(80, 221);
+        State.Player.Wealth += spoils;
+        State.Player.ConquestWinnings += spoils;
+        Log($"Castle taken. Spoils: {spoils}s.");
+    }
+
+    private bool IsHostileStronghold(int location)
+    {
+        if (location <= 0 || location >= World.Locations.Length || State.ConqueredLocations.Contains(location)) return false;
+        return World.Locations[location].Kind is LocationKind.Castle or LocationKind.London;
+    }
+
+    private static Army CreateArmy(int strength)
+    {
+        var enemy = new Army();
+        enemy.Units[UnitType.Swordsmen] = strength / 3;
+        enemy.Units[UnitType.Halberdiers] = strength / 3;
+        enemy.Units[UnitType.Knights] = strength - enemy.Units[UnitType.Swordsmen] - enemy.Units[UnitType.Halberdiers];
+        return enemy;
+    }
+
+    private void EnsureStrategicState()
+    {
+        foreach (var (location, index) in World.Locations.Select((location, index) => (location, index)))
+            if (location.Kind is LocationKind.Castle or LocationKind.London)
+                State.GarrisonStrength.TryAdd(index, State.ConqueredLocations.Contains(index) ? 0 : location.Garrison);
+        if (State.PendingFieldLocation < 0) State.PendingEnemyArmy = null;
+    }
+
+    public SiegeSession CreateSiege()
+    {
+        if (State.PendingSiegeLocation < 0) throw new InvalidOperationException("No siege has been started.");
+        var target = World.Locations[State.PendingSiegeLocation];
+        return new SiegeSession(State.Player, target.Garrison, State.Date.DayOfYear + State.PendingSiegeLocation * 1086);
+    }
+
+    public bool FinishSiege(SiegeSession siege)
+    {
+        var location = State.PendingSiegeLocation;
+        State.Player.Army.RemoveUnits(siege.RetainerLosses);
+        if (!siege.Won)
+        {
+            Log(siege.Defeated ? "You are carried unconscious from the keep." : "The assault is abandoned.");
+            State.PendingSiegeLocation = -1;
+            return false;
+        }
+        WinSiege();
+        if (location == Balance.Victories[VictoryKind.Crown].LocationIndex)
+        {
+            State.Victory = VictoryKind.Crown;
+            Log("London falls. William is overthrown and you take the crown of England.");
+        }
+        return true;
+    }
+
+    public bool Joust(int accuracy, int opponentIndex = 2)
+    {
+        RefreshTournament();
+        if (!IsTournamentHere) { Log("There is no tournament here this month."); return false; }
+        if (State.JoustsThisTournament >= 3) { Log("You have already ridden three jousts this tournament."); return false; }
+        var opponent = Balance.TournamentOpponents[Math.Clamp(opponentIndex, 0, Balance.TournamentOpponents.Length - 1)];
+        if (!Spend(opponent.Wager, $"joust wager against {opponent.Name}")) return false;
+        State.JoustsThisTournament++;
+        var won = accuracy <= opponent.JoustTolerance;
+        if (won)
+        {
+            State.Player.LanceExperience = Math.Min(20, State.Player.LanceExperience + 1);
+            State.Player.Stats = State.Player.Stats with
+            {
+                Dexterity = Math.Min(20, State.Player.Stats.Dexterity + (State.Player.LanceExperience % 4 == 0 ? 1 : 0)),
+                Honor = Math.Min(20, State.Player.Stats.Honor + 1)
+            };
+            State.Player.Wealth += opponent.Wager * 2;
+            State.Player.TournamentWinnings += opponent.Wager;
+            if (State.Player.LadyColors is { } lady) RewardCourtship(lady);
+            Log($"Joust won against {opponent.Name}: {opponent.Wager}s profit and honor gained.");
+        }
+        else Log($"Unhorsed by {opponent.Name}; the {opponent.Wager}s wager is lost.");
+        return won;
+    }
+
+    public BattleResult? TournamentSkirmish(int opponentIndex = 2)
+    {
+        RefreshTournament();
+        if (!IsTournamentHere || State.SkirmishedThisTournament) { Log("No further skirmish is available at this tournament."); return null; }
+        var opponent = Balance.TournamentOpponents[Math.Clamp(opponentIndex, 0, Balance.TournamentOpponents.Length - 1)];
+        if (!Spend(opponent.Wager, $"skirmish wager against {opponent.Name}")) return null;
+        State.SkirmishedThisTournament = true;
+        var friendly = new Army(); var enemy = new Army();
+        friendly.Units[UnitType.Swordsmen] = 3; friendly.Units[UnitType.Halberdiers] = 3; friendly.Units[UnitType.Knights] = 2;
+        enemy.Units[UnitType.Swordsmen] = opponent.Swordsmen;
+        enemy.Units[UnitType.Halberdiers] = opponent.Halberdiers;
+        enemy.Units[UnitType.Knights] = opponent.Knights;
+        var result = Combat.Resolve(friendly, enemy, _random);
+        State.Player.SwordExperience++;
+        if (result.Won)
+        {
+            State.Player.Wealth += opponent.Wager * 2;
+            State.Player.TournamentWinnings += opponent.Wager;
+        }
+        Log($"Tournament skirmish against {opponent.Name} {(result.Won ? $"won for {opponent.Wager}s profit" : $"lost with a {opponent.Wager}s wager")}.");
+        return result;
+    }
+
+    public bool AttemptCrown()
+    {
+        return AttemptVictory(VictoryKind.Crown);
+    }
+
+    public bool AttemptDragon()
+    {
+        return AttemptVictory(VictoryKind.Dragon);
+    }
+
+    public bool AttemptVictory(VictoryKind kind)
+    {
+        if (!Balance.Victories.TryGetValue(kind, out var definition)) return false;
+        var p = State.Player;
+        var missingItems = definition.RequiredItems.Where(x => !p.Inventory.Items.Contains(x)).ToArray();
+        if (State.CurrentLocation != definition.LocationIndex || p.Fiefs < definition.RequiredFiefs || p.Army.Total < definition.RequiredArmy
+            || p.Stats.Strength < definition.RequiredStrength || missingItems.Length > 0)
+        {
+            Log($"Requirements not met for {kind}: travel to {World.Locations[definition.LocationIndex].Name}, fiefs {definition.RequiredFiefs}, army {definition.RequiredArmy}, strength {definition.RequiredStrength}, items {string.Join(", ", definition.RequiredItems)}.");
+            return false;
+        }
+        State.Victory = kind;
+        Log(kind == VictoryKind.Crown ? "William is overthrown. You take the crown of England." : "The dragon falls. England hails its champion.");
+        return true;
+    }
+
+    public bool RequestColors(string lady)
+    {
+        if (!IsTournamentHere) { Log("Courtship takes place at the tournament stands."); return false; }
+        var definition = Balance.Courtships.FirstOrDefault(x => x.Name.Equals(lady, StringComparison.OrdinalIgnoreCase));
+        if (definition is null || !definition.CourtAble) { Log($"{lady} cannot be courted."); return false; }
+        var p = State.Player;
+        var pietyBlocked = definition.MaxPiety is { } maximum && p.Stats.Piety > maximum && (!definition.FameWaivesPiety || p.Fame == 0);
+        if (p.Stats.Honor < definition.MinHonor || pietyBlocked) { Log($"{lady} declines your request for her colors."); return false; }
+        p.LadyColors = definition.Name;
+        Log($"{definition.Name} grants you her colors for the next joust.");
+        return true;
+    }
+
+    private void RewardCourtship(string lady)
+    {
+        var p = State.Player;
+        var wins = p.CourtshipWins.GetValueOrDefault(lady) + 1;
+        p.CourtshipWins[lady] = wins;
+        p.LadyColors = null;
+        var definition = Balance.Courtships.Single(x => x.Name.Equals(lady, StringComparison.OrdinalIgnoreCase));
+        var reward = definition.Rewards.FirstOrDefault(x => x.Win == wins);
+        if (reward is not null && reward.Wealth > 0) { p.Wealth += reward.Wealth; Log($"{lady} rewards you with {reward.Wealth}s."); }
+        if (reward?.Item is not null) { p.Inventory.Items.Add(reward.Item); Log($"{lady} rewards you with {reward.Item}."); }
+        if (definition.MarriageWins > 0 && wins >= definition.MarriageWins) p.Wife = definition.Name;
+    }
+
+    public void Save(string path)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
+        File.WriteAllText(path, JsonSerializer.Serialize(State, new JsonSerializerOptions { WriteIndented = true }));
+    }
+
+    public static Campaign Load(string path, int seed = 1086) => new(JsonSerializer.Deserialize<CampaignState>(File.ReadAllText(path)) ?? throw new InvalidDataException("Invalid campaign save."), seed);
+    public void Log(string text) { State.Journal.Add($"{State.Date:dd MMM yyyy}: {text}"); if (State.Journal.Count > 60) State.Journal.RemoveAt(0); }
+}
+
+public sealed record BattleResult(bool Won, int FriendlyLosses, int EnemyLosses, string Summary);
+
+public static class Combat
+{
+    public static BattleResult Resolve(Army friendly, Army enemy, Random random)
+    {
+        var friendlyStart = friendly.Total;
+        var enemyStart = enemy.Total;
+        if (friendlyStart == 0) return new(false, 0, 0, "No army stands with you.");
+        var friendlyPower = Power(friendly, enemy) * (.9 + random.NextDouble() * .2);
+        var enemyPower = Power(enemy, friendly) * (.9 + random.NextDouble() * .2);
+        var won = friendlyPower >= enemyPower;
+        var friendlyLosses = Math.Min(friendlyStart, (int)Math.Round(enemyPower / Math.Max(1, friendlyPower) * friendlyStart * (won ? .32 : .72)));
+        var enemyLosses = Math.Min(enemyStart, (int)Math.Round(friendlyPower / Math.Max(1, enemyPower) * enemyStart * (won ? .72 : .32)));
+        ApplyLosses(friendly, friendlyLosses);
+        ApplyLosses(enemy, enemyLosses);
+        return new(won, friendlyLosses, enemyLosses, $"Field battle {(won ? "won" : "lost")}: {friendlyLosses} of yours and {enemyLosses} enemies fell.");
+    }
+
+    private static double Power(Army army, Army enemy) => army.Units.Sum(pair =>
+        pair.Value * (1 + enemy.Units[Balance.Counter(pair.Key)] / (double)Math.Max(1, enemy.Total) * .75));
+
+    private static void ApplyLosses(Army army, int losses)
+    {
+        while (losses-- > 0 && army.Total > 0)
+        {
+            var type = army.Units.OrderByDescending(x => x.Value).First().Key;
+            army.Units[type]--;
+        }
+    }
+}
