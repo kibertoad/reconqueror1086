@@ -11,7 +11,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private sealed record DilemmaAnimation(IReadOnlyList<Texture2D> Frames, int FramesPerChoice);
     private sealed record OriginalAnimation(IReadOnlyList<Texture2D> Frames);
 
-    private enum Screen { Title, OptionsHub, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Map, Home, Village, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
+    private enum Screen { Title, OptionsHub, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Map, Home, Farm, Village, Blacksmith, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _batch = null!;
     private Texture2D _pixel = null!;
@@ -34,6 +34,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private IReadOnlyList<UiBounds> _pregeneratedBounds = CharacterCreationDefinitions.PregeneratedCharacters;
     private IReadOnlyList<UiBounds> _dilemmaChoiceBounds = YouthDilemmaPresentationDefinitions.Choices;
     private UiBounds _dilemmaContinueBounds = YouthDilemmaPresentationDefinitions.Continue;
+    private UiBounds _blacksmithBounds = BlacksmithPresentationDefinitions.Blacksmith;
     private int _joustCursor;
     private SiegeSession? _siege;
     private bool _showRadar = true;
@@ -92,6 +93,9 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         var dilemmaLayout = dilemmaLayoutId is null ? null : _importedContent?.DecodeHat(dilemmaLayoutId);
         _dilemmaChoiceBounds = YouthDilemmaPresentationDefinitions.ChoicesFrom(dilemmaLayout);
         _dilemmaContinueBounds = YouthDilemmaPresentationDefinitions.ContinueFrom(dilemmaLayout);
+        var blacksmithLayoutId = _importedContent?.FindId("resource", ":vsmith.hat");
+        var blacksmithLayout = blacksmithLayoutId is null ? null : _importedContent?.DecodeHat(blacksmithLayoutId);
+        _blacksmithBounds = BlacksmithPresentationDefinitions.BlacksmithFrom(blacksmithLayout);
         foreach (var definition in ImportedArt.Definitions)
         {
             var id = _importedContent?.FindId(definition.Kind, definition.IdSuffix);
@@ -170,6 +174,9 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             else if (_screen == Screen.CharacterName) _screen = Screen.CharacterOptions;
             else if (_screen == Screen.CharacterOptions) _screen = Screen.Title;
             else if (_screen == Screen.Character) _screen = Screen.CharacterOptions;
+            else if (_screen == Screen.Farm) _screen = Screen.Home;
+            else if (_screen == Screen.Blacksmith) _screen = Screen.Village;
+            else if (_screen == Screen.Shop) _screen = Screen.Blacksmith;
             else if (_screen == Screen.FieldBattle && _fieldBattle is not null) { _fieldBattle.IssueAll(UnitOrder.Withdraw); _notice = "WITHDRAWAL ORDERED"; }
             else { if (_screen == Screen.Siege && _siege is not null) _campaign.FinishSiege(_siege); _screen = Screen.Map; }
         }
@@ -189,8 +196,10 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.Dilemma: UpdateDilemma(Press, mouse, click); break;
             case Screen.Map: UpdateMap(Press); break;
             case Screen.Home: UpdateHome(Press); break;
+            case Screen.Farm: UpdateFarm(Press); break;
             case Screen.Village: UpdateVillage(Press); break;
-            case Screen.Shop: UpdateShop(Press); break;
+            case Screen.Blacksmith: UpdateBlacksmith(Press, mouse, click); break;
+            case Screen.Shop: UpdateShop(Press, mouse, click); break;
             case Screen.Tournament: UpdateTournament(Press); break;
             case Screen.FieldBattle: UpdateFieldBattle(Press, gameTime); break;
             case Screen.Siege: UpdateSiege(Press); break;
@@ -493,6 +502,13 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void UpdateHome(Func<Keys, bool> press)
     {
+        if (press(Keys.F)) _screen = Screen.Farm;
+        if (press(Keys.V)) _screen = Screen.Village;
+        if (press(Keys.Enter) || press(Keys.H)) _screen = Screen.Map;
+    }
+
+    private void UpdateFarm(Func<Keys, bool> press)
+    {
         if (press(Keys.D1)) _campaign.Build("Steward"); if (press(Keys.D2)) _campaign.Build("Beadle");
         if (press(Keys.D3)) _campaign.Build("Priest"); if (press(Keys.D4)) _campaign.Build("Servant Room");
         if (press(Keys.D5)) _campaign.Build("House"); if (press(Keys.D6)) _campaign.Build("Monastery");
@@ -501,7 +517,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (press(Keys.D9)) _campaign.DevelopForest(ForestIndustry.Timber); if (press(Keys.G)) _campaign.DevelopForest(ForestIndustry.GoldMine);
         if (press(Keys.I)) _campaign.DevelopForest(ForestIndustry.IronMine); if (press(Keys.C)) _campaign.DevelopForest(ForestIndustry.CoalMine); if (press(Keys.S)) _campaign.DevelopForest(ForestIndustry.SilverMine);
         if (press(Keys.Q)) _campaign.Recruit(UnitType.Swordsmen); if (press(Keys.W)) _campaign.Recruit(UnitType.Halberdiers); if (press(Keys.R)) _campaign.Recruit(UnitType.Knights);
-        if (press(Keys.Enter) || press(Keys.H)) _screen = Screen.Map;
+        if (press(Keys.Enter) || press(Keys.H)) _screen = Screen.Home;
     }
 
     private void UpdateVillage(Func<Keys, bool> press)
@@ -512,21 +528,59 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (press(Keys.A)) _notice = _campaign.BuyEquipment("Spiked Mace") ? "BOUGHT AND EQUIPPED SPIKED MACE" : "PURCHASE REFUSED";
         if (press(Keys.N)) _notice = _campaign.BuyEquipment("Norman Shield") ? "BOUGHT AND EQUIPPED NORMAN SHIELD" : "PURCHASE REFUSED";
         if (press(Keys.W)) _notice = _campaign.BuyEquipment("War Helm") ? "BOUGHT AND EQUIPPED WAR HELM" : "PURCHASE REFUSED";
-        if (press(Keys.K)) { _shopIndex = 0; _screen = Screen.Shop; }
+        if (press(Keys.K)) _screen = Screen.Blacksmith;
         if (press(Keys.OemPlus) || press(Keys.Add)) _campaign.State.Player.Home.TaxRate = Math.Min(100, _campaign.State.Player.Home.TaxRate + 5);
         if (press(Keys.OemMinus) || press(Keys.Subtract)) _campaign.State.Player.Home.TaxRate = Math.Max(0, _campaign.State.Player.Home.TaxRate - 5);
         if (press(Keys.Enter) || press(Keys.V)) _screen = Screen.Map;
     }
 
-    private void UpdateShop(Func<Keys, bool> press)
+    private void UpdateBlacksmith(Func<Keys, bool> press, MouseState mouse, bool click)
+    {
+        if (press(Keys.Enter) || press(Keys.B))
+        {
+            _shopIndex = 0;
+            _screen = Screen.Shop;
+            return;
+        }
+        if (!click) return;
+        var (x, y) = OriginalPoint(mouse);
+        if (_blacksmithBounds.Contains(x, y))
+        {
+            _shopIndex = 0;
+            _screen = Screen.Shop;
+        }
+    }
+
+    private void UpdateShop(Func<Keys, bool> press, MouseState mouse, bool click)
     {
         var stock = Balance.Equipment.Where(x => x.Shop).ToArray();
-        if (press(Keys.Up)) _shopIndex = (_shopIndex + stock.Length - 1) % stock.Length;
-        if (press(Keys.Down)) _shopIndex = (_shopIndex + 1) % stock.Length;
+        if (press(Keys.Up) || press(Keys.Left)) _shopIndex = (_shopIndex + stock.Length - 1) % stock.Length;
+        if (press(Keys.Down) || press(Keys.Right)) _shopIndex = (_shopIndex + 1) % stock.Length;
         var item = stock[_shopIndex];
         if (press(Keys.B)) _notice = _campaign.BuyEquipment(item.Name) ? $"BOUGHT {item.Name}" : "PURCHASE REFUSED";
         if (press(Keys.S)) _notice = _campaign.SellEquipment(item.Name) ? $"SOLD {item.Name}" : "YOU DO NOT OWN THAT ITEM";
-        if (press(Keys.Enter)) _screen = Screen.Village;
+        if (press(Keys.Enter)) _screen = Screen.Blacksmith;
+        if (!click) return;
+
+        var (x, y) = OriginalPoint(mouse);
+        var control = ShopPresentationDefinitions.Controls.FirstOrDefault(control => control.Bounds.Contains(x, y));
+        if (control is not null) ActivateShopControl(control.Action, stock);
+    }
+
+    private void ActivateShopControl(ShopControlAction action, EquipmentBalance[] stock)
+    {
+        switch (action)
+        {
+            case ShopControlAction.Previous: _shopIndex = (_shopIndex + stock.Length - 1) % stock.Length; break;
+            case ShopControlAction.Next: _shopIndex = (_shopIndex + 1) % stock.Length; break;
+            case ShopControlAction.View: _notice = "ITEM DESCRIPTION SHOWN"; break;
+            case ShopControlAction.Purchase:
+                var item = stock[_shopIndex];
+                _notice = _campaign.BuyEquipment(item.Name) ? $"BOUGHT {item.Name}" : "PURCHASE REFUSED";
+                break;
+            case ShopControlAction.Exit: _screen = Screen.Blacksmith; break;
+            default: throw new ArgumentOutOfRangeException(nameof(action));
+        }
     }
 
     private void UpdateTournament(Func<Keys, bool> press)
@@ -585,7 +639,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         switch (_screen)
         {
             case Screen.Title: DrawTitle(); break; case Screen.OptionsHub: DrawOptionsHub(); break; case Screen.LoadGame: DrawLoadGame(); break; case Screen.CharacterOptions: DrawCharacterOptions(); break; case Screen.CharacterName: DrawCharacterName(); break; case Screen.Character: DrawCharacter(); break; case Screen.Dilemma: DrawDilemma(); break; case Screen.Map: DrawMap(); break;
-            case Screen.Home: DrawHome(); break; case Screen.Village: DrawVillage(); break; case Screen.Shop: DrawShop(); break; case Screen.Tournament: DrawTournament(); break; case Screen.FieldBattle: DrawFieldBattle(); break;
+            case Screen.Home: DrawHome(); break; case Screen.Farm: DrawFarm(); break; case Screen.Village: DrawVillage(); break; case Screen.Blacksmith: DrawBlacksmith(); break; case Screen.Shop: DrawShop(); break; case Screen.Tournament: DrawTournament(); break; case Screen.FieldBattle: DrawFieldBattle(); break;
             case Screen.Siege: DrawSiege(); break; case Screen.Overview: DrawOverview(); break; case Screen.Ending: DrawEnding(); break;
         }
         if (_screen is not Screen.Title and not Screen.LoadGame and not Screen.Character and not Screen.Dilemma) DrawText(_notice, 24, 730, Color.Gold, 2);
@@ -840,17 +894,45 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void DrawHome()
     {
+        var original = DrawOriginal("Home.Office", new Rectangle(0, 0, 1024, 768));
+        if (!original) DrawPanel("CASTLE OFFICE", "MANAGE YOUR FIEF OR RETURN TO THE ROAD");
+        DrawText("F  FARM MANAGEMENT    V  VILLAGE    ENTER  MAP", 80, 715, Color.Wheat, 2);
+    }
+
+    private void DrawFarm()
+    {
         var f = _campaign.State.Player.Home; var p = _campaign.State.Player;
-        DrawPanel("TACTICAL ROOM", $"WEALTH {p.Wealth}S  POPULATION {f.Population}  SERFS FREE {f.AvailableSerfs}  PRODUCTIVITY {f.Productivity()}%");
-        DrawText("CASTLE", 70, 170, Color.Gold); DrawText("1 STEWARD 20S (+10%)   2 BEADLE 10S (+5%)", 70, 215, Color.White, 2);
-        DrawText("3 PRIEST 10S (+5%)     4 SERVANT ROOM 50S", 70, 250, Color.White, 2);
-        DrawText("VILLAGE AND FARM", 70, 310, Color.Gold); DrawText("5 HOUSE 5S   6 MONASTERY 150S (+15%)", 70, 355, Color.White, 2);
-        DrawText("7 BEANS 1S   8 VEGETABLES 1S   Z GRAIN 1S   X FRUIT 5S", 70, 390, Color.White, 2);
-        DrawText("FOREST", 70, 450, Color.Gold); DrawText("9 CUT TIMBER 5S", 70, 495, Color.White, 2);
-        DrawText("G GOLD   I IRON   C COAL   S SILVER  (MINES 400S)", 70, 525, Color.White, 2);
-        DrawText("WAR PLANNING", 70, 565, Color.Gold); DrawText("Q SWORDSMAN   W HALBERDIER   R KNIGHT", 70, 605, Color.White, 2);
-        DrawText($"CURRENT: S {p.Army.Units[UnitType.Swordsmen]}  H {p.Army.Units[UnitType.Halberdiers]}  K {p.Army.Units[UnitType.Knights]}", 70, 640, Color.Wheat, 2);
-        DrawText("ENTER RETURN TO MAP", 700, 680, Color.LightGreen, 2);
+        var original = DrawOriginal("Farm.Management", new Rectangle(0, 0, 1024, 768));
+        if (!original) DrawPanel("FARM MANAGEMENT", $"WEALTH {p.Wealth}S  POPULATION {f.Population}  PRODUCTIVITY {f.Productivity()}%");
+        else DrawFarmTerrain(FarmPresentationDefinitions.Terrain);
+
+        var accountColor = original ? Color.Black : Color.White;
+        DrawText("FIEF ACCOUNTS", 55, 70, accountColor, 3);
+        DrawText($"WEALTH          {p.Wealth}", 55, 120, accountColor, 2);
+        DrawText($"POPULATION      {f.Population}", 55, 155, accountColor, 2);
+        DrawText($"SERFS AVAILABLE {f.AvailableSerfs}", 55, 190, accountColor, 2);
+        DrawText($"PRODUCTIVITY    {f.Productivity()}%", 55, 225, accountColor, 2);
+        DrawText($"HOUSES          {f.Houses}", 55, 260, accountColor, 2);
+        DrawText("1-6 STAFF/BUILD   7/8/Z/X CROPS", 55, 545, Color.Wheat, 2, 500);
+        DrawText("9/G/I/C/S FOREST   Q/W/R RECRUIT", 55, 585, Color.Wheat, 2, 500);
+        DrawText("ENTER OR ESC  OFFICE", 55, 710, Color.Gold, 2);
+    }
+
+    private void DrawFarmTerrain(UiBounds originalBounds)
+    {
+        var bounds = ScaleBounds(originalBounds);
+        Fill(bounds, new Color(91, 115, 63));
+        const int columns = 14;
+        const int rows = 22;
+        var cellWidth = Math.Max(1, bounds.Width / columns);
+        var cellHeight = Math.Max(1, bounds.Height / rows);
+        for (var row = 0; row < rows; row++)
+            for (var column = 0; column < columns; column++)
+            {
+                var x = bounds.X + column * cellWidth + (row % 2) * 2;
+                var y = bounds.Y + row * cellHeight;
+                Fill(new Rectangle(x, y, 2, Math.Max(3, cellHeight - 3)), new Color(25, 82, 35));
+            }
     }
 
     private void DrawVillage()
@@ -862,17 +944,35 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         DrawText("ENTER RETURN TO MAP", 100, 520, Color.LightGreen);
     }
 
+    private void DrawBlacksmith()
+    {
+        if (!DrawOriginal("Blacksmith.Workshop", new Rectangle(0, 0, 1024, 768)))
+            DrawPanel("THE BLACKSMITH", "SELECT THE SMITH TO BROWSE HIS WARES");
+        DrawOutline(ScaleBounds(_blacksmithBounds), Color.Gold, 2);
+        DrawText("ENTER OR B  BROWSE WARES    ESC  VILLAGE", 120, 715, Color.Wheat, 2);
+    }
+
     private void DrawShop()
     {
         var stock = Balance.Equipment.Where(x => x.Shop).ToArray();
         var p = _campaign.State.Player;
+        var item = stock[_shopIndex];
+        if (DrawOriginal("Shop.Inventory", new Rectangle(0, 0, 1024, 768)))
+        {
+            var details = item.Power > 0 ? $"FIGHTING POWER {item.Power}" : $"ARMOR PROTECTION {item.Armor}";
+            DrawText($"{item.Name.ToUpperInvariant()} - {details}.", 440, 70, Color.Black, 2, 500);
+            DrawText($"WEALTH\n{p.Wealth}", 455, 585, Color.White, 2);
+            DrawText($"BUY\n{item.BuyPrice}", 790, 585, Color.White, 2);
+            return;
+        }
+
         DrawPanel("THE BLACKSMITH", $"WEALTH {p.Wealth}S   B BUY   S SELL FOR 75%   ENTER LEAVE");
         var first = Math.Clamp(_shopIndex - 3, 0, Math.Max(0, stock.Length - 8));
         for (var row = 0; row < 8 && first + row < stock.Length; row++)
         {
-            var index = first + row; var item = stock[index]; var owned = p.Inventory.Items.Contains(item.Name);
-            var details = item.Power > 0 ? $"POWER {item.Power}" : $"ARMOR {item.Armor}";
-            DrawText($"{(index == _shopIndex ? ">" : " ")} {item.Name}  {item.BuyPrice}S  {details} {(owned ? "OWNED" : "")}", 85, 180 + row * 58, index == _shopIndex ? Color.Gold : owned ? Color.LightGreen : Color.White, 2);
+            var index = first + row; var rowItem = stock[index]; var owned = p.Inventory.Items.Contains(rowItem.Name);
+            var details = rowItem.Power > 0 ? $"POWER {rowItem.Power}" : $"ARMOR {rowItem.Armor}";
+            DrawText($"{(index == _shopIndex ? ">" : " ")} {rowItem.Name}  {rowItem.BuyPrice}S  {details} {(owned ? "OWNED" : "")}", 85, 180 + row * 58, index == _shopIndex ? Color.Gold : owned ? Color.LightGreen : Color.White, 2);
         }
         DrawText($"EQUIPPED: {p.Inventory.Weapon} / {p.Inventory.Armor} / {p.Inventory.Shield} / {p.Inventory.Helm}", 75, 660, Color.Wheat, 2, 870);
     }

@@ -20,6 +20,10 @@ public static class ImportedArt
         new("Dilemma.Background", "image", ":morality.pcx"),
         new("Load.Background", "image", ":loadgame.pcx"),
         new("Map.England", "image", ":engmap1.pcx"),
+        new("Home.Office", "image", ":tactical.pcx"),
+        new("Farm.Management", "image", ":fiefmgmt.pcx"),
+        new("Blacksmith.Workshop", "image", ":forgesmi.pcx"),
+        new("Shop.Inventory", "image", ":swdtemp.pcx"),
         new("Tournament.Richard", "image", ":richard.pcc")
     ];
 }
@@ -32,7 +36,8 @@ public static class ImportedLayouts
         new("Options", ":gameopts.hat"),
         new("Character.Options", ":cgopts.hat"),
         new("Character.Pregenerated", ":pregen.hat"),
-        new("Dilemma", ":chargen.hat")
+        new("Dilemma", ":chargen.hat"),
+        new("Blacksmith.Workshop", ":vsmith.hat")
     ];
 }
 

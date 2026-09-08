@@ -84,6 +84,28 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void LocationScreenRolesAndShopControlsAreDataDriven()
+    {
+        var roles = ImportedArt.Definitions.ToDictionary(definition => definition.Role);
+        Assert.Equal(":tactical.pcx", roles["Home.Office"].IdSuffix);
+        Assert.Equal(":fiefmgmt.pcx", roles["Farm.Management"].IdSuffix);
+        Assert.Equal(":forgesmi.pcx", roles["Blacksmith.Workshop"].IdSuffix);
+        Assert.Equal(":swdtemp.pcx", roles["Shop.Inventory"].IdSuffix);
+
+        Assert.Equal(Enum.GetValues<ShopControlAction>().Length, ShopPresentationDefinitions.Controls.Count);
+        Assert.Equal(ShopPresentationDefinitions.Controls.Count,
+            ShopPresentationDefinitions.Controls.Select(control => control.Action).Distinct().Count());
+        Assert.All(ShopPresentationDefinitions.Controls, control =>
+        {
+            Assert.InRange(control.Bounds.X, 0, 639);
+            Assert.InRange(control.Bounds.Y, 0, 479);
+            Assert.InRange(control.Bounds.X + control.Bounds.Width, 1, 640);
+            Assert.InRange(control.Bounds.Y + control.Bounds.Height, 1, 480);
+        });
+        Assert.Equal(new UiBounds(253, 109, 107, 164), BlacksmithPresentationDefinitions.Blacksmith);
+    }
+
+    [Fact]
     public void DilemmaChoiceHotspotsComeFromTheOriginalLayout()
     {
         byte[] bytes = new byte[40 + 3 * 24];

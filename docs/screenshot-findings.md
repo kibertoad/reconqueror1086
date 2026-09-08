@@ -7,6 +7,12 @@ Local reference filenames:
 - `dilemma-screen.png`
 - `estate-travel-screen.png`
 - `options-hub-screen.png`
+- `village-sabines-keep.png`
+- `blacksmith-screen.png`
+- `blacksmith-dialogue-screen.png`
+- `blacksmith-store-screen.png`
+- `home-office-screen.png`
+- `farm-management-screen.png`
 
 ## Observed screens
 
@@ -15,6 +21,12 @@ Local reference filenames:
 | Youth dilemma | A stone-framed 4:3 screen has the character summary at upper left, Reroll and Continue at upper right, an orange scroll across the center, and three animated choice panels along the bottom labelled I, II, and III. | `CHARGEN.HAT` names `MORALITY.PCX`; its regions 0–2 align with the three bottom panels and region 6 aligns with Continue. Each `D*.CSF` frame is 99×149 versus the 100×150 choice regions. Rendering `D121.CSF` with the `MORALITY.PCX` palette reproduces the screenshot's sepia figures. | Confirmed layout and palette association; four-frame-per-choice grouping is Corroborated pending code-path confirmation. |
 | Estate/travel view | The main area is a tile-based fief landscape, not a full-screen England map. A smaller England map occupies the upper-right panel; Map, Orders, and Help tabs sit below it. The lower-right panel shows location, date, time multiplier, wealth, and census. Home and Village are persistent bottom navigation targets. | The framing resembles the `FIEFMGMT.PCX` screen family and its HAT layouts, but the terrain, marker, inset-map role, and exact tab mapping require resource-to-screenshot comparison. The current runtime's full-screen `engmap1.pcx` assumption must not be treated as final. | Direct visual layout Confirmed; individual asset assignments Provisional. |
 | Options/start hub | The interactive hub includes New Game, Load, Save, Practice, Resume, Exit DOS, CD music, MIDI music, sound effects, digitized speech, animation, credits, and movie controls. It follows the introductory title rather than being the title bitmap itself. | `GAMEOPTS.HAT` declares screen 1 with `OPTFIN.PCX`; `OPTION.CSF` contains five settings-widget frames. Exact region-to-action IDs and enabled/disabled states still need executable or controlled-input confirmation. | Direct visual controls Confirmed; resource/action mapping Corroborated. |
+| Village exterior | A village is a full-screen location scene. Named destinations are written on the bottom scroll, and Travel is an in-world sign hotspot. The supplied example is Sabine's Keep and includes inn and blacksmith signs around a church. | A normalized pixel comparison over all decoded village images selected `V66_1111.PCX` with RMSE 0.05645, far ahead of the next candidate at 0.16899; direct inspection confirms the scene match. The destination caption is a runtime overlay. | Scene/resource association Confirmed; the wider village-to-location mapping remains Provisional. |
+| Castle office/Home | Home is a full-screen castle office with desk, map, orders, model keep, and exits embedded in the room. | Decoded `TACTICAL.PCX` matches the supplied screenshot exactly. HAT screen 16 uses `TACTICAL.PCX` and defines ten object/exit regions. | Background Confirmed; object action dispatch Corroborated. |
+| Farm management | Farm management has a parchment accounting table on the left, a terrain grid on the right, and OK/Cancel plus wealth, productivity, and date in the footer. It is distinct from Home and travel. | Decoded `FIEFMGMT.PCX` is the exact static shell. HAT screens 19–22 reuse it with different row counts and right-panel/footer regions. | Background and screen-family geometry Confirmed; row semantics and tile editing remain under investigation. |
+| Blacksmith workshop | Entering the blacksmith first shows a full-screen forge with the smith standing behind the anvil and a blank bottom scroll. | Decoded `FORGESMI.PCX` matches the screenshot exactly. `VSMITH.HAT`/screen 13 identifies the same background and region 0 covers the smith. | Background and smith hotspot Confirmed; conversation trigger semantics Corroborated. |
+| Blacksmith dialogue | Selecting the smith opens a framed portrait/conversation screen: portrait and speaker label at upper left, response at upper right, and player choices across the lower panel. | `COMSCRN1.PCX` is the exact empty frame; `BLACKSMI.PCC` is the named portrait candidate. The complete text/choice source still needs decoding from `VSMITH.666`. | Frame association Confirmed; portrait and dialogue-data bindings Corroborated. |
+| Blacksmith store | The store is a separate stone-and-parchment inventory screen with selected item art, description, wealth/price, previous/next, View, Purchase, and Exit controls. | `SWDTEMP.PCX` is the exact empty shell. `SWORDS.CSF` contains 39 tall item frames and `BUYSELL.CSF` contains four control-sized frames, but index/action mappings remain to be traced. | Static shell Confirmed; item/control sequence mappings Corroborated. |
 
 ## Implementation follow-ups
 
@@ -43,6 +55,16 @@ Local reference filenames:
 - **Partially implemented:** render `OPTION.CSF` frames 0 and 2 as the ON/OFF state below each setting label and frame 4 as Resume when a campaign is active. The `OPTFIN.PCX` palette renders these frames coherently and their 23x22/80x40 dimensions match the screenshot/HAT roles. Frames 1 and 3 appear to be alternate pressed-state variants and remain disabled pending input-timing confirmation.
 - **Partially implemented:** CD music and animation control active runtime behavior; sound-effects and speech state are represented; MIDI and unsupported presentations are explicitly labelled unavailable. Persisted settings, fullscreen/scaling, subtitles, and reduced motion remain follow-ups.
 - Replace Exit DOS wording only in fallback presentation; imported original-media mode may preserve the original label while exiting the application safely.
+
+### Home, farm, village, and blacksmith
+
+- **Implemented:** split the previous overloaded Home handler into a castle office and separate farm-management screen; use `TACTICAL.PCX` and `FIEFMGMT.PCX` when installed.
+- **Implemented:** insert the original `FORGESMI.PCX` workshop between Village and the store, with the smith hotspot sourced from `VSMITH.HAT`.
+- **Partially implemented:** render `SWDTEMP.PCX` as the store shell and route previous, next, purchase, and exit through typed 640x480 controls. Item artwork and exact prose remain pending.
+- Map the village-image suffixes to world locations before activating `V66_1111.PCX` outside its confirmed Sabine's Keep role.
+- Decode `VSMITH.666` dialogue nodes and bind `COMSCRN1.PCX`, `BLACKSMI.PCC`, scroll regions, and choices through the generic dialogue interpreter planned in Phase 1.2.
+- Recover the `SWORDS.CSF` frame-to-item table and `BUYSELL.CSF` state meanings before drawing original item/control frames.
+- Recover `TACTICAL.PCX` object actions and the four `FIEFMGMT.PCX` HAT variants; then replace the provisional farm table/terrain fill with exact definitions and editable tiles.
 
 ## Acceptance reference
 

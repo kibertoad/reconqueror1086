@@ -27,7 +27,7 @@ The repository currently provides:
 - An end-user importer that installs byte-stored, kind-1, and kind-2 owned resources plus lossless CDDA WAV files under ignored local storage.
 - A runtime imported-content catalog, CD music playback, and definition-driven original art for the title, options hub, character options, pre-generated characters, animated youth dilemmas, England map, load screen, and a tournament portrait.
 - An executable-confirmed `TITLE.HAT`/`FFTITLE.PCX` title load followed by a corroborated character-options flow whose exact geometry comes from installed `CGOPTS.HAT` and `PREGEN.HAT`.
-- Nineteen xUnit test cases and 112 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
+- Twenty xUnit test cases and 112 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
 
 ## Dependency map
 
@@ -411,7 +411,7 @@ Deliverables:
 - Map original backgrounds, portraits, heraldry, cursors, icons, transitions, and cinematics to runtime scenes.
 - Preserve a clean-room fallback skin for installations without original media.
 - Match original aspect ratio and confirmed `WAR_MODE` behavior while supporting modern scaling.
-- Apply the owner-supplied dilemma, estate/travel, and options-hub observations and follow-ups recorded in [`screenshot-findings.md`](screenshot-findings.md).
+- Apply the owner-supplied dilemma, estate/travel, options-hub, village, Home/farm, and blacksmith observations and follow-ups recorded in [`screenshot-findings.md`](screenshot-findings.md).
 - Correct the startup flow to include the `OPTFIN.PCX` options hub, and separate the estate/fief presentation from the England-map navigation role.
 
 ### 9.2 Input
@@ -536,6 +536,7 @@ Local static-analysis tool: Ghidra 12.1.3 is installed user-wide at `C:\Users\ki
 - [x] Activate decoded `fftitle.pcx` and `engmap1.pcx` through definition-driven title and map roles.
 - [x] Correct the startup flow from executable/resource evidence: static `FFTITLE.PCX` title, then interactive `CHAR_OPS.PCX`, with `PREGEN.PCX` and `LOADGAME.PCX` registered as distinct screen roles.
 - [x] Decode HAT screen descriptors and use installed `CGOPTS.HAT`/`PREGEN.HAT` geometry at runtime with bounded fallback definitions.
+- [x] Split Home, farm management, blacksmith workshop, and blacksmith inventory into distinct runtime scenes using screenshot-verified `TACTICAL.PCX`, `FIEFMGMT.PCX`, `FORGESMI.PCX`, and `SWDTEMP.PCX` roles.
 - [ ] Trace the complete startup/menu state machine, input timing, cursor behavior, and region-action dispatch from `CONQUER.EXE`; keep semantics corroborated until each executable branch is confirmed.
 
 The resource-decoding sprint is first because it unlocks exact dialogue, screen mappings, opponent identities, construction data, and balance tables needed by most later phases.
