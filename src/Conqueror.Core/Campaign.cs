@@ -20,11 +20,11 @@ public sealed class Campaign
         return new CampaignState { Player = new Player { Name = "Sir " + template.Name, Stats = template.Stats, Wealth = template.Wealth } };
     }
 
-    public static CampaignState NewCustom(string name, int seed)
+    public static CampaignState NewCustom(string name, int seed, string heraldicColor = "Green")
     {
         var r = new Random(seed);
         int Roll() => r.Next(2, 13);
-        return new CampaignState { Player = new Player { Name = name, Stats = new(Roll(), Roll(), Roll(), Roll(), Roll()), Wealth = Balance.StartingCustomWealth } };
+        return new CampaignState { Player = new Player { Name = name, HeraldicColor = heraldicColor, Stats = new(Roll(), Roll(), Roll(), Roll(), Roll()), Wealth = Balance.StartingCustomWealth } };
     }
 
     public bool AnswerDilemma(int choice)

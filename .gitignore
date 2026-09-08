@@ -26,6 +26,8 @@ nunit-*.xml
 *.snupkg
 .env
 .dotnet-home/
+.config/
+tmp/
 project.lock.json
 project.fragment.lock.json
 ScaffoldingReadMe.txt

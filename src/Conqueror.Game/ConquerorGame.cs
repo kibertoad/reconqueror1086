@@ -8,13 +8,21 @@ namespace Conqueror.Game;
 
 public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 {
-    private enum Screen { Title, Character, Dilemma, Map, Home, Village, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
+    private enum Screen { Title, CharacterOptions, CharacterName, Character, Dilemma, Map, Home, Village, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _batch = null!;
     private Texture2D _pixel = null!;
     private Campaign _campaign = new();
     private Screen _screen = Screen.Title;
     private KeyboardState _last;
+    private MouseState _lastMouse;
+    private int _characterOption;
+    private int _characterTemplate;
+    private int _heraldicColor = 1;
+    private string _characterName = "Sir ";
+    private IReadOnlyList<CharacterCreationOption> _characterOptions = CharacterCreationDefinitions.Options;
+    private IReadOnlyList<HeraldicColorOption> _heraldicColors = CharacterCreationDefinitions.HeraldicColors;
+    private IReadOnlyList<UiBounds> _pregeneratedBounds = CharacterCreationDefinitions.PregeneratedCharacters;
     private int _joustCursor;
     private SiegeSession? _siege;
     private bool _showRadar = true;
@@ -29,6 +37,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private ImportedContentCatalog? _importedContent;
     private SoundEffect? _importedMusic;
     private SoundEffectInstance? _musicInstance;
+    private readonly Dictionary<string, Texture2D> _originalArt = new(StringComparer.OrdinalIgnoreCase);
     private readonly string _savePath = Path.Combine(AppContext.BaseDirectory, "saves", "campaign.json");
 
     public ConquerorGame()
@@ -45,6 +54,21 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _pixel = new Texture2D(GraphicsDevice, 1, 1);
         _pixel.SetData([Color.White]);
         _importedContent = ImportedContentCatalog.Discover();
+        var characterLayoutId = _importedContent?.FindId("resource", ":cgopts.hat");
+        var characterLayout = characterLayoutId is null ? null : _importedContent?.DecodeHat(characterLayoutId);
+        _characterOptions = CharacterCreationDefinitions.OptionsFrom(characterLayout);
+        _heraldicColors = CharacterCreationDefinitions.ColorsFrom(characterLayout);
+        var pregeneratedLayoutId = _importedContent?.FindId("resource", ":pregen.hat");
+        var pregeneratedLayout = pregeneratedLayoutId is null ? null : _importedContent?.DecodeHat(pregeneratedLayoutId);
+        _pregeneratedBounds = CharacterCreationDefinitions.PregeneratedFrom(pregeneratedLayout);
+        foreach (var definition in ImportedArt.Definitions)
+        {
+            var id = _importedContent?.FindId(definition.Kind, definition.IdSuffix);
+            if (id is null || _importedContent?.DecodePcx(id) is not { } image) continue;
+            var texture = new Texture2D(GraphicsDevice, image.Width, image.Height, false, SurfaceFormat.Color);
+            texture.SetData(image.ToRgba());
+            _originalArt.Add(definition.Role, texture);
+        }
         if (_importedContent?.Open("CDDA/TRACK02") is { } music)
         {
             using (music)
@@ -63,15 +87,31 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         }
     }
 
+    protected override void UnloadContent()
+    {
+        _musicInstance?.Dispose();
+        _importedMusic?.Dispose();
+        foreach (var texture in _originalArt.Values) texture.Dispose();
+        _pixel.Dispose();
+        _batch.Dispose();
+        base.UnloadContent();
+    }
+
     protected override void Update(GameTime gameTime)
     {
         var keys = Keyboard.GetState();
+        var mouse = Mouse.GetState();
         bool Press(Keys key) => keys.IsKeyDown(key) && !_last.IsKeyDown(key);
+        var click = mouse.LeftButton == ButtonState.Pressed && _lastMouse.LeftButton == ButtonState.Released;
+        var pressAny = keys.GetPressedKeys().Any(key => key != Keys.Escape && !_last.IsKeyDown(key));
         if (Press(Keys.F5) && _screen != Screen.Title) { _campaign.Save(_savePath); _notice = "CAMPAIGN SAVED"; }
         if (Press(Keys.F9) && File.Exists(_savePath)) { _campaign = Campaign.Load(_savePath); _selectedLocation = _campaign.State.CurrentLocation; _screen = Screen.Map; _notice = "CAMPAIGN LOADED"; }
         if (Press(Keys.Escape))
         {
             if (_screen == Screen.Title) Exit();
+            else if (_screen == Screen.CharacterName) _screen = Screen.CharacterOptions;
+            else if (_screen == Screen.CharacterOptions) _screen = Screen.Title;
+            else if (_screen == Screen.Character) _screen = Screen.CharacterOptions;
             else if (_screen == Screen.FieldBattle && _fieldBattle is not null) { _fieldBattle.IssueAll(UnitOrder.Withdraw); _notice = "WITHDRAWAL ORDERED"; }
             else { if (_screen == Screen.Siege && _siege is not null) _campaign.FinishSiege(_siege); _screen = Screen.Map; }
         }
@@ -79,12 +119,12 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         switch (_screen)
         {
             case Screen.Title:
-                if (Press(Keys.N)) _screen = Screen.Character;
-                if (Press(Keys.L) && File.Exists(_savePath)) { _campaign = Campaign.Load(_savePath); _selectedLocation = _campaign.State.CurrentLocation; _screen = Screen.Map; }
+                if (pressAny || click) _screen = Screen.CharacterOptions;
                 break;
+            case Screen.CharacterOptions: UpdateCharacterOptions(Press, mouse, click); break;
+            case Screen.CharacterName: UpdateCharacterName(Press); break;
             case Screen.Character:
-                for (var i = 0; i < 6; i++) if (Press(Keys.D1 + i)) { _campaign = new Campaign(Campaign.NewFromTemplate(i)); _screen = Screen.Map; }
-                if (Press(Keys.D0)) { _campaign = new Campaign(Campaign.NewCustom("Sir Custom", Environment.TickCount)); _screen = Screen.Dilemma; }
+                UpdatePregeneratedCharacters(Press, mouse, click);
                 break;
             case Screen.Dilemma: UpdateDilemma(Press); break;
             case Screen.Map: UpdateMap(Press); break;
@@ -99,8 +139,83 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         }
         if (_campaign.State.Victory != VictoryKind.None && _screen != Screen.Title) _screen = Screen.Ending;
         _last = keys;
+        _lastMouse = mouse;
         base.Update(gameTime);
     }
+
+    private void UpdateCharacterOptions(Func<Keys, bool> press, MouseState mouse, bool click)
+    {
+        var options = _characterOptions;
+        if (press(Keys.Up)) _characterOption = (_characterOption + options.Count - 1) % options.Count;
+        if (press(Keys.Down)) _characterOption = (_characterOption + 1) % options.Count;
+        for (var i = 0; i < options.Count; i++) if (press(Keys.D1 + i)) ActivateCharacterOption(options[i].Action);
+        if (press(Keys.Enter)) ActivateCharacterOption(options[_characterOption].Action);
+        if (!click) return;
+        var (x, y) = OriginalPoint(mouse);
+        for (var i = 0; i < _heraldicColors.Count; i++)
+            if (_heraldicColors[i].OriginalBounds.Contains(x, y))
+            {
+                _heraldicColor = i;
+                _characterOption = 1;
+                _notice = $"HERALDIC COLOR: {_heraldicColors[i].Name}";
+                return;
+            }
+        for (var i = 0; i < options.Count; i++)
+            if (options[i].OriginalBounds.Contains(x, y)) { _characterOption = i; ActivateCharacterOption(options[i].Action); break; }
+    }
+
+    private void ActivateCharacterOption(CharacterCreationAction action)
+    {
+        switch (action)
+        {
+            case CharacterCreationAction.ChooseName:
+                _screen = Screen.CharacterName;
+                break;
+            case CharacterCreationAction.ChooseColor:
+                _heraldicColor = (_heraldicColor + 1) % _heraldicColors.Count;
+                _notice = $"HERALDIC COLOR: {_heraldicColors[_heraldicColor].Name}";
+                break;
+            case CharacterCreationAction.GenerateNew:
+                _campaign = new Campaign(Campaign.NewCustom(NormalizedCharacterName(), Environment.TickCount, _heraldicColors[_heraldicColor].Name));
+                _screen = Screen.Dilemma;
+                break;
+            case CharacterCreationAction.ChoosePregenerated:
+                _screen = Screen.Character;
+                break;
+        }
+    }
+
+    private void UpdateCharacterName(Func<Keys, bool> press)
+    {
+        if (press(Keys.Back) && _characterName.Length > 4) _characterName = _characterName[..^1];
+        if (press(Keys.Space) && _characterName.Length < 24 && !_characterName.EndsWith(' ')) _characterName += ' ';
+        for (var value = (int)Keys.A; value <= (int)Keys.Z && _characterName.Length < 24; value++)
+            if (press((Keys)value)) _characterName += ((char)('A' + value - (int)Keys.A)).ToString();
+        if (press(Keys.Enter)) _screen = Screen.CharacterOptions;
+    }
+
+    private void UpdatePregeneratedCharacters(Func<Keys, bool> press, MouseState mouse, bool click)
+    {
+        if (press(Keys.Left)) _characterTemplate = (_characterTemplate + Balance.Templates.Length - 1) % Balance.Templates.Length;
+        if (press(Keys.Right)) _characterTemplate = (_characterTemplate + 1) % Balance.Templates.Length;
+        if (press(Keys.Up) || press(Keys.Down)) _characterTemplate = (_characterTemplate + 3) % Balance.Templates.Length;
+        for (var i = 0; i < Balance.Templates.Length; i++) if (press(Keys.D1 + i)) StartPregeneratedCharacter(i);
+        if (press(Keys.Enter)) StartPregeneratedCharacter(_characterTemplate);
+        if (!click) return;
+        var (x, y) = OriginalPoint(mouse);
+        for (var i = 0; i < _pregeneratedBounds.Count; i++)
+            if (_pregeneratedBounds[i].Contains(x, y)) { _characterTemplate = i; StartPregeneratedCharacter(i); break; }
+    }
+
+    private void StartPregeneratedCharacter(int index)
+    {
+        _campaign = new Campaign(Campaign.NewFromTemplate(index));
+        _screen = Screen.Map;
+    }
+
+    private string NormalizedCharacterName() => _characterName.Trim() is { Length: > 4 } name ? name : "Sir Custom";
+    private (int X, int Y) OriginalPoint(MouseState mouse) =>
+        (mouse.X * 640 / Math.Max(1, GraphicsDevice.Viewport.Width), mouse.Y * 480 / Math.Max(1, GraphicsDevice.Viewport.Height));
 
     private void UpdateMap(Func<Keys, bool> press)
     {
@@ -254,7 +369,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _batch.Begin(samplerState: SamplerState.PointClamp);
         switch (_screen)
         {
-            case Screen.Title: DrawTitle(); break; case Screen.Character: DrawCharacter(); break; case Screen.Dilemma: DrawDilemma(); break; case Screen.Map: DrawMap(); break;
+            case Screen.Title: DrawTitle(); break; case Screen.CharacterOptions: DrawCharacterOptions(); break; case Screen.CharacterName: DrawCharacterName(); break; case Screen.Character: DrawCharacter(); break; case Screen.Dilemma: DrawDilemma(); break; case Screen.Map: DrawMap(); break;
             case Screen.Home: DrawHome(); break; case Screen.Village: DrawVillage(); break; case Screen.Shop: DrawShop(); break; case Screen.Tournament: DrawTournament(); break; case Screen.FieldBattle: DrawFieldBattle(); break;
             case Screen.Siege: DrawSiege(); break; case Screen.Overview: DrawOverview(); break; case Screen.Ending: DrawEnding(); break;
         }
@@ -275,22 +390,57 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void DrawTitle()
     {
-        Fill(new Rectangle(0, 0, 1024, 768), new Color(39, 50, 35));
-        Fill(new Rectangle(90, 90, 844, 590), new Color(91, 63, 38));
-        Fill(new Rectangle(110, 110, 804, 550), new Color(25, 30, 24));
-        DrawText("CONQUEROR", 250, 190, Color.Gold, 7); DrawText("A.D. 1086", 350, 265, Color.Wheat, 4);
-        DrawText("N  NEW CAMPAIGN", 360, 430, Color.White); DrawText("L  LOAD CAMPAIGN", 360, 475, Color.White);
-        DrawText(_importedContent is null ? "ORIGINAL RESOURCES: NOT INSTALLED" : $"ORIGINAL RESOURCES: {_importedContent.Count} INSTALLED", 285, 535, _importedContent is null ? Color.Gray : Color.LightGreen, 2);
-        DrawText("A MONOGAME REIMPLEMENTATION", 275, 600, new Color(160, 160, 140), 2);
+        var hasTitle = DrawOriginal("Title.Background", new Rectangle(0, 0, 1024, 768));
+        if (!hasTitle)
+        {
+            Fill(new Rectangle(0, 0, 1024, 768), new Color(39, 50, 35));
+            Fill(new Rectangle(90, 90, 844, 590), new Color(91, 63, 38));
+            Fill(new Rectangle(110, 110, 804, 550), new Color(25, 30, 24));
+            DrawText("CONQUEROR", 250, 190, Color.Gold, 7); DrawText("A.D. 1086", 350, 265, Color.Wheat, 4);
+        }
+        if (!hasTitle) DrawText("PRESS ANY KEY", 405, 600, Color.White, 2);
+    }
+
+    private void DrawCharacterOptions()
+    {
+        var original = DrawOriginal("Character.Options", new Rectangle(0, 0, 1024, 768));
+        if (!original)
+        {
+            DrawPanel("CREATE YOUR CHARACTER", "CHOOSE HOW YOUR CONQUEROR WILL BEGIN");
+            for (var i = 0; i < _characterOptions.Count; i++)
+                DrawText($"{i + 1}  {_characterOptions[i].Label}", 170, 220 + i * 80, i == _characterOption ? Color.Gold : Color.White, 2);
+        }
+        else
+        {
+            DrawOutline(ScaleBounds(_characterOptions[_characterOption].OriginalBounds), Color.Gold, 3);
+            DrawOutline(ScaleBounds(_heraldicColors[_heraldicColor].OriginalBounds), Color.Gold, 2);
+        }
+        if (!string.IsNullOrEmpty(_notice)) DrawText(_notice, 25, 700, Color.Gold, 2);
+    }
+
+    private void DrawCharacterName()
+    {
+        if (!DrawOriginal("Character.Options", new Rectangle(0, 0, 1024, 768)))
+            DrawPanel("CHOOSE CHARACTER NAME", "TYPE A NAME AND PRESS ENTER");
+        var entry = ScaleBounds(CharacterCreationDefinitions.NameEntryBounds);
+        Fill(entry, new Color(10, 10, 10, 225));
+        DrawOutline(entry, Color.Gold, 2);
+        DrawText(_characterName + "_", entry.X + 12, entry.Y + 14, Color.White, 2);
     }
 
     private void DrawCharacter()
     {
+        if (DrawOriginal("Character.Pregenerated", new Rectangle(0, 0, 1024, 768)))
+        {
+            DrawOutline(ScaleBounds(_pregeneratedBounds[_characterTemplate]), Color.Gold, 3);
+            DrawText("1-6 OR ARROWS/ENTER   ESC BACK", 25, 735, Color.Wheat, 2);
+            return;
+        }
         DrawPanel("CHOOSE YOUR KNIGHT", "THE ROAD FROM BOYHOOD TO LORDSHIP BEGINS");
         for (var i = 0; i < Balance.Templates.Length; i++)
         {
             var t = Balance.Templates[i];
-            DrawText($"{i + 1}  {t.Name}   STR {t.Stats.Strength} DEX {t.Stats.Dexterity} PIE {t.Stats.Piety} STA {t.Stats.Stamina} HON {t.Stats.Honor}  {t.Wealth}S", 80, 180 + i * 62, i == 1 ? Color.Gold : Color.White, 2);
+            DrawText($"{i + 1}  {t.Name}   STR {t.Stats.Strength} DEX {t.Stats.Dexterity} PIE {t.Stats.Piety} STA {t.Stats.Stamina} HON {t.Stats.Honor}  {t.Wealth}S", 80, 180 + i * 62, i == _characterTemplate ? Color.Gold : Color.White, 2);
         }
         DrawText("0  CUSTOM ROLLED CHARACTER", 80, 575, Color.LightGreen, 2);
     }
@@ -308,7 +458,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void DrawMap()
     {
-        Fill(new Rectangle(0, 0, 760, 768), new Color(71, 92, 58));
+        if (!DrawOriginal("Map.England", new Rectangle(0, 0, 760, 768)))
+            Fill(new Rectangle(0, 0, 760, 768), new Color(71, 92, 58));
         for (var i = 0; i < World.Locations.Length; i++)
         {
             var place = World.Locations[i];
@@ -384,6 +535,11 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         DrawText("PRESS SPACE WHEN THE LANCE MEETS THE GOLD MARK", 170, 390, Color.White, 2);
         DrawText($"JOUSTS {_campaign.State.JoustsThisTournament}/3", 400, 445, Color.Gold, 2);
         var opponent = Balance.TournamentOpponents[_tournamentOpponent];
+        if (_originalArt.TryGetValue($"Tournament.{opponent.Name}", out var opponentPortrait))
+        {
+            Fill(new Rectangle(816, 150, 154, 166), Color.Gold);
+            _batch.Draw(opponentPortrait, new Rectangle(820, 154, 146, 158), Color.White);
+        }
         DrawText($"LEFT RIGHT OPPONENT: {opponent.Name}   WAGER {opponent.Wager}S", 150, 470, Color.LightGreen, 2);
         var lady = Balance.Courtships[_ladyIndex];
         var wins = _campaign.State.Player.CourtshipWins.GetValueOrDefault(lady.Name);
@@ -477,5 +633,19 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     }
 
     private void Fill(Rectangle rectangle, Color color) => _batch.Draw(_pixel, rectangle, color);
+    private static Rectangle ScaleBounds(UiBounds bounds) => new(bounds.X * 1024 / 640, bounds.Y * 768 / 480, bounds.Width * 1024 / 640, bounds.Height * 768 / 480);
+    private void DrawOutline(Rectangle rectangle, Color color, int thickness)
+    {
+        Fill(new Rectangle(rectangle.X, rectangle.Y, rectangle.Width, thickness), color);
+        Fill(new Rectangle(rectangle.X, rectangle.Bottom - thickness, rectangle.Width, thickness), color);
+        Fill(new Rectangle(rectangle.X, rectangle.Y, thickness, rectangle.Height), color);
+        Fill(new Rectangle(rectangle.Right - thickness, rectangle.Y, thickness, rectangle.Height), color);
+    }
+    private bool DrawOriginal(string role, Rectangle destination)
+    {
+        if (!_originalArt.TryGetValue(role, out var texture)) return false;
+        _batch.Draw(texture, destination, Color.White);
+        return true;
+    }
     private void DrawText(string text, int x, int y, Color color, int scale = 3, int wrap = 0) => PixelFont.Draw(_batch, _pixel, text, new Vector2(x, y), color, scale, wrap);
 }

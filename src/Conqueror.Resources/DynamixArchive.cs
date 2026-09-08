@@ -12,13 +12,18 @@ public sealed class DynamixArchive
 {
     private const int HeaderSize = 8;
     private const int DirectoryEntrySize = 52;
-    private readonly string _path;
+    private readonly byte[] _data;
+    public string SourceName { get; }
     public IReadOnlyList<DynamixEntry> Entries { get; }
 
-    public DynamixArchive(string path)
+    public DynamixArchive(string path) : this(File.ReadAllBytes(Path.GetFullPath(path)), Path.GetFullPath(path)) { }
+
+    public DynamixArchive(byte[] data, string sourceName = "<memory>")
     {
-        _path = Path.GetFullPath(path);
-        using var stream = File.Open(_path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        ArgumentNullException.ThrowIfNull(data);
+        _data = data;
+        SourceName = sourceName;
+        using var stream = new MemoryStream(_data, writable: false);
         Span<byte> header = stackalloc byte[HeaderSize];
         stream.ReadExactly(header);
         if (!header[..4].SequenceEqual(".RES"u8)) throw new InvalidDataException("Not a Dynamix .RES archive.");
@@ -53,16 +58,15 @@ public sealed class DynamixArchive
     public byte[] ReadStored(DynamixEntry entry)
     {
         if (!Entries.Contains(entry)) throw new ArgumentException("Entry does not belong to this archive.", nameof(entry));
-        using var stream = File.Open(_path, FileMode.Open, FileAccess.Read, FileShare.Read);
-        stream.Position = entry.Offset;
         var bytes = new byte[checked((int)entry.StoredSize)];
-        stream.ReadExactly(bytes);
+        _data.AsSpan(checked((int)entry.Offset), bytes.Length).CopyTo(bytes);
         return bytes;
     }
 
     public byte[] ReadDecoded(DynamixEntry entry)
     {
-        if (!entry.IsStored) throw new NotSupportedException($"Compression for '{entry.Name}' has not been verified.");
-        return ReadStored(entry);
+        if (entry.IsStored) return ReadStored(entry);
+        if (entry.Flags != 1) throw new NotSupportedException($"Compression kind {entry.Flags} for '{entry.Name}' has not been verified.");
+        return DynamixCompression.DecodeKind1(ReadStored(entry), checked((int)entry.ExpandedSize));
     }
 }

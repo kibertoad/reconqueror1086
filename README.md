@@ -10,11 +10,13 @@ Gameplay is definition-driven: buildings, equipment slots, population bands, uni
 dotnet run --project src/Conqueror.Game
 ```
 
-The game opens at 1024x768, matching the original `WAR_MODE=1024` configuration. Start with `N`, choose a template with `1`-`6` (or `0` for a rolled character), and use the on-screen keyboard legend. `F5` saves and `F9` loads. Saves are JSON and deliberately version-readable.
+The game opens at 1024x768. Press any key or click through the title, then use the original character-options screen to choose a name, heraldic color, newly generated character, or one of six pre-generated characters. Keyboard navigation and numbered shortcuts remain available. `F5` saves and `F9` loads. Saves are JSON and deliberately version-readable.
 
 On Windows, double-click `Start Conqueror 1086.bat` in the repository root. It checks for the .NET SDK and builds/starts the game locally.
 
-Owners of the original GOG release can first double-click `Install Original Resources.bat`. The importer reads the original installation without modifying it, installs exact resources into the Git-ignored `UserContent` directory, converts CDDA tracks losslessly to PCM WAV, and writes a provenance manifest. The launcher makes that catalog available to the game automatically. Imported CD music is playable now; SMK video and Sierra dialogue/image containers are cataloged but still require runtime decoders.
+Owners of the original GOG release can first double-click `Install Original Resources.bat`. The importer reads the original installation without modifying it, installs exact resources into the Git-ignored `UserContent` directory, converts CDDA tracks losslessly to PCM WAV, and writes a provenance manifest. The launcher makes that catalog available to the game automatically. Imported CD music, the original title, character-options and pre-generated-character screens, parchment England map, load-game background, and a validated tournament portrait are active now. Rerun the installer after this upgrade to decode resources omitted by older manifests; SMK video and the remaining Sierra containers still require adapters.
+
+The importer also validates stored CSF files as indexed animation sequences. Their pixels and transparency are decoded, but they are not displayed until the correct original screen palettes are identified; rerun the installer after importer upgrades to refresh manifest classifications.
 
 ## Implemented systems
 
@@ -37,11 +39,11 @@ Owners of the original GOG release can first double-click `Install Original Reso
 
 ## Verification
 
-```powershell
-dotnet run --project tests/Conqueror.Specs
-```
+On Windows, double-click `Run Tests.bat`. It builds into a unique directory under `%TEMP%`, disables the shared compiler, and runs both the xUnit suite and the broader executable specifications without touching the game’s normal output files. This prevents a running game from locking test build outputs.
 
-The specification runner checks the externally documented balance values and core campaign invariants without requiring a graphics device.
+The xUnit project uses xUnit.net v3 4.0.0, and the desktop project uses MonoGame 3.8.5.1—the latest stable NuGet releases checked on 2026-09-07.
+
+Both test paths check resource boundaries, externally documented balance values, and core campaign invariants without requiring a graphics device.
 It reports every `PASS`/`FAIL`, prints one compact summary, and returns a normal nonzero process exit code on failure rather than throwing an application exception.
 Unexpected fixture or parser errors are caught by the runner and reported as a concise failed check. The import and inspection utilities use the same clean command-line error boundary.
 

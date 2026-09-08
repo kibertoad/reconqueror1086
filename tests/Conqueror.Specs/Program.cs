@@ -29,6 +29,9 @@ var rewardItems = Balance.Courtships.SelectMany(x => x.Rewards).Where(x => x.Ite
 Check(Balance.Victories[VictoryKind.Dragon].RequiredItems.All(rewardItems.Contains), "victory items obtainable from definitions");
 Check(Balance.Strategy == new StrategicDefinition(80, 98, 9), "strategic warfare definitions");
 Check(Balance.TournamentOpponents.Length == 5 && Balance.TournamentOpponents.All(x => x.Wager is >= 20 and <= 80 && x.Swordsmen + x.Halberdiers + x.Knights == 8), "tournament opponent definitions valid");
+Check(ImportedArt.Definitions.Select(x => x.Role).Distinct(StringComparer.OrdinalIgnoreCase).Count() == ImportedArt.Definitions.Count, "imported art roles are unique definitions");
+Check(CharacterCreationDefinitions.Options.Select(x => x.Action).Distinct().Count() == Enum.GetValues<CharacterCreationAction>().Length, "character option actions are unique definitions");
+Check(CharacterCreationDefinitions.PregeneratedCharacters.Count == Balance.Templates.Length && CharacterCreationDefinitions.HeraldicColors.Select(x => x.Name).SequenceEqual(["Red", "Green", "Blue"]), "original character selection hotspots are defined");
 
 string[] syntheticCue =
 [
@@ -38,6 +41,45 @@ string[] syntheticCue =
 var cueTracks = CueSheet.Tracks(syntheticCue);
 Check(CueSheet.DataTrackSectors(syntheticCue) == 150 && cueTracks.Length == 3 && cueTracks[2].StartSector == 235, "cue sheet parses data and audio boundaries");
 Check(Throws<InvalidDataException>(() => CueSheet.Tracks(["not a cue sheet"])), "invalid cue sheet fails cleanly");
+
+var lzwFixture = PackLsbCodes([65, 66, 257, 259], 9);
+Check(Encoding.ASCII.GetString(DynamixCompression.DecodeLzw(lzwFixture, 7)) == "ABABABA", "Dynamix LZW expands dictionary and special code");
+Check(Throws<InvalidDataException>(() => DynamixCompression.DecodeLzw(lzwFixture, 8)), "Dynamix LZW rejects truncated streams cleanly");
+Check(Throws<InvalidDataException>(() => DynamixCompression.DecodeLzw(lzwFixture, 7, 6)), "Dynamix LZW enforces expanded-size limit");
+var kind1Source = new byte[] { 3, 0, 0x80, 2, 3, 2, 0, 0x40, 5 };
+var kind1Blocks = DynamixCompression.ReadKind1Blocks(kind1Source);
+Check(kind1Blocks.SequenceEqual([new DynamixCompressedBlock(0, 2, 3, DynamixBlockStorage.Stored), new DynamixCompressedBlock(1, 7, 2, DynamixBlockStorage.Compressed)]), "Dynamix kind-1 block framing and storage markers");
+Check(DynamixCompression.DecodeKind1Block(kind1Source, kind1Blocks[0], 2).SequenceEqual(new byte[] { 2, 3 }), "Dynamix stored kind-1 block decodes verbatim");
+Check(Throws<InvalidDataException>(() => DynamixCompression.DecodeKind1Block(kind1Source, kind1Blocks[1], 1)), "Dynamix compressed block rejects a truncated header");
+Check(Throws<InvalidDataException>(() => DynamixCompression.DecodeKind1Block(kind1Source, kind1Blocks[0], 1)), "Dynamix stored block requires its exact output slice length");
+var compressedKind1 = new byte[] { 13, 0, 0x40, 0x00, 0x18, 0x00, (byte)'A', (byte)'B', (byte)'C', 0, 0x30, 0, 0, 0, (byte)'Z' };
+Check(Encoding.ASCII.GetString(DynamixCompression.DecodeKind1(compressedKind1, 22)) == "ABCABC" + new string('Z', 16), "Dynamix kind-1 literal, dictionary-copy, and run tokens decode");
+Check(DynamixCompression.ExpectedKind1BlockCount(32_769) == 3 && DynamixCompression.ExpectedKind1BlockSize(32_769, 2) == 1, "Dynamix kind-1 output divides into 16 KiB slices");
+Check(Throws<InvalidDataException>(() => DynamixCompression.ReadKind1Blocks([4, 0, 1, 2])), "Dynamix kind-1 framing rejects truncated blocks");
+Check(Throws<InvalidDataException>(() => DynamixCompression.ReadKind1Blocks([1, 0, 0x20])), "Dynamix kind-1 framing rejects unknown block markers");
+var pcx = PcxDecoder.Decode(CreateSyntheticPcx());
+Check(pcx.Width == 3 && pcx.Height == 1 && pcx.Indices.SequenceEqual(new byte[] { 1, 1, 2 }), "indexed PCX dimensions, RLE, and row padding decode");
+Check(pcx.ToRgba().SequenceEqual(new byte[] { 10, 20, 30, 255, 10, 20, 30, 255, 40, 50, 60, 255 }), "indexed PCX palette expands to RGBA");
+Check(Throws<InvalidDataException>(() => new PcxImage(2, 2, [1], new byte[768]).ToRgba()), "indexed PCX rejects inconsistent decoded buffers");
+var brokenPcx = CreateSyntheticPcx(); brokenPcx[^769] = 0;
+Check(Throws<InvalidDataException>(() => PcxDecoder.Decode(brokenPcx)), "indexed PCX rejects a missing palette marker");
+var csf = new CsfSequence(CreateSyntheticCsf());
+Check(csf.Chunks.SequenceEqual([new CsfChunk(0, 14, 3), new CsfChunk(1, 17, 2)]) && csf.ReadChunk(csf.Chunks[1]).SequenceEqual(new byte[] { 4, 5 }), "CSF chunk table and payload boundaries decode");
+var dimensionCsf = new CsfSequence(CreateSyntheticCsf([80, 0, 90, 0]));
+Check(dimensionCsf.ReadDimensionHeader(dimensionCsf.Chunks[0]) == new CsfDimensionHeader(80, 90), "CSF dimension header reads bounded little-endian values");
+var frameCsf = new CsfSequence(CreateSyntheticCsf(CreateSyntheticCsfFrame()));
+var csfFrame = frameCsf.DecodeFrame(frameCsf.Chunks[0]);
+Check(csfFrame is { Width: 5, Height: 2 } && csfFrame.Indices.SequenceEqual(new byte[] { 0, 7, 8, 9, 9, 0, 0, 0, 0, 0 }), "CSF scanline skip, literal, and fill operations decode");
+Check(csfFrame.Alpha.SequenceEqual(new byte[] { 0, 255, 255, 255, 255, 0, 0, 0, 0, 0 }), "CSF skipped pixels remain transparent");
+Check(Throws<InvalidDataException>(() => new CsfFrame(2, 2, [1], [255], 0, 0, 0).ToRgba(new byte[768])), "CSF RGBA conversion rejects inconsistent decoded buffers");
+Check(Throws<InvalidDataException>(() => frameCsf.DecodeFrame(frameCsf.Chunks[0], 9)), "CSF decoder enforces pixel limit");
+var malformedFrameCsf = new CsfSequence(CreateSyntheticCsf([1, 0, 1, 0, 1, 1, 2, 0]));
+Check(Throws<InvalidDataException>(() => malformedFrameCsf.DecodeFrame(malformedFrameCsf.Chunks[0])), "CSF decoder rejects scanlines beyond declared width");
+var brokenCsf = CreateSyntheticCsf(); BinaryPrimitives.WriteUInt32LittleEndian(brokenCsf.AsSpan(10, 4), 20);
+Check(Throws<InvalidDataException>(() => new CsfSequence(brokenCsf)), "CSF rejects chunks outside the resource");
+var palette = IndexedPaletteDecoder.Decode(Enumerable.Range(0, IndexedPalette.ByteSize).Select(x => (byte)x).ToArray());
+Check(palette.Rgb.Length == 768 && palette.Rgb[767] == 255, "indexed RGB palette decodes 256 colors");
+Check(Throws<InvalidDataException>(() => IndexedPaletteDecoder.Decode(new byte[767])), "indexed RGB palette requires exact length");
 
 var cddaBytes = Enumerable.Range(0, CddaWave.BytesPerSector * 2).Select(x => (byte)(x % 251)).ToArray();
 using (var cddaSource = new MemoryStream(cddaBytes))
@@ -75,6 +117,8 @@ try
     BinaryPrimitives.WriteUInt32LittleEndian(corrupt.AsSpan(13 + 4 + 48, 4), uint.MaxValue);
     File.WriteAllBytes(resPath, corrupt);
     Check(Throws<InvalidDataException>(() => new DynamixArchive(resPath)), "Dynamix archive rejects out-of-bounds entry");
+    var memoryArchive = new DynamixArchive(CreateSyntheticDynamixArchive(), "synthetic.res");
+    Check(memoryArchive.SourceName == "synthetic.res" && Encoding.ASCII.GetString(memoryArchive.ReadStored(memoryArchive.Entries[0])) == "HELLO", "Dynamix archive parses in-memory disc resources");
 }
 finally
 {
@@ -215,6 +259,9 @@ try
 {
     Directory.CreateDirectory(Path.Combine(contentRoot, "Audio"));
     File.WriteAllBytes(Path.Combine(contentRoot, "Audio", "track02.wav"), [1, 2, 3, 4]);
+    File.WriteAllBytes(Path.Combine(contentRoot, "portrait.pcc"), CreateSyntheticPcx());
+    File.WriteAllBytes(Path.Combine(contentRoot, "animation.csf"), CreateSyntheticCsf(CreateSyntheticCsfFrame()));
+    File.WriteAllBytes(Path.Combine(contentRoot, "screen.pal"), new byte[IndexedPalette.ByteSize]);
     var manifest = new
     {
         Version = 1,
@@ -222,6 +269,9 @@ try
         Assets = new[]
         {
             new { Id = "CDDA/TRACK02", Path = "Audio/track02.wav", Kind = "audio", Size = 4, Sha256 = "test" },
+            new { Id = "IMAGE", Path = "portrait.pcc", Kind = "image", Size = CreateSyntheticPcx().Length, Sha256 = "test" },
+            new { Id = "ANIMATION", Path = "animation.csf", Kind = "indexed-animation", Size = 0, Sha256 = "test" },
+            new { Id = "PALETTE", Path = "screen.pal", Kind = "palette", Size = IndexedPalette.ByteSize, Sha256 = "test" },
             new { Id = "UNSAFE", Path = "../outside.bin", Kind = "resource", Size = 0, Sha256 = "test" }
         }
     };
@@ -229,7 +279,12 @@ try
     Environment.SetEnvironmentVariable("CONQUEROR_USER_CONTENT", contentRoot);
     var catalog = ImportedContentCatalog.Discover();
     using var importedTrack = catalog?.Open("CDDA/TRACK02");
-    Check(catalog?.Count == 2 && importedTrack?.Length == 4 && catalog.Ids("audio").SequenceEqual(["CDDA/TRACK02"]), "imported content manifest is discoverable");
+    Check(catalog?.Count == 5 && importedTrack?.Length == 4 && catalog.Ids("audio").SequenceEqual(["CDDA/TRACK02"]), "imported content manifest is discoverable");
+    Check(catalog?.FindId("image", "aGe") == "IMAGE" && catalog.FindId("audio", "aGe") is null, "imported content finds role candidates by kind and suffix");
+    Check(catalog?.DecodePcx("IMAGE") is { Width: 3, Height: 1 }, "runtime catalog decodes imported PCX-compatible images");
+    var importedSequence = catalog?.DecodeCsf("ANIMATION");
+    Check(importedSequence?.DecodeFrame(importedSequence.Chunks[0]) is { Width: 5, Height: 2 }, "runtime catalog decodes imported CSF frame sequences");
+    Check(catalog?.DecodePalette("PALETTE")?.Rgb.Length == IndexedPalette.ByteSize, "runtime catalog decodes imported RGB palettes");
     Check(catalog?.Open("UNSAFE") is null, "imported content rejects paths outside its root");
 }
 finally
@@ -308,3 +363,53 @@ static byte[] CreateSyntheticDynamixArchive()
     BinaryPrimitives.WriteUInt32LittleEndian(record.Slice(48, 4), 8);
     return bytes;
 }
+
+static byte[] PackLsbCodes(int[] codes, int width)
+{
+    var result = new byte[(codes.Length * width + 7) / 8];
+    var bitPosition = 0;
+    foreach (var code in codes)
+    {
+        for (var bit = 0; bit < width; bit++, bitPosition++)
+            if ((code & (1 << bit)) != 0) result[bitPosition >> 3] |= (byte)(1 << (bitPosition & 7));
+    }
+    return result;
+}
+
+static byte[] CreateSyntheticPcx()
+{
+    var bytes = new byte[128 + 4 + 1 + 768];
+    bytes[0] = 0x0A; bytes[1] = 5; bytes[2] = 1; bytes[3] = 8;
+    BinaryPrimitives.WriteUInt16LittleEndian(bytes.AsSpan(8, 2), 2);
+    bytes[65] = 1;
+    BinaryPrimitives.WriteUInt16LittleEndian(bytes.AsSpan(66, 2), 4);
+    bytes[128] = 0xC2; bytes[129] = 1; bytes[130] = 2; bytes[131] = 0;
+    bytes[132] = 0x0C;
+    bytes[132 + 3 + 1] = 10; bytes[132 + 3 + 2] = 20; bytes[132 + 3 + 3] = 30;
+    bytes[132 + 6 + 1] = 40; bytes[132 + 6 + 2] = 50; bytes[132 + 6 + 3] = 60;
+    return bytes;
+}
+
+static byte[] CreateSyntheticCsf(byte[]? firstChunk = null)
+{
+    firstChunk ??= [1, 2, 3];
+    var bytes = new byte[14 + firstChunk.Length + 2];
+    BinaryPrimitives.WriteUInt16LittleEndian(bytes, CsfSequence.ObservedMagic);
+    BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(2), 2);
+    BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(6), (uint)firstChunk.Length);
+    BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(10), 2);
+    firstChunk.CopyTo(bytes, 14);
+    new byte[] { 4, 5 }.CopyTo(bytes, 14 + firstChunk.Length);
+    return bytes;
+}
+
+static byte[] CreateSyntheticCsfFrame() =>
+[
+    5, 0, 2, 0,
+    3,
+    1, 1, 0,
+    0, 2, 0, 7, 8,
+    2, 2, 0, 9,
+    1,
+    1, 5, 0
+];

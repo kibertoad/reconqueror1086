@@ -1,0 +1,232 @@
+# Original resource format specification
+
+This document is the clean-room, byte-level specification for formats observed in the legally owned GOG release identified in [`original-findings.md`](original-findings.md). It contains structural facts and independently derived descriptions only—never extracted dialogue, images, audio, video, or binary payloads.
+
+Confidence terms have the same meaning as the evidence register: **Confirmed** is directly measured across the named sample, **Corroborated** combines local evidence with independent documentation, **Provisional** remains a working hypothesis, and **Disproved** records a rejected interpretation.
+
+## Indexed `.RES` container
+
+The loose `C1086.GOB` and the 50 `.RES` scene files on the CD use the same outer indexed container. The `.GOB` extension does not imply the unrelated LucasArts GOB format.
+
+### Header
+
+All integers are little-endian.
+
+| Offset | Size | Type | Meaning | Confidence |
+| ---: | ---: | --- | --- | --- |
+| `0x00` | 4 | ASCII | Literal `.RES` signature | Confirmed |
+| `0x04` | 4 | `UINT32LE` | Absolute directory offset | Confirmed |
+
+Entry data occupies the range beginning at offset 8 and ending no later than the directory offset. Gaps have not yet been assigned semantics.
+
+### Directory
+
+| Offset from directory | Size | Type | Meaning | Confidence |
+| ---: | ---: | --- | --- | --- |
+| `0x00` | 4 | `UINT32LE` | Entry count | Confirmed |
+| `0x04` | `count × 52` | records | Directory entries | Confirmed |
+
+Each 52-byte record is:
+
+| Record offset | Size | Type | Meaning | Confidence |
+| ---: | ---: | --- | --- | --- |
+| `0x00` | 32 | ASCII, NUL padded | Resource name | Confirmed |
+| `0x20` | 4 | `UINT32LE` | Storage/compression kind: observed values 0, 1, 2 | Confirmed classification; codec names unknown |
+| `0x24` | 4 | `UINT32LE` | Reserved or unknown | Provisional |
+| `0x28` | 4 | `UINT32LE` | Stored byte length | Confirmed |
+| `0x2C` | 4 | `UINT32LE` | Expanded byte length | Confirmed |
+| `0x30` | 4 | `UINT32LE` | Absolute data offset | Confirmed |
+
+The parser rejects a directory before byte 8, a directory extending past end of file, more than one million records, blank names, and any stored extent outside the data area. Allocation uses checked conversions.
+
+### Storage kinds
+
+- Kind 0 entries have equal stored and expanded sizes in every observed example and are copied byte-for-byte. This behavior is **Corroborated**, because the bytes are structurally readable but the original decoding branch has not yet been disassembled.
+- Kind 1 entries have unequal sizes and use the independently decoded block format below. Its framing and token grammar are **Confirmed for the hashed release**.
+- Kind 2 occurs in five unequal-size GOB entries and has not yet been framed or decoded.
+- Stored-versus-compressed behavior is determined from both the kind and size relationship; unknown combinations must be rejected rather than guessed.
+
+### Kind-1 block framing
+
+A kind-1 stored extent is a concatenation of blocks:
+
+| Block offset | Size | Type | Meaning | Confidence |
+| ---: | ---: | --- | --- | --- |
+| `+0x00` | 2 | `UINT16LE` | Number of payload bytes following this field | Confirmed |
+| `+0x02` | 1 | `BYTE` | Storage marker: `0x40` compressed, `0x80` verbatim | Confirmed for this release |
+| `+0x03` | `length - 1` | bytes | Encoded data | Confirmed boundary and codec |
+
+The next length begins immediately after the preceding payload. Zero lengths, truncated length fields, unknown storage markers, payloads beyond the entry extent, and trailing bytes that cannot form a complete block are invalid.
+
+Each block expands to 16,384 bytes except the final block of an entry, which expands to the remaining bytes. Consequently, an entry has exactly `ceil(expanded length / 16384)` blocks. A `0x80` block contains those output bytes directly, so its framed payload length is the expected output length plus one marker byte. The decoder validates this relationship before copying it.
+
+Across the hashed release, all 471 kind-1 GOB entries consume exactly as 2,963 blocks: 2,940 use `0x40` and 23 use `0x80`. All 11,372 kind-1 entries in the 50 CD scene containers consume exactly as 17,418 blocks: 17,410 use `0x40` and eight use `0x80`. Every one of these 20,381 blocks decodes to its expected slice length. No scene entry uses kind 2. These population-wide results make the framing, marker meanings, output block size, and decoder **Confirmed for this release**, not necessarily for every game using a `.RES` signature.
+
+### Kind-1 compressed token grammar
+
+A `0x40` payload starts with the marker, one metadata byte that the original decoder does not consult, and a 16-bit big-endian control word. Control bits are consumed most-significant first. After 16 tokens, the next two bytes in the stream form another control word.
+
+| Control bit | Token bytes | Meaning |
+| ---: | --- | --- |
+| `0` | one byte | Emit one literal byte. |
+| `1`, nonzero distance | two bytes `a`, `b` | Copy `(b & 0x0F) + 3` bytes from the already decoded output at distance `(a << 4) | (b >> 4)`. Overlap is allowed. Distances range from 1 to 4095 and lengths from 3 to 18. |
+| `1`, zero distance | four bytes `0`, `b`, `c`, `value` | Emit `value` repeatedly `(b << 8) + c + 16` times. Because the encoded distance is zero, `b` is at most `0x0F`; run lengths range from 16 to 4111. |
+
+The implementation rejects truncated control words and tokens, history references before the beginning of output, output overflow, block-count disagreement, and any final expanded-size mismatch. The grammar was reconstructed from the owned executable's decoder and then independently checked by exact-size decoding of the full GOB/scene kind-1 population. It also yields 188 strict PCX-compatible images, including 640x480 `fftitle.pcx` and `engmap1.pcx`. The algorithm and those dimensions are **Confirmed for the hashed release**; assigning those two filenames to the title and England-map runtime roles is **Corroborated** by decoded visual inspection.
+
+### Resource population
+
+The 486 GOB records and 13,147 scene records produce this extension-level inventory. `<none>` entries are predominantly internal scene resources; an absent extension is not evidence of a single payload type.
+
+| Extension | Total | Stored | Kind 1 | Kind 2 | Scope |
+| --- | ---: | ---: | ---: | ---: | --- |
+| `<none>` | 13,129 | 1,770 | 11,359 | 0 | Scene |
+| `.PCX` | 152 | 0 | 148 | 4 | GOB and scene |
+| `.RAT` | 116 | 1 | 115 | 0 | GOB |
+| `.CSF` | 66 | 5 | 61 | 0 | GOB and scene |
+| `.PCC` | 49 | 1 | 48 | 0 | GOB |
+| `.DAT` | 35 | 0 | 35 | 0 | GOB |
+| `.HAT` | 27 | 0 | 27 | 0 | GOB |
+| `.666` | 26 | 2 | 23 | 1 | GOB and scene |
+| `.HMP` | 12 | 0 | 12 | 0 | GOB |
+| `.PAL` | 5 | 5 | 0 | 0 | Scene |
+| `.JP` | 5 | 0 | 5 | 0 | GOB |
+| Other named extensions | 11 | 1 | 10 | 0 | GOB and scene |
+
+The five kind-2 resources are four `.PCX` entries and one `.666` entry. This distribution is **Confirmed**, while the semantic meaning of `.666` and most other extensions remains unknown.
+
+## Indexed PCX images
+
+At least one `.PCC` resource is actually a standard single-plane, 8-bit PCX payload. Decoders must identify the content from its header rather than relying exclusively on its filename extension.
+
+The currently supported subset requires:
+
+| Header offset | Size | Required value or meaning |
+| ---: | ---: | --- |
+| `0x00` | 1 | Manufacturer `0x0A` |
+| `0x01` | 1 | Version (observed `5`) |
+| `0x02` | 1 | RLE encoding `1` |
+| `0x03` | 1 | 8 bits per plane |
+| `0x04`–`0x0B` | 8 | `xmin`, `ymin`, `xmax`, `ymax` as `UINT16LE` |
+| `0x41` | 1 | One color plane |
+| `0x42` | 2 | Bytes per scanline as `UINT16LE`, at least image width |
+
+Image dimensions are inclusive: `width = xmax - xmin + 1` and `height = ymax - ymin + 1`. Beginning at byte 128, a byte with top bits other than `11` is one literal index. A byte with top bits `11` stores a run length in its low six bits and is followed by the repeated index. Decoding fills `bytesPerLine × height`; per-row padding beyond `width` is discarded.
+
+The final 769 bytes are marker `0x0C` followed by 256 RGB triples. The implementation requires the decoded scanline stream to end exactly at that marker and bounds the total pixel allocation. It can expand indices to RGBA8 with alpha 255.
+
+The stored `richard.pcc` entry validates as 195×203 pixels; its decoded index SHA-256 is `bee27150d1271ec996cc29e63e196b3fe9ff0504faaec5486f35c685fcbfcd36`. This structure and hash are **Confirmed for the hashed release**. It does not yet prove that all `.PCC` resources are PCX or that compressed `.PCX` entries contain identical payloads after outer decompression.
+
+## Indexed RGB palettes
+
+All five byte-stored `.PAL` entries are exactly 768 bytes: 256 consecutive red, green, and blue byte triples with no header or trailer. Observed channel values span nearly the complete byte range (maximum values 252–255), so they are already 8-bit color components and must not be multiplied from VGA 6-bit values. Exact length, byte interpretation, and component range are **Confirmed for these resources**. Association with particular images or CSF sequences remains **Provisional**.
+
+The importer assigns the `palette` kind only after exact-length validation. `stored-palette-report.txt` records provenance, component range, and a stable SHA-256 without exporting palette bytes.
+
+## CSF chunk sequences
+
+All five byte-stored `.CSF` resources share this structure:
+
+| Offset | Size | Type | Meaning | Confidence |
+| ---: | ---: | --- | --- | --- |
+| `0x00` | 2 | `UINT16LE` | Observed magic `0x4A32` | Confirmed |
+| `0x02` | 4 | `UINT32LE` | Chunk count | Confirmed |
+| `0x06` | `count × 4` | `UINT32LE[]` | Ordered chunk byte lengths | Confirmed |
+| after table | sum of lengths | bytes | Concatenated chunk payloads | Confirmed boundaries; semantics unknown |
+
+There are no offsets in the observed table: each chunk begins immediately after its predecessor. The bounded parser rejects oversized counts, truncated tables, chunks beyond the resource, and any trailing bytes not consumed by the size table.
+
+| Stored resource | Chunks | Minimum chunk | Maximum chunk | Total payload |
+| --- | ---: | ---: | ---: | ---: |
+| `men8.CSF` | 723 | 71 | 3,412 | 1,247,405 |
+| `credit.CSF` | 32 | 50,717 | 52,472 | 1,648,002 |
+| `ica.CSF` | 337 | 599 | 5,878 | 827,986 |
+| `ics.CSF` | 337 | 599 | 5,878 | 827,273 |
+| `icw.CSF` | 337 | 599 | 5,864 | 824,883 |
+
+The table and scanline decoder establish an indexed-frame sequence. Treating `.CSF` as dialogue based solely on its extension is **Disproved** for these five resources.
+
+Every one of the 1,766 stored chunks begins with two positive `UINT16LE` values that fit conservative image bounds. Their observed distribution is:
+
+- `credit.CSF`: 32 chunks at 275×190.
+- `ica.CSF`, `ics.CSF`, and `icw.CSF`: 337 chunks each at 80×80.
+- `men8.CSF`: 720 chunks at 90×90, plus one each at 3×9, 39×13, and 57×14.
+
+The values, population counts, and width/height interpretation are **Confirmed** by exact scanline decoding across every chunk.
+
+### CSF frame payload
+
+After the four-byte dimension header, each of `height` scanlines is encoded independently:
+
+| Size | Type | Meaning |
+| ---: | --- | --- |
+| 1 | `BYTE` | Number of segments in this scanline |
+| variable | segments | Consecutive commands whose lengths must sum to `width` |
+
+Each segment begins with an operation byte and a `UINT16LE` pixel length. Lengths must be positive and may not extend beyond the declared width.
+
+| Operation | Following bytes | Meaning |
+| ---: | --- | --- |
+| `0` | `length` palette indices | Copy literal opaque pixels |
+| `1` | none | Advance by `length` transparent pixels |
+| `2` | one palette index | Fill `length` opaque pixels with that index |
+
+The decoder requires every row to total exactly the width and every chunk to end exactly after the final row. It bounds pixel allocation, rejects unknown operations and truncated commands, and returns separate index and alpha arrays. Palette association remains unresolved; CSF frames appear to rely on a palette supplied by their surrounding screen rather than embedding one.
+
+All 1,766 stored chunks decode with this grammar. Across the five resources they contain 119,292 literal segments, 254,433 transparent-skip segments, and 19,573 fill segments. `csf-report.txt` records per-resource counts and stable SHA-256 values over decoded dimensions, indices, and alpha masks, and now applies the same validation to kind-1 CSFs. These command meanings and stored-resource population results are **Confirmed for the hashed release**.
+
+### Rejected codec identifications
+
+Documented Dynamix inner chunks can use an LSB-first 9-to-12-bit LZW variant. Applying that bitstream directly to outer kind-1 blocks produces undefined initial dictionary codes and no valid output. The claim that outer kind 1 is raw inner-chunk LZW is therefore **Disproved**. The bounded inner LZW decoder remains separate and must not be selected from the outer kind value.
+
+Classic LH1/LZHUF with a 4 KiB history window and independently reset 16 KiB output blocks was also tested against all 187 kind-1 `.PCX` and `.PCC` entries in the GOB. It produced no valid PCX headers under either tested bit order. That exact interpretation is **Disproved**; the similar compression ratio and block count are not sufficient evidence to label kind 1 as LH1.
+
+## HAT screen layouts
+
+The decoded `.HAT` population uses a compact fixed-header layout. Integer fields are signed 32-bit little-endian values. The following structure is **Confirmed for the hashed release**:
+
+| Offset | Size | Meaning |
+| ---: | ---: | --- |
+| `0x00` | 4 | Screen identifier |
+| `0x04` | 4 | Screen origin X |
+| `0x08` | 4 | Screen origin Y |
+| `0x0C` | 4 | Screen width; observed as 640 |
+| `0x10` | 4 | Screen height; observed as 480 |
+| `0x14` | 4 | Region count |
+| `0x18` | 13 | Null-terminated/padded background resource name |
+| `0x25` | 3 | Unknown tag; observed as little-endian `0x0045C0` |
+| `0x28` | `count × 24` | Ordered region records |
+
+Each region record contains six 32-bit fields: identifier, X, Y, width, height, and enabled flag. Some rectangles deliberately extend beyond the 640x480 viewport and are clipped, so the bounded parser requires intersection rather than full containment. One observed file ends with the DOS text marker `0D 0A 1A`; no other trailing data is accepted. `hat-layout-report.txt` records every decoded descriptor without exporting its original bytes.
+
+`CGOPTS.HAT` maps `CHAR_OPS.PCX` regions 0–2 to Generate New Character, Choose Pre-generated Character, and Choose Character Name, followed by red, green, and blue shield regions 3–5. `PREGEN.HAT` maps `PREGEN.PCX` region identifiers 0–5 to the six profile panels. The geometry and numeric identifiers are **Confirmed**; action semantics are **Corroborated** by their alignment with labeled artwork and runtime flow.
+
+## Disc image and audio
+
+`game.ins` is a cue sheet. Track 1 is MODE1/2352 data; each raw sector exposes its 2,048-byte ISO-9660 payload beginning 16 bytes into the sector. The first audio-track index determines the data-track sector count. Later tracks are Red Book CDDA: 44,100 Hz, stereo, signed 16-bit little-endian PCM, with 2,352 bytes per sector. The importer wraps those samples losslessly in a RIFF/WAVE header.
+
+The raw-sector bounds, ISO directory traversal, cue timestamps, and WAV sample preservation are covered by synthetic executable specifications.
+
+## Reproducible reports
+
+`tools/Conqueror.Inspect` generates these ignored reports under `analysis/original`:
+
+- `cd-manifest.txt`: ISO paths and byte sizes.
+- `gob-directory.txt`: outer GOB directory fields.
+- `gob-compression-report.txt`: kind-1 block counts and complete decoding validation.
+- `scene-res-report.txt`: per-scene entry, storage-kind, and block totals.
+- `resource-extension-report.txt`: aggregate extension and storage-kind inventory.
+- `stored-image-report.txt`: dimensions and decoded pixel-index hashes for stored and kind-1 PCX-compatible payloads.
+- `csf-report.txt`: storage kind, chunk sizes, dimensions, decoded segment totals, and stable frame-sequence hashes for byte-stored and kind-1 CSF containers.
+- `stored-palette-report.txt`: provenance, component ranges, and hashes for validated 256-color RGB palettes.
+- `hat-layout-report.txt`: decoded screen identifiers, background names, and region records for HAT layout descriptors.
+- `artifact-hashes.txt` and `string-hits.txt`: provenance and targeted executable evidence.
+
+The reports are regenerated from the user's installation and must never be committed. Stable conclusions belong here and confidence-scoped gameplay conclusions belong in [`original-findings.md`](original-findings.md).
+
+## Open questions
+
+1. Determine kind-2 framing and whether it represents a second codec or preprocessing stage.
+2. Recover the semantic meaning of directory field `0x24` and test whether data extents may alias or overlap.
+3. Specify nested chunk headers and the exact compression selector used inside decoded resources.
+4. Associate CSF sequences with their screen palettes, and specify the remaining PCC, LOW, palette, RAT, FNT, and `666` payload semantics as each decoder is validated.

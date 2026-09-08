@@ -28,7 +28,7 @@ using (var image = new RawMode1Image(imagePath, CueSheet.DataTrackSectors(cueLin
         File.WriteAllBytes(target, iso.ReadFile(file));
         entries.Add(NewEntry(file.Path, relative, Kind(file.Path), target));
         if (Path.GetExtension(file.Path).Equals(".RES", StringComparison.OrdinalIgnoreCase))
-            InstallStoredEntries(new DynamixArchive(target), file.Path, output, entries);
+            InstallDecodedEntries(new DynamixArchive(target), file.Path, output, entries);
     }
 }
 
@@ -37,7 +37,7 @@ var archiveTarget = ResourcePaths.SafeTarget(output, archiveRelative);
 Directory.CreateDirectory(Path.GetDirectoryName(archiveTarget)!);
 File.Copy(gobPath, archiveTarget, true);
 entries.Add(NewEntry("C1086.GOB", archiveRelative, "archive", archiveTarget));
-InstallStoredEntries(new DynamixArchive(archiveTarget), "C1086.GOB", output, entries);
+InstallDecodedEntries(new DynamixArchive(archiveTarget), "C1086.GOB", output, entries);
 
 var tracks = CueSheet.Tracks(cueLines);
 using (var source = File.Open(imagePath, FileMode.Open, FileAccess.Read, FileShare.Read))
@@ -71,15 +71,38 @@ static string Kind(string path) => Path.GetExtension(path).ToUpperInvariant() sw
 };
 static ImportedAsset NewEntry(string id, string relative, string kind, string path) => new(id.Replace('\\', '/'), relative.Replace('\\', '/'), kind, new FileInfo(path).Length, ResourceHash.Sha256(path));
 
-static void InstallStoredEntries(DynamixArchive archive, string archiveId, string output, List<ImportedAsset> entries)
+static string DecodedKind(string name, string path)
 {
-    foreach (var entry in archive.Entries.Where(x => x.IsStored))
+    if (Path.GetExtension(name).Equals(".CSF", StringComparison.OrdinalIgnoreCase))
+    {
+        try
+        {
+            _ = new CsfSequence(File.ReadAllBytes(path));
+            return "indexed-animation";
+        }
+        catch (InvalidDataException) { }
+    }
+    if (Path.GetExtension(name).Equals(".PAL", StringComparison.OrdinalIgnoreCase))
+    {
+        try
+        {
+            _ = IndexedPaletteDecoder.Decode(File.ReadAllBytes(path));
+            return "palette";
+        }
+        catch (InvalidDataException) { }
+    }
+    return Kind(name);
+}
+
+static void InstallDecodedEntries(DynamixArchive archive, string archiveId, string output, List<ImportedAsset> entries)
+{
+    foreach (var entry in archive.Entries.Where(x => x.IsStored || x.Flags == 1))
     {
         var folder = ResourcePaths.SafeName(Path.GetFileNameWithoutExtension(archiveId));
         var relative = Path.Combine("Decoded", folder, $"{entry.Index:0000}-{ResourcePaths.SafeName(entry.Name)}");
         var target = ResourcePaths.SafeTarget(output, relative);
         Directory.CreateDirectory(Path.GetDirectoryName(target)!);
         File.WriteAllBytes(target, archive.ReadDecoded(entry));
-        entries.Add(NewEntry($"{archiveId}#{entry.Index}:{entry.Name}", relative, Kind(entry.Name), target));
+        entries.Add(NewEntry($"{archiveId}#{entry.Index}:{entry.Name}", relative, DecodedKind(entry.Name, target), target));
     }
 }

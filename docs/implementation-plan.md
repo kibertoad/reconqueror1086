@@ -9,6 +9,7 @@ Complete a clean-room MonoGame reimplementation of *Conqueror: A.D. 1086* that p
 - Keep gameplay rules in typed definitions and generic interpreters rather than screen-specific conditionals.
 - Keep simulation code independent of MonoGame so it remains deterministic and testable without a graphics device.
 - Treat `docs/original-findings.md` as the evidence register for claims about the original.
+- Maintain `docs/resource-formats.md` as the byte-level technical specification for every inspected container, compression stream, and decoded resource family.
 - Label every recovered value as Confirmed, Corroborated, or Provisional.
 - Do not promote a provisional value without executable/resource evidence, controlled observation, or corroborating documentation.
 - Store imported resources only under Git-ignored `UserContent` and validate every manifest path and source hash.
@@ -21,10 +22,12 @@ The repository currently provides:
 - A MonoGame desktop application and data-driven campaign core.
 - Character templates, representative youth dilemmas, economy, construction counters, army recruitment, travel, tournaments, courtship, equipment, field battles, sieges, crown victory, dragon victory, and the age limit.
 - Persistent strategic garrisons, spying, interception, retreat, conquest, and JSON saves.
-- A read-only original-disc inspector with ISO inventory, hashes, and printable-string searches.
-- An end-user importer for raw original resources and lossless CDDA WAV conversion.
-- A runtime imported-content catalog and CD music playback.
-- Sixty-two executable specifications passing without a graphics device.
+- A read-only original-disc inspector with ISO inventory, hashes, executable-string offsets, archive/compression reports, CSF previews, and HAT layout reports.
+- Bounded parsers for GOB/RES directories, kind-1 LZ/RLE blocks, indexed PCX/PCC images, CSF animation frames, raw RGB palettes, and HAT screen descriptors.
+- An end-user importer that installs byte-stored and kind-1 owned resources plus lossless CDDA WAV files under ignored local storage.
+- A runtime imported-content catalog, CD music playback, and definition-driven original art for the title, character options, pre-generated characters, England map, load-screen background registration, and a tournament portrait.
+- An executable-confirmed `TITLE.HAT`/`FFTITLE.PCX` title load followed by a corroborated character-options flow whose exact geometry comes from installed `CGOPTS.HAT` and `PREGEN.HAT`.
+- Seven xUnit tests and 103 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
 
 ## Dependency map
 
@@ -65,6 +68,26 @@ Acceptance criteria:
 - Known entries reproduce stable hashes across repeated extraction.
 - Synthetic malformed archives cannot write outside the selected output root or allocate unbounded memory.
 - No extracted data is tracked by Git.
+
+### 1.1a Technical format documentation
+
+Maintain a reviewable clean-room specification alongside the implementation rather than leaving format knowledge implicit in decoder code.
+
+Deliverables:
+
+- Document byte layouts, endianness, offsets, length semantics, compression framing, known signatures, and validation rules in `docs/resource-formats.md`.
+- Record sample-population totals and the exact hashed release to which each observation applies.
+- Label every field and codec claim Confirmed, Corroborated, Provisional, or Disproved.
+- Link format claims to the inspector report that reproduces them and to synthetic specifications covering malformed input.
+- Update the specification whenever support is added for a new archive, image, palette, dialogue, audio, animation, save, or metadata structure.
+- Preserve unsuccessful hypotheses when they prevent future contributors from repeating the same false identification.
+
+Acceptance criteria:
+
+- A contributor can implement an independent parser from the documentation without consulting proprietary files.
+- Every implemented field has a documented bounds rule and confidence grade.
+- Generated reports and original bytes remain ignored; only compact facts, layouts, hashes, and independently authored fixtures are tracked.
+- Format documentation and decoder changes are reviewed and committed together.
 
 ### 1.2 Dialogue extraction
 
@@ -471,28 +494,50 @@ All parser fixtures must be synthetic or independently authored; never commit ex
 - Fail CI if `UserContent` or `analysis/original` generated outputs are tracked.
 - Review new binary files and unusually large files explicitly.
 
-## Suggested milestone order
+## Milestone status
 
-| Milestone | Phases | Playable result |
-| --- | --- | --- |
-| M1: Decoded content | 1-2 | Local original dialogue/images can be inspected and loaded with traceable confidence. |
-| M2: Feudal simulation | 3-4 | Exact map, buildable home fief, multiple estates, NPCs, quests, and political orders. |
-| M3: Knightly competition | 5 | Full wagered jousting and tournament melee. |
-| M4: Conquest | 6-7 | Faithful strategic, field, and castle warfare with original layouts and loot. |
-| M5: Two endings | 8 | Complete Drogo, dragon cave, dragon fight, crown route, and endings. |
-| M6: Original presentation | 9 | Imported audiovisual presentation plus accessible fallback mode. |
-| M7: Release | 10 | Robust saves/importer, CI, and self-contained Windows distribution. |
+Status is conservative: “prototype” means the route is playable but substantial original behavior or balance remains provisional; only acceptance-criteria completion can mark a milestone complete.
 
-## Immediate next sprint
+| Milestone | Phases | Status (2026-09-08) | Remaining completion gate |
+| --- | --- | --- | --- |
+| M1: Decoded content | 1-2 | In progress: archive kind 1, PCX/PCC, CSF, palettes, HAT layouts, installer, and evidence reports work. | Decode kind 2 and dialogue/text structures; complete executable table recovery and controlled observations. |
+| M2: Feudal simulation | 3-4 | Playable prototype. | Exact map/economy, tile-based fief construction, multiple managed estates, full dialogue/quests, and political orders. |
+| M3: Knightly competition | 5 | Playable prototype. | Exact opponent tables plus faithful first-person jousting and tactical tournament melee. |
+| M4: Conquest | 6-7 | Playable prototype. | Original strategic rules, battlefield systems, castle layouts, combat balance, retainers, and loot. |
+| M5: Two endings | 8 | Both routes playable as prototypes. | Complete Drogo/dragon quest chain, dragon encounter, crown politics, and original endings. |
+| M6: Original presentation | 9 | In progress: title, character screens, map, one portrait, CD audio, and presentation descriptors are active. | Full screen mapping, CSF/SMK playback, palettes, fonts, cursors, dialogue, effects, speech, and accessibility/settings. |
+| M7: Release | 10 | Not started beyond launch/test/import batch utilities. | Save slots/migrations, importer repair workflow, CI/legal gates, packaging, and clean-machine verification. |
+
+## Current resource and startup sprint
 
 - [x] Move shared ISO/cue/CDDA/manifest primitives out of the inspector executable into `Conqueror.Resources`.
 - [x] Add synthetic ISO, cue, WAV, archive, manifest, and path-safety tests.
+- [x] Add an xUnit.net v3 4.0.0 suite and an isolated Windows test launcher that cannot collide with a running game's build outputs.
 - [x] Reverse-engineer and bounds-check the top-level `C1086.GOB`/scene-RES directory structure.
 - [x] Inventory stored versus compressed entries without bulk decompression.
 - [ ] Identify and decode one uncompressed text resource end to end.
-- [ ] Decode one image/palette resource into runtime pixels end to end.
+- [x] Decode one byte-stored image/palette resource into runtime RGBA pixels end to end.
+- [x] Decode all five byte-stored CSF indexed-animation sequences into bounded palette indices and alpha masks.
+- [x] Validate and classify the five stored 256-color RGB palette resources.
 - [x] Add current findings with evidence and confidence grades.
 - [x] Make the importer install byte-stored entries and expose them through `ImportedContentCatalog`.
-- [ ] Prove and implement the compression method used by unequal-size entries.
+- [x] Prove and implement the kind-1 compression method used by unequal-size entries.
+  - [x] Confirm kind-1 block framing across all 471 entries in the hashed GOB.
+  - [x] Confirm 16 KiB output slices and the `0x40` compressed/`0x80` verbatim block markers across the GOB and all 50 scene containers.
+  - [x] Separate the five kind-2 entries and disprove raw inner-chunk LZW and independently reset classic LH1 for kind 1.
+  - [x] Identify the kind-1 LZ/RLE token codec and validate all 20,381 blocks plus 188 decoded PCX-compatible images.
+  - [ ] Identify kind 2 and validate its five GOB entries.
+- [x] Activate decoded `fftitle.pcx` and `engmap1.pcx` through definition-driven title and map roles.
+- [x] Correct the startup flow from executable/resource evidence: static `FFTITLE.PCX` title, then interactive `CHAR_OPS.PCX`, with `PREGEN.PCX` and `LOADGAME.PCX` registered as distinct screen roles.
+- [x] Decode HAT screen descriptors and use installed `CGOPTS.HAT`/`PREGEN.HAT` geometry at runtime with bounded fallback definitions.
+- [ ] Trace the complete startup/menu state machine, input timing, cursor behavior, and region-action dispatch from `CONQUER.EXE`; keep semantics corroborated until each executable branch is confirmed.
 
 The resource-decoding sprint is first because it unlocks exact dialogue, screen mappings, opponent identities, construction data, and balance tables needed by most later phases.
+
+## Next implementation priorities
+
+1. Trace startup/menu input timing and HAT region-action dispatch from `CONQUER.EXE`; implement the original five-slot load/resume flow without inferring unsupported transitions.
+2. Identify kind-2 compression and validate all five affected GOB entries with bounded synthetic failure cases.
+3. Locate and decode the first text/dialogue structure end to end, exposing it through a runtime repository while keeping original prose untracked.
+4. Bind menu CSF sequences to verified palettes and roles, beginning with cursor/settings animation; record every association and confidence grade.
+5. Add legal-boundary automation that fails if imported media or generated analysis artifacts enter Git, then add CI restore/build/test coverage.

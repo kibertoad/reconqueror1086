@@ -44,7 +44,10 @@ report.AppendLine("# Extracted artifact hashes");
 foreach (var path in Directory.EnumerateFiles(artifactRoot, "*", SearchOption.AllDirectories).Order())
     report.AppendLine($"{Hash(path)}  {Path.GetRelativePath(artifactRoot, path)}  {new FileInfo(path).Length}");
 File.WriteAllText(Path.Combine(output, "artifact-hashes.txt"), report.ToString());
-var terms = args.Skip(2).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+var inspectionOptions = args.Skip(2).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+var renderCsfName = OptionValue(inspectionOptions, "--render-csf=");
+var palettePcxName = OptionValue(inspectionOptions, "--palette-pcx=");
+var terms = inspectionOptions.Where(x => !x.StartsWith("--", StringComparison.Ordinal)).ToArray();
 if (terms.Length > 0)
 {
     var hits = new StringBuilder("# Printable-string hits (offset, source, text)\n");
@@ -57,18 +60,192 @@ if (terms.Length > 0)
 }
 var gobEntries = 0;
 var gobStoredEntries = 0;
+var kind1Blocks = 0;
+var resourceInventory = new List<(string Scope, DynamixEntry Entry)>();
 var gobPath = Path.Combine(install, "C1086.GOB");
 if (File.Exists(gobPath))
 {
     var gob = new DynamixArchive(gobPath);
     gobEntries = gob.Entries.Count;
     gobStoredEntries = gob.Entries.Count(x => x.IsStored);
+    resourceInventory.AddRange(gob.Entries.Select(x => ("GOB", x)));
     var directory = new StringBuilder("# Index  Flags  Stored  Expanded  Offset  Name\n");
     foreach (var entry in gob.Entries)
         directory.AppendLine($"{entry.Index,5}  {entry.Flags,5}  {entry.StoredSize,10}  {entry.ExpandedSize,10}  0x{entry.Offset:X8}  {entry.Name}");
     File.WriteAllText(Path.Combine(output, "gob-directory.txt"), directory.ToString());
+
+    var compressionReport = new StringBuilder("# Index  Kind  Blocks  Compressed  Stored  Result  Name\n");
+    foreach (var entry in gob.Entries.Where(x => !x.IsStored))
+    {
+        try
+        {
+            if (entry.Flags != 1)
+            {
+                compressionReport.AppendLine($"{entry.Index,5}  {entry.Flags,4}  -  -  -  codec-unidentified  {entry.Name}");
+                continue;
+            }
+            var blocks = DynamixCompression.ReadKind1Blocks(gob.ReadStored(entry));
+            if (blocks.Count != DynamixCompression.ExpectedKind1BlockCount(checked((int)entry.ExpandedSize)))
+                throw new InvalidDataException("Kind-1 block count does not match the declared expanded size.");
+            kind1Blocks += blocks.Count;
+            var storedBytes = gob.ReadStored(entry);
+            _ = gob.ReadDecoded(entry);
+            compressionReport.AppendLine($"{entry.Index,5}  {entry.Flags,4}  {blocks.Count,6}  {blocks.Count(x => x.Storage == DynamixBlockStorage.Compressed),10}  {blocks.Count(x => x.Storage == DynamixBlockStorage.Stored),6}  decoded-size-valid  {entry.Name}");
+        }
+        catch (InvalidDataException error)
+        {
+            compressionReport.AppendLine($"{entry.Index,5}  {entry.Flags,4}  -  rejected: {error.Message.Replace('\r', ' ').Replace('\n', ' ')}  {entry.Name}");
+        }
+    }
+    File.WriteAllText(Path.Combine(output, "gob-compression-report.txt"), compressionReport.ToString());
+
+    var imageReport = new StringBuilder("# Width  Height  Pixel-index SHA-256  Name\n");
+    foreach (var entry in gob.Entries.Where(x => x.IsStored || x.Flags == 1))
+    {
+        var bytes = gob.ReadDecoded(entry);
+        if (bytes.Length < 4 || bytes[0] != 0x0A || bytes[2] != 1 || bytes[3] != 8) continue;
+        try
+        {
+            var pcxImage = PcxDecoder.Decode(bytes);
+            imageReport.AppendLine($"{pcxImage.Width,5}  {pcxImage.Height,6}  {Convert.ToHexString(SHA256.HashData(pcxImage.Indices)).ToLowerInvariant()}  {entry.Name}");
+        }
+        catch (InvalidDataException error)
+        {
+            imageReport.AppendLine($"rejected  {error.Message.Replace('\r', ' ').Replace('\n', ' ')}  {entry.Name}");
+        }
+    }
+    File.WriteAllText(Path.Combine(output, "stored-image-report.txt"), imageReport.ToString());
+
+    var csfReport = new StringBuilder("# Storage  Chunks  Minimum  Maximum  Payload bytes  Segments literal/skip/fill  Frame-sequence SHA-256  Dimension headers  Name\n");
+    foreach (var entry in gob.Entries.Where(x => (x.IsStored || x.Flags == 1) && Path.GetExtension(x.Name).Equals(".CSF", StringComparison.OrdinalIgnoreCase)))
+    {
+        try
+        {
+            var sequence = new CsfSequence(gob.ReadDecoded(entry));
+            using var frameHash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+            var dimensionsBytes = new byte[4];
+            long literalSegments = 0, transparentSegments = 0, fillSegments = 0;
+            foreach (var chunk in sequence.Chunks)
+            {
+                var frame = sequence.DecodeFrame(chunk);
+                literalSegments += frame.LiteralSegments;
+                transparentSegments += frame.TransparentSegments;
+                fillSegments += frame.FillSegments;
+                System.Buffers.Binary.BinaryPrimitives.WriteUInt16LittleEndian(dimensionsBytes, checked((ushort)frame.Width));
+                System.Buffers.Binary.BinaryPrimitives.WriteUInt16LittleEndian(dimensionsBytes.AsSpan(2), checked((ushort)frame.Height));
+                frameHash.AppendData(dimensionsBytes);
+                frameHash.AppendData(frame.Indices);
+                frameHash.AppendData(frame.Alpha);
+            }
+            var dimensions = sequence.Chunks.Select(x => sequence.ReadDimensionHeader(x)).GroupBy(x => x).OrderByDescending(x => x.Count()).ThenBy(x => x.Key.Width).Select(x => $"{x.Key.Width}x{x.Key.Height}:{x.Count()}");
+            csfReport.AppendLine($"{(entry.IsStored ? "stored" : "kind1"),7}  {sequence.Chunks.Count,6}  {sequence.Chunks.Min(x => x.Size),7}  {sequence.Chunks.Max(x => x.Size),7}  {sequence.Chunks.Sum(x => (long)x.Size),13}  {literalSegments}/{transparentSegments}/{fillSegments}  {Convert.ToHexString(frameHash.GetHashAndReset()).ToLowerInvariant()}  {string.Join(',', dimensions)}  {entry.Name}");
+        }
+        catch (InvalidDataException error)
+        {
+            csfReport.AppendLine($"rejected  {error.Message.Replace('\r', ' ').Replace('\n', ' ')}  {entry.Name}");
+        }
+    }
+    File.WriteAllText(Path.Combine(output, "csf-report.txt"), csfReport.ToString());
+
+    var hatReport = new StringBuilder("# Screen  Origin  Size  Regions  Tag  Background  Region records (id:x,y,width,height,enabled)\n");
+    foreach (var entry in gob.Entries.Where(x => (x.IsStored || x.Flags == 1) && Path.GetExtension(x.Name).Equals(".HAT", StringComparison.OrdinalIgnoreCase)))
+    {
+        try
+        {
+            var layout = new HatLayout(gob.ReadDecoded(entry));
+            var regions = string.Join(' ', layout.Regions.Select(x => $"{x.Id}:{x.X},{x.Y},{x.Width},{x.Height},{x.Enabled}"));
+            hatReport.AppendLine($"{layout.ScreenId,6}  {layout.OriginX},{layout.OriginY}  {layout.Width}x{layout.Height}  {layout.Regions.Count,7}  0x{layout.UnknownTag:X6}  {layout.BackgroundName}  {regions}");
+        }
+        catch (InvalidDataException error)
+        {
+            hatReport.AppendLine($"rejected  {entry.Name}: {error.Message.Replace('\r', ' ').Replace('\n', ' ')}");
+        }
+    }
+    File.WriteAllText(Path.Combine(output, "hat-layout-report.txt"), hatReport.ToString());
+
+    if (renderCsfName is not null || palettePcxName is not null)
+    {
+        if (renderCsfName is null || palettePcxName is null)
+            throw new ArgumentException("CSF previews require both --render-csf=<name> and --palette-pcx=<name>.");
+        var csfEntry = gob.Entries.FirstOrDefault(x => x.Name.Equals(renderCsfName, StringComparison.OrdinalIgnoreCase))
+            ?? throw new ArgumentException($"GOB resource '{renderCsfName}' was not found.");
+        var paletteEntry = gob.Entries.FirstOrDefault(x => x.Name.Equals(palettePcxName, StringComparison.OrdinalIgnoreCase))
+            ?? throw new ArgumentException($"GOB resource '{palettePcxName}' was not found.");
+        var previewSequence = new CsfSequence(gob.ReadDecoded(csfEntry));
+        var previewPalette = PcxDecoder.Decode(gob.ReadDecoded(paletteEntry)).PaletteRgb;
+        var previewRoot = Path.Combine(artifactRoot, "csf-previews", SafeName(csfEntry.Name));
+        Directory.CreateDirectory(previewRoot);
+        foreach (var chunk in previewSequence.Chunks)
+            WritePpm(Path.Combine(previewRoot, $"frame-{chunk.Index:D4}.ppm"), previewSequence.DecodeFrame(chunk), previewPalette, 6);
+    }
 }
-Console.WriteLine($"Indexed {files.Length} CD files, {gobEntries} GOB entries ({gobStoredEntries} stored), and extracted {extracted} inspectable artifacts to {output}.");
+
+var sceneReport = new StringBuilder("# Result  Entries  Stored  Kind1  Kind2  CompressedBlocks  StoredBlocks  ISO path\n");
+var paletteReport = new StringBuilder("# Minimum  Maximum  SHA-256  Resource  ISO path\n");
+var sceneContainers = 0;
+var sceneEntries = 0;
+var sceneStoredEntries = 0;
+var sceneCompressedBlocks = 0;
+var sceneVerbatimBlocks = 0;
+foreach (var file in files.Where(x => Path.GetExtension(x.Path).Equals(".RES", StringComparison.OrdinalIgnoreCase)))
+{
+    try
+    {
+        var archive = new DynamixArchive(iso.ReadFile(file), file.Path);
+        var stored = archive.Entries.Count(x => x.IsStored);
+        var kind1 = archive.Entries.Where(x => !x.IsStored && x.Flags == 1).ToArray();
+        var compressedBlocks = 0;
+        var verbatimBlocks = 0;
+        foreach (var entry in kind1)
+        {
+            var storedBytes = archive.ReadStored(entry);
+            var blocks = DynamixCompression.ReadKind1Blocks(storedBytes);
+            if (blocks.Count != DynamixCompression.ExpectedKind1BlockCount(checked((int)entry.ExpandedSize)))
+                throw new InvalidDataException("Kind-1 block count does not match the declared expanded size.");
+            compressedBlocks += blocks.Count(x => x.Storage == DynamixBlockStorage.Compressed);
+            verbatimBlocks += blocks.Count(x => x.Storage == DynamixBlockStorage.Stored);
+            _ = archive.ReadDecoded(entry);
+        }
+        var kind2 = archive.Entries.Count(x => !x.IsStored && x.Flags == 2);
+        sceneReport.AppendLine($"valid  {archive.Entries.Count,7}  {stored,6}  {kind1.Length,5}  {kind2,5}  {compressedBlocks,16}  {verbatimBlocks,12}  {file.Path}");
+        sceneContainers++;
+        sceneEntries += archive.Entries.Count;
+        sceneStoredEntries += stored;
+        sceneCompressedBlocks += compressedBlocks;
+        sceneVerbatimBlocks += verbatimBlocks;
+        resourceInventory.AddRange(archive.Entries.Select(x => ("SCENE", x)));
+        foreach (var entry in archive.Entries.Where(x => x.IsStored && Path.GetExtension(x.Name).Equals(".PAL", StringComparison.OrdinalIgnoreCase)))
+        {
+            try
+            {
+                var palette = IndexedPaletteDecoder.Decode(archive.ReadStored(entry));
+                paletteReport.AppendLine($"{palette.Rgb.Min(),7}  {palette.Rgb.Max(),7}  {Convert.ToHexString(SHA256.HashData(palette.Rgb)).ToLowerInvariant()}  {entry.Name}  {file.Path}");
+            }
+            catch (InvalidDataException error)
+            {
+                paletteReport.AppendLine($"rejected  {entry.Name}  {file.Path}: {error.Message.Replace('\r', ' ').Replace('\n', ' ')}");
+            }
+        }
+    }
+    catch (InvalidDataException error)
+    {
+        sceneReport.AppendLine($"rejected: {error.Message.Replace('\r', ' ').Replace('\n', ' ')}  {file.Path}");
+    }
+}
+File.WriteAllText(Path.Combine(output, "scene-res-report.txt"), sceneReport.ToString());
+File.WriteAllText(Path.Combine(output, "stored-palette-report.txt"), paletteReport.ToString());
+var extensionReport = new StringBuilder("# Extension  Total  Stored  Kind1  Kind2  Other  Scopes\n");
+foreach (var group in resourceInventory.GroupBy(x => Path.GetExtension(x.Entry.Name).ToUpperInvariant()).OrderBy(x => x.Key))
+{
+    var extension = string.IsNullOrEmpty(group.Key) ? "<none>" : group.Key;
+    var stored = group.Count(x => x.Entry.IsStored);
+    var kind1 = group.Count(x => !x.Entry.IsStored && x.Entry.Flags == 1);
+    var kind2 = group.Count(x => !x.Entry.IsStored && x.Entry.Flags == 2);
+    var other = group.Count() - stored - kind1 - kind2;
+    extensionReport.AppendLine($"{extension,-10}  {group.Count(),5}  {stored,6}  {kind1,5}  {kind2,5}  {other,5}  {string.Join(',', group.Select(x => x.Scope).Distinct().Order())}");
+}
+File.WriteAllText(Path.Combine(output, "resource-extension-report.txt"), extensionReport.ToString());
+Console.WriteLine($"Indexed {files.Length} CD files, {gobEntries} GOB entries ({gobStoredEntries} stored, {kind1Blocks} kind-1 blocks), and {sceneContainers} scene containers ({sceneEntries} entries, {sceneStoredEntries} stored, {sceneCompressedBlocks} compressed-marker blocks, {sceneVerbatimBlocks} verbatim blocks); extracted {extracted} inspectable artifacts to {output}.");
 return 0;
 }
 catch (Exception error) when (error is IOException or UnauthorizedAccessException or InvalidDataException or ArgumentException or OverflowException)
@@ -78,6 +255,42 @@ catch (Exception error) when (error is IOException or UnauthorizedAccessExceptio
 }
 
 static string SafeName(string name) => string.Concat(name.Where(c => char.IsLetterOrDigit(c) || c is '.' or '_' or '-'));
+static string? OptionValue(IEnumerable<string> arguments, string prefix) => arguments
+    .FirstOrDefault(x => x.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))?[prefix.Length..];
+
+static void WritePpm(string path, CsfFrame frame, byte[] palette, int scale)
+{
+    if (scale <= 0) throw new ArgumentOutOfRangeException(nameof(scale));
+    var width = checked(frame.Width * scale);
+    var height = checked(frame.Height * scale);
+    var header = Encoding.ASCII.GetBytes($"P6\n{width} {height}\n255\n");
+    var bytes = new byte[checked(header.Length + width * height * 3)];
+    header.CopyTo(bytes, 0);
+    var target = header.Length;
+    for (var y = 0; y < height; y++)
+    for (var x = 0; x < width; x++)
+    {
+        var sourceX = x / scale;
+        var sourceY = y / scale;
+        var source = sourceY * frame.Width + sourceX;
+        if (frame.Alpha[source] == 0)
+        {
+            var checker = ((sourceX / 4) + (sourceY / 4)) % 2 == 0 ? (byte)48 : (byte)80;
+            bytes[target++] = checker;
+            bytes[target++] = checker;
+            bytes[target++] = checker;
+        }
+        else
+        {
+            var color = frame.Indices[source] * 3;
+            bytes[target++] = palette[color];
+            bytes[target++] = palette[color + 1];
+            bytes[target++] = palette[color + 2];
+        }
+    }
+    File.WriteAllBytes(path, bytes);
+}
+
 static string Hash(string path)
 {
     using var stream = File.OpenRead(path);

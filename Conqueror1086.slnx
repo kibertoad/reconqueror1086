@@ -3,6 +3,7 @@
   <Project Path="src/Conqueror.Game/Conqueror.Game.csproj" />
   <Project Path="src/Conqueror.Resources/Conqueror.Resources.csproj" />
   <Project Path="tests/Conqueror.Specs/Conqueror.Specs.csproj" />
+  <Project Path="tests/Conqueror.Tests/Conqueror.Tests.csproj" />
   <Project Path="tools/Conqueror.Inspect/Conqueror.Inspect.csproj" />
   <Project Path="tools/Conqueror.Import/Conqueror.Import.csproj" />
 </Solution>

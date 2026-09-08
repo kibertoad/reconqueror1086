@@ -3,6 +3,32 @@ using System.Text.Json;
 
 namespace Conqueror.Game;
 
+public sealed record ImportedArtDefinition(string Role, string Kind, string IdSuffix);
+public sealed record ImportedLayoutDefinition(string Role, string IdSuffix);
+
+public static class ImportedArt
+{
+    public static IReadOnlyList<ImportedArtDefinition> Definitions { get; } =
+    [
+        new("Title.Background", "image", ":fftitle.pcx"),
+        new("Character.Options", "image", ":char_ops.pcx"),
+        new("Character.Pregenerated", "image", ":pregen.pcx"),
+        new("Load.Background", "image", ":loadgame.pcx"),
+        new("Map.England", "image", ":engmap1.pcx"),
+        new("Tournament.Richard", "image", ":richard.pcc")
+    ];
+}
+
+public static class ImportedLayouts
+{
+    public static IReadOnlyList<ImportedLayoutDefinition> Definitions { get; } =
+    [
+        new("Title", ":title.hat"),
+        new("Character.Options", ":cgopts.hat"),
+        new("Character.Pregenerated", ":pregen.hat")
+    ];
+}
+
 public sealed class ImportedContentCatalog
 {
     private readonly string _root;
@@ -48,6 +74,73 @@ public sealed class ImportedContentCatalog
     }
 
     public IReadOnlyList<string> Ids(string kind) => _assets.Where(x => x.Kind.Equals(kind, StringComparison.OrdinalIgnoreCase)).Select(x => x.Id).ToArray();
+
+    public string? FindId(string kind, string idSuffix) => _assets
+        .FirstOrDefault(x => x.Kind.Equals(kind, StringComparison.OrdinalIgnoreCase) && x.Id.EndsWith(idSuffix, StringComparison.OrdinalIgnoreCase))?.Id;
+
+    public PcxImage? DecodePcx(string id)
+    {
+        using var stream = Open(id);
+        if (stream is null) return null;
+        try
+        {
+            using var memory = new MemoryStream();
+            stream.CopyTo(memory);
+            return PcxDecoder.Decode(memory.ToArray());
+        }
+        catch (InvalidDataException)
+        {
+            return null;
+        }
+    }
+
+    public CsfSequence? DecodeCsf(string id)
+    {
+        using var stream = Open(id);
+        if (stream is null) return null;
+        try
+        {
+            using var memory = new MemoryStream();
+            stream.CopyTo(memory);
+            return new CsfSequence(memory.ToArray());
+        }
+        catch (InvalidDataException)
+        {
+            return null;
+        }
+    }
+
+    public HatLayout? DecodeHat(string id)
+    {
+        using var stream = Open(id);
+        if (stream is null) return null;
+        try
+        {
+            using var memory = new MemoryStream();
+            stream.CopyTo(memory);
+            return new HatLayout(memory.ToArray());
+        }
+        catch (InvalidDataException)
+        {
+            return null;
+        }
+    }
+
+    public IndexedPalette? DecodePalette(string id)
+    {
+        using var stream = Open(id);
+        if (stream is null) return null;
+        try
+        {
+            using var memory = new MemoryStream();
+            stream.CopyTo(memory);
+            return IndexedPaletteDecoder.Decode(memory.ToArray());
+        }
+        catch (InvalidDataException)
+        {
+            return null;
+        }
+    }
 
     private Stream? OpenAsset(ImportedAsset asset)
     {

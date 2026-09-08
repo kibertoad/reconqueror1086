@@ -36,7 +36,7 @@ Binary-derived claims and their confidence levels are recorded in [`original-fin
 
 ## Media status
 
-The owned release contains a 35,361,714-byte `.RES`-signature `C1086.GOB` archive, a raw MODE1/2352 CD data track, thousands of Smacker (`.SMK`) sequences, Sierra `.RES/.LOW` resources, and five CD-audio tracks. `tools/Conqueror.Inspect` inventories that data track; `tools/Conqueror.Import` installs owned resources locally with a provenance manifest and lossless CDDA WAV conversion. Generated proprietary files remain ignored and are not redistributed. The runtime currently plays imported CD audio and safely opens catalog streams; SMK and Sierra container/asset decoders remain incomplete.
+The owned release contains a 35,361,714-byte `.RES`-signature `C1086.GOB` archive, a raw MODE1/2352 CD data track, thousands of Smacker (`.SMK`) sequences, Sierra `.RES/.LOW` resources, and five CD-audio tracks. `tools/Conqueror.Inspect` inventories that data track; `tools/Conqueror.Import` installs owned resources locally with a provenance manifest and lossless CDDA WAV conversion. Generated proprietary files remain ignored and are not redistributed. The bounded kind-1 archive decoder is validated across all 20,381 GOB and scene blocks in the hashed release. The runtime currently plays imported CD audio and renders the decoded original title, England map, and Richard portrait; SMK, kind 2, palette-to-animation association, and other Sierra payload formats remain incomplete.
 
 ## Controls represented
 
