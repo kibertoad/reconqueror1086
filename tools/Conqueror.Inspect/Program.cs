@@ -1,4 +1,6 @@
 using Conqueror.Resources;
+using Iced.Intel;
+using System.Buffers.Binary;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -47,6 +49,14 @@ File.WriteAllText(Path.Combine(output, "artifact-hashes.txt"), report.ToString()
 var inspectionOptions = args.Skip(2).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
 var renderCsfName = OptionValue(inspectionOptions, "--render-csf=");
 var palettePcxName = OptionValue(inspectionOptions, "--palette-pcx=");
+var disassembleAddresses = OptionValue(inspectionOptions, "--disassemble=");
+if (disassembleAddresses is not null)
+{
+    var executable = Directory.EnumerateFiles(artifactRoot, "CONQUER.EXE", SearchOption.AllDirectories).Single();
+    var addresses = disassembleAddresses.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .Select(ParseAddress).ToArray();
+    File.WriteAllText(Path.Combine(output, "executable-disassembly-report.txt"), DisassembleLinearExecutable(executable, addresses));
+}
 var terms = inspectionOptions.Where(x => !x.StartsWith("--", StringComparison.Ordinal)).ToArray();
 if (terms.Length > 0)
 {
@@ -79,6 +89,12 @@ if (File.Exists(gobPath))
     {
         try
         {
+            if (entry.Flags == 2)
+            {
+                _ = gob.ReadDecoded(entry);
+                compressionReport.AppendLine($"{entry.Index,5}  {entry.Flags,4}  -  -  -  decoded-size-valid  {entry.Name}");
+                continue;
+            }
             if (entry.Flags != 1)
             {
                 compressionReport.AppendLine($"{entry.Index,5}  {entry.Flags,4}  -  -  -  codec-unidentified  {entry.Name}");
@@ -100,7 +116,7 @@ if (File.Exists(gobPath))
     File.WriteAllText(Path.Combine(output, "gob-compression-report.txt"), compressionReport.ToString());
 
     var imageReport = new StringBuilder("# Width  Height  Pixel-index SHA-256  Name\n");
-    foreach (var entry in gob.Entries.Where(x => x.IsStored || x.Flags == 1))
+    foreach (var entry in gob.Entries.Where(DynamixArchive.CanDecode))
     {
         var bytes = gob.ReadDecoded(entry);
         if (bytes.Length < 4 || bytes[0] != 0x0A || bytes[2] != 1 || bytes[3] != 8) continue;
@@ -117,7 +133,7 @@ if (File.Exists(gobPath))
     File.WriteAllText(Path.Combine(output, "stored-image-report.txt"), imageReport.ToString());
 
     var csfReport = new StringBuilder("# Storage  Chunks  Minimum  Maximum  Payload bytes  Segments literal/skip/fill  Frame-sequence SHA-256  Dimension headers  Name\n");
-    foreach (var entry in gob.Entries.Where(x => (x.IsStored || x.Flags == 1) && Path.GetExtension(x.Name).Equals(".CSF", StringComparison.OrdinalIgnoreCase)))
+    foreach (var entry in gob.Entries.Where(x => DynamixArchive.CanDecode(x) && Path.GetExtension(x.Name).Equals(".CSF", StringComparison.OrdinalIgnoreCase)))
     {
         try
         {
@@ -162,6 +178,26 @@ if (File.Exists(gobPath))
         }
     }
     File.WriteAllText(Path.Combine(output, "hat-layout-report.txt"), hatReport.ToString());
+
+    var dilemmaReport = new StringBuilder("# Number  Age  Scene  Choices  Outcomes  Changes  PromptChars  OutcomeChars  Name\n");
+    foreach (var entry in gob.Entries.Where(x => (x.IsStored || x.Flags == 1)
+        && x.Name.StartsWith("dilem", StringComparison.OrdinalIgnoreCase)
+        && Path.GetExtension(x.Name).Equals(".DAT", StringComparison.OrdinalIgnoreCase)))
+    {
+        try
+        {
+            var dilemma = DilemmaTextDecoder.Decode(gob.ReadDecoded(entry));
+            var outcomes = dilemma.Choices.Sum(choice => choice.Outcomes.Count);
+            var changes = dilemma.Choices.Sum(choice => choice.Outcomes.Sum(outcome => outcome.Changes.Count));
+            var outcomeChars = dilemma.Choices.Sum(choice => choice.Outcomes.Sum(outcome => outcome.Text.Length));
+            dilemmaReport.AppendLine($"{dilemma.Number,6}  {dilemma.Age,3}  {dilemma.SceneFile,-12}  {dilemma.Choices.Count,7}  {outcomes,8}  {changes,7}  {dilemma.Prompt.Length,11}  {outcomeChars,12}  {entry.Name}");
+        }
+        catch (InvalidDataException error)
+        {
+            dilemmaReport.AppendLine($"rejected  {entry.Name}: {error.Message.Replace('\r', ' ').Replace('\n', ' ')}");
+        }
+    }
+    File.WriteAllText(Path.Combine(output, "dilemma-text-report.txt"), dilemmaReport.ToString());
 
     if (renderCsfName is not null || palettePcxName is not null)
     {
@@ -257,6 +293,62 @@ catch (Exception error) when (error is IOException or UnauthorizedAccessExceptio
 static string SafeName(string name) => string.Concat(name.Where(c => char.IsLetterOrDigit(c) || c is '.' or '_' or '-'));
 static string? OptionValue(IEnumerable<string> arguments, string prefix) => arguments
     .FirstOrDefault(x => x.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))?[prefix.Length..];
+
+static uint ParseAddress(string value)
+{
+    var digits = value.StartsWith("0x", StringComparison.OrdinalIgnoreCase) ? value[2..] : value;
+    return uint.TryParse(digits, System.Globalization.NumberStyles.HexNumber, null, out var address)
+        ? address
+        : throw new ArgumentException($"Invalid hexadecimal address '{value}'.");
+}
+
+static string DisassembleLinearExecutable(string path, IReadOnlyList<uint> addresses)
+{
+    var bytes = File.ReadAllBytes(path);
+    var le = Enumerable.Range(0, bytes.Length - 0x84)
+        .FirstOrDefault(index => bytes[index] == (byte)'L' && bytes[index + 1] == (byte)'E'
+            && bytes[index + 2] == 0 && bytes[index + 3] == 0
+            && BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(index + 0x44, 4)) is > 0 and < 64
+            && BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(index + 0x28, 4)) is >= 512 and <= 65536);
+    if (le == 0) throw new InvalidDataException("Linear Executable header was not found.");
+    var pageSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(le + 0x28, 4));
+    var objectTable = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(le + 0x40, 4));
+    var objectCount = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(le + 0x44, 4));
+    var dataPages = checked((uint)le + BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(le + 0x80, 4)));
+    var report = new StringBuilder("# 32-bit LE disassembly (derived metadata; original bytes omitted)\n");
+    report.AppendLine($"# LE file offset 0x{le:X}; objects {objectCount}; page size 0x{pageSize:X}");
+    foreach (var address in addresses)
+    {
+        var mapped = false;
+        for (var objectIndex = 0; objectIndex < objectCount; objectIndex++)
+        {
+            var descriptor = checked(le + (int)objectTable + objectIndex * 24);
+            var virtualSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor, 4));
+            var baseAddress = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor + 4, 4));
+            var pageIndex = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor + 12, 4));
+            if (address < baseAddress || address >= baseAddress + virtualSize) continue;
+            var fileOffset = checked(dataPages + (pageIndex - 1) * pageSize + address - baseAddress);
+            var available = Math.Min(256, bytes.Length - checked((int)fileOffset));
+            var reader = new ByteArrayCodeReader(bytes.AsSpan(checked((int)fileOffset), available).ToArray());
+            var decoder = Iced.Intel.Decoder.Create(32, reader);
+            decoder.IP = address;
+            var formatter = new IntelFormatter();
+            report.AppendLine($"\n# object {objectIndex + 1}, VA 0x{address:X8}, file offset 0x{fileOffset:X8}");
+            for (var instructionIndex = 0; instructionIndex < 40 && decoder.IP < address + (uint)available; instructionIndex++)
+            {
+                decoder.Decode(out var instruction);
+                if (instruction.IsInvalid) break;
+                var formatted = new StringOutput();
+                formatter.Format(instruction, formatted);
+                report.AppendLine($"0x{instruction.IP:X8}  {formatted}");
+            }
+            mapped = true;
+            break;
+        }
+        if (!mapped) report.AppendLine($"# VA 0x{address:X8} is outside mapped objects.");
+    }
+    return report.ToString();
+}
 
 static void WritePpm(string path, CsfFrame frame, byte[] palette, int scale)
 {

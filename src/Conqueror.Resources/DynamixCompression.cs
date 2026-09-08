@@ -12,6 +12,7 @@ public static class DynamixCompression
     private const int ClearCode = 256;
     private const int FirstDictionaryCode = 257;
     private const int MaximumCodeCount = 4096;
+    private const int Kind2MaximumCodeCount = 1 << 14;
     public const int DefaultMaximumExpandedSize = 256 * 1024 * 1024;
 
     /// <summary>
@@ -230,6 +231,77 @@ public static class DynamixCompression
         return output;
     }
 
+    /// <summary>Decodes outer-archive kind 2 using the executable-confirmed MSB-first 9-to-14-bit LZW variant.</summary>
+    public static byte[] DecodeKind2(ReadOnlySpan<byte> source, int expectedSize, int maximumExpandedSize = DefaultMaximumExpandedSize)
+    {
+        const int endCode = 257;
+        const int firstDictionaryCode = 258;
+        ValidateExpandedSize(expectedSize, maximumExpandedSize);
+        if (expectedSize == 0) return [];
+
+        var prefixes = new ushort[Kind2MaximumCodeCount];
+        var suffixes = new byte[Kind2MaximumCodeCount];
+        var stack = new byte[Kind2MaximumCodeCount];
+        for (var code = 0; code < 256; code++) suffixes[code] = (byte)code;
+        var reader = new MsbBitReader(source);
+        var output = new byte[expectedSize];
+        var outputPosition = 0;
+        var width = 9;
+        var nextCode = firstDictionaryCode;
+        var previousCode = -1;
+        byte previousFirst = 0;
+        var ended = false;
+
+        while (reader.TryRead(width, out var code))
+        {
+            if (code == endCode) { ended = true; break; }
+            if (code == ClearCode)
+            {
+                width = 9;
+                nextCode = firstDictionaryCode;
+                previousCode = -1;
+                continue;
+            }
+            if (code > nextCode || code >= Kind2MaximumCodeCount)
+                throw new InvalidDataException($"Kind-2 resource refers to undefined LZW code {code}.");
+
+            var stackSize = 0;
+            var current = code;
+            if (code == nextCode)
+            {
+                if (previousCode < 0) throw new InvalidDataException("Kind-2 resource starts with an undefined LZW code.");
+                current = previousCode;
+                stack[stackSize++] = previousFirst;
+            }
+            while (current >= 256)
+            {
+                if (current >= nextCode || stackSize >= stack.Length)
+                    throw new InvalidDataException("Kind-2 resource contains an invalid LZW dictionary chain.");
+                stack[stackSize++] = suffixes[current];
+                current = prefixes[current];
+            }
+            var first = (byte)current;
+            stack[stackSize++] = first;
+            if (stackSize > output.Length - outputPosition)
+                throw new InvalidDataException("Kind-2 resource expands beyond its declared size.");
+            while (stackSize > 0) output[outputPosition++] = stack[--stackSize];
+
+            if (previousCode >= 0 && nextCode < Kind2MaximumCodeCount)
+            {
+                prefixes[nextCode] = (ushort)previousCode;
+                suffixes[nextCode++] = first;
+                if (width < 14 && nextCode == (1 << width) - 1) width++;
+            }
+            previousCode = code;
+            previousFirst = first;
+        }
+        if (!ended)
+            throw new InvalidDataException("Kind-2 resource is truncated before its end code.");
+        if (outputPosition != expectedSize)
+            throw new InvalidDataException($"Kind-2 resource produced {outputPosition} of {expectedSize} expected bytes before its end code.");
+        return output;
+    }
+
     private static void ValidateExpandedSize(int expectedSize, int maximumExpandedSize)
     {
         if (expectedSize < 0) throw new ArgumentOutOfRangeException(nameof(expectedSize));
@@ -251,6 +323,25 @@ public static class DynamixCompression
             {
                 var position = _bitPosition + bit;
                 value |= ((_source[position >> 3] >> (position & 7)) & 1) << bit;
+            }
+            _bitPosition += width;
+            return true;
+        }
+    }
+
+    private ref struct MsbBitReader(ReadOnlySpan<byte> source)
+    {
+        private readonly ReadOnlySpan<byte> _source = source;
+        private int _bitPosition;
+
+        public bool TryRead(int width, out int value)
+        {
+            if (_bitPosition > _source.Length * 8 - width) { value = 0; return false; }
+            value = 0;
+            for (var bit = 0; bit < width; bit++)
+            {
+                var position = _bitPosition + bit;
+                value = (value << 1) | ((_source[position >> 3] >> (7 - (position & 7))) & 1);
             }
             _bitPosition += width;
             return true;

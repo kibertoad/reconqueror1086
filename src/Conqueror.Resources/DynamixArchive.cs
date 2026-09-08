@@ -1,4 +1,5 @@
 using System.Buffers.Binary;
+using System.Collections.Frozen;
 using System.Text;
 
 namespace Conqueror.Resources;
@@ -12,6 +13,12 @@ public sealed class DynamixArchive
 {
     private const int HeaderSize = 8;
     private const int DirectoryEntrySize = 52;
+    private static readonly FrozenDictionary<uint, Func<byte[], int, byte[]>> CompressionDecoders =
+        new Dictionary<uint, Func<byte[], int, byte[]>>
+        {
+            [1] = static (source, expectedSize) => DynamixCompression.DecodeKind1(source, expectedSize),
+            [2] = static (source, expectedSize) => DynamixCompression.DecodeKind2(source, expectedSize),
+        }.ToFrozenDictionary();
     private readonly byte[] _data;
     public string SourceName { get; }
     public IReadOnlyList<DynamixEntry> Entries { get; }
@@ -66,7 +73,10 @@ public sealed class DynamixArchive
     public byte[] ReadDecoded(DynamixEntry entry)
     {
         if (entry.IsStored) return ReadStored(entry);
-        if (entry.Flags != 1) throw new NotSupportedException($"Compression kind {entry.Flags} for '{entry.Name}' has not been verified.");
-        return DynamixCompression.DecodeKind1(ReadStored(entry), checked((int)entry.ExpandedSize));
+        if (!CompressionDecoders.TryGetValue(entry.Flags, out var decoder))
+            throw new NotSupportedException($"Compression kind {entry.Flags} for '{entry.Name}' has not been verified.");
+        return decoder(ReadStored(entry), checked((int)entry.ExpandedSize));
     }
+
+    public static bool CanDecode(DynamixEntry entry) => entry.IsStored || CompressionDecoders.ContainsKey(entry.Flags);
 }

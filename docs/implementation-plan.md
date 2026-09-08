@@ -24,10 +24,10 @@ The repository currently provides:
 - Persistent strategic garrisons, spying, interception, retreat, conquest, and JSON saves.
 - A read-only original-disc inspector with ISO inventory, hashes, executable-string offsets, archive/compression reports, CSF previews, and HAT layout reports.
 - Bounded parsers for GOB/RES directories, kind-1 LZ/RLE blocks, indexed PCX/PCC images, CSF animation frames, raw RGB palettes, and HAT screen descriptors.
-- An end-user importer that installs byte-stored and kind-1 owned resources plus lossless CDDA WAV files under ignored local storage.
+- An end-user importer that installs byte-stored, kind-1, and kind-2 owned resources plus lossless CDDA WAV files under ignored local storage.
 - A runtime imported-content catalog, CD music playback, and definition-driven original art for the title, character options, pre-generated characters, England map, load-screen background registration, and a tournament portrait.
 - An executable-confirmed `TITLE.HAT`/`FFTITLE.PCX` title load followed by a corroborated character-options flow whose exact geometry comes from installed `CGOPTS.HAT` and `PREGEN.HAT`.
-- Seven xUnit tests and 103 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
+- Twelve xUnit tests and 110 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
 
 ## Dependency map
 
@@ -500,7 +500,7 @@ Status is conservative: “prototype” means the route is playable but substant
 
 | Milestone | Phases | Status (2026-09-08) | Remaining completion gate |
 | --- | --- | --- | --- |
-| M1: Decoded content | 1-2 | In progress: archive kind 1, PCX/PCC, CSF, palettes, HAT layouts, installer, and evidence reports work. | Decode kind 2 and dialogue/text structures; complete executable table recovery and controlled observations. |
+| M1: Decoded content | 1-2 | In progress: archive kinds 1 and 2, PCX/PCC, CSF, palettes, HAT layouts, dilemma text, installer, and evidence reports work. | Decode remaining dialogue/text structures; complete executable table recovery and controlled observations. |
 | M2: Feudal simulation | 3-4 | Playable prototype. | Exact map/economy, tile-based fief construction, multiple managed estates, full dialogue/quests, and political orders. |
 | M3: Knightly competition | 5 | Playable prototype. | Exact opponent tables plus faithful first-person jousting and tactical tournament melee. |
 | M4: Conquest | 6-7 | Playable prototype. | Original strategic rules, battlefield systems, castle layouts, combat balance, retainers, and loot. |
@@ -510,12 +510,16 @@ Status is conservative: “prototype” means the route is playable but substant
 
 ## Current resource and startup sprint
 
+Local analysis reference: the complete owned installation is available read-only at `C:\GOG Games\Conqueror AD1086`. This machine-specific path is for inspection/import tooling only; no proprietary file from it may be committed, packaged, or redistributed.
+
+Local static-analysis tool: Ghidra 12.1.3 is installed user-wide at `C:\Users\kiber\AppData\Local\Programs\Ghidra\ghidra_12.1.3_PUBLIC`, with Temurin JDK 21.0.12.1 at `C:\Users\kiber\AppData\Local\Programs\Java\jdk-21.0.12.1+1`. `GHIDRA_HOME`, `JAVA_HOME`, and the user `PATH` contain these locations. Temporary Ghidra projects and derived disassembly must remain outside Git just like other original-binary analysis artifacts. [`ghidra.md`](ghidra.md) documents setup, isolated-Codex environment variables, LE executable handling, and the reproducible headless workflow.
+
 - [x] Move shared ISO/cue/CDDA/manifest primitives out of the inspector executable into `Conqueror.Resources`.
 - [x] Add synthetic ISO, cue, WAV, archive, manifest, and path-safety tests.
 - [x] Add an xUnit.net v3 4.0.0 suite and an isolated Windows test launcher that cannot collide with a running game's build outputs.
 - [x] Reverse-engineer and bounds-check the top-level `C1086.GOB`/scene-RES directory structure.
 - [x] Inventory stored versus compressed entries without bulk decompression.
-- [ ] Identify and decode one uncompressed text resource end to end.
+- [x] Identify and decode the marker-delimited `DILEM*.DAT` text resources end to end; all 30 validate through a bounded ASCII parser and are exposed by stable number through the runtime dialogue repository.
 - [x] Decode one byte-stored image/palette resource into runtime RGBA pixels end to end.
 - [x] Decode all five byte-stored CSF indexed-animation sequences into bounded palette indices and alpha masks.
 - [x] Validate and classify the five stored 256-color RGB palette resources.
@@ -526,7 +530,7 @@ Status is conservative: “prototype” means the route is playable but substant
   - [x] Confirm 16 KiB output slices and the `0x40` compressed/`0x80` verbatim block markers across the GOB and all 50 scene containers.
   - [x] Separate the five kind-2 entries and disprove raw inner-chunk LZW and independently reset classic LH1 for kind 1.
   - [x] Identify the kind-1 LZ/RLE token codec and validate all 20,381 blocks plus 188 decoded PCX-compatible images.
-  - [ ] Identify kind 2 and validate its five GOB entries.
+  - [x] Recover kind 2 from the LE executable as MSB-first adaptive 9-to-14-bit LZW; validate exact expansion of all five GOB entries and strict 640x480 PCX decoding of all four image entries.
 - [x] Activate decoded `fftitle.pcx` and `engmap1.pcx` through definition-driven title and map roles.
 - [x] Correct the startup flow from executable/resource evidence: static `FFTITLE.PCX` title, then interactive `CHAR_OPS.PCX`, with `PREGEN.PCX` and `LOADGAME.PCX` registered as distinct screen roles.
 - [x] Decode HAT screen descriptors and use installed `CGOPTS.HAT`/`PREGEN.HAT` geometry at runtime with bounded fallback definitions.
@@ -536,8 +540,7 @@ The resource-decoding sprint is first because it unlocks exact dialogue, screen 
 
 ## Next implementation priorities
 
-1. Trace startup/menu input timing and HAT region-action dispatch from `CONQUER.EXE`; implement the original five-slot load/resume flow without inferring unsupported transitions.
-2. Identify kind-2 compression and validate all five affected GOB entries with bounded synthetic failure cases.
-3. Locate and decode the first text/dialogue structure end to end, exposing it through a runtime repository while keeping original prose untracked.
-4. Bind menu CSF sequences to verified palettes and roles, beginning with cursor/settings animation; record every association and confidence grade.
-5. Add legal-boundary automation that fails if imported media or generated analysis artifacts enter Git, then add CI restore/build/test coverage.
+1. Continue tracing startup/menu input timing and HAT region-action dispatch from `CONQUER.EXE`; the five-slot load/resume UI and `campaign.json` compatibility path are implemented, while exact original dispatch/timing remains to be confirmed.
+2. Determine the original per-age selection policy, then bind the decoded five-definition age groups to campaign state; keep original prose local and retain built-in fallback summaries.
+3. Bind menu CSF sequences to verified palettes and roles, beginning with cursor/settings animation; record every association and confidence grade.
+4. Add legal-boundary automation that fails if imported media or generated analysis artifacts enter Git, then add CI restore/build/test coverage.

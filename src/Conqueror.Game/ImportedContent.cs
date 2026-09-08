@@ -142,6 +142,22 @@ public sealed class ImportedContentCatalog
         }
     }
 
+    public DilemmaTextResource? DecodeDilemma(string id)
+    {
+        using var stream = Open(id);
+        if (stream is null) return null;
+        try
+        {
+            using var memory = new MemoryStream();
+            stream.CopyTo(memory);
+            return DilemmaTextDecoder.Decode(memory.ToArray());
+        }
+        catch (InvalidDataException)
+        {
+            return null;
+        }
+    }
+
     private Stream? OpenAsset(ImportedAsset asset)
     {
         var path = Path.GetFullPath(Path.Combine(_root, asset.Path.Replace('/', Path.DirectorySeparatorChar)));
@@ -149,4 +165,48 @@ public sealed class ImportedContentCatalog
         return File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
     }
 
+}
+
+/// <summary>Runtime access to locally imported original dilemma text.</summary>
+public sealed class ImportedDialogueRepository(ImportedContentCatalog catalog)
+{
+    private readonly Dictionary<int, DilemmaTextResource?> _dilemmas = [];
+    private readonly int[] _numbers = catalog.Ids("resource")
+        .Select(DilemmaNumberFromId)
+        .Where(number => number.HasValue)
+        .Select(number => number!.Value)
+        .Distinct()
+        .Order()
+        .ToArray();
+
+    public IReadOnlyList<int> AvailableNumbers => _numbers;
+
+    public DilemmaTextResource? GetDilemma(int number)
+    {
+        if (number < 0) return null;
+        if (_dilemmas.TryGetValue(number, out var cached)) return cached;
+        var id = catalog.FindId("resource", $":dilem{number}.dat");
+        var resource = id is null ? null : catalog.DecodeDilemma(id);
+        _dilemmas.Add(number, resource);
+        return resource;
+    }
+
+    public IReadOnlyList<DilemmaTextResource> GetDilemmasForAge(int age) => _numbers
+        .Select(GetDilemma)
+        .OfType<DilemmaTextResource>()
+        .Where(dilemma => dilemma.Age == age)
+        .OrderBy(dilemma => dilemma.Number)
+        .ToArray();
+
+    private static int? DilemmaNumberFromId(string id)
+    {
+        var separator = id.LastIndexOf(':');
+        var name = id[(separator + 1)..];
+        const string prefix = "dilem";
+        const string extension = ".dat";
+        if (!name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+            || !name.EndsWith(extension, StringComparison.OrdinalIgnoreCase)) return null;
+        var digits = name.AsSpan(prefix.Length, name.Length - prefix.Length - extension.Length);
+        return int.TryParse(digits, out var number) && number >= 0 ? number : null;
+    }
 }

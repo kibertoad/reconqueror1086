@@ -96,7 +96,7 @@ static string DecodedKind(string name, string path)
 
 static void InstallDecodedEntries(DynamixArchive archive, string archiveId, string output, List<ImportedAsset> entries)
 {
-    foreach (var entry in archive.Entries.Where(x => x.IsStored || x.Flags == 1))
+    foreach (var entry in archive.Entries.Where(DynamixArchive.CanDecode))
     {
         var folder = ResourcePaths.SafeName(Path.GetFileNameWithoutExtension(archiveId));
         var relative = Path.Combine("Decoded", folder, $"{entry.Index:0000}-{ResourcePaths.SafeName(entry.Name)}");

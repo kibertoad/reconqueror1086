@@ -31,7 +31,7 @@ Each 52-byte record is:
 | Record offset | Size | Type | Meaning | Confidence |
 | ---: | ---: | --- | --- | --- |
 | `0x00` | 32 | ASCII, NUL padded | Resource name | Confirmed |
-| `0x20` | 4 | `UINT32LE` | Storage/compression kind: observed values 0, 1, 2 | Confirmed classification; codec names unknown |
+| `0x20` | 4 | `UINT32LE` | Storage/compression kind: observed values 0, 1, 2 | Confirmed classification and kind-1/kind-2 codecs |
 | `0x24` | 4 | `UINT32LE` | Reserved or unknown | Provisional |
 | `0x28` | 4 | `UINT32LE` | Stored byte length | Confirmed |
 | `0x2C` | 4 | `UINT32LE` | Expanded byte length | Confirmed |
@@ -43,7 +43,7 @@ The parser rejects a directory before byte 8, a directory extending past end of 
 
 - Kind 0 entries have equal stored and expanded sizes in every observed example and are copied byte-for-byte. This behavior is **Corroborated**, because the bytes are structurally readable but the original decoding branch has not yet been disassembled.
 - Kind 1 entries have unequal sizes and use the independently decoded block format below. Its framing and token grammar are **Confirmed for the hashed release**.
-- Kind 2 occurs in five unequal-size GOB entries and has not yet been framed or decoded.
+- Kind 2 occurs in five unequal-size GOB entries and uses the executable-confirmed adaptive LZW stream described below.
 - Stored-versus-compressed behavior is determined from both the kind and size relationship; unknown combinations must be rejected rather than guessed.
 
 ### Kind-1 block framing
@@ -74,6 +74,16 @@ A `0x40` payload starts with the marker, one metadata byte that the original dec
 
 The implementation rejects truncated control words and tokens, history references before the beginning of output, output overflow, block-count disagreement, and any final expanded-size mismatch. The grammar was reconstructed from the owned executable's decoder and then independently checked by exact-size decoding of the full GOB/scene kind-1 population. It also yields 188 strict PCX-compatible images, including 640x480 `fftitle.pcx` and `engmap1.pcx`. The algorithm and those dimensions are **Confirmed for the hashed release**; assigning those two filenames to the title and England-map runtime roles is **Corroborated** by decoded visual inspection.
 
+### Kind-2 adaptive LZW stream
+
+Kind 2 is one continuous MSB-first LZW bitstream with no outer block framing. Codes `0` through `255` are literal bytes, `256` clears the dictionary, `257` ends the stream, and newly defined strings begin at code `258`. A clear resets the width to 9 bits and the next dictionary code to `258`. Each ordinary code after the first adds `previous string + first byte of current string`; the conventional `code == next code` special case emits `previous string + its first byte`.
+
+The code width grows from 9 through 14 bits. After adding a dictionary entry, when the next code equals the current mask `(1 << width) - 1`, the decoder increments the width before reading the next code and recomputes the mask. At 14 bits the dictionary stops growing. This less common transition point and the 14-bit ceiling explain why the earlier 12-bit probe produced plausible PCX prefixes before losing bit alignment.
+
+Static analysis of the owned LE executable identifies the MSB bit reader at virtual address `0x456F4`, dictionary helper at `0x4576C`, and kind-2 decoder at `0x45C6E`. Its setup at `0x45C90` writes width 9 and mask `0x1FF`; branches at `0x45CCC` and `0x45CFD` recognize end `0x101` and clear `0x100`; the growth path at `0x45D7F`–`0x45DF4` compares against the mask and caps the width at `0x0E`. The independently implemented bounded decoder expands all five kind-2 entries to their exact directory lengths. `prog.pcx`, `champion.pcx`, `crowning.pcx`, and `death.pcx` also pass strict PCX validation as 640x480 images. The codec is therefore **Confirmed for the hashed release**.
+
+The implementation requires an end code, rejects truncated input, undefined codes and cyclic/out-of-range dictionary chains, bounds the dictionary at 16,384 entries, enforces the declared expanded length, and applies the common 256 MiB expansion ceiling before allocation.
+
 ### Resource population
 
 The 486 GOB records and 13,147 scene records produce this extension-level inventory. `<none>` entries are predominantly internal scene resources; an absent extension is not evidence of a single payload type.
@@ -93,7 +103,7 @@ The 486 GOB records and 13,147 scene records produce this extension-level invent
 | `.JP` | 5 | 0 | 5 | 0 | GOB |
 | Other named extensions | 11 | 1 | 10 | 0 | GOB and scene |
 
-The five kind-2 resources are four `.PCX` entries and one `.666` entry. This distribution is **Confirmed**, while the semantic meaning of `.666` and most other extensions remains unknown.
+The five kind-2 resources are four strictly validated 640x480 `.PCX` entries and one exactly expanded `.666` entry. This distribution and the image structure are **Confirmed**, while the semantic meaning of `.666` and most other extensions remains unknown.
 
 ## Indexed PCX images
 
@@ -181,6 +191,14 @@ Documented Dynamix inner chunks can use an LSB-first 9-to-12-bit LZW variant. Ap
 
 Classic LH1/LZHUF with a 4 KiB history window and independently reset 16 KiB output blocks was also tested against all 187 kind-1 `.PCX` and `.PCC` entries in the GOB. It produced no valid PCX headers under either tested bit order. That exact interpretation is **Disproved**; the similar compression ratio and block count are not sufficient evidence to label kind 1 as LH1.
 
+Reading kind-2 data with a 12-bit ceiling produces the exact four-byte PCX prefix for all four image entries but diverges when the dictionary reaches that artificial ceiling. Byte-, word-, and doubleword-aligned reset hypotheses likewise fail. Those reset and 12-bit-ceiling variants are **Disproved**; executable analysis instead confirms the uninterrupted 9-to-14-bit stream specified above.
+
+## Dilemma text resources
+
+The 30 `DILEM0.DAT` through `DILEM29.DAT` resources are marker-delimited 7-bit ASCII text ending optionally in DOS EOF byte `0x1A`. Each contains a stable numeric identifier, declared age, title, and CSF reference, a multi-line prompt, and exactly three choice records. The declarations form six groups of five definitions for ages 12 through 17. Each choice declares a scoring attribute, high/low breakpoints, and win/draw/lose outcomes; each outcome contains text and a counted table of named integer attribute modifiers. The marker spelling contains two harmless inconsistencies in the original data, so the parser dispatches on the stable prefix character and validates the following typed row rather than matching commentary prose. This structure, including the age grouping, and all 30 instances are **Confirmed** for the hashed release; the policy that chooses one of the five definitions for each age remains unknown.
+
+`DilemmaTextDecoder` bounds input size, accepts ASCII only, validates identifiers, counts, integer rows, unique choices, and the complete outcome set. `ImportedDialogueRepository` resolves a locally imported definition by stable number. The inspector records only structural counts and text lengths in `dilemma-text-report.txt`; original prose remains confined to ignored `UserContent`.
+
 ## HAT screen layouts
 
 The decoded `.HAT` population uses a compact fixed-header layout. Integer fields are signed 32-bit little-endian values. The following structure is **Confirmed for the hashed release**:
@@ -213,20 +231,20 @@ The raw-sector bounds, ISO directory traversal, cue timestamps, and WAV sample p
 
 - `cd-manifest.txt`: ISO paths and byte sizes.
 - `gob-directory.txt`: outer GOB directory fields.
-- `gob-compression-report.txt`: kind-1 block counts and complete decoding validation.
+- `gob-compression-report.txt`: kind-1 block counts plus complete kind-1 and kind-2 decoding validation.
 - `scene-res-report.txt`: per-scene entry, storage-kind, and block totals.
 - `resource-extension-report.txt`: aggregate extension and storage-kind inventory.
-- `stored-image-report.txt`: dimensions and decoded pixel-index hashes for stored and kind-1 PCX-compatible payloads.
+- `stored-image-report.txt`: dimensions and decoded pixel-index hashes for stored, kind-1, and kind-2 PCX-compatible payloads.
 - `csf-report.txt`: storage kind, chunk sizes, dimensions, decoded segment totals, and stable frame-sequence hashes for byte-stored and kind-1 CSF containers.
 - `stored-palette-report.txt`: provenance, component ranges, and hashes for validated 256-color RGB palettes.
 - `hat-layout-report.txt`: decoded screen identifiers, background names, and region records for HAT layout descriptors.
-- `artifact-hashes.txt` and `string-hits.txt`: provenance and targeted executable evidence.
+- `dilemma-text-report.txt`: stable dilemma/scene identifiers plus choice, outcome, modifier, and text-length counts without original prose.
+- `artifact-hashes.txt`, `string-hits.txt`, and `executable-disassembly-report.txt`: provenance and targeted executable evidence.
 
 The reports are regenerated from the user's installation and must never be committed. Stable conclusions belong here and confidence-scoped gameplay conclusions belong in [`original-findings.md`](original-findings.md).
 
 ## Open questions
 
-1. Determine kind-2 framing and whether it represents a second codec or preprocessing stage.
-2. Recover the semantic meaning of directory field `0x24` and test whether data extents may alias or overlap.
-3. Specify nested chunk headers and the exact compression selector used inside decoded resources.
-4. Associate CSF sequences with their screen palettes, and specify the remaining PCC, LOW, palette, RAT, FNT, and `666` payload semantics as each decoder is validated.
+1. Recover the semantic meaning of directory field `0x24` and test whether data extents may alias or overlap.
+2. Specify nested chunk headers and the exact compression selector used inside decoded resources.
+3. Associate CSF sequences with their screen palettes, and specify the remaining PCC, LOW, palette, RAT, FNT, and `666` payload semantics as each decoder is validated.

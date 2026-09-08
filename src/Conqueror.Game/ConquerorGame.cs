@@ -8,7 +8,7 @@ namespace Conqueror.Game;
 
 public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 {
-    private enum Screen { Title, CharacterOptions, CharacterName, Character, Dilemma, Map, Home, Village, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
+    private enum Screen { Title, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Map, Home, Village, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _batch = null!;
     private Texture2D _pixel = null!;
@@ -18,6 +18,10 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private MouseState _lastMouse;
     private int _characterOption;
     private int _characterTemplate;
+    private int _loadSlot;
+    private int _activeSaveSlot = 1;
+    private Screen _loadReturnScreen = Screen.Title;
+    private IReadOnlyList<CampaignSaveSlot> _saveSlotInfo = [];
     private int _heraldicColor = 1;
     private string _characterName = "Sir ";
     private IReadOnlyList<CharacterCreationOption> _characterOptions = CharacterCreationDefinitions.Options;
@@ -38,7 +42,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private SoundEffect? _importedMusic;
     private SoundEffectInstance? _musicInstance;
     private readonly Dictionary<string, Texture2D> _originalArt = new(StringComparer.OrdinalIgnoreCase);
-    private readonly string _savePath = Path.Combine(AppContext.BaseDirectory, "saves", "campaign.json");
+    private readonly CampaignSaveSlots _saveSlots = new(Path.Combine(AppContext.BaseDirectory, "saves"));
 
     public ConquerorGame()
     {
@@ -104,11 +108,16 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         bool Press(Keys key) => keys.IsKeyDown(key) && !_last.IsKeyDown(key);
         var click = mouse.LeftButton == ButtonState.Pressed && _lastMouse.LeftButton == ButtonState.Released;
         var pressAny = keys.GetPressedKeys().Any(key => key != Keys.Escape && !_last.IsKeyDown(key));
-        if (Press(Keys.F5) && _screen != Screen.Title) { _campaign.Save(_savePath); _notice = "CAMPAIGN SAVED"; }
-        if (Press(Keys.F9) && File.Exists(_savePath)) { _campaign = Campaign.Load(_savePath); _selectedLocation = _campaign.State.CurrentLocation; _screen = Screen.Map; _notice = "CAMPAIGN LOADED"; }
+        if (Press(Keys.F5) && _screen is not Screen.Title and not Screen.LoadGame)
+        {
+            _saveSlots.Save(_campaign, _activeSaveSlot);
+            _notice = $"CAMPAIGN SAVED IN SLOT {_activeSaveSlot}";
+        }
+        if (Press(Keys.F9)) OpenLoadGame();
         if (Press(Keys.Escape))
         {
             if (_screen == Screen.Title) Exit();
+            else if (_screen == Screen.LoadGame) ResumeFromLoadGame();
             else if (_screen == Screen.CharacterName) _screen = Screen.CharacterOptions;
             else if (_screen == Screen.CharacterOptions) _screen = Screen.Title;
             else if (_screen == Screen.Character) _screen = Screen.CharacterOptions;
@@ -121,6 +130,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.Title:
                 if (pressAny || click) _screen = Screen.CharacterOptions;
                 break;
+            case Screen.LoadGame: UpdateLoadGame(Press, mouse, click); break;
             case Screen.CharacterOptions: UpdateCharacterOptions(Press, mouse, click); break;
             case Screen.CharacterName: UpdateCharacterName(Press); break;
             case Screen.Character:
@@ -137,10 +147,72 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.Overview: if (Press(Keys.Enter) || Press(Keys.O)) _screen = Screen.Map; break;
             case Screen.Ending: if (Press(Keys.Enter)) _screen = Screen.Title; break;
         }
-        if (_campaign.State.Victory != VictoryKind.None && _screen != Screen.Title) _screen = Screen.Ending;
+        if (_campaign.State.Victory != VictoryKind.None && _screen is not Screen.Title and not Screen.LoadGame) _screen = Screen.Ending;
         _last = keys;
         _lastMouse = mouse;
         base.Update(gameTime);
+    }
+
+    private void OpenLoadGame()
+    {
+        if (_screen != Screen.LoadGame) _loadReturnScreen = _screen;
+        _saveSlotInfo = _saveSlots.Inspect();
+        _loadSlot = Math.Clamp(_activeSaveSlot - 1, 0, CampaignSaveSlots.SlotCount - 1);
+        _screen = Screen.LoadGame;
+        _notice = "SELECT A SAVED CAMPAIGN OR RESUME";
+    }
+
+    private void UpdateLoadGame(Func<Keys, bool> press, MouseState mouse, bool click)
+    {
+        if (press(Keys.R))
+        {
+            ResumeFromLoadGame();
+            return;
+        }
+        if (press(Keys.Up)) _loadSlot = (_loadSlot + CampaignSaveSlots.SlotCount - 1) % CampaignSaveSlots.SlotCount;
+        if (press(Keys.Down)) _loadSlot = (_loadSlot + 1) % CampaignSaveSlots.SlotCount;
+        for (var i = 0; i < CampaignSaveSlots.SlotCount; i++)
+            if (press(Keys.D1 + i)) LoadSlot(i + 1);
+        if (press(Keys.Enter)) LoadSlot(_loadSlot + 1);
+        if (!click) return;
+
+        var (x, y) = OriginalPoint(mouse);
+        if (LoadGameDefinitions.Resume.Contains(x, y))
+        {
+            ResumeFromLoadGame();
+            return;
+        }
+        for (var i = 0; i < LoadGameDefinitions.Slots.Count; i++)
+            if (LoadGameDefinitions.Slots[i].Contains(x, y))
+            {
+                _loadSlot = i;
+                LoadSlot(i + 1);
+                return;
+            }
+    }
+
+    private void LoadSlot(int number)
+    {
+        if (!_saveSlots.TryLoad(number, out var campaign, out var error))
+        {
+            _notice = error ?? "CAMPAIGN COULD NOT BE LOADED";
+            _saveSlotInfo = _saveSlots.Inspect();
+            return;
+        }
+
+        _campaign = campaign!;
+        _fieldBattle = null;
+        _siege = null;
+        _activeSaveSlot = number;
+        _selectedLocation = _campaign.State.CurrentLocation;
+        _screen = Screen.Map;
+        _notice = $"CAMPAIGN LOADED FROM SLOT {number}";
+    }
+
+    private void ResumeFromLoadGame()
+    {
+        _screen = _loadReturnScreen;
+        _notice = "";
     }
 
     private void UpdateCharacterOptions(Func<Keys, bool> press, MouseState mouse, bool click)
@@ -369,11 +441,11 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _batch.Begin(samplerState: SamplerState.PointClamp);
         switch (_screen)
         {
-            case Screen.Title: DrawTitle(); break; case Screen.CharacterOptions: DrawCharacterOptions(); break; case Screen.CharacterName: DrawCharacterName(); break; case Screen.Character: DrawCharacter(); break; case Screen.Dilemma: DrawDilemma(); break; case Screen.Map: DrawMap(); break;
+            case Screen.Title: DrawTitle(); break; case Screen.LoadGame: DrawLoadGame(); break; case Screen.CharacterOptions: DrawCharacterOptions(); break; case Screen.CharacterName: DrawCharacterName(); break; case Screen.Character: DrawCharacter(); break; case Screen.Dilemma: DrawDilemma(); break; case Screen.Map: DrawMap(); break;
             case Screen.Home: DrawHome(); break; case Screen.Village: DrawVillage(); break; case Screen.Shop: DrawShop(); break; case Screen.Tournament: DrawTournament(); break; case Screen.FieldBattle: DrawFieldBattle(); break;
             case Screen.Siege: DrawSiege(); break; case Screen.Overview: DrawOverview(); break; case Screen.Ending: DrawEnding(); break;
         }
-        if (_screen is not Screen.Title and not Screen.Character and not Screen.Dilemma) DrawText(_notice, 24, 730, Color.Gold, 2);
+        if (_screen is not Screen.Title and not Screen.LoadGame and not Screen.Character and not Screen.Dilemma) DrawText(_notice, 24, 730, Color.Gold, 2);
         _batch.End();
         base.Draw(gameTime);
     }
@@ -399,6 +471,25 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             DrawText("CONQUEROR", 250, 190, Color.Gold, 7); DrawText("A.D. 1086", 350, 265, Color.Wheat, 4);
         }
         if (!hasTitle) DrawText("PRESS ANY KEY", 405, 600, Color.White, 2);
+    }
+
+    private void DrawLoadGame()
+    {
+        var original = DrawOriginal("Load.Background", new Rectangle(0, 0, 1024, 768));
+        if (!original) DrawPanel("LOAD GAME", "SELECT ONE OF FIVE CAMPAIGN SLOTS");
+
+        for (var i = 0; i < CampaignSaveSlots.SlotCount; i++)
+        {
+            var bounds = original ? ScaleBounds(LoadGameDefinitions.Slots[i]) : new Rectangle(150, 190 + i * 82, 724, 55);
+            var info = i < _saveSlotInfo.Count ? _saveSlotInfo[i] : new CampaignSaveSlot(i + 1, false, false, "EMPTY", null, null);
+            var details = info.IsValid ? $"{info.PlayerName}   {info.CampaignDate:dd MMM yyyy}" : info.PlayerName;
+            DrawText(details.ToUpperInvariant(), bounds.X + 90, bounds.Y + 10, info.IsValid ? Color.White : Color.LightGray, 2, bounds.Width - 110);
+            if (i == _loadSlot) DrawOutline(bounds, Color.Gold, 3);
+        }
+
+        if (!original) DrawText("ESC OR R  RESUME", 150, 640, Color.LightGreen, 2);
+        DrawText("ARROWS/1-5 LOAD   ESC RESUME", 250, 710, Color.Wheat, 2);
+        if (!string.IsNullOrEmpty(_notice)) DrawText(_notice, 250, 740, Color.Gold, 2);
     }
 
     private void DrawCharacterOptions()

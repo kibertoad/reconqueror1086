@@ -46,6 +46,16 @@ var lzwFixture = PackLsbCodes([65, 66, 257, 259], 9);
 Check(Encoding.ASCII.GetString(DynamixCompression.DecodeLzw(lzwFixture, 7)) == "ABABABA", "Dynamix LZW expands dictionary and special code");
 Check(Throws<InvalidDataException>(() => DynamixCompression.DecodeLzw(lzwFixture, 8)), "Dynamix LZW rejects truncated streams cleanly");
 Check(Throws<InvalidDataException>(() => DynamixCompression.DecodeLzw(lzwFixture, 7, 6)), "Dynamix LZW enforces expanded-size limit");
+var kind2Fixture = PackMsbCodes([(256, 9), (65, 9), (66, 9), (258, 9), (260, 9), (257, 9)]);
+Check(Encoding.ASCII.GetString(DynamixCompression.DecodeKind2(kind2Fixture, 7)) == "ABABABA", "Dynamix kind-2 handles clear, dictionary, special, and end codes");
+(int Count, int Width)[] kind2WidthRuns = [(254, 9), (512, 10), (1_024, 11), (2_048, 12), (4_096, 13), (8_193, 14)];
+var kind2GrowthCodes = new List<(int Code, int Width)> { (256, 9) };
+foreach (var (count, width) in kind2WidthRuns) kind2GrowthCodes.AddRange(Enumerable.Repeat((0, width), count));
+kind2GrowthCodes.Add((257, 14));
+Check(DynamixCompression.DecodeKind2(PackMsbCodes(kind2GrowthCodes), kind2WidthRuns.Sum(run => run.Count)).SequenceEqual(new byte[kind2WidthRuns.Sum(run => run.Count)]), "Dynamix kind-2 grows from nine through fourteen bits at executable-confirmed boundaries");
+Check(Throws<InvalidDataException>(() => DynamixCompression.DecodeKind2(kind2Fixture[..^1], 7)), "Dynamix kind-2 rejects a stream without its end code");
+Check(Throws<InvalidDataException>(() => DynamixCompression.DecodeKind2(PackMsbCodes([(256, 9), (300, 9), (257, 9)]), 1)), "Dynamix kind-2 rejects undefined dictionary codes");
+Check(Throws<InvalidDataException>(() => DynamixCompression.DecodeKind2(kind2Fixture, 7, 6)), "Dynamix kind-2 enforces expanded-size limit");
 var kind1Source = new byte[] { 3, 0, 0x80, 2, 3, 2, 0, 0x40, 5 };
 var kind1Blocks = DynamixCompression.ReadKind1Blocks(kind1Source);
 Check(kind1Blocks.SequenceEqual([new DynamixCompressedBlock(0, 2, 3, DynamixBlockStorage.Stored), new DynamixCompressedBlock(1, 7, 2, DynamixBlockStorage.Compressed)]), "Dynamix kind-1 block framing and storage markers");
@@ -262,6 +272,7 @@ try
     File.WriteAllBytes(Path.Combine(contentRoot, "portrait.pcc"), CreateSyntheticPcx());
     File.WriteAllBytes(Path.Combine(contentRoot, "animation.csf"), CreateSyntheticCsf(CreateSyntheticCsfFrame()));
     File.WriteAllBytes(Path.Combine(contentRoot, "screen.pal"), new byte[IndexedPalette.ByteSize]);
+    File.WriteAllText(Path.Combine(contentRoot, "dilem7.dat"), CreateSyntheticDilemma());
     var manifest = new
     {
         Version = 1,
@@ -272,6 +283,7 @@ try
             new { Id = "IMAGE", Path = "portrait.pcc", Kind = "image", Size = CreateSyntheticPcx().Length, Sha256 = "test" },
             new { Id = "ANIMATION", Path = "animation.csf", Kind = "indexed-animation", Size = 0, Sha256 = "test" },
             new { Id = "PALETTE", Path = "screen.pal", Kind = "palette", Size = IndexedPalette.ByteSize, Sha256 = "test" },
+            new { Id = "C1086.GOB#177:dilem7.dat", Path = "dilem7.dat", Kind = "resource", Size = 0, Sha256 = "test" },
             new { Id = "UNSAFE", Path = "../outside.bin", Kind = "resource", Size = 0, Sha256 = "test" }
         }
     };
@@ -279,12 +291,15 @@ try
     Environment.SetEnvironmentVariable("CONQUEROR_USER_CONTENT", contentRoot);
     var catalog = ImportedContentCatalog.Discover();
     using var importedTrack = catalog?.Open("CDDA/TRACK02");
-    Check(catalog?.Count == 5 && importedTrack?.Length == 4 && catalog.Ids("audio").SequenceEqual(["CDDA/TRACK02"]), "imported content manifest is discoverable");
+    Check(catalog?.Count == 6 && importedTrack?.Length == 4 && catalog.Ids("audio").SequenceEqual(["CDDA/TRACK02"]), "imported content manifest is discoverable");
     Check(catalog?.FindId("image", "aGe") == "IMAGE" && catalog.FindId("audio", "aGe") is null, "imported content finds role candidates by kind and suffix");
     Check(catalog?.DecodePcx("IMAGE") is { Width: 3, Height: 1 }, "runtime catalog decodes imported PCX-compatible images");
     var importedSequence = catalog?.DecodeCsf("ANIMATION");
     Check(importedSequence?.DecodeFrame(importedSequence.Chunks[0]) is { Width: 5, Height: 2 }, "runtime catalog decodes imported CSF frame sequences");
     Check(catalog?.DecodePalette("PALETTE")?.Rgb.Length == IndexedPalette.ByteSize, "runtime catalog decodes imported RGB palettes");
+    var dialogue = catalog is null ? null : new ImportedDialogueRepository(catalog).GetDilemma(7);
+    Check(dialogue is { Number: 7, Age: 12, Choices.Count: 3 }, "runtime dialogue repository loads a dilemma by stable number");
+    Check(catalog is not null && new ImportedDialogueRepository(catalog).GetDilemmasForAge(12).Select(x => x.Number).SequenceEqual([7]), "runtime dialogue repository groups definitions by declared age");
     Check(catalog?.Open("UNSAFE") is null, "imported content rejects paths outside its root");
 }
 finally
@@ -303,6 +318,23 @@ catch (Exception error)
 Console.WriteLine();
 Console.WriteLine($"Result: {passed} passed, {failed} failed, {passed + failed} total.");
 Environment.ExitCode = failed == 0 ? 0 : 1;
+
+static string CreateSyntheticDilemma()
+{
+    var text = new StringBuilder("# AGE: 12\r\n# TITLE: SYNTHETIC\r\n!DILEMMA_NUMBER DILEMMA_SFG_FILE\r\n7 D777.CSF\r\n&DILEMMA TEXT\r\n^Synthetic prompt.\r\n");
+    var attributes = new[] { "STRENGTH", "DEXTERITY", "NONE" };
+    foreach (var choice in Enumerable.Range(1, 3))
+    {
+        text.Append("@RELEVANT SCORING ATTRIBUTE\r\n~").Append(attributes[choice - 1]).Append("\r\n");
+        text.Append("%HIGH SCORING BREAKPOINT LOW SCORING BREAKPOINT\r\n17 6\r\n");
+        foreach (var outcome in Enum.GetNames<DilemmaOutcome>())
+        {
+            text.Append("?DILEMMA CHOICE ").Append(choice).Append(' ').Append(outcome.ToUpperInvariant()).Append(" TEXT\r\n");
+            text.Append("^Synthetic outcome.\r\n*NUMBER OF ATTRIBUTES MODIFIED\r\n1\r\n$ATTRIBUTE MODIFIER\r\nHONOR 1\r\n");
+        }
+    }
+    return text.Append('\u001a').ToString();
+}
 
 static bool Throws<T>(Action action) where T : Exception
 {
@@ -373,6 +405,17 @@ static byte[] PackLsbCodes(int[] codes, int width)
         for (var bit = 0; bit < width; bit++, bitPosition++)
             if ((code & (1 << bit)) != 0) result[bitPosition >> 3] |= (byte)(1 << (bitPosition & 7));
     }
+    return result;
+}
+
+static byte[] PackMsbCodes(IEnumerable<(int Code, int Width)> codes)
+{
+    var values = codes.ToArray();
+    var result = new byte[(values.Sum(value => value.Width) + 7) / 8];
+    var bitPosition = 0;
+    foreach (var (code, width) in values)
+        for (var bit = width - 1; bit >= 0; bit--, bitPosition++)
+            if ((code & (1 << bit)) != 0) result[bitPosition >> 3] |= (byte)(1 << (7 - (bitPosition & 7)));
     return result;
 }
 

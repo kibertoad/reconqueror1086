@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup><OutputType>Exe</OutputType></PropertyGroup>
   <ItemGroup><ProjectReference Include="../../src/Conqueror.Resources/Conqueror.Resources.csproj" /></ItemGroup>
+  <ItemGroup><PackageReference Include="Iced" Version="1.21.0" /></ItemGroup>
 </Project>
