@@ -18,6 +18,7 @@ Gameplay content is described in typed definition records in `Balance.cs` and in
 | `Dilemma` | prompt, choices and stat/wealth/item effects | character creation |
 | `YouthDilemmaDefinition` | imported prompt, scoring attribute, breakpoints, outcome prose and typed changes | `YouthDilemmaRules` / `Campaign.AnswerDilemma` |
 | `YouthDilemmaPoolDefinition` | age range, variants per age and stable resource-number mapping | campaign youth selection |
+| `YouthDilemmaPresentationDefinitions` | original HAT-derived choice hitboxes | dilemma mouse input and highlighting |
 | `SiegeDefinition` | map size, garrison scaling, champion health, healing and break chance | `SiegeSession` |
 | `FieldBattleDefinition` | battlefield size, counter bonus, morale and withdrawal pressure | `FieldBattleSession` |
 | `StrategicDefinition` | spy cost, interception chance and minimum field force | campaign travel and reconnaissance |

@@ -27,6 +27,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private IReadOnlyList<CharacterCreationOption> _characterOptions = CharacterCreationDefinitions.Options;
     private IReadOnlyList<HeraldicColorOption> _heraldicColors = CharacterCreationDefinitions.HeraldicColors;
     private IReadOnlyList<UiBounds> _pregeneratedBounds = CharacterCreationDefinitions.PregeneratedCharacters;
+    private IReadOnlyList<UiBounds> _dilemmaChoiceBounds = YouthDilemmaPresentationDefinitions.Choices;
     private int _joustCursor;
     private SiegeSession? _siege;
     private bool _showRadar = true;
@@ -68,6 +69,9 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         var pregeneratedLayoutId = _importedContent?.FindId("resource", ":pregen.hat");
         var pregeneratedLayout = pregeneratedLayoutId is null ? null : _importedContent?.DecodeHat(pregeneratedLayoutId);
         _pregeneratedBounds = CharacterCreationDefinitions.PregeneratedFrom(pregeneratedLayout);
+        var dilemmaLayoutId = _importedContent?.FindId("resource", ":chargen.hat");
+        var dilemmaLayout = dilemmaLayoutId is null ? null : _importedContent?.DecodeHat(dilemmaLayoutId);
+        _dilemmaChoiceBounds = YouthDilemmaPresentationDefinitions.ChoicesFrom(dilemmaLayout);
         foreach (var definition in ImportedArt.Definitions)
         {
             var id = _importedContent?.FindId(definition.Kind, definition.IdSuffix);
@@ -139,7 +143,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.Character:
                 UpdatePregeneratedCharacters(Press, mouse, click);
                 break;
-            case Screen.Dilemma: UpdateDilemma(Press); break;
+            case Screen.Dilemma: UpdateDilemma(Press, mouse, click); break;
             case Screen.Map: UpdateMap(Press); break;
             case Screen.Home: UpdateHome(Press); break;
             case Screen.Village: UpdateVillage(Press); break;
@@ -340,7 +344,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _notice = notice;
     }
 
-    private void UpdateDilemma(Func<Keys, bool> press)
+    private void UpdateDilemma(Func<Keys, bool> press, MouseState mouse, bool click)
     {
         if (_youthDilemmaResult is not null)
         {
@@ -352,15 +356,20 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             return;
         }
 
-        var imported = CurrentImportedDilemma();
-        for (var i = 0; i < 3; i++)
+        var selectedChoice = Enumerable.Range(0, _dilemmaChoiceBounds.Count)
+            .FirstOrDefault(index => press(Keys.D1 + index), -1);
+        if (selectedChoice < 0 && click)
         {
-            if (!press(Keys.D1 + i)) continue;
-            if (imported is not null) _youthDilemmaResult = _campaign.AnswerDilemma(imported, i);
-            else _campaign.AnswerDilemma(i);
-            if (_youthDilemmaResult is null) CompleteYouthIfReady();
-            return;
+            var (x, y) = OriginalPoint(mouse);
+            selectedChoice = Enumerable.Range(0, _dilemmaChoiceBounds.Count)
+                .FirstOrDefault(index => _dilemmaChoiceBounds[index].Contains(x, y), -1);
         }
+        if (selectedChoice < 0) return;
+
+        var imported = CurrentImportedDilemma();
+        if (imported is not null) _youthDilemmaResult = _campaign.AnswerDilemma(imported, selectedChoice);
+        else _campaign.AnswerDilemma(selectedChoice);
+        if (_youthDilemmaResult is null) CompleteYouthIfReady();
     }
 
     private YouthDilemmaDefinition? CurrentImportedDilemma() =>
@@ -566,18 +575,25 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     {
         var index = _campaign.State.YouthDilemmasAnswered;
         var stats = _campaign.State.Player.Stats;
+        var original = DrawOriginal("Dilemma.Background", new Rectangle(0, 0, 1024, 768));
         if (_youthDilemmaResult is { } result)
         {
-            DrawPanel($"YOUTH - {result.Outcome.ToString().ToUpperInvariant()}", $"DILEMMA {result.DilemmaNumber}");
+            if (!original) DrawPanel($"YOUTH - {result.Outcome.ToString().ToUpperInvariant()}", $"DILEMMA {result.DilemmaNumber}");
+            else DrawText($"{result.Outcome.ToString().ToUpperInvariant()} - DILEMMA {result.DilemmaNumber}", 70, 70, Color.Gold, 3);
             DrawText(result.Text, 90, 190, Color.Wheat, 2, 820);
             DrawText("ENTER OR SPACE TO CONTINUE", 220, 520, Color.LightGreen, 2);
         }
         else if (CurrentImportedDilemma() is { } imported)
         {
-            DrawPanel($"YOUTH - AGE {imported.Age}", imported.Title);
+            if (!original) DrawPanel($"YOUTH - AGE {imported.Age}", imported.Title);
+            else DrawText($"AGE {imported.Age} - {imported.Title}", 70, 70, Color.Gold, 3, 880);
             DrawText(imported.Prompt, 90, 170, Color.Wheat, 2, 820);
             for (var i = 0; i < imported.Choices.Count; i++)
-                DrawText($"{i + 1}  {imported.Choices[i].Text}", 110, 285 + i * 75, Color.White, 2, 800);
+            {
+                var bounds = ScaleBounds(_dilemmaChoiceBounds[i]);
+                DrawOutline(bounds, Color.Gold, 2);
+                DrawText($"{i + 1}", bounds.X + 6, bounds.Y + 6, Color.Gold, 3);
+            }
         }
         else
         {

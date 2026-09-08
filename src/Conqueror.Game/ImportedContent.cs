@@ -15,6 +15,7 @@ public static class ImportedArt
         new("Title.Background", "image", ":fftitle.pcx"),
         new("Character.Options", "image", ":char_ops.pcx"),
         new("Character.Pregenerated", "image", ":pregen.pcx"),
+        new("Dilemma.Background", "image", ":morality.pcx"),
         new("Load.Background", "image", ":loadgame.pcx"),
         new("Map.England", "image", ":engmap1.pcx"),
         new("Tournament.Richard", "image", ":richard.pcc")
@@ -27,7 +28,8 @@ public static class ImportedLayouts
     [
         new("Title", ":title.hat"),
         new("Character.Options", ":cgopts.hat"),
-        new("Character.Pregenerated", ":pregen.hat")
+        new("Character.Pregenerated", ":pregen.hat"),
+        new("Dilemma", ":chargen.hat")
     ];
 }
 

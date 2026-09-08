@@ -62,6 +62,25 @@ public sealed class ResourceAndDefinitionTests
         Assert.Equal(Balance.Templates.Length, CharacterCreationDefinitions.PregeneratedCharacters.Count);
         Assert.Equal(["Red", "Green", "Blue"], CharacterCreationDefinitions.HeraldicColors.Select(x => x.Name));
         Assert.All(CharacterCreationDefinitions.HeraldicColors, x => Assert.True(CharacterCreationDefinitions.Options[1].OriginalBounds.Contains(x.OriginalBounds.X, x.OriginalBounds.Y)));
+        Assert.Contains(ImportedArt.Definitions, definition => definition.Role == "Dilemma.Background" && definition.IdSuffix == ":morality.pcx");
+        Assert.Contains(ImportedLayouts.Definitions, definition => definition.Role == "Dilemma" && definition.IdSuffix == ":chargen.hat");
+    }
+
+    [Fact]
+    public void DilemmaChoiceHotspotsComeFromTheOriginalLayout()
+    {
+        byte[] bytes = new byte[40 + 3 * 24];
+        WriteInt(bytes, 12, 640); WriteInt(bytes, 16, 480); WriteInt(bytes, 20, 3);
+        for (var index = 0; index < 3; index++)
+        {
+            var offset = 40 + index * 24;
+            WriteInt(bytes, offset, index); WriteInt(bytes, offset + 4, 10 + index * 100);
+            WriteInt(bytes, offset + 8, 300); WriteInt(bytes, offset + 12, 90);
+            WriteInt(bytes, offset + 16, 140); WriteInt(bytes, offset + 20, 1);
+        }
+        var choices = YouthDilemmaPresentationDefinitions.ChoicesFrom(new HatLayout(bytes));
+
+        Assert.Equal([new UiBounds(10, 300, 90, 140), new UiBounds(110, 300, 90, 140), new UiBounds(210, 300, 90, 140)], choices);
     }
 
     [Fact]

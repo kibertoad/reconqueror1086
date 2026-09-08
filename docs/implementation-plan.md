@@ -25,9 +25,9 @@ The repository currently provides:
 - A read-only original-disc inspector with ISO inventory, hashes, executable-string offsets, archive/compression reports, CSF previews, and HAT layout reports.
 - Bounded parsers for GOB/RES directories, kind-1 LZ/RLE blocks, indexed PCX/PCC images, CSF animation frames, raw RGB palettes, and HAT screen descriptors.
 - An end-user importer that installs byte-stored, kind-1, and kind-2 owned resources plus lossless CDDA WAV files under ignored local storage.
-- A runtime imported-content catalog, CD music playback, and definition-driven original art for the title, character options, pre-generated characters, England map, load-screen background registration, and a tournament portrait.
+- A runtime imported-content catalog, CD music playback, and definition-driven original art for the title, character options, pre-generated characters, youth dilemmas, England map, load screen, and a tournament portrait.
 - An executable-confirmed `TITLE.HAT`/`FFTITLE.PCX` title load followed by a corroborated character-options flow whose exact geometry comes from installed `CGOPTS.HAT` and `PREGEN.HAT`.
-- Seventeen xUnit test cases and 112 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
+- Eighteen xUnit test cases and 112 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
 
 ## Dependency map
 
