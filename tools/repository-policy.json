@@ -1,0 +1,33 @@
+{
+  "deniedRoots": [
+    "UserContent/",
+    "analysis/original/"
+  ],
+  "restrictedExtensions": [
+    ".666",
+    ".csf",
+    ".cue",
+    ".dat",
+    ".fnt",
+    ".gob",
+    ".iso",
+    ".low",
+    ".mid",
+    ".midi",
+    ".mp3",
+    ".ogg",
+    ".pal",
+    ".pcc",
+    ".pcx",
+    ".rat",
+    ".res",
+    ".smk",
+    ".wav"
+  ],
+  "approvedRestrictedRoots": [
+    "assets/clean-room/",
+    "tests/fixtures/synthetic/"
+  ],
+  "maximumTrackedFileBytes": 1048576,
+  "approvedLargeFiles": []
+}

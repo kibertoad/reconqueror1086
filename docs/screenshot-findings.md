@@ -40,7 +40,7 @@ Local reference filenames:
 - **Implemented:** insert the options hub after the title/intro and route New Game to character creation.
 - **Implemented:** decode `GAMEOPTS.HAT` into typed actions rather than branching on raw region numbers in screen code.
 - **Partially implemented:** New Game, Load, Save, Resume, and Exit have real state transitions. Practice, Credits, and Movie remain explicit unavailable actions pending their runtime systems.
-- Use `OPTION.CSF` for setting-state visuals after its frame meanings are verified.
+- **Partially implemented:** render `OPTION.CSF` frames 0 and 2 as the ON/OFF state below each setting label and frame 4 as Resume when a campaign is active. The `OPTFIN.PCX` palette renders these frames coherently and their 23x22/80x40 dimensions match the screenshot/HAT roles. Frames 1 and 3 appear to be alternate pressed-state variants and remain disabled pending input-timing confirmation.
 - **Partially implemented:** CD music and animation control active runtime behavior; sound-effects and speech state are represented; MIDI and unsupported presentations are explicitly labelled unavailable. Persisted settings, fullscreen/scaling, subtitles, and reduced motion remain follow-ups.
 - Replace Exit DOS wording only in fallback presentation; imported original-media mode may preserve the original label while exiting the application safely.
 

@@ -507,8 +507,8 @@ Status is conservative: “prototype” means the route is playable but substant
 | M3: Knightly competition | 5 | Playable prototype. | Exact opponent tables plus faithful first-person jousting and tactical tournament melee. |
 | M4: Conquest | 6-7 | Playable prototype. | Original strategic rules, battlefield systems, castle layouts, combat balance, retainers, and loot. |
 | M5: Two endings | 8 | Both routes playable as prototypes. | Complete Drogo/dragon quest chain, dragon encounter, crown politics, and original endings. |
-| M6: Original presentation | 9 | In progress: title, character screens, map, one portrait, CD audio, and presentation descriptors are active. | Full screen mapping, CSF/SMK playback, palettes, fonts, cursors, dialogue, effects, speech, and accessibility/settings. |
-| M7: Release | 10 | Not started beyond launch/test/import batch utilities. | Save slots/migrations, importer repair workflow, CI/legal gates, packaging, and clean-machine verification. |
+| M6: Original presentation | 9 | In progress: title, options hub with original state widgets, character screens, map, one portrait, CD audio, and presentation descriptors are active. | Full screen mapping, remaining CSF/SMK playback, fonts, cursors, dialogue, effects, speech, and accessibility/settings. |
+| M7: Release | 10 | In progress: launch/test/import batch utilities, five save slots, a data-driven legal-boundary check, and Windows CI are implemented. | Save migrations and recovery, importer repair workflow, packaging, and clean-machine verification. |
 
 ## Current resource and startup sprint
 
@@ -544,5 +544,5 @@ The resource-decoding sprint is first because it unlocks exact dialogue, screen 
 
 1. Continue tracing startup/menu input timing and HAT region-action dispatch from `CONQUER.EXE`; the five-slot load/resume UI and `campaign.json` compatibility path are implemented, while exact original dispatch/timing remains to be confirmed.
 2. Determine the original per-age selection policy, then bind the decoded five-definition age groups to campaign state; keep original prose local and retain built-in fallback summaries.
-3. Bind menu CSF sequences to verified palettes and roles, beginning with cursor/settings animation; record every association and confidence grade.
-4. Add legal-boundary automation that fails if imported media or generated analysis artifacts enter Git, then add CI restore/build/test coverage.
+3. In progress: bind menu CSF sequences to verified palettes and roles. `OPTION.CSF` static ON/OFF and Resume frames now use the verified `OPTFIN.PCX` palette through a typed animation-role definition; its alternate input frames and other cursor/menu sequences still require timing and palette evidence.
+4. [Completed 2026-09-08] Add legal-boundary automation that fails if imported media or generated analysis artifacts enter Git, then add CI restore/build/test coverage. `tools/Verify-Repository.ps1` interprets the data-only `repository-policy.json`; the local test launcher and Windows GitHub Actions workflow both enforce it before compiling.

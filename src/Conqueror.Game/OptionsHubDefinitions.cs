@@ -19,12 +19,22 @@ public enum OptionsHubAction
     Exit
 }
 
+public enum OptionsHubSetting
+{
+    CdMusic,
+    MidiMusic,
+    SoundEffects,
+    Speech,
+    Animation
+}
+
 public sealed record OptionsHubOption(
     string Label,
     OptionsHubAction Action,
     UiBounds OriginalBounds,
     int HatRegionId,
-    bool RequiresCampaign = false);
+    bool RequiresCampaign = false,
+    OptionsHubSetting? Setting = null);
 
 public static class OptionsHubDefinitions
 {
@@ -37,11 +47,11 @@ public static class OptionsHubDefinitions
         new("Practice", OptionsHubAction.Practice, new(340, 0, 145, 230), 5),
         new("Credits", OptionsHubAction.Credits, new(290, 320, 140, 160), 8),
         new("Movie", OptionsHubAction.Movie, new(430, 320, 150, 160), 9),
-        new("CD Music", OptionsHubAction.ToggleCdMusic, new(160, 0, 120, 85), 4),
-        new("MIDI Music", OptionsHubAction.ToggleMidiMusic, new(510, 15, 90, 70), 10),
-        new("Sound Effects", OptionsHubAction.ToggleSoundEffects, new(145, 90, 100, 65), 0),
-        new("Digitized Speech", OptionsHubAction.ToggleSpeech, new(200, 160, 90, 60), 12),
-        new("Animation", OptionsHubAction.ToggleAnimation, new(500, 85, 85, 70), 1),
+        new("CD Music", OptionsHubAction.ToggleCdMusic, new(160, 0, 120, 85), 4, Setting: OptionsHubSetting.CdMusic),
+        new("MIDI Music", OptionsHubAction.ToggleMidiMusic, new(510, 15, 90, 70), 10, Setting: OptionsHubSetting.MidiMusic),
+        new("Sound Effects", OptionsHubAction.ToggleSoundEffects, new(145, 90, 100, 65), 0, Setting: OptionsHubSetting.SoundEffects),
+        new("Digitized Speech", OptionsHubAction.ToggleSpeech, new(200, 160, 90, 60), 12, Setting: OptionsHubSetting.Speech),
+        new("Animation", OptionsHubAction.ToggleAnimation, new(500, 85, 85, 70), 1, Setting: OptionsHubSetting.Animation),
         new("Exit", OptionsHubAction.Exit, new(10, 20, 75, 65), 2)
     ];
 
@@ -50,4 +60,14 @@ public static class OptionsHubDefinitions
             ? option with { OriginalBounds = new UiBounds(region.X, region.Y, region.Width, region.Height) }
             : option)
         .ToArray();
+
+    public static UiBounds StatusBounds(OptionsHubOption option, int width, int height) => new(
+        option.OriginalBounds.X + (option.OriginalBounds.Width - width) / 2,
+        option.OriginalBounds.Y + option.OriginalBounds.Height - height - 6,
+        width,
+        height);
+
+    public const int EnabledStatusFrame = 0;
+    public const int DisabledStatusFrame = 2;
+    public const int ResumeFrame = 4;
 }

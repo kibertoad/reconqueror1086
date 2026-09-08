@@ -39,7 +39,9 @@ The importer also validates stored CSF files as indexed animation sequences. The
 
 ## Verification
 
-On Windows, double-click `Run Tests.bat`. It builds into a unique directory under `%TEMP%`, disables the shared compiler, and runs both the xUnit suite and the broader executable specifications without touching the game’s normal output files. This prevents a running game from locking test build outputs.
+On Windows, double-click `Run Tests.bat`. It first enforces the repository legal boundary, then builds into a unique directory under `%TEMP%`, disables the shared compiler, and runs both the xUnit suite and the broader executable specifications without touching the game's normal output files. This prevents a running game from locking test build outputs. The same sequence runs in GitHub Actions.
+
+The legal-boundary policy rejects tracked `UserContent`, tracked `analysis/original` material, restricted original-media extensions outside explicitly approved clean-room or synthetic-fixture roots, and unreviewed files over 1 MiB. Its definitions live in `tools/repository-policy.json`; `tools/Verify-Repository.ps1` is the generic interpreter.
 
 The xUnit project uses xUnit.net v3 4.0.0, and the desktop project uses MonoGame 3.8.5.1—the latest stable NuGet releases checked on 2026-09-07.
 

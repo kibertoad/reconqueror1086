@@ -77,6 +77,10 @@ public sealed class ResourceAndDefinitionTests
         Assert.Equal(11, OptionsHubDefinitions.Options.Single(option => option.Action == OptionsHubAction.Resume).HatRegionId);
         Assert.Contains(ImportedArt.Definitions,
             definition => definition.Role == "Options.Background" && definition.IdSuffix == ":optfin.pcx");
+        Assert.Equal(5, OptionsHubDefinitions.Options.Count(option => option.Setting.HasValue));
+        Assert.Equal(5, OptionsHubDefinitions.Options.Select(option => option.Setting).OfType<OptionsHubSetting>().Distinct().Count());
+        Assert.Single(ImportedAnimations.Definitions);
+        Assert.Equal("Options.Background", ImportedAnimations.Definitions[0].PaletteArtRole);
     }
 
     [Fact]

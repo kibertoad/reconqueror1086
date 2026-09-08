@@ -7,6 +7,7 @@ namespace Conqueror.Game;
 
 public sealed record ImportedArtDefinition(string Role, string Kind, string IdSuffix);
 public sealed record ImportedLayoutDefinition(string Role, string IdSuffix);
+public sealed record ImportedAnimationDefinition(string Role, string IdSuffix, string PaletteArtRole);
 
 public static class ImportedArt
 {
@@ -32,6 +33,14 @@ public static class ImportedLayouts
         new("Character.Options", ":cgopts.hat"),
         new("Character.Pregenerated", ":pregen.hat"),
         new("Dilemma", ":chargen.hat")
+    ];
+}
+
+public static class ImportedAnimations
+{
+    public static IReadOnlyList<ImportedAnimationDefinition> Definitions { get; } =
+    [
+        new("Options.Widgets", ":option.csf", "Options.Background")
     ];
 }
 

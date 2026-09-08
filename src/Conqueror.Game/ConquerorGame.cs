@@ -9,6 +9,7 @@ namespace Conqueror.Game;
 public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 {
     private sealed record DilemmaAnimation(IReadOnlyList<Texture2D> Frames, int FramesPerChoice);
+    private sealed record OriginalAnimation(IReadOnlyList<Texture2D> Frames);
 
     private enum Screen { Title, OptionsHub, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Map, Home, Village, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
     private readonly GraphicsDeviceManager _graphics;
@@ -50,6 +51,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private SoundEffect? _importedMusic;
     private SoundEffectInstance? _musicInstance;
     private readonly Dictionary<string, Texture2D> _originalArt = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, byte[]> _originalPalettes = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, OriginalAnimation> _originalAnimations = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, DilemmaAnimation?> _dilemmaAnimations = new(StringComparer.OrdinalIgnoreCase);
     private byte[]? _dilemmaPalette;
     private double _presentationSeconds;
@@ -96,7 +99,22 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             var texture = new Texture2D(GraphicsDevice, image.Width, image.Height, false, SurfaceFormat.Color);
             texture.SetData(image.ToRgba());
             _originalArt.Add(definition.Role, texture);
+            _originalPalettes.Add(definition.Role, image.PaletteRgb);
             if (definition.Role == "Dilemma.Background") _dilemmaPalette = image.PaletteRgb;
+        }
+        foreach (var definition in ImportedAnimations.Definitions)
+        {
+            var id = _importedContent?.FindId("indexed-animation", definition.IdSuffix);
+            if (id is null || _importedContent?.DecodeCsf(id) is not { } sequence
+                || !_originalPalettes.TryGetValue(definition.PaletteArtRole, out var palette)) continue;
+            var frames = sequence.Chunks.Select(chunk =>
+            {
+                var frame = sequence.DecodeFrame(chunk);
+                var texture = new Texture2D(GraphicsDevice, frame.Width, frame.Height, false, SurfaceFormat.Color);
+                texture.SetData(frame.ToRgba(palette));
+                return texture;
+            }).ToArray();
+            _originalAnimations.Add(definition.Role, new OriginalAnimation(frames));
         }
         if (_importedContent?.Open("CDDA/TRACK02") is { } music)
         {
@@ -121,6 +139,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _musicInstance?.Dispose();
         _importedMusic?.Dispose();
         foreach (var texture in _originalArt.Values) texture.Dispose();
+        foreach (var animation in _originalAnimations.Values)
+            foreach (var texture in animation.Frames) texture.Dispose();
         foreach (var animation in _dilemmaAnimations.Values.OfType<DilemmaAnimation>())
             foreach (var texture in animation.Frames) texture.Dispose();
         _pixel.Dispose();
@@ -612,12 +632,46 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         }
         else
         {
+            DrawOptionsWidgets();
             var selected = _optionsHubOptions[_optionsHubOption];
             DrawOutline(ScaleBounds(selected.OriginalBounds),
                 selected.RequiresCampaign && !_hasActiveCampaign ? Color.Gray : Color.Gold, 3);
         }
         if (_notice.Length > 0) DrawText(_notice, 30, 730, Color.Gold, 2, 960);
     }
+
+    private void DrawOptionsWidgets()
+    {
+        if (!_originalAnimations.TryGetValue("Options.Widgets", out var animation)
+            || animation.Frames.Count <= OptionsHubDefinitions.ResumeFrame) return;
+
+        foreach (var option in _optionsHubOptions.Where(option => option.Setting.HasValue))
+        {
+            var frameIndex = SettingEnabled(option.Setting!.Value)
+                ? OptionsHubDefinitions.EnabledStatusFrame
+                : OptionsHubDefinitions.DisabledStatusFrame;
+            var frame = animation.Frames[frameIndex];
+            var bounds = OptionsHubDefinitions.StatusBounds(option, frame.Width, frame.Height);
+            _batch.Draw(frame, ScaleBounds(bounds), Color.White);
+        }
+
+        if (_hasActiveCampaign)
+        {
+            var resume = _optionsHubOptions.Single(option => option.Action == OptionsHubAction.Resume);
+            var frame = animation.Frames[OptionsHubDefinitions.ResumeFrame];
+            _batch.Draw(frame, ScaleBounds(resume.OriginalBounds), Color.White);
+        }
+    }
+
+    private bool SettingEnabled(OptionsHubSetting setting) => setting switch
+    {
+        OptionsHubSetting.CdMusic => _cdMusicEnabled,
+        OptionsHubSetting.MidiMusic => false,
+        OptionsHubSetting.SoundEffects => _soundEffectsEnabled,
+        OptionsHubSetting.Speech => _speechEnabled,
+        OptionsHubSetting.Animation => _animationEnabled,
+        _ => throw new ArgumentOutOfRangeException(nameof(setting))
+    };
 
     private void DrawLoadGame()
     {
