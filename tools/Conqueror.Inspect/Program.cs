@@ -180,6 +180,7 @@ if (File.Exists(gobPath))
     File.WriteAllText(Path.Combine(output, "hat-layout-report.txt"), hatReport.ToString());
 
     var dilemmaReport = new StringBuilder("# Number  Age  Scene  Choices  Outcomes  Changes  PromptChars  OutcomeChars  Name\n");
+    var dilemmaRules = new StringBuilder("# Number  Choice:scoring[low,high] outcome(changes); original prose omitted\n");
     foreach (var entry in gob.Entries.Where(x => (x.IsStored || x.Flags == 1)
         && x.Name.StartsWith("dilem", StringComparison.OrdinalIgnoreCase)
         && Path.GetExtension(x.Name).Equals(".DAT", StringComparison.OrdinalIgnoreCase)))
@@ -191,6 +192,11 @@ if (File.Exists(gobPath))
             var changes = dilemma.Choices.Sum(choice => choice.Outcomes.Sum(outcome => outcome.Changes.Count));
             var outcomeChars = dilemma.Choices.Sum(choice => choice.Outcomes.Sum(outcome => outcome.Text.Length));
             dilemmaReport.AppendLine($"{dilemma.Number,6}  {dilemma.Age,3}  {dilemma.SceneFile,-12}  {dilemma.Choices.Count,7}  {outcomes,8}  {changes,7}  {dilemma.Prompt.Length,11}  {outcomeChars,12}  {entry.Name}");
+            var rules = dilemma.Choices.Select(choice =>
+                $"{choice.Number}:{choice.ScoringAttribute}[{choice.LowBreakpoint},{choice.HighBreakpoint}] "
+                + string.Join(' ', choice.Outcomes.OrderBy(outcome => outcome.Outcome).Select(outcome =>
+                    $"{outcome.Outcome}({string.Join(',', outcome.Changes.Select(change => $"{change.Attribute}{change.Modifier:+#;-#;0}"))})")));
+            dilemmaRules.AppendLine($"{dilemma.Number,6}  {string.Join("; ", rules)}");
         }
         catch (InvalidDataException error)
         {
@@ -198,6 +204,7 @@ if (File.Exists(gobPath))
         }
     }
     File.WriteAllText(Path.Combine(output, "dilemma-text-report.txt"), dilemmaReport.ToString());
+    File.WriteAllText(Path.Combine(output, "dilemma-rules-report.txt"), dilemmaRules.ToString());
 
     if (renderCsfName is not null || palettePcxName is not null)
     {
@@ -328,13 +335,14 @@ static string DisassembleLinearExecutable(string path, IReadOnlyList<uint> addre
             var pageIndex = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor + 12, 4));
             if (address < baseAddress || address >= baseAddress + virtualSize) continue;
             var fileOffset = checked(dataPages + (pageIndex - 1) * pageSize + address - baseAddress);
-            var available = Math.Min(256, bytes.Length - checked((int)fileOffset));
+            const int maximumDisassemblyBytes = 4096;
+            var available = Math.Min(maximumDisassemblyBytes, bytes.Length - checked((int)fileOffset));
             var reader = new ByteArrayCodeReader(bytes.AsSpan(checked((int)fileOffset), available).ToArray());
             var decoder = Iced.Intel.Decoder.Create(32, reader);
             decoder.IP = address;
             var formatter = new IntelFormatter();
             report.AppendLine($"\n# object {objectIndex + 1}, VA 0x{address:X8}, file offset 0x{fileOffset:X8}");
-            for (var instructionIndex = 0; instructionIndex < 40 && decoder.IP < address + (uint)available; instructionIndex++)
+            for (var instructionIndex = 0; instructionIndex < 1000 && decoder.IP < address + (uint)available; instructionIndex++)
             {
                 decoder.Decode(out var instruction);
                 if (instruction.IsInvalid) break;

@@ -20,7 +20,7 @@ Binary-derived claims and their confidence levels are recorded in [`original-fin
 - Joust and melee wager dialogue, five selectable melee opponents, and the documented typical 20-80 shilling wager range
 - Lady-specific colors, piety/fame restrictions, win-indexed courtship rewards, and simultaneous courtships
 - Dragon route requirements: Jane's lance, Wendessa's Shield of St. George, Valetta's armor, and Mighty strength
-- Six representative youth dilemmas with documented choice outcomes
+- Thirty imported youth-dilemma definitions grouped five per age from 12 through 17, with executable-confirmed random selection and inclusive breakpoint outcome rules; six representative summaries remain as the no-media fallback
 - Age 18 campaign start, age 30 deadline, crown and dragon endings
 
 ## Inferred and isolated

@@ -8,17 +8,19 @@ public enum LocationKind { Home, Village, Castle, City, Tournament, London, Drag
 public enum EquipmentSlot { Weapon, Body, Shield, Helm, Keepsake }
 public enum BuildingKind { House, Church, Monastery, Steward, Beadle, Priest, ServantRoom, Woodward }
 
-public sealed record CharacterStats(int Strength, int Dexterity, int Piety, int Stamina, int Honor)
+public sealed record CharacterStats(int Strength, int Dexterity, int Piety, int Stamina, int Honor, int Intelligence = 8)
 {
     public CharacterStats Clamp() => new(
         Math.Clamp(Strength, 0, 20), Math.Clamp(Dexterity, 1, 20),
-        Math.Clamp(Piety, 0, 20), Math.Clamp(Stamina, 0, 20), Math.Clamp(Honor, 0, 20));
+        Math.Clamp(Piety, 0, 20), Math.Clamp(Stamina, 0, 20), Math.Clamp(Honor, 0, 20),
+        Math.Clamp(Intelligence, 0, 20));
 
     public string DescribeStrength => Describe(Strength, "Feeble", "Runt", "Weak", "Average", "Brawny", "Mighty", "Herculean");
     public string DescribeDexterity => Describe(Dexterity, "Unskilled", "Unskilled", "Clumsy", "Adequate", "Handy", "Skilled", "Expert");
     public string DescribePiety => Describe(Piety, "Evil", "Black-Hearted", "Sordid", "Amoral", "Upright", "Righteous", "Saint");
     public string DescribeStamina => Describe(Stamina, "Exhausted", "Weary", "Dragging", "Average", "Athletic", "Tireless", "Dynamo");
     public string DescribeHonor => Describe(Honor, "Blackguard", "Despicable", "Unprincipled", "Decent", "Gallant", "Valiant", "Chivalrous");
+    public string DescribeIntelligence => Describe(Intelligence, "Foolish", "Slow", "Dull", "Average", "Clever", "Brilliant", "Genius");
 
     private static string Describe(int value, params string[] names) => value switch
     {
@@ -173,5 +175,6 @@ public sealed class CampaignState
     public Dictionary<int, int> GarrisonStrength { get; init; } = [];
     public HashSet<int> SpiedLocations { get; init; } = [];
     public int YouthDilemmasAnswered { get; set; }
+    public int? ActiveYouthDilemmaNumber { get; set; }
     public List<string> Journal { get; init; } = [];
 }

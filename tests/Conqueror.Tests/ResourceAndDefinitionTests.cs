@@ -157,6 +157,69 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void ImportedDilemmaDefinitionsMapThroughTypedAttributes()
+    {
+        var resource = DilemmaTextDecoder.Decode(System.Text.Encoding.ASCII.GetBytes(SyntheticDilemma()));
+
+        var definition = Assert.IsType<YouthDilemmaDefinition>(ImportedDilemmaAdapter.Convert(resource));
+
+        Assert.Equal(CharacterAttribute.Strength, definition.Choices[0].ScoringAttribute);
+        Assert.Equal("D777.CSF", definition.SceneFile);
+        Assert.Equal(CharacterAttribute.Honor,
+            definition.Choices[0].Outcomes[YouthDilemmaOutcome.Win].Changes.Single().Attribute);
+    }
+
+    [Theory]
+    [InlineData(17, YouthDilemmaOutcome.Win)]
+    [InlineData(6, YouthDilemmaOutcome.Draw)]
+    [InlineData(5, YouthDilemmaOutcome.Lose)]
+    public void DilemmaBreakpointsUseInclusiveOrderedBands(int score, YouthDilemmaOutcome expected)
+    {
+        var choice = new YouthDilemmaChoiceDefinition("Choice", CharacterAttribute.Strength, 6, 17,
+            new Dictionary<YouthDilemmaOutcome, YouthDilemmaOutcomeDefinition>());
+
+        Assert.Equal(expected, YouthDilemmaRules.Resolve(choice, score));
+    }
+
+    [Fact]
+    public void CampaignPersistsSelectionAndAppliesImportedOutcomeChanges()
+    {
+        var state = Campaign.NewCustom("Test", 42);
+        state.Player.Stats = state.Player.Stats with { Strength = 17, Intelligence = 8 };
+        var campaign = new Campaign(state, 42);
+        var number = campaign.CurrentYouthDilemmaNumber;
+        var changes = new CharacterAttributeChange[]
+        {
+            new(CharacterAttribute.Strength, 1),
+            new(CharacterAttribute.Intelligence, 2),
+            new(CharacterAttribute.SwordExperience, 1),
+            new(CharacterAttribute.Age, 1)
+        };
+        var choice = new YouthDilemmaChoiceDefinition("Choice", CharacterAttribute.Strength, 6, 17,
+            new Dictionary<YouthDilemmaOutcome, YouthDilemmaOutcomeDefinition>
+            {
+                [YouthDilemmaOutcome.Win] = new("Won", changes),
+                [YouthDilemmaOutcome.Draw] = new("Drew", []),
+                [YouthDilemmaOutcome.Lose] = new("Lost", [])
+            });
+        var definition = new YouthDilemmaDefinition(number, 12, "Title", "Prompt", [choice]);
+
+        Assert.Equal(number, campaign.CurrentYouthDilemmaNumber);
+        var restoredState = System.Text.Json.JsonSerializer.Deserialize<CampaignState>(
+            System.Text.Json.JsonSerializer.Serialize(state));
+        Assert.Equal(number, Assert.IsType<CampaignState>(restoredState).ActiveYouthDilemmaNumber);
+        var result = Assert.IsType<YouthDilemmaResult>(campaign.AnswerDilemma(definition, 0));
+
+        Assert.InRange(number, 0, 4);
+        Assert.Equal(YouthDilemmaOutcome.Win, result.Outcome);
+        Assert.Equal((18, 10, 1, 13), (state.Player.Stats.Strength, state.Player.Stats.Intelligence,
+            state.Player.SwordExperience, state.Player.Age));
+        Assert.Equal(1, state.YouthDilemmasAnswered);
+        Assert.Null(state.ActiveYouthDilemmaNumber);
+        Assert.InRange(campaign.CurrentYouthDilemmaNumber, 5, 9);
+    }
+
+    [Fact]
     public void DilemmaTextRejectsUnboundedOrIncompleteData()
     {
         var bytes = System.Text.Encoding.ASCII.GetBytes(SyntheticDilemma());

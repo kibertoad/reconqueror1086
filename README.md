@@ -14,13 +14,13 @@ The game opens at 1024x768. Press any key or click through the title, then use t
 
 On Windows, double-click `Start Conqueror 1086.bat` in the repository root. It checks for the .NET SDK and builds/starts the game locally.
 
-Owners of the original GOG release can first double-click `Install Original Resources.bat`. The importer reads the original installation without modifying it, installs exact resources into the Git-ignored `UserContent` directory, converts CDDA tracks losslessly to PCM WAV, and writes a provenance manifest. The launcher makes that catalog available to the game automatically. Imported CD music, the original title, character-options and pre-generated-character screens, parchment England map, load-game background, and a validated tournament portrait are active now. The data-driven dialogue repository can also load all 30 validated original dilemma definitions by stable number; gameplay keeps its built-in summaries until the original six-event selection mapping is verified. Rerun the installer after this upgrade to decode resources omitted by older manifests; SMK video and the remaining Sierra containers still require adapters.
+Owners of the original GOG release can first double-click `Install Original Resources.bat`. The importer reads the original installation without modifying it, installs exact resources into the Git-ignored `UserContent` directory, converts CDDA tracks losslessly to PCM WAV, and writes a provenance manifest. The launcher makes that catalog available to the game automatically. Imported CD music, the original title, character-options and pre-generated-character screens, parchment England map, load-game background, a validated tournament portrait, and all 30 original youth dilemmas are active now. Dilemma selection, score bands, outcome text, and attribute changes use the executable-confirmed data-driven rules; built-in summaries remain the no-media fallback. Rerun the installer after this upgrade to decode resources omitted by older manifests; SMK video and the remaining Sierra containers still require adapters.
 
 The importer also validates stored CSF files as indexed animation sequences. Their pixels and transparency are decoded, but they are not displayed until the correct original screen palettes are identified; rerun the installer after importer upgrades to refresh manifest classifications.
 
 ## Implemented systems
 
-- Original five-attribute character model, descriptive ranks, templates, custom rolls, and six formative dilemmas
+- Original six-attribute character model, descriptive ranks, templates, custom rolls, and six formative ages
 - March 1086 start at age 18, daily/monthly simulation, and the age-30 loss condition
 - Castle staffing, farm, village, forest, productivity and population systems
 - All crop and forest development choices, adjustable taxation, and the full scrollable blacksmith catalog

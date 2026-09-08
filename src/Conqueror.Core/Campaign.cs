@@ -24,7 +24,19 @@ public sealed class Campaign
     {
         var r = new Random(seed);
         int Roll() => r.Next(2, 13);
-        return new CampaignState { Player = new Player { Name = name, HeraldicColor = heraldicColor, Stats = new(Roll(), Roll(), Roll(), Roll(), Roll()), Wealth = Balance.StartingCustomWealth } };
+        return new CampaignState { Player = new Player { Name = name, HeraldicColor = heraldicColor, Age = Youth.OriginalPool.FirstAge, Stats = new(Roll(), Roll(), Roll(), Roll(), Roll(), Roll()), Wealth = Balance.StartingCustomWealth } };
+    }
+
+    public int CurrentYouthDilemmaNumber
+    {
+        get
+        {
+            var pool = Youth.OriginalPool;
+            var age = pool.AgeAtStage(State.YouthDilemmasAnswered);
+            if (State.ActiveYouthDilemmaNumber is not { } number || !pool.Contains(number, age))
+                State.ActiveYouthDilemmaNumber = number = pool.NumberFor(age, _random.Next(pool.VariantsPerAge));
+            return number;
+        }
     }
 
     public bool AnswerDilemma(int choice)
@@ -33,12 +45,36 @@ public sealed class Campaign
         var answer = Youth.Dilemmas[State.YouthDilemmasAnswered].Choices[choice];
         var s = State.Player.Stats;
         var d = answer.Delta;
-        State.Player.Stats = new CharacterStats(s.Strength + d.Strength, s.Dexterity + d.Dexterity, s.Piety + d.Piety, s.Stamina + d.Stamina, s.Honor + d.Honor).Clamp();
+        State.Player.Stats = new CharacterStats(s.Strength + d.Strength, s.Dexterity + d.Dexterity, s.Piety + d.Piety, s.Stamina + d.Stamina, s.Honor + d.Honor, s.Intelligence).Clamp();
         State.Player.Wealth += answer.Wealth;
         if (answer.Item is not null) State.Player.Inventory.Items.Add(answer.Item);
-        State.YouthDilemmasAnswered++;
+        State.Player.Age++;
+        CompleteYouthDilemma();
         Log($"Youth: {answer.Text}.");
         return true;
+    }
+
+    public YouthDilemmaResult? AnswerDilemma(YouthDilemmaDefinition dilemma, int choice)
+    {
+        if (State.YouthDilemmasAnswered >= Youth.OriginalPool.StageCount
+            || choice < 0 || choice >= dilemma.Choices.Count
+            || dilemma.Number != CurrentYouthDilemmaNumber
+            || dilemma.Age != Youth.OriginalPool.AgeAtStage(State.YouthDilemmasAnswered)) return null;
+
+        var selected = dilemma.Choices[choice];
+        var outcome = YouthDilemmaRules.Resolve(selected, CharacterAttributes.Read(State.Player, selected.ScoringAttribute));
+        if (!selected.Outcomes.TryGetValue(outcome, out var resolved)) return null;
+        CharacterAttributes.Apply(State.Player, resolved.Changes);
+        var result = new YouthDilemmaResult(dilemma.Number, choice + 1, outcome, resolved.Text, resolved.Changes);
+        CompleteYouthDilemma();
+        Log($"Youth dilemma {dilemma.Number}: choice {choice + 1}, {outcome}.");
+        return result;
+    }
+
+    private void CompleteYouthDilemma()
+    {
+        State.YouthDilemmasAnswered++;
+        State.ActiveYouthDilemmaNumber = null;
     }
 
     public int TravelTo(int location)

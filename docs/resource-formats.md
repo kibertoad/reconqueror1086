@@ -195,9 +195,9 @@ Reading kind-2 data with a 12-bit ceiling produces the exact four-byte PCX prefi
 
 ## Dilemma text resources
 
-The 30 `DILEM0.DAT` through `DILEM29.DAT` resources are marker-delimited 7-bit ASCII text ending optionally in DOS EOF byte `0x1A`. Each contains a stable numeric identifier, declared age, title, and CSF reference, a multi-line prompt, and exactly three choice records. The declarations form six groups of five definitions for ages 12 through 17. Each choice declares a scoring attribute, high/low breakpoints, and win/draw/lose outcomes; each outcome contains text and a counted table of named integer attribute modifiers. The marker spelling contains two harmless inconsistencies in the original data, so the parser dispatches on the stable prefix character and validates the following typed row rather than matching commentary prose. This structure, including the age grouping, and all 30 instances are **Confirmed** for the hashed release; the policy that chooses one of the five definitions for each age remains unknown.
+The 30 `DILEM0.DAT` through `DILEM29.DAT` resources are marker-delimited 7-bit ASCII text ending optionally in DOS EOF byte `0x1A`. Each contains a stable numeric identifier, declared age, title, and CSF reference, a multi-line prompt, and exactly three choice records. The declarations form six groups of five definitions for ages 12 through 17. Each choice declares a scoring attribute, high/low breakpoints, and win/draw/lose outcomes; each outcome contains text and a counted table of named integer attribute modifiers. The marker spelling contains two harmless inconsistencies in the original data, so the parser dispatches on the stable prefix character and validates the following typed row rather than matching commentary prose. This structure, including the age grouping, and all 30 instances are **Confirmed** for the hashed release. Static analysis also confirms selection number `(age - 12) * 5 + random(0..4)` and inclusive high/draw-low outcome bands; gameplay evidence is recorded in [`original-findings.md`](original-findings.md).
 
-`DilemmaTextDecoder` bounds input size, accepts ASCII only, validates identifiers, counts, integer rows, unique choices, and the complete outcome set. `ImportedDialogueRepository` resolves a locally imported definition by stable number. The inspector records only structural counts and text lengths in `dilemma-text-report.txt`; original prose remains confined to ignored `UserContent`.
+`DilemmaTextDecoder` bounds input size, accepts ASCII only, validates identifiers, counts, integer rows, unique choices, and the complete outcome set. `ImportedDialogueRepository` resolves a locally imported definition by stable number and maps its named attributes into the typed core interpreter. The inspector records only structural counts and text lengths in `dilemma-text-report.txt` and compact breakpoint/modifier metadata in `dilemma-rules-report.txt`; original prose remains confined to ignored `UserContent`.
 
 ## HAT screen layouts
 
@@ -239,6 +239,7 @@ The raw-sector bounds, ISO directory traversal, cue timestamps, and WAV sample p
 - `stored-palette-report.txt`: provenance, component ranges, and hashes for validated 256-color RGB palettes.
 - `hat-layout-report.txt`: decoded screen identifiers, background names, and region records for HAT layout descriptors.
 - `dilemma-text-report.txt`: stable dilemma/scene identifiers plus choice, outcome, modifier, and text-length counts without original prose.
+- `dilemma-rules-report.txt`: choice scoring attributes, low/high breakpoints, and outcome modifiers without original prose.
 - `artifact-hashes.txt`, `string-hits.txt`, and `executable-disassembly-report.txt`: provenance and targeted executable evidence.
 
 The reports are regenerated from the user's installation and must never be committed. Stable conclusions belong here and confidence-scoped gameplay conclusions belong in [`original-findings.md`](original-findings.md).

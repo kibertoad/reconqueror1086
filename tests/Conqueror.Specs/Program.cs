@@ -148,10 +148,14 @@ Check(fief.Productivity() == 100, "productivity capped at 100");
 Check(!campaign.Build(BuildingKind.Church) && campaign.Build(BuildingKind.House), "generic building interpreter");
 
 var custom = Campaign.NewCustom("Test", 42);
-Check(custom.Player.Stats.Strength is >= 2 and <= 12 && custom.Player.Wealth == 240, "custom character bounds");
+Check(custom.Player.Stats.Strength is >= 2 and <= 12 && custom.Player.Stats.Intelligence is >= 2 and <= 12
+    && custom.Player.Age == 12 && custom.Player.Wealth == 240, "custom character bounds");
 var youth = new Campaign(custom);
+var firstDilemmaNumber = youth.CurrentYouthDilemmaNumber;
+Check(firstDilemmaNumber is >= 0 and <= 4 && youth.CurrentYouthDilemmaNumber == firstDilemmaNumber, "youth dilemma selection is stable within the age group");
 var beforeYouth = youth.State.Player.Stats;
 Check(youth.AnswerDilemma(1) && youth.State.Player.Wealth == 260 && youth.State.Player.Stats.Piety == Math.Max(0, beforeYouth.Piety - 1), "youth dilemma effects");
+Check(youth.State.Player.Age == 13 && youth.CurrentYouthDilemmaNumber is >= 5 and <= 9, "youth dilemma selection advances by five-definition age groups");
 for (var i = 1; i < Youth.Dilemmas.Length; i++) youth.AnswerDilemma(2);
 Check(youth.State.YouthDilemmasAnswered == 6 && !youth.AnswerDilemma(0), "six dilemma limit");
 Check(Balance.Equipment.Single(x => x.Name == "Full Plate").Armor == 35, "full plate protection");

@@ -1,4 +1,6 @@
 using Conqueror.Resources;
+using Conqueror.Core;
+using System.Collections.Frozen;
 using System.Text.Json;
 
 namespace Conqueror.Game;
@@ -171,6 +173,7 @@ public sealed class ImportedContentCatalog
 public sealed class ImportedDialogueRepository(ImportedContentCatalog catalog)
 {
     private readonly Dictionary<int, DilemmaTextResource?> _dilemmas = [];
+    private readonly Dictionary<int, YouthDilemmaDefinition?> _playableDilemmas = [];
     private readonly int[] _numbers = catalog.Ids("resource")
         .Select(DilemmaNumberFromId)
         .Where(number => number.HasValue)
@@ -198,6 +201,15 @@ public sealed class ImportedDialogueRepository(ImportedContentCatalog catalog)
         .OrderBy(dilemma => dilemma.Number)
         .ToArray();
 
+    public YouthDilemmaDefinition? GetPlayableDilemma(int number)
+    {
+        if (_playableDilemmas.TryGetValue(number, out var cached)) return cached;
+        var resource = GetDilemma(number);
+        var playable = resource is null ? null : ImportedDilemmaAdapter.Convert(resource);
+        _playableDilemmas.Add(number, playable);
+        return playable;
+    }
+
     private static int? DilemmaNumberFromId(string id)
     {
         var separator = id.LastIndexOf(':');
@@ -208,5 +220,48 @@ public sealed class ImportedDialogueRepository(ImportedContentCatalog catalog)
             || !name.EndsWith(extension, StringComparison.OrdinalIgnoreCase)) return null;
         var digits = name.AsSpan(prefix.Length, name.Length - prefix.Length - extension.Length);
         return int.TryParse(digits, out var number) && number >= 0 ? number : null;
+    }
+}
+
+public static class ImportedDilemmaAdapter
+{
+    private static readonly FrozenDictionary<string, CharacterAttribute> Attributes =
+        new Dictionary<string, CharacterAttribute>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["NONE"] = CharacterAttribute.None,
+            ["STRENGTH"] = CharacterAttribute.Strength,
+            ["DEXTERITY"] = CharacterAttribute.Dexterity,
+            ["INTELLIGENCE"] = CharacterAttribute.Intelligence,
+            ["PIETY"] = CharacterAttribute.Piety,
+            ["STAMINA"] = CharacterAttribute.Stamina,
+            ["HONOR"] = CharacterAttribute.Honor,
+            ["EXPERIENCE_WITH_SWORD"] = CharacterAttribute.SwordExperience,
+            ["FAME"] = CharacterAttribute.Fame,
+            ["AGE"] = CharacterAttribute.Age,
+            ["WEALTH"] = CharacterAttribute.Wealth
+        }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
+
+    public static YouthDilemmaDefinition? Convert(DilemmaTextResource resource)
+    {
+        var choices = new List<YouthDilemmaChoiceDefinition>(resource.Choices.Count);
+        foreach (var choice in resource.Choices)
+        {
+            if (!Attributes.TryGetValue(choice.ScoringAttribute, out var scoringAttribute)) return null;
+            var outcomes = new Dictionary<YouthDilemmaOutcome, YouthDilemmaOutcomeDefinition>();
+            foreach (var outcome in choice.Outcomes)
+            {
+                var changes = new List<CharacterAttributeChange>(outcome.Changes.Count);
+                foreach (var change in outcome.Changes)
+                {
+                    if (!Attributes.TryGetValue(change.Attribute, out var attribute)) return null;
+                    changes.Add(new CharacterAttributeChange(attribute, change.Modifier));
+                }
+                if (!Enum.TryParse<YouthDilemmaOutcome>(outcome.Outcome.ToString(), out var outcomeKind)) return null;
+                outcomes.Add(outcomeKind, new YouthDilemmaOutcomeDefinition(outcome.Text, changes));
+            }
+            choices.Add(new YouthDilemmaChoiceDefinition($"Choice {choice.Number}", scoringAttribute, choice.LowBreakpoint,
+                choice.HighBreakpoint, outcomes.ToFrozenDictionary()));
+        }
+        return new YouthDilemmaDefinition(resource.Number, resource.Age, resource.Title, resource.Prompt, choices, resource.SceneFile);
     }
 }

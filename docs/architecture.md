@@ -16,12 +16,14 @@ Gameplay content is described in typed definition records in `Balance.cs` and in
 | `GrowthBand` | capacity threshold and population growth rate | monthly settlement |
 | `WorldLocation` | map position, destination type, garrison and villages | travel / conquest |
 | `Dilemma` | prompt, choices and stat/wealth/item effects | character creation |
+| `YouthDilemmaDefinition` | imported prompt, scoring attribute, breakpoints, outcome prose and typed changes | `YouthDilemmaRules` / `Campaign.AnswerDilemma` |
+| `YouthDilemmaPoolDefinition` | age range, variants per age and stable resource-number mapping | campaign youth selection |
 | `SiegeDefinition` | map size, garrison scaling, champion health, healing and break chance | `SiegeSession` |
 | `FieldBattleDefinition` | battlefield size, counter bonus, morale and withdrawal pressure | `FieldBattleSession` |
 | `StrategicDefinition` | spy cost, interception chance and minimum field force | campaign travel and reconnaissance |
 | `TournamentOpponentDefinition` | wager, joust tolerance and eight-man melee composition | joust and tournament skirmish settlement |
 
-The remaining switches in `Model.cs` are state adapters: they map a typed equipment slot or building enum to serialized player fields. They contain no prices, balance coefficients, content names, reward order, or eligibility rules.
+The remaining switches in the core are state adapters: they map typed equipment slots, building kinds, and dilemma attributes to serialized player fields. They contain no prices, balance coefficients, content names, reward order, or eligibility rules. Imported resource names are translated once by `ImportedDilemmaAdapter`; screen code never branches on an attribute string or dilemma number.
 
 ## Validation
 

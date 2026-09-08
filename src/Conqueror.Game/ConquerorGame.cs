@@ -39,6 +39,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private int _ladyIndex = 1;
     private int _tournamentOpponent = 2;
     private ImportedContentCatalog? _importedContent;
+    private ImportedDialogueRepository? _importedDialogue;
+    private YouthDilemmaResult? _youthDilemmaResult;
     private SoundEffect? _importedMusic;
     private SoundEffectInstance? _musicInstance;
     private readonly Dictionary<string, Texture2D> _originalArt = new(StringComparer.OrdinalIgnoreCase);
@@ -58,6 +60,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _pixel = new Texture2D(GraphicsDevice, 1, 1);
         _pixel.SetData([Color.White]);
         _importedContent = ImportedContentCatalog.Discover();
+        _importedDialogue = _importedContent is null ? null : new ImportedDialogueRepository(_importedContent);
         var characterLayoutId = _importedContent?.FindId("resource", ":cgopts.hat");
         var characterLayout = characterLayoutId is null ? null : _importedContent?.DecodeHat(characterLayoutId);
         _characterOptions = CharacterCreationDefinitions.OptionsFrom(characterLayout);
@@ -203,9 +206,11 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _campaign = campaign!;
         _fieldBattle = null;
         _siege = null;
+        _youthDilemmaResult = null;
         _activeSaveSlot = number;
         _selectedLocation = _campaign.State.CurrentLocation;
-        _screen = Screen.Map;
+        _screen = _campaign.State.YouthDilemmasAnswered < Youth.OriginalPool.StageCount
+            && _campaign.State.Player.Age < Balance.StartingAge ? Screen.Dilemma : Screen.Map;
         _notice = $"CAMPAIGN LOADED FROM SLOT {number}";
     }
 
@@ -248,7 +253,9 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                 _notice = $"HERALDIC COLOR: {_heraldicColors[_heraldicColor].Name}";
                 break;
             case CharacterCreationAction.GenerateNew:
-                _campaign = new Campaign(Campaign.NewCustom(NormalizedCharacterName(), Environment.TickCount, _heraldicColors[_heraldicColor].Name));
+                var seed = Environment.TickCount;
+                _campaign = new Campaign(Campaign.NewCustom(NormalizedCharacterName(), seed, _heraldicColors[_heraldicColor].Name), seed);
+                _youthDilemmaResult = null;
                 _screen = Screen.Dilemma;
                 break;
             case CharacterCreationAction.ChoosePregenerated:
@@ -335,17 +342,36 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void UpdateDilemma(Func<Keys, bool> press)
     {
+        if (_youthDilemmaResult is not null)
+        {
+            if (press(Keys.Enter) || press(Keys.Space))
+            {
+                _youthDilemmaResult = null;
+                CompleteYouthIfReady();
+            }
+            return;
+        }
+
+        var imported = CurrentImportedDilemma();
         for (var i = 0; i < 3; i++)
         {
             if (!press(Keys.D1 + i)) continue;
-            _campaign.AnswerDilemma(i);
-            if (_campaign.State.YouthDilemmasAnswered >= Youth.Dilemmas.Length)
-            {
-                _selectedLocation = 0;
-                _screen = Screen.Map;
-                _notice = "YOUR YEARS OF TRAINING ARE COMPLETE";
-            }
+            if (imported is not null) _youthDilemmaResult = _campaign.AnswerDilemma(imported, i);
+            else _campaign.AnswerDilemma(i);
+            if (_youthDilemmaResult is null) CompleteYouthIfReady();
+            return;
         }
+    }
+
+    private YouthDilemmaDefinition? CurrentImportedDilemma() =>
+        _importedDialogue?.GetPlayableDilemma(_campaign.CurrentYouthDilemmaNumber);
+
+    private void CompleteYouthIfReady()
+    {
+        if (_campaign.State.YouthDilemmasAnswered < Youth.OriginalPool.StageCount) return;
+        _selectedLocation = 0;
+        _screen = Screen.Map;
+        _notice = "YOUR YEARS OF TRAINING ARE COMPLETE";
     }
 
     private void UpdateHome(Func<Keys, bool> press)
@@ -539,12 +565,28 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private void DrawDilemma()
     {
         var index = _campaign.State.YouthDilemmasAnswered;
-        var dilemma = Youth.Dilemmas[Math.Min(index, Youth.Dilemmas.Length - 1)];
         var stats = _campaign.State.Player.Stats;
-        DrawPanel($"YOUTH - YEAR {index + 1} OF 6", dilemma.Title);
-        DrawText(dilemma.Prompt, 90, 190, Color.Wheat, 2, 820);
-        for (var i = 0; i < dilemma.Choices.Length; i++) DrawText($"{i + 1}  {dilemma.Choices[i].Text}", 110, 300 + i * 75, Color.White);
-        DrawText($"STR {stats.Strength}  DEX {stats.Dexterity}  PIETY {stats.Piety}  STAMINA {stats.Stamina}  HONOR {stats.Honor}", 100, 590, Color.Gold, 2);
+        if (_youthDilemmaResult is { } result)
+        {
+            DrawPanel($"YOUTH - {result.Outcome.ToString().ToUpperInvariant()}", $"DILEMMA {result.DilemmaNumber}");
+            DrawText(result.Text, 90, 190, Color.Wheat, 2, 820);
+            DrawText("ENTER OR SPACE TO CONTINUE", 220, 520, Color.LightGreen, 2);
+        }
+        else if (CurrentImportedDilemma() is { } imported)
+        {
+            DrawPanel($"YOUTH - AGE {imported.Age}", imported.Title);
+            DrawText(imported.Prompt, 90, 170, Color.Wheat, 2, 820);
+            for (var i = 0; i < imported.Choices.Count; i++)
+                DrawText($"{i + 1}  {imported.Choices[i].Text}", 110, 285 + i * 75, Color.White, 2, 800);
+        }
+        else
+        {
+            var dilemma = Youth.Dilemmas[Math.Min(index, Youth.Dilemmas.Length - 1)];
+            DrawPanel($"YOUTH - YEAR {index + 1} OF {Youth.OriginalPool.StageCount}", dilemma.Title);
+            DrawText(dilemma.Prompt, 90, 190, Color.Wheat, 2, 820);
+            for (var i = 0; i < dilemma.Choices.Length; i++) DrawText($"{i + 1}  {dilemma.Choices[i].Text}", 110, 300 + i * 75, Color.White);
+        }
+        DrawText($"STR {stats.Strength}  DEX {stats.Dexterity}  INT {stats.Intelligence}  PIETY {stats.Piety}  STAMINA {stats.Stamina}  HONOR {stats.Honor}", 70, 590, Color.Gold, 2);
     }
 
     private void DrawMap()

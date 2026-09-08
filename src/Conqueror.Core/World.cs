@@ -46,6 +46,8 @@ public sealed record DilemmaChoice(string Text, CharacterStats Delta, int Wealth
 
 public static class Youth
 {
+    public static readonly YouthDilemmaPoolDefinition OriginalPool = new(12, 17, 5);
+
     public static readonly Dilemma[] Dilemmas =
     [
         new("A false account", "A lord lies about his income. What do you do?",
