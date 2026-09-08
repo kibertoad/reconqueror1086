@@ -103,7 +103,25 @@ The 486 GOB records and 13,147 scene records produce this extension-level invent
 | `.JP` | 5 | 0 | 5 | 0 | GOB |
 | Other named extensions | 11 | 1 | 10 | 0 | GOB and scene |
 
-The five kind-2 resources are four strictly validated 640x480 `.PCX` entries and one exactly expanded `.666` entry. This distribution and the image structure are **Confirmed**, while the semantic meaning of `.666` and most other extensions remains unknown.
+The five kind-2 resources are four strictly validated 640x480 `.PCX` entries and one exactly expanded `.666` sound bank. This distribution, the image structure, and the sound-bank framing below are **Confirmed**; most other extensions remain unknown.
+
+## Dynamix `.666` sound banks
+
+All 26 decoded `.666` resources use the same rate-tagged sample sequence:
+
+| Offset | Size | Type | Meaning |
+| ---: | ---: | --- | --- |
+| `0x00` | 4 | `UINT32LE` | Magic `0x004A5031` |
+| `0x04` | 4 | `UINT32LE` | First sample byte length |
+| `0x08` | 4 | `UINT32LE` | First sample rate in hertz |
+| `0x0C` | declared length | bytes | First sample payload |
+| next | repeated | same three fields | Further samples until exact end of resource |
+
+The GOB and scene population contains 26 banks and 102 sample payloads. Observed rates are 11,025, 11,050, and 22,050 Hz; every bank consumes its decoded resource exactly, including kind-2 `CONFIGIT.666`. `VSMITH.666` contains two samples (32,132 payload bytes total at 11,025 and 22,050 Hz), so the earlier hypothesis that it contains blacksmith dialogue nodes is **Disproved**.
+
+The framing, lengths, sample counts, and rates are **Confirmed for the hashed release**. Payload values center near `0x80`, consistent with unsigned 8-bit mono PCM, but that encoding is only **Corroborated** until playback or executable sample setup confirms it. The association between individual samples and game events remains **Provisional**.
+
+`DynamixSoundBankDecoder` limits a bank to 64 MiB, a sample to 16 MiB, a bank to 4,096 samples, and rates to 1,000-192,000 Hz. It rejects bad magic, incomplete metadata, invalid rates or lengths, excessive counts, and trailing partial records before exposing sample bytes.
 
 ## Indexed PCX images
 
@@ -251,6 +269,7 @@ The raw-sector bounds, ISO directory traversal, cue timestamps, and WAV sample p
 - `dilemma-text-report.txt`: stable dilemma/scene identifiers plus choice, outcome, modifier, and text-length counts without original prose.
 - `dilemma-rules-report.txt`: choice scoring attributes, low/high breakpoints, and outcome modifiers without original prose.
 - `weapon-store-report.txt`: store record indices, movie presence, unknown numeric values, image/item indices, prices, and description lengths without original prose.
+- `sound-bank-report.txt`: bank provenance, sample counts, distinct rates, and aggregate payload sizes without exporting audio.
 - `artifact-hashes.txt`, `string-hits.txt`, and `executable-disassembly-report.txt`: provenance and targeted executable evidence.
 
 The reports are regenerated from the user's installation and must never be committed. Stable conclusions belong here and confidence-scoped gameplay conclusions belong in [`original-findings.md`](original-findings.md).
@@ -259,4 +278,4 @@ The reports are regenerated from the user's installation and must never be commi
 
 1. Recover the semantic meaning of directory field `0x24` and test whether data extents may alias or overlap.
 2. Specify nested chunk headers and the exact compression selector used inside decoded resources.
-3. Associate CSF sequences with their screen palettes, and specify the remaining PCC, LOW, palette, RAT, FNT, and `666` payload semantics as each decoder is validated.
+3. Associate CSF sequences with their screen palettes, confirm `.666` PCM encoding/event bindings, and specify the remaining PCC, LOW, palette, RAT, and FNT payload semantics as each decoder is validated.

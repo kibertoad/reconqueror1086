@@ -44,6 +44,29 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void DynamixSoundBankParsesBoundedRateTaggedSamples()
+    {
+        var bytes = new byte[4 + 8 + 3 + 8 + 2];
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes, DynamixSoundBankDecoder.Magic);
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(4), 3);
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(8), 11025);
+        bytes[12] = 0x7f; bytes[13] = 0x80; bytes[14] = 0x81;
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(15), 2);
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(19), 22050);
+        bytes[23] = 0; bytes[24] = 255;
+
+        var bank = DynamixSoundBankDecoder.Decode(bytes);
+
+        Assert.Equal(2, bank.Samples.Count);
+        Assert.Equal(11025, bank.Samples[0].SampleRate);
+        Assert.Equal(new byte[] { 0x7f, 0x80, 0x81 }, bank.Samples[0].Samples);
+        Assert.Equal(22050, bank.Samples[1].SampleRate);
+        Assert.Throws<InvalidDataException>(() => DynamixSoundBankDecoder.Decode(bytes[..^1]));
+        bytes[0] = 0;
+        Assert.Throws<InvalidDataException>(() => DynamixSoundBankDecoder.Decode(bytes));
+    }
+
+    [Fact]
     public void OriginalArtRolesAreDataDrivenAndUnique()
     {
         Assert.Contains(ImportedArt.Definitions, x => x is { Role: "Title.Background", IdSuffix: ":fftitle.pcx" });
@@ -111,7 +134,65 @@ public sealed class ResourceAndDefinitionTests
             Assert.InRange(control.Bounds.X + control.Bounds.Width, 1, 640);
             Assert.InRange(control.Bounds.Y + control.Bounds.Height, 1, 480);
         });
-        Assert.Equal(new UiBounds(253, 109, 107, 164), BlacksmithPresentationDefinitions.Blacksmith);
+        Assert.Contains(ImportedLayouts.Definitions,
+            definition => definition.Role == "Home.Office" && definition.IdSuffix == ":fcastle.hat");
+        Assert.Empty(HomePresentationDefinitions.Hotspots);
+        Assert.Equal(
+            [(SceneNavigationAction.BlacksmithDialogue, "Blacksmith", new UiBounds(253, 109, 107, 164)),
+             (SceneNavigationAction.Shop, "Buy/Sell", new UiBounds(54, 2, 180, 141))],
+            BlacksmithPresentationDefinitions.Hotspots.Select(hotspot => (hotspot.Action, hotspot.HoverLabel, hotspot.Bounds)));
+        Assert.Contains(ImportedArt.Definitions,
+            definition => definition.Role == "Blacksmith.Dialogue" && definition.IdSuffix == ":comscrn1.pcx");
+        Assert.Contains(ImportedArt.Definitions,
+            definition => definition.Role == "Blacksmith.Portrait" && definition.IdSuffix == ":blacksmi.pcc");
+        Assert.Equal(Enum.GetValues<BlacksmithDialogueAction>().Length,
+            BlacksmithDialoguePresentationDefinitions.Commands.Count);
+        Assert.Equal(BlacksmithDialoguePresentationDefinitions.Commands.Count,
+            BlacksmithDialoguePresentationDefinitions.Commands.Select(command => command.Action).Distinct().Count());
+        Assert.Equal(BlacksmithDialoguePresentationDefinitions.Commands.SelectMany(command => command.Keys).Count(),
+            BlacksmithDialoguePresentationDefinitions.Commands.SelectMany(command => command.Keys).Distinct().Count());
+    }
+
+    [Fact]
+    public void EstateShellLayoutAndTerrainAreDefinitionDriven()
+    {
+        Assert.Contains(ImportedArt.Definitions,
+            definition => definition.Role == "Estate.Shell" && definition.IdSuffix == ":icontemp.pcx");
+        Assert.Contains(ImportedLayouts.Definitions,
+            definition => definition.Role == "Estate" && definition.IdSuffix == ":iconmap.hat");
+        var layout = EstatePresentationDefinitions.From(null);
+        Assert.Equal(new UiBounds(19, 8, 370, 433), layout.MainViewport);
+        Assert.Equal(new UiBounds(422, 4, 199, 159), layout.InsetMap);
+        Assert.Equal(Enum.GetValues<EstateControlAction>().Length, layout.Controls.Count);
+        Assert.Equal(layout.Controls.Count, layout.Controls.Select(control => control.Action).Distinct().Count());
+        Assert.Equal(Enum.GetValues<EstatePanel>().Length, layout.Controls.Count(control => control.Panel.HasValue));
+        Assert.Equal(Enum.GetValues<EstateTerrainKind>().Length, EstatePresentationDefinitions.TerrainStyles.Count);
+        foreach (var (location, index) in World.Locations.Select((location, index) => (location, index)))
+        {
+            var point = EstatePresentationDefinitions.InsetPoint(layout.InsetMap, location);
+            Assert.Equal(index, EstatePresentationDefinitions.LocationAt(layout.InsetMap, point.X, point.Y));
+        }
+
+        var fief = new Fief { Houses = 1 };
+        fief.Crops[CropType.Grain] = 2;
+        var terrain = EstatePresentationDefinitions.TerrainFor(fief);
+        Assert.Equal(EstatePresentationDefinitions.Columns * EstatePresentationDefinitions.Rows, terrain.Count);
+        Assert.Equal(2, terrain.Count(kind => kind == EstateTerrainKind.Grain));
+        Assert.Single(terrain, kind => kind == EstateTerrainKind.Settlement);
+    }
+
+    [Fact]
+    public void FarmCommandsKeepInputBehaviorAndHelpInOneRegistry()
+    {
+        var commands = FarmPresentationDefinitions.Commands;
+        Assert.Equal(commands.Count, commands.Select(command => command.Key).Distinct().Count());
+        Assert.Equal(Enum.GetValues<CropType>(), commands.Select(command => command.Action).OfType<PlantFarmAction>().Select(action => action.Crop).Order());
+        Assert.Equal(Enum.GetValues<ForestIndustry>(), commands.Select(command => command.Action).OfType<DevelopForestFarmAction>().Select(action => action.Industry).Order());
+        Assert.Equal(Enum.GetValues<UnitType>(), commands.Select(command => command.Action).OfType<RecruitFarmAction>().Select(action => action.Unit).Order());
+        Assert.Equal(6, commands.Count(command => command.Action is BuildFarmAction));
+        Assert.Equal(2, commands.Count(command => command.Action is LeaveFarmAction));
+        Assert.Equal(commands.Select(command => command.HelpRow).Distinct().Count(), FarmPresentationDefinitions.HelpRows.Count);
+        Assert.All(FarmPresentationDefinitions.HelpRows, row => Assert.False(string.IsNullOrWhiteSpace(row)));
     }
 
     [Fact]

@@ -72,6 +72,7 @@ var gobEntries = 0;
 var gobStoredEntries = 0;
 var kind1Blocks = 0;
 var resourceInventory = new List<(string Scope, DynamixEntry Entry)>();
+var soundBankReport = new StringBuilder("# Scope  Samples  Rates  SampleBytes  Name\n");
 var gobPath = Path.Combine(install, "C1086.GOB");
 if (File.Exists(gobPath))
 {
@@ -179,6 +180,10 @@ if (File.Exists(gobPath))
     }
     File.WriteAllText(Path.Combine(output, "hat-layout-report.txt"), hatReport.ToString());
 
+    foreach (var entry in gob.Entries.Where(x => DynamixArchive.CanDecode(x)
+        && Path.GetExtension(x.Name).Equals(".666", StringComparison.OrdinalIgnoreCase)))
+        AppendSoundBankReport(soundBankReport, "GOB", entry.Name, gob.ReadDecoded(entry));
+
     var weaponStoreReport = new StringBuilder("# Record  Movie  Unknown  ImageFrame  ItemId  Price  DescriptionChars\n");
     var weaponStoreEntry = gob.Entries.FirstOrDefault(x => x.Name.Equals("weapons.dat", StringComparison.OrdinalIgnoreCase));
     if (weaponStoreEntry is not null && DynamixArchive.CanDecode(weaponStoreEntry))
@@ -274,6 +279,9 @@ foreach (var file in files.Where(x => Path.GetExtension(x.Path).Equals(".RES", S
         sceneCompressedBlocks += compressedBlocks;
         sceneVerbatimBlocks += verbatimBlocks;
         resourceInventory.AddRange(archive.Entries.Select(x => ("SCENE", x)));
+        foreach (var entry in archive.Entries.Where(x => DynamixArchive.CanDecode(x)
+            && Path.GetExtension(x.Name).Equals(".666", StringComparison.OrdinalIgnoreCase)))
+            AppendSoundBankReport(soundBankReport, file.Path, entry.Name, archive.ReadDecoded(entry));
         foreach (var entry in archive.Entries.Where(x => x.IsStored && Path.GetExtension(x.Name).Equals(".PAL", StringComparison.OrdinalIgnoreCase)))
         {
             try
@@ -294,6 +302,7 @@ foreach (var file in files.Where(x => Path.GetExtension(x.Path).Equals(".RES", S
 }
 File.WriteAllText(Path.Combine(output, "scene-res-report.txt"), sceneReport.ToString());
 File.WriteAllText(Path.Combine(output, "stored-palette-report.txt"), paletteReport.ToString());
+File.WriteAllText(Path.Combine(output, "sound-bank-report.txt"), soundBankReport.ToString());
 var extensionReport = new StringBuilder("# Extension  Total  Stored  Kind1  Kind2  Other  Scopes\n");
 foreach (var group in resourceInventory.GroupBy(x => Path.GetExtension(x.Entry.Name).ToUpperInvariant()).OrderBy(x => x.Key))
 {
@@ -324,6 +333,20 @@ static uint ParseAddress(string value)
     return uint.TryParse(digits, System.Globalization.NumberStyles.HexNumber, null, out var address)
         ? address
         : throw new ArgumentException($"Invalid hexadecimal address '{value}'.");
+}
+
+static void AppendSoundBankReport(StringBuilder report, string scope, string name, byte[] bytes)
+{
+    try
+    {
+        var bank = DynamixSoundBankDecoder.Decode(bytes);
+        var rates = string.Join(',', bank.Samples.Select(sample => sample.SampleRate).Distinct().Order());
+        report.AppendLine($"{scope}  {bank.Samples.Count,7}  {rates,-17}  {bank.Samples.Sum(sample => (long)sample.Samples.Length),11}  {name}");
+    }
+    catch (InvalidDataException error)
+    {
+        report.AppendLine($"{scope}  rejected  {name}: {error.Message.Replace('\r', ' ').Replace('\n', ' ')}");
+    }
 }
 
 static string DisassembleLinearExecutable(string path, IReadOnlyList<uint> addresses)

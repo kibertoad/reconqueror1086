@@ -1,0 +1,126 @@
+using Conqueror.Core;
+using Conqueror.Resources;
+
+namespace Conqueror.Game;
+
+public enum EstatePanel { Map, Orders, Help }
+public enum EstateControlAction { Map, Orders, Help, Home, Village }
+public enum EstateTerrainKind { Meadow, HedgedField, Forest, Grain, Beans, Vegetables, Fruit, Settlement }
+
+public sealed record EstateControl(
+    EstateControlAction Action,
+    string Label,
+    int HatRegionId,
+    UiBounds Bounds,
+    EstatePanel? Panel = null);
+public sealed record EstateTerrainStyle(EstateTerrainKind Kind, byte Red, byte Green, byte Blue);
+
+public sealed record EstateLayout(
+    UiBounds MainViewport,
+    UiBounds InsetMap,
+    UiBounds InformationPanel,
+    UiBounds FooterStatus,
+    IReadOnlyList<EstateControl> Controls);
+
+public static class EstatePresentationDefinitions
+{
+    public const int Columns = 5;
+    public const int Rows = 14;
+    private const int WorldWidth = 760;
+    private const int WorldHeight = 768;
+
+    public static EstateLayout Fallback { get; } = new(
+        new UiBounds(19, 8, 370, 433),
+        new UiBounds(422, 4, 199, 159),
+        new UiBounds(422, 178, 199, 264),
+        new UiBounds(200, 455, 200, 24),
+        [
+            new(EstateControlAction.Home, "HOME", 11, new UiBounds(18, 455, 180, 24)),
+            new(EstateControlAction.Village, "VILLAGE", 12, new UiBounds(400, 455, 200, 24)),
+            new(EstateControlAction.Map, "MAP", 15, new UiBounds(424, 163, 50, 20), EstatePanel.Map),
+            new(EstateControlAction.Orders, "ORDERS", 16, new UiBounds(478, 164, 73, 17), EstatePanel.Orders),
+            new(EstateControlAction.Help, "HELP", 17, new UiBounds(554, 163, 65, 20), EstatePanel.Help)
+        ]);
+
+    public static IReadOnlyDictionary<EstateTerrainKind, EstateTerrainStyle> TerrainStyles { get; } =
+        new Dictionary<EstateTerrainKind, EstateTerrainStyle>
+        {
+            [EstateTerrainKind.Meadow] = new(EstateTerrainKind.Meadow, 91, 116, 67),
+            [EstateTerrainKind.HedgedField] = new(EstateTerrainKind.HedgedField, 45, 91, 36),
+            [EstateTerrainKind.Forest] = new(EstateTerrainKind.Forest, 32, 83, 35),
+            [EstateTerrainKind.Grain] = new(EstateTerrainKind.Grain, 190, 151, 66),
+            [EstateTerrainKind.Beans] = new(EstateTerrainKind.Beans, 86, 124, 63),
+            [EstateTerrainKind.Vegetables] = new(EstateTerrainKind.Vegetables, 134, 153, 91),
+            [EstateTerrainKind.Fruit] = new(EstateTerrainKind.Fruit, 98, 118, 49),
+            [EstateTerrainKind.Settlement] = new(EstateTerrainKind.Settlement, 139, 109, 68)
+        };
+
+    private static EstateTerrainKind[] BasePattern { get; } =
+    [
+        EstateTerrainKind.Meadow, EstateTerrainKind.HedgedField, EstateTerrainKind.Meadow,
+        EstateTerrainKind.Forest, EstateTerrainKind.HedgedField, EstateTerrainKind.Meadow,
+        EstateTerrainKind.HedgedField, EstateTerrainKind.Forest, EstateTerrainKind.Meadow,
+        EstateTerrainKind.HedgedField
+    ];
+
+    private static IReadOnlyDictionary<CropType, EstateTerrainKind> CropKinds { get; } =
+        new Dictionary<CropType, EstateTerrainKind>
+        {
+            [CropType.Grain] = EstateTerrainKind.Grain,
+            [CropType.Beans] = EstateTerrainKind.Beans,
+            [CropType.Vegetables] = EstateTerrainKind.Vegetables,
+            [CropType.Fruit] = EstateTerrainKind.Fruit
+        };
+
+    public static EstateLayout From(HatLayout? layout)
+    {
+        UiBounds Region(int id, UiBounds fallback) => layout?.FindRegion(id) is { } region
+            ? new UiBounds(region.X, region.Y, region.Width, region.Height)
+            : fallback;
+
+        return new EstateLayout(
+            Region(10, Fallback.MainViewport),
+            Region(0, Fallback.InsetMap),
+            Region(9, Fallback.InformationPanel),
+            Region(13, Fallback.FooterStatus),
+            Fallback.Controls.Select(control => control with { Bounds = Region(control.HatRegionId, control.Bounds) }).ToArray());
+    }
+
+    public static IReadOnlyList<EstateTerrainKind> TerrainFor(Fief fief)
+    {
+        var count = Columns * Rows;
+        var result = Enumerable.Range(0, count).Select(index => BasePattern[index % BasePattern.Length]).ToArray();
+        var developed = CropKinds.SelectMany(pair => Enumerable.Repeat(pair.Value, fief.Crops[pair.Key]))
+            .Concat(Enumerable.Repeat(EstateTerrainKind.Forest, fief.Forest.Values.Sum()))
+            .Concat(Enumerable.Repeat(EstateTerrainKind.Settlement, Math.Min(6, fief.Houses)))
+            .Take(count)
+            .ToArray();
+        for (var index = 0; index < developed.Length; index++) result[(index * 11 + 7) % count] = developed[index];
+        return result;
+    }
+
+    public static UiBounds TileBounds(UiBounds viewport, int index)
+    {
+        var column = index % Columns;
+        var row = index / Columns;
+        var width = viewport.Width / Columns + 2;
+        var height = Math.Max(18, viewport.Height / Rows + 8);
+        var x = viewport.X + column * (viewport.Width - width) / (Columns - 1);
+        var y = viewport.Y + row * (viewport.Height - height) / (Rows - 1);
+        return new UiBounds(x, y, width, height);
+    }
+
+    public static (int X, int Y) InsetPoint(UiBounds inset, WorldLocation location) =>
+        (inset.X + location.X * inset.Width / WorldWidth, inset.Y + location.Y * inset.Height / WorldHeight);
+
+    public static int LocationAt(UiBounds inset, int x, int y) => World.Locations
+        .Select((location, index) => (Index: index, Point: InsetPoint(inset, location)))
+        .MinBy(candidate => SquaredDistance(candidate.Point, x, y)).Index;
+
+    private static long SquaredDistance((int X, int Y) point, int x, int y)
+    {
+        var dx = point.X - x;
+        var dy = point.Y - y;
+        return (long)dx * dx + (long)dy * dy;
+    }
+}

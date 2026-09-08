@@ -30,6 +30,9 @@ Check(Balance.Victories[VictoryKind.Dragon].RequiredItems.All(rewardItems.Contai
 Check(Balance.Strategy == new StrategicDefinition(80, 98, 9), "strategic warfare definitions");
 Check(Balance.TournamentOpponents.Length == 5 && Balance.TournamentOpponents.All(x => x.Wager is >= 20 and <= 80 && x.Swordsmen + x.Halberdiers + x.Knights == 8), "tournament opponent definitions valid");
 Check(ImportedArt.Definitions.Select(x => x.Role).Distinct(StringComparer.OrdinalIgnoreCase).Count() == ImportedArt.Definitions.Count, "imported art roles are unique definitions");
+Check(EstatePresentationDefinitions.From(null).Controls.Select(x => x.Action).Distinct().Count() == Enum.GetValues<EstateControlAction>().Length, "estate controls are unique definitions");
+Check(FarmPresentationDefinitions.Commands.Select(x => x.Key).Distinct().Count() == FarmPresentationDefinitions.Commands.Count, "farm commands are unique definitions");
+Check(BlacksmithPresentationDefinitions.Hotspots.All(x => !string.IsNullOrWhiteSpace(x.HoverLabel)), "confirmed visual scene hotspots define hover labels");
 Check(CharacterCreationDefinitions.Options.Select(x => x.Action).Distinct().Count() == Enum.GetValues<CharacterCreationAction>().Length, "character option actions are unique definitions");
 Check(CharacterCreationDefinitions.PregeneratedCharacters.Count == Balance.Templates.Length && CharacterCreationDefinitions.HeraldicColors.Select(x => x.Name).SequenceEqual(["Red", "Green", "Blue"]), "original character selection hotspots are defined");
 
@@ -41,6 +44,15 @@ string[] syntheticCue =
 var cueTracks = CueSheet.Tracks(syntheticCue);
 Check(CueSheet.DataTrackSectors(syntheticCue) == 150 && cueTracks.Length == 3 && cueTracks[2].StartSector == 235, "cue sheet parses data and audio boundaries");
 Check(Throws<InvalidDataException>(() => CueSheet.Tracks(["not a cue sheet"])), "invalid cue sheet fails cleanly");
+
+var soundBankFixture = new byte[15];
+BinaryPrimitives.WriteUInt32LittleEndian(soundBankFixture, DynamixSoundBankDecoder.Magic);
+BinaryPrimitives.WriteUInt32LittleEndian(soundBankFixture.AsSpan(4), 3);
+BinaryPrimitives.WriteUInt32LittleEndian(soundBankFixture.AsSpan(8), 11025);
+soundBankFixture[12] = 0x7f; soundBankFixture[13] = 0x80; soundBankFixture[14] = 0x81;
+var soundBank = DynamixSoundBankDecoder.Decode(soundBankFixture);
+Check(soundBank.Samples is [{ SampleRate: 11025, Samples.Length: 3 }], "Dynamix sound bank parses bounded rate-tagged samples");
+Check(Throws<InvalidDataException>(() => DynamixSoundBankDecoder.Decode(soundBankFixture[..^1])), "Dynamix sound bank rejects truncated samples");
 
 var lzwFixture = PackLsbCodes([65, 66, 257, 259], 9);
 Check(Encoding.ASCII.GetString(DynamixCompression.DecodeLzw(lzwFixture, 7)) == "ABABABA", "Dynamix LZW expands dictionary and special code");

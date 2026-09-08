@@ -15,6 +15,11 @@ Complete a clean-room MonoGame reimplementation of *Conqueror: A.D. 1086* that p
 - Store imported resources only under Git-ignored `UserContent` and validate every manifest path and source hash.
 - End every phase with a playable build, clean save migration, and passing automated tests.
 
+## Evidence sources
+
+- The owned installation, decoded resources, executable control flow, and repeatable controlled observations are authoritative for this exact release.
+- The [GameFAQs Conqueror 1086 A.D. FAQ by mikel123456](https://gamefaqs.gamespot.com/pc/574792-conqueror-1086-ad/faqs/66730) is a useful secondary source for game mechanics, screen flow, strategies, and general information. Treat its claims as Corroborated until resource, executable, manual, or controlled-observation evidence confirms them; do not use it alone to label exact formulas or numeric tables Confirmed.
+
 ## Current baseline
 
 The repository currently provides:
@@ -23,11 +28,11 @@ The repository currently provides:
 - Character templates, representative fallback youth dilemmas, the executable-confirmed original 30-dilemma selection/outcome interpreter for imported content, economy, construction counters, army recruitment, travel, tournaments, courtship, equipment, field battles, sieges, crown victory, dragon victory, and the age limit.
 - Persistent strategic garrisons, spying, interception, retreat, conquest, and JSON saves.
 - A read-only original-disc inspector with ISO inventory, hashes, executable-string offsets, archive/compression reports, CSF previews, and HAT layout reports.
-- Bounded parsers for GOB/RES directories, kind-1 LZ/RLE blocks, indexed PCX/PCC images, CSF animation frames, raw RGB palettes, and HAT screen descriptors.
+- Bounded parsers for GOB/RES directories, kind-1 LZ/RLE blocks, indexed PCX/PCC images, CSF animation frames, raw RGB palettes, HAT screen descriptors, and rate-tagged `.666` sound banks.
 - An end-user importer that installs byte-stored, kind-1, and kind-2 owned resources plus lossless CDDA WAV files under ignored local storage.
-- A runtime imported-content catalog, CD music playback, and definition-driven original art for the title, options hub, character options, pre-generated characters, animated youth dilemmas, England map, load screen, and a tournament portrait.
+- A runtime imported-content catalog, CD music playback, and definition-driven original art for the title, options hub, character options, pre-generated characters, animated youth dilemmas, estate/travel shell, England map, load screen, Home/farm/blacksmith flows, and a tournament portrait.
 - An executable-confirmed `TITLE.HAT`/`FFTITLE.PCX` title load followed by a corroborated character-options flow whose exact geometry comes from installed `CGOPTS.HAT` and `PREGEN.HAT`.
-- Twenty-two xUnit test cases and 112 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
+- Twenty-five xUnit test cases and 117 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
 
 ## Dependency map
 
@@ -500,14 +505,14 @@ All parser fixtures must be synthetic or independently authored; never commit ex
 
 Status is conservative: “prototype” means the route is playable but substantial original behavior or balance remains provisional; only acceptance-criteria completion can mark a milestone complete.
 
-| Milestone | Phases | Status (2026-09-08) | Remaining completion gate |
+| Milestone | Phases | Status (2026-09-09) | Remaining completion gate |
 | --- | --- | --- | --- |
-| M1: Decoded content | 1-2 | In progress: archive kinds 1 and 2, PCX/PCC, CSF, palettes, HAT layouts, dilemma text, installer, and evidence reports work. | Decode remaining dialogue/text structures; complete executable table recovery and controlled observations. |
-| M2: Feudal simulation | 3-4 | Playable prototype. | Exact map/economy, tile-based fief construction, multiple managed estates, full dialogue/quests, and political orders. |
+| M1: Decoded content | 1-2 | In progress: archive kinds 1 and 2, PCX/PCC, CSF, palettes, HAT layouts, dilemma text, `.666` sound-bank framing, installer, and evidence reports work. | Decode remaining dialogue/text structures and audio event bindings; complete executable table recovery and controlled observations. |
+| M2: Feudal simulation | 3-4 | Playable prototype: the original estate shell and typed panel/navigation layout are active, and farm commands/help share one definition registry. | Exact terrain sprites and map/economy data, tile-based fief construction, multiple managed estates, full dialogue/quests, and political orders. |
 | M3: Knightly competition | 5 | Playable prototype. | Exact opponent tables plus faithful first-person jousting and tactical tournament melee. |
 | M4: Conquest | 6-7 | Playable prototype. | Original strategic rules, battlefield systems, castle layouts, combat balance, retainers, and loot. |
 | M5: Two endings | 8 | Both routes playable as prototypes. | Complete Drogo/dragon quest chain, dragon encounter, crown politics, and original endings. |
-| M6: Original presentation | 9 | In progress: title, options hub with original state widgets, character screens, map, one portrait, CD audio, and presentation descriptors are active. | Full screen mapping, remaining CSF/SMK playback, fonts, cursors, dialogue, effects, speech, and accessibility/settings. |
+| M6: Original presentation | 9 | In progress: title, options hub with original state widgets, character screens, estate/map panels, Home/farm/blacksmith flow, confirmed blacksmith hover hotspots, one portrait, CD audio, and presentation descriptors are active. | Accurate Home hotspot bindings, full screen mapping, exact estate tiles, remaining CSF/SMK playback, fonts, cursors, dialogue, effects, speech, and accessibility/settings. |
 | M7: Release | 10 | In progress: launch/test/import batch utilities, five save slots, a data-driven legal-boundary check, and Windows CI are implemented. | Save migrations and recovery, importer repair workflow, packaging, and clean-machine verification. |
 
 ## Current resource and startup sprint
@@ -539,6 +544,10 @@ Local static-analysis tool: Ghidra 12.1.3 is installed user-wide at `C:\Users\ki
 - [x] Split Home, farm management, blacksmith workshop, and blacksmith inventory into distinct runtime scenes using screenshot-verified `TACTICAL.PCX`, `FIEFMGMT.PCX`, `FORGESMI.PCX`, and `SWDTEMP.PCX` roles.
 - [x] Decode the 40-record `WEAPONS.DAT` store table and bind its prices, local descriptions, item order, and `SWORDS.CSF` frame indices to typed equipment definitions and the original inventory shell.
 - [x] Decode and palette-verify all four `BUYSELL.CSF` overlays, then select blank/View and Sell/Purchase states from store metadata and current ownership through typed presentation definitions.
+- [x] Identify `ICONTEMP.PCX`/`ICONMAP.HAT` as the estate/travel shell, activate its exact viewport, inset-map, tab, information, and navigation regions, and retain a no-media map fallback.
+- [x] Replace farm input branching and separately maintained help strings with one typed command/action registry.
+- [x] Add shared data-driven visual-scene hover labels and confirm the separate Blacksmith/Buy-Sell `VSMITH.HAT` targets. Home uses the same infrastructure but stays disabled after controlled observation disproved an order-based `FCASTLE.HAT` label mapping.
+- [x] Decode and classify all 26 `.666` sound banks with bounded length/rate validation; the ignored population report accounts for 102 samples and zero rejects.
 - [ ] Trace the complete startup/menu state machine, input timing, cursor behavior, and region-action dispatch from `CONQUER.EXE`; keep semantics corroborated until each executable branch is confirmed.
 
 The resource-decoding sprint is first because it unlocks exact dialogue, screen mappings, opponent identities, construction data, and balance tables needed by most later phases.
@@ -549,3 +558,5 @@ The resource-decoding sprint is first because it unlocks exact dialogue, screen 
 2. [Completed 2026-09-08] Bind the decoded five-definition age groups to campaign state using the executable-confirmed per-age selection policy; keep original prose local and retain built-in fallback summaries.
 3. In progress: bind menu CSF sequences to verified palettes and roles. `OPTION.CSF` static ON/OFF and Resume frames use `OPTFIN.PCX`; `SWORDS.CSF` item art and `BUYSELL.CSF` control states use `SWDTEMP.PCX`. Alternate input frames and other cursor/menu sequences still require timing and palette evidence.
 4. [Completed 2026-09-08] Add legal-boundary automation that fails if imported media or generated analysis artifacts enter Git, then add CI restore/build/test coverage. `tools/Verify-Repository.ps1` interprets the data-only `repository-policy.json`; the local test launcher and Windows GitHub Actions workflow both enforce it before compiling.
+5. Recover the `ICA`/`ICS`/`ICW` and related estate tile roles, roads, crops, buildings, shield, and cursor so the exact `ICONTEMP.PCX` shell no longer relies on provisional procedural terrain.
+6. Trace `.666` sample event identifiers and confirm the likely unsigned 8-bit mono PCM interpretation before enabling playback; `VSMITH.666` is audio, not the blacksmith dialogue database.

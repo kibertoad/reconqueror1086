@@ -12,7 +12,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private sealed record DilemmaAnimation(IReadOnlyList<Texture2D> Frames, int FramesPerChoice);
     private sealed record OriginalAnimation(IReadOnlyList<Texture2D> Frames);
 
-    private enum Screen { Title, OptionsHub, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Map, Home, Farm, Village, Blacksmith, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
+    private enum Screen { Title, OptionsHub, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Map, Home, Farm, Village, Blacksmith, BlacksmithDialogue, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _batch = null!;
     private Texture2D _pixel = null!;
@@ -35,7 +35,10 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private IReadOnlyList<UiBounds> _pregeneratedBounds = CharacterCreationDefinitions.PregeneratedCharacters;
     private IReadOnlyList<UiBounds> _dilemmaChoiceBounds = YouthDilemmaPresentationDefinitions.Choices;
     private UiBounds _dilemmaContinueBounds = YouthDilemmaPresentationDefinitions.Continue;
-    private UiBounds _blacksmithBounds = BlacksmithPresentationDefinitions.Blacksmith;
+    private EstateLayout _estateLayout = EstatePresentationDefinitions.Fallback;
+    private EstatePanel _estatePanel = EstatePanel.Map;
+    private IReadOnlyList<SceneHotspot> _homeHotspots = HomePresentationDefinitions.Hotspots;
+    private IReadOnlyList<SceneHotspot> _blacksmithHotspots = BlacksmithPresentationDefinitions.Hotspots;
     private int _joustCursor;
     private SiegeSession? _siege;
     private bool _showRadar = true;
@@ -97,9 +100,13 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         var dilemmaLayout = dilemmaLayoutId is null ? null : _importedContent?.DecodeHat(dilemmaLayoutId);
         _dilemmaChoiceBounds = YouthDilemmaPresentationDefinitions.ChoicesFrom(dilemmaLayout);
         _dilemmaContinueBounds = YouthDilemmaPresentationDefinitions.ContinueFrom(dilemmaLayout);
+        var estateLayoutId = _importedContent?.FindId("resource", ":iconmap.hat");
+        _estateLayout = EstatePresentationDefinitions.From(estateLayoutId is null ? null : _importedContent?.DecodeHat(estateLayoutId));
+        var homeLayoutId = _importedContent?.FindId("resource", ":fcastle.hat");
+        _homeHotspots = HomePresentationDefinitions.HotspotsFrom(homeLayoutId is null ? null : _importedContent?.DecodeHat(homeLayoutId));
         var blacksmithLayoutId = _importedContent?.FindId("resource", ":vsmith.hat");
         var blacksmithLayout = blacksmithLayoutId is null ? null : _importedContent?.DecodeHat(blacksmithLayoutId);
-        _blacksmithBounds = BlacksmithPresentationDefinitions.BlacksmithFrom(blacksmithLayout);
+        _blacksmithHotspots = BlacksmithPresentationDefinitions.HotspotsFrom(blacksmithLayout);
         foreach (var definition in ImportedArt.Definitions)
         {
             var id = _importedContent?.FindId(definition.Kind, definition.IdSuffix);
@@ -180,6 +187,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             else if (_screen == Screen.Character) _screen = Screen.CharacterOptions;
             else if (_screen == Screen.Farm) _screen = Screen.Home;
             else if (_screen == Screen.Blacksmith) _screen = Screen.Village;
+            else if (_screen == Screen.BlacksmithDialogue) _screen = Screen.Blacksmith;
             else if (_screen == Screen.Shop) _screen = Screen.Blacksmith;
             else if (_screen == Screen.FieldBattle && _fieldBattle is not null) { _fieldBattle.IssueAll(UnitOrder.Withdraw); _notice = "WITHDRAWAL ORDERED"; }
             else { if (_screen == Screen.Siege && _siege is not null) _campaign.FinishSiege(_siege); _screen = Screen.Map; }
@@ -198,11 +206,12 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                 UpdatePregeneratedCharacters(Press, mouse, click);
                 break;
             case Screen.Dilemma: UpdateDilemma(Press, mouse, click); break;
-            case Screen.Map: UpdateMap(Press); break;
-            case Screen.Home: UpdateHome(Press); break;
+            case Screen.Map: UpdateMap(Press, mouse, click); break;
+            case Screen.Home: UpdateHome(Press, mouse, click); break;
             case Screen.Farm: UpdateFarm(Press); break;
             case Screen.Village: UpdateVillage(Press); break;
             case Screen.Blacksmith: UpdateBlacksmith(Press, mouse, click); break;
+            case Screen.BlacksmithDialogue: UpdateBlacksmithDialogue(Press); break;
             case Screen.Shop: UpdateShop(Press, mouse, click); break;
             case Screen.Tournament: UpdateTournament(Press); break;
             case Screen.FieldBattle: UpdateFieldBattle(Press, gameTime); break;
@@ -420,7 +429,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private (int X, int Y) OriginalPoint(MouseState mouse) =>
         (mouse.X * 640 / Math.Max(1, GraphicsDevice.Viewport.Width), mouse.Y * 480 / Math.Max(1, GraphicsDevice.Viewport.Height));
 
-    private void UpdateMap(Func<Keys, bool> press)
+    private void UpdateMap(Func<Keys, bool> press, MouseState mouse, bool click)
     {
         if (_campaign.HasPendingFieldBattle)
         {
@@ -454,6 +463,33 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (press(Keys.E)) _campaign.AdvanceDays(_campaign.State.DaySpeed);
         if (press(Keys.OemPlus) || press(Keys.Add)) _campaign.State.DaySpeed = Math.Min(15, _campaign.State.DaySpeed + 1);
         if (press(Keys.OemMinus) || press(Keys.Subtract)) _campaign.State.DaySpeed = Math.Max(1, _campaign.State.DaySpeed - 1);
+        if (!click || !_originalArt.ContainsKey("Estate.Shell")) return;
+
+        var (x, y) = OriginalPoint(mouse);
+        if (_estateLayout.InsetMap.Contains(x, y))
+        {
+            _selectedLocation = EstatePresentationDefinitions.LocationAt(_estateLayout.InsetMap, x, y);
+            _estatePanel = EstatePanel.Map;
+            return;
+        }
+        var control = _estateLayout.Controls.FirstOrDefault(item => item.Bounds.Contains(x, y));
+        if (control is not null) ActivateEstateControl(control.Action);
+    }
+
+    private void ActivateEstateControl(EstateControlAction action)
+    {
+        switch (action)
+        {
+            case EstateControlAction.Map: _estatePanel = EstatePanel.Map; break;
+            case EstateControlAction.Orders: _estatePanel = EstatePanel.Orders; break;
+            case EstateControlAction.Help: _estatePanel = EstatePanel.Help; break;
+            case EstateControlAction.Home:
+                if (_campaign.State.CurrentLocation == 0) _screen = Screen.Home;
+                else _notice = "HOME IS AVAILABLE AT YOUR ESTATE";
+                break;
+            case EstateControlAction.Village: _screen = Screen.Village; break;
+            default: throw new ArgumentOutOfRangeException(nameof(action));
+        }
     }
 
     private void BeginFieldBattle(string notice)
@@ -504,24 +540,31 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _notice = "YOUR YEARS OF TRAINING ARE COMPLETE";
     }
 
-    private void UpdateHome(Func<Keys, bool> press)
+    private void UpdateHome(Func<Keys, bool> press, MouseState mouse, bool click)
     {
         if (press(Keys.F)) _screen = Screen.Farm;
         if (press(Keys.V)) _screen = Screen.Village;
         if (press(Keys.Enter) || press(Keys.H)) _screen = Screen.Map;
+        if (click) ActivateSceneHotspot(HitSceneHotspot(_homeHotspots, mouse));
     }
 
     private void UpdateFarm(Func<Keys, bool> press)
     {
-        if (press(Keys.D1)) _campaign.Build("Steward"); if (press(Keys.D2)) _campaign.Build("Beadle");
-        if (press(Keys.D3)) _campaign.Build("Priest"); if (press(Keys.D4)) _campaign.Build("Servant Room");
-        if (press(Keys.D5)) _campaign.Build("House"); if (press(Keys.D6)) _campaign.Build("Monastery");
-        if (press(Keys.D7)) _campaign.Plant(CropType.Beans); if (press(Keys.D8)) _campaign.Plant(CropType.Vegetables);
-        if (press(Keys.Z)) _campaign.Plant(CropType.Grain); if (press(Keys.X)) _campaign.Plant(CropType.Fruit);
-        if (press(Keys.D9)) _campaign.DevelopForest(ForestIndustry.Timber); if (press(Keys.G)) _campaign.DevelopForest(ForestIndustry.GoldMine);
-        if (press(Keys.I)) _campaign.DevelopForest(ForestIndustry.IronMine); if (press(Keys.C)) _campaign.DevelopForest(ForestIndustry.CoalMine); if (press(Keys.S)) _campaign.DevelopForest(ForestIndustry.SilverMine);
-        if (press(Keys.Q)) _campaign.Recruit(UnitType.Swordsmen); if (press(Keys.W)) _campaign.Recruit(UnitType.Halberdiers); if (press(Keys.R)) _campaign.Recruit(UnitType.Knights);
-        if (press(Keys.Enter) || press(Keys.H)) _screen = Screen.Home;
+        var command = FarmPresentationDefinitions.Commands.FirstOrDefault(item => press(item.Key));
+        if (command is not null) ActivateFarmAction(command.Action);
+    }
+
+    private void ActivateFarmAction(FarmAction action)
+    {
+        switch (action)
+        {
+            case BuildFarmAction build: _campaign.Build(build.Building); break;
+            case PlantFarmAction plant: _campaign.Plant(plant.Crop); break;
+            case DevelopForestFarmAction forest: _campaign.DevelopForest(forest.Industry); break;
+            case RecruitFarmAction recruit: _campaign.Recruit(recruit.Unit); break;
+            case LeaveFarmAction: _screen = Screen.Home; break;
+            default: throw new ArgumentOutOfRangeException(nameof(action));
+        }
     }
 
     private void UpdateVillage(Func<Keys, bool> press)
@@ -540,18 +583,57 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void UpdateBlacksmith(Func<Keys, bool> press, MouseState mouse, bool click)
     {
-        if (press(Keys.Enter) || press(Keys.B))
+        if (press(Keys.Enter))
+        {
+            _screen = Screen.BlacksmithDialogue;
+            return;
+        }
+        if (press(Keys.B))
         {
             _shopIndex = 0;
             _screen = Screen.Shop;
             return;
         }
-        if (!click) return;
-        var (x, y) = OriginalPoint(mouse);
-        if (_blacksmithBounds.Contains(x, y))
+        if (click) ActivateSceneHotspot(HitSceneHotspot(_blacksmithHotspots, mouse));
+    }
+
+    private void UpdateBlacksmithDialogue(Func<Keys, bool> press)
+    {
+        var command = BlacksmithDialoguePresentationDefinitions.Commands
+            .FirstOrDefault(item => item.Keys.Any(press));
+        if (command is null) return;
+        switch (command.Action)
         {
-            _shopIndex = 0;
-            _screen = Screen.Shop;
+            case BlacksmithDialogueAction.Shop: _shopIndex = 0; _screen = Screen.Shop; break;
+            case BlacksmithDialogueAction.Return: _screen = Screen.Blacksmith; break;
+            default: throw new ArgumentOutOfRangeException(nameof(command));
+        }
+    }
+
+    private SceneHotspot? HitSceneHotspot(IReadOnlyList<SceneHotspot> hotspots, MouseState mouse)
+    {
+        var (x, y) = OriginalPoint(mouse);
+        return hotspots.FirstOrDefault(hotspot => hotspot.Bounds.Contains(x, y));
+    }
+
+    private void ActivateSceneHotspot(SceneHotspot? hotspot)
+    {
+        if (hotspot is null) return;
+        switch (hotspot.Action)
+        {
+            case SceneNavigationAction.Overview: _screen = Screen.Overview; break;
+            case SceneNavigationAction.Castle: _notice = "CASTLE MANAGEMENT IS NOT YET AVAILABLE"; break;
+            case SceneNavigationAction.Farm: _screen = Screen.Farm; break;
+            case SceneNavigationAction.Village: _screen = Screen.Village; break;
+            case SceneNavigationAction.Forest: _notice = "FOREST MANAGEMENT IS NOT YET A SEPARATE SCREEN"; break;
+            case SceneNavigationAction.WarPlanning: _notice = "WAR PLANNING IS NOT YET AVAILABLE"; break;
+            case SceneNavigationAction.Exit: _screen = Screen.Map; break;
+            case SceneNavigationAction.Jump: _notice = "JUMP TARGET REQUIRES EXECUTABLE CONFIRMATION"; break;
+            case SceneNavigationAction.Map: _estatePanel = EstatePanel.Map; _screen = Screen.Map; break;
+            case SceneNavigationAction.Orders: _estatePanel = EstatePanel.Orders; _screen = Screen.Map; break;
+            case SceneNavigationAction.BlacksmithDialogue: _screen = Screen.BlacksmithDialogue; break;
+            case SceneNavigationAction.Shop: _shopIndex = 0; _screen = Screen.Shop; break;
+            default: throw new ArgumentOutOfRangeException(nameof(hotspot));
         }
     }
 
@@ -654,7 +736,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         switch (_screen)
         {
             case Screen.Title: DrawTitle(); break; case Screen.OptionsHub: DrawOptionsHub(); break; case Screen.LoadGame: DrawLoadGame(); break; case Screen.CharacterOptions: DrawCharacterOptions(); break; case Screen.CharacterName: DrawCharacterName(); break; case Screen.Character: DrawCharacter(); break; case Screen.Dilemma: DrawDilemma(); break; case Screen.Map: DrawMap(); break;
-            case Screen.Home: DrawHome(); break; case Screen.Farm: DrawFarm(); break; case Screen.Village: DrawVillage(); break; case Screen.Blacksmith: DrawBlacksmith(); break; case Screen.Shop: DrawShop(); break; case Screen.Tournament: DrawTournament(); break; case Screen.FieldBattle: DrawFieldBattle(); break;
+            case Screen.Home: DrawHome(); break; case Screen.Farm: DrawFarm(); break; case Screen.Village: DrawVillage(); break; case Screen.Blacksmith: DrawBlacksmith(); break; case Screen.BlacksmithDialogue: DrawBlacksmithDialogue(); break; case Screen.Shop: DrawShop(); break; case Screen.Tournament: DrawTournament(); break; case Screen.FieldBattle: DrawFieldBattle(); break;
             case Screen.Siege: DrawSiege(); break; case Screen.Overview: DrawOverview(); break; case Screen.Ending: DrawEnding(); break;
         }
         if (_screen is not Screen.Title and not Screen.LoadGame and not Screen.Character and not Screen.Dilemma) DrawText(_notice, 24, 730, Color.Gold, 2);
@@ -877,6 +959,108 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void DrawMap()
     {
+        if (DrawOriginal("Estate.Shell", new Rectangle(0, 0, 1024, 768)))
+        {
+            DrawEstateMap();
+            return;
+        }
+
+        DrawFallbackMap();
+    }
+
+    private void DrawEstateMap()
+    {
+        DrawEstateTerrain();
+        DrawEstateMarkers();
+        DrawEstateInformation();
+
+        foreach (var control in _estateLayout.Controls)
+        {
+            var bounds = ScaleBounds(control.Bounds);
+            if (control.Action is EstateControlAction.Home or EstateControlAction.Village)
+                DrawText(control.Label, bounds.X + 8, bounds.Y + 7, Color.Red, 2, bounds.Width - 16);
+            else if (control.Panel == _estatePanel)
+                DrawOutline(bounds, Color.Gold, 2);
+        }
+
+        var footer = ScaleBounds(_estateLayout.FooterStatus);
+        DrawText(World.Locations[_selectedLocation].Name.ToUpperInvariant(), footer.X + 8, footer.Y + 7, Color.Wheat, 2, footer.Width - 16);
+    }
+
+    private void DrawEstateTerrain()
+    {
+        var viewport = ScaleBounds(_estateLayout.MainViewport);
+        Fill(viewport, new Color(113, 107, 72));
+        var terrain = EstatePresentationDefinitions.TerrainFor(_campaign.State.Player.Home);
+        for (var index = 0; index < terrain.Count; index++)
+        {
+            var style = EstatePresentationDefinitions.TerrainStyles[terrain[index]];
+            var tile = ScaleBounds(EstatePresentationDefinitions.TileBounds(_estateLayout.MainViewport, index));
+            FillDiamond(tile, new Color(40, 67, 32));
+            var inner = new Rectangle(tile.X + 3, tile.Y + 3, Math.Max(1, tile.Width - 6), Math.Max(1, tile.Height - 6));
+            FillDiamond(inner, new Color(style.Red, style.Green, style.Blue));
+            if (terrain[index] == EstateTerrainKind.Forest)
+            {
+                Fill(new Rectangle(tile.Center.X - 2, tile.Center.Y - 9, 4, 18), new Color(25, 62, 29));
+                Fill(new Rectangle(tile.Center.X - 10, tile.Center.Y - 3, 20, 5), new Color(31, 84, 35));
+            }
+            else if (terrain[index] == EstateTerrainKind.Settlement)
+            {
+                Fill(new Rectangle(tile.Center.X - 8, tile.Center.Y - 8, 16, 14), new Color(95, 72, 45));
+                Fill(new Rectangle(tile.Center.X - 11, tile.Center.Y - 10, 22, 5), new Color(64, 48, 35));
+            }
+        }
+    }
+
+    private void FillDiamond(Rectangle bounds, Color color)
+    {
+        var center = bounds.X + bounds.Width / 2;
+        for (var row = 0; row < bounds.Height; row++)
+        {
+            var distance = Math.Abs(row * 2 + 1 - bounds.Height);
+            var width = Math.Max(1, bounds.Width * (bounds.Height - distance) / bounds.Height);
+            Fill(new Rectangle(center - width / 2, bounds.Y + row, width, 1), color);
+        }
+    }
+
+    private void DrawEstateMarkers()
+    {
+        for (var index = 0; index < World.Locations.Length; index++)
+        {
+            var point = EstatePresentationDefinitions.InsetPoint(_estateLayout.InsetMap, World.Locations[index]);
+            var marker = ScaleBounds(new UiBounds(point.X - 2, point.Y - 2, index == _selectedLocation ? 6 : 4, index == _selectedLocation ? 6 : 4));
+            var owned = index == 0 || _campaign.State.ConqueredLocations.Contains(index);
+            Fill(marker, index == _campaign.State.CurrentLocation ? Color.Red : index == _selectedLocation ? Color.Gold : owned ? Color.LightGreen : Color.White);
+        }
+    }
+
+    private void DrawEstateInformation()
+    {
+        var panel = ScaleBounds(_estateLayout.InformationPanel);
+        var player = _campaign.State.Player;
+        var selected = World.Locations[_selectedLocation];
+        var intel = _campaign.HasGarrisonIntel(_selectedLocation) ? _campaign.GarrisonAt(_selectedLocation).ToString() : "UNKNOWN";
+        DrawText(selected.Name, panel.X + 12, panel.Y + 20, Color.White, 2, panel.Width - 24);
+        switch (_estatePanel)
+        {
+            case EstatePanel.Map:
+                DrawText($"GARRISON {intel}\nDISTANCE {World.TravelDays(_campaign.State.CurrentLocation, _selectedLocation)} DAYS", panel.X + 12, panel.Y + 58, Color.Wheat, 2, panel.Width - 24);
+                break;
+            case EstatePanel.Orders:
+                DrawText("ENTER TRAVEL\nT TOURNAMENT\nS SIEGE  B BATTLE\nP SPY", panel.X + 12, panel.Y + 58, Color.Wheat, 2, panel.Width - 24);
+                break;
+            case EstatePanel.Help:
+                DrawText("ARROWS SELECT\n+/- CHANGE SPEED\nE ADVANCE TIME\nF5 SAVE  F9 LOAD", panel.X + 12, panel.Y + 58, Color.Wheat, 2, panel.Width - 24);
+                break;
+            default: throw new ArgumentOutOfRangeException();
+        }
+        DrawText($"{_campaign.State.Date:MMM d, yyyy}\nTIME {_campaign.State.DaySpeed}X\nWEALTH {player.Wealth}\nCENSUS {player.Home.Population}",
+            panel.X + 12, panel.Y + panel.Height - 138, Color.White, 2, panel.Width - 24);
+        if (!string.IsNullOrEmpty(_notice)) DrawText(_notice, panel.X + 12, panel.Y + panel.Height - 34, Color.Gold, 1, panel.Width - 24);
+    }
+
+    private void DrawFallbackMap()
+    {
         if (!DrawOriginal("Map.England", new Rectangle(0, 0, 760, 768)))
             Fill(new Rectangle(0, 0, 760, 768), new Color(71, 92, 58));
         for (var i = 0; i < World.Locations.Length; i++)
@@ -911,7 +1095,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     {
         var original = DrawOriginal("Home.Office", new Rectangle(0, 0, 1024, 768));
         if (!original) DrawPanel("CASTLE OFFICE", "MANAGE YOUR FIEF OR RETURN TO THE ROAD");
-        DrawText("F  FARM MANAGEMENT    V  VILLAGE    ENTER  MAP", 80, 715, Color.Wheat, 2);
+        if (original) DrawSceneHoverLabel(_homeHotspots, HomePresentationDefinitions.HoverLabelBounds);
+        else DrawText("F  FARM MANAGEMENT    V  VILLAGE    ENTER  MAP", 80, 715, Color.Wheat, 2);
     }
 
     private void DrawFarm()
@@ -928,9 +1113,9 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         DrawText($"SERFS AVAILABLE {f.AvailableSerfs}", 55, 190, accountColor, 2);
         DrawText($"PRODUCTIVITY    {f.Productivity()}%", 55, 225, accountColor, 2);
         DrawText($"HOUSES          {f.Houses}", 55, 260, accountColor, 2);
-        DrawText("1-6 STAFF/BUILD   7/8/Z/X CROPS", 55, 545, Color.Wheat, 2, 500);
-        DrawText("9/G/I/C/S FOREST   Q/W/R RECRUIT", 55, 585, Color.Wheat, 2, 500);
-        DrawText("ENTER OR ESC  OFFICE", 55, 710, Color.Gold, 2);
+        for (var row = 0; row < FarmPresentationDefinitions.HelpRows.Count; row++)
+            DrawText(FarmPresentationDefinitions.HelpRows[row], 55, 525 + row * 36,
+                row == FarmPresentationDefinitions.HelpRows.Count - 1 ? Color.Gold : Color.Wheat, 1, 900);
     }
 
     private void DrawFarmTerrain(UiBounds originalBounds)
@@ -961,10 +1146,36 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void DrawBlacksmith()
     {
-        if (!DrawOriginal("Blacksmith.Workshop", new Rectangle(0, 0, 1024, 768)))
+        var original = DrawOriginal("Blacksmith.Workshop", new Rectangle(0, 0, 1024, 768));
+        if (!original)
             DrawPanel("THE BLACKSMITH", "SELECT THE SMITH TO BROWSE HIS WARES");
-        DrawOutline(ScaleBounds(_blacksmithBounds), Color.Gold, 2);
-        DrawText("ENTER OR B  BROWSE WARES    ESC  VILLAGE", 120, 715, Color.Wheat, 2);
+        if (original) DrawSceneHoverLabel(_blacksmithHotspots, BlacksmithPresentationDefinitions.HoverLabelBounds);
+        else DrawText("ENTER OR B  BROWSE WARES    ESC  VILLAGE", 120, 715, Color.Wheat, 2);
+    }
+
+    private void DrawBlacksmithDialogue()
+    {
+        if (DrawOriginal("Blacksmith.Dialogue", new Rectangle(0, 0, 1024, 768)))
+        {
+            DrawOriginal("Blacksmith.Portrait", ScaleBounds(BlacksmithDialoguePresentationDefinitions.Portrait));
+            DrawText(BlacksmithDialoguePresentationDefinitions.Speaker, 155, 385, Color.White, 2, 260);
+            DrawText(BlacksmithDialoguePresentationDefinitions.FallbackPrompt, 435, 65, Color.White, 2, 520);
+            for (var index = 0; index < BlacksmithDialoguePresentationDefinitions.Commands.Count; index++)
+                DrawText(BlacksmithDialoguePresentationDefinitions.Commands[index].Label, 75, 500 + index * 55, Color.Cyan, 2, 850);
+            return;
+        }
+
+        DrawPanel(BlacksmithDialoguePresentationDefinitions.Speaker, BlacksmithDialoguePresentationDefinitions.FallbackPrompt.ToUpperInvariant());
+        for (var index = 0; index < BlacksmithDialoguePresentationDefinitions.Commands.Count; index++)
+            DrawText(BlacksmithDialoguePresentationDefinitions.Commands[index].Label, 100, 260 + index * 60, Color.LightGreen, 2);
+    }
+
+    private void DrawSceneHoverLabel(IReadOnlyList<SceneHotspot> hotspots, UiBounds labelBounds)
+    {
+        var hotspot = HitSceneHotspot(hotspots, _lastMouse);
+        if (hotspot is null) return;
+        var bounds = ScaleBounds(labelBounds);
+        DrawText(hotspot.HoverLabel, bounds.X + 8, bounds.Y + 6, Color.Wheat, 2, bounds.Width - 16);
     }
 
     private void DrawShop()

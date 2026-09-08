@@ -91,6 +91,15 @@ static string DecodedKind(string name, string path)
         }
         catch (InvalidDataException) { }
     }
+    if (Path.GetExtension(name).Equals(".666", StringComparison.OrdinalIgnoreCase))
+    {
+        try
+        {
+            _ = DynamixSoundBankDecoder.Decode(File.ReadAllBytes(path));
+            return "sound-bank";
+        }
+        catch (InvalidDataException) { }
+    }
     return Kind(name);
 }
 

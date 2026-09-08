@@ -19,10 +19,13 @@ public static class ImportedArt
         new("Character.Pregenerated", "image", ":pregen.pcx"),
         new("Dilemma.Background", "image", ":morality.pcx"),
         new("Load.Background", "image", ":loadgame.pcx"),
+        new("Estate.Shell", "image", ":icontemp.pcx"),
         new("Map.England", "image", ":engmap1.pcx"),
         new("Home.Office", "image", ":tactical.pcx"),
         new("Farm.Management", "image", ":fiefmgmt.pcx"),
         new("Blacksmith.Workshop", "image", ":forgesmi.pcx"),
+        new("Blacksmith.Dialogue", "image", ":comscrn1.pcx"),
+        new("Blacksmith.Portrait", "image", ":blacksmi.pcc"),
         new("Shop.Inventory", "image", ":swdtemp.pcx"),
         new("Tournament.Richard", "image", ":richard.pcc")
     ];
@@ -37,6 +40,8 @@ public static class ImportedLayouts
         new("Character.Options", ":cgopts.hat"),
         new("Character.Pregenerated", ":pregen.hat"),
         new("Dilemma", ":chargen.hat"),
+        new("Estate", ":iconmap.hat"),
+        new("Home.Office", ":fcastle.hat"),
         new("Blacksmith.Workshop", ":vsmith.hat")
     ];
 }

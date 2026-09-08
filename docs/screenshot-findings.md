@@ -13,19 +13,25 @@ Local reference filenames:
 - `blacksmith-store-screen.png`
 - `home-office-screen.png`
 - `farm-management-screen.png`
+- `campaign-briefing-screen.png`
+- `village-scotts-keep.png`
+- `inn-screen.png`
 
 ## Observed screens
 
 | Screen | Direct observations | Resource correlation | Confidence |
 | --- | --- | --- | --- |
 | Youth dilemma | A stone-framed 4:3 screen has the character summary at upper left, Reroll and Continue at upper right, an orange scroll across the center, and three animated choice panels along the bottom labelled I, II, and III. | `CHARGEN.HAT` names `MORALITY.PCX`; its regions 0–2 align with the three bottom panels and region 6 aligns with Continue. Each `D*.CSF` frame is 99×149 versus the 100×150 choice regions. Rendering `D121.CSF` with the `MORALITY.PCX` palette reproduces the screenshot's sepia figures. | Confirmed layout and palette association; four-frame-per-choice grouping is Corroborated pending code-path confirmation. |
-| Estate/travel view | The main area is a tile-based fief landscape, not a full-screen England map. A smaller England map occupies the upper-right panel; Map, Orders, and Help tabs sit below it. The lower-right panel shows location, date, time multiplier, wealth, and census. Home and Village are persistent bottom navigation targets. | The framing resembles the `FIEFMGMT.PCX` screen family and its HAT layouts, but the terrain, marker, inset-map role, and exact tab mapping require resource-to-screenshot comparison. The current runtime's full-screen `engmap1.pcx` assumption must not be treated as final. | Direct visual layout Confirmed; individual asset assignments Provisional. |
+| Campaign briefing | After character selection, a full-screen parchment explains the conquest and tournament/dragon campaign routes before normal estate play. | The exact backing resource and transition handler remain to be identified; it is distinct from character options and youth dilemmas. | Sequence and presentation Confirmed from controlled observation; asset assignment Provisional. |
+| Estate/travel view | The main area is a tile-based fief landscape, not a full-screen England map. A smaller England map occupies the upper-right panel; Map, Orders, and Help tabs sit below it. The lower-right panel shows location, date, time multiplier, wealth, and census. Home and Village are persistent bottom navigation targets. | `ICONTEMP.PCX` is the exact stone shell. `ICONMAP.HAT` screen 23 defines inset map region 0, information panel 9, main viewport 10, Home/Village/footer 11–13, and Map/Orders/Help 15–17. The original terrain atlas, roads, shield, and cursor still require mapping. | Shell and geometry Confirmed; current procedural terrain is explicitly Provisional. |
 | Options/start hub | The interactive hub includes New Game, Load, Save, Practice, Resume, Exit DOS, CD music, MIDI music, sound effects, digitized speech, animation, credits, and movie controls. It follows the introductory title rather than being the title bitmap itself. | `GAMEOPTS.HAT` declares screen 1 with `OPTFIN.PCX`; `OPTION.CSF` contains five settings-widget frames. Exact region-to-action IDs and enabled/disabled states still need executable or controlled-input confirmation. | Direct visual controls Confirmed; resource/action mapping Corroborated. |
 | Village exterior | A village is a full-screen location scene. Named destinations are written on the bottom scroll, and Travel is an in-world sign hotspot. The supplied example is Sabine's Keep and includes inn and blacksmith signs around a church. | A normalized pixel comparison over all decoded village images selected `V66_1111.PCX` with RMSE 0.05645, far ahead of the next candidate at 0.16899; direct inspection confirms the scene match. The destination caption is a runtime overlay. | Scene/resource association Confirmed; the wider village-to-location mapping remains Provisional. |
+| Village variation | Scott's Keep uses a different street composition while retaining the bottom name scroll, in-world business signs, sword cursor, and Travel sign. | This confirms location-dependent village backgrounds and rules out reusing the Sabine's Keep bitmap globally. Its exact decoded PCX identifier still needs population comparison. | Visual variation Confirmed; resource identity Provisional. |
+| Inn interior | Inns are populated full-screen rooms with multiple character hotspots, an exit area, sword cursor, and the bottom hover-label scroll used by other visual locations. | `VINN.HAT` screen 12 names `INNPEOPL.PCX` and defines ten character/object rectangles plus overlapping bottom regions 10 and 11. | Background/layout association Corroborated; individual character/action bindings require tracing. |
 | Castle office/Home | Home is a full-screen castle office with desk, map, orders, model keep, and exits embedded in the room. | Decoded `TACTICAL.PCX` matches the supplied screenshot exactly. HAT screen 16 uses `TACTICAL.PCX` and defines ten object/exit regions. | Background Confirmed; object action dispatch Corroborated. |
 | Farm management | Farm management has a parchment accounting table on the left, a terrain grid on the right, and OK/Cancel plus wealth, productivity, and date in the footer. It is distinct from Home and travel. | Decoded `FIEFMGMT.PCX` is the exact static shell. HAT screens 19–22 reuse it with different row counts and right-panel/footer regions. | Background and screen-family geometry Confirmed; row semantics and tile editing remain under investigation. |
 | Blacksmith workshop | Entering the blacksmith first shows a full-screen forge with the smith standing behind the anvil and a blank bottom scroll. | Decoded `FORGESMI.PCX` matches the screenshot exactly. `VSMITH.HAT`/screen 13 identifies the same background and region 0 covers the smith. | Background and smith hotspot Confirmed; conversation trigger semantics Corroborated. |
-| Blacksmith dialogue | Selecting the smith opens a framed portrait/conversation screen: portrait and speaker label at upper left, response at upper right, and player choices across the lower panel. | `COMSCRN1.PCX` is the exact empty frame; `BLACKSMI.PCC` is the named portrait candidate. The complete text/choice source still needs decoding from `VSMITH.666`. | Frame association Confirmed; portrait and dialogue-data bindings Corroborated. |
+| Blacksmith dialogue | Selecting the smith opens a framed portrait/conversation screen: portrait and speaker label at upper left, response at upper right, and player choices across the lower panel. The separate Buy/Sell hotspot opens inventory. | `COMSCRN1.PCX` is the exact empty frame; `BLACKSMI.PCC` is the named portrait candidate. `VSMITH.666` is a two-sample sound bank, not dialogue, so the text/choice source remains unidentified. | Frame and observed navigation split Confirmed; portrait binding Corroborated; dialogue source unknown. |
 | Blacksmith store | The store is a separate stone-and-parchment inventory screen with selected item art, description, wealth/price, previous/next, View, Purchase, and Exit controls. | `SWDTEMP.PCX` is the exact empty shell. `WEAPONS.DAT` is a 40-record table whose explicit image index selects one of 39 `SWORDS.CSF` frames; record 2 plus frame 2 reproduces the screenshot's Battle Sword and 500-shilling price with the `SWDTEMP.PCX` palette. With that palette, `BUYSELL.CSF` frames 0/1 visibly contain the blank/labelled View stone and frames 2/3 contain Sell/Purchase labels. | Shell, palette, tables, item/control frames, labels, Battle Sword binding, and price Confirmed; dynamic overlay selection Corroborated. |
 
 ## Implementation follow-ups
@@ -41,11 +47,10 @@ Local reference filenames:
 
 ### Estate/travel view
 
-- Split the current strategic-map presentation into an estate/fief view and the appropriate England-map navigation view instead of stretching one asset into both roles.
+- **Implemented:** split the strategic-map presentation into the exact `ICONTEMP.PCX` estate shell and a retained no-media map fallback.
 - Identify the background, terrain tiles, road pieces, crop/forest/building sprites, player shield, sword cursor, and inset England-map source by decoded-image comparison.
-- Recover the Map, Orders, and Help tab region IDs and their screen transitions from HAT data and executable handlers.
-- Move date, speed, wealth, census, location, Home, and Village presentation into a typed layout definition populated from original coordinates.
-- Preserve modern keyboard navigation while adding the original mouse targets.
+- **Implemented:** bind Map, Orders, Help, date, speed, wealth, census, location, Home, Village, and inset-map selection through the typed `ICONMAP.HAT` layout.
+- Replace the provisional campaign-driven terrain composition with the original tile atlas and exact road/crop/building placement.
 
 ### Options/start hub
 
@@ -60,11 +65,13 @@ Local reference filenames:
 
 - **Implemented:** split the previous overloaded Home handler into a castle office and separate farm-management screen; use `TACTICAL.PCX` and `FIEFMGMT.PCX` when installed.
 - **Implemented:** insert the original `FORGESMI.PCX` workshop between Village and the store, with the smith hotspot sourced from `VSMITH.HAT`.
+- `FCASTLE.HAT` supplies ten Home rectangles and the executable contains the adjacent labels Overview, Castle, Farm, Village, Forest, War Planning, Exit, JUMP!!, Map, and Orders, but table order is **not** region order. A direct order-based mapping was tested and disproved by controlled observation; keep Home mouse targets disabled until the actual lookup is traced.
+- **Implemented:** keep the smith and Buy/Sell hotspots distinct. The smith opens the conversation frame; the weapon-rack region opens inventory.
 - **Implemented:** render `SWDTEMP.PCX` as the store shell; parse `WEAPONS.DAT`; bind each shop definition to its original record; render the selected `SWORDS.CSF` frame, local description, and exact price; and route previous, next, transaction, and exit through typed 640x480 controls.
 - Map the village-image suffixes to world locations before activating `V66_1111.PCX` outside its confirmed Sabine's Keep role.
-- Decode `VSMITH.666` dialogue nodes and bind `COMSCRN1.PCX`, `BLACKSMI.PCC`, scroll regions, and choices through the generic dialogue interpreter planned in Phase 1.2.
+- Locate the actual blacksmith dialogue-node source and bind it to `COMSCRN1.PCX`, `BLACKSMI.PCC`, scroll regions, and choices through the generic dialogue interpreter planned in Phase 1.2. Do not repeat the disproved `VSMITH.666` text hypothesis.
 - **Implemented:** render `BUYSELL.CSF` through the store palette using data-driven overlay definitions: hide/show View from the record's movie marker and switch Purchase/Sell from current ownership. Exact mouse-down timing remains to be traced.
-- Recover `TACTICAL.PCX` object actions and the four `FIEFMGMT.PCX` HAT variants; then replace the provisional farm table/terrain fill with exact definitions and editable tiles.
+- Recover the executable dispatch for Home targets whose destination systems remain incomplete (`Castle`, `Forest`, `War Planning`, and `JUMP!!`) and the four `FIEFMGMT.PCX` HAT variants; then replace the provisional farm table/terrain fill with exact definitions and editable tiles.
 
 ## Acceptance reference
 
