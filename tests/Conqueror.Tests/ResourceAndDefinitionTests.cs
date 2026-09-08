@@ -52,6 +52,8 @@ public sealed class ResourceAndDefinitionTests
         Assert.Contains(ImportedArt.Definitions, x => x is { Role: "Load.Background", IdSuffix: ":loadgame.pcx" });
         Assert.Contains(ImportedArt.Definitions, x => x is { Role: "Map.England", IdSuffix: ":engmap1.pcx" });
         Assert.Equal(ImportedArt.Definitions.Count, ImportedArt.Definitions.Select(x => x.Role).Distinct(StringComparer.OrdinalIgnoreCase).Count());
+        Assert.Equal(ImportedAnimations.Definitions.Count,
+            ImportedAnimations.Definitions.Select(x => x.Role).Distinct(StringComparer.OrdinalIgnoreCase).Count());
     }
 
     [Fact]
@@ -95,6 +97,13 @@ public sealed class ResourceAndDefinitionTests
         Assert.Equal(Enum.GetValues<ShopControlAction>().Length, ShopPresentationDefinitions.Controls.Count);
         Assert.Equal(ShopPresentationDefinitions.Controls.Count,
             ShopPresentationDefinitions.Controls.Select(control => control.Action).Distinct().Count());
+        Assert.Equal(Enum.GetValues<ShopOverlayState>().Length, ShopPresentationDefinitions.Overlays.Count);
+        Assert.Equal(ShopPresentationDefinitions.Overlays.Count,
+            ShopPresentationDefinitions.Overlays.Select(overlay => overlay.State).Distinct().Count());
+        Assert.Equal(1, ShopPresentationDefinitions.ViewOverlay(true).Frame);
+        Assert.Equal(0, ShopPresentationDefinitions.ViewOverlay(false).Frame);
+        Assert.Equal(2, ShopPresentationDefinitions.TransactionOverlay(true).Frame);
+        Assert.Equal(3, ShopPresentationDefinitions.TransactionOverlay(false).Frame);
         Assert.All(ShopPresentationDefinitions.Controls, control =>
         {
             Assert.InRange(control.Bounds.X, 0, 639);
@@ -132,6 +141,10 @@ public sealed class ResourceAndDefinitionTests
         Assert.Equal(84, Balance.Equipment.Single(item => item.Name == "Fighter's Dagger").BuyPrice);
         Assert.Contains(ImportedAnimations.Definitions,
             definition => definition.Role == "Shop.Items" && definition.IdSuffix == ":swords.csf" && definition.PaletteArtRole == "Shop.Inventory");
+        Assert.Contains(ImportedAnimations.Definitions,
+            definition => definition.Role == "Shop.Controls" && definition.IdSuffix == ":buysell.csf" && definition.PaletteArtRole == "Shop.Inventory");
+        Assert.True(new WeaponStoreEntry(0, "item.smk", 0, 0, 0, 1, "Item").HasMovie);
+        Assert.False(new WeaponStoreEntry(0, "#", 0, 0, 0, 1, "Item").HasMovie);
     }
 
     [Fact]

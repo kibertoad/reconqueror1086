@@ -577,14 +577,25 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         {
             case ShopControlAction.Previous: _shopIndex = (_shopIndex + stock.Length - 1) % stock.Length; break;
             case ShopControlAction.Next: _shopIndex = (_shopIndex + 1) % stock.Length; break;
-            case ShopControlAction.View: _notice = "ITEM DESCRIPTION SHOWN"; break;
-            case ShopControlAction.Purchase:
-                var item = stock[_shopIndex];
-                _notice = _campaign.BuyEquipment(item.Name) ? $"BOUGHT {item.Name}" : "PURCHASE REFUSED";
-                break;
+            case ShopControlAction.View: ViewShopItem(stock[_shopIndex]); break;
+            case ShopControlAction.Transaction: TransactShopItem(stock[_shopIndex]); break;
             case ShopControlAction.Exit: _screen = Screen.Blacksmith; break;
             default: throw new ArgumentOutOfRangeException(nameof(action));
         }
+    }
+
+    private void ViewShopItem(EquipmentBalance item)
+    {
+        var imported = ImportedStoreEntry(item);
+        _notice = imported?.HasMovie == true ? "ITEM MOVIE PLAYBACK IS NOT IMPLEMENTED YET" : "NO ITEM VIEW IS AVAILABLE";
+    }
+
+    private void TransactShopItem(EquipmentBalance item)
+    {
+        if (_campaign.State.Player.Inventory.Items.Contains(item.Name))
+            _notice = _campaign.SellEquipment(item.Name) ? $"SOLD {item.Name}" : "SALE REFUSED";
+        else
+            _notice = _campaign.BuyEquipment(item.Name) ? $"BOUGHT {item.Name}" : "PURCHASE REFUSED";
     }
 
     private void UpdateTournament(Func<Keys, bool> press)
@@ -965,6 +976,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         {
             var imported = ImportedStoreEntry(item);
             DrawStoreItem(imported);
+            DrawShopOverlay(ShopPresentationDefinitions.ViewOverlay(imported?.HasMovie == true));
+            DrawShopOverlay(ShopPresentationDefinitions.TransactionOverlay(p.Inventory.Items.Contains(item.Name)));
             var descriptionBounds = ScaleBounds(ShopPresentationDefinitions.Description);
             var fallback = item.Power > 0 ? $"{item.Name} - fighting power {item.Power}." : $"{item.Name} - armor protection {item.Armor}.";
             DrawText(imported?.Description ?? fallback, descriptionBounds.X, descriptionBounds.Y, Color.Black, 2, descriptionBounds.Width);
@@ -997,6 +1010,14 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             || item.ImageFrame >= animation.Frames.Count) return;
         var frame = animation.Frames[item.ImageFrame];
         _batch.Draw(frame, ScaleBounds(ShopPresentationDefinitions.ItemBounds(frame.Width, frame.Height)), Color.White);
+    }
+
+    private void DrawShopOverlay(ShopOverlay overlay)
+    {
+        if (!_originalAnimations.TryGetValue("Shop.Controls", out var animation)
+            || overlay.Frame >= animation.Frames.Count) return;
+        var frame = animation.Frames[overlay.Frame];
+        _batch.Draw(frame, ScaleBounds(ShopPresentationDefinitions.OverlayBounds(overlay, frame.Width, frame.Height)), Color.White);
     }
 
     private void DrawTournament()

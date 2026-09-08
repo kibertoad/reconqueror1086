@@ -46,7 +46,8 @@ public static class ImportedAnimations
     public static IReadOnlyList<ImportedAnimationDefinition> Definitions { get; } =
     [
         new("Options.Widgets", ":option.csf", "Options.Background"),
-        new("Shop.Items", ":swords.csf", "Shop.Inventory")
+        new("Shop.Items", ":swords.csf", "Shop.Inventory"),
+        new("Shop.Controls", ":buysell.csf", "Shop.Inventory")
     ];
 }
 

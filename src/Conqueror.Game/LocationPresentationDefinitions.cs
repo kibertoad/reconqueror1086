@@ -7,11 +7,13 @@ public enum ShopControlAction
     Previous,
     Next,
     View,
-    Purchase,
+    Transaction,
     Exit
 }
 
 public sealed record ShopControl(ShopControlAction Action, UiBounds Bounds);
+public enum ShopOverlayState { ViewUnavailable, ViewAvailable, Sell, Purchase }
+public sealed record ShopOverlay(ShopOverlayState State, ShopControlAction Control, int Frame);
 
 public static class ShopPresentationDefinitions
 {
@@ -22,8 +24,16 @@ public static class ShopPresentationDefinitions
         new(ShopControlAction.Previous, new UiBounds(244, 405, 54, 63)),
         new(ShopControlAction.Next, new UiBounds(298, 405, 52, 63)),
         new(ShopControlAction.View, new UiBounds(350, 400, 77, 80)),
-        new(ShopControlAction.Purchase, new UiBounds(427, 417, 105, 51)),
+        new(ShopControlAction.Transaction, new UiBounds(427, 417, 105, 51)),
         new(ShopControlAction.Exit, new UiBounds(533, 417, 82, 51))
+    ];
+
+    public static IReadOnlyList<ShopOverlay> Overlays { get; } =
+    [
+        new(ShopOverlayState.ViewUnavailable, ShopControlAction.View, 0),
+        new(ShopOverlayState.ViewAvailable, ShopControlAction.View, 1),
+        new(ShopOverlayState.Sell, ShopControlAction.Transaction, 2),
+        new(ShopOverlayState.Purchase, ShopControlAction.Transaction, 3)
     ];
 
     public static UiBounds Description { get; } = new(272, 28, 344, 330);
@@ -31,6 +41,26 @@ public static class ShopPresentationDefinitions
     public static UiBounds Price { get; } = new(520, 365, 70, 40);
 
     public static UiBounds ItemBounds(int width, int height) => new((ItemViewportWidth - width) / 2, 20, width, height);
+
+    public static ShopOverlay ViewOverlay(bool available) => Overlay(available
+        ? ShopOverlayState.ViewAvailable
+        : ShopOverlayState.ViewUnavailable);
+
+    public static ShopOverlay TransactionOverlay(bool owned) => Overlay(owned
+        ? ShopOverlayState.Sell
+        : ShopOverlayState.Purchase);
+
+    public static UiBounds OverlayBounds(ShopOverlay overlay, int width, int height)
+    {
+        var control = Controls.Single(item => item.Action == overlay.Control).Bounds;
+        return new UiBounds(
+            control.X + (control.Width - width) / 2,
+            control.Y + (control.Height - height) / 2,
+            width,
+            height);
+    }
+
+    private static ShopOverlay Overlay(ShopOverlayState state) => Overlays.Single(overlay => overlay.State == state);
 }
 
 public static class BlacksmithPresentationDefinitions

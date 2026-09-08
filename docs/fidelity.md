@@ -16,7 +16,7 @@ Binary-derived claims and their confidence levels are recorded in [`original-fin
 - One house and one food tile per 100 people; 25% bean requirement; July penalties
 - 200-shilling loan ceiling with 50% harvest interest; spy price of 80
 - Shop prices, 75% resale rule, armor bar values, and crossbow availability
-- The original store table order, item-image indices, local descriptions, and Fighter's Dagger price of 84 shillings
+- The original store table order, item-image indices, local descriptions, Fighter's Dagger price of 84 shillings, and `BUYSELL.CSF` view/transaction labels
 - Three jousts and one skirmish per tournament, lance experience cap of 20
 - Joust and melee wager dialogue, five selectable melee opponents, and the documented typical 20-80 shilling wager range
 - Lady-specific colors, piety/fame restrictions, win-indexed courtship rewards, and simultaneous courtships

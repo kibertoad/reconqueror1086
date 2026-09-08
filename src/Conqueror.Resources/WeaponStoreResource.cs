@@ -10,7 +10,10 @@ public sealed record WeaponStoreEntry(
     int ImageFrame,
     int ItemId,
     int Price,
-    string Description);
+    string Description)
+{
+    public bool HasMovie => MovieFile != "#";
+}
 
 public sealed record WeaponStoreResource(IReadOnlyList<WeaponStoreEntry> Entries);
 
