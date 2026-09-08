@@ -35,6 +35,7 @@ ScaffoldingReadMe.txt
 # Original-game analysis and legally owned imported content
 analysis/original/artifacts/
 analysis/original/*.txt
+analysis/original/screenshots/
 UserContent/
 
 # Runtime output

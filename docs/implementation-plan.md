@@ -25,9 +25,9 @@ The repository currently provides:
 - A read-only original-disc inspector with ISO inventory, hashes, executable-string offsets, archive/compression reports, CSF previews, and HAT layout reports.
 - Bounded parsers for GOB/RES directories, kind-1 LZ/RLE blocks, indexed PCX/PCC images, CSF animation frames, raw RGB palettes, and HAT screen descriptors.
 - An end-user importer that installs byte-stored, kind-1, and kind-2 owned resources plus lossless CDDA WAV files under ignored local storage.
-- A runtime imported-content catalog, CD music playback, and definition-driven original art for the title, character options, pre-generated characters, youth dilemmas, England map, load screen, and a tournament portrait.
+- A runtime imported-content catalog, CD music playback, and definition-driven original art for the title, options hub, character options, pre-generated characters, animated youth dilemmas, England map, load screen, and a tournament portrait.
 - An executable-confirmed `TITLE.HAT`/`FFTITLE.PCX` title load followed by a corroborated character-options flow whose exact geometry comes from installed `CGOPTS.HAT` and `PREGEN.HAT`.
-- Eighteen xUnit test cases and 112 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
+- Nineteen xUnit test cases and 112 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
 
 ## Dependency map
 
@@ -411,6 +411,8 @@ Deliverables:
 - Map original backgrounds, portraits, heraldry, cursors, icons, transitions, and cinematics to runtime scenes.
 - Preserve a clean-room fallback skin for installations without original media.
 - Match original aspect ratio and confirmed `WAR_MODE` behavior while supporting modern scaling.
+- Apply the owner-supplied dilemma, estate/travel, and options-hub observations and follow-ups recorded in [`screenshot-findings.md`](screenshot-findings.md).
+- Correct the startup flow to include the `OPTFIN.PCX` options hub, and separate the estate/fief presentation from the England-map navigation role.
 
 ### 9.2 Input
 

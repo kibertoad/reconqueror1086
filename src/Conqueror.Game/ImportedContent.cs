@@ -13,6 +13,7 @@ public static class ImportedArt
     public static IReadOnlyList<ImportedArtDefinition> Definitions { get; } =
     [
         new("Title.Background", "image", ":fftitle.pcx"),
+        new("Options.Background", "image", ":optfin.pcx"),
         new("Character.Options", "image", ":char_ops.pcx"),
         new("Character.Pregenerated", "image", ":pregen.pcx"),
         new("Dilemma.Background", "image", ":morality.pcx"),
@@ -27,6 +28,7 @@ public static class ImportedLayouts
     public static IReadOnlyList<ImportedLayoutDefinition> Definitions { get; } =
     [
         new("Title", ":title.hat"),
+        new("Options", ":gameopts.hat"),
         new("Character.Options", ":cgopts.hat"),
         new("Character.Pregenerated", ":pregen.hat"),
         new("Dilemma", ":chargen.hat")

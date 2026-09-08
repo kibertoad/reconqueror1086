@@ -67,6 +67,19 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void OptionsHubActionsAndOriginalRegionsAreDataDriven()
+    {
+        Assert.Equal(Enum.GetValues<OptionsHubAction>().Length, OptionsHubDefinitions.Options.Count);
+        Assert.Equal(OptionsHubDefinitions.Options.Count,
+            OptionsHubDefinitions.Options.Select(option => option.Action).Distinct().Count());
+        Assert.Equal(new UiBounds(15, 243, 255, 237),
+            OptionsHubDefinitions.Options.Single(option => option.Action == OptionsHubAction.NewGame).OriginalBounds);
+        Assert.Equal(11, OptionsHubDefinitions.Options.Single(option => option.Action == OptionsHubAction.Resume).HatRegionId);
+        Assert.Contains(ImportedArt.Definitions,
+            definition => definition.Role == "Options.Background" && definition.IdSuffix == ":optfin.pcx");
+    }
+
+    [Fact]
     public void DilemmaChoiceHotspotsComeFromTheOriginalLayout()
     {
         byte[] bytes = new byte[40 + 3 * 24];
@@ -81,6 +94,8 @@ public sealed class ResourceAndDefinitionTests
         var choices = YouthDilemmaPresentationDefinitions.ChoicesFrom(new HatLayout(bytes));
 
         Assert.Equal([new UiBounds(10, 300, 90, 140), new UiBounds(110, 300, 90, 140), new UiBounds(210, 300, 90, 140)], choices);
+        Assert.Equal(YouthDilemmaPresentationDefinitions.Continue,
+            YouthDilemmaPresentationDefinitions.ContinueFrom(new HatLayout(bytes)));
     }
 
     [Fact]

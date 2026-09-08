@@ -8,7 +8,9 @@ namespace Conqueror.Game;
 
 public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 {
-    private enum Screen { Title, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Map, Home, Village, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
+    private sealed record DilemmaAnimation(IReadOnlyList<Texture2D> Frames, int FramesPerChoice);
+
+    private enum Screen { Title, OptionsHub, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Map, Home, Village, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _batch = null!;
     private Texture2D _pixel = null!;
@@ -17,6 +19,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private KeyboardState _last;
     private MouseState _lastMouse;
     private int _characterOption;
+    private int _optionsHubOption;
     private int _characterTemplate;
     private int _loadSlot;
     private int _activeSaveSlot = 1;
@@ -25,9 +28,11 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private int _heraldicColor = 1;
     private string _characterName = "Sir ";
     private IReadOnlyList<CharacterCreationOption> _characterOptions = CharacterCreationDefinitions.Options;
+    private IReadOnlyList<OptionsHubOption> _optionsHubOptions = OptionsHubDefinitions.Options;
     private IReadOnlyList<HeraldicColorOption> _heraldicColors = CharacterCreationDefinitions.HeraldicColors;
     private IReadOnlyList<UiBounds> _pregeneratedBounds = CharacterCreationDefinitions.PregeneratedCharacters;
     private IReadOnlyList<UiBounds> _dilemmaChoiceBounds = YouthDilemmaPresentationDefinitions.Choices;
+    private UiBounds _dilemmaContinueBounds = YouthDilemmaPresentationDefinitions.Continue;
     private int _joustCursor;
     private SiegeSession? _siege;
     private bool _showRadar = true;
@@ -45,6 +50,14 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private SoundEffect? _importedMusic;
     private SoundEffectInstance? _musicInstance;
     private readonly Dictionary<string, Texture2D> _originalArt = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, DilemmaAnimation?> _dilemmaAnimations = new(StringComparer.OrdinalIgnoreCase);
+    private byte[]? _dilemmaPalette;
+    private double _presentationSeconds;
+    private bool _hasActiveCampaign;
+    private bool _cdMusicEnabled = true;
+    private bool _soundEffectsEnabled = true;
+    private bool _speechEnabled = true;
+    private bool _animationEnabled = true;
     private readonly CampaignSaveSlots _saveSlots = new(Path.Combine(AppContext.BaseDirectory, "saves"));
 
     public ConquerorGame()
@@ -62,6 +75,9 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _pixel.SetData([Color.White]);
         _importedContent = ImportedContentCatalog.Discover();
         _importedDialogue = _importedContent is null ? null : new ImportedDialogueRepository(_importedContent);
+        var optionsLayoutId = _importedContent?.FindId("resource", ":gameopts.hat");
+        var optionsLayout = optionsLayoutId is null ? null : _importedContent?.DecodeHat(optionsLayoutId);
+        _optionsHubOptions = OptionsHubDefinitions.OptionsFrom(optionsLayout);
         var characterLayoutId = _importedContent?.FindId("resource", ":cgopts.hat");
         var characterLayout = characterLayoutId is null ? null : _importedContent?.DecodeHat(characterLayoutId);
         _characterOptions = CharacterCreationDefinitions.OptionsFrom(characterLayout);
@@ -72,6 +88,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         var dilemmaLayoutId = _importedContent?.FindId("resource", ":chargen.hat");
         var dilemmaLayout = dilemmaLayoutId is null ? null : _importedContent?.DecodeHat(dilemmaLayoutId);
         _dilemmaChoiceBounds = YouthDilemmaPresentationDefinitions.ChoicesFrom(dilemmaLayout);
+        _dilemmaContinueBounds = YouthDilemmaPresentationDefinitions.ContinueFrom(dilemmaLayout);
         foreach (var definition in ImportedArt.Definitions)
         {
             var id = _importedContent?.FindId(definition.Kind, definition.IdSuffix);
@@ -79,6 +96,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             var texture = new Texture2D(GraphicsDevice, image.Width, image.Height, false, SurfaceFormat.Color);
             texture.SetData(image.ToRgba());
             _originalArt.Add(definition.Role, texture);
+            if (definition.Role == "Dilemma.Background") _dilemmaPalette = image.PaletteRgb;
         }
         if (_importedContent?.Open("CDDA/TRACK02") is { } music)
         {
@@ -103,6 +121,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _musicInstance?.Dispose();
         _importedMusic?.Dispose();
         foreach (var texture in _originalArt.Values) texture.Dispose();
+        foreach (var animation in _dilemmaAnimations.Values.OfType<DilemmaAnimation>())
+            foreach (var texture in animation.Frames) texture.Dispose();
         _pixel.Dispose();
         _batch.Dispose();
         base.UnloadContent();
@@ -110,6 +130,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     protected override void Update(GameTime gameTime)
     {
+        _presentationSeconds += gameTime.ElapsedGameTime.TotalSeconds;
         var keys = Keyboard.GetState();
         var mouse = Mouse.GetState();
         bool Press(Keys key) => keys.IsKeyDown(key) && !_last.IsKeyDown(key);
@@ -124,6 +145,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (Press(Keys.Escape))
         {
             if (_screen == Screen.Title) Exit();
+            else if (_screen == Screen.OptionsHub) _screen = Screen.Title;
             else if (_screen == Screen.LoadGame) ResumeFromLoadGame();
             else if (_screen == Screen.CharacterName) _screen = Screen.CharacterOptions;
             else if (_screen == Screen.CharacterOptions) _screen = Screen.Title;
@@ -135,8 +157,9 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         switch (_screen)
         {
             case Screen.Title:
-                if (pressAny || click) _screen = Screen.CharacterOptions;
+                if (pressAny || click) _screen = Screen.OptionsHub;
                 break;
+            case Screen.OptionsHub: UpdateOptionsHub(Press, mouse, click); break;
             case Screen.LoadGame: UpdateLoadGame(Press, mouse, click); break;
             case Screen.CharacterOptions: UpdateCharacterOptions(Press, mouse, click); break;
             case Screen.CharacterName: UpdateCharacterName(Press); break;
@@ -168,6 +191,68 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _screen = Screen.LoadGame;
         _notice = "SELECT A SAVED CAMPAIGN OR RESUME";
     }
+
+    private void UpdateOptionsHub(Func<Keys, bool> press, MouseState mouse, bool click)
+    {
+        if (press(Keys.Up)) _optionsHubOption = (_optionsHubOption + _optionsHubOptions.Count - 1) % _optionsHubOptions.Count;
+        if (press(Keys.Down)) _optionsHubOption = (_optionsHubOption + 1) % _optionsHubOptions.Count;
+        var selected = press(Keys.Enter) ? _optionsHubOption : -1;
+        if (selected < 0 && click)
+        {
+            var (x, y) = OriginalPoint(mouse);
+            selected = Enumerable.Range(0, _optionsHubOptions.Count)
+                .FirstOrDefault(index => _optionsHubOptions[index].OriginalBounds.Contains(x, y), -1);
+        }
+        if (selected >= 0) ActivateOptionsHub(_optionsHubOptions[selected]);
+    }
+
+    private void ActivateOptionsHub(OptionsHubOption option)
+    {
+        if (option.RequiresCampaign && !_hasActiveCampaign)
+        {
+            _notice = $"{option.Label.ToUpperInvariant()} REQUIRES AN ACTIVE CAMPAIGN";
+            return;
+        }
+
+        switch (option.Action)
+        {
+            case OptionsHubAction.NewGame: _screen = Screen.CharacterOptions; break;
+            case OptionsHubAction.Load: OpenLoadGame(); break;
+            case OptionsHubAction.Save:
+                _saveSlots.Save(_campaign, _activeSaveSlot);
+                _notice = $"CAMPAIGN SAVED IN SLOT {_activeSaveSlot}";
+                break;
+            case OptionsHubAction.Resume: _screen = CampaignScreen(); break;
+            case OptionsHubAction.ToggleCdMusic:
+                _cdMusicEnabled = !_cdMusicEnabled;
+                if (_cdMusicEnabled) _musicInstance?.Resume(); else _musicInstance?.Pause();
+                _notice = $"CD MUSIC {OnOff(_cdMusicEnabled)}";
+                break;
+            case OptionsHubAction.ToggleSoundEffects:
+                _soundEffectsEnabled = !_soundEffectsEnabled;
+                _notice = $"SOUND EFFECTS {OnOff(_soundEffectsEnabled)}";
+                break;
+            case OptionsHubAction.ToggleSpeech:
+                _speechEnabled = !_speechEnabled;
+                _notice = $"DIGITIZED SPEECH {OnOff(_speechEnabled)}";
+                break;
+            case OptionsHubAction.ToggleAnimation:
+                _animationEnabled = !_animationEnabled;
+                _notice = $"ANIMATION {OnOff(_animationEnabled)}";
+                break;
+            case OptionsHubAction.ToggleMidiMusic: _notice = "MIDI MUSIC IS NOT AVAILABLE"; break;
+            case OptionsHubAction.Practice: _notice = "PRACTICE MODE IS NOT IMPLEMENTED YET"; break;
+            case OptionsHubAction.Credits: _notice = "CREDITS PRESENTATION IS NOT IMPLEMENTED YET"; break;
+            case OptionsHubAction.Movie: _notice = "MOVIE PLAYBACK IS NOT IMPLEMENTED YET"; break;
+            case OptionsHubAction.Exit: Exit(); break;
+            default: throw new ArgumentOutOfRangeException(nameof(option));
+        }
+    }
+
+    private Screen CampaignScreen() => _campaign.State.YouthDilemmasAnswered < Youth.OriginalPool.StageCount
+        && _campaign.State.Player.Age < Balance.StartingAge ? Screen.Dilemma : Screen.Map;
+
+    private static string OnOff(bool enabled) => enabled ? "ON" : "OFF";
 
     private void UpdateLoadGame(Func<Keys, bool> press, MouseState mouse, bool click)
     {
@@ -208,13 +293,13 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         }
 
         _campaign = campaign!;
+        _hasActiveCampaign = true;
         _fieldBattle = null;
         _siege = null;
         _youthDilemmaResult = null;
         _activeSaveSlot = number;
         _selectedLocation = _campaign.State.CurrentLocation;
-        _screen = _campaign.State.YouthDilemmasAnswered < Youth.OriginalPool.StageCount
-            && _campaign.State.Player.Age < Balance.StartingAge ? Screen.Dilemma : Screen.Map;
+        _screen = CampaignScreen();
         _notice = $"CAMPAIGN LOADED FROM SLOT {number}";
     }
 
@@ -259,6 +344,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             case CharacterCreationAction.GenerateNew:
                 var seed = Environment.TickCount;
                 _campaign = new Campaign(Campaign.NewCustom(NormalizedCharacterName(), seed, _heraldicColors[_heraldicColor].Name), seed);
+                _hasActiveCampaign = true;
                 _youthDilemmaResult = null;
                 _screen = Screen.Dilemma;
                 break;
@@ -293,6 +379,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private void StartPregeneratedCharacter(int index)
     {
         _campaign = new Campaign(Campaign.NewFromTemplate(index));
+        _hasActiveCampaign = true;
         _screen = Screen.Map;
     }
 
@@ -348,7 +435,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     {
         if (_youthDilemmaResult is not null)
         {
-            if (press(Keys.Enter) || press(Keys.Space))
+            var (x, y) = OriginalPoint(mouse);
+            if (press(Keys.Enter) || press(Keys.Space) || click && _dilemmaContinueBounds.Contains(x, y))
             {
                 _youthDilemmaResult = null;
                 CompleteYouthIfReady();
@@ -476,7 +564,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _batch.Begin(samplerState: SamplerState.PointClamp);
         switch (_screen)
         {
-            case Screen.Title: DrawTitle(); break; case Screen.LoadGame: DrawLoadGame(); break; case Screen.CharacterOptions: DrawCharacterOptions(); break; case Screen.CharacterName: DrawCharacterName(); break; case Screen.Character: DrawCharacter(); break; case Screen.Dilemma: DrawDilemma(); break; case Screen.Map: DrawMap(); break;
+            case Screen.Title: DrawTitle(); break; case Screen.OptionsHub: DrawOptionsHub(); break; case Screen.LoadGame: DrawLoadGame(); break; case Screen.CharacterOptions: DrawCharacterOptions(); break; case Screen.CharacterName: DrawCharacterName(); break; case Screen.Character: DrawCharacter(); break; case Screen.Dilemma: DrawDilemma(); break; case Screen.Map: DrawMap(); break;
             case Screen.Home: DrawHome(); break; case Screen.Village: DrawVillage(); break; case Screen.Shop: DrawShop(); break; case Screen.Tournament: DrawTournament(); break; case Screen.FieldBattle: DrawFieldBattle(); break;
             case Screen.Siege: DrawSiege(); break; case Screen.Overview: DrawOverview(); break; case Screen.Ending: DrawEnding(); break;
         }
@@ -506,6 +594,29 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             DrawText("CONQUEROR", 250, 190, Color.Gold, 7); DrawText("A.D. 1086", 350, 265, Color.Wheat, 4);
         }
         if (!hasTitle) DrawText("PRESS ANY KEY", 405, 600, Color.White, 2);
+    }
+
+    private void DrawOptionsHub()
+    {
+        var original = DrawOriginal("Options.Background", new Rectangle(0, 0, 1024, 768));
+        if (!original)
+        {
+            DrawPanel("OPTIONS", "NEW GAME, LOAD, SETTINGS, OR RESUME");
+            for (var i = 0; i < _optionsHubOptions.Count; i++)
+            {
+                var option = _optionsHubOptions[i];
+                var unavailable = option.RequiresCampaign && !_hasActiveCampaign;
+                DrawText($"{i + 1,2}  {option.Label}", 110, 180 + i * 35,
+                    unavailable ? Color.Gray : i == _optionsHubOption ? Color.Gold : Color.White, 2);
+            }
+        }
+        else
+        {
+            var selected = _optionsHubOptions[_optionsHubOption];
+            DrawOutline(ScaleBounds(selected.OriginalBounds),
+                selected.RequiresCampaign && !_hasActiveCampaign ? Color.Gray : Color.Gold, 3);
+        }
+        if (_notice.Length > 0) DrawText(_notice, 30, 730, Color.Gold, 2, 960);
     }
 
     private void DrawLoadGame()
@@ -576,23 +687,22 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         var index = _campaign.State.YouthDilemmasAnswered;
         var stats = _campaign.State.Player.Stats;
         var original = DrawOriginal("Dilemma.Background", new Rectangle(0, 0, 1024, 768));
+        var imported = _youthDilemmaResult is null ? CurrentImportedDilemma() : null;
+        if (original && imported is not null) DrawDilemmaAnimation(imported);
         if (_youthDilemmaResult is { } result)
         {
             if (!original) DrawPanel($"YOUTH - {result.Outcome.ToString().ToUpperInvariant()}", $"DILEMMA {result.DilemmaNumber}");
-            else DrawText($"{result.Outcome.ToString().ToUpperInvariant()} - DILEMMA {result.DilemmaNumber}", 70, 70, Color.Gold, 3);
-            DrawText(result.Text, 90, 190, Color.Wheat, 2, 820);
-            DrawText("ENTER OR SPACE TO CONTINUE", 220, 520, Color.LightGreen, 2);
+            DrawText(result.Text, original ? 84 : 90, original ? 330 : 190, original ? Color.Black : Color.Wheat, 2, original ? 850 : 820);
+            if (!original) DrawText("ENTER OR SPACE TO CONTINUE", 220, 520, Color.LightGreen, 2);
         }
-        else if (CurrentImportedDilemma() is { } imported)
+        else if (imported is not null)
         {
             if (!original) DrawPanel($"YOUTH - AGE {imported.Age}", imported.Title);
-            else DrawText($"AGE {imported.Age} - {imported.Title}", 70, 70, Color.Gold, 3, 880);
-            DrawText(imported.Prompt, 90, 170, Color.Wheat, 2, 820);
-            for (var i = 0; i < imported.Choices.Count; i++)
+            DrawText(imported.Prompt, original ? 84 : 90, original ? 330 : 170, original ? Color.Black : Color.Wheat, 2, original ? 850 : 820);
+            if (!original)
             {
-                var bounds = ScaleBounds(_dilemmaChoiceBounds[i]);
-                DrawOutline(bounds, Color.Gold, 2);
-                DrawText($"{i + 1}", bounds.X + 6, bounds.Y + 6, Color.Gold, 3);
+                for (var i = 0; i < imported.Choices.Count; i++)
+                    DrawText($"{i + 1}  {imported.Choices[i].Text}", 110, 285 + i * 75, Color.White, 2, 800);
             }
         }
         else
@@ -602,7 +712,44 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             DrawText(dilemma.Prompt, 90, 190, Color.Wheat, 2, 820);
             for (var i = 0; i < dilemma.Choices.Length; i++) DrawText($"{i + 1}  {dilemma.Choices[i].Text}", 110, 300 + i * 75, Color.White);
         }
-        DrawText($"STR {stats.Strength}  DEX {stats.Dexterity}  INT {stats.Intelligence}  PIETY {stats.Piety}  STAMINA {stats.Stamina}  HONOR {stats.Honor}", 70, 590, Color.Gold, 2);
+        if (original)
+        {
+            int[] values = [stats.Strength, stats.Dexterity, stats.Piety, stats.Stamina, stats.Honor, _campaign.State.Player.Wealth, _campaign.State.Player.Age];
+            for (var i = 0; i < values.Length; i++) DrawText(values[i].ToString(), 320, 103 + i * 27, Color.Black, 2);
+        }
+        else DrawText($"STR {stats.Strength}  DEX {stats.Dexterity}  INT {stats.Intelligence}  PIETY {stats.Piety}  STAMINA {stats.Stamina}  HONOR {stats.Honor}", 70, 590, Color.Gold, 2);
+    }
+
+    private void DrawDilemmaAnimation(YouthDilemmaDefinition dilemma)
+    {
+        var animation = GetDilemmaAnimation(dilemma.SceneFile);
+        if (animation is null) return;
+        var localFrame = _animationEnabled ? (int)(_presentationSeconds * 5) % animation.FramesPerChoice : 0;
+        for (var choice = 0; choice < YouthDilemmaPresentationDefinitions.ChoiceCount; choice++)
+            _batch.Draw(animation.Frames[choice * animation.FramesPerChoice + localFrame],
+                ScaleBounds(_dilemmaChoiceBounds[choice]), Color.White);
+    }
+
+    private DilemmaAnimation? GetDilemmaAnimation(string? sceneFile)
+    {
+        if (sceneFile is null || _dilemmaPalette is null || _importedContent is null) return null;
+        if (_dilemmaAnimations.TryGetValue(sceneFile, out var cached)) return cached;
+        var id = _importedContent.FindId("indexed-animation", $":{sceneFile}");
+        var sequence = id is null ? null : _importedContent.DecodeCsf(id);
+        if (sequence is null || sequence.Chunks.Count == 0
+            || sequence.Chunks.Count % YouthDilemmaPresentationDefinitions.ChoiceCount != 0)
+            return _dilemmaAnimations[sceneFile] = null;
+
+        var textures = new List<Texture2D>(sequence.Chunks.Count);
+        foreach (var chunk in sequence.Chunks)
+        {
+            var frame = sequence.DecodeFrame(chunk);
+            var texture = new Texture2D(GraphicsDevice, frame.Width, frame.Height, false, SurfaceFormat.Color);
+            texture.SetData(frame.ToRgba(_dilemmaPalette));
+            textures.Add(texture);
+        }
+        return _dilemmaAnimations[sceneFile] = new DilemmaAnimation(textures,
+            sequence.Chunks.Count / YouthDilemmaPresentationDefinitions.ChoiceCount);
     }
 
     private void DrawMap()
