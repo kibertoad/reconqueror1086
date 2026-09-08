@@ -15,6 +15,8 @@ public sealed record ShopControl(ShopControlAction Action, UiBounds Bounds);
 
 public static class ShopPresentationDefinitions
 {
+    private const int ItemViewportWidth = 240;
+
     public static IReadOnlyList<ShopControl> Controls { get; } =
     [
         new(ShopControlAction.Previous, new UiBounds(244, 405, 54, 63)),
@@ -23,6 +25,12 @@ public static class ShopPresentationDefinitions
         new(ShopControlAction.Purchase, new UiBounds(427, 417, 105, 51)),
         new(ShopControlAction.Exit, new UiBounds(533, 417, 82, 51))
     ];
+
+    public static UiBounds Description { get; } = new(272, 28, 344, 330);
+    public static UiBounds Wealth { get; } = new(284, 365, 90, 40);
+    public static UiBounds Price { get; } = new(520, 365, 70, 40);
+
+    public static UiBounds ItemBounds(int width, int height) => new((ItemViewportWidth - width) / 2, 20, width, height);
 }
 
 public static class BlacksmithPresentationDefinitions

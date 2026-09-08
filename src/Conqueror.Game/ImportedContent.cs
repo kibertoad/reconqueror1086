@@ -45,7 +45,8 @@ public static class ImportedAnimations
 {
     public static IReadOnlyList<ImportedAnimationDefinition> Definitions { get; } =
     [
-        new("Options.Widgets", ":option.csf", "Options.Background")
+        new("Options.Widgets", ":option.csf", "Options.Background"),
+        new("Shop.Items", ":swords.csf", "Shop.Inventory")
     ];
 }
 
@@ -171,6 +172,22 @@ public sealed class ImportedContentCatalog
             using var memory = new MemoryStream();
             stream.CopyTo(memory);
             return DilemmaTextDecoder.Decode(memory.ToArray());
+        }
+        catch (InvalidDataException)
+        {
+            return null;
+        }
+    }
+
+    public WeaponStoreResource? DecodeWeaponStore(string id)
+    {
+        using var stream = Open(id);
+        if (stream is null) return null;
+        try
+        {
+            using var memory = new MemoryStream();
+            stream.CopyTo(memory);
+            return WeaponStoreDecoder.Decode(memory.ToArray());
         }
         catch (InvalidDataException)
         {

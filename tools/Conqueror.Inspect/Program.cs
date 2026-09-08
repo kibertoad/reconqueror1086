@@ -179,6 +179,23 @@ if (File.Exists(gobPath))
     }
     File.WriteAllText(Path.Combine(output, "hat-layout-report.txt"), hatReport.ToString());
 
+    var weaponStoreReport = new StringBuilder("# Record  Movie  Unknown  ImageFrame  ItemId  Price  DescriptionChars\n");
+    var weaponStoreEntry = gob.Entries.FirstOrDefault(x => x.Name.Equals("weapons.dat", StringComparison.OrdinalIgnoreCase));
+    if (weaponStoreEntry is not null && DynamixArchive.CanDecode(weaponStoreEntry))
+    {
+        try
+        {
+            var weaponStore = WeaponStoreDecoder.Decode(gob.ReadDecoded(weaponStoreEntry));
+            foreach (var item in weaponStore.Entries)
+                weaponStoreReport.AppendLine($"{item.RecordIndex,8}  {(item.MovieFile == "#" ? "none" : "yes"),5}  {item.UnknownValue,7}  {item.ImageFrame,10}  {item.ItemId,6}  {item.Price,5}  {item.Description.Length,16}");
+        }
+        catch (InvalidDataException error)
+        {
+            weaponStoreReport.AppendLine($"rejected  {error.Message.Replace('\r', ' ').Replace('\n', ' ')}");
+        }
+    }
+    File.WriteAllText(Path.Combine(output, "weapon-store-report.txt"), weaponStoreReport.ToString());
+
     var dilemmaReport = new StringBuilder("# Number  Age  Scene  Choices  Outcomes  Changes  PromptChars  OutcomeChars  Name\n");
     var dilemmaRules = new StringBuilder("# Number  Choice:scoring[low,high] outcome(changes); original prose omitted\n");
     foreach (var entry in gob.Entries.Where(x => (x.IsStored || x.Flags == 1)

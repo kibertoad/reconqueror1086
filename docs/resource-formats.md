@@ -199,6 +199,14 @@ The 30 `DILEM0.DAT` through `DILEM29.DAT` resources are marker-delimited 7-bit A
 
 `DilemmaTextDecoder` bounds input size, accepts ASCII only, validates identifiers, counts, integer rows, unique choices, and the complete outcome set. `ImportedDialogueRepository` resolves a locally imported definition by stable number and maps its named attributes into the typed core interpreter. The inspector records only structural counts and text lengths in `dilemma-text-report.txt` and compact breakpoint/modifier metadata in `dilemma-rules-report.txt`; original prose remains confined to ignored `UserContent`.
 
+## Weapon-store text resource
+
+`WEAPONS.DAT` is a CRLF-delimited printable-ASCII table containing 40 records of exactly six lines each. For every record the lines are, in order: movie filename (or `#` when absent), one non-negative numeric field whose semantics remain unknown, `SWORDS.CSF` image-frame index, internal item identifier, purchase price in shillings, and display description. This framing, the 40-record population, prices, identifiers, and image indices are **Confirmed** for the hashed release. The first numeric field is deliberately exposed as unknown rather than assigned a speculative gameplay meaning.
+
+Image frames and item identifiers normally advance together from 0 through 36. The final three records demonstrate that they are separate fields: record 37 maps frame 38 to item 37, record 38 maps frame 37 to item 38, and record 39 repeats frame/item pair 38/37 with a different unknown value. `SWORDS.CSF` contains exactly 39 frames numbered 0 through 38. Rendering it with the `SWDTEMP.PCX` palette reproduces the Battle Sword shown in the owner screenshot at the frame index declared by record 2, so that palette and table-to-frame binding are **Confirmed**. The purpose of duplicate record 39 remains **Provisional**.
+
+`WeaponStoreDecoder` rejects oversized input, non-printable/non-ASCII bytes, bare line endings, incomplete records, excessive record counts or text fields, and negative/non-decimal numeric fields. Runtime equipment definitions store the original record number explicitly; the UI uses the parsed record's frame, price, and locally held description without copying original prose into tracked files or matching on display names. `weapon-store-report.txt` emits only numeric fields, movie presence, and description lengths.
+
 ## HAT screen layouts
 
 The decoded `.HAT` population uses a compact fixed-header layout. Integer fields are signed 32-bit little-endian values. The following structure is **Confirmed for the hashed release**:
@@ -240,6 +248,7 @@ The raw-sector bounds, ISO directory traversal, cue timestamps, and WAV sample p
 - `hat-layout-report.txt`: decoded screen identifiers, background names, and region records for HAT layout descriptors.
 - `dilemma-text-report.txt`: stable dilemma/scene identifiers plus choice, outcome, modifier, and text-length counts without original prose.
 - `dilemma-rules-report.txt`: choice scoring attributes, low/high breakpoints, and outcome modifiers without original prose.
+- `weapon-store-report.txt`: store record indices, movie presence, unknown numeric values, image/item indices, prices, and description lengths without original prose.
 - `artifact-hashes.txt`, `string-hits.txt`, and `executable-disassembly-report.txt`: provenance and targeted executable evidence.
 
 The reports are regenerated from the user's installation and must never be committed. Stable conclusions belong here and confidence-scoped gameplay conclusions belong in [`original-findings.md`](original-findings.md).

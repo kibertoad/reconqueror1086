@@ -1,4 +1,5 @@
 using Conqueror.Core;
+using Conqueror.Resources;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -48,6 +49,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private int _tournamentOpponent = 2;
     private ImportedContentCatalog? _importedContent;
     private ImportedDialogueRepository? _importedDialogue;
+    private WeaponStoreResource? _weaponStore;
     private YouthDilemmaResult? _youthDilemmaResult;
     private SoundEffect? _importedMusic;
     private SoundEffectInstance? _musicInstance;
@@ -79,6 +81,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _pixel.SetData([Color.White]);
         _importedContent = ImportedContentCatalog.Discover();
         _importedDialogue = _importedContent is null ? null : new ImportedDialogueRepository(_importedContent);
+        var weaponStoreId = _importedContent?.FindId("resource", ":weapons.dat");
+        _weaponStore = weaponStoreId is null ? null : _importedContent?.DecodeWeaponStore(weaponStoreId);
         var optionsLayoutId = _importedContent?.FindId("resource", ":gameopts.hat");
         var optionsLayout = optionsLayoutId is null ? null : _importedContent?.DecodeHat(optionsLayoutId);
         _optionsHubOptions = OptionsHubDefinitions.OptionsFrom(optionsLayout);
@@ -553,7 +557,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void UpdateShop(Func<Keys, bool> press, MouseState mouse, bool click)
     {
-        var stock = Balance.Equipment.Where(x => x.Shop).ToArray();
+        var stock = Balance.StoreEquipment;
         if (press(Keys.Up) || press(Keys.Left)) _shopIndex = (_shopIndex + stock.Length - 1) % stock.Length;
         if (press(Keys.Down) || press(Keys.Right)) _shopIndex = (_shopIndex + 1) % stock.Length;
         var item = stock[_shopIndex];
@@ -954,15 +958,20 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void DrawShop()
     {
-        var stock = Balance.Equipment.Where(x => x.Shop).ToArray();
+        var stock = Balance.StoreEquipment;
         var p = _campaign.State.Player;
         var item = stock[_shopIndex];
         if (DrawOriginal("Shop.Inventory", new Rectangle(0, 0, 1024, 768)))
         {
-            var details = item.Power > 0 ? $"FIGHTING POWER {item.Power}" : $"ARMOR PROTECTION {item.Armor}";
-            DrawText($"{item.Name.ToUpperInvariant()} - {details}.", 440, 70, Color.Black, 2, 500);
-            DrawText($"WEALTH\n{p.Wealth}", 455, 585, Color.White, 2);
-            DrawText($"BUY\n{item.BuyPrice}", 790, 585, Color.White, 2);
+            var imported = ImportedStoreEntry(item);
+            DrawStoreItem(imported);
+            var descriptionBounds = ScaleBounds(ShopPresentationDefinitions.Description);
+            var fallback = item.Power > 0 ? $"{item.Name} - fighting power {item.Power}." : $"{item.Name} - armor protection {item.Armor}.";
+            DrawText(imported?.Description ?? fallback, descriptionBounds.X, descriptionBounds.Y, Color.Black, 2, descriptionBounds.Width);
+            var wealthBounds = ScaleBounds(ShopPresentationDefinitions.Wealth);
+            var priceBounds = ScaleBounds(ShopPresentationDefinitions.Price);
+            DrawText($"WEALTH\n{p.Wealth}", wealthBounds.X, wealthBounds.Y, Color.White, 2);
+            DrawText($"BUY\n{imported?.Price ?? item.BuyPrice}", priceBounds.X, priceBounds.Y, Color.White, 2);
             return;
         }
 
@@ -975,6 +984,19 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             DrawText($"{(index == _shopIndex ? ">" : " ")} {rowItem.Name}  {rowItem.BuyPrice}S  {details} {(owned ? "OWNED" : "")}", 85, 180 + row * 58, index == _shopIndex ? Color.Gold : owned ? Color.LightGreen : Color.White, 2);
         }
         DrawText($"EQUIPPED: {p.Inventory.Weapon} / {p.Inventory.Armor} / {p.Inventory.Shield} / {p.Inventory.Helm}", 75, 660, Color.Wheat, 2, 870);
+    }
+
+    private WeaponStoreEntry? ImportedStoreEntry(EquipmentBalance item) => item.OriginalStoreRecord is { } record
+        && _weaponStore?.Entries.ElementAtOrDefault(record) is { } imported
+        ? imported
+        : null;
+
+    private void DrawStoreItem(WeaponStoreEntry? item)
+    {
+        if (item is null || !_originalAnimations.TryGetValue("Shop.Items", out var animation)
+            || item.ImageFrame >= animation.Frames.Count) return;
+        var frame = animation.Frames[item.ImageFrame];
+        _batch.Draw(frame, ScaleBounds(ShopPresentationDefinitions.ItemBounds(frame.Width, frame.Height)), Color.White);
     }
 
     private void DrawTournament()

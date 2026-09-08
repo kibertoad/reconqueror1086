@@ -79,8 +79,8 @@ public sealed class ResourceAndDefinitionTests
             definition => definition.Role == "Options.Background" && definition.IdSuffix == ":optfin.pcx");
         Assert.Equal(5, OptionsHubDefinitions.Options.Count(option => option.Setting.HasValue));
         Assert.Equal(5, OptionsHubDefinitions.Options.Select(option => option.Setting).OfType<OptionsHubSetting>().Distinct().Count());
-        Assert.Single(ImportedAnimations.Definitions);
-        Assert.Equal("Options.Background", ImportedAnimations.Definitions[0].PaletteArtRole);
+        var optionsAnimation = Assert.Single(ImportedAnimations.Definitions, definition => definition.Role == "Options.Widgets");
+        Assert.Equal("Options.Background", optionsAnimation.PaletteArtRole);
     }
 
     [Fact]
@@ -103,6 +103,35 @@ public sealed class ResourceAndDefinitionTests
             Assert.InRange(control.Bounds.Y + control.Bounds.Height, 1, 480);
         });
         Assert.Equal(new UiBounds(253, 109, 107, 164), BlacksmithPresentationDefinitions.Blacksmith);
+    }
+
+    [Fact]
+    public void WeaponStoreTableParsesBoundedSixLineRecords()
+    {
+        var text = "first.smk\r\n2\r\n7\r\n9\r\n500\r\nA synthetic sword.\r\n#\r\n3\r\n8\r\n10\r\n120\r\nSynthetic armor.";
+
+        var resource = WeaponStoreDecoder.Decode(System.Text.Encoding.ASCII.GetBytes(text));
+
+        Assert.Equal(2, resource.Entries.Count);
+        Assert.Equal(new WeaponStoreEntry(0, "first.smk", 2, 7, 9, 500, "A synthetic sword."), resource.Entries[0]);
+        Assert.Equal(8, resource.Entries[1].ImageFrame);
+    }
+
+    [Fact]
+    public void WeaponStoreTableAndEquipmentMappingsRejectAmbiguity()
+    {
+        var incomplete = System.Text.Encoding.ASCII.GetBytes("#\r\n1\r\n2");
+        Assert.Throws<InvalidDataException>(() => WeaponStoreDecoder.Decode(incomplete));
+        Assert.Throws<InvalidDataException>(() => WeaponStoreDecoder.Decode([0xFF]));
+
+        var mapped = Balance.StoreEquipment.Select(item => item.OriginalStoreRecord).ToArray();
+        Assert.All(mapped, record => Assert.NotNull(record));
+        Assert.Equal(mapped.Length, mapped.Distinct().Count());
+        Assert.Equal(Enumerable.Range(0, 39).Select(index => (int?)index), mapped);
+        Assert.Equal(2, Balance.Equipment.Single(item => item.Name == "Battle Sword").OriginalStoreRecord);
+        Assert.Equal(84, Balance.Equipment.Single(item => item.Name == "Fighter's Dagger").BuyPrice);
+        Assert.Contains(ImportedAnimations.Definitions,
+            definition => definition.Role == "Shop.Items" && definition.IdSuffix == ":swords.csf" && definition.PaletteArtRole == "Shop.Inventory");
     }
 
     [Fact]

@@ -26,7 +26,7 @@ Local reference filenames:
 | Farm management | Farm management has a parchment accounting table on the left, a terrain grid on the right, and OK/Cancel plus wealth, productivity, and date in the footer. It is distinct from Home and travel. | Decoded `FIEFMGMT.PCX` is the exact static shell. HAT screens 19–22 reuse it with different row counts and right-panel/footer regions. | Background and screen-family geometry Confirmed; row semantics and tile editing remain under investigation. |
 | Blacksmith workshop | Entering the blacksmith first shows a full-screen forge with the smith standing behind the anvil and a blank bottom scroll. | Decoded `FORGESMI.PCX` matches the screenshot exactly. `VSMITH.HAT`/screen 13 identifies the same background and region 0 covers the smith. | Background and smith hotspot Confirmed; conversation trigger semantics Corroborated. |
 | Blacksmith dialogue | Selecting the smith opens a framed portrait/conversation screen: portrait and speaker label at upper left, response at upper right, and player choices across the lower panel. | `COMSCRN1.PCX` is the exact empty frame; `BLACKSMI.PCC` is the named portrait candidate. The complete text/choice source still needs decoding from `VSMITH.666`. | Frame association Confirmed; portrait and dialogue-data bindings Corroborated. |
-| Blacksmith store | The store is a separate stone-and-parchment inventory screen with selected item art, description, wealth/price, previous/next, View, Purchase, and Exit controls. | `SWDTEMP.PCX` is the exact empty shell. `SWORDS.CSF` contains 39 tall item frames and `BUYSELL.CSF` contains four control-sized frames, but index/action mappings remain to be traced. | Static shell Confirmed; item/control sequence mappings Corroborated. |
+| Blacksmith store | The store is a separate stone-and-parchment inventory screen with selected item art, description, wealth/price, previous/next, View, Purchase, and Exit controls. | `SWDTEMP.PCX` is the exact empty shell. `WEAPONS.DAT` is a 40-record table whose explicit image index selects one of 39 `SWORDS.CSF` frames; record 2 plus frame 2 reproduces the screenshot's Battle Sword and 500-shilling price with the `SWDTEMP.PCX` palette. `BUYSELL.CSF` contains four additional control-sized frames whose state meanings still need tracing. | Shell, palette, table, Battle Sword frame, and price Confirmed; control animation meanings Corroborated. |
 
 ## Implementation follow-ups
 
@@ -60,10 +60,10 @@ Local reference filenames:
 
 - **Implemented:** split the previous overloaded Home handler into a castle office and separate farm-management screen; use `TACTICAL.PCX` and `FIEFMGMT.PCX` when installed.
 - **Implemented:** insert the original `FORGESMI.PCX` workshop between Village and the store, with the smith hotspot sourced from `VSMITH.HAT`.
-- **Partially implemented:** render `SWDTEMP.PCX` as the store shell and route previous, next, purchase, and exit through typed 640x480 controls. Item artwork and exact prose remain pending.
+- **Implemented:** render `SWDTEMP.PCX` as the store shell; parse `WEAPONS.DAT`; bind each shop definition to its original record; render the selected `SWORDS.CSF` frame, local description, and exact price; and route previous, next, purchase, and exit through typed 640x480 controls.
 - Map the village-image suffixes to world locations before activating `V66_1111.PCX` outside its confirmed Sabine's Keep role.
 - Decode `VSMITH.666` dialogue nodes and bind `COMSCRN1.PCX`, `BLACKSMI.PCC`, scroll regions, and choices through the generic dialogue interpreter planned in Phase 1.2.
-- Recover the `SWORDS.CSF` frame-to-item table and `BUYSELL.CSF` state meanings before drawing original item/control frames.
+- Recover `BUYSELL.CSF` state meanings before drawing its original control overlays. The `SWORDS.CSF` frame-to-item mapping is implemented from `WEAPONS.DAT`.
 - Recover `TACTICAL.PCX` object actions and the four `FIEFMGMT.PCX` HAT variants; then replace the provisional farm table/terrain fill with exact definitions and editable tiles.
 
 ## Acceptance reference

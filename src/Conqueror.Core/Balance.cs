@@ -3,7 +3,8 @@ namespace Conqueror.Core;
 public sealed record CropBalance(int Cost, int NormalRevenueAt50, int HarvestRevenueAt50, int Serfs = 5);
 public sealed record ForestBalance(int Cost, int RevenueAt50, int Serfs);
 public sealed record UnitBalance(int PriceAt50, int PriceAt100, int UpkeepAt50, int UpkeepAt100);
-public sealed record EquipmentBalance(string Name, int BuyPrice, int Armor, int Power, bool Shop = true, EquipmentSlot Slot = EquipmentSlot.Weapon);
+public sealed record EquipmentBalance(string Name, int BuyPrice, int Armor, int Power, bool Shop = true,
+    EquipmentSlot Slot = EquipmentSlot.Weapon, int? OriginalStoreRecord = null);
 public sealed record BuildingDefinition(BuildingKind Kind, string Name, int Cost, int ProductivityBonus, bool Repeatable = false);
 public sealed record CourtshipReward(int Win, int Wealth = 0, string? Item = null);
 public sealed record CourtshipDefinition(string Name, bool CourtAble, int MinHonor, int? MaxPiety, bool FameWaivesPiety, int MarriageWins, CourtshipReward[] Rewards);
@@ -88,27 +89,32 @@ public static class Balance
 
     public static readonly EquipmentBalance[] Equipment =
     [
-        new("Kingslayer Sword", 4000, 0, 182), new("Mercenary's Sword", 2800, 0, 174),
-        new("Bishop's Sword", 3200, 0, 171), new("Thruster's Sword", 1500, 0, 143),
-        new("Armor-Ripping Sword", 850, 0, 144), new("Defender's Sword", 900, 0, 130),
-        new("Knight's Sword", 700, 0, 129), new("Irish Sword", 500, 0, 131),
-        new("Battle Sword", 500, 0, 122), new("Danish Sword", 450, 0, 113),
-        new("General Sword", 300, 0, 99), new("Heavy Crossbow", 0, 0, 143, false),
-        new("Light Crossbow", 0, 0, 130, false), new("Spiked Mace", 90, 0, 138),
-        new("Flanged Mace", 100, 0, 103), new("Battle Axe", 300, 0, 122),
-        new("Horseman's Axe", 210, 0, 97), new("Saxon Axe", 120, 0, 82),
-        new("Basic Axe", 122, 0, 81), new("War Hammer", 100, 0, 101),
-        new("Hammer", 130, 0, 85), new("Stiletto Dagger", 34, 0, 68),
-        new("Thruster's Dagger", 44, 0, 61), new("Fighter's Dagger", 0, 0, 60, false),
-        new("Decorative Dagger", 100, 0, 34),
-        new("Full Plate", 5000, 35, 0, Slot: EquipmentSlot.Body), new("Half Plate", 3000, 30, 0, Slot: EquipmentSlot.Body),
-        new("Quarter Plate", 1600, 25, 0, Slot: EquipmentSlot.Body), new("Chain Hauberk", 1800, 20, 0, Slot: EquipmentSlot.Body),
-        new("Chain Tunic", 1200, 15, 0, Slot: EquipmentSlot.Body), new("Leather", 800, 10, 0, Slot: EquipmentSlot.Body), new("Gambeson", 400, 5, 0, Slot: EquipmentSlot.Body),
-        new("Heraldic Shield", 600, 10, 0, Slot: EquipmentSlot.Shield), new("Norman Shield", 200, 10, 0, Slot: EquipmentSlot.Shield),
-        new("Decorative Shield", 300, 5, 0, Slot: EquipmentSlot.Shield), new("Saxon Shield", 120, 5, 0, Slot: EquipmentSlot.Shield),
-        new("Tilting Shield", 50, 0, 0, Slot: EquipmentSlot.Shield), new("Great War Helm", 300, 15, 0, Slot: EquipmentSlot.Helm),
-        new("War Helm", 180, 10, 0, Slot: EquipmentSlot.Helm), new("Norman Helm", 120, 5, 0, Slot: EquipmentSlot.Helm), new("Footman's Helm", 60, 0, 0, Slot: EquipmentSlot.Helm)
+        new("Kingslayer Sword", 4000, 0, 182, OriginalStoreRecord: 0), new("Mercenary's Sword", 2800, 0, 174, OriginalStoreRecord: 4),
+        new("Bishop's Sword", 3200, 0, 171, OriginalStoreRecord: 1), new("Thruster's Sword", 1500, 0, 143, OriginalStoreRecord: 7),
+        new("Armor-Ripping Sword", 850, 0, 144, OriginalStoreRecord: 8), new("Defender's Sword", 900, 0, 130, OriginalStoreRecord: 6),
+        new("Knight's Sword", 700, 0, 129, OriginalStoreRecord: 9), new("Irish Sword", 500, 0, 131, OriginalStoreRecord: 10),
+        new("Battle Sword", 500, 0, 122, OriginalStoreRecord: 2), new("Danish Sword", 450, 0, 113, OriginalStoreRecord: 3),
+        new("General Sword", 300, 0, 99, OriginalStoreRecord: 5), new("Heavy Crossbow", 0, 0, 143, false),
+        new("Light Crossbow", 0, 0, 130, false), new("Spiked Mace", 90, 0, 138, OriginalStoreRecord: 21),
+        new("Flanged Mace", 100, 0, 103, OriginalStoreRecord: 22), new("Battle Axe", 300, 0, 122, OriginalStoreRecord: 14),
+        new("Horseman's Axe", 210, 0, 97, OriginalStoreRecord: 11), new("Saxon Axe", 120, 0, 82, OriginalStoreRecord: 12),
+        new("Basic Axe", 122, 0, 81, OriginalStoreRecord: 13), new("War Hammer", 100, 0, 101, OriginalStoreRecord: 20),
+        new("Hammer", 130, 0, 85, OriginalStoreRecord: 19), new("Stiletto Dagger", 34, 0, 68, OriginalStoreRecord: 18),
+        new("Thruster's Dagger", 44, 0, 61, OriginalStoreRecord: 17), new("Fighter's Dagger", 84, 0, 60, OriginalStoreRecord: 16),
+        new("Decorative Dagger", 100, 0, 34, OriginalStoreRecord: 15),
+        new("Full Plate", 5000, 35, 0, Slot: EquipmentSlot.Body, OriginalStoreRecord: 27), new("Half Plate", 3000, 30, 0, Slot: EquipmentSlot.Body, OriginalStoreRecord: 37),
+        new("Quarter Plate", 1600, 25, 0, Slot: EquipmentSlot.Body, OriginalStoreRecord: 38), new("Chain Hauberk", 1800, 20, 0, Slot: EquipmentSlot.Body, OriginalStoreRecord: 25),
+        new("Chain Tunic", 1200, 15, 0, Slot: EquipmentSlot.Body, OriginalStoreRecord: 24), new("Leather", 800, 10, 0, Slot: EquipmentSlot.Body, OriginalStoreRecord: 26), new("Gambeson", 400, 5, 0, Slot: EquipmentSlot.Body, OriginalStoreRecord: 23),
+        new("Heraldic Shield", 600, 10, 0, Slot: EquipmentSlot.Shield, OriginalStoreRecord: 36), new("Norman Shield", 200, 10, 0, Slot: EquipmentSlot.Shield, OriginalStoreRecord: 33),
+        new("Decorative Shield", 300, 5, 0, Slot: EquipmentSlot.Shield, OriginalStoreRecord: 35), new("Saxon Shield", 120, 5, 0, Slot: EquipmentSlot.Shield, OriginalStoreRecord: 34),
+        new("Tilting Shield", 50, 0, 0, Slot: EquipmentSlot.Shield, OriginalStoreRecord: 32), new("Great War Helm", 300, 15, 0, Slot: EquipmentSlot.Helm, OriginalStoreRecord: 30),
+        new("War Helm", 180, 10, 0, Slot: EquipmentSlot.Helm, OriginalStoreRecord: 29), new("Norman Helm", 120, 5, 0, Slot: EquipmentSlot.Helm, OriginalStoreRecord: 31), new("Footman's Helm", 60, 0, 0, Slot: EquipmentSlot.Helm, OriginalStoreRecord: 28)
     ];
+
+    public static readonly EquipmentBalance[] StoreEquipment = Equipment
+        .Where(item => item.Shop)
+        .OrderBy(item => item.OriginalStoreRecord ?? int.MaxValue)
+        .ToArray();
 
     public static readonly CourtshipDefinition[] Courtships =
     [
