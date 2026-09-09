@@ -14,7 +14,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private const string OriginalCursorRole = "Interface.Cursor";
     private const int OriginalDefaultCursorFrame = 0;
 
-    private enum Screen { Title, Movie, OptionsHub, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Briefing, Map, Home, WarPlanning, Farm, Village, Inn, Blacksmith, BlacksmithDialogue, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
+    private enum Screen { Title, Movie, OptionsHub, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Briefing, Map, Home, WarPlanning, Farm, Village, Inn, InnDialogue, Blacksmith, BlacksmithDialogue, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _batch = null!;
     private Texture2D _pixel = null!;
@@ -52,6 +52,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private IReadOnlyList<SceneHotspot> _homeHotspots = HomePresentationDefinitions.Hotspots;
     private IReadOnlyList<SceneHotspot> _blacksmithHotspots = BlacksmithPresentationDefinitions.Hotspots;
     private InnPresentationLayout _innLayout = InnPresentationDefinitions.Fallback;
+    private InnPatronHotspot? _innPatron;
     private int _joustCursor;
     private SiegeSession? _siege;
     private bool _showRadar = true;
@@ -237,6 +238,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             else if (_screen == Screen.Overview) _screen = _overviewReturnScreen;
             else if (_screen == Screen.Blacksmith) _screen = Screen.Village;
             else if (_screen == Screen.Inn) _screen = Screen.Village;
+            else if (_screen == Screen.InnDialogue) _screen = Screen.Inn;
             else if (_screen == Screen.BlacksmithDialogue) _screen = Screen.Blacksmith;
             else if (_screen == Screen.Shop) _screen = Screen.Blacksmith;
             else if (_screen == Screen.FieldBattle && _fieldBattle is not null) { _fieldBattle.IssueAll(UnitOrder.Withdraw); _notice = "WITHDRAWAL ORDERED"; }
@@ -281,6 +283,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.Farm: UpdateFarm(Press, mouse, click); break;
             case Screen.Village: UpdateVillage(Press); break;
             case Screen.Inn: UpdateInn(Press, mouse, click); break;
+            case Screen.InnDialogue: UpdateInnDialogue(Press); break;
             case Screen.Blacksmith: UpdateBlacksmith(Press, mouse, click); break;
             case Screen.BlacksmithDialogue: UpdateBlacksmithDialogue(Press); break;
             case Screen.Shop: UpdateShop(Press, mouse, click); break;
@@ -783,8 +786,19 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         }
         if (!click) return;
         var (x, y) = OriginalPoint(mouse);
-        if (_innLayout.Patrons.Any(patron => patron.Bounds.Contains(x, y)))
-            _notice = "PATRON CONVERSATION DATA HAS NOT YET BEEN RECOVERED";
+        _innPatron = _innLayout.Patrons.FirstOrDefault(patron => patron.Bounds.Contains(x, y));
+        if (_innPatron is not null)
+        {
+            _notice = "";
+            _screen = Screen.InnDialogue;
+        }
+        else if (_innLayout.ExitBounds.Contains(x, y))
+            _screen = Screen.Village;
+    }
+
+    private void UpdateInnDialogue(Func<Keys, bool> press)
+    {
+        if (press(Keys.Enter) || press(Keys.I) || press(Keys.V)) _screen = Screen.Inn;
     }
 
     private void UpdateBlacksmith(Func<Keys, bool> press, MouseState mouse, bool click)
@@ -981,11 +995,11 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         switch (_screen)
         {
             case Screen.Title: DrawTitle(); break; case Screen.Movie: DrawEventMovie(); break; case Screen.OptionsHub: DrawOptionsHub(); break; case Screen.LoadGame: DrawLoadGame(); break; case Screen.CharacterOptions: DrawCharacterOptions(); break; case Screen.CharacterName: DrawCharacterName(); break; case Screen.Character: DrawCharacter(); break; case Screen.Dilemma: DrawDilemma(); break; case Screen.Briefing: DrawCampaignBriefing(); break; case Screen.Map: DrawMap(); break;
-            case Screen.Home: DrawHome(); break; case Screen.WarPlanning: DrawWarPlanning(); break; case Screen.Farm: DrawFarm(); break; case Screen.Village: DrawVillage(); break; case Screen.Inn: DrawInn(); break; case Screen.Blacksmith: DrawBlacksmith(); break; case Screen.BlacksmithDialogue: DrawBlacksmithDialogue(); break; case Screen.Shop: DrawShop(); break; case Screen.Tournament: DrawTournament(); break; case Screen.FieldBattle: DrawFieldBattle(); break;
+            case Screen.Home: DrawHome(); break; case Screen.WarPlanning: DrawWarPlanning(); break; case Screen.Farm: DrawFarm(); break; case Screen.Village: DrawVillage(); break; case Screen.Inn: DrawInn(); break; case Screen.InnDialogue: DrawInnDialogue(); break; case Screen.Blacksmith: DrawBlacksmith(); break; case Screen.BlacksmithDialogue: DrawBlacksmithDialogue(); break; case Screen.Shop: DrawShop(); break; case Screen.Tournament: DrawTournament(); break; case Screen.FieldBattle: DrawFieldBattle(); break;
             case Screen.Siege: DrawSiege(); break; case Screen.Overview: DrawOverview(); break; case Screen.Ending: DrawEnding(); break;
         }
         if (_screen is not Screen.Title and not Screen.Movie and not Screen.LoadGame
-            and not Screen.Character and not Screen.Dilemma and not Screen.Briefing and not Screen.Inn)
+            and not Screen.Character and not Screen.Dilemma and not Screen.Briefing and not Screen.Inn and not Screen.InnDialogue)
             DrawText(_notice, 24, 730, Color.Gold, 2);
         if (_screen != Screen.Movie && !(_screen == Screen.Title && _titleMovie is { IsComplete: false }))
             DrawOriginalCursor();
@@ -1675,10 +1689,32 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
         var (x, y) = OriginalPoint(_lastMouse);
         var patron = _innLayout.Patrons.FirstOrDefault(candidate => candidate.Bounds.Contains(x, y));
-        var label = _notice.Length > 0 ? _notice : patron is null ? "" : "SPEAK WITH THIS PATRON";
+        var label = patron?.Name ?? (_innLayout.ExitBounds.Contains(x, y) ? "EXIT" : "");
         if (label.Length == 0) return;
         var footer = ScaleBounds(_innLayout.HoverLabelBounds);
         DrawText(label, footer.X + 10, footer.Y + 8, Color.Wheat, 2, footer.Width - 20);
+    }
+
+    private void DrawInnDialogue()
+    {
+        var patron = _innPatron;
+        if (patron is null)
+        {
+            _screen = Screen.Inn;
+            return;
+        }
+
+        if (DrawOriginal("Dialogue.Frame", new Rectangle(0, 0, 1024, 768)))
+        {
+            DrawOriginal(patron.PortraitRole, ScaleBounds(BlacksmithDialoguePresentationDefinitions.Portrait));
+            DrawText(patron.Name, 155, 385, Color.White, 2, 260);
+            DrawText("Conversation text has not yet been recovered.", 435, 65, Color.White, 2, 520);
+            DrawText("ENTER  RETURN TO THE INN", 75, 500, Color.Cyan, 2, 850);
+            return;
+        }
+
+        DrawPanel(patron.Name.ToUpperInvariant(), "CONVERSATION TEXT HAS NOT YET BEEN RECOVERED");
+        DrawText("ENTER  RETURN TO THE INN", 100, 300, Color.LightGreen, 2);
     }
 
     private void DrawBlacksmith()
@@ -1692,7 +1728,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void DrawBlacksmithDialogue()
     {
-        if (DrawOriginal("Blacksmith.Dialogue", new Rectangle(0, 0, 1024, 768)))
+        if (DrawOriginal("Dialogue.Frame", new Rectangle(0, 0, 1024, 768)))
         {
             DrawOriginal("Blacksmith.Portrait", ScaleBounds(BlacksmithDialoguePresentationDefinitions.Portrait));
             DrawText(BlacksmithDialoguePresentationDefinitions.Speaker, 155, 385, Color.White, 2, 260);

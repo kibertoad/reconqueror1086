@@ -338,7 +338,7 @@ public sealed class ResourceAndDefinitionTests
              (SceneNavigationAction.Shop, "Buy/Sell", new UiBounds(54, 2, 180, 141))],
             BlacksmithPresentationDefinitions.Hotspots.Select(hotspot => (hotspot.Action, hotspot.HoverLabel, hotspot.Bounds)));
         Assert.Contains(ImportedArt.Definitions,
-            definition => definition.Role == "Blacksmith.Dialogue" && definition.IdSuffix == ":comscrn1.pcx");
+            definition => definition.Role == "Dialogue.Frame" && definition.IdSuffix == ":comscrn1.pcx");
         Assert.Contains(ImportedArt.Definitions,
             definition => definition.Role == "Blacksmith.Portrait" && definition.IdSuffix == ":blacksmi.pcc");
         Assert.Equal(Enum.GetValues<BlacksmithDialogueAction>().Length,
@@ -729,8 +729,13 @@ public sealed class ResourceAndDefinitionTests
 
         Assert.Equal(InnPresentationDefinitions.PatronCount, layout.Patrons.Count);
         Assert.Equal(Enumerable.Range(0, 10), layout.Patrons.Select(patron => patron.HatRegionId));
+        Assert.Equal(["Frederick", "Gerard", "Barkeep", "Otto", "Hugh", "Gilbert", "Nellie", "Richard", "Ivo", "Albert"],
+            layout.Patrons.Select(patron => patron.Name));
+        Assert.All(layout.Patrons, patron => Assert.Contains(ImportedArt.Definitions,
+            definition => definition.Role == patron.PortraitRole && definition.IdSuffix == patron.PortraitSuffix));
         Assert.Equal(new UiBounds(75, 27, 37, 47), layout.Patrons[7].Bounds);
-        Assert.Equal(new UiBounds(105, 30, 40, 50), layout.HoverLabelBounds);
+        Assert.Equal(new UiBounds(105, 30, 40, 50), layout.ExitBounds);
+        Assert.Equal(new UiBounds(115, 31, 41, 51), layout.HoverLabelBounds);
     }
 
     [Fact]

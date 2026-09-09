@@ -31,10 +31,12 @@ public static class ImportedArt
         new("Farm.Management", "image", ":fiefmgmt.pcx"),
         new("Village.Inn", "image", ":innpeopl.pcx"),
         new("Blacksmith.Workshop", "image", ":forgesmi.pcx"),
-        new("Blacksmith.Dialogue", "image", ":comscrn1.pcx"),
+        new("Dialogue.Frame", "image", ":comscrn1.pcx"),
         new("Blacksmith.Portrait", "image", ":blacksmi.pcc"),
         new("Shop.Inventory", "image", ":swdtemp.pcx"),
-        new("Tournament.Richard", "image", ":richard.pcc")
+        new("Tournament.Richard", "image", ":richard.pcc"),
+        .. InnPresentationDefinitions.Fallback.Patrons.Select(patron =>
+            new ImportedArtDefinition(patron.PortraitRole, "image", patron.PortraitSuffix))
     ];
 }
 
