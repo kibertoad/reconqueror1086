@@ -49,6 +49,7 @@ Local reference filenames:
 
 - **Implemented:** split the strategic-map presentation into the exact `ICONTEMP.PCX` estate shell and a retained no-media map fallback.
 - Identify the background, terrain tiles, road pieces, crop/forest/building sprites, player shield, sword cursor, and inset England-map source by decoded-image comparison.
+- **Implemented:** render the decoded seasonal `ICA.CSF`/`ICS.CSF`/`ICW.CSF` 80x80 tiles with the `ICONTEMP.PCX` palette and switch their typed atlas role by campaign month. Terrain frame assignments remain provisional.
 - **Implemented:** bind Map, Orders, Help, date, speed, wealth, census, location, Home, Village, and inset-map selection through the typed `ICONMAP.HAT` layout.
 - Replace the provisional campaign-driven terrain composition with the original tile atlas and exact road/crop/building placement.
 

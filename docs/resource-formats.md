@@ -182,6 +182,8 @@ Every one of the 1,766 stored chunks begins with two positive `UINT16LE` values 
 
 The values, population counts, and width/height interpretation are **Confirmed** by exact scanline decoding across every chunk.
 
+Decoded-image comparison confirms that `ica.CSF`, `ics.CSF`, and `icw.CSF` are matching 337-frame isometric estate atlases for autumn, spring/summer, and winter respectively. Each frame index preserves the same broad visual role across the three files, and all three render coherently with the palette embedded in `ICONTEMP.PCX`. The runtime therefore selects the atlas by campaign month and uses that palette. The seasonal filename interpretation and palette association are **Corroborated** by the rendered populations and screen context; the precise month boundaries and individual frame-to-estate-data mapping remain **Provisional** pending executable table recovery.
+
 ### CSF frame payload
 
 After the four-byte dimension header, each of `height` scanlines is encoded independently:

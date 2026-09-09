@@ -167,6 +167,28 @@ public sealed class ResourceAndDefinitionTests
         Assert.Equal(layout.Controls.Count, layout.Controls.Select(control => control.Action).Distinct().Count());
         Assert.Equal(Enum.GetValues<EstatePanel>().Length, layout.Controls.Count(control => control.Panel.HasValue));
         Assert.Equal(Enum.GetValues<EstateTerrainKind>().Length, EstatePresentationDefinitions.TerrainStyles.Count);
+        Assert.Equal(Enum.GetValues<EstateTerrainKind>().Length, EstatePresentationDefinitions.TileFrames.Count);
+        Assert.Equal(Enum.GetValues<EstateSeason>().Length, EstatePresentationDefinitions.TileAtlases.Count);
+        Assert.All(EstatePresentationDefinitions.TileFrames.Values, frame => Assert.InRange(frame, 0, 336));
+        Assert.Equal(EstateSeason.SpringSummer, EstatePresentationDefinitions.SeasonFor(new DateTime(1086, 3, 1)));
+        Assert.Equal(EstateSeason.Autumn, EstatePresentationDefinitions.SeasonFor(new DateTime(1086, 10, 1)));
+        Assert.Equal(EstateSeason.Winter, EstatePresentationDefinitions.SeasonFor(new DateTime(1086, 1, 1)));
+        Assert.All(EstatePresentationDefinitions.TileAtlases, atlas =>
+            Assert.Contains(ImportedAnimations.Definitions,
+                definition => definition.Role == atlas.Role && definition.IdSuffix == atlas.IdSuffix
+                    && definition.PaletteArtRole == "Estate.Shell"));
+        foreach (var index in Enumerable.Range(0, EstatePresentationDefinitions.Columns * EstatePresentationDefinitions.Rows))
+        {
+            var bounds = EstatePresentationDefinitions.TileSpriteBounds(layout.MainViewport, index);
+            Assert.InRange(bounds.X, layout.MainViewport.X, layout.MainViewport.X + layout.MainViewport.Width - bounds.Width);
+            Assert.InRange(bounds.Y, layout.MainViewport.Y, layout.MainViewport.Y + layout.MainViewport.Height - bounds.Height);
+        }
+        var firstTile = EstatePresentationDefinitions.TileSpriteBounds(layout.MainViewport, 0);
+        var lastTile = EstatePresentationDefinitions.TileSpriteBounds(layout.MainViewport,
+            EstatePresentationDefinitions.Columns * EstatePresentationDefinitions.Rows - 1);
+        Assert.Equal(new UiBounds(layout.MainViewport.X, layout.MainViewport.Y, 80, 80), firstTile);
+        Assert.Equal(layout.MainViewport.X + layout.MainViewport.Width, lastTile.X + lastTile.Width);
+        Assert.Equal(layout.MainViewport.Y + layout.MainViewport.Height, lastTile.Y + lastTile.Height);
         foreach (var (location, index) in World.Locations.Select((location, index) => (location, index)))
         {
             var point = EstatePresentationDefinitions.InsetPoint(layout.InsetMap, location);

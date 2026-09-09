@@ -6,6 +6,7 @@ namespace Conqueror.Game;
 public enum EstatePanel { Map, Orders, Help }
 public enum EstateControlAction { Map, Orders, Help, Home, Village }
 public enum EstateTerrainKind { Meadow, HedgedField, Forest, Grain, Beans, Vegetables, Fruit, Settlement }
+public enum EstateSeason { SpringSummer, Autumn, Winter }
 
 public sealed record EstateControl(
     EstateControlAction Action,
@@ -14,6 +15,7 @@ public sealed record EstateControl(
     UiBounds Bounds,
     EstatePanel? Panel = null);
 public sealed record EstateTerrainStyle(EstateTerrainKind Kind, byte Red, byte Green, byte Blue);
+public sealed record EstateTileAtlas(EstateSeason Season, string Role, string IdSuffix);
 
 public sealed record EstateLayout(
     UiBounds MainViewport,
@@ -28,6 +30,7 @@ public static class EstatePresentationDefinitions
     public const int Rows = 14;
     private const int WorldWidth = 760;
     private const int WorldHeight = 768;
+    public const int OriginalTileSize = 80;
 
     public static EstateLayout Fallback { get; } = new(
         new UiBounds(19, 8, 370, 433),
@@ -53,6 +56,28 @@ public static class EstatePresentationDefinitions
             [EstateTerrainKind.Vegetables] = new(EstateTerrainKind.Vegetables, 134, 153, 91),
             [EstateTerrainKind.Fruit] = new(EstateTerrainKind.Fruit, 98, 118, 49),
             [EstateTerrainKind.Settlement] = new(EstateTerrainKind.Settlement, 139, 109, 68)
+        };
+
+    public static IReadOnlyList<EstateTileAtlas> TileAtlases { get; } =
+    [
+        new(EstateSeason.SpringSummer, "Estate.Tiles.SpringSummer", ":ics.csf"),
+        new(EstateSeason.Autumn, "Estate.Tiles.Autumn", ":ica.csf"),
+        new(EstateSeason.Winter, "Estate.Tiles.Winter", ":icw.csf")
+    ];
+
+    // The atlases and matching frame order are confirmed. These semantic choices are
+    // intentionally provisional until the executable's estate map table is recovered.
+    public static IReadOnlyDictionary<EstateTerrainKind, int> TileFrames { get; } =
+        new Dictionary<EstateTerrainKind, int>
+        {
+            [EstateTerrainKind.Meadow] = 293,
+            [EstateTerrainKind.HedgedField] = 258,
+            [EstateTerrainKind.Forest] = 255,
+            [EstateTerrainKind.Grain] = 287,
+            [EstateTerrainKind.Beans] = 290,
+            [EstateTerrainKind.Vegetables] = 289,
+            [EstateTerrainKind.Fruit] = 292,
+            [EstateTerrainKind.Settlement] = 24
         };
 
     private static EstateTerrainKind[] BasePattern { get; } =
@@ -108,6 +133,29 @@ public static class EstatePresentationDefinitions
         var x = viewport.X + column * (viewport.Width - width) / (Columns - 1);
         var y = viewport.Y + row * (viewport.Height - height) / (Rows - 1);
         return new UiBounds(x, y, width, height);
+    }
+
+    public static UiBounds TileSpriteBounds(UiBounds viewport, int index)
+    {
+        if (index < 0 || index >= Columns * Rows) throw new ArgumentOutOfRangeException(nameof(index));
+        var column = index % Columns;
+        var row = index / Columns;
+        var x = viewport.X + column * (viewport.Width - OriginalTileSize) / (Columns - 1);
+        var y = viewport.Y + row * (viewport.Height - OriginalTileSize) / (Rows - 1);
+        return new UiBounds(x, y, OriginalTileSize, OriginalTileSize);
+    }
+
+    public static EstateSeason SeasonFor(DateTime date) => date.Month switch
+    {
+        9 or 10 or 11 => EstateSeason.Autumn,
+        12 or 1 or 2 => EstateSeason.Winter,
+        _ => EstateSeason.SpringSummer
+    };
+
+    public static EstateTileAtlas AtlasFor(DateTime date)
+    {
+        var season = SeasonFor(date);
+        return TileAtlases.Single(atlas => atlas.Season == season);
     }
 
     public static (int X, int Y) InsetPoint(UiBounds inset, WorldLocation location) =>

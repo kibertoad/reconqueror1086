@@ -992,8 +992,17 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         var viewport = ScaleBounds(_estateLayout.MainViewport);
         Fill(viewport, new Color(113, 107, 72));
         var terrain = EstatePresentationDefinitions.TerrainFor(_campaign.State.Player.Home);
+        var atlasDefinition = EstatePresentationDefinitions.AtlasFor(_campaign.State.Date);
+        _originalAnimations.TryGetValue(atlasDefinition.Role, out var atlas);
         for (var index = 0; index < terrain.Count; index++)
         {
+            var frameIndex = EstatePresentationDefinitions.TileFrames[terrain[index]];
+            if (atlas is not null && frameIndex < atlas.Frames.Count)
+            {
+                _batch.Draw(atlas.Frames[frameIndex],
+                    ScaleBounds(EstatePresentationDefinitions.TileSpriteBounds(_estateLayout.MainViewport, index)), Color.White);
+                continue;
+            }
             var style = EstatePresentationDefinitions.TerrainStyles[terrain[index]];
             var tile = ScaleBounds(EstatePresentationDefinitions.TileBounds(_estateLayout.MainViewport, index));
             FillDiamond(tile, new Color(40, 67, 32));
