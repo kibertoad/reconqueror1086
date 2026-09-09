@@ -116,6 +116,28 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void ImportedSceneLayoutCropsDisconnectedTemplateGallery()
+    {
+        var source = SyntheticScene();
+        SetSceneBlockName(source.Blocks, 0, "wall");
+        source.Map.AsSpan().Clear();
+        SetSceneCell(source.Map, 10, 20, 3);
+        SetSceneCell(source.Map, 11, 20, 1);
+        SetSceneCell(source.Map, 12, 20, 5);
+        SetSceneCell(source.Map, 30, 30, 6);
+        var scene = DynamixSceneDecoder.Decode(source.Viewer, source.Scenario, source.Map, source.Blocks);
+
+        var layout = ImportedSiegeLayouts.Convert(scene);
+        var tiles = layout.CopyTiles();
+
+        Assert.Equal((5, 3, 1, 1),
+            (tiles.GetLength(0), tiles.GetLength(1), layout.PlayerX, layout.PlayerY));
+        Assert.Equal(SiegeTile.Door, tiles[2, 1]);
+        var enemy = Assert.Single(layout.Enemies);
+        Assert.Equal((3, 1, false), (enemy.X, enemy.Y, enemy.Champion));
+    }
+
+    [Fact]
     public void FirstPersonProjectionUsesLayoutWallsFacingAndEnemyPositions()
     {
         var tiles = new SiegeTile[6, 5];
@@ -1631,6 +1653,13 @@ public sealed class ResourceAndDefinitionTests
 
     private static void SetSceneCell(byte[] map, int x, int y, ushort block) =>
         BinaryPrimitives.WriteUInt16LittleEndian(map.AsSpan((x * DynamixScene.MapHeight + y) * 2, 2), block);
+
+    private static void SetSceneBlockName(byte[] blocks, int index, string name)
+    {
+        var field = blocks.AsSpan(index * DynamixSceneDecoder.BlockSize + 78, 16);
+        field.Clear();
+        System.Text.Encoding.ASCII.GetBytes(name).CopyTo(field);
+    }
 
     private sealed class TestActionState(IReadOnlyList<int> initial) : IDynamixActionState
     {

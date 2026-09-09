@@ -11,9 +11,13 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 {
     private sealed record DilemmaAnimation(IReadOnlyList<Texture2D> Frames, int FramesPerChoice);
     private sealed record OriginalAnimation(IReadOnlyList<Texture2D> Frames);
-    private sealed class SiegeVisuals(DynamixScene scene, IReadOnlyDictionary<int, Texture2D> textures) : IDisposable
+    private sealed class SiegeVisuals(
+        DynamixScene scene, int sourceOriginX, int sourceOriginY,
+        IReadOnlyDictionary<int, Texture2D> textures) : IDisposable
     {
         public DynamixScene Scene { get; } = scene;
+        public int SourceOriginX { get; } = sourceOriginX;
+        public int SourceOriginY { get; } = sourceOriginY;
         public IReadOnlyDictionary<int, Texture2D> Textures { get; } = textures;
         public void Dispose()
         {
@@ -2292,14 +2296,18 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             texture.SetData(IndexedRgba(decoded.Indices, palette.Rgb));
             textures.Add(decoded.Index, texture);
         }
-        _siegeVisuals = new SiegeVisuals(imported.Scene, textures);
+        _siegeVisuals = new SiegeVisuals(
+            imported.Scene, imported.SourceOriginX, imported.SourceOriginY, textures);
     }
 
     private Texture2D? SceneWallTexture(SiegeRayHit hit)
     {
-        if (_siegeVisuals is null || hit.MapX is < 0 or >= DynamixScene.MapWidth ||
-            hit.MapY is < 0 or >= DynamixScene.MapHeight) return null;
-        var block = _siegeVisuals.Scene.BlockAt(hit.MapX, hit.MapY);
+        if (_siegeVisuals is null) return null;
+        var sourceX = hit.MapX + _siegeVisuals.SourceOriginX;
+        var sourceY = hit.MapY + _siegeVisuals.SourceOriginY;
+        if (sourceX is < 0 or >= DynamixScene.MapWidth || sourceY is < 0 or >= DynamixScene.MapHeight)
+            return null;
+        var block = _siegeVisuals.Scene.BlockAt(sourceX, sourceY);
         foreach (var index in new[] { block.Surface0, block.Surface1, block.Surface2, block.Surface3 })
             if (_siegeVisuals.Textures.TryGetValue(index, out var texture)) return texture;
         return null;

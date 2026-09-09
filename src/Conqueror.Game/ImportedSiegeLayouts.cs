@@ -3,7 +3,8 @@ using Conqueror.Resources;
 
 namespace Conqueror.Game;
 
-public sealed record ImportedSiegeScene(string ArchiveId, DynamixScene Scene, SiegeLayout Layout);
+public sealed record ImportedSiegeScene(
+    string ArchiveId, DynamixScene Scene, SiegeLayout Layout, int SourceOriginX, int SourceOriginY);
 
 public static class ImportedSiegeLayouts
 {
@@ -15,38 +16,79 @@ public static class ImportedSiegeLayouts
     public static ImportedSiegeScene? ForPracticeMelee(ImportedContentCatalog? catalog) => Load(catalog, "MELEE0.RES");
     public static ImportedSiegeScene? ForPracticeCastleSkirmish(ImportedContentCatalog? catalog) => Load(catalog, "DEFEND0.RES");
 
-    public static SiegeLayout Convert(DynamixScene scene)
+    public static SiegeLayout Convert(DynamixScene scene) => ConvertWithOrigin(scene).Layout;
+
+    private static (SiegeLayout Layout, int OriginX, int OriginY) ConvertWithOrigin(DynamixScene scene)
     {
         ArgumentNullException.ThrowIfNull(scene);
-        var tiles = new SiegeTile[DynamixScene.MapWidth, DynamixScene.MapHeight];
-        var enemies = new List<SiegeSpawn>();
+        var sourceTiles = new SiegeTile[DynamixScene.MapWidth, DynamixScene.MapHeight];
         for (var x = 0; x < DynamixScene.MapWidth; x++)
         for (var y = 0; y < DynamixScene.MapHeight; y++)
-        {
-            var block = scene.BlockAt(x, y);
-            tiles[x, y] = TileFor(block.Name);
-            if (IsEnemy(block.Name))
-                enemies.Add(new SiegeSpawn(x, y, block.Name.Contains("champion", StringComparison.OrdinalIgnoreCase)));
-        }
+            sourceTiles[x, y] = TileFor(scene.BlockAt(x, y).Name);
+        sourceTiles[scene.Viewer.CellX, scene.Viewer.CellY] = SiegeTile.Floor;
 
+        var reachable = ReachableFromViewer(sourceTiles, scene.Viewer.CellX, scene.Viewer.CellY);
+        var points = Enumerable.Range(0, DynamixScene.MapWidth)
+            .SelectMany(x => Enumerable.Range(0, DynamixScene.MapHeight).Select(y => (X: x, Y: y)))
+            .Where(point => reachable[point.X, point.Y])
+            .ToArray();
+        var minX = Math.Max(0, points.Min(point => point.X) - 1);
+        var maxX = Math.Min(DynamixScene.MapWidth - 1, points.Max(point => point.X) + 1);
+        var minY = Math.Max(0, points.Min(point => point.Y) - 1);
+        var maxY = Math.Min(DynamixScene.MapHeight - 1, points.Max(point => point.Y) + 1);
+        var tiles = new SiegeTile[maxX - minX + 1, maxY - minY + 1];
+        for (var x = minX; x <= maxX; x++)
+        for (var y = minY; y <= maxY; y++)
+            tiles[x - minX, y - minY] = reachable[x, y] ? sourceTiles[x, y] : SiegeTile.Wall;
+
+        var enemies = points
+            .Where(point => IsEnemy(scene.BlockAt(point.X, point.Y).Name))
+            .Select(point => new SiegeSpawn(point.X - minX, point.Y - minY,
+                scene.BlockAt(point.X, point.Y).Name.Contains("champion", StringComparison.OrdinalIgnoreCase)))
+            .ToArray();
         var heading = (scene.Viewer.Heading + 8192) / 16384 & 3;
-        var facing = (Facing)heading;
-        tiles[scene.Viewer.CellX, scene.Viewer.CellY] = SiegeTile.Floor;
-        return new SiegeLayout(tiles, scene.Viewer.CellX, scene.Viewer.CellY, facing, enemies);
+        var layout = new SiegeLayout(tiles, scene.Viewer.CellX - minX, scene.Viewer.CellY - minY,
+            (Facing)heading, enemies);
+        return (layout, minX, minY);
+    }
+
+    private static bool[,] ReachableFromViewer(SiegeTile[,] tiles, int startX, int startY)
+    {
+        var reachable = new bool[tiles.GetLength(0), tiles.GetLength(1)];
+        var pending = new Queue<(int X, int Y)>();
+        reachable[startX, startY] = true;
+        pending.Enqueue((startX, startY));
+        while (pending.Count > 0)
+        {
+            var point = pending.Dequeue();
+            foreach (var (dx, dy) in new[] { (1, 0), (-1, 0), (0, 1), (0, -1) })
+            {
+                var x = point.X + dx;
+                var y = point.Y + dy;
+                if (x < 0 || y < 0 || x >= tiles.GetLength(0) || y >= tiles.GetLength(1) ||
+                    reachable[x, y] || tiles[x, y] == SiegeTile.Wall) continue;
+                reachable[x, y] = true;
+                pending.Enqueue((x, y));
+            }
+        }
+        return reachable;
     }
 
     private static ImportedSiegeScene? Load(ImportedContentCatalog? catalog, string name)
     {
         var archiveId = $"CONQUER/{name}";
         var scene = catalog?.DecodeScene(archiveId);
-        return scene is null ? null : new ImportedSiegeScene(archiveId, scene, Convert(scene));
+        if (scene is null) return null;
+        var converted = ConvertWithOrigin(scene);
+        return new ImportedSiegeScene(archiveId, scene, converted.Layout, converted.OriginX, converted.OriginY);
     }
 
     private static SiegeTile TileFor(string name)
     {
         if (name.Contains("secret passage", StringComparison.OrdinalIgnoreCase)) return SiegeTile.SecretDoor;
         if (name.Contains("door", StringComparison.OrdinalIgnoreCase) ||
-            name.Contains("portcullis", StringComparison.OrdinalIgnoreCase)) return SiegeTile.Door;
+            name.Contains("portcullis", StringComparison.OrdinalIgnoreCase) ||
+            name.Equals("gate", StringComparison.OrdinalIgnoreCase)) return SiegeTile.Door;
         if (name.Contains("meal", StringComparison.OrdinalIgnoreCase) ||
             name.Equals("barrel", StringComparison.OrdinalIgnoreCase)) return SiegeTile.Barrel;
         if (name.Contains("coin", StringComparison.OrdinalIgnoreCase) ||
@@ -59,6 +101,8 @@ public static class ImportedSiegeLayouts
             name.Contains("floor", StringComparison.OrdinalIgnoreCase) ||
             name.Equals("carpet", StringComparison.OrdinalIgnoreCase) ||
             name.Equals("dirt", StringComparison.OrdinalIgnoreCase) ||
+            name.Equals("grass", StringComparison.OrdinalIgnoreCase) ||
+            name.Contains("flagstone", StringComparison.OrdinalIgnoreCase) ||
             name.Contains("stairs", StringComparison.OrdinalIgnoreCase) ||
             name.Equals("exit", StringComparison.OrdinalIgnoreCase)) return SiegeTile.Floor;
         return SiegeTile.Wall;

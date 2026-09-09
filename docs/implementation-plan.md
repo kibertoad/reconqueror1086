@@ -32,7 +32,7 @@ The repository currently provides:
 - An end-user importer that installs byte-stored, kind-1, and kind-2 owned resources plus lossless CDDA WAV files under ignored local storage.
 - A runtime imported-content catalog, CD music playback, and definition-driven original art for the title, options hub, character options, pre-generated characters, campaign briefing, animated youth dilemmas, estate/travel shell, England map, load screen, Home/farm/blacksmith flows, and a tournament portrait.
 - An executable-confirmed `TITLE.HAT`/`FFTITLE.PCX` title load followed by a corroborated character-options flow whose exact geometry comes from installed `CGOPTS.HAT` and `PREGEN.HAT`.
-- Seventy-two xUnit test cases and 143 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
+- Seventy-three xUnit test cases and 143 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
 
 ## Dependency map
 
@@ -371,7 +371,7 @@ Deliverables:
 - Track conquest spoils separately in the economics overview.
 - Apply correct estate transfer, fame, experience, strength, and victory effects.
 
-Current progress: the owned scene archives' bounded `Viewer`, `Scenario`, `Map`, and `Blocks` records now drive 128x128 collision maps, initial position/facing, named doors and secret passages, food/treasure roles, and defender/champion placements in practice and campaign siege sessions. A map-aware raycast viewport renders wall-occluded defender billboards and original indexed wall/door planes selected by bounded block references; missing media uses shaded structural columns, and the generated 12x12 keep remains the no-media fallback. Exact per-location archive selection, four-side texture ordering, block state transitions, palette confirmation, sprite animation, AI, timing, balance, retainers, and loot/consequence tables remain open.
+Current progress: the owned scene archives' bounded `Viewer`, `Scenario`, `Map`, and `Blocks` records now drive collision maps, initial position/facing, named doors and secret passages, food/treasure roles, and defender/champion placements in practice and campaign siege sessions. Import floods from the Viewer and crops the 128x128 source map to its reachable play area plus enclosing wall, excluding the disconnected resource-authoring gallery. A map-aware raycast viewport renders wall-occluded defender billboards and original indexed wall/door planes selected by bounded block references; missing media uses shaded structural columns, and the generated 12x12 keep remains the no-media fallback. Exact per-location archive selection, four-side texture ordering, block state transitions, palette confirmation, sprite animation, AI, timing, balance, retainers, and loot/consequence tables remain open.
 
 Acceptance criteria:
 
