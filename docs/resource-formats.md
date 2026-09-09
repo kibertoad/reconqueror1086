@@ -308,6 +308,8 @@ Each region record contains six 32-bit fields: identifier, X, Y, width, height, 
 
 `UserContent/manifest.json` is a version-1 UTF-8 JSON document with the SHA-256 of the source disc image and an asset array. Every asset records a stable source identifier, root-relative generated path, runtime kind, exact byte length, and lowercase SHA-256. Identifiers and paths must be nonempty and case-insensitively unique; paths must be relative and resolve beneath `UserContent`; sizes must be non-negative; both digests must contain exactly 64 hexadecimal characters.
 
+The source-image digest `8a584cc03a0a19f74851d2c1f4653804a58bfbf2c16e4fd34759f7a7f88cf015` identifies the supported GOG English release (**Confirmed** from the owned installation). The importer announces that match before extraction and emits a warning for other hashes while continuing through the same bounded decoders rather than rejecting a potentially compatible legal copy.
+
 `Conqueror.Import --verify` checks those structural invariants and then requires every listed file to exist with the declared size and digest. The install and repair paths run the same verification after writing the manifest. Generated files and the manifest use same-directory temporary files plus atomic replacement; byte-identical destinations are retained rather than rewritten. `--uninstall` prevalidates all manifest paths before removing only those files and the manifest, preserving everything unlisted. These manifest rules describe independently authored importer metadata, not an original-game format.
 
 ## Reimplementation save format

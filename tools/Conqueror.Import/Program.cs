@@ -24,9 +24,16 @@ if (!File.Exists(imagePath) || !File.Exists(cuePath) || !File.Exists(gobPath))
     Console.Error.WriteLine("A complete GOG installation with game.gog, game.ins, and C1086.GOB is required.");
     return 2;
 }
+var sourceImageHash = ResourceHash.Sha256(imagePath);
+var releaseName = SupportedOriginalReleases.NameForSourceImage(sourceImageHash);
+if (releaseName is null)
+    Console.Error.WriteLine($"WARNING: unrecognized source image SHA-256 {sourceImageHash}; bounded validation will continue.");
+else
+    Console.WriteLine($"Recognized {releaseName} ({sourceImageHash}).");
 
 Directory.CreateDirectory(output);
 var entries = new List<ImportedAsset>();
+var changedFiles = 0;
 var cueLines = File.ReadAllLines(cuePath);
 using (var image = new RawMode1Image(imagePath, CueSheet.DataTrackSectors(cueLines)))
 {
@@ -38,19 +45,24 @@ using (var image = new RawMode1Image(imagePath, CueSheet.DataTrackSectors(cueLin
         var target = ResourcePaths.SafeTarget(output, relative);
         Directory.CreateDirectory(Path.GetDirectoryName(target)!);
         var installed = GeneratedContentInstaller.InstallBytes(output, relative, iso.ReadFile(file));
+        if (installed.Changed) changedFiles++;
         target = installed.Path;
         entries.Add(NewEntry(file.Path, relative, Kind(file.Path), target));
+        ReportProgress(entries, changedFiles, file.Path);
         if (DynamixArchive.HasContainerExtension(file.Path))
-            InstallDecodedEntries(new DynamixArchive(target), file.Path, output, entries);
+            changedFiles += InstallDecodedEntries(new DynamixArchive(target), file.Path, output, entries, changedFiles);
     }
 }
 
 var archiveRelative = Path.Combine("Archives", "C1086.GOB");
 var archiveTarget = ResourcePaths.SafeTarget(output, archiveRelative);
 Directory.CreateDirectory(Path.GetDirectoryName(archiveTarget)!);
-archiveTarget = GeneratedContentInstaller.InstallFile(output, archiveRelative, gobPath).Path;
+var installedArchive = GeneratedContentInstaller.InstallFile(output, archiveRelative, gobPath);
+if (installedArchive.Changed) changedFiles++;
+archiveTarget = installedArchive.Path;
 entries.Add(NewEntry("C1086.GOB", archiveRelative, "archive", archiveTarget));
-InstallDecodedEntries(new DynamixArchive(archiveTarget), "C1086.GOB", output, entries);
+ReportProgress(entries, changedFiles, "C1086.GOB");
+changedFiles += InstallDecodedEntries(new DynamixArchive(archiveTarget), "C1086.GOB", output, entries, changedFiles);
 
 var tracks = CueSheet.Tracks(cueLines);
 using (var source = File.Open(imagePath, FileMode.Open, FileAccess.Read, FileShare.Read))
@@ -62,12 +74,15 @@ for (var index = 0; index < tracks.Length; index++)
     var relative = Path.Combine("Audio", $"track{track.Number:00}.wav");
     var target = ResourcePaths.SafeTarget(output, relative);
     Directory.CreateDirectory(Path.GetDirectoryName(target)!);
-    target = GeneratedContentInstaller.InstallGenerated(output, relative,
-        wave => CddaWave.Write(source, wave, track.StartSector, endSector - track.StartSector)).Path;
+    var installedTrack = GeneratedContentInstaller.InstallGenerated(output, relative,
+        wave => CddaWave.Write(source, wave, track.StartSector, endSector - track.StartSector));
+    if (installedTrack.Changed) changedFiles++;
+    target = installedTrack.Path;
     entries.Add(NewEntry($"CDDA/TRACK{track.Number:00}", relative, "audio", target));
+    ReportProgress(entries, changedFiles, $"CDDA/TRACK{track.Number:00}");
 }
 
-var manifest = new ImportManifest(1, ResourceHash.Sha256(imagePath), entries.OrderBy(x => x.Id, StringComparer.OrdinalIgnoreCase).ToArray());
+var manifest = new ImportManifest(1, sourceImageHash, entries.OrderBy(x => x.Id, StringComparer.OrdinalIgnoreCase).ToArray());
 manifest.Write(Path.Combine(output, "manifest.json"));
 var verification = ImportManifestVerifier.Verify(output, manifest);
 if (!verification.IsValid)
@@ -77,7 +92,7 @@ if (!verification.IsValid)
     Console.Error.WriteLine($"Installation verification failed with {verification.Issues.Count} issue(s).");
     return 3;
 }
-Console.WriteLine($"{(operation == "--repair" ? "Repaired" : "Installed")} and verified {entries.Count} owned resources in {output}.");
+Console.WriteLine($"{(operation == "--repair" ? "Repaired" : "Installed")} and verified {entries.Count} owned resources in {output}: {changedFiles} written, {entries.Count - changedFiles} reused.");
 return 0;
 }
 
@@ -160,15 +175,26 @@ static string DecodedKind(string name, string path)
     return Kind(name);
 }
 
-static void InstallDecodedEntries(DynamixArchive archive, string archiveId, string output, List<ImportedAsset> entries)
+static int InstallDecodedEntries(DynamixArchive archive, string archiveId, string output, List<ImportedAsset> entries, int changedBefore)
 {
+    var changed = 0;
     foreach (var entry in archive.Entries.Where(DynamixArchive.CanDecode))
     {
         var folder = ResourcePaths.DecodedArchiveFolder(archiveId);
         var relative = Path.Combine("Decoded", folder, $"{entry.Index:0000}-{ResourcePaths.SafeName(entry.Name)}");
         var target = ResourcePaths.SafeTarget(output, relative);
         Directory.CreateDirectory(Path.GetDirectoryName(target)!);
-        target = GeneratedContentInstaller.InstallBytes(output, relative, archive.ReadDecoded(entry)).Path;
+        var installed = GeneratedContentInstaller.InstallBytes(output, relative, archive.ReadDecoded(entry));
+        if (installed.Changed) changed++;
+        target = installed.Path;
         entries.Add(NewEntry($"{archiveId}#{entry.Index}:{entry.Name}", relative, DecodedKind(entry.Name, target), target));
+        ReportProgress(entries, changedBefore + changed, $"{archiveId}#{entry.Index}:{entry.Name}");
     }
+    return changed;
+}
+
+static void ReportProgress(List<ImportedAsset> entries, int changed, string current)
+{
+    if (entries.Count != 1 && entries.Count % 500 != 0) return;
+    Console.WriteLine($"Processed {entries.Count}: {changed} written, {entries.Count - changed} reused; current {current}");
 }

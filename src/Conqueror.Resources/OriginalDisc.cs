@@ -9,6 +9,15 @@ namespace Conqueror.Resources;
 public sealed record CueTrack(int Number, string Mode, int StartSector);
 public sealed record IsoFile(string Path, uint Extent, uint Size);
 public sealed record ImportedAsset(string Id, string Path, string Kind, long Size, string Sha256);
+
+public static class SupportedOriginalReleases
+{
+    public const string GogEnglishSourceImageSha256 = "8a584cc03a0a19f74851d2c1f4653804a58bfbf2c16e4fd34759f7a7f88cf015";
+
+    public static string? NameForSourceImage(string sha256) => sha256.Equals(
+        GogEnglishSourceImageSha256, StringComparison.OrdinalIgnoreCase) ? "GOG English release" : null;
+}
+
 public sealed record ImportManifest(int Version, string SourceImageSha256, ImportedAsset[] Assets)
 {
     public static ImportManifest Read(string path) => JsonSerializer.Deserialize<ImportManifest>(File.ReadAllText(path))

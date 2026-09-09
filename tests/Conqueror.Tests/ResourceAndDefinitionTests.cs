@@ -1238,6 +1238,14 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void SupportedOriginalReleaseIsIdentifiedByExactSourceImageHash()
+    {
+        Assert.Equal("GOG English release", SupportedOriginalReleases.NameForSourceImage(
+            SupportedOriginalReleases.GogEnglishSourceImageSha256.ToUpperInvariant()));
+        Assert.Null(SupportedOriginalReleases.NameForSourceImage(new string('0', 64)));
+    }
+
+    [Fact]
     public void DilemmaTextIsParsedIntoDataDrivenChoicesAndOutcomes()
     {
         var dilemma = DilemmaTextDecoder.Decode(System.Text.Encoding.ASCII.GetBytes(SyntheticDilemma()));
