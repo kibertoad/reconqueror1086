@@ -31,6 +31,7 @@ Check(Balance.Strategy == new StrategicDefinition(80, 98, 9), "strategic warfare
 Check(Balance.TournamentOpponents.Length == 5 && Balance.TournamentOpponents.All(x => x.Wager is >= 20 and <= 80 && x.Swordsmen + x.Halberdiers + x.Knights == 8), "tournament opponent definitions valid");
 Check(ImportedArt.Definitions.Select(x => x.Role).Distinct(StringComparer.OrdinalIgnoreCase).Count() == ImportedArt.Definitions.Count, "imported art roles are unique definitions");
 Check(ImportedArt.Definitions.Any(x => x is { Role: "Campaign.Briefing", IdSuffix: ":fluff.pcx" }), "campaign briefing uses the screenshot-confirmed FLUFF resource");
+Check(ImportedArt.Definitions.Any(x => x is { Role: "Village.Inn", IdSuffix: ":innpeopl.pcx" }), "inn uses the screenshot-confirmed INNPEOPL resource");
 Check(ImportedAnimations.Definitions.Any(x => x is { Role: "Interface.Cursor", IdSuffix: ":ffmouse.csf" }), "original cursor role is definition driven");
 Check(ImportedMovies.Definitions.Any(x => x is { Role: "Title.Intro", IdSuffix: "/title.smk" }), "original title movie role uses the disc-file identifier shape");
 Check(ImportedMovies.Definitions.Any(x => x is { Role: "Options.Credits", IdSuffix: "/creditzz.smk" }), "original credits movie role is definition driven");
@@ -43,6 +44,7 @@ Check(FarmPresentationDefinitions.Layouts.All(x => x.Okay.Width > 0 && x.Cancel.
 Check(FarmPresentationDefinitions.EntriesFor(FarmPresentationDefinitions.Section.Farm).Count == Enum.GetValues<CropType>().Length, "farm management rows match the executable label table");
 Check(Enum.GetValues<FarmPresentationDefinitions.Section>().Select(section => FarmPresentationDefinitions.EntriesFor(section).Count).SequenceEqual([17, 17, 4, 7]), "fief-management label catalogs have recovered section sizes");
 Check(BlacksmithPresentationDefinitions.Hotspots.All(x => !string.IsNullOrWhiteSpace(x.HoverLabel)), "confirmed visual scene hotspots define hover labels");
+Check(InnPresentationDefinitions.Fallback.Patrons.Count == InnPresentationDefinitions.PatronCount && InnPresentationDefinitions.Fallback.Patrons.Select(x => x.HatRegionId).Distinct().Count() == InnPresentationDefinitions.PatronCount, "inn patron hotspots are bounded unique definitions");
 Check(HomePresentationDefinitions.Hotspots.Select(x => x.Action).SequenceEqual([SceneNavigationAction.Overview, SceneNavigationAction.Castle, SceneNavigationAction.Farm, SceneNavigationAction.Village, SceneNavigationAction.Forest, SceneNavigationAction.WarPlanning, SceneNavigationAction.Exit, SceneNavigationAction.Jump, SceneNavigationAction.Map, SceneNavigationAction.Orders]), "executable-ordered Home hotspots are definition driven");
 Check(WarPlanningPresentationDefinitions.ArmyFrame(4, false, false) == 14 && WarPlanningPresentationDefinitions.SendSpyUnavailableFrame == 21, "War Planning control frames match the decoded CSF sequence");
 Check(CharacterCreationDefinitions.Options.Select(x => x.Action).Distinct().Count() == Enum.GetValues<CharacterCreationAction>().Length, "character option actions are unique definitions");

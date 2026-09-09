@@ -29,6 +29,7 @@ public static class ImportedArt
         new("Home.Overview", "image", ":f_over.pcx"),
         new("Home.WarPlanning", "image", ":warplan.pcx"),
         new("Farm.Management", "image", ":fiefmgmt.pcx"),
+        new("Village.Inn", "image", ":innpeopl.pcx"),
         new("Blacksmith.Workshop", "image", ":forgesmi.pcx"),
         new("Blacksmith.Dialogue", "image", ":comscrn1.pcx"),
         new("Blacksmith.Portrait", "image", ":blacksmi.pcc"),
@@ -50,6 +51,7 @@ public static class ImportedLayouts
         new("Home.Office", ":fopts.hat"),
         new("Home.Overview", ":foview.hat"),
         new("Home.WarPlanning", ":fwarplan.hat"),
+        new("Village.Inn", ":vinn.hat"),
         .. FarmPresentationDefinitions.Layouts.Select(layout =>
             new ImportedLayoutDefinition(layout.LayoutRole, layout.LayoutSuffix)),
         new("Blacksmith.Workshop", ":vsmith.hat")

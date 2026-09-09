@@ -226,6 +226,7 @@ public sealed class ResourceAndDefinitionTests
         Assert.Contains(ImportedArt.Definitions, x => x is { Role: "Character.Options", IdSuffix: ":char_ops.pcx" });
         Assert.Contains(ImportedArt.Definitions, x => x is { Role: "Character.Pregenerated", IdSuffix: ":pregen.pcx" });
         Assert.Contains(ImportedArt.Definitions, x => x is { Role: "Campaign.Briefing", IdSuffix: ":fluff.pcx" });
+        Assert.Contains(ImportedArt.Definitions, x => x is { Role: "Village.Inn", IdSuffix: ":innpeopl.pcx" });
         Assert.Contains(ImportedArt.Definitions, x => x is { Role: "Load.Background", IdSuffix: ":loadgame.pcx" });
         Assert.Contains(ImportedArt.Definitions, x => x is { Role: "Map.England", IdSuffix: ":engmap1.pcx" });
         Assert.Equal(ImportedArt.Definitions.Count, ImportedArt.Definitions.Select(x => x.Role).Distinct(StringComparer.OrdinalIgnoreCase).Count());
@@ -706,6 +707,30 @@ public sealed class ResourceAndDefinitionTests
              (SceneNavigationAction.Village, 3, new UiBounds(70, 103, 14, 24)),
              (SceneNavigationAction.Forest, 4, new UiBounds(90, 104, 15, 25))],
             books.Select(book => (book.Action, book.HatRegionId, book.Bounds)));
+    }
+
+    [Fact]
+    public void InnPatronHotspotsAndFooterComeFromTheOriginalDescriptor()
+    {
+        var bytes = new byte[40 + 12 * 24];
+        WriteInt(bytes, 12, 640); WriteInt(bytes, 16, 480); WriteInt(bytes, 20, 12);
+        for (var id = 0; id < 12; id++)
+        {
+            var offset = 40 + id * 24;
+            WriteInt(bytes, offset, id);
+            WriteInt(bytes, offset + 4, 5 + id * 10);
+            WriteInt(bytes, offset + 8, 20 + id);
+            WriteInt(bytes, offset + 12, 30 + id);
+            WriteInt(bytes, offset + 16, 40 + id);
+            WriteInt(bytes, offset + 20, 1);
+        }
+
+        var layout = InnPresentationDefinitions.From(new HatLayout(bytes));
+
+        Assert.Equal(InnPresentationDefinitions.PatronCount, layout.Patrons.Count);
+        Assert.Equal(Enumerable.Range(0, 10), layout.Patrons.Select(patron => patron.HatRegionId));
+        Assert.Equal(new UiBounds(75, 27, 37, 47), layout.Patrons[7].Bounds);
+        Assert.Equal(new UiBounds(105, 30, 40, 50), layout.HoverLabelBounds);
     }
 
     [Fact]
