@@ -523,6 +523,23 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void PracticeCombatAdaptersCreateIsolatedRepeatableSessions()
+    {
+        var war = PracticeCombatDefinitions.CreateWar(seed: 7);
+        Assert.Equal(32, war.Friendly.Sum(squad => squad.Count));
+        Assert.Equal(32, war.Enemy.Sum(squad => squad.Count));
+        Assert.Equal(3, war.Friendly.Count());
+        Assert.Equal(3, war.Enemy.Count());
+
+        var melee = PracticeCombatDefinitions.CreateMelee(seed: 7);
+        var castle = PracticeCombatDefinitions.CreateCastleSkirmish(seed: 7);
+        Assert.Equal(7, melee.Enemies.Count);
+        Assert.Equal(11, castle.Enemies.Count);
+        Assert.NotSame(melee, PracticeCombatDefinitions.CreateMelee(seed: 7));
+        Assert.NotSame(castle, PracticeCombatDefinitions.CreateCastleSkirmish(seed: 7));
+    }
+
+    [Fact]
     public void LocationScreenRolesAndShopControlsAreDataDriven()
     {
         var roles = ImportedArt.Definitions.ToDictionary(definition => definition.Role);

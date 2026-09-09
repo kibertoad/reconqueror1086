@@ -59,6 +59,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private SiegeSession? _siege;
     private bool _showRadar = true;
     private FieldBattleSession? _fieldBattle;
+    private PracticeCombatKind? _activePracticeCombat;
     private UnitType _selectedUnit = UnitType.Swordsmen;
     private double _battleTick;
     private string _notice = "";
@@ -256,6 +257,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             else if (_screen == Screen.InnDialogue) _screen = Screen.Inn;
             else if (_screen == Screen.BlacksmithDialogue) _screen = Screen.Blacksmith;
             else if (_screen == Screen.Shop) _screen = Screen.Blacksmith;
+            else if (_screen == Screen.FieldBattle && _activePracticeCombat is not null) FinishPracticeCombat("PRACTICE ENDED");
+            else if (_screen == Screen.Siege && _activePracticeCombat is not null) FinishPracticeCombat("PRACTICE ENDED");
             else if (_screen == Screen.FieldBattle && _fieldBattle is not null) { _fieldBattle.IssueAll(UnitOrder.Withdraw); _notice = "WITHDRAWAL ORDERED"; }
             else { if (_screen == Screen.Siege && _siege is not null) _campaign.FinishSiege(_siege); _screen = Screen.Map; }
         }
@@ -425,9 +428,25 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         {
             case PracticeAction.Joust: PlayEventMovie("Practice.Joust", Screen.Practice); break;
             case PracticeAction.Exit: _screen = Screen.OptionsHub; break;
-            case PracticeAction.War: _notice = "WAR PRACTICE ENGINE IS NOT YET REIMPLEMENTED"; break;
-            case PracticeAction.Melee: _notice = "MELEE PRACTICE ENGINE IS NOT YET REIMPLEMENTED"; break;
-            case PracticeAction.CastleSkirmish: _notice = "CASTLE SKIRMISH ENGINE IS NOT YET REIMPLEMENTED"; break;
+            case PracticeAction.War:
+                _activePracticeCombat = PracticeCombatKind.War;
+                _fieldBattle = PracticeCombatDefinitions.CreateWar(Environment.TickCount);
+                _battleTick = 0;
+                _screen = Screen.FieldBattle;
+                _notice = "WAR PRACTICE";
+                break;
+            case PracticeAction.Melee:
+                _activePracticeCombat = PracticeCombatKind.Melee;
+                _siege = PracticeCombatDefinitions.CreateMelee(Environment.TickCount);
+                _screen = Screen.Siege;
+                _notice = "MELEE PRACTICE";
+                break;
+            case PracticeAction.CastleSkirmish:
+                _activePracticeCombat = PracticeCombatKind.CastleSkirmish;
+                _siege = PracticeCombatDefinitions.CreateCastleSkirmish(Environment.TickCount);
+                _screen = Screen.Siege;
+                _notice = "CASTLE SKIRMISH PRACTICE";
+                break;
             default: throw new ArgumentOutOfRangeException();
         }
     }
@@ -1072,7 +1091,12 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void UpdateSiege(Func<Keys, bool> press)
     {
-        if (_siege is null) { _screen = Screen.Map; return; }
+        if (_siege is null)
+        {
+            _screen = _activePracticeCombat is null ? Screen.Map : Screen.Practice;
+            _activePracticeCombat = null;
+            return;
+        }
         if (press(Keys.W)) _siege.Move(true); if (press(Keys.S)) _siege.Move(false);
         if (press(Keys.A)) _siege.TurnLeft(); if (press(Keys.D)) _siege.TurnRight();
         if (press(Keys.E)) _siege.Interact(); if (press(Keys.Space)) _siege.Attack(); if (press(Keys.X)) _siege.Shoot();
@@ -1080,15 +1104,29 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _notice = _siege.LastMessage;
         if (press(Keys.R))
         {
+            if (_activePracticeCombat is not null) { FinishPracticeCombat("PRACTICE ENDED"); return; }
             _campaign.FinishSiege(_siege); var lost = _campaign.Retreat(); _siege = null; _screen = Screen.Map; _notice = $"RETREATED - {lost} SOLDIERS LOST"; return;
         }
-        if (_siege.Won) { _campaign.FinishSiege(_siege); _siege = null; _screen = Screen.Map; _notice = "THE CASTLE IS YOURS"; }
-        else if (_siege.Defeated) { _campaign.FinishSiege(_siege); _siege = null; _screen = Screen.Map; _notice = "YOU ARE CARRIED FROM THE CASTLE"; }
+        if (_siege.Won)
+        {
+            if (_activePracticeCombat is not null) FinishPracticeCombat("PRACTICE WON");
+            else { _campaign.FinishSiege(_siege); _siege = null; _screen = Screen.Map; _notice = "THE CASTLE IS YOURS"; }
+        }
+        else if (_siege.Defeated)
+        {
+            if (_activePracticeCombat is not null) FinishPracticeCombat("PRACTICE LOST");
+            else { _campaign.FinishSiege(_siege); _siege = null; _screen = Screen.Map; _notice = "YOU ARE CARRIED FROM THE CASTLE"; }
+        }
     }
 
     private void UpdateFieldBattle(Func<Keys, bool> press, GameTime gameTime)
     {
-        if (_fieldBattle is null) { _screen = Screen.Map; return; }
+        if (_fieldBattle is null)
+        {
+            _screen = _activePracticeCombat is null ? Screen.Map : Screen.Practice;
+            _activePracticeCombat = null;
+            return;
+        }
         if (press(Keys.D1)) _selectedUnit = UnitType.Swordsmen; if (press(Keys.D2)) _selectedUnit = UnitType.Halberdiers; if (press(Keys.D3)) _selectedUnit = UnitType.Knights;
         if (press(Keys.H)) _fieldBattle.Issue(_selectedUnit, UnitOrder.Hold);
         if (press(Keys.A)) _fieldBattle.Issue(_selectedUnit, UnitOrder.Advance);
@@ -1102,8 +1140,23 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _notice = _fieldBattle.LastMessage;
         if (_fieldBattle.Outcome != FieldBattleOutcome.InProgress)
         {
+            if (_activePracticeCombat is not null)
+            {
+                var result = _fieldBattle.Outcome;
+                FinishPracticeCombat($"WAR PRACTICE: {result}".ToUpperInvariant());
+                return;
+            }
             var outcome = _campaign.FinishFieldBattle(_fieldBattle); _fieldBattle = null; _screen = Screen.Map; _notice = $"FIELD BATTLE: {outcome}";
         }
+    }
+
+    private void FinishPracticeCombat(string notice)
+    {
+        _fieldBattle = null;
+        _siege = null;
+        _activePracticeCombat = null;
+        _screen = Screen.Practice;
+        _notice = notice;
     }
 
     protected override void Draw(GameTime gameTime)

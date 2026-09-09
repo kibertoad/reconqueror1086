@@ -564,7 +564,7 @@ Local static-analysis tool: Ghidra 12.1.3 is installed user-wide at `C:\Users\ki
 - [x] Decode and classify all 26 `.666` sound banks with bounded length/rate validation; the ignored population report accounts for 102 samples and zero rejects.
 - [x] Confirm unsigned 8-bit mono PCM from waveform centering, identify the identical shared UI sample across 17 screen banks, and activate it through a startup cache that decodes each referenced bank and converts each registered sample only once.
 - [x] Decode and classify all six `FFMOUSE.CSF` cursor frames, activate contextual travel/talk/target/pressed-hand selection, and use the decoded `OPTION.CSF` held states with same-region press/release activation.
-- [x] Activate the original `PRACTICE.PCX`/`PRACTICE.HAT` menu, preserve its executable-ordered War/Joust/Melee/Exit/Castle Skirmish labels, and bind the directly decoded `JOUSPRAC.SMK`; the three legacy gameplay engines remain to be reimplemented.
+- [x] Activate the original `PRACTICE.PCX`/`PRACTICE.HAT` menu, preserve its executable-ordered War/Joust/Melee/Exit/Castle Skirmish labels, bind the directly decoded `JOUSPRAC.SMK`, and route War versus Melee/Castle Skirmish into isolated non-campaign tactical versus first-person practice sessions. Exact legacy combat presentation and parameters remain provisional.
 - [ ] Trace the complete startup/menu state machine, input timing, cursor behavior, and region-action dispatch from `CONQUER.EXE`; keep semantics corroborated until each executable branch is confirmed.
 
 The resource-decoding sprint is first because it unlocks exact dialogue, screen mappings, opponent identities, construction data, and balance tables needed by most later phases.
