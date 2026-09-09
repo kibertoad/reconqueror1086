@@ -96,10 +96,23 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private bool _speechEnabled = true;
     private bool _animationEnabled = true;
     private readonly CampaignSaveSlots _saveSlots = new(Path.Combine(AppContext.BaseDirectory, "saves"));
+    private readonly GameSettingsStore _settingsStore = new(Path.Combine(AppContext.BaseDirectory, "settings.json"));
+    private GameSettings _settings = new();
 
     public ConquerorGame()
     {
-        _graphics = new GraphicsDeviceManager(this) { PreferredBackBufferWidth = 1024, PreferredBackBufferHeight = 768 };
+        _settings = _settingsStore.Load();
+        _cdMusicEnabled = _settings.CdMusic;
+        _soundEffectsEnabled = _settings.SoundEffects;
+        _speechEnabled = _settings.Speech;
+        _animationEnabled = _settings.Animation;
+        _graphics = new GraphicsDeviceManager(this)
+        {
+            PreferredBackBufferWidth = 1024,
+            PreferredBackBufferHeight = 768,
+            HardwareModeSwitch = false,
+            IsFullScreen = _settings.Fullscreen
+        };
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
         Window.Title = "Conqueror: A.D. 1086 - MonoGame Reimplementation";
@@ -226,8 +239,9 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         var click = mouse.LeftButton == ButtonState.Pressed && _lastMouse.LeftButton == ButtonState.Released;
         var release = mouse.LeftButton == ButtonState.Released && _lastMouse.LeftButton == ButtonState.Pressed;
         var rightClick = mouse.RightButton == ButtonState.Pressed && _lastMouse.RightButton == ButtonState.Released;
+        if (Press(Keys.F11)) ToggleFullscreen();
         if (click && _soundEffectsEnabled) PlayOriginalSound("Interface.Activate");
-        var pressAny = keys.GetPressedKeys().Any(key => key != Keys.Escape && !_last.IsKeyDown(key));
+        var pressAny = keys.GetPressedKeys().Any(key => key is not Keys.Escape and not Keys.F11 && !_last.IsKeyDown(key));
         if (Press(Keys.F5) && _screen is Screen.Farm or Screen.WarPlanning)
         {
             _notice = "CONFIRM OR CANCEL PENDING MANAGEMENT CHANGES BEFORE SAVING";
@@ -372,18 +386,22 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                 if (_cdMusicEnabled) StartMusic();
                 else if (_musicInstance?.State == SoundState.Playing) _musicInstance.Pause();
                 _notice = $"CD MUSIC {OnOff(_cdMusicEnabled)}";
+                SaveSettings();
                 break;
             case OptionsHubAction.ToggleSoundEffects:
                 _soundEffectsEnabled = !_soundEffectsEnabled;
                 _notice = $"SOUND EFFECTS {OnOff(_soundEffectsEnabled)}";
+                SaveSettings();
                 break;
             case OptionsHubAction.ToggleSpeech:
                 _speechEnabled = !_speechEnabled;
                 _notice = $"DIGITIZED SPEECH {OnOff(_speechEnabled)}";
+                SaveSettings();
                 break;
             case OptionsHubAction.ToggleAnimation:
                 _animationEnabled = !_animationEnabled;
                 _notice = $"ANIMATION {OnOff(_animationEnabled)}";
+                SaveSettings();
                 break;
             case OptionsHubAction.ToggleMidiMusic: _notice = "MIDI MUSIC IS NOT AVAILABLE"; break;
             case OptionsHubAction.Practice:
@@ -455,6 +473,26 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         && _campaign.State.Player.Age < Balance.StartingAge ? Screen.Dilemma : Screen.Map;
 
     private static string OnOff(bool enabled) => enabled ? "ON" : "OFF";
+
+    private void ToggleFullscreen()
+    {
+        _graphics.ToggleFullScreen();
+        _notice = _graphics.IsFullScreen ? "FULLSCREEN" : "WINDOWED";
+        SaveSettings();
+    }
+
+    private void SaveSettings()
+    {
+        _settings = _settings with
+        {
+            CdMusic = _cdMusicEnabled,
+            SoundEffects = _soundEffectsEnabled,
+            Speech = _speechEnabled,
+            Animation = _animationEnabled,
+            Fullscreen = _graphics.IsFullScreen
+        };
+        _settingsStore.Save(_settings);
+    }
 
     private void UpdateLoadGame(Func<Keys, bool> press, MouseState mouse, bool click)
     {

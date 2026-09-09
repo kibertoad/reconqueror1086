@@ -1273,6 +1273,37 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void GameSettingsPersistAndRecoverThePreviousValidGeneration()
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"conqueror-settings-{Guid.NewGuid():N}");
+        try
+        {
+            var path = Path.Combine(root, "settings.json");
+            var store = new GameSettingsStore(path);
+            Assert.Equal(new GameSettings(), store.Load());
+
+            var first = new GameSettings(CdMusic: false, SoundEffects: true, Speech: false,
+                Animation: true, Fullscreen: true);
+            store.Save(first);
+            Assert.Equal(first, store.Load());
+            var second = first with { SoundEffects = false, Fullscreen = false };
+            store.Save(second);
+            Assert.True(File.Exists(store.BackupPath));
+            Assert.Equal(second, store.Load());
+
+            File.WriteAllText(path, "corrupt");
+            Assert.Equal(first, store.Load());
+            File.WriteAllText(store.BackupPath, "corrupt too");
+            Assert.Equal(new GameSettings(), store.Load());
+            Assert.Throws<InvalidDataException>(() => store.Save(first with { Version = 2 }));
+        }
+        finally
+        {
+            if (Directory.Exists(root)) Directory.Delete(root, true);
+        }
+    }
+
+    [Fact]
     public void DilemmaTextIsParsedIntoDataDrivenChoicesAndOutcomes()
     {
         var dilemma = DilemmaTextDecoder.Decode(System.Text.Encoding.ASCII.GetBytes(SyntheticDilemma()));
