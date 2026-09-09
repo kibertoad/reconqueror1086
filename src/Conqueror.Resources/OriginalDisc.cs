@@ -14,7 +14,142 @@ public sealed record ImportManifest(int Version, string SourceImageSha256, Impor
     public static ImportManifest Read(string path) => JsonSerializer.Deserialize<ImportManifest>(File.ReadAllText(path))
         ?? throw new InvalidDataException("Invalid imported-content manifest.");
 
-    public void Write(string path) => File.WriteAllText(path, JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true }));
+    public void Write(string path) => AtomicFile.WriteAllText(path,
+        JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true }));
+}
+
+public sealed record InstalledFile(string Path, long Size, string Sha256, bool Changed);
+
+public static class GeneratedContentInstaller
+{
+    public static InstalledFile InstallBytes(string root, string relative, ReadOnlySpan<byte> bytes)
+    {
+        var target = ResourcePaths.SafeTarget(root, relative);
+        var hash = ResourceHash.Sha256(bytes);
+        if (Matches(target, bytes.Length, hash)) return new(target, bytes.Length, hash, false);
+        AtomicFile.WriteBytes(target, bytes);
+        return new(target, bytes.Length, hash, true);
+    }
+
+    public static InstalledFile InstallFile(string root, string relative, string source)
+    {
+        var target = ResourcePaths.SafeTarget(root, relative);
+        var info = new FileInfo(source);
+        var hash = ResourceHash.Sha256(source);
+        if (Matches(target, info.Length, hash)) return new(target, info.Length, hash, false);
+        AtomicFile.Copy(source, target);
+        return new(target, info.Length, hash, true);
+    }
+
+    public static InstalledFile InstallGenerated(string root, string relative, Action<Stream> write)
+    {
+        ArgumentNullException.ThrowIfNull(write);
+        var target = ResourcePaths.SafeTarget(root, relative);
+        Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+        var temporary = AtomicFile.TemporaryPath(target);
+        try
+        {
+            using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None,
+                       128 * 1024, FileOptions.WriteThrough))
+            {
+                write(stream);
+                stream.Flush(flushToDisk: true);
+            }
+            var info = new FileInfo(temporary);
+            var hash = ResourceHash.Sha256(temporary);
+            if (Matches(target, info.Length, hash)) return new(target, info.Length, hash, false);
+            File.Move(temporary, target, overwrite: true);
+            return new(target, info.Length, hash, true);
+        }
+        finally
+        {
+            if (File.Exists(temporary)) File.Delete(temporary);
+        }
+    }
+
+    private static bool Matches(string path, long size, string hash) => File.Exists(path)
+        && new FileInfo(path).Length == size
+        && ResourceHash.Sha256(path).Equals(hash, StringComparison.OrdinalIgnoreCase);
+}
+
+public static class ImportedContentUninstaller
+{
+    public static int Remove(string root, ImportManifest manifest)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(root);
+        ArgumentNullException.ThrowIfNull(manifest);
+        var fullRoot = Path.GetFullPath(root);
+        var targets = (manifest.Assets ?? []).Select(asset => asset?.Path
+                ?? throw new InvalidDataException("Manifest contains a null asset record."))
+            .Select(relative => Path.IsPathFullyQualified(relative)
+                ? throw new InvalidDataException("Manifest contains an absolute asset path.")
+                : ResourcePaths.SafeTarget(fullRoot, relative))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        var removed = 0;
+        foreach (var target in targets)
+            if (File.Exists(target))
+            {
+                File.Delete(target);
+                removed++;
+            }
+        var manifestPath = ResourcePaths.SafeTarget(fullRoot, "manifest.json");
+        if (File.Exists(manifestPath)) File.Delete(manifestPath);
+        if (Directory.Exists(fullRoot))
+            foreach (var directory in Directory.EnumerateDirectories(fullRoot, "*", SearchOption.AllDirectories)
+                         .OrderByDescending(path => path.Length))
+                if (!Directory.EnumerateFileSystemEntries(directory).Any()) Directory.Delete(directory);
+        return removed;
+    }
+}
+
+public static class AtomicFile
+{
+    public static void WriteAllText(string path, string contents) => WriteBytes(path,
+        new UTF8Encoding(encoderShouldEmitUTF8Identifier: false).GetBytes(contents));
+
+    public static void WriteBytes(string path, ReadOnlySpan<byte> contents)
+    {
+        var fullPath = Path.GetFullPath(path);
+        Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+        var temporary = TemporaryPath(fullPath);
+        try
+        {
+            using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None,
+                       128 * 1024, FileOptions.WriteThrough))
+            {
+                stream.Write(contents);
+                stream.Flush(flushToDisk: true);
+            }
+            File.Move(temporary, fullPath, overwrite: true);
+        }
+        finally
+        {
+            if (File.Exists(temporary)) File.Delete(temporary);
+        }
+    }
+
+    public static void Copy(string source, string destination)
+    {
+        var fullPath = Path.GetFullPath(destination);
+        Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+        var temporary = TemporaryPath(fullPath);
+        try
+        {
+            File.Copy(source, temporary, overwrite: false);
+            using (var stream = File.Open(temporary, FileMode.Open, FileAccess.Write, FileShare.None))
+                stream.Flush(flushToDisk: true);
+            File.Move(temporary, fullPath, overwrite: true);
+        }
+        finally
+        {
+            if (File.Exists(temporary)) File.Delete(temporary);
+        }
+    }
+
+    internal static string TemporaryPath(string destination) => Path.Combine(
+        Path.GetDirectoryName(Path.GetFullPath(destination))!, $".{Path.GetFileName(destination)}.{Guid.NewGuid():N}.tmp");
 }
 
 public sealed record ImportVerificationIssue(string AssetId, string Path, string Reason);
@@ -111,6 +246,7 @@ public static class ResourcePaths
 public static class ResourceHash
 {
     public static string Sha256(string path) { using var stream = File.OpenRead(path); return Convert.ToHexString(SHA256.HashData(stream)).ToLowerInvariant(); }
+    public static string Sha256(ReadOnlySpan<byte> bytes) => Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
 }
 
 public static class CueSheet

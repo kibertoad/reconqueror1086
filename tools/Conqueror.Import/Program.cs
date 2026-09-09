@@ -8,6 +8,11 @@ if (operation == "--verify")
     var verifyRoot = args.Length > 1 ? Path.GetFullPath(args[1]) : Path.GetFullPath("UserContent");
     return VerifyInstalledContent(verifyRoot);
 }
+if (operation == "--uninstall")
+{
+    var uninstallRoot = args.Length > 1 ? Path.GetFullPath(args[1]) : Path.GetFullPath("UserContent");
+    return UninstallContent(uninstallRoot);
+}
 var positionalOffset = operation == "--repair" ? 1 : 0;
 var install = args.Length > positionalOffset ? Path.GetFullPath(args[positionalOffset]) : @"C:\GOG Games\Conqueror AD1086";
 var output = args.Length > positionalOffset + 1 ? Path.GetFullPath(args[positionalOffset + 1]) : Path.GetFullPath("UserContent");
@@ -32,7 +37,8 @@ using (var image = new RawMode1Image(imagePath, CueSheet.DataTrackSectors(cueLin
         var relative = Path.Combine("Raw", string.Join(Path.DirectorySeparatorChar, file.Path.Split('/').Select(ResourcePaths.SafeName)));
         var target = ResourcePaths.SafeTarget(output, relative);
         Directory.CreateDirectory(Path.GetDirectoryName(target)!);
-        File.WriteAllBytes(target, iso.ReadFile(file));
+        var installed = GeneratedContentInstaller.InstallBytes(output, relative, iso.ReadFile(file));
+        target = installed.Path;
         entries.Add(NewEntry(file.Path, relative, Kind(file.Path), target));
         if (DynamixArchive.HasContainerExtension(file.Path))
             InstallDecodedEntries(new DynamixArchive(target), file.Path, output, entries);
@@ -42,7 +48,7 @@ using (var image = new RawMode1Image(imagePath, CueSheet.DataTrackSectors(cueLin
 var archiveRelative = Path.Combine("Archives", "C1086.GOB");
 var archiveTarget = ResourcePaths.SafeTarget(output, archiveRelative);
 Directory.CreateDirectory(Path.GetDirectoryName(archiveTarget)!);
-File.Copy(gobPath, archiveTarget, true);
+archiveTarget = GeneratedContentInstaller.InstallFile(output, archiveRelative, gobPath).Path;
 entries.Add(NewEntry("C1086.GOB", archiveRelative, "archive", archiveTarget));
 InstallDecodedEntries(new DynamixArchive(archiveTarget), "C1086.GOB", output, entries);
 
@@ -56,8 +62,8 @@ for (var index = 0; index < tracks.Length; index++)
     var relative = Path.Combine("Audio", $"track{track.Number:00}.wav");
     var target = ResourcePaths.SafeTarget(output, relative);
     Directory.CreateDirectory(Path.GetDirectoryName(target)!);
-    using (var wave = File.Create(target))
-        CddaWave.Write(source, wave, track.StartSector, endSector - track.StartSector);
+    target = GeneratedContentInstaller.InstallGenerated(output, relative,
+        wave => CddaWave.Write(source, wave, track.StartSector, endSector - track.StartSector)).Path;
     entries.Add(NewEntry($"CDDA/TRACK{track.Number:00}", relative, "audio", target));
 }
 
@@ -99,6 +105,20 @@ static int VerifyInstalledContent(string root)
         return 3;
     }
     Console.WriteLine($"Verified {result.CheckedAssets} imported assets in {root}.");
+    return 0;
+}
+
+static int UninstallContent(string root)
+{
+    var manifestPath = Path.Combine(root, "manifest.json");
+    if (!File.Exists(manifestPath))
+    {
+        Console.Error.WriteLine($"No imported-content manifest exists in {root}; nothing was removed.");
+        return 2;
+    }
+    var manifest = ImportManifest.Read(manifestPath);
+    var removed = ImportedContentUninstaller.Remove(root, manifest);
+    Console.WriteLine($"Removed {removed} manifest-owned files from {root}. Unlisted files were preserved.");
     return 0;
 }
 
@@ -148,7 +168,7 @@ static void InstallDecodedEntries(DynamixArchive archive, string archiveId, stri
         var relative = Path.Combine("Decoded", folder, $"{entry.Index:0000}-{ResourcePaths.SafeName(entry.Name)}");
         var target = ResourcePaths.SafeTarget(output, relative);
         Directory.CreateDirectory(Path.GetDirectoryName(target)!);
-        File.WriteAllBytes(target, archive.ReadDecoded(entry));
+        target = GeneratedContentInstaller.InstallBytes(output, relative, archive.ReadDecoded(entry)).Path;
         entries.Add(NewEntry($"{archiveId}#{entry.Index}:{entry.Name}", relative, DecodedKind(entry.Name, target), target));
     }
 }

@@ -1201,6 +1201,43 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void GeneratedContentInstallationIsAtomicIncrementalAndManifestScoped()
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"conqueror-install-{Guid.NewGuid():N}");
+        try
+        {
+            var relative = Path.Combine("Decoded", "fixture.bin");
+            var first = GeneratedContentInstaller.InstallBytes(root, relative, [1, 2, 3]);
+            Assert.True(first.Changed);
+            var unchanged = GeneratedContentInstaller.InstallBytes(root, relative, [1, 2, 3]);
+            Assert.False(unchanged.Changed);
+            var replaced = GeneratedContentInstaller.InstallGenerated(root, relative, stream => stream.Write([4, 5, 6, 7]));
+            Assert.True(replaced.Changed);
+            Assert.Equal([4, 5, 6, 7], File.ReadAllBytes(replaced.Path));
+            Assert.Empty(Directory.EnumerateFiles(Path.GetDirectoryName(replaced.Path)!, "*.tmp"));
+
+            var unlisted = Path.Combine(root, "keep.txt");
+            File.WriteAllText(unlisted, "mine");
+            var asset = new ImportedAsset("fixture", relative, "resource", replaced.Size, replaced.Sha256);
+            var manifest = new ImportManifest(1, new string('a', 64), [asset]);
+            manifest.Write(Path.Combine(root, "manifest.json"));
+
+            var unsafeManifest = manifest with { Assets = [asset, asset with { Id = "unsafe", Path = "../outside.bin" }] };
+            Assert.Throws<InvalidDataException>(() => ImportedContentUninstaller.Remove(root, unsafeManifest));
+            Assert.True(File.Exists(replaced.Path));
+
+            Assert.Equal(1, ImportedContentUninstaller.Remove(root, manifest));
+            Assert.False(File.Exists(replaced.Path));
+            Assert.False(File.Exists(Path.Combine(root, "manifest.json")));
+            Assert.True(File.Exists(unlisted));
+        }
+        finally
+        {
+            if (Directory.Exists(root)) Directory.Delete(root, true);
+        }
+    }
+
+    [Fact]
     public void DilemmaTextIsParsedIntoDataDrivenChoicesAndOutcomes()
     {
         var dilemma = DilemmaTextDecoder.Decode(System.Text.Encoding.ASCII.GetBytes(SyntheticDilemma()));
