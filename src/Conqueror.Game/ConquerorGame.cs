@@ -61,7 +61,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private YouthDilemmaResult? _youthDilemmaResult;
     private SoundEffect? _importedMusic;
     private SoundEffectInstance? _musicInstance;
-    private SoundEffect? _interfaceActivationSound;
+    private readonly Dictionary<string, SoundEffect> _originalSounds = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, Texture2D> _originalArt = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, byte[]> _originalPalettes = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, OriginalAnimation> _originalAnimations = new(StringComparer.OrdinalIgnoreCase);
@@ -146,12 +146,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             _originalAnimations.Add(definition.Role, new OriginalAnimation(frames));
         }
         IsMouseVisible = !_originalAnimations.ContainsKey(OriginalCursorRole);
-        var interfaceSound = ImportedSounds.Definitions.Single(sound => sound.Role == "Interface.Activate");
-        var interfaceSoundId = _importedContent?.FindId("sound-bank", interfaceSound.IdSuffix);
-        var interfaceBank = interfaceSoundId is null ? null : _importedContent?.DecodeSoundBank(interfaceSoundId);
-        if (interfaceBank?.Samples.ElementAtOrDefault(interfaceSound.SampleIndex) is { } interfaceSample)
-            _interfaceActivationSound = new SoundEffect(interfaceSample.ToPcm16LittleEndian(),
-                interfaceSample.SampleRate, AudioChannels.Mono);
+        LoadOriginalSounds();
         if (_importedContent?.Open("CDDA/TRACK02") is { } music)
         {
             using (music)
@@ -179,7 +174,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             foreach (var texture in animation.Frames) texture.Dispose();
         foreach (var animation in _dilemmaAnimations.Values.OfType<DilemmaAnimation>())
             foreach (var texture in animation.Frames) texture.Dispose();
-        _interfaceActivationSound?.Dispose();
+        DisposeOriginalSounds();
         _pixel.Dispose();
         _batch.Dispose();
         base.UnloadContent();
@@ -192,7 +187,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         var mouse = Mouse.GetState();
         bool Press(Keys key) => keys.IsKeyDown(key) && !_last.IsKeyDown(key);
         var click = mouse.LeftButton == ButtonState.Pressed && _lastMouse.LeftButton == ButtonState.Released;
-        if (click && _soundEffectsEnabled) _interfaceActivationSound?.Play();
+        if (click && _soundEffectsEnabled) PlayOriginalSound("Interface.Activate");
         var pressAny = keys.GetPressedKeys().Any(key => key != Keys.Escape && !_last.IsKeyDown(key));
         if (Press(Keys.F5) && _screen is not Screen.Title and not Screen.LoadGame)
         {
@@ -780,9 +775,37 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         {
             _musicInstance?.Dispose();
             _importedMusic?.Dispose();
-            _interfaceActivationSound?.Dispose();
+            DisposeOriginalSounds();
         }
         base.Dispose(disposing);
+    }
+
+    private void LoadOriginalSounds()
+    {
+        foreach (var bankDefinitions in ImportedSounds.Definitions.GroupBy(
+            sound => sound.IdSuffix, StringComparer.OrdinalIgnoreCase))
+        {
+            var bankId = _importedContent?.FindId("sound-bank", bankDefinitions.Key);
+            var bank = bankId is null ? null : _importedContent?.DecodeSoundBank(bankId);
+            if (bank is null) continue;
+            foreach (var definition in bankDefinitions)
+            {
+                if (bank.Samples.ElementAtOrDefault(definition.SampleIndex) is not { } sample) continue;
+                _originalSounds.Add(definition.Role, new SoundEffect(
+                    sample.ToPcm16LittleEndian(), sample.SampleRate, AudioChannels.Mono));
+            }
+        }
+    }
+
+    private void PlayOriginalSound(string role)
+    {
+        if (_originalSounds.TryGetValue(role, out var sound)) sound.Play();
+    }
+
+    private void DisposeOriginalSounds()
+    {
+        foreach (var sound in _originalSounds.Values) sound.Dispose();
+        _originalSounds.Clear();
     }
 
     private void DrawTitle()
