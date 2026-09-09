@@ -87,6 +87,39 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void SiegeWallDistanceUsesTheConfirmedDarkeningFamilyWithinBounds()
+    {
+        Assert.Equal(32, SiegeColorMapping.WallDistanceMap(0));
+        Assert.Equal(32, SiegeColorMapping.WallDistanceMap(0.999));
+        Assert.Equal(33, SiegeColorMapping.WallDistanceMap(1));
+        Assert.Equal(47, SiegeColorMapping.WallDistanceMap(15.9));
+        Assert.Equal(63, SiegeColorMapping.WallDistanceMap(31));
+        Assert.Equal(63, SiegeColorMapping.WallDistanceMap(10_000));
+        Assert.Throws<ArgumentOutOfRangeException>(() => SiegeColorMapping.WallDistanceMap(-0.1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => SiegeColorMapping.WallDistanceMap(double.NaN));
+    }
+
+    [Fact]
+    public void SceneColorMapsRemapRgbWithoutTurningMappedBlackTransparent()
+    {
+        var palette = new byte[IndexedPalette.ByteSize];
+        palette[3] = 10;
+        palette[4] = 11;
+        palette[5] = 12;
+        palette[6] = 20;
+        palette[7] = 21;
+        palette[8] = 22;
+        var colorMap = Enumerable.Range(0, DynamixSceneColorMaps.EntryCount).Select(value => (byte)value).ToArray();
+        colorMap[1] = 2;
+        colorMap[2] = 0;
+
+        var rgba = IndexedScenePixels.ToRgba([0, 1, 2], palette, colorMap: colorMap);
+
+        Assert.Equal([0, 0, 0, 0, 20, 21, 22, 255, 0, 0, 0, 255], rgba);
+        Assert.Throws<InvalidDataException>(() => IndexedScenePixels.ToRgba([1], palette, colorMap: new byte[255]));
+    }
+
+    [Fact]
     public void SceneDecoderReadsColumnMajorMapViewerAndNamedBlocks()
     {
         var source = SyntheticScene();

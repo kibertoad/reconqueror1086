@@ -13,16 +13,37 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private sealed record OriginalAnimation(IReadOnlyList<Texture2D> Frames);
     private sealed class SiegeVisuals(
         DynamixScene scene, int sourceOriginX, int sourceOriginY,
-        IReadOnlyDictionary<int, Texture2D> textures, Texture2D? backdrop) : IDisposable
+        IReadOnlyDictionary<int, Texture2D> textures,
+        IReadOnlyDictionary<int, DynamixSceneTexture> sources,
+        byte[] palette,
+        DynamixSceneColorMaps? colorMaps,
+        Texture2D? backdrop) : IDisposable
     {
+        private readonly Dictionary<(int Texture, int ColorMap), Texture2D> _mappedTextures = [];
         public DynamixScene Scene { get; } = scene;
         public int SourceOriginX { get; } = sourceOriginX;
         public int SourceOriginY { get; } = sourceOriginY;
         public IReadOnlyDictionary<int, Texture2D> Textures { get; } = textures;
         public Texture2D? Backdrop { get; } = backdrop;
+
+        public Texture2D? TextureFor(int textureIndex, int? colorMapIndex = null)
+        {
+            if (!Textures.TryGetValue(textureIndex, out var original)) return null;
+            if (colorMapIndex is null || colorMaps is null || !sources.TryGetValue(textureIndex, out var source))
+                return original;
+            var key = (textureIndex, colorMapIndex.Value);
+            if (_mappedTextures.TryGetValue(key, out var mapped)) return mapped;
+            mapped = new Texture2D(original.GraphicsDevice, source.Width, source.Height, false, SurfaceFormat.Color);
+            mapped.SetData(IndexedScenePixels.ToRgba(
+                source.Indices, palette, colorMap: colorMaps[colorMapIndex.Value].Span));
+            _mappedTextures.Add(key, mapped);
+            return mapped;
+        }
+
         public void Dispose()
         {
             foreach (var texture in Textures.Values) texture.Dispose();
+            foreach (var texture in _mappedTextures.Values) texture.Dispose();
             Backdrop?.Dispose();
         }
     }
@@ -2285,8 +2306,28 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         var palette = paletteId is null ? null : _importedContent.DecodePalette(paletteId);
         if (palette is null) return;
 
-        var required = imported.Scene.Blocks.SelectMany(block => block.TextureReferences())
-            .Where(index => index >= 0).ToHashSet();
+        var required = new HashSet<int>();
+        void Require(DynamixSceneBlock block)
+        {
+            foreach (var index in block.TextureReferences())
+                if (index >= 0) required.Add(index);
+        }
+
+        var layoutTiles = imported.Layout.CopyTiles();
+        for (var x = 0; x < layoutTiles.GetLength(0); x++)
+        for (var y = 0; y < layoutTiles.GetLength(1); y++)
+        {
+            var block = imported.Scene.BlockAt(x + imported.SourceOriginX, y + imported.SourceOriginY);
+            Require(block);
+            if (layoutTiles[x, y] is not (SiegeTile.Door or SiegeTile.SecretDoor)) continue;
+            for (var stateOffset = 1; stateOffset <= 2 && block.Index + stateOffset < imported.Scene.Blocks.Count;
+                 stateOffset++)
+            {
+                var state = imported.Scene.Blocks[block.Index + stateOffset];
+                if (state.Kind == block.Kind && state.Name.Equals(block.Name, StringComparison.OrdinalIgnoreCase))
+                    Require(state);
+            }
+        }
         foreach (var spawn in imported.Layout.Enemies.Where(spawn => spawn.VisualId >= 0 &&
                      spawn.VisualId < imported.Scene.Blocks.Count))
         {
@@ -2306,6 +2347,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             }
         }
         var textures = new Dictionary<int, Texture2D>();
+        var sources = new Dictionary<int, DynamixSceneTexture>();
         foreach (var id in _importedContent.Ids("resource").Where(id =>
                      id.StartsWith(imported.ArchiveId + "#", StringComparison.OrdinalIgnoreCase) &&
                      id.Contains(":TEX", StringComparison.OrdinalIgnoreCase)))
@@ -2313,21 +2355,24 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             var decoded = _importedContent.DecodeSceneTexture(id);
             if (decoded is null || !required.Contains(decoded.Index) || textures.ContainsKey(decoded.Index)) continue;
             var texture = new Texture2D(GraphicsDevice, decoded.Width, decoded.Height, false, SurfaceFormat.Color);
-            texture.SetData(IndexedRgba(decoded.Indices, palette.Rgb));
+            texture.SetData(IndexedScenePixels.ToRgba(decoded.Indices, palette.Rgb));
             textures.Add(decoded.Index, texture);
+            sources.Add(decoded.Index, decoded);
         }
         Texture2D? backdrop = null;
         if (imported.Backdrop is { } decodedBackdrop)
         {
             backdrop = new Texture2D(GraphicsDevice, decodedBackdrop.Width, decodedBackdrop.Height,
                 false, SurfaceFormat.Color);
-            backdrop.SetData(IndexedRgba(decodedBackdrop.Indices, palette.Rgb, transparentZero: false));
+            backdrop.SetData(IndexedScenePixels.ToRgba(
+                decodedBackdrop.Indices, palette.Rgb, transparentZero: false));
         }
         _siegeVisuals = new SiegeVisuals(
-            imported.Scene, imported.SourceOriginX, imported.SourceOriginY, textures, backdrop);
+            imported.Scene, imported.SourceOriginX, imported.SourceOriginY,
+            textures, sources, palette.Rgb, imported.ColorMaps, backdrop);
     }
 
-    private Texture2D? SceneWallTexture(SiegeRayHit hit)
+    private Texture2D? SceneWallTexture(SiegeRayHit hit, int colorMapIndex)
     {
         if (_siegeVisuals is null) return null;
         var sourceX = hit.MapX + _siegeVisuals.SourceOriginX;
@@ -2353,7 +2398,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             SiegeWallFace.South => DynamixSceneFace.South,
             _ => DynamixSceneFace.West
         };
-        return _siegeVisuals.Textures.GetValueOrDefault(block.TextureForFace(face));
+        return _siegeVisuals.TextureFor(block.TextureForFace(face), colorMapIndex);
     }
 
     private (Texture2D? Texture, bool Flip) SceneEnemyTexture(SiegeEnemy enemy)
@@ -2371,7 +2416,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             textureIndex = ActorStateTexture(block, 2, (frame.DirectionOffset + 1) / 2, textureIndex);
         else if (enemy.VisualState == SiegeEnemyVisualState.Dying)
             textureIndex = ActorStateTexture(block, 3, enemy.VisualFrame, textureIndex);
-        return (_siegeVisuals.Textures.GetValueOrDefault(textureIndex) ?? FirstSceneTexture(block),
+        return (_siegeVisuals.TextureFor(textureIndex) ?? FirstSceneTexture(block),
             enemy.VisualState is SiegeEnemyVisualState.Attack or SiegeEnemyVisualState.Dying
                 ? false : frame.FlipHorizontally);
     }
@@ -2389,7 +2434,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     {
         if (_siegeVisuals is null) return null;
         foreach (var index in block.TextureReferences())
-            if (_siegeVisuals.Textures.TryGetValue(index, out var texture)) return texture;
+            if (_siegeVisuals.TextureFor(index) is { } texture) return texture;
         return null;
     }
 
@@ -2397,23 +2442,6 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     {
         _siegeVisuals?.Dispose();
         _siegeVisuals = null;
-    }
-
-    private static byte[] IndexedRgba(
-        ReadOnlySpan<byte> indices, ReadOnlySpan<byte> palette, bool transparentZero = true)
-    {
-        if (palette.Length != IndexedPalette.ByteSize) throw new InvalidDataException("Scene palette is incomplete.");
-        var rgba = new byte[checked(indices.Length * 4)];
-        for (var pixel = 0; pixel < indices.Length; pixel++)
-        {
-            var source = indices[pixel] * 3;
-            var target = pixel * 4;
-            rgba[target] = palette[source];
-            rgba[target + 1] = palette[source + 1];
-            rgba[target + 2] = palette[source + 2];
-            rgba[target + 3] = transparentZero && indices[pixel] == 0 ? (byte)0 : (byte)255;
-        }
-        return rgba;
     }
 
     private void DrawSiegeBackdrop(Rectangle viewport, Facing facing)
@@ -2463,12 +2491,12 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                 _ => new Color(128, 126, 120)
             };
             var distanceShade = Math.Clamp(1.05f - (float)hit.Distance / 32f, 0.22f, 1f);
-            if (!hit.HitVerticalSide) distanceShade *= 0.78f;
-            if (SceneWallTexture(hit) is { } wallTexture)
+            var colorMapIndex = SiegeColorMapping.WallDistanceMap(hit.Distance);
+            if (SceneWallTexture(hit, colorMapIndex) is { } wallTexture)
             {
                 var sourceX = Math.Clamp((int)(hit.TextureOffset * wallTexture.Width), 0, wallTexture.Width - 1);
                 _batch.Draw(wallTexture, new Rectangle(viewport.X + column, top, 1, wallHeight),
-                    new Rectangle(sourceX, 0, 1, wallTexture.Height), Color.White * distanceShade);
+                    new Rectangle(sourceX, 0, 1, wallTexture.Height), Color.White);
             }
             else
             {
