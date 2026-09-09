@@ -1,7 +1,7 @@
 namespace Conqueror.Core;
 
 public enum Facing { North, East, South, West }
-public enum SiegeTile { Floor, Wall, Door, SecretDoor, Barrel, Treasure }
+public enum SiegeTile { Floor, Wall, Door, SecretDoor, OpeningDoor, Barrel, Treasure }
 public enum SiegeAction { None, Moved, Blocked, DoorOpened, Healed, Looted, Hit, Missed, WeaponBroke, Shot, NoAmmunition }
 
 public sealed class SiegeEnemy
@@ -50,9 +50,11 @@ public sealed class SiegeLayout
 public sealed class SiegeSession
 {
     public static readonly SiegeDefinition Rules = new(12, 12, 5, 3, 3, 25, 2);
+    public const double DoorOpeningSeconds = 0.36;
     private readonly Player _player;
     private readonly Random _random;
     private readonly SiegeTile[,] _map;
+    private readonly Dictionary<(int X, int Y), double> _openingDoors = [];
     public IReadOnlyList<SiegeEnemy> Enemies => _enemies;
     private readonly List<SiegeEnemy> _enemies = [];
 
@@ -123,6 +125,27 @@ public sealed class SiegeSession
     public SiegeTile TileAt(int x, int y) => x < 0 || y < 0 || x >= Width || y >= Height ? SiegeTile.Wall : _map[x, y];
     public SiegeEnemy? EnemyAt(int x, int y) => _enemies.FirstOrDefault(e => e.X == x && e.Y == y);
 
+    public double? DoorOpeningProgress(int x, int y) => _openingDoors.TryGetValue((x, y), out var elapsed)
+        ? Math.Clamp(elapsed / DoorOpeningSeconds, 0, 1)
+        : null;
+
+    public void AdvanceDoorAnimations(double elapsedSeconds)
+    {
+        if (!double.IsFinite(elapsedSeconds) || elapsedSeconds < 0)
+            throw new ArgumentOutOfRangeException(nameof(elapsedSeconds));
+        foreach (var point in _openingDoors.Keys.ToArray())
+        {
+            var elapsed = _openingDoors[point] + elapsedSeconds;
+            if (elapsed < DoorOpeningSeconds)
+                _openingDoors[point] = elapsed;
+            else
+            {
+                _openingDoors.Remove(point);
+                _map[point.X, point.Y] = SiegeTile.Floor;
+            }
+        }
+    }
+
     public void TurnLeft() { Facing = (Facing)(((int)Facing + 3) % 4); LastMessage = $"Facing {Facing}."; }
     public void TurnRight() { Facing = (Facing)(((int)Facing + 1) % 4); LastMessage = $"Facing {Facing}."; }
 
@@ -132,7 +155,7 @@ public sealed class SiegeSession
         if (!forward) { dx = -dx; dy = -dy; }
         var nx = PlayerX + dx; var ny = PlayerY + dy;
         var tile = TileAt(nx, ny);
-        if (tile is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor || EnemyAt(nx, ny) is not null)
+        if (tile is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor || EnemyAt(nx, ny) is not null)
         {
             LastMessage = "The way is blocked."; TickEnemies(); return SiegeAction.Blocked;
         }
@@ -147,7 +170,9 @@ public sealed class SiegeSession
         var (dx, dy) = Direction(Facing); var x = PlayerX + dx; var y = PlayerY + dy;
         if (TileAt(x, y) is SiegeTile.Door or SiegeTile.SecretDoor)
         {
-            _map[x, y] = SiegeTile.Floor; LastMessage = "The door opens."; TickEnemies(); return SiegeAction.DoorOpened;
+            _map[x, y] = SiegeTile.OpeningDoor;
+            _openingDoors[(x, y)] = 0;
+            LastMessage = "The door opens."; TickEnemies(); return SiegeAction.DoorOpened;
         }
         LastMessage = "Nothing happens."; TickEnemies(); return SiegeAction.None;
     }
@@ -194,7 +219,7 @@ public sealed class SiegeSession
         for (var distance = 1; distance <= 8; distance++)
         {
             var x = PlayerX + dx * distance; var y = PlayerY + dy * distance;
-            if (TileAt(x, y) is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor) return 0;
+            if (TileAt(x, y) is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor) return 0;
             if (EnemyAt(x, y) is not null) return distance;
         }
         return 0;
@@ -263,7 +288,7 @@ public sealed class SiegeSession
         for (var i = 1; i <= range; i++)
         {
             var x = PlayerX + dx * i; var y = PlayerY + dy * i;
-            if (TileAt(x, y) is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor) return null;
+            if (TileAt(x, y) is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor) return null;
             if (EnemyAt(x, y) is { } enemy) return enemy;
         }
         return null;

@@ -225,6 +225,31 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void SiegeDoorsRemainSolidWhileTheirOpeningStateAdvances()
+    {
+        var tiles = new SiegeTile[4, 3];
+        for (var x = 0; x < 4; x++)
+        for (var y = 0; y < 3; y++)
+            tiles[x, y] = x == 0 || y == 0 || x == 3 || y == 2 ? SiegeTile.Wall : SiegeTile.Floor;
+        tiles[2, 1] = SiegeTile.Door;
+        var siege = new SiegeSession(new Player(), new Army(), 0, 1,
+            new SiegeLayout(tiles, 1, 1, Facing.East, []));
+
+        Assert.Equal(SiegeAction.DoorOpened, siege.Interact());
+        Assert.Equal(SiegeTile.OpeningDoor, siege.TileAt(2, 1));
+        Assert.Equal(0, siege.DoorOpeningProgress(2, 1));
+        Assert.Equal(SiegeAction.Blocked, siege.Move(true));
+        siege.AdvanceDoorAnimations(SiegeSession.DoorOpeningSeconds / 2);
+        Assert.InRange(siege.DoorOpeningProgress(2, 1)!.Value, 0.49, 0.51);
+        Assert.Equal(SiegeTile.OpeningDoor, SiegeViewProjection.Cast(siege, 0).Tile);
+        siege.AdvanceDoorAnimations(SiegeSession.DoorOpeningSeconds / 2);
+        Assert.Null(siege.DoorOpeningProgress(2, 1));
+        Assert.Equal(SiegeTile.Floor, siege.TileAt(2, 1));
+        Assert.Equal(SiegeAction.Moved, siege.Move(true));
+        Assert.Throws<ArgumentOutOfRangeException>(() => siege.AdvanceDoorAnimations(-0.1));
+    }
+
+    [Fact]
     public void ConversationDatabaseDecodesIndexedPromptsResponsesAndLinks()
     {
         var first = ConversationNode(["GERARD.PCC", "Earl Gerard", "Greetings.", "Ask about the dragon.", "Farewell."],

@@ -87,7 +87,8 @@ public static class SiegeViewProjection
         return result.OrderByDescending(item => item.ForwardDistance).ToArray();
     }
 
-    private static bool IsSolid(SiegeTile tile) => tile is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor;
+    private static bool IsSolid(SiegeTile tile) =>
+        tile is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor;
 
     private static (double X, double Y) Direction(Facing facing) => facing switch
     {
