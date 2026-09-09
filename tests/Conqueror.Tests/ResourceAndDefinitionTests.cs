@@ -230,8 +230,44 @@ public sealed class ResourceAndDefinitionTests
         Assert.Equal(Enum.GetValues<UnitType>(), commands.Select(command => command.Action).OfType<RecruitFarmAction>().Select(action => action.Unit).Order());
         Assert.Equal(6, commands.Count(command => command.Action is BuildFarmAction));
         Assert.Equal(2, commands.Count(command => command.Action is LeaveFarmAction));
-        Assert.Equal(commands.Select(command => command.HelpRow).Distinct().Count(), FarmPresentationDefinitions.HelpRows.Count);
-        Assert.All(FarmPresentationDefinitions.HelpRows, row => Assert.False(string.IsNullOrWhiteSpace(row)));
+        Assert.Equal(
+            [(FarmPresentationDefinitions.Section.Castle, ":fcastle.hat", 18, 20, 21),
+             (FarmPresentationDefinitions.Section.Village, ":fvillage.hat", 14, 17, 18),
+             (FarmPresentationDefinitions.Section.Farm, ":ffarm.hat", 9, 11, 12),
+             (FarmPresentationDefinitions.Section.Forest, ":fforest.hat", 8, 10, 11)],
+            FarmPresentationDefinitions.Layouts.Select(layout =>
+                (layout.Section, layout.LayoutSuffix, layout.AccountRowCount, layout.TerrainRegionId, layout.WealthRegionId)));
+        Assert.All(FarmPresentationDefinitions.Layouts, layout =>
+            Assert.Contains(ImportedLayouts.Definitions,
+                imported => imported.Role == layout.LayoutRole && imported.IdSuffix == layout.LayoutSuffix));
+        Assert.All(Enum.GetValues<FarmPresentationDefinitions.Section>(), section =>
+        {
+            var sectionCommands = FarmPresentationDefinitions.CommandsFor(section);
+            Assert.Equal(2, sectionCommands.Count(command => command.Action is LeaveFarmAction));
+            Assert.All(FarmPresentationDefinitions.HelpRowsFor(section), row => Assert.False(string.IsNullOrWhiteSpace(row)));
+        });
+        Assert.All(FarmPresentationDefinitions.CommandsFor(FarmPresentationDefinitions.Section.Castle),
+            command => Assert.True(command.Action is BuildFarmAction or RecruitFarmAction or LeaveFarmAction));
+        Assert.All(FarmPresentationDefinitions.CommandsFor(FarmPresentationDefinitions.Section.Village),
+            command => Assert.IsType<LeaveFarmAction>(command.Action));
+        Assert.All(FarmPresentationDefinitions.CommandsFor(FarmPresentationDefinitions.Section.Farm),
+            command => Assert.True(command.Action is PlantFarmAction or LeaveFarmAction));
+        Assert.All(FarmPresentationDefinitions.CommandsFor(FarmPresentationDefinitions.Section.Forest),
+            command => Assert.True(command.Action is DevelopForestFarmAction or LeaveFarmAction));
+
+        var bytes = new byte[40 + 13 * 24];
+        WriteInt(bytes, 12, 640); WriteInt(bytes, 16, 480); WriteInt(bytes, 20, 13);
+        for (var id = 0; id < 13; id++)
+        {
+            var offset = 40 + id * 24;
+            WriteInt(bytes, offset, id); WriteInt(bytes, offset + 4, id);
+            WriteInt(bytes, offset + 8, id); WriteInt(bytes, offset + 12, 1);
+            WriteInt(bytes, offset + 16, 1); WriteInt(bytes, offset + 20, 1);
+        }
+        var importedFarm = FarmPresentationDefinitions.LayoutFrom(
+            FarmPresentationDefinitions.Section.Farm, new HatLayout(bytes));
+        Assert.Equal(new UiBounds(11, 11, 1, 1), importedFarm.Terrain);
+        Assert.Equal(new UiBounds(12, 12, 1, 1), importedFarm.Wealth);
     }
 
     [Fact]

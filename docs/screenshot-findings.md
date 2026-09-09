@@ -65,7 +65,7 @@ Local reference filenames:
 
 ### Home, farm, village, and blacksmith
 
-- **Implemented:** split the previous overloaded Home handler into a castle office and separate farm-management screen; use `TACTICAL.PCX` and `FIEFMGMT.PCX` when installed.
+- **Implemented:** split the previous overloaded Home handler into a castle office and section-aware Castle, Village, Farm, and Forest management variants; use `TACTICAL.PCX` and the shared `FIEFMGMT.PCX` shell when installed.
 - **Implemented:** insert the original `FORGESMI.PCX` workshop between Village and the store, with the smith hotspot sourced from `VSMITH.HAT`.
 - **Corrected:** `FOPTS.HAT`, not `FCASTLE.HAT`, supplies the ten `TACTICAL.PCX` Home rectangles. The old generated report omitted resource names, concealing that `FCASTLE.HAT` actually describes screen 19's `FIEFMGMT.PCX` table.
 - **Implemented:** Home regions 0-5 and 8 expose Overview, Castle, Farm, Village, Forest, Orders, and Map. The Farm/Village/Forest trio follows the executable's consecutive label block and the left-to-right ledger rectangles. The two exits and small desk object remain disabled until their War Planning/Exit/JUMP dispatch is traced.
@@ -74,7 +74,7 @@ Local reference filenames:
 - Map the village-image suffixes to world locations before activating `V66_1111.PCX` outside its confirmed Sabine's Keep role.
 - Locate the actual blacksmith dialogue-node source and bind it to `COMSCRN1.PCX`, `BLACKSMI.PCC`, scroll regions, and choices through the generic dialogue interpreter planned in Phase 1.2. Do not repeat the disproved `VSMITH.666` text hypothesis.
 - **Implemented:** render `BUYSELL.CSF` through the store palette using data-driven overlay definitions: hide/show View from the record's movie marker and switch Purchase/Sell from current ownership. Exact mouse-down timing remains to be traced.
-- Recover the executable dispatch for Home targets whose destination systems remain incomplete (`Castle`, `Forest`, `War Planning`, and `JUMP!!`) and the four `FIEFMGMT.PCX` HAT variants; then replace the provisional farm table/terrain fill with exact definitions and editable tiles.
+- Recover the executable dispatch for the unresolved Home exits/small object (`War Planning`, `Exit`, and `JUMP!!`), then recover the exact row semantics for the four now-wired `FIEFMGMT.PCX` HAT variants and replace the provisional terrain fill with editable tiles.
 
 ## Acceptance reference
 

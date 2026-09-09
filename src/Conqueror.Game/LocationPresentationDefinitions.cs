@@ -145,8 +145,48 @@ public static class BlacksmithDialoguePresentationDefinitions
 
 public static class FarmPresentationDefinitions
 {
+    public enum Section { Castle, Village, Farm, Forest }
+
+    public sealed record Layout(
+        Section Section,
+        string Title,
+        string LayoutRole,
+        string LayoutSuffix,
+        int AccountRowCount,
+        int OkayRegionId,
+        int CancelRegionId,
+        int? ExtraRegionId,
+        int TerrainRegionId,
+        int WealthRegionId,
+        UiBounds Terrain,
+        UiBounds Wealth);
+
     public static UiBounds Information { get; } = new(20, 22, 330, 390);
     public static UiBounds Terrain { get; } = new(382, 22, 238, 390);
+
+    private static IReadOnlyList<Layout> FallbackLayouts { get; } =
+    [
+        new(Section.Castle, "CASTLE MANAGEMENT", "Fief.Castle", ":fcastle.hat", 18, 18, 19, null, 20, 21,
+            new UiBounds(383, 20, 232, 380), new UiBounds(532, 0, 86, 16)),
+        new(Section.Village, "VILLAGE MANAGEMENT", "Fief.Village", ":fvillage.hat", 14, 14, 15, 16, 17, 18,
+            new UiBounds(383, 20, 232, 380), new UiBounds(532, 0, 86, 16)),
+        new(Section.Farm, "FARM MANAGEMENT", "Fief.Farm", ":ffarm.hat", 9, 9, 10, null, 11, 12,
+            new UiBounds(383, 20, 232, 380), new UiBounds(532, 0, 86, 16)),
+        new(Section.Forest, "FOREST MANAGEMENT", "Fief.Forest", ":fforest.hat", 8, 8, 9, null, 10, 11,
+            new UiBounds(383, 20, 232, 380), new UiBounds(532, 0, 86, 16))
+    ];
+
+    public static IReadOnlyList<Layout> Layouts { get; } = FallbackLayouts;
+
+    public static Layout LayoutFrom(Section section, HatLayout? source)
+    {
+        var fallback = FallbackLayouts.Single(layout => layout.Section == section);
+        return fallback with
+        {
+            Terrain = RegionBounds(source, fallback.TerrainRegionId, fallback.Terrain),
+            Wealth = RegionBounds(source, fallback.WealthRegionId, fallback.Wealth)
+        };
+    }
 
     public static IReadOnlyList<FarmCommand> Commands { get; } =
     [
@@ -172,11 +212,27 @@ public static class FarmPresentationDefinitions
         new(Keys.H, "H OFFICE", 4, new LeaveFarmAction())
     ];
 
-    public static IReadOnlyList<string> HelpRows { get; } = Commands
+    public static IReadOnlyList<FarmCommand> CommandsFor(Section section) => Commands
+        .Where(command => command.Action switch
+        {
+            BuildFarmAction or RecruitFarmAction => section == Section.Castle,
+            PlantFarmAction => section == Section.Farm,
+            DevelopForestFarmAction => section == Section.Forest,
+            LeaveFarmAction => true,
+            _ => false
+        })
+        .ToArray();
+
+    public static IReadOnlyList<string> HelpRowsFor(Section section) => CommandsFor(section)
         .GroupBy(command => command.HelpRow)
         .OrderBy(group => group.Key)
         .Select(group => string.Join("   ", group.Select(command => command.Label)))
         .ToArray();
+
+    private static UiBounds RegionBounds(HatLayout? layout, int id, UiBounds fallback) =>
+        layout?.FindRegion(id) is { Enabled: not 0 } region
+            ? new UiBounds(region.X, region.Y, region.Width, region.Height)
+            : fallback;
 }
 
 public abstract record FarmAction;

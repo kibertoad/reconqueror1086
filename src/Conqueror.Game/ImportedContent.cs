@@ -43,6 +43,8 @@ public static class ImportedLayouts
         new("Dilemma", ":chargen.hat"),
         new("Estate", ":iconmap.hat"),
         new("Home.Office", ":fopts.hat"),
+        .. FarmPresentationDefinitions.Layouts.Select(layout =>
+            new ImportedLayoutDefinition(layout.LayoutRole, layout.LayoutSuffix)),
         new("Blacksmith.Workshop", ":vsmith.hat")
     ];
 }

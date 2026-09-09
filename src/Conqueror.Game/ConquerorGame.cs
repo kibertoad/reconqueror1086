@@ -39,6 +39,9 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private UiBounds _dilemmaContinueBounds = YouthDilemmaPresentationDefinitions.Continue;
     private EstateLayout _estateLayout = EstatePresentationDefinitions.Fallback;
     private EstatePanel _estatePanel = EstatePanel.Map;
+    private FarmPresentationDefinitions.Section _fiefSection = FarmPresentationDefinitions.Section.Farm;
+    private IReadOnlyDictionary<FarmPresentationDefinitions.Section, FarmPresentationDefinitions.Layout> _fiefLayouts =
+        FarmPresentationDefinitions.Layouts.ToDictionary(layout => layout.Section);
     private IReadOnlyList<SceneHotspot> _homeHotspots = HomePresentationDefinitions.Hotspots;
     private IReadOnlyList<SceneHotspot> _blacksmithHotspots = BlacksmithPresentationDefinitions.Hotspots;
     private int _joustCursor;
@@ -107,6 +110,14 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _estateLayout = EstatePresentationDefinitions.From(estateLayoutId is null ? null : _importedContent?.DecodeHat(estateLayoutId));
         var homeLayoutId = _importedContent?.FindId("resource", ":fopts.hat");
         _homeHotspots = HomePresentationDefinitions.HotspotsFrom(homeLayoutId is null ? null : _importedContent?.DecodeHat(homeLayoutId));
+        _fiefLayouts = FarmPresentationDefinitions.Layouts.ToDictionary(
+            layout => layout.Section,
+            layout =>
+            {
+                var id = _importedContent?.FindId("resource", layout.LayoutSuffix);
+                return FarmPresentationDefinitions.LayoutFrom(layout.Section,
+                    id is null ? null : _importedContent?.DecodeHat(id));
+            });
         var blacksmithLayoutId = _importedContent?.FindId("resource", ":vsmith.hat");
         var blacksmithLayout = blacksmithLayoutId is null ? null : _importedContent?.DecodeHat(blacksmithLayoutId);
         _blacksmithHotspots = BlacksmithPresentationDefinitions.HotspotsFrom(blacksmithLayout);
@@ -554,16 +565,22 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void UpdateHome(Func<Keys, bool> press, MouseState mouse, bool click)
     {
-        if (press(Keys.F)) _screen = Screen.Farm;
-        if (press(Keys.V)) _screen = Screen.Village;
+        if (press(Keys.F)) EnterFiefManagement(FarmPresentationDefinitions.Section.Farm);
+        if (press(Keys.V)) EnterFiefManagement(FarmPresentationDefinitions.Section.Village);
         if (press(Keys.Enter) || press(Keys.H)) _screen = Screen.Map;
         if (click) ActivateSceneHotspot(HitSceneHotspot(_homeHotspots, mouse));
     }
 
     private void UpdateFarm(Func<Keys, bool> press)
     {
-        var command = FarmPresentationDefinitions.Commands.FirstOrDefault(item => press(item.Key));
+        var command = FarmPresentationDefinitions.CommandsFor(_fiefSection).FirstOrDefault(item => press(item.Key));
         if (command is not null) ActivateFarmAction(command.Action);
+    }
+
+    private void EnterFiefManagement(FarmPresentationDefinitions.Section section)
+    {
+        _fiefSection = section;
+        _screen = Screen.Farm;
     }
 
     private void ActivateFarmAction(FarmAction action)
@@ -634,10 +651,10 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         switch (hotspot.Action)
         {
             case SceneNavigationAction.Overview: _screen = Screen.Overview; break;
-            case SceneNavigationAction.Castle: _notice = "CASTLE MANAGEMENT IS NOT YET AVAILABLE"; break;
-            case SceneNavigationAction.Farm: _screen = Screen.Farm; break;
-            case SceneNavigationAction.Village: _screen = Screen.Village; break;
-            case SceneNavigationAction.Forest: _notice = "FOREST MANAGEMENT IS NOT YET A SEPARATE SCREEN"; break;
+            case SceneNavigationAction.Castle: EnterFiefManagement(FarmPresentationDefinitions.Section.Castle); break;
+            case SceneNavigationAction.Farm: EnterFiefManagement(FarmPresentationDefinitions.Section.Farm); break;
+            case SceneNavigationAction.Village: EnterFiefManagement(FarmPresentationDefinitions.Section.Village); break;
+            case SceneNavigationAction.Forest: EnterFiefManagement(FarmPresentationDefinitions.Section.Forest); break;
             case SceneNavigationAction.WarPlanning: _notice = "WAR PLANNING IS NOT YET AVAILABLE"; break;
             case SceneNavigationAction.Exit: _screen = Screen.Map; break;
             case SceneNavigationAction.Jump: _notice = "JUMP TARGET REQUIRES EXECUTABLE CONFIRMATION"; break;
@@ -1125,20 +1142,27 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private void DrawFarm()
     {
         var f = _campaign.State.Player.Home; var p = _campaign.State.Player;
+        var layout = _fiefLayouts[_fiefSection];
         var original = DrawOriginal("Farm.Management", new Rectangle(0, 0, 1024, 768));
-        if (!original) DrawPanel("FARM MANAGEMENT", $"WEALTH {p.Wealth}S  POPULATION {f.Population}  PRODUCTIVITY {f.Productivity()}%");
-        else DrawFarmTerrain(FarmPresentationDefinitions.Terrain);
+        if (!original) DrawPanel(layout.Title, $"WEALTH {p.Wealth}S  POPULATION {f.Population}  PRODUCTIVITY {f.Productivity()}%");
+        else DrawFarmTerrain(layout.Terrain);
 
         var accountColor = original ? Color.Black : Color.White;
-        DrawText("FIEF ACCOUNTS", 55, 70, accountColor, 3);
+        DrawText(layout.Title, 55, 70, accountColor, 3);
         DrawText($"WEALTH          {p.Wealth}", 55, 120, accountColor, 2);
         DrawText($"POPULATION      {f.Population}", 55, 155, accountColor, 2);
         DrawText($"SERFS AVAILABLE {f.AvailableSerfs}", 55, 190, accountColor, 2);
         DrawText($"PRODUCTIVITY    {f.Productivity()}%", 55, 225, accountColor, 2);
         DrawText($"HOUSES          {f.Houses}", 55, 260, accountColor, 2);
-        for (var row = 0; row < FarmPresentationDefinitions.HelpRows.Count; row++)
-            DrawText(FarmPresentationDefinitions.HelpRows[row], 55, 525 + row * 36,
-                row == FarmPresentationDefinitions.HelpRows.Count - 1 ? Color.Gold : Color.Wheat, 1, 900);
+        if (original)
+        {
+            var wealth = ScaleBounds(layout.Wealth);
+            DrawText($"{p.Wealth}S", wealth.X + 4, wealth.Y + 3, Color.White, 1, wealth.Width - 8);
+        }
+        var helpRows = FarmPresentationDefinitions.HelpRowsFor(_fiefSection);
+        for (var row = 0; row < helpRows.Count; row++)
+            DrawText(helpRows[row], 55, 525 + row * 36,
+                row == helpRows.Count - 1 ? Color.Gold : Color.Wheat, 1, 900);
     }
 
     private void DrawFarmTerrain(UiBounds originalBounds)

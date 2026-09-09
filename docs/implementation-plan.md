@@ -512,7 +512,7 @@ Status is conservative: “prototype” means the route is playable but substant
 | M3: Knightly competition | 5 | Playable prototype. | Exact opponent tables plus faithful first-person jousting and tactical tournament melee. |
 | M4: Conquest | 6-7 | Playable prototype. | Original strategic rules, battlefield systems, castle layouts, combat balance, retainers, and loot. |
 | M5: Two endings | 8 | Both routes playable as prototypes. | Complete Drogo/dragon quest chain, dragon encounter, crown politics, and original endings. |
-| M6: Original presentation | 9 | In progress: title, options hub with original state widgets, character screens, estate/map panels, Home/farm/blacksmith flow, confirmed blacksmith hover hotspots, one portrait, CD audio, and presentation descriptors are active. | Accurate Home hotspot bindings, full screen mapping, exact estate tiles, remaining CSF/SMK playback, fonts, cursors, dialogue, effects, speech, and accessibility/settings. |
+| M6: Original presentation | 9 | In progress: title, options hub with original state widgets, character screens, estate/map panels, Home and four descriptor-driven fief-management variants, blacksmith flow, confirmed blacksmith hover hotspots, one portrait, CD audio, and presentation descriptors are active. | Remaining Home dispatch, full screen mapping, exact estate tiles, remaining CSF/SMK playback, fonts, cursors, dialogue, effects, speech, and accessibility/settings. |
 | M7: Release | 10 | In progress: launch/test/import batch utilities, five save slots, a data-driven legal-boundary check, and Windows CI are implemented. | Save migrations and recovery, importer repair workflow, packaging, and clean-machine verification. |
 
 ## Current resource and startup sprint
@@ -547,6 +547,7 @@ Local static-analysis tool: Ghidra 12.1.3 is installed user-wide at `C:\Users\ki
 - [x] Identify `ICONTEMP.PCX`/`ICONMAP.HAT` as the estate/travel shell, activate its exact viewport, inset-map, tab, information, and navigation regions, and retain a no-media map fallback.
 - [x] Replace farm input branching and separately maintained help strings with one typed command/action registry.
 - [x] Add shared data-driven visual-scene hover labels and confirm the separate Blacksmith/Buy-Sell `VSMITH.HAT` targets. Correct the Home descriptor from `FCASTLE.HAT` to `FOPTS.HAT` and activate its seven visually/evidence-correlated office objects; three ambiguous targets remain disabled.
+- [x] Route the Home Castle model and Farm/Village/Forest books into a shared section-aware management screen, import `FCASTLE.HAT`, `FVILLAGE.HAT`, `FFARM.HAT`, and `FFOREST.HAT`, and source each variant's exact terrain/wealth region IDs from its descriptor. Row semantics remain deliberately unassigned where evidence is incomplete.
 - [x] Decode and classify all 26 `.666` sound banks with bounded length/rate validation; the ignored population report accounts for 102 samples and zero rejects.
 - [x] Confirm unsigned 8-bit mono PCM from waveform centering, identify the identical shared UI sample across 17 screen banks, and activate its one-time-converted runtime buffer for mouse actions.
 - [ ] Trace the complete startup/menu state machine, input timing, cursor behavior, and region-action dispatch from `CONQUER.EXE`; keep semantics corroborated until each executable branch is confirmed.
