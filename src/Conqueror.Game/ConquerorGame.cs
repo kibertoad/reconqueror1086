@@ -95,6 +95,13 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private int _joustCursor;
     private SiegeSession? _siege;
     private SiegeVisuals? _siegeVisuals;
+    private int _siegeWeaponFrame = -1;
+    private int _siegeWeaponEnd;
+    private double _siegeWeaponElapsed;
+    private int _siegeBloodFrame = -1;
+    private double _siegeBloodElapsed;
+    private int _siegeImpactFrame = -1;
+    private double _siegeImpactElapsed;
     private bool _showRadar = true;
     private FieldBattleSession? _fieldBattle;
     private PracticeCombatKind? _activePracticeCombat;
@@ -222,8 +229,17 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         foreach (var definition in ImportedAnimations.Definitions)
         {
             var id = _importedContent?.FindId("indexed-animation", definition.IdSuffix);
-            if (id is null || _importedContent?.DecodeCsf(id) is not { } sequence
-                || !_originalPalettes.TryGetValue(definition.PaletteArtRole, out var palette)) continue;
+            byte[]? palette;
+            if (definition.PaletteIdSuffix is { } paletteSuffix)
+            {
+                var paletteId = _importedContent?.FindId("palette", paletteSuffix);
+                palette = paletteId is null ? null : _importedContent?.DecodePalette(paletteId)?.Rgb;
+            }
+            else
+            {
+                _originalPalettes.TryGetValue(definition.PaletteArtRole, out palette);
+            }
+            if (id is null || palette is null || _importedContent?.DecodeCsf(id) is not { } sequence) continue;
             var frames = sequence.Chunks.Select(chunk =>
             {
                 var frame = sequence.DecodeFrame(chunk);
@@ -1295,11 +1311,31 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             _activePracticeCombat = null;
             return;
         }
+        AdvanceSiegeForeground(gameTime.ElapsedGameTime.TotalSeconds);
+        var healthBeforeInput = _siege.Health;
         _siege.AdvanceDoorAnimations(_animationEnabled ? gameTime.ElapsedGameTime.TotalSeconds : SiegeSession.DoorOpeningSeconds);
         _siege.AdvanceEnemyAnimations(_animationEnabled ? gameTime.ElapsedGameTime.TotalSeconds : 1);
         if (press(Keys.W)) _siege.Move(true); if (press(Keys.S)) _siege.Move(false);
         if (press(Keys.A)) _siege.TurnLeft(); if (press(Keys.D)) _siege.TurnRight();
-        if (press(Keys.E)) _siege.Interact(); if (press(Keys.Space)) _siege.Attack(); if (press(Keys.X)) _siege.Shoot();
+        if (press(Keys.E)) _siege.Interact();
+        if (press(Keys.Space))
+        {
+            var enemyHealthBeforeAttack = LivingSiegeEnemyHealth();
+            var attackFrames = SiegeCombatPresentation.AttackFramesFor(_campaign.State.Player.Inventory.Weapon);
+            _siege.Attack();
+            StartSiegeWeapon(attackFrames);
+            if (LivingSiegeEnemyHealth() < enemyHealthBeforeAttack) StartSiegeImpact();
+        }
+        if (press(Keys.X))
+        {
+            var enemyHealthBeforeShot = LivingSiegeEnemyHealth();
+            if (_siege.Shoot() == SiegeAction.Shot)
+            {
+                StartSiegeWeapon(SiegeCombatPresentation.CrossbowAttack);
+                if (LivingSiegeEnemyHealth() < enemyHealthBeforeShot) StartSiegeImpact();
+            }
+        }
+        if (_siege.Health < healthBeforeInput) StartSiegeBlood();
         if (press(Keys.M)) _showRadar = !_showRadar;
         _notice = _siege.LastMessage;
         if (press(Keys.R))
@@ -1316,6 +1352,58 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         {
             if (_activePracticeCombat is not null) FinishPracticeCombat("PRACTICE LOST");
             else { _campaign.FinishSiege(_siege); _siege = null; ClearSiegeVisuals(); _screen = Screen.Map; _notice = "YOU ARE CARRIED FROM THE CASTLE"; Autosave(); }
+        }
+    }
+
+    private void StartSiegeWeapon(SiegeFrameRun run)
+    {
+        _siegeWeaponFrame = _animationEnabled ? run.Start : run.EndExclusive - 1;
+        _siegeWeaponEnd = run.EndExclusive;
+        _siegeWeaponElapsed = 0;
+    }
+
+    private void StartSiegeBlood()
+    {
+        _siegeBloodFrame = _animationEnabled
+            ? SiegeCombatPresentation.PlayerBlood.Start
+            : SiegeCombatPresentation.PlayerBlood.EndExclusive - 1;
+        _siegeBloodElapsed = 0;
+    }
+
+    private void StartSiegeImpact()
+    {
+        _siegeImpactFrame = _animationEnabled
+            ? SiegeCombatPresentation.EnemyBlood.Start
+            : SiegeCombatPresentation.EnemyBlood.EndExclusive - 1;
+        _siegeImpactElapsed = 0;
+    }
+
+    private int LivingSiegeEnemyHealth() =>
+        _siege?.Enemies.Where(enemy => enemy.Health > 0).Sum(enemy => enemy.Health) ?? 0;
+
+    private void AdvanceSiegeForeground(double elapsedSeconds)
+    {
+        AdvanceSiegeRun(ref _siegeWeaponFrame, _siegeWeaponEnd, ref _siegeWeaponElapsed, elapsedSeconds);
+        AdvanceSiegeRun(ref _siegeBloodFrame, SiegeCombatPresentation.PlayerBlood.EndExclusive,
+            ref _siegeBloodElapsed, elapsedSeconds);
+        AdvanceSiegeRun(ref _siegeImpactFrame, SiegeCombatPresentation.EnemyBlood.EndExclusive,
+            ref _siegeImpactElapsed, elapsedSeconds);
+    }
+
+    private void AdvanceSiegeRun(ref int frame, int endExclusive, ref double elapsed, double elapsedSeconds)
+    {
+        if (frame < 0) return;
+        if (!_animationEnabled)
+        {
+            frame = -1;
+            elapsed = 0;
+            return;
+        }
+        elapsed += elapsedSeconds;
+        while (elapsed >= SiegeCombatPresentation.FrameSeconds && frame >= 0)
+        {
+            elapsed -= SiegeCombatPresentation.FrameSeconds;
+            if (++frame >= endExclusive) frame = -1;
         }
     }
 
@@ -2442,6 +2530,13 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     {
         _siegeVisuals?.Dispose();
         _siegeVisuals = null;
+        _siegeWeaponFrame = -1;
+        _siegeWeaponEnd = 0;
+        _siegeWeaponElapsed = 0;
+        _siegeBloodFrame = -1;
+        _siegeBloodElapsed = 0;
+        _siegeImpactFrame = -1;
+        _siegeImpactElapsed = 0;
     }
 
     private void DrawSiegeBackdrop(Rectangle viewport, Facing facing)
@@ -2535,11 +2630,46 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                 }
             }
         }
+        DrawSiegeForeground(viewport);
         DrawText($"HEALTH {_siege.Health}/{_siege.MaxHealth}  ENEMIES {_siege.Enemies.Count(enemy => enemy.Health > 0)}  ALLIES {_siege.AlliesAlive}", 25, 25, Color.White, 2);
         DrawText($"FACING {_siege.Facing}  ARMOR {_siege.ArmorRating()}  GOLD FOUND {_siege.GoldFound}", 25, 55, Color.Wheat, 2);
         if (_showRadar) DrawRadar(_siege);
         DrawText("W/S MOVE  A/D TURN  E OPEN  SPACE SWING  X CROSSBOW", 130, 655, Color.Gold, 2);
         DrawText("M RADAR  R RETREAT", 380, 685, Color.Gold, 2);
+    }
+
+    private void DrawSiegeForeground(Rectangle viewport)
+    {
+        if (!_originalAnimations.TryGetValue("Combat.FirstPerson", out var animation)) return;
+        if (_siegeWeaponFrame >= 0 && _siegeWeaponFrame < animation.Frames.Count)
+        {
+            var texture = animation.Frames[_siegeWeaponFrame];
+            var scale = Math.Min(2.5f, viewport.Height / 200f);
+            var width = Math.Max(1, (int)Math.Round(texture.Width * scale));
+            var height = Math.Max(1, (int)Math.Round(texture.Height * scale));
+            _batch.Draw(texture,
+                new Rectangle(viewport.Center.X - width / 2, viewport.Bottom - height, width, height), Color.White);
+        }
+        if (_siegeBloodFrame >= 0 && _siegeBloodFrame < animation.Frames.Count)
+        {
+            var texture = animation.Frames[_siegeBloodFrame];
+            var scale = Math.Min(3f, viewport.Height / 160f);
+            var width = Math.Max(1, (int)Math.Round(texture.Width * scale));
+            var height = Math.Max(1, (int)Math.Round(texture.Height * scale));
+            _batch.Draw(texture,
+                new Rectangle(viewport.Center.X - width / 2, viewport.Center.Y - height / 2, width, height),
+                Color.White);
+        }
+        if (_siegeImpactFrame >= 0 && _siegeImpactFrame < animation.Frames.Count)
+        {
+            var texture = animation.Frames[_siegeImpactFrame];
+            var scale = Math.Min(3f, viewport.Height / 160f);
+            var width = Math.Max(1, (int)Math.Round(texture.Width * scale));
+            var height = Math.Max(1, (int)Math.Round(texture.Height * scale));
+            _batch.Draw(texture,
+                new Rectangle(viewport.Center.X - width / 2, viewport.Center.Y - height / 2, width, height),
+                Color.White);
+        }
     }
 
     private void DrawFieldBattle()

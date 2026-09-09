@@ -7,7 +7,8 @@ namespace Conqueror.Game;
 
 public sealed record ImportedArtDefinition(string Role, string Kind, string IdSuffix);
 public sealed record ImportedLayoutDefinition(string Role, string IdSuffix);
-public sealed record ImportedAnimationDefinition(string Role, string IdSuffix, string PaletteArtRole);
+public sealed record ImportedAnimationDefinition(
+    string Role, string IdSuffix, string PaletteArtRole, string? PaletteIdSuffix = null);
 public sealed record ImportedSoundDefinition(string Role, string IdSuffix, int SampleIndex);
 public sealed record ImportedMovieDefinition(string Role, string IdSuffix);
 public sealed record PreparedImportedSound(string BankId, int SampleIndex, int SampleRate, byte[] Pcm16LittleEndian);
@@ -71,6 +72,7 @@ public static class ImportedAnimations
         new("Shop.Items", ":swords.csf", "Shop.Inventory"),
         new("Shop.Controls", ":buysell.csf", "Shop.Inventory"),
         new("Interface.Cursor", ":ffmouse.csf", "Estate.Shell"),
+        new("Combat.FirstPerson", ":skirmish.csf", "", ":SKIRMISH.PAL"),
         .. EstatePresentationDefinitions.TileAtlases.Select(atlas =>
             new ImportedAnimationDefinition(atlas.Role, atlas.IdSuffix, "Estate.Shell"))
     ];

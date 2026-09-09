@@ -99,6 +99,24 @@ public sealed class ResourceAndDefinitionTests
         Assert.Throws<ArgumentOutOfRangeException>(() => SiegeColorMapping.WallDistanceMap(double.NaN));
     }
 
+    [Theory]
+    [InlineData("Basic Axe", 27, 3)]
+    [InlineData("Heavy Crossbow", 30, 3)]
+    [InlineData("War Hammer", 33, 3)]
+    [InlineData("Spiked Mace", 36, 3)]
+    [InlineData("Battle Sword", 39, 3)]
+    [InlineData("Stiletto Dagger", 42, 1)]
+    [InlineData(null, 39, 3)]
+    public void EquippedWeaponSelectsItsOriginalFirstPersonFrameRun(string? weapon, int start, int count)
+    {
+        var run = SiegeCombatPresentation.AttackFramesFor(weapon);
+        Assert.Equal((start, count, start + count), (run.Start, run.Count, run.EndExclusive));
+        Assert.True(run.EndExclusive <= SiegeCombatPresentation.PlayerBlood.Start);
+        Assert.Equal(new SiegeFrameRun(43, 5), SiegeCombatPresentation.PlayerBlood);
+        Assert.Equal(new SiegeFrameRun(48, 5), SiegeCombatPresentation.EnemyBlood);
+        Assert.Equal(SiegeCombatPresentation.EnemyBlood.Start, SiegeCombatPresentation.PlayerBlood.EndExclusive);
+    }
+
     [Fact]
     public void SceneColorMapsRemapRgbWithoutTurningMappedBlackTransparent()
     {
@@ -790,6 +808,11 @@ public sealed class ResourceAndDefinitionTests
             sound => sound is { Role: "Interface.Activate", IdSuffix: ":gameopts.666", SampleIndex: 0 });
         Assert.Contains(ImportedAnimations.Definitions,
             definition => definition is { Role: "Interface.Cursor", IdSuffix: ":ffmouse.csf", PaletteArtRole: "Estate.Shell" });
+        Assert.Contains(ImportedAnimations.Definitions,
+            definition => definition is
+            {
+                Role: "Combat.FirstPerson", IdSuffix: ":skirmish.csf", PaletteIdSuffix: ":SKIRMISH.PAL"
+            });
     }
 
     [Fact]
