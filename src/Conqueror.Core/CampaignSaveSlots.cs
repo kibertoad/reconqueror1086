@@ -6,7 +6,8 @@ public sealed record CampaignSaveSlot(
     bool IsValid,
     string PlayerName,
     DateTime? CampaignDate,
-    string? Error);
+    string? Error,
+    bool RecoveredFromBackup = false);
 
 public sealed class CampaignSaveSlots
 {
@@ -25,48 +26,56 @@ public sealed class CampaignSaveSlots
 
     public CampaignSaveSlot Inspect(int number)
     {
-        var path = ExistingPath(number);
-        if (path is null) return new(number, false, false, "EMPTY", null, null);
+        Validate(number);
+        var paths = ExistingPaths(number);
+        if (paths.Count == 0) return new(number, false, false, "EMPTY", null, null);
 
-        try
-        {
-            var campaign = Campaign.Load(path);
-            return new(number, true, true, campaign.State.Player.Name, campaign.State.Date, null);
-        }
-        catch (Exception error) when (IsUnreadableSave(error))
-        {
-            return new(number, true, false, "UNREADABLE", null, error.Message);
-        }
+        Exception? firstError = null;
+        foreach (var candidate in paths)
+            try
+            {
+                var campaign = Campaign.Load(candidate.Path);
+                return new(number, true, true, campaign.State.Player.Name, campaign.State.Date, null, candidate.IsBackup);
+            }
+            catch (Exception error) when (IsUnreadableSave(error))
+            {
+                firstError ??= error;
+            }
+        return new(number, true, false, "UNREADABLE", null, firstError?.Message);
     }
 
     public void Save(Campaign campaign, int number)
     {
         ArgumentNullException.ThrowIfNull(campaign);
-        campaign.Save(SlotPath(number));
+        var path = SlotPath(number);
+        if (File.Exists(path) && IsReadable(path)) ReplaceBackup(path, BackupPath(number));
+        campaign.Save(path);
     }
 
     public bool TryLoad(int number, out Campaign? campaign, out string? error)
     {
-        var path = ExistingPath(number);
-        if (path is null)
+        Validate(number);
+        var paths = ExistingPaths(number);
+        if (paths.Count == 0)
         {
             campaign = null;
             error = "THAT SAVE SLOT IS EMPTY";
             return false;
         }
 
-        try
+        foreach (var candidate in paths)
         {
-            campaign = Campaign.Load(path);
-            error = null;
-            return true;
+            try
+            {
+                campaign = Campaign.Load(candidate.Path);
+                error = null;
+                return true;
+            }
+            catch (Exception loadError) when (IsUnreadableSave(loadError)) { }
         }
-        catch (Exception loadError) when (IsUnreadableSave(loadError))
-        {
-            campaign = null;
-            error = "THAT SAVE SLOT CANNOT BE READ";
-            return false;
-        }
+        campaign = null;
+        error = "THAT SAVE SLOT CANNOT BE READ";
+        return false;
     }
 
     public string SlotPath(int number)
@@ -75,14 +84,44 @@ public sealed class CampaignSaveSlots
         return Path.Combine(_root, $"campaign-{number}.json");
     }
 
-    private string? ExistingPath(int number)
+    public string BackupPath(int number)
     {
+        Validate(number);
+        return SlotPath(number) + ".bak";
+    }
+
+    private IReadOnlyList<(string Path, bool IsBackup)> ExistingPaths(int number)
+    {
+        var result = new List<(string, bool)>();
         var path = SlotPath(number);
-        if (File.Exists(path)) return path;
+        if (File.Exists(path)) result.Add((path, false));
+        var backup = BackupPath(number);
+        if (File.Exists(backup)) result.Add((backup, true));
 
         // Compatibility with the single-save prototype used before the five-slot UI.
         var legacy = Path.Combine(_root, "campaign.json");
-        return number == 1 && File.Exists(legacy) ? legacy : null;
+        if (number == 1 && File.Exists(legacy)) result.Add((legacy, false));
+        return result;
+    }
+
+    private static bool IsReadable(string path)
+    {
+        try { Campaign.Load(path); return true; }
+        catch (Exception error) when (IsUnreadableSave(error)) { return false; }
+    }
+
+    private static void ReplaceBackup(string source, string destination)
+    {
+        var temporaryPath = destination + $".{Guid.NewGuid():N}.tmp";
+        try
+        {
+            File.Copy(source, temporaryPath, overwrite: false);
+            File.Move(temporaryPath, destination, overwrite: true);
+        }
+        finally
+        {
+            if (File.Exists(temporaryPath)) File.Delete(temporaryPath);
+        }
     }
 
     private static void Validate(int number)

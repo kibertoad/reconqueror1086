@@ -1108,6 +1108,60 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void SaveSlotsVersionAtomicWritesAndRecoverThePreviousSave()
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"conqueror-recovery-{Guid.NewGuid():N}");
+        try
+        {
+            var slots = new CampaignSaveSlots(root);
+            var campaign = new Campaign(Campaign.NewFromTemplate(0));
+            campaign.State.Player.Wealth = 111;
+            slots.Save(campaign, 4);
+            Assert.Contains($"\"SchemaVersion\": {Campaign.CurrentSaveSchemaVersion}", File.ReadAllText(slots.SlotPath(4)));
+
+            campaign.State.Player.Wealth = 222;
+            slots.Save(campaign, 4);
+            Assert.True(File.Exists(slots.BackupPath(4)));
+            File.WriteAllText(slots.SlotPath(4), "interrupted");
+
+            var info = slots.Inspect(4);
+            Assert.True(info.IsValid);
+            Assert.True(info.RecoveredFromBackup);
+            Assert.True(slots.TryLoad(4, out var recovered, out var error));
+            Assert.Null(error);
+            Assert.Equal(111, recovered!.State.Player.Wealth);
+            Assert.Empty(Directory.EnumerateFiles(root, "*.tmp"));
+        }
+        finally
+        {
+            if (Directory.Exists(root)) Directory.Delete(root, true);
+        }
+    }
+
+    [Fact]
+    public void UnversionedSavesMigrateAndFutureSchemasAreRejected()
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"conqueror-schema-{Guid.NewGuid():N}");
+        try
+        {
+            Directory.CreateDirectory(root);
+            var legacyPath = Path.Combine(root, "legacy.json");
+            File.WriteAllText(legacyPath, System.Text.Json.JsonSerializer.Serialize(Campaign.NewFromTemplate(0)));
+            Assert.Equal(Campaign.CurrentSaveSchemaVersion, Campaign.Load(legacyPath).State.SchemaVersion);
+
+            var future = Campaign.NewFromTemplate(0);
+            future.SchemaVersion = Campaign.CurrentSaveSchemaVersion + 1;
+            var futurePath = Path.Combine(root, "future.json");
+            File.WriteAllText(futurePath, System.Text.Json.JsonSerializer.Serialize(future));
+            Assert.Throws<InvalidDataException>(() => Campaign.Load(futurePath));
+        }
+        finally
+        {
+            if (Directory.Exists(root)) Directory.Delete(root, true);
+        }
+    }
+
+    [Fact]
     public void DilemmaTextIsParsedIntoDataDrivenChoicesAndOutcomes()
     {
         var dilemma = DilemmaTextDecoder.Decode(System.Text.Encoding.ASCII.GetBytes(SyntheticDilemma()));

@@ -304,6 +304,12 @@ Each region record contains six 32-bit fields: identifier, X, Y, width, height, 
 
 `FWARPLAN.HAT` declares five 40×38 army buttons in regions 0–4, a 114×38 Field Army control in region 5, a 138×38 Send Out Spy control in region 6, a 198×38 membership control in region 7, three 300×14 unit rows in regions 8–10, OK/Cancel in regions 11–12, and a 100×20 army-name field in region 13. Decoded `WARPLAN.CSF` has 22 frames whose dimensions match those controls exactly: frames 0–14 are five selected/normal/disabled army triplets, frames 15–17 are Join/blank/Leave Selected Army, frames 18–19 are Field Army/blank, and frames 20–21 are two Send Out Spy states. Geometry, dimensions, palette association, visible frame identities, and the name field are **Confirmed**; independent army movement dispatch remains **Provisional**.
 
+## Reimplementation save format
+
+Campaign slots are UTF-8 JSON representations of `CampaignState`. Schema 1 adds the required non-negative `SchemaVersion` field; a missing field identifies schema 0, the unversioned format written by every earlier prototype. Loading migrates schema 0 in memory before campaign-state repair, accepts schema 1, and rejects negative or future versions rather than silently discarding unknown state. The former `campaign.json` filename remains a schema-independent slot-1 fallback.
+
+Each numbered slot uses `campaign-N.json`, for N from 1 through 5. A save is written and flushed to a uniquely named file in the same directory, then moved over the destination so a partial JSON document is never exposed as the current slot. Before replacing a readable current slot, the slot manager atomically refreshes `campaign-N.json.bak`; it deliberately preserves an existing valid backup when the current primary is already corrupt. Inspection and loading try the primary, then its backup, and finally the old slot-1 filename. These rules are independently authored reimplementation behavior rather than claims about the original save format.
+
 ## Disc image and audio
 
 `game.ins` is a cue sheet. Track 1 is MODE1/2352 data; each raw sector exposes its 2,048-byte ISO-9660 payload beginning 16 bytes into the sector. The first audio-track index determines the data-track sector count. Later tracks are Red Book CDDA: 44,100 Hz, stereo, signed 16-bit little-endian PCM, with 2,352 bytes per sector. The importer wraps those samples losslessly in a RIFF/WAVE header.

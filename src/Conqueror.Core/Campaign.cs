@@ -1,9 +1,12 @@
 using System.Text.Json;
+using System.Text;
 
 namespace Conqueror.Core;
 
 public sealed class Campaign
 {
+    public const int CurrentSaveSchemaVersion = 1;
+
     public CampaignState State { get; private set; }
     private readonly Random _random;
 
@@ -649,11 +652,47 @@ public sealed class Campaign
 
     public void Save(string path)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
-        File.WriteAllText(path, JsonSerializer.Serialize(State, new JsonSerializerOptions { WriteIndented = true }));
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+        var fullPath = Path.GetFullPath(path);
+        var directory = Path.GetDirectoryName(fullPath)!;
+        Directory.CreateDirectory(directory);
+        State.SchemaVersion = CurrentSaveSchemaVersion;
+        var json = JsonSerializer.Serialize(State, new JsonSerializerOptions { WriteIndented = true });
+        var temporaryPath = Path.Combine(directory, $".{Path.GetFileName(fullPath)}.{Guid.NewGuid():N}.tmp");
+        try
+        {
+            using (var stream = new FileStream(temporaryPath, FileMode.CreateNew, FileAccess.Write, FileShare.None,
+                       bufferSize: 4096, FileOptions.WriteThrough))
+            using (var writer = new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false)))
+            {
+                writer.Write(json);
+                writer.Flush();
+                stream.Flush(flushToDisk: true);
+            }
+            File.Move(temporaryPath, fullPath, overwrite: true);
+        }
+        finally
+        {
+            if (File.Exists(temporaryPath)) File.Delete(temporaryPath);
+        }
     }
 
-    public static Campaign Load(string path, int seed = 1086) => new(JsonSerializer.Deserialize<CampaignState>(File.ReadAllText(path)) ?? throw new InvalidDataException("Invalid campaign save."), seed);
+    public static Campaign Load(string path, int seed = 1086)
+    {
+        var state = JsonSerializer.Deserialize<CampaignState>(File.ReadAllText(path))
+            ?? throw new InvalidDataException("Invalid campaign save.");
+        if (state.SchemaVersion < 0 || state.SchemaVersion > CurrentSaveSchemaVersion)
+            throw new InvalidDataException($"Unsupported campaign save schema {state.SchemaVersion}.");
+        MigrateSave(state);
+        return new Campaign(state, seed);
+    }
+
+    private static void MigrateSave(CampaignState state)
+    {
+        // Schema 0 is every save written before explicit versioning. Existing
+        // constructors and EnsureStrategicState supply its missing fields.
+        if (state.SchemaVersion == 0) state.SchemaVersion = 1;
+    }
     public void Log(string text) { State.Journal.Add($"{State.Date:dd MMM yyyy}: {text}"); if (State.Journal.Count > 60) State.Journal.RemoveAt(0); }
 }
 

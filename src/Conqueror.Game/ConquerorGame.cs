@@ -1434,7 +1434,9 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         {
             var bounds = original ? ScaleBounds(LoadGameDefinitions.Slots[i]) : new Rectangle(150, 190 + i * 82, 724, 55);
             var info = i < _saveSlotInfo.Count ? _saveSlotInfo[i] : new CampaignSaveSlot(i + 1, false, false, "EMPTY", null, null);
-            var details = info.IsValid ? $"{info.PlayerName}   {info.CampaignDate:dd MMM yyyy}" : info.PlayerName;
+            var details = info.IsValid
+                ? $"{info.PlayerName}   {info.CampaignDate:dd MMM yyyy}{(info.RecoveredFromBackup ? "   BACKUP" : "")}"
+                : info.PlayerName;
             DrawText(details.ToUpperInvariant(), bounds.X + 90, bounds.Y + 10, info.IsValid ? Color.White : Color.LightGray, 2, bounds.Width - 110);
             if (i == _loadSlot) DrawOutline(bounds, Color.Gold, 3);
         }

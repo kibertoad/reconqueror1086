@@ -218,6 +218,7 @@ public sealed class Player
 
 public sealed class CampaignState
 {
+    public int SchemaVersion { get; set; }
     public Player Player { get; init; } = new();
     public DateTime Date { get; set; } = new(1086, 3, 1);
     public VictoryKind Victory { get; set; }

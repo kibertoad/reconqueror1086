@@ -10,7 +10,7 @@ Gameplay is definition-driven: buildings, equipment slots, population bands, uni
 dotnet run --project src/Conqueror.Game
 ```
 
-The game opens at 1024x768. Press any key or click through the title to reach the original options hub, then choose New Game for the character-options screen, where you can set a name and heraldic color, generate a new character, or select one of six pre-generated characters. Keyboard navigation remains available. `F5` saves to the active slot; `F9` opens the original five-slot load screen, where Escape or the Resume scroll returns without loading. Saves are JSON and deliberately version-readable; the former single `campaign.json` save remains readable as slot 1.
+The game opens at 1024x768. Press any key or click through the title to reach the original options hub, then choose New Game for the character-options screen, where you can set a name and heraldic color, generate a new character, or select one of six pre-generated characters. Keyboard navigation remains available. `F5` saves atomically to the active slot while retaining the previous valid generation as a recovery backup; `F9` opens the original five-slot load screen and automatically offers that backup when the primary is damaged. Escape or the Resume scroll returns without loading. Saves are versioned JSON with an explicit migration path; the former unversioned single `campaign.json` save remains readable as slot 1.
 
 On Windows, double-click `Start Conqueror 1086.bat` in the repository root. It checks for the .NET SDK and builds/starts the game locally.
 
