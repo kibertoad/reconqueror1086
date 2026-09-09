@@ -132,7 +132,9 @@ The CD contains 2,131 Smacker movies occupying 288,867,980 bytes and indexing 18
 
 Of the 2,131 files, 2,095 declare one packed 8-bit mono audio track: 2,093 at 22,050 Hz and two at 11,025 Hz. The other 36 are silent. The dominant geometry is 196x204 (2,068 files); larger and special-purpose movies span eight other observed dimensions up to 640x480. Frame flags bind optional palette data followed by audio packets for tracks 0–6; the remainder is the video packet. Population-wide demultiplexing validates 2,135 palette changes and 161,884 audio packets while leaving a non-empty video packet in every frame. Palette packets copy the previous 256-entry RGB table, then apply bounded skip, old-palette copy, and new 6-bit RGB commands. Six-bit components expand with `value * 4 + value / 16`.
 
-This uniform `SMK2` population makes direct decoding a viable primary strategy; installation-time transcoding remains a fallback rather than a prerequisite. Video-tree, block, and packed-audio decoding are still incomplete.
+Packed audio uses one LSB-first Huffman tree of 8-bit deltas for this release's mono profile. Each packet declares its decoded byte count, defines a bounded tree of at most 256 leaves and depth 27, seeds an unsigned 8-bit predictor, and reconstructs subsequent samples with byte-wrapping delta addition. All 161,884 packets decode to their declared sizes, totaling 398,368,812 unsigned PCM bytes. The playback adapter can convert these samples once to signed PCM16 using the same range-preserving mapping as `.666` banks.
+
+This uniform `SMK2` population makes direct decoding the primary strategy; installation-time transcoding remains a fallback rather than a prerequisite. Video-tree and block decoding are still incomplete.
 
 ## Dynamix `.666` sound banks
 

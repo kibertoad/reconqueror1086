@@ -87,6 +87,31 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void SmackerPackedMonoAudioDecodesPredictiveHuffmanSamples()
+    {
+        var packet = new byte[7];
+        BinaryPrimitives.WriteUInt32LittleEndian(packet, 3);
+        packet[4] = 0x29;
+        packet[5] = 0xA0;
+        packet[6] = 0x02;
+        var track = new SmackerAudioTrack(0, 22050, 4096, true, false, false);
+
+        var decoded = SmackerAudioDecoder.Decode(packet, track);
+
+        Assert.Equal([10, 11, 12], decoded.Samples);
+        Assert.Equal([0, 0x8A, 0, 0x8B, 0, 0x8C], decoded.ToPcm16LittleEndian());
+    }
+
+    [Fact]
+    public void SmackerPackedAudioRejectsTruncationAndProfileMismatch()
+    {
+        var track = new SmackerAudioTrack(0, 22050, 4096, true, false, false);
+        Assert.Throws<InvalidDataException>(() => SmackerAudioDecoder.Decode([3, 0, 0, 0, 1], track));
+        Assert.Throws<InvalidDataException>(() => SmackerAudioDecoder.Decode([3, 0, 0, 0, 0x2B, 0xA0, 0x02], track));
+        Assert.Throws<NotSupportedException>(() => SmackerAudioDecoder.Decode([3, 0, 0, 0, 1], track with { IsStereo = true }));
+    }
+
+    [Fact]
     public void SmackerMovieRejectsInvalidHeadersAndFrameExtents()
     {
         var badMagic = SyntheticSmacker();
