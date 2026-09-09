@@ -63,6 +63,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private int _ladyIndex = 1;
     private int _tournamentOpponent = 2;
     private ImportedContentCatalog? _importedContent;
+    private ImportedSoundLibrary? _importedSoundLibrary;
     private ImportedDialogueRepository? _importedDialogue;
     private WeaponStoreResource? _weaponStore;
     private YouthDilemmaResult? _youthDilemmaResult;
@@ -96,6 +97,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _pixel = new Texture2D(GraphicsDevice, 1, 1);
         _pixel.SetData([Color.White]);
         _importedContent = ImportedContentCatalog.Discover();
+        _importedSoundLibrary = _importedContent is null ? null : ImportedSoundLibrary.Load(_importedContent);
         _importedDialogue = _importedContent is null ? null : new ImportedDialogueRepository(_importedContent);
         var weaponStoreId = _importedContent?.FindId("resource", ":weapons.dat");
         _weaponStore = weaponStoreId is null ? null : _importedContent?.DecodeWeaponStore(weaponStoreId);
@@ -948,13 +950,12 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             sound => sound.IdSuffix, StringComparer.OrdinalIgnoreCase))
         {
             var bankId = _importedContent?.FindId("sound-bank", bankDefinitions.Key);
-            var bank = bankId is null ? null : _importedContent?.DecodeSoundBank(bankId);
-            if (bank is null) continue;
+            if (bankId is null) continue;
             foreach (var definition in bankDefinitions)
             {
-                if (bank.Samples.ElementAtOrDefault(definition.SampleIndex) is not { } sample) continue;
+                if (_importedSoundLibrary?.Find(bankId, definition.SampleIndex) is not { } sample) continue;
                 _originalSounds.Add(definition.Role, new SoundEffect(
-                    sample.ToPcm16LittleEndian(), sample.SampleRate, AudioChannels.Mono));
+                    sample.Pcm16LittleEndian, sample.SampleRate, AudioChannels.Mono));
             }
         }
     }

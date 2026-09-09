@@ -344,6 +344,10 @@ try
     Check(importedSequence?.DecodeFrame(importedSequence.Chunks[0]) is { Width: 5, Height: 2 }, "runtime catalog decodes imported CSF frame sequences");
     Check(catalog?.DecodePalette("PALETTE")?.Rgb.Length == IndexedPalette.ByteSize, "runtime catalog decodes imported RGB palettes");
     Check(catalog?.DecodeSoundBank("SOUND")?.Samples is [{ SampleRate: 11025, Samples.Length: 3 }], "runtime catalog decodes imported sound banks");
+    var preparedSounds = ImportedSoundLibrary.Load(catalog!);
+    Check(preparedSounds is { BankCount: 1, SampleCount: 1 }
+        && preparedSounds.Find("sound", 0)?.Pcm16LittleEndian.SequenceEqual(new byte[] { 0, 255, 0, 0, 0, 1 }) == true,
+        "startup sound cache decodes and converts every imported sample once");
     var dialogue = catalog is null ? null : new ImportedDialogueRepository(catalog).GetDilemma(7);
     Check(dialogue is { Number: 7, Age: 12, Choices.Count: 3 }, "runtime dialogue repository loads a dilemma by stable number");
     Check(catalog is not null && new ImportedDialogueRepository(catalog).GetDilemmasForAge(12).Select(x => x.Number).SequenceEqual([7]), "runtime dialogue repository groups definitions by declared age");

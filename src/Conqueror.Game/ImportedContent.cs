@@ -9,6 +9,7 @@ public sealed record ImportedArtDefinition(string Role, string Kind, string IdSu
 public sealed record ImportedLayoutDefinition(string Role, string IdSuffix);
 public sealed record ImportedAnimationDefinition(string Role, string IdSuffix, string PaletteArtRole);
 public sealed record ImportedSoundDefinition(string Role, string IdSuffix, int SampleIndex);
+public sealed record PreparedImportedSound(string BankId, int SampleIndex, int SampleRate, byte[] Pcm16LittleEndian);
 
 public static class ImportedArt
 {
@@ -243,6 +244,40 @@ public sealed class ImportedContentCatalog
         return File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
     }
 
+}
+
+/// <summary>
+/// Eager session cache for the small original sound-bank population. Decoding and unsigned
+/// 8-to-signed-16-bit conversion happen once during game startup, never in an input handler.
+/// </summary>
+public sealed class ImportedSoundLibrary
+{
+    private readonly Dictionary<string, PreparedImportedSound[]> _banks = new(StringComparer.OrdinalIgnoreCase);
+    public int BankCount => _banks.Count;
+    public int SampleCount => _banks.Values.Sum(samples => samples.Length);
+
+    private ImportedSoundLibrary()
+    {
+    }
+
+    public static ImportedSoundLibrary Load(ImportedContentCatalog catalog)
+    {
+        ArgumentNullException.ThrowIfNull(catalog);
+        var library = new ImportedSoundLibrary();
+        foreach (var id in catalog.Ids("sound-bank").Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            var bank = catalog.DecodeSoundBank(id);
+            if (bank is null) continue;
+            library._banks.Add(id, bank.Samples.Select(sample => new PreparedImportedSound(
+                id, sample.Index, sample.SampleRate, sample.ToPcm16LittleEndian())).ToArray());
+        }
+        return library;
+    }
+
+    public PreparedImportedSound? Find(string bankId, int sampleIndex) =>
+        sampleIndex >= 0 && _banks.TryGetValue(bankId, out var samples)
+            ? samples.ElementAtOrDefault(sampleIndex)
+            : null;
 }
 
 /// <summary>Runtime access to locally imported original dilemma text.</summary>
