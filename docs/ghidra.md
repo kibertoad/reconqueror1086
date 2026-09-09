@@ -101,6 +101,14 @@ dotnet run --project tools\Conqueror.Inspect --artifacts-path $artifactPath -- `
 
 This writes the ignored metadata-only `analysis/original/executable-disassembly-report.txt`. Addresses are LE virtual addresses, not raw file offsets. The inspector maps them through the executable's object and page tables before decoding 32-bit x86 instructions.
 
+For data references that are absent from raw instruction operands, `--xref-data=` also decodes the executable's fixup page and record tables according to the IBM LE/LX field definitions and Open Watcom's `exeflat.h` constants. Pass comma-separated target-object offsets; the ignored report includes matching internal relocations and a small source-address neighborhood without exporting original bytes:
+
+```powershell
+dotnet run --project tools\Conqueror.Inspect -- `
+  'C:\GOG Games\Conqueror AD1086' 'analysis\original' `
+  '--xref-data=0x17C0,0x17CC,0x1810'
+```
+
 ## Evidence discipline
 
 - Hash the executable before analysis and compare it with the reference hash above.

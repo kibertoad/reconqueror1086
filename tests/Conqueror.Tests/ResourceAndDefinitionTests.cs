@@ -349,6 +349,35 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void LinearExecutableInternalFixupsResolveObjectRelativeTargets()
+    {
+        var bytes = new byte[0x180];
+        const int header = 0x40;
+        bytes[header] = (byte)'L'; bytes[header + 1] = (byte)'E';
+        WriteInt(bytes, header + 0x14, 2); WriteInt(bytes, header + 0x28, 0x1000);
+        WriteInt(bytes, header + 0x40, 0xb0); WriteInt(bytes, header + 0x44, 2);
+        WriteInt(bytes, header + 0x68, 0xe0); WriteInt(bytes, header + 0x6c, 0xec);
+        var firstObject = header + 0xb0;
+        WriteInt(bytes, firstObject, 0x1000); WriteInt(bytes, firstObject + 4, 0x10000);
+        WriteInt(bytes, firstObject + 12, 1); WriteInt(bytes, firstObject + 16, 1);
+        var secondObject = firstObject + 24;
+        WriteInt(bytes, secondObject, 0x2000); WriteInt(bytes, secondObject + 4, 0x20000);
+        WriteInt(bytes, secondObject + 12, 2); WriteInt(bytes, secondObject + 16, 1);
+        var pageTable = header + 0xe0;
+        WriteInt(bytes, pageTable, 0); WriteInt(bytes, pageTable + 4, 9); WriteInt(bytes, pageTable + 8, 9);
+        var record = header + 0xec;
+        bytes[record] = 7; bytes[record + 1] = 0x10;
+        BinaryPrimitives.WriteUInt16LittleEndian(bytes.AsSpan(record + 2), 0x20);
+        bytes[record + 4] = 2;
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(record + 5), 0x17c0);
+
+        Assert.Equal(
+            [new LinearExecutableFixup(1, 0x10020, 7, 2, 0x17c0, false, false)],
+            LinearExecutableFixupReader.ReadInternalFixups(bytes));
+        Assert.Throws<InvalidDataException>(() => LinearExecutableFixupReader.ReadInternalFixups(bytes[..(record + 8)]));
+    }
+
+    [Fact]
     public void FiveSaveSlotsRoundTripAndRecognizeLegacySlotOne()
     {
         var root = Path.Combine(Path.GetTempPath(), $"conqueror-slots-{Guid.NewGuid():N}");

@@ -409,6 +409,7 @@ static string DisassembleLinearExecutable(string path, IReadOnlyList<uint> addre
 static string FindLinearExecutableDataReferences(string path, IReadOnlyList<uint> offsets)
 {
     var bytes = File.ReadAllBytes(path);
+    var fixups = LinearExecutableFixupReader.ReadInternalFixups(bytes);
     var le = Enumerable.Range(0, bytes.Length - 0x84)
         .FirstOrDefault(index => bytes[index] == (byte)'L' && bytes[index + 1] == (byte)'E'
             && bytes[index + 2] == 0 && bytes[index + 3] == 0
@@ -421,6 +422,19 @@ static string FindLinearExecutableDataReferences(string path, IReadOnlyList<uint
     var dataPages = checked((uint)le + BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(le + 0x80, 4)));
     var report = new StringBuilder("# 32-bit LE references to object-relative data offsets (derived metadata; original bytes omitted)\n");
     report.AppendLine($"# requested: {string.Join(',', offsets.Select(offset => $"0x{offset:X}"))}");
+    report.AppendLine($"# decoded internal fixups: {fixups.Count}");
+    var matchedFixups = fixups.Where(fixup => offsets.Contains(fixup.TargetOffset)).OrderBy(fixup => fixup.SourceAddress).ToArray();
+    foreach (var fixup in matchedFixups)
+        report.AppendLine($"0x{fixup.SourceAddress:X8}  relocation object{fixup.TargetObject}+0x{fixup.TargetOffset:X}  source-type 0x{fixup.SourceType:X2}{(fixup.Additive ? " additive" : "")}{(fixup.Chained ? " chained" : "")}");
+    var nearbyFixups = fixups.Where(candidate => !matchedFixups.Contains(candidate)
+        && matchedFixups.Any(match => Math.Abs((long)candidate.SourceAddress - match.SourceAddress) <= 0x100))
+        .OrderBy(fixup => fixup.SourceAddress).ToArray();
+    if (nearbyFixups.Length > 0)
+    {
+        report.AppendLine("# nearby relocation context (within 0x100 source bytes of a requested match)");
+        foreach (var fixup in nearbyFixups)
+                report.AppendLine($"0x{fixup.SourceAddress:X8}  nearby object{fixup.TargetObject}+0x{fixup.TargetOffset:X}  source-type 0x{fixup.SourceType:X2}{(fixup.Additive ? " additive" : "")}{(fixup.Chained ? " chained" : "")}");
+    }
 
     for (var objectIndex = 0; objectIndex < objectCount; objectIndex++)
     {

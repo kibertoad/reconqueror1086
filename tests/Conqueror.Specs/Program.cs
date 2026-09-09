@@ -59,6 +59,7 @@ var soundBank = DynamixSoundBankDecoder.Decode(soundBankFixture);
 Check(soundBank.Samples is [{ SampleRate: 11025, Samples.Length: 3 }], "Dynamix sound bank parses bounded rate-tagged samples");
 Check(soundBank.Samples[0].ToPcm16LittleEndian().SequenceEqual(new byte[] { 0, 255, 0, 0, 0, 1 }), "unsigned 8-bit samples convert to signed 16-bit PCM");
 Check(Throws<InvalidDataException>(() => DynamixSoundBankDecoder.Decode(soundBankFixture[..^1])), "Dynamix sound bank rejects truncated samples");
+Check(Throws<InvalidDataException>(() => LinearExecutableFixupReader.ReadInternalFixups(new byte[128])), "linear executable fixup parser rejects missing headers");
 
 var lzwFixture = PackLsbCodes([65, 66, 257, 259], 9);
 Check(Encoding.ASCII.GetString(DynamixCompression.DecodeLzw(lzwFixture, 7)) == "ABABABA", "Dynamix LZW expands dictionary and special code");
