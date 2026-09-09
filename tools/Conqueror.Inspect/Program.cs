@@ -396,16 +396,45 @@ if (File.Exists(gobPath))
     {
         if (renderCsfName is null || palettePcxName is null)
             throw new ArgumentException("CSF previews require both --render-csf=<name> and --palette-pcx=<name>.");
-        var csfEntry = gob.Entries.FirstOrDefault(x => x.Name.Equals(renderCsfName, StringComparison.OrdinalIgnoreCase))
-            ?? throw new ArgumentException($"GOB resource '{renderCsfName}' was not found.");
-        var paletteEntry = gob.Entries.FirstOrDefault(x => x.Name.Equals(palettePcxName, StringComparison.OrdinalIgnoreCase))
-            ?? throw new ArgumentException($"GOB resource '{palettePcxName}' was not found.");
-        var previewSequence = new CsfSequence(gob.ReadDecoded(csfEntry));
-        var previewPalette = PcxDecoder.Decode(gob.ReadDecoded(paletteEntry)).PaletteRgb;
-        var previewRoot = Path.Combine(artifactRoot, "csf-previews", SafeName(csfEntry.Name));
+        byte[] ReadPreviewResource(string identifier)
+        {
+            var separator = identifier.IndexOf('/');
+            if (separator < 0)
+            {
+                var entry = gob.Entries.FirstOrDefault(candidate =>
+                    candidate.Name.Equals(identifier, StringComparison.OrdinalIgnoreCase))
+                    ?? throw new ArgumentException($"GOB resource '{identifier}' was not found.");
+                return gob.ReadDecoded(entry);
+            }
+
+            var archiveName = identifier[..separator];
+            var resourceName = identifier[(separator + 1)..];
+            if (archiveName.Length == 0 || resourceName.Length == 0 || identifier[(separator + 1)..].Contains('/'))
+                throw new ArgumentException($"Nested resource identifier '{identifier}' is invalid.");
+            var archiveFile = files.SingleOrDefault(file =>
+                Path.GetFileName(file.Path).Equals(archiveName, StringComparison.OrdinalIgnoreCase))
+                ?? throw new ArgumentException($"Scene archive '{archiveName}' was not found.");
+            var archive = new DynamixArchive(iso.ReadFile(archiveFile), archiveFile.Path);
+            var nested = archive.Entries.FirstOrDefault(candidate =>
+                candidate.Name.Equals(resourceName, StringComparison.OrdinalIgnoreCase))
+                ?? throw new ArgumentException($"Resource '{resourceName}' was not found in '{archiveName}'.");
+            return archive.ReadDecoded(nested);
+        }
+
+        var previewSequence = new CsfSequence(ReadPreviewResource(renderCsfName));
+        var paletteBytes = ReadPreviewResource(palettePcxName);
+        var previewPalette = paletteBytes.Length == IndexedPalette.ByteSize
+            ? IndexedPaletteDecoder.Decode(paletteBytes).Rgb
+            : PcxDecoder.Decode(paletteBytes).PaletteRgb;
+        var previewRoot = Path.Combine(artifactRoot, "csf-previews", SafeName(renderCsfName));
         Directory.CreateDirectory(previewRoot);
         foreach (var chunk in previewSequence.Chunks)
             WritePpm(Path.Combine(previewRoot, $"frame-{chunk.Index:D4}.ppm"), previewSequence.DecodeFrame(chunk), previewPalette, 6);
+        if (inspectionOptions.Contains("--preview-only", StringComparer.OrdinalIgnoreCase))
+        {
+            Console.WriteLine($"Rendered {previewSequence.Chunks.Count} bounded CSF previews to {previewRoot}.");
+            return 0;
+        }
     }
 }
 

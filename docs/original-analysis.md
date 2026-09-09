@@ -10,6 +10,17 @@ From the repository root:
 dotnet run --project tools/Conqueror.Inspect -- "C:\GOG Games\Conqueror AD1086" "analysis\original" wager joust skirmish
 ```
 
+CSF previews may name either a top-level GOB resource or one nested scene resource as
+`ARCHIVE.RES/resource`. A raw 768-byte palette or a paletted PCX can supply colors; use
+`--preview-only` to stop after the bounded render instead of repeating population scans:
+
+```powershell
+dotnet run --project tools/Conqueror.Inspect -- `
+  "C:\GOG Games\Conqueror AD1086" "analysis\original" `
+  --render-csf=SKIRMISH.RES/skirmish.csf `
+  --palette-pcx=SKIRMISH.RES/SKIRMISH.PAL --preview-only
+```
+
 The first argument is the installed-game directory, the second is an output directory inside this repository, and any remaining arguments are case-insensitive printable-string search terms. With no arguments, the utility uses the paths shown above.
 
 End users should use `Install Original Resources.bat` instead. It runs `tools/Conqueror.Import`, extracts owned SMK/RES/CSF/PCX/PCC/LOW/audio resources into ignored `UserContent`, copies the owned GOB archive, converts Red Book CD audio losslessly to runtime-loadable PCM WAV, and records every installed file in `manifest.json`. MonoGame's runtime stream loader requires PCM RIFF data; compressed Ogg/MP3 support normally goes through the build-time content pipeline, while FLAC would require an additional decoder.
