@@ -18,6 +18,7 @@ public static class ImportedArt
     [
         new("Title.Background", "image", ":fftitle.pcx"),
         new("Options.Background", "image", ":optfin.pcx"),
+        new("Practice.Background", "image", ":practice.pcx"),
         new("Character.Options", "image", ":char_ops.pcx"),
         new("Character.Pregenerated", "image", ":pregen.pcx"),
         new("Campaign.Briefing", "image", ":fluff.pcx"),
@@ -46,6 +47,7 @@ public static class ImportedLayouts
     [
         new("Title", ":title.hat"),
         new("Options", ":gameopts.hat"),
+        new("Practice", ":practice.hat"),
         new("Character.Options", ":cgopts.hat"),
         new("Character.Pregenerated", ":pregen.hat"),
         new("Dilemma", ":chargen.hat"),
@@ -87,7 +89,8 @@ public static class ImportedMovies
     public static IReadOnlyList<ImportedMovieDefinition> Definitions { get; } =
     [
         new("Title.Intro", "/title.smk"),
-        new("Options.Credits", "/creditzz.smk")
+        new("Options.Credits", "/creditzz.smk"),
+        new("Practice.Joust", "/jousprac.smk")
     ];
 }
 

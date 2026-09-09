@@ -13,7 +13,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private sealed record OriginalAnimation(IReadOnlyList<Texture2D> Frames);
     private const string OriginalCursorAnimationRole = "Interface.Cursor";
 
-    private enum Screen { Title, Movie, OptionsHub, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Briefing, Map, Home, WarPlanning, Farm, Village, Inn, InnDialogue, Blacksmith, BlacksmithDialogue, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
+    private enum Screen { Title, Movie, OptionsHub, Practice, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Briefing, Map, Home, WarPlanning, Farm, Village, Inn, InnDialogue, Blacksmith, BlacksmithDialogue, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _batch = null!;
     private Texture2D _pixel = null!;
@@ -24,6 +24,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private int _characterOption;
     private int _optionsHubOption;
     private int _pressedOptionsHubOption = -1;
+    private int _practiceOption;
     private int _characterTemplate;
     private int _loadSlot;
     private int _activeSaveSlot = 1;
@@ -34,6 +35,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private string _characterName = "Sir ";
     private IReadOnlyList<CharacterCreationOption> _characterOptions = CharacterCreationDefinitions.Options;
     private IReadOnlyList<OptionsHubOption> _optionsHubOptions = OptionsHubDefinitions.Options;
+    private IReadOnlyList<PracticeOption> _practiceOptions = PracticePresentationDefinitions.Options;
     private IReadOnlyList<HeraldicColorOption> _heraldicColors = CharacterCreationDefinitions.HeraldicColors;
     private IReadOnlyList<UiBounds> _pregeneratedBounds = CharacterCreationDefinitions.PregeneratedCharacters;
     private IReadOnlyList<UiBounds> _dilemmaChoiceBounds = YouthDilemmaPresentationDefinitions.Choices;
@@ -115,6 +117,9 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         var optionsLayoutId = _importedContent?.FindId("resource", ":gameopts.hat");
         var optionsLayout = optionsLayoutId is null ? null : _importedContent?.DecodeHat(optionsLayoutId);
         _optionsHubOptions = OptionsHubDefinitions.OptionsFrom(optionsLayout);
+        var practiceLayoutId = _importedContent?.FindId("resource", ":practice.hat");
+        var practiceLayout = practiceLayoutId is null ? null : _importedContent?.DecodeHat(practiceLayoutId);
+        _practiceOptions = PracticePresentationDefinitions.OptionsFrom(practiceLayout);
         var characterLayoutId = _importedContent?.FindId("resource", ":cgopts.hat");
         var characterLayout = characterLayoutId is null ? null : _importedContent?.DecodeHat(characterLayoutId);
         _characterOptions = CharacterCreationDefinitions.OptionsFrom(characterLayout);
@@ -237,6 +242,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             if (_screen == Screen.Title) Exit();
             else if (_screen == Screen.Movie) FinishEventMovie();
             else if (_screen == Screen.OptionsHub) _screen = Screen.Title;
+            else if (_screen == Screen.Practice) _screen = Screen.OptionsHub;
             else if (_screen == Screen.LoadGame) ResumeFromLoadGame();
             else if (_screen == Screen.CharacterName) _screen = Screen.CharacterOptions;
             else if (_screen == Screen.CharacterOptions) _screen = Screen.Title;
@@ -278,6 +284,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                 }
                 break;
             case Screen.OptionsHub: UpdateOptionsHub(Press, mouse, click, release); break;
+            case Screen.Practice: UpdatePractice(Press, mouse, click); break;
             case Screen.LoadGame: UpdateLoadGame(Press, mouse, click); break;
             case Screen.CharacterOptions: UpdateCharacterOptions(Press, mouse, click); break;
             case Screen.CharacterName: UpdateCharacterName(Press); break;
@@ -376,11 +383,52 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                 _notice = $"ANIMATION {OnOff(_animationEnabled)}";
                 break;
             case OptionsHubAction.ToggleMidiMusic: _notice = "MIDI MUSIC IS NOT AVAILABLE"; break;
-            case OptionsHubAction.Practice: _notice = "PRACTICE MODE IS NOT IMPLEMENTED YET"; break;
+            case OptionsHubAction.Practice:
+                _practiceOption = 0;
+                _screen = Screen.Practice;
+                _notice = "SELECT A PRACTICE EVENT";
+                break;
             case OptionsHubAction.Credits: PlayEventMovie("Options.Credits", Screen.OptionsHub); break;
             case OptionsHubAction.Movie: PlayEventMovie("Title.Intro", Screen.OptionsHub); break;
             case OptionsHubAction.Exit: Exit(); break;
             default: throw new ArgumentOutOfRangeException(nameof(option));
+        }
+    }
+
+    private void UpdatePractice(Func<Keys, bool> press, MouseState mouse, bool click)
+    {
+        var moved = false;
+        if (press(Keys.Up) || press(Keys.Left))
+        {
+            _practiceOption = (_practiceOption + _practiceOptions.Count - 1) % _practiceOptions.Count;
+            moved = true;
+        }
+        if (press(Keys.Down) || press(Keys.Right))
+        {
+            _practiceOption = (_practiceOption + 1) % _practiceOptions.Count;
+            moved = true;
+        }
+        if (moved) _notice = _practiceOptions[_practiceOption].Label.ToUpperInvariant();
+
+        var (x, y) = OriginalPoint(mouse);
+        var hovered = Enumerable.Range(0, _practiceOptions.Count)
+            .FirstOrDefault(index => _practiceOptions[index].OriginalBounds.Contains(x, y), -1);
+        if (hovered >= 0)
+        {
+            _practiceOption = hovered;
+            _notice = _practiceOptions[hovered].Label.ToUpperInvariant();
+        }
+
+        var selected = press(Keys.Enter) ? _practiceOption : click ? hovered : -1;
+        if (selected < 0) return;
+        switch (_practiceOptions[selected].Action)
+        {
+            case PracticeAction.Joust: PlayEventMovie("Practice.Joust", Screen.Practice); break;
+            case PracticeAction.Exit: _screen = Screen.OptionsHub; break;
+            case PracticeAction.War: _notice = "WAR PRACTICE ENGINE IS NOT YET REIMPLEMENTED"; break;
+            case PracticeAction.Melee: _notice = "MELEE PRACTICE ENGINE IS NOT YET REIMPLEMENTED"; break;
+            case PracticeAction.CastleSkirmish: _notice = "CASTLE SKIRMISH ENGINE IS NOT YET REIMPLEMENTED"; break;
+            default: throw new ArgumentOutOfRangeException();
         }
     }
 
@@ -1064,7 +1112,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _batch.Begin(samplerState: SamplerState.PointClamp);
         switch (_screen)
         {
-            case Screen.Title: DrawTitle(); break; case Screen.Movie: DrawEventMovie(); break; case Screen.OptionsHub: DrawOptionsHub(); break; case Screen.LoadGame: DrawLoadGame(); break; case Screen.CharacterOptions: DrawCharacterOptions(); break; case Screen.CharacterName: DrawCharacterName(); break; case Screen.Character: DrawCharacter(); break; case Screen.Dilemma: DrawDilemma(); break; case Screen.Briefing: DrawCampaignBriefing(); break; case Screen.Map: DrawMap(); break;
+            case Screen.Title: DrawTitle(); break; case Screen.Movie: DrawEventMovie(); break; case Screen.OptionsHub: DrawOptionsHub(); break; case Screen.Practice: DrawPractice(); break; case Screen.LoadGame: DrawLoadGame(); break; case Screen.CharacterOptions: DrawCharacterOptions(); break; case Screen.CharacterName: DrawCharacterName(); break; case Screen.Character: DrawCharacter(); break; case Screen.Dilemma: DrawDilemma(); break; case Screen.Briefing: DrawCampaignBriefing(); break; case Screen.Map: DrawMap(); break;
             case Screen.Home: DrawHome(); break; case Screen.WarPlanning: DrawWarPlanning(); break; case Screen.Farm: DrawFarm(); break; case Screen.Village: DrawVillage(); break; case Screen.Inn: DrawInn(); break; case Screen.InnDialogue: DrawInnDialogue(); break; case Screen.Blacksmith: DrawBlacksmith(); break; case Screen.BlacksmithDialogue: DrawBlacksmithDialogue(); break; case Screen.Shop: DrawShop(); break; case Screen.Tournament: DrawTournament(); break; case Screen.FieldBattle: DrawFieldBattle(); break;
             case Screen.Siege: DrawSiege(); break; case Screen.Overview: DrawOverview(); break; case Screen.Ending: DrawEnding(); break;
         }
@@ -1298,6 +1346,20 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             var frame = animation.Frames[OptionsHubDefinitions.ResumeFrame];
             _batch.Draw(frame, ScaleBounds(resume.OriginalBounds), Color.White);
         }
+    }
+
+    private void DrawPractice()
+    {
+        var original = DrawOriginal("Practice.Background", new Rectangle(0, 0, 1024, 768));
+        if (!original)
+        {
+            DrawPanel("PRACTICE", "SELECT A TRAINING EVENT");
+            for (var index = 0; index < _practiceOptions.Count; index++)
+                DrawText($"{index + 1}  {_practiceOptions[index].Label}", 220, 235 + index * 60,
+                    index == _practiceOption ? Color.Gold : Color.White, 3);
+            return;
+        }
+
     }
 
     private bool SettingEnabled(OptionsHubSetting setting) => setting switch

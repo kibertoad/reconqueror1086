@@ -505,6 +505,24 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void PracticeMenuUsesOriginalRegionAndExecutableLabelOrder()
+    {
+        Assert.Equal(Enum.GetValues<PracticeAction>().Length, PracticePresentationDefinitions.Options.Count);
+        Assert.Equal(["War", "Joust", "Melee", "Exit", "Castle Skirmish"],
+            PracticePresentationDefinitions.Options.Select(option => option.Label));
+        Assert.Equal(Enumerable.Range(0, 5),
+            PracticePresentationDefinitions.Options.Select(option => option.HatRegionId));
+        Assert.Equal(new UiBounds(1, 1, 234, 170),
+            PracticePresentationDefinitions.Options.Single(option => option.Action == PracticeAction.CastleSkirmish).OriginalBounds);
+        Assert.Contains(ImportedArt.Definitions,
+            definition => definition.Role == "Practice.Background" && definition.IdSuffix == ":practice.pcx");
+        Assert.Contains(ImportedLayouts.Definitions,
+            definition => definition.Role == "Practice" && definition.IdSuffix == ":practice.hat");
+        Assert.Contains(ImportedMovies.Definitions,
+            definition => definition.Role == "Practice.Joust" && definition.IdSuffix == "/jousprac.smk");
+    }
+
+    [Fact]
     public void LocationScreenRolesAndShopControlsAreDataDriven()
     {
         var roles = ImportedArt.Definitions.ToDictionary(definition => definition.Role);
