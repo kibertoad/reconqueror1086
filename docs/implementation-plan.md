@@ -531,7 +531,7 @@ Local static-analysis tool: Ghidra 12.1.3 is installed user-wide at `C:\Users\ki
 - [x] Preserve all 423 node-level and 2,318 response-level action references from the fixed conversation headers, with exact 30-slot bounds and metadata-only reporting.
 - [x] Decode the indexed `ALL.TMI`/`ALL.TMB` structure with bounded recursive traversal; validate all 689 groups, 2,267 actions, 10,373 expressions, and 13,352 values and report the lone unresolved original reference `5011`.
 - [x] Recover action function IDs 3-9, the relocated operator jump table, and the 190-value `ALL.VTB` initializer; execute the confirmed expression/branch grammar, persistent script variables, dialogue redirects, raw item counters, and wealth mutations from original inn conversations.
-- [ ] Map the remaining original character-attribute selectors and numeric quest-item identities onto the corresponding campaign fields and visible inventory rewards.
+- [x] Map the original scope-1 selectors for wealth, honor, fame, piety, strength, stamina, and intelligence onto typed campaign fields; map produced/consumed item IDs 0-23 onto their executable/dialogue-confirmed visible inventory names while retaining raw counters for save compatibility and the producer-less original `161` shield-gate outlier.
 - [x] Decode one byte-stored image/palette resource into runtime RGBA pixels end to end.
 - [x] Decode all five byte-stored CSF indexed-animation sequences into bounded palette indices and alpha masks.
 - [x] Validate and classify the five stored 256-color RGB palette resources.

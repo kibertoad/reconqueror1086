@@ -54,6 +54,7 @@ var disassembleAddresses = OptionValue(inspectionOptions, "--disassemble=");
 var xrefDataOffsets = OptionValue(inspectionOptions, "--xref-data=");
 var fixupSourceAddresses = OptionValue(inspectionOptions, "--fixup-source=");
 var conversationNodeIds = OptionValue(inspectionOptions, "--conversation-nodes=");
+var conversationTextIds = OptionValue(inspectionOptions, "--conversation-text=");
 var integerResourceName = OptionValue(inspectionOptions, "--resource-integers=");
 var actionGroupIds = OptionValue(inspectionOptions, "--action-groups=");
 if (disassembleAddresses is not null)
@@ -258,7 +259,10 @@ if (File.Exists(gobPath))
             if (conversationNodeIds is not null)
             {
                 var nodeReport = new StringBuilder("# Id  Offset  Continuation  Prompts  Responses  NodeActionIds  ResponseActionIds  Portrait  Speaker\n");
-                foreach (var id in conversationNodeIds.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(ParseNodeId))
+                var requestedNodeIds = conversationNodeIds.Equals("all", StringComparison.OrdinalIgnoreCase)
+                    ? conversations.Nodes.Keys.Order().ToArray()
+                    : conversationNodeIds.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(ParseNodeId).ToArray();
+                foreach (var id in requestedNodeIds)
                 {
                     var node = conversations.Find(id)
                         ?? throw new ArgumentException($"Conversation node {id} was not found.");
@@ -267,6 +271,24 @@ if (File.Exists(gobPath))
                     nodeReport.AppendLine($"{node.Id,6}  0x{node.SourceOffset:X8}  {node.ContinuationNodeId?.ToString() ?? "-",12}  {node.PromptVariants.Count,7}  {node.Responses.Count,9}  {string.Join(',', node.ActionIds),13}  {responseActionIds,-24}  {node.PortraitFile ?? "-"}  {node.Speaker ?? "-"}");
                 }
                 File.WriteAllText(Path.Combine(output, "conversation-node-report.txt"), nodeReport.ToString());
+            }
+            if (conversationTextIds is not null)
+            {
+                var textReport = new StringBuilder("# Selected original conversation text; local analysis only; do not redistribute\n");
+                var requestedTextIds = conversationTextIds.Equals("all", StringComparison.OrdinalIgnoreCase)
+                    ? conversations.Nodes.Keys.Order().ToArray()
+                    : conversationTextIds.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(ParseNodeId).ToArray();
+                foreach (var id in requestedTextIds)
+                {
+                    var node = conversations.Find(id)
+                        ?? throw new ArgumentException($"Conversation node {id} was not found.");
+                    textReport.AppendLine($"node {node.Id} speaker={ReportText(node.Speaker ?? "-")} portrait={node.PortraitFile ?? "-"} continuation={node.ContinuationNodeId?.ToString() ?? "-"} actions={string.Join(',', node.ActionIds)}");
+                    foreach (var prompt in node.PromptVariants.Select((text, index) => (text, index)))
+                        textReport.AppendLine($"  prompt {prompt.index}: {ReportText(prompt.text)}");
+                    foreach (var response in node.Responses.Select((value, index) => (value, index)))
+                        textReport.AppendLine($"  response {response.index}: target={response.value.TargetNodeId} actions={string.Join(',', response.value.ActionIds)} text={ReportText(response.value.Text)}");
+                }
+                File.WriteAllText(Path.Combine(output, "conversation-text-report.txt"), textReport.ToString());
             }
         }
         catch (InvalidDataException error)
@@ -322,7 +344,10 @@ if (File.Exists(gobPath))
             if (actionGroupIds is not null)
             {
                 var groupReport = new StringBuilder("# Selected action groups; expressions are numeric metadata only\n");
-                foreach (var id in actionGroupIds.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(ParseNodeId))
+                var requestedGroupIds = actionGroupIds.Equals("all", StringComparison.OrdinalIgnoreCase)
+                    ? actionTrees.Groups.Keys.Order().ToArray()
+                    : actionGroupIds.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(ParseNodeId).ToArray();
+                foreach (var id in requestedGroupIds)
                 {
                     var group = actionTrees.Find(id)
                         ?? throw new ArgumentException($"Action group {id} was not found.");
@@ -554,6 +579,8 @@ static int ParseNodeId(string value)
         ? id
         : throw new ArgumentException($"Invalid conversation node identifier '{value}'.");
 }
+
+static string ReportText(string value) => value.Replace('\r', ' ').Replace('\n', ' ');
 
 static void AppendSoundBankReport(StringBuilder report, string scope, string name, byte[] bytes)
 {

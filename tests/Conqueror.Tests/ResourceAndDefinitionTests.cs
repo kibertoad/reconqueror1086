@@ -227,6 +227,46 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void OriginalConversationSelectorsAndItemsUseTypedCampaignState()
+    {
+        var campaign = new CampaignState
+        {
+            Player = new Player
+            {
+                Wealth = 120,
+                Fame = 4,
+                Stats = new CharacterStats(11, 12, 13, 14, 15, 16)
+            },
+            ConversationItems = { [21] = 1 }
+        };
+        var state = new ImportedConversationActionState(campaign);
+
+        state.Initialize([]);
+
+        Assert.Equal(7, OriginalConversationBindings.Attributes.Count);
+        Assert.Equal(24, OriginalConversationBindings.Items.Count);
+        Assert.Contains("Book of Hours", campaign.Player.Inventory.Items);
+        Assert.True(state.TryGetVariable(1, 2, out var honor));
+        Assert.True(state.TryGetVariable(1, 3, out var fame));
+        Assert.True(state.TryGetVariable(1, 5, out var piety));
+        Assert.True(state.TryGetVariable(1, 6, out var strength));
+        Assert.True(state.TryGetVariable(1, 7, out var stamina));
+        Assert.True(state.TryGetVariable(1, 8, out var intelligence));
+        Assert.Equal((15, 4, 13, 11, 14, 16), (honor, fame, piety, strength, stamina, intelligence));
+
+        Assert.True(state.TrySetVariable(1, 2, 30));
+        Assert.True(state.TrySetVariable(1, 3, -5));
+        Assert.Equal((20, 0), (campaign.Player.Stats.Honor, campaign.Player.Fame));
+        Assert.True(state.TryAddItem(10));
+        Assert.Contains("Dragon Slaying Lance", campaign.Player.Inventory.Items);
+        Assert.True(state.HasItem(10));
+        Assert.True(state.TryClearItem(10));
+        Assert.DoesNotContain("Dragon Slaying Lance", campaign.Player.Inventory.Items);
+        campaign.Player.Inventory.Items.Add("Shield of St. George");
+        Assert.True(state.HasItem(15));
+    }
+
+    [Fact]
     public void SmackerMovieHeaderAndFrameIndexAreBounded()
     {
         var movie = SmackerMovieDecoder.Decode(SyntheticSmacker());

@@ -113,7 +113,7 @@ dotnet run --project tools\Conqueror.Inspect -- `
 
 For bounded conversation entry-point analysis, pass decimal or hexadecimal node identifiers with `--conversation-nodes=1100,0x44C`. The ignored `conversation-node-report.txt` records only structural metadata plus portrait and speaker identifiers; it does not copy prompts or response text into the repository.
 
-For numeric action-tree inspection, `--action-groups=1101,2011` writes an ignored expression/branch trace without dialogue prose, while `--resource-integers=all.vtb` emits a bounded dword view. `--fixup-source=0x6ABBC` reports LE relocations near a source address and is useful for resolving switch tables whose unrelocated operands are misleading.
+For numeric action-tree inspection, `--action-groups=1101,2011` writes an ignored expression/branch trace without dialogue prose, while `--resource-integers=all.vtb` emits a bounded dword view. Pass `all` to `--action-groups` or `--conversation-nodes` to emit the complete metadata-only population rather than a comma-separated selection. For evidence correlation against the owner-local dialogue, `--conversation-text=1101,1152` writes only the explicitly selected decoded text to an ignored, redistribution-prohibited report; never commit that output. `--fixup-source=0x6ABBC` reports LE relocations near a source address and is useful for resolving switch tables whose unrelocated operands are misleading.
 
 ## Evidence discipline
 
