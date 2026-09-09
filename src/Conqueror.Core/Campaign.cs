@@ -81,15 +81,19 @@ public sealed class Campaign
     {
         if (location < 0 || location >= World.Locations.Length || State.PendingEnemyArmy is not null) return 0;
         var origin = State.CurrentLocation;
+        var accompanyingArmyIndex = JoinedArmyIndexAt(origin);
         var days = World.TravelDays(State.CurrentLocation, location);
         AdvanceDays(days);
         State.PreviousLocation = origin;
         State.CurrentLocation = location;
+        if (days > 0 && accompanyingArmyIndex is { } armyIndex)
+            State.Player.SetArmyFieldState(armyIndex, true, location);
         Log($"Arrived at {World.Locations[location].Name} after {days} days.");
-        if (days > 0 && State.Player.Army.Total > 0 && IsHostileStronghold(location) && GarrisonAt(location) > 0
+        if (days > 0 && accompanyingArmyIndex is { } friendlyArmyIndex && IsHostileStronghold(location) && GarrisonAt(location) > 0
             && _random.Next(100) < Balance.Strategy.InterceptionPercent)
         {
             State.PendingFieldLocation = location;
+            State.PendingFriendlyArmyIndex = friendlyArmyIndex;
             State.PendingEnemyArmy = CreateArmy(GarrisonAt(location));
             Log($"The garrison of {World.Locations[location].Name} intercepts your army.");
         }
@@ -146,7 +150,8 @@ public sealed class Campaign
         if (armyIndex is < 0 or >= Player.ArmyDivisionLimit) return false;
         var player = State.Player;
         player.EnsureArmyRoster();
-        if (player.ArmyAt(armyIndex).Total == 0) return false;
+        if (player.ArmyAt(armyIndex).Total == 0 || !player.ArmyIsFielded(armyIndex)
+            || player.ArmyLocationAt(armyIndex) != State.CurrentLocation) return false;
         player.JoinedArmyIndex = player.JoinedArmyIndex == armyIndex ? null : armyIndex;
         Log(player.JoinedArmyIndex is null ? "You leave the selected army." : $"You join {player.ArmyNameAt(armyIndex)}.");
         return true;
@@ -162,11 +167,13 @@ public sealed class Campaign
 
     public bool StartSiege(int location)
     {
-        if (location <= 0 || location >= World.Locations.Length || location != State.CurrentLocation || State.Player.Army.Total == 0
+        var friendlyArmyIndex = JoinedArmyIndexAt(location);
+        if (location <= 0 || location >= World.Locations.Length || location != State.CurrentLocation || friendlyArmyIndex is null
             || State.ConqueredLocations.Contains(location) || State.PendingEnemyArmy is not null) return false;
         var target = World.Locations[location];
         if (target.Kind is not (LocationKind.Castle or LocationKind.London)) return false;
         State.PendingSiegeLocation = location;
+        State.PendingFriendlyArmyIndex = friendlyArmyIndex.Value;
         return true;
     }
 
@@ -256,9 +263,11 @@ public sealed class Campaign
 
     public int Retreat()
     {
-        var army = State.Player.Army;
+        var armyIndex = ActiveArmyIndex();
+        var army = State.Player.ArmyAt(armyIndex);
         var losses = army.Total == 0 ? 0 : Math.Clamp((int)Math.Ceiling(army.Total * (.50 + _random.NextDouble() * .25)), 1, army.Total);
         army.RemoveUnits(losses);
+        State.Player.SetArmyFieldState(armyIndex, army.Total > 0, State.PreviousLocation);
         Log($"Retreat cost {losses} soldiers.");
         return losses;
     }
@@ -328,7 +337,7 @@ public sealed class Campaign
 
     public BattleResult FightFieldBattle(Army enemy)
     {
-        var result = Combat.Resolve(State.Player.Army, enemy, _random);
+        var result = Combat.Resolve(State.Player.ArmyAt(ActiveArmyIndex()), enemy, _random);
         State.Player.SwordExperience += result.Won ? 2 : 1;
         if (result.Won) State.Player.Fame++;
         Log(result.Summary);
@@ -342,15 +351,21 @@ public sealed class Campaign
         if (State.PendingEnemyArmy is null && (!IsHostileStronghold(location) || strength <= 0))
             throw new InvalidOperationException("There is no hostile field army here.");
         var enemy = State.PendingEnemyArmy ?? CreateArmy(Math.Max(Balance.Strategy.MinimumFieldArmy, strength));
+        var friendlyArmyIndex = State.PendingFriendlyArmyIndex >= 0
+            ? State.PendingFriendlyArmyIndex
+            : JoinedArmyIndexAt(location) ?? throw new InvalidOperationException("No joined army is present for battle.");
         State.PendingFieldLocation = location;
+        State.PendingFriendlyArmyIndex = friendlyArmyIndex;
         State.PendingEnemyArmy = enemy;
-        return new FieldBattleSession(State.Player.Army, enemy, State.Date.DayOfYear + State.CurrentLocation * 37);
+        return new FieldBattleSession(State.Player.ArmyAt(friendlyArmyIndex), enemy, State.Date.DayOfYear + State.CurrentLocation * 37);
     }
 
     public FieldBattleOutcome FinishFieldBattle(FieldBattleSession battle)
     {
+        var friendlyArmyIndex = ActiveArmyIndex();
+        var friendlyArmy = State.Player.ArmyAt(friendlyArmyIndex);
         var survivors = battle.FriendlySurvivors();
-        foreach (var type in Enum.GetValues<UnitType>()) State.Player.Army.Units[type] = survivors.Units[type];
+        foreach (var type in Enum.GetValues<UnitType>()) friendlyArmy.Units[type] = survivors.Units[type];
         var enemySurvivors = battle.EnemySurvivors();
         if (State.PendingFieldLocation >= 0) State.GarrisonStrength[State.PendingFieldLocation] = enemySurvivors.Total;
         State.Player.SwordExperience += battle.Outcome == FieldBattleOutcome.Victory ? 2 : 1;
@@ -360,9 +375,13 @@ public sealed class Campaign
             if (battle.Outcome == FieldBattleOutcome.Withdrawn) Retreat();
             else Log("Your army is defeated in the field.");
             State.CurrentLocation = State.PreviousLocation;
+            State.Player.SetArmyFieldState(friendlyArmyIndex, friendlyArmy.Total > 0, State.CurrentLocation);
             Log($"Your survivors fall back to {World.Locations[State.CurrentLocation].Name}.");
         }
+        if (battle.Outcome == FieldBattleOutcome.Victory)
+            State.Player.SetArmyFieldState(friendlyArmyIndex, friendlyArmy.Total > 0, State.CurrentLocation);
         State.PendingFieldLocation = -1;
+        State.PendingFriendlyArmyIndex = -1;
         State.PendingEnemyArmy = null;
         return battle.Outcome;
     }
@@ -376,6 +395,7 @@ public sealed class Campaign
         }
         var captured = State.PendingSiegeLocation >= 0 ? World.Locations[State.PendingSiegeLocation] : null;
         State.PendingSiegeLocation = -1;
+        State.PendingFriendlyArmyIndex = -1;
         State.CastlesConquered++;
         State.Player.Fiefs++;
         State.Player.Villages += captured?.Villages ?? _random.Next(1, 4);
@@ -410,7 +430,22 @@ public sealed class Campaign
             if (location.Kind is LocationKind.Castle or LocationKind.London)
                 State.GarrisonStrength.TryAdd(index, State.ConqueredLocations.Contains(index) ? 0 : location.Garrison);
         if (State.PendingFieldLocation < 0) State.PendingEnemyArmy = null;
+        if (State.PendingFieldLocation < 0 && State.PendingSiegeLocation < 0) State.PendingFriendlyArmyIndex = -1;
+        if (State.PendingFriendlyArmyIndex >= Player.ArmyDivisionLimit) State.PendingFriendlyArmyIndex = -1;
     }
+
+    private int? JoinedArmyIndexAt(int location)
+    {
+        var player = State.Player;
+        player.EnsureArmyRoster();
+        if (player.JoinedArmyIndex is not { } index || player.ArmyAt(index).Total == 0
+            || player.ArmyLocationAt(index) != location) return null;
+        return index;
+    }
+
+    private int ActiveArmyIndex() => State.PendingFriendlyArmyIndex is >= 0 and < Player.ArmyDivisionLimit
+        ? State.PendingFriendlyArmyIndex
+        : State.Player.JoinedArmyIndex is int joined and >= 0 and < Player.ArmyDivisionLimit ? joined : 0;
 
     private void ResolveSpyReports()
     {
@@ -429,17 +464,21 @@ public sealed class Campaign
     {
         if (State.PendingSiegeLocation < 0) throw new InvalidOperationException("No siege has been started.");
         var target = World.Locations[State.PendingSiegeLocation];
-        return new SiegeSession(State.Player, target.Garrison, State.Date.DayOfYear + State.PendingSiegeLocation * 1086);
+        return new SiegeSession(State.Player, State.Player.ArmyAt(ActiveArmyIndex()), target.Garrison,
+            State.Date.DayOfYear + State.PendingSiegeLocation * 1086);
     }
 
     public bool FinishSiege(SiegeSession siege)
     {
         var location = State.PendingSiegeLocation;
-        State.Player.Army.RemoveUnits(siege.RetainerLosses);
+        var armyIndex = ActiveArmyIndex();
+        var army = State.Player.ArmyAt(armyIndex);
+        army.RemoveUnits(siege.RetainerLosses);
         if (!siege.Won)
         {
             Log(siege.Defeated ? "You are carried unconscious from the keep." : "The assault is abandoned.");
             State.PendingSiegeLocation = -1;
+            State.PendingFriendlyArmyIndex = -1;
             return false;
         }
         WinSiege();

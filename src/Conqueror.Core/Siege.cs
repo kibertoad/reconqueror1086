@@ -40,13 +40,18 @@ public sealed class SiegeSession
     public int Height => _map.GetLength(1);
 
     public SiegeSession(Player player, int garrison, int seed)
+        : this(player, player.Army, garrison, seed)
+    {
+    }
+
+    public SiegeSession(Player player, Army army, int garrison, int seed)
     {
         _player = player;
         _random = new Random(seed);
         _map = GenerateMap(Rules.Width, Rules.Height);
         MaxHealth = 80 + player.Stats.Stamina * 5;
         Health = MaxHealth;
-        AlliesStarted = Math.Clamp(1 + player.Army.Total / 10, 1, 5);
+        AlliesStarted = Math.Clamp(1 + army.Total / 10, 1, 5);
         AlliesAlive = AlliesStarted;
         var count = Rules.BaseEnemies + Math.Max(0, garrison / Rules.GarrisonPerEnemy);
         for (var i = 0; i < count; i++)

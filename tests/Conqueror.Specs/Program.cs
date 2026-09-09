@@ -196,6 +196,7 @@ var york = Array.FindIndex(World.Locations, x => x.Name == "York");
 var travelDays = traveler.TravelTo(york);
 Check(travelDays == World.TravelDays(0, york) && traveler.State.Date == new DateTime(1086, 3, 1).AddDays(travelDays), "travel advances calendar");
 traveler.State.Player.Army.Units[UnitType.Halberdiers] = 1;
+traveler.State.Player.SetArmyFieldState(0, true, york);
 Check(traveler.StartSiege(york), "siege requires arrival and army");
 traveler.WinSiege();
 Check(traveler.State.ConqueredLocations.Contains(york) && traveler.State.Player.Fiefs == 2, "location conquest persists");
@@ -215,18 +216,25 @@ Check(spyCampaign.State.Player.Wealth == 410 && spyCampaign.HasGarrisonIntel(yor
 Check(!spyCampaign.SendSpy(york) && spyCampaign.State.Player.Wealth == 410, "known garrison is not charged twice");
 
 var invader = new Campaign(Campaign.NewFromTemplate(2), 1086);
-foreach (var type in Enum.GetValues<UnitType>()) invader.State.Player.Army.Units[type] = 40;
+foreach (var type in Enum.GetValues<UnitType>()) invader.State.Player.ArmyAt(3).Units[type] = 40;
+Check(invader.FieldArmy(3) && invader.ToggleArmyMembership(3), "selected division can accompany the player");
 invader.TravelTo(york);
-Check(invader.HasPendingFieldBattle && !invader.StartSiege(york), "hostile approach intercepts army before siege");
+Check(invader.HasPendingFieldBattle && invader.State.PendingFriendlyArmyIndex == 3
+    && invader.State.Player.ArmyLocationAt(3) == york && !invader.StartSiege(york),
+    "hostile approach intercepts the accompanying division before siege");
 var strategicSave = Path.Combine(Path.GetTempPath(), $"conqueror-strategy-{Guid.NewGuid():N}.json");
 invader.Save(strategicSave);
 var loadedInvasion = Campaign.Load(strategicSave);
 File.Delete(strategicSave);
-Check(loadedInvasion.HasPendingFieldBattle && loadedInvasion.GarrisonAt(york) == World.Locations[york].Garrison, "save preserves interrupted invasion state");
+Check(loadedInvasion.HasPendingFieldBattle && loadedInvasion.State.PendingFriendlyArmyIndex == 3
+    && loadedInvasion.GarrisonAt(york) == World.Locations[york].Garrison,
+    "save preserves the selected division in an interrupted invasion");
 var invasion = invader.CreateFieldBattle();
 invasion.IssueAll(UnitOrder.Captains);
 for (var i = 0; i < 300 && invasion.Outcome == FieldBattleOutcome.InProgress; i++) invasion.Tick();
-Check(invader.FinishFieldBattle(invasion) == FieldBattleOutcome.Victory && invader.GarrisonAt(york) == 0, "field victory clears persistent garrison");
+Check(invader.FinishFieldBattle(invasion) == FieldBattleOutcome.Victory && invader.GarrisonAt(york) == 0
+    && invader.State.Player.ArmyAt(3).Total > 0 && invader.State.Player.Army.Total == 0,
+    "field victory updates the selected division and clears the persistent garrison");
 Check(invader.StartSiege(york), "cleared road permits castle assault");
 
 var withdrawingInvader = new Campaign(Campaign.NewFromTemplate(2), 1086);

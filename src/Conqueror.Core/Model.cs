@@ -226,6 +226,7 @@ public sealed class CampaignState
     public int PreviousLocation { get; set; }
     public int PendingSiegeLocation { get; set; } = -1;
     public int PendingFieldLocation { get; set; } = -1;
+    public int PendingFriendlyArmyIndex { get; set; } = -1;
     public Army? PendingEnemyArmy { get; set; }
     public int TournamentToken { get; set; } = -1;
     public int JoustsThisTournament { get; set; }
