@@ -3,6 +3,7 @@ namespace Conqueror.Core;
 public enum Facing { North, East, South, West }
 public enum SiegeTile { Floor, Wall, Door, SecretDoor, OpeningDoor, Barrel, Treasure }
 public enum SiegeAction { None, Moved, Blocked, DoorOpened, Healed, Looted, Hit, Missed, WeaponBroke, Shot, NoAmmunition }
+public enum SiegeEnemyVisualState { Walk, Attack, Hit }
 
 public sealed class SiegeEnemy
 {
@@ -13,6 +14,9 @@ public sealed class SiegeEnemy
     public int VisualId { get; init; } = -1;
     public Facing Facing { get; set; }
     public int WalkFrame { get; set; }
+    public SiegeEnemyVisualState VisualState { get; internal set; }
+    public int VisualFrame { get; internal set; }
+    internal double VisualElapsed { get; set; }
 }
 
 public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int GarrisonPerEnemy, int BaseChampionHealth, int FoodHealing, int WeaponBreakPercent);
@@ -53,6 +57,8 @@ public sealed class SiegeSession
 {
     public static readonly SiegeDefinition Rules = new(12, 12, 5, 3, 3, 25, 2);
     public const double DoorOpeningSeconds = 0.36;
+    public const double EnemyAttackFrameSeconds = 0.07;
+    public const double EnemyHitSeconds = 0.20;
     private readonly Player _player;
     private readonly Random _random;
     private readonly SiegeTile[,] _map;
@@ -159,6 +165,26 @@ public sealed class SiegeSession
         }
     }
 
+    public void AdvanceEnemyAnimations(double elapsedSeconds)
+    {
+        if (!double.IsFinite(elapsedSeconds) || elapsedSeconds < 0)
+            throw new ArgumentOutOfRangeException(nameof(elapsedSeconds));
+        foreach (var enemy in _enemies.Where(enemy => enemy.VisualState != SiegeEnemyVisualState.Walk))
+        {
+            enemy.VisualElapsed += elapsedSeconds;
+            if (enemy.VisualState == SiegeEnemyVisualState.Attack)
+            {
+                enemy.VisualFrame = (int)(enemy.VisualElapsed / EnemyAttackFrameSeconds);
+                if (enemy.VisualFrame < 9) continue;
+            }
+            else if (enemy.VisualElapsed < EnemyHitSeconds)
+                continue;
+            enemy.VisualState = SiegeEnemyVisualState.Walk;
+            enemy.VisualFrame = 0;
+            enemy.VisualElapsed = 0;
+        }
+    }
+
     public void TurnLeft() { Facing = (Facing)(((int)Facing + 3) % 4); LastMessage = $"Facing {Facing}."; }
     public void TurnRight() { Facing = (Facing)(((int)Facing + 1) % 4); LastMessage = $"Facing {Facing}."; }
 
@@ -200,6 +226,7 @@ public sealed class SiegeSession
         if (_random.Next(220) < chance)
         {
             target.Health -= 1 + _player.Stats.Strength / 16;
+            if (target.Health > 0) StartVisual(target, SiegeEnemyVisualState.Hit);
             LastMessage = target.Champion ? "You strike the castle champion." : "Your weapon finds its mark.";
             RemoveDead();
         }
@@ -221,7 +248,12 @@ public sealed class SiegeSession
         if (!_player.Inventory.Weapon.Contains("Crossbow", StringComparison.OrdinalIgnoreCase)) { LastMessage = "Equip a crossbow first."; return SiegeAction.NoAmmunition; }
         _player.Inventory.CrossbowBolts--;
         var target = FirstEnemyAhead(8);
-        if (target is not null) { target.Health -= 2; RemoveDead(); LastMessage = "The bolt strikes true."; }
+        if (target is not null)
+        {
+            target.Health -= 2;
+            if (target.Health > 0) StartVisual(target, SiegeEnemyVisualState.Hit);
+            RemoveDead(); LastMessage = "The bolt strikes true.";
+        }
         else LastMessage = "The bolt vanishes into the dark.";
         TickEnemies(); return SiegeAction.Shot;
     }
@@ -279,6 +311,8 @@ public sealed class SiegeSession
             {
                 enemy.Facing = DirectionToward(enemy.X, enemy.Y, PlayerX, PlayerY, enemy.Facing);
                 enemy.WalkFrame = 0;
+                if (enemy.VisualState != SiegeEnemyVisualState.Hit)
+                    StartVisual(enemy, SiegeEnemyVisualState.Attack);
                 if (AlliesAlive > 0 && _random.Next(100) < 18) { AlliesAlive--; LastMessage = "A retainer falls defending you."; continue; }
                 var hitChance = Math.Clamp(70 - ArmorRating(), 5, 70);
                 if (_random.Next(100) < hitChance) Health -= Math.Max(2, 12 - _player.Stats.Stamina / 3);
@@ -315,6 +349,13 @@ public sealed class SiegeSession
     }
 
     private void RemoveDead() => _enemies.RemoveAll(x => x.Health <= 0);
+
+    private static void StartVisual(SiegeEnemy enemy, SiegeEnemyVisualState state)
+    {
+        enemy.VisualState = state;
+        enemy.VisualFrame = 0;
+        enemy.VisualElapsed = 0;
+    }
 
     private Point EmptySpawn(int index)
     {

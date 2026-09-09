@@ -1275,6 +1275,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             return;
         }
         _siege.AdvanceDoorAnimations(_animationEnabled ? gameTime.ElapsedGameTime.TotalSeconds : SiegeSession.DoorOpeningSeconds);
+        _siege.AdvanceEnemyAnimations(_animationEnabled ? gameTime.ElapsedGameTime.TotalSeconds : 1);
         if (press(Keys.W)) _siege.Move(true); if (press(Keys.S)) _siege.Move(false);
         if (press(Keys.A)) _siege.TurnLeft(); if (press(Keys.D)) _siege.TurnRight();
         if (press(Keys.E)) _siege.Interact(); if (press(Keys.Space)) _siege.Attack(); if (press(Keys.X)) _siege.Shoot();
@@ -2293,6 +2294,16 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             if (block.Kind != 4 || block.Surface0 < 0) continue;
             for (var frame = 0; frame < 15 && block.Surface0 + frame < imported.Scene.TextureCount; frame++)
                 required.Add(block.Surface0 + frame);
+            foreach (var (stateOffset, frameCount) in new[] { (1, 9), (2, 3), (3, 8) })
+            {
+                var stateIndex = block.Index + stateOffset;
+                if (stateIndex >= imported.Scene.Blocks.Count) continue;
+                var state = imported.Scene.Blocks[stateIndex];
+                if (state.Kind != 4 || !state.Name.Equals(block.Name, StringComparison.OrdinalIgnoreCase) ||
+                    state.Surface0 < 0) continue;
+                for (var frame = 0; frame < frameCount && state.Surface0 + frame < imported.Scene.TextureCount; frame++)
+                    required.Add(state.Surface0 + frame);
+            }
         }
         var textures = new Dictionary<int, Texture2D>();
         foreach (var id in _importedContent.Ids("resource").Where(id =>
@@ -2354,8 +2365,21 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             ? new SiegeEnemyFrame(4, false)
             : SiegeViewProjection.FrameFor(enemy, _siege.PlayerX, _siege.PlayerY);
         var textureIndex = block.Surface0 + enemy.WalkFrame * 5 + frame.DirectionOffset;
+        if (enemy.VisualState == SiegeEnemyVisualState.Attack)
+            textureIndex = ActorStateTexture(block, 1, enemy.VisualFrame, textureIndex);
+        else if (enemy.VisualState == SiegeEnemyVisualState.Hit)
+            textureIndex = ActorStateTexture(block, 2, (frame.DirectionOffset + 1) / 2, textureIndex);
         return (_siegeVisuals.Textures.GetValueOrDefault(textureIndex) ?? FirstSceneTexture(block),
-            frame.FlipHorizontally);
+            enemy.VisualState == SiegeEnemyVisualState.Attack ? false : frame.FlipHorizontally);
+    }
+
+    private int ActorStateTexture(DynamixSceneBlock initial, int stateOffset, int frame, int fallback)
+    {
+        if (_siegeVisuals is null || initial.Index + stateOffset >= _siegeVisuals.Scene.Blocks.Count) return fallback;
+        var state = _siegeVisuals.Scene.Blocks[initial.Index + stateOffset];
+        return state.Kind == 4 && state.Name.Equals(initial.Name, StringComparison.OrdinalIgnoreCase) && state.Surface0 >= 0
+            ? state.Surface0 + frame
+            : fallback;
     }
 
     private Texture2D? FirstSceneTexture(DynamixSceneBlock block)

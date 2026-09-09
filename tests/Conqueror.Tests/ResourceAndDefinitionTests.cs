@@ -283,6 +283,28 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void AdjacentEnemiesAdvanceThroughACompleteAttackSequence()
+    {
+        var tiles = new SiegeTile[5, 3];
+        for (var x = 0; x < 5; x++)
+        for (var y = 0; y < 3; y++)
+            tiles[x, y] = x == 0 || y == 0 || x == 4 || y == 2 ? SiegeTile.Wall : SiegeTile.Floor;
+        var siege = new SiegeSession(new Player(), new Army(), 0, 7,
+            new SiegeLayout(tiles, 1, 1, Facing.East, [new SiegeSpawn(2, 1, true, 99)]));
+        var enemy = Assert.Single(siege.Enemies);
+
+        siege.Move(false);
+        Assert.Equal(SiegeEnemyVisualState.Attack, enemy.VisualState);
+        Assert.Equal(Facing.West, enemy.Facing);
+        siege.AdvanceEnemyAnimations(SiegeSession.EnemyAttackFrameSeconds * 4.1);
+        Assert.Equal(4, enemy.VisualFrame);
+        siege.AdvanceEnemyAnimations(SiegeSession.EnemyAttackFrameSeconds * 5);
+        Assert.Equal(SiegeEnemyVisualState.Walk, enemy.VisualState);
+        Assert.Equal(0, enemy.VisualFrame);
+        Assert.Throws<ArgumentOutOfRangeException>(() => siege.AdvanceEnemyAnimations(double.NaN));
+    }
+
+    [Fact]
     public void ConversationDatabaseDecodesIndexedPromptsResponsesAndLinks()
     {
         var first = ConversationNode(["GERARD.PCC", "Earl Gerard", "Greetings.", "Ask about the dragon.", "Farewell."],
