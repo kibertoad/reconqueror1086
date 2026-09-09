@@ -40,6 +40,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private EstateLayout _estateLayout = EstatePresentationDefinitions.Fallback;
     private EstatePanel _estatePanel = EstatePanel.Map;
     private FarmPresentationDefinitions.Section _fiefSection = FarmPresentationDefinitions.Section.Farm;
+    private FiefManagementCheckpoint? _fiefCheckpoint;
     private IReadOnlyDictionary<FarmPresentationDefinitions.Section, FarmPresentationDefinitions.Layout> _fiefLayouts =
         FarmPresentationDefinitions.Layouts.ToDictionary(layout => layout.Section);
     private IReadOnlyList<SceneHotspot> _homeHotspots = HomePresentationDefinitions.Hotspots;
@@ -189,7 +190,11 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         var click = mouse.LeftButton == ButtonState.Pressed && _lastMouse.LeftButton == ButtonState.Released;
         if (click && _soundEffectsEnabled) PlayOriginalSound("Interface.Activate");
         var pressAny = keys.GetPressedKeys().Any(key => key != Keys.Escape && !_last.IsKeyDown(key));
-        if (Press(Keys.F5) && _screen is not Screen.Title and not Screen.LoadGame)
+        if (Press(Keys.F5) && _screen == Screen.Farm)
+        {
+            _notice = "CONFIRM OR CANCEL FIEF CHANGES BEFORE SAVING";
+        }
+        else if (Press(Keys.F5) && _screen is not Screen.Title and not Screen.LoadGame)
         {
             _saveSlots.Save(_campaign, _activeSaveSlot);
             _notice = $"CAMPAIGN SAVED IN SLOT {_activeSaveSlot}";
@@ -203,7 +208,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             else if (_screen == Screen.CharacterName) _screen = Screen.CharacterOptions;
             else if (_screen == Screen.CharacterOptions) _screen = Screen.Title;
             else if (_screen == Screen.Character) _screen = Screen.CharacterOptions;
-            else if (_screen == Screen.Farm) _screen = Screen.Home;
+            else if (_screen == Screen.Farm) CancelFiefManagement();
             else if (_screen == Screen.Blacksmith) _screen = Screen.Village;
             else if (_screen == Screen.BlacksmithDialogue) _screen = Screen.Blacksmith;
             else if (_screen == Screen.Shop) _screen = Screen.Blacksmith;
@@ -226,7 +231,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.Dilemma: UpdateDilemma(Press, mouse, click); break;
             case Screen.Map: UpdateMap(Press, mouse, click); break;
             case Screen.Home: UpdateHome(Press, mouse, click); break;
-            case Screen.Farm: UpdateFarm(Press); break;
+            case Screen.Farm: UpdateFarm(Press, mouse, click); break;
             case Screen.Village: UpdateVillage(Press); break;
             case Screen.Blacksmith: UpdateBlacksmith(Press, mouse, click); break;
             case Screen.BlacksmithDialogue: UpdateBlacksmithDialogue(Press); break;
@@ -353,6 +358,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         }
 
         _campaign = campaign!;
+        _fiefCheckpoint = null;
         _hasActiveCampaign = true;
         _fieldBattle = null;
         _siege = null;
@@ -566,16 +572,38 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (click) ActivateSceneHotspot(HitSceneHotspot(_homeHotspots, mouse));
     }
 
-    private void UpdateFarm(Func<Keys, bool> press)
+    private void UpdateFarm(Func<Keys, bool> press, MouseState mouse, bool click)
     {
         var command = FarmPresentationDefinitions.CommandsFor(_fiefSection).FirstOrDefault(item => press(item.Key));
         if (command is not null) ActivateFarmAction(command.Action);
+        if (!click) return;
+        var (x, y) = OriginalPoint(mouse);
+        var layout = _fiefLayouts[_fiefSection];
+        switch (FarmPresentationDefinitions.FooterActionAt(layout, x, y))
+        {
+            case FarmPresentationDefinitions.FooterAction.Okay: CommitFiefManagement(); break;
+            case FarmPresentationDefinitions.FooterAction.Cancel: CancelFiefManagement(); break;
+        }
     }
 
     private void EnterFiefManagement(FarmPresentationDefinitions.Section section)
     {
         _fiefSection = section;
+        _fiefCheckpoint = FiefManagementCheckpoint.Capture(_campaign.State);
         _screen = Screen.Farm;
+    }
+
+    private void CommitFiefManagement()
+    {
+        _fiefCheckpoint = null;
+        _screen = Screen.Home;
+    }
+
+    private void CancelFiefManagement()
+    {
+        _fiefCheckpoint?.Restore(_campaign.State);
+        _fiefCheckpoint = null;
+        _screen = Screen.Home;
     }
 
     private void ActivateFarmAction(FarmAction action)
@@ -586,7 +614,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             case PlantFarmAction plant: _campaign.Plant(plant.Crop); break;
             case DevelopForestFarmAction forest: _campaign.DevelopForest(forest.Industry); break;
             case RecruitFarmAction recruit: _campaign.Recruit(recruit.Unit); break;
-            case LeaveFarmAction: _screen = Screen.Home; break;
+            case LeaveFarmAction: CommitFiefManagement(); break;
             default: throw new ArgumentOutOfRangeException(nameof(action));
         }
     }
@@ -1181,6 +1209,10 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         {
             var wealth = ScaleBounds(layout.Wealth);
             DrawText($"{p.Wealth}S", wealth.X + 4, wealth.Y + 3, Color.White, 1, wealth.Width - 8);
+            var okay = ScaleBounds(layout.Okay);
+            var cancel = ScaleBounds(layout.Cancel);
+            DrawText("OK", okay.X + 4, okay.Y + 3, Color.White, 1, okay.Width - 8);
+            DrawText("CANCEL", cancel.X + 4, cancel.Y + 3, Color.White, 1, cancel.Width - 8);
         }
         var helpRows = FarmPresentationDefinitions.HelpRowsFor(_fiefSection);
         for (var row = 0; row < helpRows.Count; row++)

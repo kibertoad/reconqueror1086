@@ -66,6 +66,7 @@ Local reference filenames:
 ### Home, farm, village, and blacksmith
 
 - **Implemented:** split the previous overloaded Home handler into a castle office and section-aware Castle, Village, Farm, and Forest management variants; use `TACTICAL.PCX` and the shared `FIEFMGMT.PCX` shell when installed.
+- **Implemented:** source each management variant's OK/Cancel, terrain, and wealth regions from its own HAT descriptor. Management mutations are staged as a bounded session: OK/Enter commits, while Cancel/Escape restores wealth, fief development, army counts, and the associated journal entries.
 - **Implemented:** insert the original `FORGESMI.PCX` workshop between Village and the store, with the smith hotspot sourced from `VSMITH.HAT`.
 - **Corrected:** `FOPTS.HAT`, not `FCASTLE.HAT`, supplies the ten `TACTICAL.PCX` Home rectangles. The old generated report omitted resource names, concealing that `FCASTLE.HAT` actually describes screen 19's `FIEFMGMT.PCX` table.
 - **Implemented:** Home regions 0-5 and 8 expose Overview, Castle, Farm, Village, Forest, Orders, and Map. The Farm/Village/Forest trio follows the executable's consecutive label block and the left-to-right ledger rectangles. The two exits and small desk object remain disabled until their War Planning/Exit/JUMP dispatch is traced.

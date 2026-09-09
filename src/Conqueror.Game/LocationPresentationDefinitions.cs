@@ -146,6 +146,7 @@ public static class BlacksmithDialoguePresentationDefinitions
 public static class FarmPresentationDefinitions
 {
     public enum Section { Castle, Village, Farm, Forest }
+    public enum FooterAction { Okay, Cancel }
 
     public sealed record Layout(
         Section Section,
@@ -159,7 +160,10 @@ public static class FarmPresentationDefinitions
         int TerrainRegionId,
         int WealthRegionId,
         UiBounds Terrain,
-        UiBounds Wealth);
+        UiBounds Wealth,
+        UiBounds Okay,
+        UiBounds Cancel,
+        UiBounds? Extra);
 
     public static UiBounds Information { get; } = new(20, 22, 330, 390);
     public static UiBounds Terrain { get; } = new(382, 22, 238, 390);
@@ -167,13 +171,17 @@ public static class FarmPresentationDefinitions
     private static IReadOnlyList<Layout> FallbackLayouts { get; } =
     [
         new(Section.Castle, "CASTLE MANAGEMENT", "Fief.Castle", ":fcastle.hat", 18, 18, 19, null, 20, 21,
-            new UiBounds(383, 20, 232, 380), new UiBounds(532, 0, 86, 16)),
+            new UiBounds(383, 20, 232, 380), new UiBounds(532, 0, 86, 16),
+            new UiBounds(30, 435, 30, 20), new UiBounds(70, 435, 70, 20), null),
         new(Section.Village, "VILLAGE MANAGEMENT", "Fief.Village", ":fvillage.hat", 14, 14, 15, 16, 17, 18,
-            new UiBounds(383, 20, 232, 380), new UiBounds(532, 0, 86, 16)),
+            new UiBounds(383, 20, 232, 380), new UiBounds(532, 0, 86, 16),
+            new UiBounds(30, 435, 30, 20), new UiBounds(70, 435, 70, 20), new UiBounds(250, 435, 80, 20)),
         new(Section.Farm, "FARM MANAGEMENT", "Fief.Farm", ":ffarm.hat", 9, 9, 10, null, 11, 12,
-            new UiBounds(383, 20, 232, 380), new UiBounds(532, 0, 86, 16)),
+            new UiBounds(383, 20, 232, 380), new UiBounds(532, 0, 86, 16),
+            new UiBounds(30, 435, 30, 20), new UiBounds(70, 435, 70, 20), null),
         new(Section.Forest, "FOREST MANAGEMENT", "Fief.Forest", ":fforest.hat", 8, 8, 9, null, 10, 11,
-            new UiBounds(383, 20, 232, 380), new UiBounds(532, 0, 86, 16))
+            new UiBounds(383, 20, 232, 380), new UiBounds(532, 0, 86, 16),
+            new UiBounds(30, 435, 30, 20), new UiBounds(70, 435, 70, 20), null)
     ];
 
     public static IReadOnlyList<Layout> Layouts { get; } = FallbackLayouts;
@@ -184,7 +192,12 @@ public static class FarmPresentationDefinitions
         return fallback with
         {
             Terrain = RegionBounds(source, fallback.TerrainRegionId, fallback.Terrain),
-            Wealth = RegionBounds(source, fallback.WealthRegionId, fallback.Wealth)
+            Wealth = RegionBounds(source, fallback.WealthRegionId, fallback.Wealth),
+            Okay = RegionBounds(source, fallback.OkayRegionId, fallback.Okay),
+            Cancel = RegionBounds(source, fallback.CancelRegionId, fallback.Cancel),
+            Extra = fallback.ExtraRegionId is { } extraId
+                ? RegionBounds(source, extraId, fallback.Extra!)
+                : null
         };
     }
 
@@ -228,6 +241,13 @@ public static class FarmPresentationDefinitions
         .OrderBy(group => group.Key)
         .Select(group => string.Join("   ", group.Select(command => command.Label)))
         .ToArray();
+
+    public static FooterAction? FooterActionAt(Layout layout, int x, int y)
+    {
+        if (layout.Okay.Contains(x, y)) return FooterAction.Okay;
+        if (layout.Cancel.Contains(x, y)) return FooterAction.Cancel;
+        return null;
+    }
 
     private static UiBounds RegionBounds(HatLayout? layout, int id, UiBounds fallback) =>
         layout?.FindRegion(id) is { Enabled: not 0 } region

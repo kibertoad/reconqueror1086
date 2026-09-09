@@ -36,6 +36,7 @@ Check(EstatePresentationDefinitions.TileAtlases.Count == 3 && EstatePresentation
 Check(FarmPresentationDefinitions.Commands.Select(x => x.Key).Distinct().Count() == FarmPresentationDefinitions.Commands.Count, "farm commands are unique definitions");
 Check(FarmPresentationDefinitions.Layouts.Select(x => x.Section).SequenceEqual(Enum.GetValues<FarmPresentationDefinitions.Section>()), "four original fief-management variants are definition driven");
 Check(FarmPresentationDefinitions.Layouts.All(x => ImportedLayouts.Definitions.Any(layout => layout.Role == x.LayoutRole && layout.IdSuffix == x.LayoutSuffix)), "fief-management HAT descriptors are imported");
+Check(FarmPresentationDefinitions.Layouts.All(x => x.Okay.Width > 0 && x.Cancel.Width > 0), "fief-management confirmation controls are definition driven");
 Check(BlacksmithPresentationDefinitions.Hotspots.All(x => !string.IsNullOrWhiteSpace(x.HoverLabel)), "confirmed visual scene hotspots define hover labels");
 Check(HomePresentationDefinitions.Hotspots.Select(x => x.Action).SequenceEqual([SceneNavigationAction.Overview, SceneNavigationAction.Castle, SceneNavigationAction.Farm, SceneNavigationAction.Village, SceneNavigationAction.Forest, SceneNavigationAction.Orders, SceneNavigationAction.Map]), "corroborated Home object hotspots are definition driven");
 Check(CharacterCreationDefinitions.Options.Select(x => x.Action).Distinct().Count() == Enum.GetValues<CharacterCreationAction>().Length, "character option actions are unique definitions");

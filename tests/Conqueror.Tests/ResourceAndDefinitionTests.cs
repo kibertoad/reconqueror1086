@@ -268,6 +268,41 @@ public sealed class ResourceAndDefinitionTests
             FarmPresentationDefinitions.Section.Farm, new HatLayout(bytes));
         Assert.Equal(new UiBounds(11, 11, 1, 1), importedFarm.Terrain);
         Assert.Equal(new UiBounds(12, 12, 1, 1), importedFarm.Wealth);
+        Assert.Equal(new UiBounds(9, 9, 1, 1), importedFarm.Okay);
+        Assert.Equal(new UiBounds(10, 10, 1, 1), importedFarm.Cancel);
+        Assert.Equal(FarmPresentationDefinitions.FooterAction.Okay,
+            FarmPresentationDefinitions.FooterActionAt(importedFarm, 9, 9));
+        Assert.Equal(FarmPresentationDefinitions.FooterAction.Cancel,
+            FarmPresentationDefinitions.FooterActionAt(importedFarm, 10, 10));
+        Assert.Null(FarmPresentationDefinitions.FooterActionAt(importedFarm, 20, 20));
+    }
+
+    [Fact]
+    public void FiefManagementCheckpointRestoresPendingEconomyChanges()
+    {
+        var campaign = new Campaign();
+        campaign.State.Player.Wealth = 10_000;
+        var originalWealth = campaign.State.Player.Wealth;
+        var originalJournal = campaign.State.Journal.Count;
+        var checkpoint = FiefManagementCheckpoint.Capture(campaign.State);
+
+        Assert.True(campaign.Build(BuildingKind.House));
+        Assert.True(campaign.Plant(CropType.Beans));
+        Assert.True(campaign.DevelopForest(ForestIndustry.Timber));
+        Assert.True(campaign.Recruit(UnitType.Swordsmen));
+        campaign.State.Player.Home.Population = 999;
+        campaign.State.Player.Home.TaxRate = 75;
+        campaign.State.Player.Home.Prospector = true;
+        checkpoint.Restore(campaign.State);
+
+        Assert.Equal(originalWealth, campaign.State.Player.Wealth);
+        Assert.Equal((1200, 10, 0, false), (campaign.State.Player.Home.Population,
+            campaign.State.Player.Home.TaxRate, campaign.State.Player.Home.Houses,
+            campaign.State.Player.Home.Prospector));
+        Assert.All(campaign.State.Player.Home.Crops.Values, value => Assert.Equal(0, value));
+        Assert.All(campaign.State.Player.Home.Forest.Values, value => Assert.Equal(0, value));
+        Assert.All(campaign.State.Player.Army.Units.Values, value => Assert.Equal(0, value));
+        Assert.Equal(originalJournal, campaign.State.Journal.Count);
     }
 
     [Fact]
