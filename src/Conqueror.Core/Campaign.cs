@@ -102,6 +102,10 @@ public sealed class Campaign
 
     public bool HasPendingFieldBattle => State.PendingEnemyArmy is not null;
 
+    public int JoinedArmyTotalHere => JoinedArmyIndexAt(State.CurrentLocation) is { } index
+        ? State.Player.ArmyAt(index).Total
+        : 0;
+
     public bool CanStartFieldBattle => HasPendingFieldBattle
         || (IsHostileStronghold(State.CurrentLocation) && GarrisonAt(State.CurrentLocation) > 0);
 
@@ -151,7 +155,8 @@ public sealed class Campaign
         var player = State.Player;
         player.EnsureArmyRoster();
         if (player.ArmyAt(armyIndex).Total == 0 || !player.ArmyIsFielded(armyIndex)
-            || player.ArmyLocationAt(armyIndex) != State.CurrentLocation) return false;
+            || player.ArmyLocationAt(armyIndex) != State.CurrentLocation
+            || State.ArmyOrders.ContainsKey(armyIndex)) return false;
         player.JoinedArmyIndex = player.JoinedArmyIndex == armyIndex ? null : armyIndex;
         Log(player.JoinedArmyIndex is null ? "You leave the selected army." : $"You join {player.ArmyNameAt(armyIndex)}.");
         return true;
@@ -162,6 +167,25 @@ public sealed class Campaign
         if (!Spend(Balance.Strategy.SpyCost, "assign spy")) return false;
         State.Player.ActiveSpies++;
         Log("A spy is sent to observe troop movements across England.");
+        return true;
+    }
+
+    public StrategicArmyOrder? ArmyOrderAt(int armyIndex) =>
+        State.ArmyOrders.GetValueOrDefault(armyIndex);
+
+    public bool DispatchArmy(int armyIndex, int destination)
+    {
+        if (armyIndex is < 0 or >= Player.ArmyDivisionLimit || destination < 0
+            || destination >= World.Locations.Length) return false;
+        var player = State.Player;
+        player.EnsureArmyRoster();
+        var origin = player.ArmyLocationAt(armyIndex);
+        if (player.JoinedArmyIndex == armyIndex || !player.ArmyIsFielded(armyIndex)
+            || player.ArmyAt(armyIndex).Total == 0 || origin == destination
+            || State.ArmyOrders.ContainsKey(armyIndex)) return false;
+        var days = World.TravelDays(origin, destination);
+        State.ArmyOrders[armyIndex] = new StrategicArmyOrder(origin, destination, State.Date, State.Date.AddDays(days));
+        Log($"{player.ArmyNameAt(armyIndex)} marches for {World.Locations[destination].Name} under its captain; arrival in {days} days.");
         return true;
     }
 
@@ -294,6 +318,7 @@ public sealed class Campaign
             var previousMonth = State.Date.Month;
             var previousYear = State.Date.Year;
             State.Date = State.Date.AddDays(1);
+            ResolveArmyOrders();
             if (State.Date.Month != previousMonth) SettleMonth();
             if (State.Date.Year != previousYear)
             {
@@ -432,6 +457,37 @@ public sealed class Campaign
         if (State.PendingFieldLocation < 0) State.PendingEnemyArmy = null;
         if (State.PendingFieldLocation < 0 && State.PendingSiegeLocation < 0) State.PendingFriendlyArmyIndex = -1;
         if (State.PendingFriendlyArmyIndex >= Player.ArmyDivisionLimit) State.PendingFriendlyArmyIndex = -1;
+        foreach (var (armyIndex, order) in State.ArmyOrders)
+            if (armyIndex is < 0 or >= Player.ArmyDivisionLimit || order.Origin < 0
+                || order.Origin >= World.Locations.Length || order.Destination < 0
+                || order.Destination >= World.Locations.Length || order.Arrives <= order.Departed
+                || State.Player.ArmyLocationAt(armyIndex) != order.Origin)
+                throw new InvalidDataException("Campaign contains an invalid army movement order.");
+    }
+
+    private void ResolveArmyOrders()
+    {
+        foreach (var (armyIndex, order) in State.ArmyOrders.OrderBy(pair => pair.Key).ToArray())
+        {
+            if (order.Arrives > State.Date) continue;
+            State.ArmyOrders.Remove(armyIndex);
+            var player = State.Player;
+            var army = player.ArmyAt(armyIndex);
+            player.SetArmyFieldState(armyIndex, army.Total > 0, order.Destination);
+            Log($"{player.ArmyNameAt(armyIndex)} arrives at {World.Locations[order.Destination].Name}.");
+            if (army.Total == 0 || !IsHostileStronghold(order.Destination) || GarrisonAt(order.Destination) == 0
+                || _random.Next(100) >= Balance.Strategy.InterceptionPercent) continue;
+
+            var enemy = CreateArmy(GarrisonAt(order.Destination));
+            var result = Combat.Resolve(army, enemy, _random);
+            State.GarrisonStrength[order.Destination] = enemy.Total;
+            if (!result.Won)
+                player.SetArmyFieldState(armyIndex, army.Total > 0, order.Origin);
+            else if (army.Total == 0)
+                player.SetArmyFieldState(armyIndex, false, order.Destination);
+            Log($"Captain's report from {player.ArmyNameAt(armyIndex)}: {result.Summary}" +
+                (result.Won ? " The division holds its destination." : $" The survivors return to {World.Locations[order.Origin].Name}."));
+        }
     }
 
     private int? JoinedArmyIndexAt(int location)

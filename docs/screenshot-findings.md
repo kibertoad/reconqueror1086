@@ -77,7 +77,7 @@ Local reference filenames:
 - Map the village-image suffixes to world locations before activating `V66_1111.PCX` outside its confirmed Sabine's Keep role.
 - Locate the actual blacksmith dialogue-node source and bind it to `COMSCRN1.PCX`, `BLACKSMI.PCC`, scroll regions, and choices through the generic dialogue interpreter planned in Phase 1.2. Do not repeat the disproved `VSMITH.666` text hypothesis.
 - **Implemented:** render `BUYSELL.CSF` through the store palette using data-driven overlay definitions: hide/show View from the record's movie marker and switch Purchase/Sell from current ownership. Exact mouse-down timing remains to be traced.
-- Integrate independently fielded divisions with map travel and combat and recover exact spy timing/cost and the `JUMP!!` effect; then recover behavior/cost semantics for currently display-only management rows and replace the provisional terrain fill with editable tiles.
+- Recover exact path interaction and captain battle rules for the now-active independently fielded divisions, plus exact spy timing/cost and the `JUMP!!` effect; then recover behavior/cost semantics for currently display-only management rows and replace the provisional terrain fill with editable tiles.
 
 ## Acceptance reference
 

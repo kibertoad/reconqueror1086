@@ -365,6 +365,41 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void CaptainCommandedDivisionTravelsFightsAndSurvivesSaveLoadIndependently()
+    {
+        var campaign = new Campaign(Campaign.NewFromTemplate(2), 1086);
+        var york = Array.FindIndex(World.Locations, location => location.Name == "York");
+        foreach (var type in Enum.GetValues<UnitType>()) campaign.State.Player.ArmyAt(2).Units[type] = 40;
+        Assert.True(campaign.FieldArmy(2));
+        Assert.False(campaign.DispatchArmy(0, york));
+        Assert.True(campaign.DispatchArmy(2, york));
+
+        var order = Assert.IsType<StrategicArmyOrder>(campaign.ArmyOrderAt(2));
+        var path = Path.Combine(Path.GetTempPath(), $"conqueror-army-order-{Guid.NewGuid():N}.json");
+        try
+        {
+            campaign.Save(path);
+            var loaded = Campaign.Load(path);
+            Assert.Equal(order, loaded.ArmyOrderAt(2));
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+
+        campaign.AdvanceDays((order.Arrives - campaign.State.Date).Days - 1);
+        Assert.Equal(0, campaign.State.Player.ArmyLocationAt(2));
+        Assert.NotNull(campaign.ArmyOrderAt(2));
+        campaign.AdvanceDays(1);
+
+        Assert.Null(campaign.ArmyOrderAt(2));
+        Assert.Equal(york, campaign.State.Player.ArmyLocationAt(2));
+        Assert.True(campaign.GarrisonAt(york) < World.Locations[york].Garrison);
+        Assert.Equal(0, campaign.State.Player.Army.Total);
+        Assert.Contains(campaign.State.Journal, entry => entry.Contains("Captain's report", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void ArmyRosterRepairsLegacySlotsAndRejectsOverflow()
     {
         var player = new Player { AdditionalArmies = [] };

@@ -89,6 +89,8 @@ public sealed class StrategicArmyDivision
     public int Location { get; set; }
 }
 
+public sealed record StrategicArmyOrder(int Origin, int Destination, DateTime Departed, DateTime Arrives);
+
 public sealed class Fief
 {
     public string Name { get; init; } = "Home Fief";
@@ -228,6 +230,7 @@ public sealed class CampaignState
     public int PendingFieldLocation { get; set; } = -1;
     public int PendingFriendlyArmyIndex { get; set; } = -1;
     public Army? PendingEnemyArmy { get; set; }
+    public Dictionary<int, StrategicArmyOrder> ArmyOrders { get; init; } = [];
     public int TournamentToken { get; set; } = -1;
     public int JoustsThisTournament { get; set; }
     public bool SkirmishedThisTournament { get; set; }

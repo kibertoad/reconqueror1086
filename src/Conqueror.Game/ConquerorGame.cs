@@ -475,6 +475,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         }
         if (press(Keys.Left) || press(Keys.Up)) _selectedLocation = (_selectedLocation + World.Locations.Length - 1) % World.Locations.Length;
         if (press(Keys.Right) || press(Keys.Down)) _selectedLocation = (_selectedLocation + 1) % World.Locations.Length;
+        for (var armyIndex = 0; armyIndex < Player.ArmyDivisionLimit; armyIndex++)
+            if (press(Keys.D1 + armyIndex)) _warPlanningArmyIndex = armyIndex;
         if (press(Keys.Enter))
         {
             var days = _campaign.TravelTo(_selectedLocation);
@@ -486,9 +488,16 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (press(Keys.T) && _campaign.IsTournamentHere) _screen = Screen.Tournament;
         if (press(Keys.O)) EnterOverview(Screen.Map);
         if (press(Keys.S) && _campaign.StartSiege(_selectedLocation)) { _siege = _campaign.CreateSiege(); _showRadar = true; _screen = Screen.Siege; }
+        if (press(Keys.A))
+        {
+            var armyName = _campaign.State.Player.ArmyNameAt(_warPlanningArmyIndex);
+            _notice = _campaign.DispatchArmy(_warPlanningArmyIndex, _selectedLocation)
+                ? $"{armyName.ToUpperInvariant()} MARCHES TO {World.Locations[_selectedLocation].Name.ToUpperInvariant()}"
+                : $"{armyName.ToUpperInvariant()} CANNOT TAKE THAT ORDER";
+        }
         if (press(Keys.B))
         {
-            if (_campaign.State.Player.Army.Total == 0) _notice = "YOU HAVE NO ARMY";
+            if (_campaign.JoinedArmyTotalHere == 0) _notice = "NO JOINED ARMY IS PRESENT";
             else if (_campaign.CanStartFieldBattle) BeginFieldBattle("YOU CHALLENGE THE GARRISON");
             else _notice = "THERE IS NO HOSTILE FIELD ARMY HERE";
         }
@@ -1248,6 +1257,12 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             var owned = index == 0 || _campaign.State.ConqueredLocations.Contains(index);
             Fill(marker, index == _campaign.State.CurrentLocation ? Color.Red : index == _selectedLocation ? Color.Gold : owned ? Color.LightGreen : Color.White);
         }
+        DrawArmyMarkers((armyIndex, x, y) =>
+        {
+            var point = EstatePresentationDefinitions.InsetPoint(_estateLayout.InsetMap, x, y);
+            var marker = ScaleBounds(new UiBounds(point.X - 3 + armyIndex, point.Y - 3, 5, 5));
+            Fill(marker, armyIndex == _warPlanningArmyIndex ? Color.Gold : Color.Cyan);
+        });
     }
 
     private void DrawEstateInformation()
@@ -1263,7 +1278,13 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                 DrawText($"GARRISON {intel}\nDISTANCE {World.TravelDays(_campaign.State.CurrentLocation, _selectedLocation)} DAYS", panel.X + 12, panel.Y + 58, Color.Wheat, 2, panel.Width - 24);
                 break;
             case EstatePanel.Orders:
-                DrawText("ENTER TRAVEL\nT TOURNAMENT\nS SIEGE  B BATTLE\nP SPY", panel.X + 12, panel.Y + 58, Color.Wheat, 2, panel.Width - 24);
+                var order = _campaign.ArmyOrderAt(_warPlanningArmyIndex);
+                var army = player.ArmyAt(_warPlanningArmyIndex);
+                var armyStatus = order is null
+                    ? $"AT {World.Locations[player.ArmyLocationAt(_warPlanningArmyIndex)].Name}"
+                    : $"TO {World.Locations[order.Destination].Name}\nARRIVES {order.Arrives:MMM d}";
+                DrawText($"{_warPlanningArmyIndex + 1} {player.ArmyNameAt(_warPlanningArmyIndex)} ({army.Total})\n{armyStatus}\n1-5 SELECT  A DISPATCH\nS SIEGE  B BATTLE",
+                    panel.X + 12, panel.Y + 48, Color.Wheat, 2, panel.Width - 24);
                 break;
             case EstatePanel.Help:
                 DrawText("ARROWS SELECT\n+/- CHANGE SPEED\nE ADVANCE TIME\nF5 SAVE  F9 LOAD", panel.X + 12, panel.Y + 58, Color.Wheat, 2, panel.Width - 24);
@@ -1289,22 +1310,45 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         }
         var current = World.Locations[_campaign.State.CurrentLocation];
         Fill(new Rectangle(current.X - 5, current.Y - 5, 18, 18), Color.Red);
+        DrawArmyMarkers((armyIndex, x, y) =>
+            Fill(new Rectangle(x - 4 + armyIndex * 2, y - 4, 8, 8),
+                armyIndex == _warPlanningArmyIndex ? Color.Gold : Color.Cyan));
         Fill(new Rectangle(760, 0, 264, 768), new Color(47, 36, 28));
         var p = _campaign.State.Player; var f = p.Home;
         var selected = World.Locations[_selectedLocation];
         var intel = _campaign.HasGarrisonIntel(_selectedLocation) ? _campaign.GarrisonAt(_selectedLocation).ToString() : "UNKNOWN";
         DrawText("ENGLAND", 820, 25, Color.Gold, 3); DrawText($"{_campaign.State.Date:DD MMM YYYY}", 785, 80, Color.White, 2);
         DrawText(p.Name, 780, 125, Color.Wheat, 2, 230); DrawText($"AGE {p.Age}   WEALTH {p.Wealth}S", 780, 180, Color.White, 2);
-        DrawText($"FIEFS {p.Fiefs}  VILLAGES {p.Villages}", 780, 215, Color.White, 2); DrawText($"ARMY {p.Army.Total}  FAME {p.Fame}", 780, 250, Color.White, 2);
+        DrawText($"FIEFS {p.Fiefs}  VILLAGES {p.Villages}", 780, 215, Color.White, 2); DrawText($"ARMIES {p.TotalArmyPopulation}  FAME {p.Fame}", 780, 250, Color.White, 2);
         DrawText($"PRODUCTIVITY {f.Productivity()}%", 780, 285, Color.White, 2);
         var tournament = World.Locations[World.TournamentIndex(_campaign.State.Date)].Name;
         DrawText($"AT {current.Name}", 780, 320, Color.Gold, 2, 230);
         DrawText($"TARGET {selected.Name} GARRISON {intel}", 780, 350, Color.Wheat, 2, 230);
         DrawText("ARROWS SELECT ENTER TRAVEL", 780, 395, Color.LightGreen, 2, 230); DrawText("H HOME   V VILLAGE", 780, 440, Color.LightGreen, 2);
         DrawText("T TOURNAMENT O OVERVIEW", 780, 475, Color.LightGreen, 2, 230);
-        DrawText("S SIEGE   B FIELD BATTLE", 780, 520, Color.LightGreen, 2, 230); DrawText("P SPY 80S   D DRAGON", 780, 555, Color.LightGreen, 2, 230);
-        DrawText($"TOURNAMENT {tournament}", 780, 595, Color.Wheat, 2, 230); DrawText("E ADVANCE  PLUS MINUS SPEED", 780, 635, Color.LightGreen, 2, 230);
+        DrawText("S SIEGE   B FIELD BATTLE", 780, 520, Color.LightGreen, 2, 230); DrawText("1-5 ARMY  A DISPATCH", 780, 555, Color.LightGreen, 2, 230);
+        DrawText("P SPY 80S   D DRAGON", 780, 585, Color.LightGreen, 2, 230);
+        DrawText($"TOURNAMENT {tournament}", 780, 615, Color.Wheat, 2, 230); DrawText("E ADVANCE  PLUS MINUS SPEED", 780, 650, Color.LightGreen, 2, 230);
         DrawText("F5 SAVE  F9 LOAD", 780, 690, Color.Gold, 2);
+    }
+
+    private void DrawArmyMarkers(Action<int, int, int> draw)
+    {
+        var player = _campaign.State.Player;
+        player.EnsureArmyRoster();
+        for (var armyIndex = 0; armyIndex < Player.ArmyDivisionLimit; armyIndex++)
+        {
+            if (!player.ArmyIsFielded(armyIndex) || player.ArmyAt(armyIndex).Total == 0) continue;
+            var order = _campaign.ArmyOrderAt(armyIndex);
+            var origin = World.Locations[order?.Origin ?? player.ArmyLocationAt(armyIndex)];
+            if (order is null) { draw(armyIndex, origin.X, origin.Y); continue; }
+            var destination = World.Locations[order.Destination];
+            var duration = Math.Max(1, (order.Arrives - order.Departed).TotalDays);
+            var progress = Math.Clamp((_campaign.State.Date - order.Departed).TotalDays / duration, 0, 1);
+            draw(armyIndex,
+                (int)Math.Round(origin.X + (destination.X - origin.X) * progress),
+                (int)Math.Round(origin.Y + (destination.Y - origin.Y) * progress));
+        }
     }
 
     private void DrawHome()

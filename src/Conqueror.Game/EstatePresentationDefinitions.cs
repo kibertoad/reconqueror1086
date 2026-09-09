@@ -159,7 +159,10 @@ public static class EstatePresentationDefinitions
     }
 
     public static (int X, int Y) InsetPoint(UiBounds inset, WorldLocation location) =>
-        (inset.X + location.X * inset.Width / WorldWidth, inset.Y + location.Y * inset.Height / WorldHeight);
+        InsetPoint(inset, location.X, location.Y);
+
+    public static (int X, int Y) InsetPoint(UiBounds inset, int worldX, int worldY) =>
+        (inset.X + worldX * inset.Width / WorldWidth, inset.Y + worldY * inset.Height / WorldHeight);
 
     public static int LocationAt(UiBounds inset, int x, int y) => World.Locations
         .Select((location, index) => (Index: index, Point: InsetPoint(inset, location)))
