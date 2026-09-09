@@ -294,6 +294,26 @@ public sealed class ImportedContentCatalog
         }
     }
 
+    public DynamixSceneColorMaps? DecodeSceneColorMaps(string archiveId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(archiveId);
+        var prefix = archiveId.Replace('\\', '/') + "#";
+        var ids = _assets.Where(asset => asset.Id.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            .Select(asset => asset.Id)
+            .Where(id => id[(id.LastIndexOf(':') + 1)..].StartsWith("Pal", StringComparison.Ordinal))
+            .ToArray();
+        if (ids.Length == 0) return null;
+        try
+        {
+            return new DynamixSceneColorMaps(ids.Select(id =>
+                DynamixSceneColorMapDecoder.Decode(id[(id.LastIndexOf(':') + 1)..], ReadBytes(id))));
+        }
+        catch (InvalidDataException)
+        {
+            return null;
+        }
+    }
+
     public DynamixConversationDatabase? DecodeConversations(string bodyId, string indexId)
     {
         using var body = Open(bodyId);

@@ -5,7 +5,7 @@ namespace Conqueror.Game;
 
 public sealed record ImportedSiegeScene(
     string ArchiveId, DynamixScene Scene, DynamixSceneBackdrop? Backdrop,
-    SiegeLayout Layout, int SourceOriginX, int SourceOriginY);
+    DynamixSceneColorMaps? ColorMaps, SiegeLayout Layout, int SourceOriginX, int SourceOriginY);
 
 public static class ImportedSiegeLayouts
 {
@@ -84,6 +84,7 @@ public static class ImportedSiegeLayouts
         if (scene is null) return null;
         var converted = ConvertWithOrigin(scene);
         return new ImportedSiegeScene(archiveId, scene, catalog!.DecodeSceneBackdrop(archiveId),
+            catalog.DecodeSceneColorMaps(archiveId),
             converted.Layout, converted.OriginX, converted.OriginY);
     }
 

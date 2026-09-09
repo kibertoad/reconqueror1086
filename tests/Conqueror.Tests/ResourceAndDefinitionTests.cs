@@ -69,6 +69,24 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void SceneColorMapsRequireTheCompleteCanonicalIndexRamp()
+    {
+        var decoded = Enumerable.Range(0, DynamixSceneColorMaps.Count)
+            .Select(index => DynamixSceneColorMapDecoder.Decode($"Pal{index}",
+                Enumerable.Range(0, DynamixSceneColorMaps.EntryCount).Select(value => (byte)value).ToArray()))
+            .ToArray();
+
+        var maps = new DynamixSceneColorMaps(decoded.Reverse());
+
+        Assert.Equal(73, maps[9].Span[73]);
+        Assert.Throws<InvalidDataException>(() => new DynamixSceneColorMaps(decoded[..^1]));
+        Assert.Throws<InvalidDataException>(() => new DynamixSceneColorMaps(decoded.Append(decoded[0])));
+        Assert.Throws<InvalidDataException>(() => DynamixSceneColorMapDecoder.Decode("Pal128", new byte[256]));
+        Assert.Throws<InvalidDataException>(() => DynamixSceneColorMapDecoder.Decode("pal0", new byte[256]));
+        Assert.Throws<InvalidDataException>(() => DynamixSceneColorMapDecoder.Decode("Pal0", new byte[255]));
+    }
+
+    [Fact]
     public void SceneDecoderReadsColumnMajorMapViewerAndNamedBlocks()
     {
         var source = SyntheticScene();
