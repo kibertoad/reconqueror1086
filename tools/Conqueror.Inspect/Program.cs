@@ -77,6 +77,11 @@ if (terms.Length > 0)
             hits.AppendLine($"0x{offset:X8}  {Path.GetFileName(target)}  {value}");
     File.WriteAllText(Path.Combine(output, "string-hits.txt"), hits.ToString());
 }
+if (inspectionOptions.Contains("--executable-only", StringComparer.OrdinalIgnoreCase))
+{
+    Console.WriteLine($"Inspected executable metadata and extracted {extracted} bounded artifacts to {output}.");
+    return 0;
+}
 var gobEntries = 0;
 var gobStoredEntries = 0;
 var kind1Blocks = 0;

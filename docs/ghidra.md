@@ -96,7 +96,7 @@ $env:NUGET_PACKAGES = 'C:\Users\kiber\.nuget\packages'
 $artifactPath = Join-Path $env:TEMP ('reconqueror-disassembly-' + [guid]::NewGuid().ToString('N'))
 dotnet run --project tools\Conqueror.Inspect --artifacts-path $artifactPath -- `
   'C:\GOG Games\Conqueror AD1086' 'analysis\original' `
-  '--disassemble=0x45C6E,0x456F4,0x4576C'
+  '--disassemble=0x45C6E,0x456F4,0x4576C' '--executable-only'
 ```
 
 This writes the ignored metadata-only `analysis/original/executable-disassembly-report.txt`. Addresses are LE virtual addresses, not raw file offsets. The inspector maps them through the executable's object and page tables before decoding 32-bit x86 instructions.
@@ -106,8 +106,10 @@ For data references that are absent from raw instruction operands, `--xref-data=
 ```powershell
 dotnet run --project tools\Conqueror.Inspect -- `
   'C:\GOG Games\Conqueror AD1086' 'analysis\original' `
-  '--xref-data=0x17C0,0x17CC,0x1810'
+  '--xref-data=0x17C0,0x17CC,0x1810' '--executable-only'
 ```
+
+`--executable-only` returns after artifact extraction and requested executable string, disassembly, or relocation reports. Use it for iterative static analysis so unrelated GOB, scene-container, and movie population scans are not repeated.
 
 ## Evidence discipline
 
