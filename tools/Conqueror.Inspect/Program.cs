@@ -250,6 +250,40 @@ if (File.Exists(gobPath))
     }
     File.WriteAllText(Path.Combine(output, "conversation-report.txt"), conversationReport.ToString());
 
+    var actionTreeReport = new StringBuilder("# IndexHeader  Groups  Actions  Expressions  Values  MissingConversationIds  Body  Index\n");
+    var actionBody = gob.Entries.FirstOrDefault(x => x.Name.Equals("all.tmb", StringComparison.OrdinalIgnoreCase));
+    var actionIndex = gob.Entries.FirstOrDefault(x => x.Name.Equals("all.tmi", StringComparison.OrdinalIgnoreCase));
+    if (actionBody is not null && actionIndex is not null
+        && DynamixArchive.CanDecode(actionBody) && DynamixArchive.CanDecode(actionIndex))
+    {
+        try
+        {
+            var actionTrees = DynamixActionTreeDecoder.Decode(gob.ReadDecoded(actionBody), gob.ReadDecoded(actionIndex));
+            var referencedActionIds = Array.Empty<int>();
+            if (conversationBody is not null && conversationIndex is not null
+                && DynamixArchive.CanDecode(conversationBody) && DynamixArchive.CanDecode(conversationIndex))
+            {
+                var conversations = DynamixConversationDecoder.Decode(
+                    gob.ReadDecoded(conversationBody), gob.ReadDecoded(conversationIndex));
+                referencedActionIds = conversations.Nodes.Values
+                    .SelectMany(node => node.ActionIds.Concat(node.Responses.SelectMany(response => response.ActionIds)))
+                    .Distinct().Order().ToArray();
+            }
+            var missing = referencedActionIds.Where(id => actionTrees.Find(id) is null).ToArray();
+            actionTreeReport.AppendLine($"{actionTrees.IndexHeaderValue,11}  {actionTrees.Groups.Count,6}  {actionTrees.Actions.Count,7}  {actionTrees.Expressions.Count,11}  {actionTrees.Values.Count,6}  {missing.Length,22}  {actionBody.Name}  {actionIndex.Name}");
+            actionTreeReport.AppendLine($"# ActionKinds  {string.Join(' ', actionTrees.Actions.Values.GroupBy(x => x.Kind).OrderBy(x => x.Key).Select(x => $"{x.Key}:{x.Count()}"))}");
+            actionTreeReport.AppendLine($"# ValueKinds   {string.Join(' ', actionTrees.Values.Values.GroupBy(x => x.Kind).OrderBy(x => x.Key).Select(x => $"{x.Key}:{x.Count()}"))}");
+            actionTreeReport.AppendLine($"# Operators    {string.Join(' ', actionTrees.Expressions.Values.SelectMany(x => x.Operators).GroupBy(x => x).OrderBy(x => x.Key).Select(x => $"{x.Key}:{x.Count()}"))}");
+            actionTreeReport.AppendLine($"# FunctionIds  {string.Join(' ', actionTrees.Values.Values.Where(x => x.Kind == DynamixValueKind.Function).GroupBy(x => x.Value).OrderBy(x => x.Key).Select(x => $"{x.Key}:{x.Count()}"))}");
+            if (missing.Length > 0) actionTreeReport.AppendLine($"# MissingIds   {string.Join(',', missing)}");
+        }
+        catch (InvalidDataException error)
+        {
+            actionTreeReport.AppendLine($"rejected  {error.Message.Replace('\r', ' ').Replace('\n', ' ')}");
+        }
+    }
+    File.WriteAllText(Path.Combine(output, "action-tree-report.txt"), actionTreeReport.ToString());
+
     var dilemmaReport = new StringBuilder("# Number  Age  Scene  Choices  Outcomes  Changes  PromptChars  OutcomeChars  Name\n");
     var dilemmaRules = new StringBuilder("# Number  Choice:scoring[low,high] outcome(changes); original prose omitted\n");
     foreach (var entry in gob.Entries.Where(x => (x.IsStored || x.Flags == 1)

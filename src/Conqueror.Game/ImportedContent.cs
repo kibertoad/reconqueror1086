@@ -255,6 +255,25 @@ public sealed class ImportedContentCatalog
         }
     }
 
+    public DynamixActionTreeDatabase? DecodeActionTrees(string bodyId, string indexId)
+    {
+        using var body = Open(bodyId);
+        using var index = Open(indexId);
+        if (body is null || index is null) return null;
+        try
+        {
+            using var bodyMemory = new MemoryStream();
+            using var indexMemory = new MemoryStream();
+            body.CopyTo(bodyMemory);
+            index.CopyTo(indexMemory);
+            return DynamixActionTreeDecoder.Decode(bodyMemory.ToArray(), indexMemory.ToArray());
+        }
+        catch (InvalidDataException)
+        {
+            return null;
+        }
+    }
+
     public DynamixSoundBank? DecodeSoundBank(string id)
     {
         using var stream = Open(id);

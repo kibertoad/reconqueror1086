@@ -128,6 +128,41 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void ActionTreeDatabaseDecodesIndexedRecursiveExpressionsWithinBounds()
+    {
+        var body = new byte[104];
+        WriteInt(body, 0, 1); WriteInt(body, 4, 8);
+        WriteInt(body, 8, (int)DynamixActionKind.IfElse);
+        WriteInt(body, 12, 28); WriteInt(body, 16, 2);
+        WriteInt(body, 20, 80); WriteInt(body, 24, 92);
+        WriteInt(body, 28, 2); WriteInt(body, 32, 1);
+        WriteInt(body, 36, 48); WriteInt(body, 40, 64);
+        WriteInt(body, 44, (int)DynamixExpressionOperator.Equal);
+        WriteInt(body, 48, (int)DynamixValueKind.Literal); WriteInt(body, 52, 7); WriteInt(body, 56, -1);
+        WriteInt(body, 64, (int)DynamixValueKind.Literal); WriteInt(body, 68, 7); WriteInt(body, 72, 1);
+        WriteInt(body, 80, (int)DynamixActionKind.Evaluate); WriteInt(body, 84, 28);
+        WriteInt(body, 92, (int)DynamixActionKind.Evaluate); WriteInt(body, 96, 28);
+        var index = new byte[12];
+        WriteInt(index, 0, 1); WriteInt(index, 4, 1101); WriteInt(index, 8, 0);
+
+        var database = DynamixActionTreeDecoder.Decode(body, index);
+
+        var group = Assert.IsType<DynamixActionGroup>(database.Find(1101));
+        Assert.Equal([8], group.ActionOffsets);
+        Assert.Equal(DynamixActionKind.IfElse, database.Actions[8].Kind);
+        Assert.Equal([80, 92], database.Actions[8].BranchActionOffsets);
+        Assert.Equal([DynamixExpressionOperator.Equal], database.Expressions[28].Operators);
+        Assert.False(database.Values[48].Invert);
+        Assert.True(database.Values[64].Invert);
+        Assert.Equal(1, database.IndexHeaderValue);
+        Assert.Equal((3, 1, 2), (database.Actions.Count, database.Expressions.Count, database.Values.Count));
+
+        var badOperator = body.ToArray(); WriteInt(badOperator, 44, 9);
+        Assert.Throws<InvalidDataException>(() => DynamixActionTreeDecoder.Decode(badOperator, index));
+        Assert.Throws<InvalidDataException>(() => DynamixActionTreeDecoder.Decode(body, index[..^1]));
+    }
+
+    [Fact]
     public void SmackerMovieHeaderAndFrameIndexAreBounded()
     {
         var movie = SmackerMovieDecoder.Decode(SyntheticSmacker());

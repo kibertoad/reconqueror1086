@@ -528,7 +528,9 @@ Local static-analysis tool: Ghidra 12.1.3 is installed user-wide at `C:\Users\ki
 - [x] Inventory stored versus compressed entries without bulk decompression.
 - [x] Identify and decode the marker-delimited `DILEM*.DAT` text resources end to end; all 30 validate through a bounded ASCII parser and are exposed by stable number through the runtime dialogue repository.
 - [x] Decode `ALL.CIF`/`ALL.CBF` conversation framing end to end; all 1,311 indexed nodes, 2,062 prompt variants, 2,696 terminal/linked responses, and 63 zero-response continuation slots validate through a bounded graph parser and runtime catalog adapter. Confirm the populated inn's ten selector roots and first named nodes against the owned database.
-- [x] Preserve all 423 node-level and 2,318 response-level action references from the fixed conversation headers, with exact 30-slot bounds and metadata-only reporting. Decode and execute their indexed `ALL.TMI`/`ALL.TMB` expression trees next.
+- [x] Preserve all 423 node-level and 2,318 response-level action references from the fixed conversation headers, with exact 30-slot bounds and metadata-only reporting.
+- [x] Decode the indexed `ALL.TMI`/`ALL.TMB` structure with bounded recursive traversal; validate all 689 groups, 2,267 actions, 10,373 expressions, and 13,352 values and report the lone unresolved original reference `5011`.
+- [ ] Recover action function IDs 3-9 and execute their confirmed conversation conditions, redirects, and state mutations.
 - [x] Decode one byte-stored image/palette resource into runtime RGBA pixels end to end.
 - [x] Decode all five byte-stored CSF indexed-animation sequences into bounded palette indices and alpha masks.
 - [x] Validate and classify the five stored 256-color RGB palette resources.
