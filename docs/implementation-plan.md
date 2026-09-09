@@ -551,6 +551,7 @@ Local static-analysis tool: Ghidra 12.1.3 is installed user-wide at `C:\Users\ki
 - [x] Activate descriptor-driven fief-management OK/Cancel controls with transactional commit/rollback; prevent pending edits from leaking into saves, and restore economy, development, recruitment, and journal state on cancellation.
 - [x] Recover the four contiguous fief-management label catalogs from executable data, render them through each HAT's exact row rectangles, add bounded Village scrolling, activate only supported row mutations, and correct the shared upper-right region from a presumed wealth field to the visible Full Screen control.
 - [x] Bind all ten `FOPTS.HAT` Home regions in the executable's contiguous label order, correct War Planning/Orders region identities, activate both exit regions, and register the original `F_OVER.PCX`/`WARPLAN.PCX` destinations with their descriptors.
+- [x] Decode the 22-frame `WARPLAN.CSF` state catalog, map its five army selectors, Field Army, Join/Leave, Send Out Spy, unit rows, target, and footer through `FWARPLAN.HAT`, and activate the subset supported by the current aggregate-army model.
 - [x] Decode and classify all 26 `.666` sound banks with bounded length/rate validation; the ignored population report accounts for 102 samples and zero rejects.
 - [x] Confirm unsigned 8-bit mono PCM from waveform centering, identify the identical shared UI sample across 17 screen banks, and activate it through a startup cache that decodes each referenced bank and converts each registered sample only once.
 - [ ] Trace the complete startup/menu state machine, input timing, cursor behavior, and region-action dispatch from `CONQUER.EXE`; keep semantics corroborated until each executable branch is confirmed.
@@ -559,7 +560,7 @@ The resource-decoding sprint is first because it unlocks exact dialogue, screen 
 
 ## Next implementation priorities
 
-1. Continue tracing startup/menu input timing and HAT region-action dispatch from `CONQUER.EXE`; all ten Home labels now follow the executable's ordinal catalog, while exact War Planning controls, `JUMP!!`, and original input timing remain to be confirmed.
+1. Continue tracing startup/menu input timing and HAT region-action dispatch from `CONQUER.EXE`; all ten Home labels and War Planning control frames are mapped, while multi-army membership, `JUMP!!`, and original input timing remain to be confirmed.
 2. [Completed 2026-09-08] Bind the decoded five-definition age groups to campaign state using the executable-confirmed per-age selection policy; keep original prose local and retain built-in fallback summaries.
 3. In progress: bind menu CSF sequences to verified palettes and roles. `OPTION.CSF` static ON/OFF and Resume frames use `OPTFIN.PCX`; `SWORDS.CSF` item art and `BUYSELL.CSF` control states use `SWDTEMP.PCX`; `FFMOUSE.CSF` default sword frame uses the estate/interface palette. Alternate cursor frames and other menu sequences still require dispatch and timing evidence.
 4. [Completed 2026-09-08] Add legal-boundary automation that fails if imported media or generated analysis artifacts enter Git, then add CI restore/build/test coverage. `tools/Verify-Repository.ps1` interprets the data-only `repository-policy.json`; the local test launcher and Windows GitHub Actions workflow both enforce it before compiling.

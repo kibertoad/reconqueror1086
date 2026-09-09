@@ -152,6 +152,15 @@ public sealed class ResourceAndDefinitionTests
             definition => definition.Role == "Home.Overview" && definition.IdSuffix == ":foview.hat");
         Assert.Contains(ImportedLayouts.Definitions,
             definition => definition.Role == "Home.WarPlanning" && definition.IdSuffix == ":fwarplan.hat");
+        Assert.Contains(ImportedAnimations.Definitions,
+            definition => definition.Role == "Home.WarPlanning.Controls" && definition.IdSuffix == ":warplan.csf"
+                && definition.PaletteArtRole == "Home.WarPlanning");
+        Assert.Equal([0, 3, 6, 9, 12], Enumerable.Range(0, 5)
+            .Select(index => WarPlanningPresentationDefinitions.ArmyFrame(index, true, true)));
+        Assert.Equal([2, 5, 8, 11, 14], Enumerable.Range(0, 5)
+            .Select(index => WarPlanningPresentationDefinitions.ArmyFrame(index, false, false)));
+        Assert.Equal(5, WarPlanningPresentationDefinitions.Fallback.ArmyButtons.Count);
+        Assert.Equal(3, WarPlanningPresentationDefinitions.Fallback.UnitRows.Count);
         Assert.Equal(
             [(SceneNavigationAction.Overview, "Overview", 0, new UiBounds(248, 184, 64, 31)),
              (SceneNavigationAction.Castle, "Castle", 1, new UiBounds(172, 153, 72, 44)),
@@ -400,6 +409,8 @@ public sealed class ResourceAndDefinitionTests
         Assert.Equal(new UiBounds(69, 18, 119, 133), CharacterCreationDefinitions.PregeneratedFrom(layout)[0]);
         Assert.Equal(new UiBounds(69, 18, 119, 133),
             HomePresentationDefinitions.HotspotsFrom(layout).Single(hotspot => hotspot.HatRegionId == 0).Bounds);
+        Assert.Equal(new UiBounds(69, 18, 119, 133),
+            WarPlanningPresentationDefinitions.From(layout).ArmyButtons[0]);
     }
 
     [Fact]

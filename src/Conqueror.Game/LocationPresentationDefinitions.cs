@@ -61,6 +61,58 @@ public static class HomePresentationDefinitions
         .ToArray();
 }
 
+public static class WarPlanningPresentationDefinitions
+{
+    public sealed record Layout(
+        IReadOnlyList<UiBounds> ArmyButtons,
+        UiBounds FieldArmy,
+        UiBounds SendSpy,
+        UiBounds Membership,
+        IReadOnlyList<UiBounds> UnitRows,
+        UiBounds Okay,
+        UiBounds Cancel,
+        UiBounds Target);
+
+    public const int ArmyCount = 5;
+    public const int ArmyFrameStates = 3;
+    public const int JoinFrame = 15;
+    public const int MembershipUnavailableFrame = 16;
+    public const int LeaveFrame = 17;
+    public const int FieldArmyFrame = 18;
+    public const int FieldArmyUnavailableFrame = 19;
+    public const int SendSpyFrame = 20;
+    public const int SendSpyUnavailableFrame = 21;
+
+    public static Layout Fallback { get; } = new(
+        [new UiBounds(8, 0, 40, 38), new UiBounds(23, 45, 40, 38), new UiBounds(24, 91, 40, 38),
+         new UiBounds(7, 141, 40, 38), new UiBounds(21, 185, 40, 38)],
+        new UiBounds(8, 392, 114, 38),
+        new UiBounds(2, 433, 138, 38),
+        new UiBounds(224, 410, 198, 38),
+        Enumerable.Range(0, 3).Select(index => new UiBounds(115, 103 + index * 14, 300, 14)).ToArray(),
+        new UiBounds(538, 436, 57, 38),
+        new UiBounds(550, 392, 55, 38),
+        new UiBounds(315, 45, 100, 20));
+
+    public static Layout From(HatLayout? layout) => new(
+        Enumerable.Range(0, ArmyCount).Select(index => Region(layout, index, Fallback.ArmyButtons[index])).ToArray(),
+        Region(layout, 5, Fallback.FieldArmy),
+        Region(layout, 6, Fallback.SendSpy),
+        Region(layout, 7, Fallback.Membership),
+        Enumerable.Range(0, 3).Select(index => Region(layout, 8 + index, Fallback.UnitRows[index])).ToArray(),
+        Region(layout, 11, Fallback.Okay),
+        Region(layout, 12, Fallback.Cancel),
+        Region(layout, 13, Fallback.Target));
+
+    public static int ArmyFrame(int armyIndex, bool selected, bool available) =>
+        checked(armyIndex * ArmyFrameStates + (available ? selected ? 0 : 1 : 2));
+
+    private static UiBounds Region(HatLayout? layout, int id, UiBounds fallback) =>
+        layout?.FindRegion(id) is { Enabled: not 0 } region
+            ? new UiBounds(region.X, region.Y, region.Width, region.Height)
+            : fallback;
+}
+
 public static class ShopPresentationDefinitions
 {
     private const int ItemViewportWidth = 240;

@@ -41,6 +41,7 @@ Check(FarmPresentationDefinitions.EntriesFor(FarmPresentationDefinitions.Section
 Check(Enum.GetValues<FarmPresentationDefinitions.Section>().Select(section => FarmPresentationDefinitions.EntriesFor(section).Count).SequenceEqual([17, 17, 4, 7]), "fief-management label catalogs have recovered section sizes");
 Check(BlacksmithPresentationDefinitions.Hotspots.All(x => !string.IsNullOrWhiteSpace(x.HoverLabel)), "confirmed visual scene hotspots define hover labels");
 Check(HomePresentationDefinitions.Hotspots.Select(x => x.Action).SequenceEqual([SceneNavigationAction.Overview, SceneNavigationAction.Castle, SceneNavigationAction.Farm, SceneNavigationAction.Village, SceneNavigationAction.Forest, SceneNavigationAction.WarPlanning, SceneNavigationAction.Exit, SceneNavigationAction.Jump, SceneNavigationAction.Map, SceneNavigationAction.Orders]), "executable-ordered Home hotspots are definition driven");
+Check(WarPlanningPresentationDefinitions.ArmyFrame(4, false, false) == 14 && WarPlanningPresentationDefinitions.SendSpyUnavailableFrame == 21, "War Planning control frames match the decoded CSF sequence");
 Check(CharacterCreationDefinitions.Options.Select(x => x.Action).Distinct().Count() == Enum.GetValues<CharacterCreationAction>().Length, "character option actions are unique definitions");
 Check(CharacterCreationDefinitions.PregeneratedCharacters.Count == Balance.Templates.Length && CharacterCreationDefinitions.HeraldicColors.Select(x => x.Name).SequenceEqual(["Red", "Green", "Blue"]), "original character selection hotspots are defined");
 
