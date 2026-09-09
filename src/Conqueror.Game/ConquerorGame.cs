@@ -67,6 +67,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private ImportedContentCatalog? _importedContent;
     private ImportedSoundLibrary? _importedSoundLibrary;
     private ImportedDialogueRepository? _importedDialogue;
+    private ImportedConversationSession? _conversationSession;
     private WeaponStoreResource? _weaponStore;
     private YouthDilemmaResult? _youthDilemmaResult;
     private SoundEffect? _importedMusic;
@@ -76,11 +77,13 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private Screen _movieReturnScreen = Screen.OptionsHub;
     private readonly Dictionary<string, SoundEffect> _originalSounds = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, Texture2D> _originalArt = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, Texture2D> _conversationPortraits = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, byte[]> _originalPalettes = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, OriginalAnimation> _originalAnimations = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, DilemmaAnimation?> _dilemmaAnimations = new(StringComparer.OrdinalIgnoreCase);
     private byte[]? _dilemmaPalette;
     private double _presentationSeconds;
+    private double _conversationAdvanceAt;
     private bool _hasActiveCampaign;
     private bool _cdMusicEnabled = true;
     private bool _soundEffectsEnabled = true;
@@ -151,6 +154,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             _originalPalettes.Add(definition.Role, image.PaletteRgb);
             if (definition.Role == "Dilemma.Background") _dilemmaPalette = image.PaletteRgb;
         }
+        LoadOriginalConversations();
         foreach (var definition in ImportedAnimations.Definitions)
         {
             var id = _importedContent?.FindId("indexed-animation", definition.IdSuffix);
@@ -193,6 +197,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _musicInstance?.Dispose();
         _importedMusic?.Dispose();
         foreach (var texture in _originalArt.Values) texture.Dispose();
+        foreach (var texture in _conversationPortraits.Values) texture.Dispose();
         foreach (var animation in _originalAnimations.Values)
             foreach (var texture in animation.Frames) texture.Dispose();
         foreach (var animation in _dilemmaAnimations.Values.OfType<DilemmaAnimation>())
@@ -283,7 +288,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.Farm: UpdateFarm(Press, mouse, click); break;
             case Screen.Village: UpdateVillage(Press); break;
             case Screen.Inn: UpdateInn(Press, mouse, click); break;
-            case Screen.InnDialogue: UpdateInnDialogue(Press); break;
+            case Screen.InnDialogue: UpdateInnDialogue(Press, mouse, click); break;
             case Screen.Blacksmith: UpdateBlacksmith(Press, mouse, click); break;
             case Screen.BlacksmithDialogue: UpdateBlacksmithDialogue(Press); break;
             case Screen.Shop: UpdateShop(Press, mouse, click); break;
@@ -790,16 +795,65 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (_innPatron is not null)
         {
             _notice = "";
+            if (_conversationSession?.Start(_innPatron.ConversationRootNodeId, Random.Shared.Next) == true)
+                ScheduleAutomaticConversationAdvance();
             _screen = Screen.InnDialogue;
         }
         else if (_innLayout.ExitBounds.Contains(x, y))
             _screen = Screen.Village;
     }
 
-    private void UpdateInnDialogue(Func<Keys, bool> press)
+    private void UpdateInnDialogue(Func<Keys, bool> press, MouseState mouse, bool click)
     {
-        if (press(Keys.Enter) || press(Keys.I) || press(Keys.V)) _screen = Screen.Inn;
+        if (press(Keys.I) || press(Keys.V))
+        {
+            _screen = Screen.Inn;
+            return;
+        }
+        var node = _conversationSession?.CurrentNode;
+        if (node is null)
+        {
+            if (press(Keys.Enter)) _screen = Screen.Inn;
+            return;
+        }
+        if (node.Responses.Count == 0)
+        {
+            if (_presentationSeconds >= _conversationAdvanceAt || press(Keys.Enter)) ContinueConversation();
+            return;
+        }
+        var selected = Enumerable.Range(0, node.Responses.Count)
+            .FirstOrDefault(index => press(Keys.D1 + index), -1);
+        if (selected < 0 && click)
+        {
+            var (x, y) = OriginalPoint(mouse);
+            selected = Enumerable.Range(0, node.Responses.Count)
+                .FirstOrDefault(index => ConversationPresentationDefinitions.ResponseBounds(index).Contains(x, y), -1);
+        }
+        if (selected >= 0) ChooseConversationResponse(selected);
     }
+
+    private void ChooseConversationResponse(int index)
+    {
+        if (_conversationSession?.ChooseResponse(index, Random.Shared.Next) != true)
+        {
+            _screen = Screen.Inn;
+            return;
+        }
+        ScheduleAutomaticConversationAdvance();
+    }
+
+    private void ContinueConversation()
+    {
+        if (_conversationSession?.Continue(Random.Shared.Next) != true)
+        {
+            _screen = Screen.Inn;
+            return;
+        }
+        ScheduleAutomaticConversationAdvance();
+    }
+
+    private void ScheduleAutomaticConversationAdvance() => _conversationAdvanceAt =
+        _conversationSession?.CurrentNode?.Responses.Count == 0 ? _presentationSeconds + 2 : double.PositiveInfinity;
 
     private void UpdateBlacksmith(Func<Keys, bool> press, MouseState mouse, bool click)
     {
@@ -1033,6 +1087,29 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                 _originalSounds.Add(definition.Role, new SoundEffect(
                     sample.Pcm16LittleEndian, sample.SampleRate, AudioChannels.Mono));
             }
+        }
+    }
+
+    private void LoadOriginalConversations()
+    {
+        var bodyId = _importedContent?.FindId("resource", ":all.cbf");
+        var indexId = _importedContent?.FindId("resource", ":all.cif");
+        if (bodyId is null || indexId is null
+            || _importedContent?.DecodeConversations(bodyId, indexId) is not { } database) return;
+        _conversationSession = new ImportedConversationSession(database);
+        foreach (var portraitFile in database.Nodes.Values
+            .Select(node => node.PortraitFile)
+            .OfType<string>()
+            .Where(file => Path.GetFileName(file) == file
+                && (file.EndsWith(".PCC", StringComparison.OrdinalIgnoreCase)
+                    || file.EndsWith(".PCX", StringComparison.OrdinalIgnoreCase)))
+            .Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            var id = _importedContent.FindId("image", ":" + portraitFile);
+            if (id is null || _importedContent.DecodePcx(id) is not { } image) continue;
+            var texture = new Texture2D(GraphicsDevice, image.Width, image.Height, false, SurfaceFormat.Color);
+            texture.SetData(image.ToRgba());
+            _conversationPortraits.Add(portraitFile, texture);
         }
     }
 
@@ -1682,7 +1759,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (!original)
         {
             DrawPanel("THE INN", "TRAVELLERS AND LOCAL PATRONS GATHER HERE");
-            DrawText("PATRON CONVERSATIONS ARE NOT YET AVAILABLE", 155, 340, Color.Wheat, 2);
+            DrawText("ORIGINAL INN ART IS NOT INSTALLED", 190, 340, Color.Wheat, 2);
             DrawText("ENTER, I, OR V  RETURN TO VILLAGE", 185, 570, Color.LightGreen, 2);
             return;
         }
@@ -1704,17 +1781,40 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             return;
         }
 
+        var node = _conversationSession?.CurrentNode;
+        var prompt = _conversationSession?.Prompt;
         if (DrawOriginal("Dialogue.Frame", new Rectangle(0, 0, 1024, 768)))
         {
-            DrawOriginal(patron.PortraitRole, ScaleBounds(BlacksmithDialoguePresentationDefinitions.Portrait));
-            DrawText(patron.Name, 155, 385, Color.White, 2, 260);
-            DrawText("Conversation text has not yet been recovered.", 435, 65, Color.White, 2, 520);
-            DrawText("ENTER  RETURN TO THE INN", 75, 500, Color.Cyan, 2, 850);
+            if (node?.PortraitFile is not null && _conversationPortraits.TryGetValue(node.PortraitFile, out var portrait))
+                _batch.Draw(portrait, ScaleBounds(ConversationPresentationDefinitions.Portrait), Color.White);
+            else
+                DrawOriginal(patron.PortraitRole, ScaleBounds(ConversationPresentationDefinitions.Portrait));
+            DrawText(node?.Speaker ?? patron.Name, 155, 385, Color.White, 2, 260);
+            var promptBounds = ScaleBounds(ConversationPresentationDefinitions.Prompt);
+            DrawText(prompt ?? "Conversation data is not installed.", promptBounds.X,
+                promptBounds.Y + 16, Color.White, 2, promptBounds.Width);
+            if (node is not null)
+            {
+                var (mouseX, mouseY) = OriginalPoint(_lastMouse);
+                for (var index = 0; index < node.Responses.Count; index++)
+                {
+                    var originalBounds = ConversationPresentationDefinitions.ResponseBounds(index);
+                    var bounds = ScaleBounds(originalBounds);
+                    var color = originalBounds.Contains(mouseX, mouseY) ? Color.Yellow : Color.Cyan;
+                    DrawText(node.Responses[index].Text, bounds.X + 4, bounds.Y + 8, color, 2, bounds.Width - 8);
+                }
+            }
+            else
+                DrawText("ENTER  RETURN TO THE INN", 75, 500, Color.Cyan, 2, 850);
             return;
         }
 
-        DrawPanel(patron.Name.ToUpperInvariant(), "CONVERSATION TEXT HAS NOT YET BEEN RECOVERED");
-        DrawText("ENTER  RETURN TO THE INN", 100, 300, Color.LightGreen, 2);
+        DrawPanel((node?.Speaker ?? patron.Name).ToUpperInvariant(), (prompt ?? "CONVERSATION DATA IS NOT INSTALLED").ToUpperInvariant());
+        if (node is null)
+            DrawText("ENTER  RETURN TO THE INN", 100, 300, Color.LightGreen, 2);
+        else
+            for (var index = 0; index < node.Responses.Count; index++)
+                DrawText($"{index + 1}  {node.Responses[index].Text}", 100, 300 + index * 55, Color.LightGreen, 2, 820);
     }
 
     private void DrawBlacksmith()

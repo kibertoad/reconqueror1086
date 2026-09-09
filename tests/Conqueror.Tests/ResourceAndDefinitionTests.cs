@@ -97,6 +97,30 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void ImportedConversationSessionTraversesSelectorsResponsesAndTimedContinuations()
+    {
+        var nodes = new Dictionary<int, DynamixConversationNode>
+        {
+            [1] = new(1, 0, null, null, [], [], 2),
+            [2] = new(2, 0, "GERARD.PCC", "Earl Gerard", ["First.", "Second."],
+                [new DynamixConversationResponse("Continue.", 3)], null),
+            [3] = new(3, 0, "BARKEEP.PCC", "Bartender", ["Farewell."], [], 0)
+        };
+        var session = new ImportedConversationSession(new DynamixConversationDatabase(nodes));
+
+        Assert.True(session.Start(1, count => count - 1));
+        Assert.Equal((2, "Second."), (session.CurrentNode?.Id, session.Prompt));
+        Assert.True(session.ChooseResponse(0, _ => 0));
+        Assert.Equal((3, "Farewell."), (session.CurrentNode?.Id, session.Prompt));
+        Assert.False(session.Continue(_ => 0));
+        Assert.True(session.IsComplete);
+
+        var cycle = new ImportedConversationSession(new DynamixConversationDatabase(
+            new Dictionary<int, DynamixConversationNode> { [1] = new(1, 0, null, null, [], [], 1) }));
+        Assert.Throws<InvalidDataException>(() => cycle.Start(1, _ => 0));
+    }
+
+    [Fact]
     public void SmackerMovieHeaderAndFrameIndexAreBounded()
     {
         var movie = SmackerMovieDecoder.Decode(SyntheticSmacker());
@@ -778,6 +802,8 @@ public sealed class ResourceAndDefinitionTests
         Assert.Equal(Enumerable.Range(0, 10), layout.Patrons.Select(patron => patron.HatRegionId));
         Assert.Equal(["Frederick", "Gerard", "Barkeep", "Otto", "Hugh", "Gilbert", "Nellie", "Richard", "Ivo", "Albert"],
             layout.Patrons.Select(patron => patron.Name));
+        Assert.Equal([1900, 1100, 3200, 3500, 1600, 1400, 3000, 1698, 3300, 3600],
+            layout.Patrons.Select(patron => patron.ConversationRootNodeId));
         Assert.All(layout.Patrons, patron => Assert.Contains(ImportedArt.Definitions,
             definition => definition.Role == patron.PortraitRole && definition.IdSuffix == patron.PortraitSuffix));
         Assert.Equal(new UiBounds(75, 27, 37, 47), layout.Patrons[7].Bounds);
@@ -994,7 +1020,7 @@ public sealed class ResourceAndDefinitionTests
         var encoded = strings.Select(System.Text.Encoding.ASCII.GetBytes).ToArray();
         var result = new byte[0x348 + encoded.Sum(bytes => bytes.Length + 1)];
         result[0x48] = checked((byte)targets.Count);
-        result[0x08] = checked((byte)(strings.Count - 2 - targets.Count));
+        result[0x08] = checked((byte)(strings.Count == 0 ? 0 : strings.Count - 2 - targets.Count));
         result[0x49] = 0x65; result[0x4a] = 0x3a; result[0x4b] = 0x5c;
         if (targets.Count == 0) WriteInt(result, 0x4c, continuationNodeId);
         for (var index = 0; index < targets.Count; index++) WriteInt(result, 0x4c + index * 4, targets[index]);
