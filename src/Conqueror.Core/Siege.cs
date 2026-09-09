@@ -10,10 +10,11 @@ public sealed class SiegeEnemy
     public int Y { get; set; }
     public int Health { get; set; }
     public bool Champion { get; init; }
+    public int VisualId { get; init; } = -1;
 }
 
 public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int GarrisonPerEnemy, int BaseChampionHealth, int FoodHealing, int WeaponBreakPercent);
-public sealed record SiegeSpawn(int X, int Y, bool Champion);
+public sealed record SiegeSpawn(int X, int Y, bool Champion, int VisualId = -1);
 
 public sealed class SiegeLayout
 {
@@ -99,7 +100,14 @@ public sealed class SiegeSession
         if (layout is not null)
         {
             foreach (var spawn in layout.Enemies)
-                _enemies.Add(new SiegeEnemy { X = spawn.X, Y = spawn.Y, Health = spawn.Champion ? Rules.BaseChampionHealth : 1, Champion = spawn.Champion });
+                _enemies.Add(new SiegeEnemy
+                {
+                    X = spawn.X,
+                    Y = spawn.Y,
+                    Health = spawn.Champion ? Rules.BaseChampionHealth : 1,
+                    Champion = spawn.Champion,
+                    VisualId = spawn.VisualId
+                });
         }
         else
         {

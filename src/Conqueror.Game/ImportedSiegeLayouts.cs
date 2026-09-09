@@ -44,7 +44,9 @@ public static class ImportedSiegeLayouts
         var enemies = points
             .Where(point => IsEnemy(scene.BlockAt(point.X, point.Y).Name))
             .Select(point => new SiegeSpawn(point.X - minX, point.Y - minY,
-                scene.BlockAt(point.X, point.Y).Name.Contains("champion", StringComparison.OrdinalIgnoreCase)))
+                scene.BlockAt(point.X, point.Y).Name.Contains("champion", StringComparison.OrdinalIgnoreCase) ||
+                scene.BlockAt(point.X, point.Y).Name.Contains("lord", StringComparison.OrdinalIgnoreCase),
+                scene.BlockIndexAt(point.X, point.Y)))
             .ToArray();
         var heading = (scene.Viewer.Heading + 8192) / 16384 & 3;
         var layout = new SiegeLayout(tiles, scene.Viewer.CellX - minX, scene.Viewer.CellY - minY,

@@ -2308,6 +2308,19 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (sourceX is < 0 or >= DynamixScene.MapWidth || sourceY is < 0 or >= DynamixScene.MapHeight)
             return null;
         var block = _siegeVisuals.Scene.BlockAt(sourceX, sourceY);
+        return FirstSceneTexture(block);
+    }
+
+    private Texture2D? SceneEnemyTexture(SiegeEnemy enemy)
+    {
+        if (_siegeVisuals is null || enemy.VisualId < 0 || enemy.VisualId >= _siegeVisuals.Scene.Blocks.Count)
+            return null;
+        return FirstSceneTexture(_siegeVisuals.Scene.Blocks[enemy.VisualId]);
+    }
+
+    private Texture2D? FirstSceneTexture(DynamixSceneBlock block)
+    {
+        if (_siegeVisuals is null) return null;
         foreach (var index in new[] { block.Surface0, block.Surface1, block.Surface2, block.Surface3 })
             if (_siegeVisuals.Textures.TryGetValue(index, out var texture)) return texture;
         return null;
@@ -2371,17 +2384,33 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         }
         foreach (var projection in SiegeViewProjection.ProjectEnemies(_siege))
         {
-            var height = Math.Clamp((int)(viewport.Height / projection.ForwardDistance), 20, viewport.Height);
-            var width = Math.Max(10, height / 2);
+            var enemyTexture = SceneEnemyTexture(projection.Enemy);
+            var wallHeight = viewport.Height / projection.ForwardDistance;
+            var height = enemyTexture is null
+                ? Math.Clamp((int)(wallHeight * 0.75), 20, viewport.Height)
+                : Math.Clamp((int)(wallHeight * enemyTexture.Height / 256.0), 20, viewport.Height);
+            var width = enemyTexture is null
+                ? Math.Max(10, height / 2)
+                : Math.Max(10, height * enemyTexture.Width / enemyTexture.Height);
             var center = viewport.X + (int)(projection.ScreenPosition * viewport.Width);
             var left = center - width / 2;
-            var top = viewport.Bottom - viewport.Height / 5 - height;
+            var floor = viewport.Center.Y + (int)(wallHeight / 2);
+            var top = floor - height;
             var body = projection.Enemy.Champion ? Color.DarkRed : new Color(120, 75, 50);
             for (var x = Math.Max(viewport.Left, left); x < Math.Min(viewport.Right, left + width); x++)
             {
                 if (projection.ForwardDistance >= depths[x - viewport.X]) continue;
-                Fill(new Rectangle(x, top + height / 4, 1, height * 3 / 4), body);
-                Fill(new Rectangle(x, top, 1, height / 4), Color.Gray);
+                if (enemyTexture is not null)
+                {
+                    var sourceX = Math.Clamp((x - left) * enemyTexture.Width / width, 0, enemyTexture.Width - 1);
+                    _batch.Draw(enemyTexture, new Rectangle(x, top, 1, height),
+                        new Rectangle(sourceX, 0, 1, enemyTexture.Height), Color.White);
+                }
+                else
+                {
+                    Fill(new Rectangle(x, top + height / 4, 1, height * 3 / 4), body);
+                    Fill(new Rectangle(x, top, 1, height / 4), Color.Gray);
+                }
             }
         }
         DrawText($"HEALTH {_siege.Health}/{_siege.MaxHealth}  ENEMIES {_siege.Enemies.Count}  ALLIES {_siege.AlliesAlive}", 25, 25, Color.White, 2);
