@@ -14,6 +14,7 @@ Complete a clean-room MonoGame reimplementation of *Conqueror: A.D. 1086* that p
 - Do not promote a provisional value without executable/resource evidence, controlled observation, or corroborating documentation.
 - Store imported resources only under Git-ignored `UserContent` and validate every manifest path and source hash.
 - End every phase with a playable build, clean save migration, and passing automated tests.
+- Keep every compiled C# source file at or below the 1,000-line ceiling enforced by `Directory.Build.targets`; split responsibilities before they exceed the bound.
 
 ## Evidence sources
 
