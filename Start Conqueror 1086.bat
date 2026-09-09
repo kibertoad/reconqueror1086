@@ -12,7 +12,7 @@ if not defined DOTNET_EXE (
 )
 
 echo Starting Conqueror A.D. 1086...
-set "CONQUEROR_USER_CONTENT=%~dp0UserContent"
+set "RECONQUEROR_USER_CONTENT=%~dp0UserContent"
 "%DOTNET_EXE%" run --project "src\Conqueror.Game\Conqueror.Game.csproj"
 if errorlevel 1 (
     echo.

@@ -2,14 +2,14 @@ using System.Buffers.Binary;
 
 namespace Conqueror.Resources;
 
-public sealed record PcxImage(int Width, int Height, byte[] Indices, byte[] PaletteRgb)
+public record IndexedImage(int Width, int Height, byte[] Indices, byte[] PaletteRgb)
 {
     public byte[] ToRgba()
     {
         if (Width <= 0 || Height <= 0 || (long)Width * Height != Indices.Length)
-            throw new InvalidDataException("PCX pixel buffer does not match its dimensions.");
+            throw new InvalidDataException("Indexed pixel buffer does not match its dimensions.");
         if (PaletteRgb.Length != 256 * 3)
-            throw new InvalidDataException("PCX palette does not contain 256 RGB triples.");
+            throw new InvalidDataException("Indexed palette does not contain 256 RGB triples.");
         var rgba = new byte[checked(Indices.Length * 4)];
         for (var pixel = 0; pixel < Indices.Length; pixel++)
         {
@@ -21,6 +21,29 @@ public sealed record PcxImage(int Width, int Height, byte[] Indices, byte[] Pale
             rgba[target + 3] = 255;
         }
         return rgba;
+    }
+}
+
+public sealed record PcxImage(int Width, int Height, byte[] Indices, byte[] PaletteRgb)
+    : IndexedImage(Width, Height, Indices, PaletteRgb);
+
+public static class RawIndexedImageDecoder
+{
+    public static IndexedImage Decode(
+        ReadOnlySpan<byte> indices, ReadOnlySpan<byte> paletteRgb,
+        int width, int height, int maximumPixels = 16_777_216)
+    {
+        if (width <= 0) throw new ArgumentOutOfRangeException(nameof(width));
+        if (height <= 0) throw new ArgumentOutOfRangeException(nameof(height));
+        if (maximumPixels < 0) throw new ArgumentOutOfRangeException(nameof(maximumPixels));
+        var pixelCount = checked(width * height);
+        if (pixelCount > maximumPixels)
+            throw new InvalidDataException("Raw indexed image dimensions exceed the configured pixel limit.");
+        if (indices.Length != pixelCount)
+            throw new InvalidDataException("Raw indexed image does not contain exactly width times height pixels.");
+        if (paletteRgb.Length != IndexedPalette.ByteSize)
+            throw new InvalidDataException("Raw indexed image palette does not contain 256 RGB triples.");
+        return new IndexedImage(width, height, indices.ToArray(), paletteRgb.ToArray());
     }
 }
 

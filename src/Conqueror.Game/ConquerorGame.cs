@@ -142,12 +142,17 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private bool _animationEnabled = true;
     private bool _paused;
     private bool _musicPausedByGame;
-    private readonly CampaignSaveSlots _saveSlots = new(Path.Combine(AppContext.BaseDirectory, "saves"));
-    private readonly GameSettingsStore _settingsStore = new(Path.Combine(AppContext.BaseDirectory, "settings.json"));
+    private readonly string? _userContentRoot;
+    private readonly CampaignSaveSlots _saveSlots;
+    private readonly GameSettingsStore _settingsStore;
     private GameSettings _settings = new();
 
-    public ConquerorGame()
+    public ConquerorGame(string? userContentRoot = null, string? stateRoot = null)
     {
+        _userContentRoot = userContentRoot;
+        var writableStateRoot = stateRoot ?? AppContext.BaseDirectory;
+        _saveSlots = new CampaignSaveSlots(Path.Combine(writableStateRoot, "saves"));
+        _settingsStore = new GameSettingsStore(Path.Combine(writableStateRoot, "settings.json"));
         _settings = _settingsStore.Load();
         _cdMusicEnabled = _settings.CdMusic;
         _soundEffectsEnabled = _settings.SoundEffects;
@@ -162,7 +167,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         };
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
-        Window.Title = "Conqueror: A.D. 1086 - MonoGame Reimplementation";
+        Window.Title = "ReConqueror A.D. 1086";
     }
 
     protected override void LoadContent()
@@ -172,7 +177,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _pixel.SetData([Color.White]);
         _canvas = new RenderTarget2D(GraphicsDevice, PresentationScaling.VirtualWidth,
             PresentationScaling.VirtualHeight, false, SurfaceFormat.Color, DepthFormat.None);
-        _importedContent = ImportedContentCatalog.Discover();
+        _importedContent = ImportedContentCatalog.Discover(_userContentRoot);
         _importedSoundLibrary = _importedContent is null ? null : ImportedSoundLibrary.Load(_importedContent);
         _importedDialogue = _importedContent is null ? null : new ImportedDialogueRepository(_importedContent);
         var weaponStoreId = _importedContent?.FindId("resource", ":weapons.dat");
@@ -224,6 +229,17 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             _originalArt.Add(definition.Role, texture);
             _originalPalettes.Add(definition.Role, image.PaletteRgb);
             if (definition.Role == "Dilemma.Background") _dilemmaPalette = image.PaletteRgb;
+        }
+        foreach (var definition in ImportedRawArt.Definitions)
+        {
+            var id = _importedContent?.FindId("image", definition.IdSuffix);
+            var paletteId = _importedContent?.FindId("palette", definition.PaletteIdSuffix);
+            if (id is null || paletteId is null || _importedContent?.DecodeRawIndexedImage(
+                    id, paletteId, definition.Width, definition.Height) is not { } image) continue;
+            var texture = new Texture2D(GraphicsDevice, image.Width, image.Height, false, SurfaceFormat.Color);
+            texture.SetData(image.ToRgba());
+            _originalArt.Add(definition.Role, texture);
+            _originalPalettes.Add(definition.Role, image.PaletteRgb);
         }
         LoadOriginalConversations();
         foreach (var definition in ImportedAnimations.Definitions)
@@ -2567,8 +2583,11 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private void DrawSiege()
     {
         if (_siege is null) return;
-        var viewport = new Rectangle(0, 85, 1024, 520);
-        Fill(new Rectangle(0, 0, 1024, 768), new Color(22, 19, 18));
+        var originalShell = DrawOriginal("Combat.Shell", new Rectangle(0, 0, 1024, 768));
+        var viewport = originalShell
+            ? ScaleSiegeBounds(SiegeCombatPresentation.Viewport)
+            : new Rectangle(0, 85, 1024, 520);
+        if (!originalShell) Fill(new Rectangle(0, 0, 1024, 768), new Color(22, 19, 18));
         DrawSiegeBackdrop(viewport, _siege.Facing);
         var depths = new double[viewport.Width];
         for (var column = 0; column < viewport.Width; column++)
@@ -2630,46 +2649,93 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                 }
             }
         }
-        DrawSiegeForeground(viewport);
-        DrawText($"HEALTH {_siege.Health}/{_siege.MaxHealth}  ENEMIES {_siege.Enemies.Count(enemy => enemy.Health > 0)}  ALLIES {_siege.AlliesAlive}", 25, 25, Color.White, 2);
-        DrawText($"FACING {_siege.Facing}  ARMOR {_siege.ArmorRating()}  GOLD FOUND {_siege.GoldFound}", 25, 55, Color.Wheat, 2);
-        if (_showRadar) DrawRadar(_siege);
-        DrawText("W/S MOVE  A/D TURN  E OPEN  SPACE SWING  X CROSSBOW", 130, 655, Color.Gold, 2);
-        DrawText("M RADAR  R RETREAT", 380, 685, Color.Gold, 2);
+        DrawSiegeForeground(viewport, originalShell);
+        if (originalShell)
+            DrawOriginalSiegeStatus();
+        else
+        {
+            DrawText($"HEALTH {_siege.Health}/{_siege.MaxHealth}  ENEMIES {_siege.Enemies.Count(enemy => enemy.Health > 0)}  ALLIES {_siege.AlliesAlive}", 25, 25, Color.White, 2);
+            DrawText($"FACING {_siege.Facing}  ARMOR {_siege.ArmorRating()}  GOLD FOUND {_siege.GoldFound}", 25, 55, Color.Wheat, 2);
+            if (_showRadar) DrawRadar(_siege);
+            DrawText("W/S MOVE  A/D TURN  E OPEN  SPACE SWING  X CROSSBOW", 130, 655, Color.Gold, 2);
+            DrawText("M RADAR  R RETREAT", 380, 685, Color.Gold, 2);
+        }
     }
 
-    private void DrawSiegeForeground(Rectangle viewport)
+    private void DrawOriginalSiegeStatus()
+    {
+        if (_siege is null) return;
+        var health = ScaleSiegeBounds(SiegeCombatPresentation.HealthBar);
+        Fill(health, Color.Black);
+        var healthWidth = _siege.MaxHealth == 0 ? 0 : health.Width * _siege.Health / _siege.MaxHealth;
+        if (healthWidth > 0) Fill(new Rectangle(health.X, health.Y, healthWidth, health.Height), Color.LimeGreen);
+
+        var primary = ScaleSiegeBounds(SiegeCombatPresentation.PrimaryStatus);
+        DrawText($"HEALTH {_siege.Health}/{_siege.MaxHealth}", primary.X, primary.Y, Color.White, 2);
+        DrawText($"ENEMIES {_siege.Enemies.Count(enemy => enemy.Health > 0)}", primary.X, primary.Y + 18,
+            Color.White, 2);
+        var secondary = ScaleSiegeBounds(SiegeCombatPresentation.SecondaryStatus);
+        DrawText($"ARMOR {_siege.ArmorRating()}", secondary.X, secondary.Y, Color.Wheat, 2);
+        DrawText($"ALLIES {_siege.AlliesAlive}", secondary.X, secondary.Y + 18, Color.Wheat, 2);
+        DrawText($"GOLD {_siege.GoldFound}", secondary.X, secondary.Y + 36, Color.Wheat, 2);
+
+        if (_showRadar) DrawRadar(_siege, ScaleSiegeBounds(SiegeCombatPresentation.Radar));
+        var message = ScaleSiegeBounds(SiegeCombatPresentation.Message);
+        DrawText(_siege.LastMessage.ToUpperInvariant(), message.X, message.Y, Color.Wheat, 2, message.Width);
+    }
+
+    private void DrawSiegeForeground(Rectangle viewport, bool originalScale)
     {
         if (!_originalAnimations.TryGetValue("Combat.FirstPerson", out var animation)) return;
         if (_siegeWeaponFrame >= 0 && _siegeWeaponFrame < animation.Frames.Count)
         {
             var texture = animation.Frames[_siegeWeaponFrame];
-            var scale = Math.Min(2.5f, viewport.Height / 200f);
-            var width = Math.Max(1, (int)Math.Round(texture.Width * scale));
-            var height = Math.Max(1, (int)Math.Round(texture.Height * scale));
-            _batch.Draw(texture,
-                new Rectangle(viewport.Center.X - width / 2, viewport.Bottom - height, width, height), Color.White);
+            var width = originalScale
+                ? texture.Width * 1024 / SiegeCombatPresentation.OriginalWidth
+                : Math.Max(1, (int)Math.Round(texture.Width * Math.Min(2.5f, viewport.Height / 200f)));
+            var height = originalScale
+                ? texture.Height * 768 / SiegeCombatPresentation.OriginalHeight
+                : Math.Max(1, (int)Math.Round(texture.Height * Math.Min(2.5f, viewport.Height / 200f)));
+            DrawClipped(texture,
+                new Rectangle(viewport.Center.X - width / 2, viewport.Bottom - height, width, height), viewport);
         }
         if (_siegeBloodFrame >= 0 && _siegeBloodFrame < animation.Frames.Count)
         {
             var texture = animation.Frames[_siegeBloodFrame];
-            var scale = Math.Min(3f, viewport.Height / 160f);
-            var width = Math.Max(1, (int)Math.Round(texture.Width * scale));
-            var height = Math.Max(1, (int)Math.Round(texture.Height * scale));
-            _batch.Draw(texture,
-                new Rectangle(viewport.Center.X - width / 2, viewport.Center.Y - height / 2, width, height),
-                Color.White);
+            DrawSiegeEffect(texture, viewport, originalScale);
         }
         if (_siegeImpactFrame >= 0 && _siegeImpactFrame < animation.Frames.Count)
         {
             var texture = animation.Frames[_siegeImpactFrame];
-            var scale = Math.Min(3f, viewport.Height / 160f);
-            var width = Math.Max(1, (int)Math.Round(texture.Width * scale));
-            var height = Math.Max(1, (int)Math.Round(texture.Height * scale));
-            _batch.Draw(texture,
-                new Rectangle(viewport.Center.X - width / 2, viewport.Center.Y - height / 2, width, height),
-                Color.White);
+            DrawSiegeEffect(texture, viewport, originalScale);
         }
+    }
+
+    private void DrawSiegeEffect(Texture2D texture, Rectangle viewport, bool originalScale)
+    {
+        var scale = Math.Min(3f, viewport.Height / 160f);
+        var width = originalScale
+            ? texture.Width * 1024 / SiegeCombatPresentation.OriginalWidth
+            : Math.Max(1, (int)Math.Round(texture.Width * scale));
+        var height = originalScale
+            ? texture.Height * 768 / SiegeCombatPresentation.OriginalHeight
+            : Math.Max(1, (int)Math.Round(texture.Height * scale));
+        DrawClipped(texture,
+            new Rectangle(viewport.Center.X - width / 2, viewport.Center.Y - height / 2, width, height), viewport);
+    }
+
+    private void DrawClipped(Texture2D texture, Rectangle destination, Rectangle clip)
+    {
+        var visible = Rectangle.Intersect(destination, clip);
+        if (visible.Width <= 0 || visible.Height <= 0) return;
+        var source = new Rectangle(
+            (visible.X - destination.X) * texture.Width / destination.Width,
+            (visible.Y - destination.Y) * texture.Height / destination.Height,
+            Math.Max(1, visible.Width * texture.Width / destination.Width),
+            Math.Max(1, visible.Height * texture.Height / destination.Height));
+        source.Width = Math.Min(source.Width, texture.Width - source.X);
+        source.Height = Math.Min(source.Height, texture.Height - source.Y);
+        _batch.Draw(texture, visible, source, Color.White);
     }
 
     private void DrawFieldBattle()
@@ -2692,12 +2758,20 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         DrawText("C CAPTAINS CONTROL ALL  W WITHDRAW ALL", 60, 670, Color.Wheat, 2);
     }
 
-    private void DrawRadar(SiegeSession siege)
+    private void DrawRadar(SiegeSession siege, Rectangle? requestedBounds = null)
     {
-        var scale = Math.Clamp(128 / Math.Max(siege.Width, siege.Height), 1, 9);
-        var ox = 1004 - siege.Width * scale;
-        const int oy = 85;
-        Fill(new Rectangle(ox - 8, oy - 8, siege.Width * scale + 16, siege.Height * scale + 16), new Color(10, 10, 10, 220));
+        var bounds = requestedBounds ?? new Rectangle(0, 0, 144, 144);
+        var availableWidth = requestedBounds?.Width ?? 128;
+        var availableHeight = requestedBounds?.Height ?? 128;
+        var scale = Math.Clamp(Math.Min(availableWidth / siege.Width, availableHeight / siege.Height), 1, 9);
+        var ox = requestedBounds is null
+            ? 1004 - siege.Width * scale
+            : bounds.X + (bounds.Width - siege.Width * scale) / 2;
+        var oy = requestedBounds is null
+            ? 85
+            : bounds.Y + (bounds.Height - siege.Height * scale) / 2;
+        Fill(requestedBounds ?? new Rectangle(ox - 8, oy - 8, siege.Width * scale + 16, siege.Height * scale + 16),
+            new Color(10, 10, 10, 220));
         for (var x = 0; x < siege.Width; x++) for (var y = 0; y < siege.Height; y++)
         {
             var tile = siege.TileAt(x, y);
@@ -2747,6 +2821,11 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void Fill(Rectangle rectangle, Color color) => _batch.Draw(_pixel, rectangle, color);
     private static Rectangle ScaleBounds(UiBounds bounds) => new(bounds.X * 1024 / 640, bounds.Y * 768 / 480, bounds.Width * 1024 / 640, bounds.Height * 768 / 480);
+    private static Rectangle ScaleSiegeBounds(UiBounds bounds) => new(
+        bounds.X * 1024 / SiegeCombatPresentation.OriginalWidth,
+        bounds.Y * 768 / SiegeCombatPresentation.OriginalHeight,
+        bounds.Width * 1024 / SiegeCombatPresentation.OriginalWidth,
+        bounds.Height * 768 / SiegeCombatPresentation.OriginalHeight);
     private void DrawOutline(Rectangle rectangle, Color color, int thickness)
     {
         Fill(new Rectangle(rectangle.X, rectangle.Y, rectangle.Width, thickness), color);

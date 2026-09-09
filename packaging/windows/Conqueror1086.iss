@@ -4,6 +4,7 @@
 
 #define MyAppName "ReConqueror A.D. 1086"
 #define MyAppGroupName "ReConqueror A.D. 1086"
+#define MyAppShortcutName "ReConqueror A.D. 1086"
 #define MyAppPublisher "Reconqueror1086 contributors"
 #define MyAppExeName "Conqueror.Game.exe"
 #define PackageRoot "..\..\artifacts\Conqueror1086-win-x64"
@@ -22,7 +23,7 @@ Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
 OutputDir=..\..\artifacts
-OutputBaseFilename=ReConqueror1086-Setup
+OutputBaseFilename=ReConqueror1086-Setup-{#MyAppVersion}
 UninstallDisplayIcon={app}\Game\{#MyAppExeName}
 SetupLogging=yes
 
@@ -30,9 +31,9 @@ SetupLogging=yes
 Source: "{#PackageRoot}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\Game\{#MyAppExeName}"; WorkingDir: "{app}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\Game\{#MyAppExeName}"; WorkingDir: "{app}"; Tasks: desktopicon
-Name: "{group}\Manage Original Resources"; Filename: "{app}\Manage Original Resources.bat"; WorkingDir: "{app}"
+Name: "{group}\{#MyAppShortcutName}"; Filename: "{app}\Game\{#MyAppExeName}"; WorkingDir: "{app}"
+Name: "{autodesktop}\{#MyAppShortcutName}"; Filename: "{app}\Game\{#MyAppExeName}"; WorkingDir: "{app}"; Tasks: desktopicon
+Name: "{group}\Import or Manage Original Conqueror Resources"; Filename: "{app}\Manage Original Resources.bat"; WorkingDir: "{app}"
 
 [Tasks]
 Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional shortcuts:"
@@ -155,10 +156,10 @@ procedure InitializeWizard;
 begin
   DetectedOriginalPath := FindOriginalInstall;
   OriginalPage := CreateInputDirPage(wpSelectDir,
-    'Original game resources',
+    'Original Conqueror: A.D. 1086 resources',
     'Import resources from a legally owned GOG installation.',
-    'Setup can extract the original art, audio, video, and data without modifying the GOG installation. ' +
-    'Choose its folder, or clear the import option to install the clean-room game alone.',
+    'Setup can extract the original Conqueror art, audio, video, and data without modifying the GOG installation. ' +
+    'Choose its folder, or clear the import option to install ReConqueror without original media.',
     False, '');
   OriginalPage.Add('GOG installation folder:');
   if DetectedOriginalPath <> '' then
@@ -172,7 +173,7 @@ begin
   ImportCheckBox.Top := OriginalPage.Edits[0].Top + OriginalPage.Edits[0].Height + ScaleY(20);
   ImportCheckBox.Width := OriginalPage.SurfaceWidth;
   ImportCheckBox.Caption := 'Import my original resources automatically after installation';
-  ImportCheckBox.Checked := DetectedOriginalPath <> '';
+  ImportCheckBox.Checked := ExpandConstant('{param:NOIMPORT|0}') <> '1';
 
   PurchaseButton := TNewButton.Create(OriginalPage);
   PurchaseButton.Parent := OriginalPage.Surface;
@@ -189,7 +190,7 @@ begin
   if (CurPageID = OriginalPage.ID) and ImportCheckBox.Checked and
      not IsOriginalInstall(OriginalPage.Values[0]) then
   begin
-    MsgBox('That folder is not a complete GOG installation. Select the folder containing ' +
+    MsgBox('That folder is not a complete Conqueror: A.D. 1086 GOG installation. Select the folder containing ' +
       'game.gog, game.ins, and C1086.GOB, or clear the automatic import option.', mbError, MB_OK);
     Result := False;
   end;
@@ -223,9 +224,9 @@ begin
   WizardForm.StatusLabel.Caption := 'Importing and verifying legally owned original resources...';
   if not Exec(Importer, Parameters, ExpandConstant('{app}'), SW_SHOW,
       ewWaitUntilTerminated, ResultCode) then
-    MsgBox('The resource importer could not be started. You can retry later with ' +
+    MsgBox('The original Conqueror resource importer could not be started. You can retry later with ' +
       'Install Original Resources.bat.', mbError, MB_OK)
   else if ResultCode <> 0 then
-    MsgBox('The game was installed, but original resource import returned error ' +
+    MsgBox('ReConqueror was installed, but original Conqueror resource import returned error ' +
       IntToStr(ResultCode) + '. You can retry later with Install Original Resources.bat.', mbError, MB_OK);
 end;

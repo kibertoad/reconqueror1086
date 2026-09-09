@@ -202,6 +202,8 @@ The stored `richard.pcc` entry validates as 195×203 pixels; its decoded index S
 
 ## Indexed RGB palettes
 
+The stored `SKIRMISH.PCX` resource is not a conventional PCX stream despite its name. It is exactly 64,000 bytes and decodes as a headerless 320x200 indexed plane using the separate 768-byte `SKIRMISH.PAL`. `RawIndexedImageDecoder` therefore requires caller-supplied dimensions, an exact `width * height` payload, a valid 256-color palette, and bounded pixel counts. The dimensions, framing, palette association, and visible combat-shell geometry are **Confirmed for the hashed release**.
+
 All five byte-stored `.PAL` entries are exactly 768 bytes: 256 consecutive red, green, and blue byte triples with no header or trailer. Observed channel values span nearly the complete byte range (maximum values 252–255), so they are already 8-bit color components and must not be multiplied from VGA 6-bit values. Exact length, byte interpretation, and component range are **Confirmed for these resources**. Association with particular images or CSF sequences remains **Provisional**.
 
 The importer assigns the `palette` kind only after exact-length validation. `stored-palette-report.txt` records provenance, component range, and a stable SHA-256 without exporting palette bytes.

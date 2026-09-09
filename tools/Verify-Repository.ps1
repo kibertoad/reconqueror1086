@@ -33,12 +33,12 @@ $safeRoot = $root.Replace('\', '/')
 $policyPath = Join-Path $PSScriptRoot 'repository-policy.json'
 $policy = Get-Content -LiteralPath $policyPath -Raw | ConvertFrom-Json
 
-$trackedOutput = & git -c "safe.directory=$safeRoot" -C $root ls-files -z
+$trackedOutput = @(& git -c "safe.directory=$safeRoot" -c core.quotepath=false -C $root ls-files)
 if ($LASTEXITCODE -ne 0) {
     throw "Unable to enumerate tracked files under '$root'."
 }
 
-$trackedPaths = @($trackedOutput -split "`0" | Where-Object { $_ } | ForEach-Object { Normalize-RepositoryPath $_ })
+$trackedPaths = @($trackedOutput | Where-Object { $_ } | ForEach-Object { Normalize-RepositoryPath $_ })
 $violations = [Collections.Generic.List[string]]::new()
 $restrictedExtensions = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
 foreach ($extension in $policy.restrictedExtensions) {
@@ -58,12 +58,12 @@ foreach ($path in $trackedPaths) {
     }
 
     $absolutePath = Join-Path $root $path
-    if (-not (Test-Path -LiteralPath $absolutePath -PathType Leaf)) {
+    if (-not [IO.File]::Exists($absolutePath)) {
         $violations.Add("tracked path is missing from the worktree: $path")
         continue
     }
 
-    $length = (Get-Item -LiteralPath $absolutePath).Length
+    $length = [IO.FileInfo]::new($absolutePath).Length
     $approvedLargeFile = $policy.approvedLargeFiles -contains $path
     if ($length -gt $policy.maximumTrackedFileBytes -and -not $approvedLargeFile) {
         $violations.Add("unreviewed large file ($length bytes): $path")

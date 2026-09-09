@@ -115,6 +115,27 @@ public sealed class ResourceAndDefinitionTests
         Assert.Equal(new SiegeFrameRun(43, 5), SiegeCombatPresentation.PlayerBlood);
         Assert.Equal(new SiegeFrameRun(48, 5), SiegeCombatPresentation.EnemyBlood);
         Assert.Equal(SiegeCombatPresentation.EnemyBlood.Start, SiegeCombatPresentation.PlayerBlood.EndExclusive);
+        Assert.Equal((320, 200), (SiegeCombatPresentation.OriginalWidth, SiegeCombatPresentation.OriginalHeight));
+        Assert.True(SiegeCombatPresentation.Viewport.X + SiegeCombatPresentation.Viewport.Width <=
+                    SiegeCombatPresentation.OriginalWidth);
+        Assert.True(SiegeCombatPresentation.Viewport.Y + SiegeCombatPresentation.Viewport.Height <=
+                    SiegeCombatPresentation.OriginalHeight);
+    }
+
+    [Fact]
+    public void RawIndexedScreensRequireExactBoundedPlanesAndPalettes()
+    {
+        var palette = new byte[IndexedPalette.ByteSize];
+        palette[3] = 10;
+        palette[4] = 20;
+        palette[5] = 30;
+        var image = RawIndexedImageDecoder.Decode([1, 0], palette, 2, 1);
+
+        Assert.Equal((2, 1), (image.Width, image.Height));
+        Assert.Equal(new byte[] { 10, 20, 30, 255, 0, 0, 0, 255 }, image.ToRgba());
+        Assert.Throws<InvalidDataException>(() => RawIndexedImageDecoder.Decode([1], palette, 2, 1));
+        Assert.Throws<InvalidDataException>(() => RawIndexedImageDecoder.Decode([1, 0], palette, 2, 1, 1));
+        Assert.Throws<InvalidDataException>(() => RawIndexedImageDecoder.Decode([1, 0], palette[..^1], 2, 1));
     }
 
     [Fact]
@@ -813,6 +834,14 @@ public sealed class ResourceAndDefinitionTests
             {
                 Role: "Combat.FirstPerson", IdSuffix: ":skirmish.csf", PaletteIdSuffix: ":SKIRMISH.PAL"
             });
+        Assert.Contains(ImportedRawArt.Definitions,
+            definition => definition is
+            {
+                Role: "Combat.Shell", IdSuffix: ":SKIRMISH.PCX", PaletteIdSuffix: ":SKIRMISH.PAL",
+                Width: 320, Height: 200
+            });
+        Assert.Equal(ImportedRawArt.Definitions.Count,
+            ImportedRawArt.Definitions.Select(x => x.Role).Distinct(StringComparer.OrdinalIgnoreCase).Count());
     }
 
     [Fact]

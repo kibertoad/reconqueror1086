@@ -7,7 +7,15 @@ public readonly record struct SiegeFrameRun(int Start, int Count)
 
 public static class SiegeCombatPresentation
 {
+    public const int OriginalWidth = 320;
+    public const int OriginalHeight = 200;
     public const double FrameSeconds = 0.07;
+    public static readonly UiBounds Viewport = new(26, 24, 167, 117);
+    public static readonly UiBounds Radar = new(223, 111, 94, 84);
+    public static readonly UiBounds HealthBar = new(60, 192, 137, 5);
+    public static readonly UiBounds Message = new(5, 145, 205, 26);
+    public static readonly UiBounds PrimaryStatus = new(225, 22, 90, 25);
+    public static readonly UiBounds SecondaryStatus = new(225, 54, 90, 35);
     public static readonly SiegeFrameRun AxeAttack = new(27, 3);
     public static readonly SiegeFrameRun CrossbowAttack = new(30, 3);
     public static readonly SiegeFrameRun HammerAttack = new(33, 3);

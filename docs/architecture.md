@@ -30,3 +30,7 @@ The remaining switches in the core are state adapters: they map typed equipment 
 ## Validation
 
 The executable specifications reject duplicate equipment and courtship names, duplicate win rewards, mismatched building keys, and dragon requirements that cannot be earned from a defined reward ladder. Full campaign behavior tests then exercise the same generic interpreters used by the game.
+
+## Runtime paths and packages
+
+`GamePathResolver` keeps distributable content and writable player state separate. Imported `UserContent` is selected explicitly by `--user-content`, then `RECONQUEROR_USER_CONTENT`, an adjacent or package-root directory, a development checkout, and finally the platform's per-user application-data directory. Saves and settings always use the per-user `ReConquerorAD1086` state root, so an installed game never assumes its program directory is writable. Windows Inno Setup, Linux Debian, and macOS package builders all consume the same verified, self-contained portable publish layout.

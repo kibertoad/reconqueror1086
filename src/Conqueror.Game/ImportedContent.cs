@@ -6,6 +6,8 @@ using System.Text.Json;
 namespace Conqueror.Game;
 
 public sealed record ImportedArtDefinition(string Role, string Kind, string IdSuffix);
+public sealed record ImportedRawArtDefinition(
+    string Role, string IdSuffix, string PaletteIdSuffix, int Width, int Height);
 public sealed record ImportedLayoutDefinition(string Role, string IdSuffix);
 public sealed record ImportedAnimationDefinition(
     string Role, string IdSuffix, string PaletteArtRole, string? PaletteIdSuffix = null);
@@ -63,6 +65,14 @@ public static class ImportedLayouts
     ];
 }
 
+public static class ImportedRawArt
+{
+    public static IReadOnlyList<ImportedRawArtDefinition> Definitions { get; } =
+    [
+        new("Combat.Shell", ":SKIRMISH.PCX", ":SKIRMISH.PAL", 320, 200)
+    ];
+}
+
 public static class ImportedAnimations
 {
     public static IReadOnlyList<ImportedAnimationDefinition> Definitions { get; } =
@@ -110,10 +120,17 @@ public sealed class ImportedContentCatalog
         SourceImageSha256 = manifest.SourceImageSha256 ?? "unknown";
     }
 
-    public static ImportedContentCatalog? Discover()
+    public static ImportedContentCatalog? Discover(string? preferredRoot = null)
     {
-        var configured = Environment.GetEnvironmentVariable("CONQUEROR_USER_CONTENT");
-        var candidates = new[] { configured, Path.Combine(Environment.CurrentDirectory, "UserContent"), Path.Combine(AppContext.BaseDirectory, "UserContent") };
+        var configured = Environment.GetEnvironmentVariable("RECONQUEROR_USER_CONTENT") ??
+            Environment.GetEnvironmentVariable("CONQUEROR_USER_CONTENT");
+        var candidates = new[]
+        {
+            preferredRoot,
+            configured,
+            Path.Combine(Environment.CurrentDirectory, "UserContent"),
+            Path.Combine(AppContext.BaseDirectory, "UserContent")
+        };
         foreach (var root in candidates.Where(x => !string.IsNullOrWhiteSpace(x)).Distinct(StringComparer.OrdinalIgnoreCase))
         {
             var manifestPath = Path.Combine(root!, "manifest.json");
@@ -154,6 +171,19 @@ public sealed class ImportedContentCatalog
             using var memory = new MemoryStream();
             stream.CopyTo(memory);
             return PcxDecoder.Decode(memory.ToArray());
+        }
+        catch (InvalidDataException)
+        {
+            return null;
+        }
+    }
+
+    public IndexedImage? DecodeRawIndexedImage(string id, string paletteId, int width, int height)
+    {
+        try
+        {
+            var palette = DecodePalette(paletteId);
+            return palette is null ? null : RawIndexedImageDecoder.Decode(ReadBytes(id), palette.Rgb, width, height);
         }
         catch (InvalidDataException)
         {
