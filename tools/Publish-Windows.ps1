@@ -63,3 +63,4 @@ if (-not $SkipArchive) {
     Write-Host "Created $archivePath"
 }
 Write-Host "Self-contained Windows package verified at $packageRoot"
+exit 0
