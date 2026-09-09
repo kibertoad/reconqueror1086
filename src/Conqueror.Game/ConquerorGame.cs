@@ -2255,19 +2255,42 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private void DrawSiege()
     {
         if (_siege is null) return;
+        var viewport = new Rectangle(0, 85, 1024, 520);
         Fill(new Rectangle(0, 0, 1024, 768), new Color(22, 19, 18));
-        for (var i = 0; i < 16; i++)
+        Fill(new Rectangle(viewport.X, viewport.Y, viewport.Width, viewport.Height / 2), new Color(32, 31, 34));
+        Fill(new Rectangle(viewport.X, viewport.Center.Y, viewport.Width, viewport.Height / 2), new Color(42, 35, 29));
+        var depths = new double[viewport.Width];
+        for (var column = 0; column < viewport.Width; column++)
         {
-            var shade = (byte)(35 + i * 5); var width = 1024 - i * 55; var height = 768 - i * 38;
-            Fill(new Rectangle((1024 - width) / 2, (768 - height) / 2, width, 18), new Color(shade, shade, shade));
+            var camera = 2.0 * column / (viewport.Width - 1) - 1.0;
+            var hit = SiegeViewProjection.Cast(_siege, camera);
+            depths[column] = hit.Distance;
+            var wallHeight = Math.Min(viewport.Height, (int)(viewport.Height / hit.Distance));
+            var top = viewport.Center.Y - wallHeight / 2;
+            var baseColor = hit.Tile switch
+            {
+                SiegeTile.Door => new Color(126, 83, 48),
+                SiegeTile.SecretDoor => new Color(76, 73, 68),
+                _ => new Color(128, 126, 120)
+            };
+            var distanceShade = Math.Clamp(1.05f - (float)hit.Distance / 32f, 0.22f, 1f);
+            if (!hit.HitVerticalSide) distanceShade *= 0.78f;
+            Fill(new Rectangle(viewport.X + column, top, 1, wallHeight), baseColor * distanceShade);
         }
-        Fill(new Rectangle(395, 170, 235, 430), new Color(70, 58, 48));
-        var distance = _siege.VisibleEnemyDistance();
-        if (distance > 0)
+        foreach (var projection in SiegeViewProjection.ProjectEnemies(_siege))
         {
-            var size = Math.Max(35, 180 / distance); var enemy = _siege.Enemies.FirstOrDefault(x => Math.Abs(x.X - _siege.PlayerX) + Math.Abs(x.Y - _siege.PlayerY) == distance);
-            Fill(new Rectangle(512 - size / 2, 410 - size, size, size * 2), enemy?.Champion == true ? Color.DarkRed : new Color(120, 75, 50));
-            Fill(new Rectangle(512 - size / 3, 390 - size, size * 2 / 3, size * 2 / 3), Color.Gray);
+            var height = Math.Clamp((int)(viewport.Height / projection.ForwardDistance), 20, viewport.Height);
+            var width = Math.Max(10, height / 2);
+            var center = viewport.X + (int)(projection.ScreenPosition * viewport.Width);
+            var left = center - width / 2;
+            var top = viewport.Bottom - viewport.Height / 5 - height;
+            var body = projection.Enemy.Champion ? Color.DarkRed : new Color(120, 75, 50);
+            for (var x = Math.Max(viewport.Left, left); x < Math.Min(viewport.Right, left + width); x++)
+            {
+                if (projection.ForwardDistance >= depths[x - viewport.X]) continue;
+                Fill(new Rectangle(x, top + height / 4, 1, height * 3 / 4), body);
+                Fill(new Rectangle(x, top, 1, height / 4), Color.Gray);
+            }
         }
         DrawText($"HEALTH {_siege.Health}/{_siege.MaxHealth}  ENEMIES {_siege.Enemies.Count}  ALLIES {_siege.AlliesAlive}", 25, 25, Color.White, 2);
         DrawText($"FACING {_siege.Facing}  ARMOR {_siege.ArmorRating()}  GOLD FOUND {_siege.GoldFound}", 25, 55, Color.Wheat, 2);

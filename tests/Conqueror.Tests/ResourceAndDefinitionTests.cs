@@ -109,6 +109,27 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void FirstPersonProjectionUsesLayoutWallsFacingAndEnemyPositions()
+    {
+        var tiles = new SiegeTile[6, 5];
+        for (var x = 0; x < 6; x++)
+        for (var y = 0; y < 5; y++)
+            tiles[x, y] = x == 0 || y == 0 || x == 5 || y == 4 ? SiegeTile.Wall : SiegeTile.Floor;
+        tiles[4, 2] = SiegeTile.Door;
+        var layout = new SiegeLayout(tiles, 1, 2, Facing.East, [new SiegeSpawn(2, 2, false)]);
+        var siege = new SiegeSession(new Player(), new Army(), 0, 9, layout);
+
+        var center = SiegeViewProjection.Cast(siege, 0);
+        var enemy = Assert.Single(SiegeViewProjection.ProjectEnemies(siege));
+
+        Assert.Equal(SiegeTile.Door, center.Tile);
+        Assert.InRange(center.Distance, 2.49, 2.51);
+        Assert.True(center.HitVerticalSide);
+        Assert.InRange(enemy.ScreenPosition, 0.499, 0.501);
+        Assert.Equal(1, enemy.ForwardDistance);
+    }
+
+    [Fact]
     public void ConversationDatabaseDecodesIndexedPromptsResponsesAndLinks()
     {
         var first = ConversationNode(["GERARD.PCC", "Earl Gerard", "Greetings.", "Ask about the dragon.", "Farewell."],
