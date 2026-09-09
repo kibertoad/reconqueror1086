@@ -1246,6 +1246,33 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void ImportDiskPlanningAccountsForNewFilesAndAtomicReplacementScratch()
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"conqueror-space-{Guid.NewGuid():N}");
+        try
+        {
+            Directory.CreateDirectory(root);
+            File.WriteAllBytes(Path.Combine(root, "existing.bin"), [1]);
+            var plan = ImportDiskPlanner.Calculate(root,
+            [
+                new("existing.bin", 400),
+                new(Path.Combine("new", "one.bin"), 100),
+                new(Path.Combine("new", "two.bin"), 200)
+            ]);
+            Assert.Equal((700, 300, 400, 700),
+                (plan.InstalledBytes, plan.NewBytes, plan.ReplacementScratchBytes, plan.RequiredAvailableBytes));
+            Assert.Throws<InvalidDataException>(() => ImportDiskPlanner.Calculate(root,
+                [new("same.bin", 1), new("SAME.BIN", 1)]));
+            Assert.Throws<InvalidDataException>(() => ImportDiskPlanner.Calculate(root,
+                [new("../escape.bin", 1)]));
+        }
+        finally
+        {
+            if (Directory.Exists(root)) Directory.Delete(root, true);
+        }
+    }
+
+    [Fact]
     public void DilemmaTextIsParsedIntoDataDrivenChoicesAndOutcomes()
     {
         var dilemma = DilemmaTextDecoder.Decode(System.Text.Encoding.ASCII.GetBytes(SyntheticDilemma()));

@@ -312,6 +312,8 @@ The source-image digest `8a584cc03a0a19f74851d2c1f4653804a58bfbf2c16e4fd34759f7a
 
 `Conqueror.Import --verify` checks those structural invariants and then requires every listed file to exist with the declared size and digest. The install and repair paths run the same verification after writing the manifest. Generated files and the manifest use same-directory temporary files plus atomic replacement; byte-identical destinations are retained rather than rewritten. `--uninstall` prevalidates all manifest paths before removing only those files and the manifest, preserving everything unlisted. These manifest rules describe independently authored importer metadata, not an original-game format.
 
+Before any generated file is written, the importer inventories every selected raw disc file, every decodable archive entry's declared expanded size, the loose GOB and its decodable entries, and each CDDA WAV header plus PCM extent. The preflight sums missing destinations and reserves scratch space for the largest possible atomic replacement, rejects duplicate or escaping planned paths, and compares that requirement with the output volume's available space.
+
 ## Reimplementation save format
 
 Campaign slots are UTF-8 JSON representations of `CampaignState`. Schema 1 adds the required non-negative `SchemaVersion` field; a missing field identifies schema 0, the unversioned format written by every earlier prototype. Loading migrates schema 0 in memory before campaign-state repair, accepts schema 1, and rejects negative or future versions rather than silently discarding unknown state. The former `campaign.json` filename remains a schema-independent slot-1 fallback.

@@ -32,14 +32,22 @@ else
     Console.WriteLine($"Recognized {releaseName} ({sourceImageHash}).");
 
 Directory.CreateDirectory(output);
+var cueLines = File.ReadAllLines(cuePath);
+var diskPlan = PlanInstallation(imagePath, cueLines, gobPath, output);
+var driveRoot = Path.GetPathRoot(output) ?? throw new InvalidDataException("Output path has no filesystem root.");
+var availableBytes = new DriveInfo(driveRoot).AvailableFreeSpace;
+Console.WriteLine($"Planned {diskPlan.InstalledBytes / 1048576d:F1} MiB installed; {diskPlan.RequiredAvailableBytes / 1048576d:F1} MiB additional/scratch required; {availableBytes / 1048576d:F1} MiB available.");
+if (availableBytes < diskPlan.RequiredAvailableBytes)
+{
+    Console.Error.WriteLine("Insufficient free space for an atomic resource installation.");
+    return 4;
+}
 var entries = new List<ImportedAsset>();
 var changedFiles = 0;
-var cueLines = File.ReadAllLines(cuePath);
 using (var image = new RawMode1Image(imagePath, CueSheet.DataTrackSectors(cueLines)))
 {
     var iso = new Iso9660(image);
-    var supported = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".SMK", ".RES", ".CSF", ".PCX", ".PCC", ".LOW", ".WAV", ".MID" };
-    foreach (var file in iso.Files.Where(x => supported.Contains(Path.GetExtension(x.Path))))
+    foreach (var file in iso.Files.Where(file => IsSupportedDiscFile(file.Path)))
     {
         var relative = Path.Combine("Raw", string.Join(Path.DirectorySeparatorChar, file.Path.Split('/').Select(ResourcePaths.SafeName)));
         var target = ResourcePaths.SafeTarget(output, relative);
@@ -136,6 +144,47 @@ static int UninstallContent(string root)
     Console.WriteLine($"Removed {removed} manifest-owned files from {root}. Unlisted files were preserved.");
     return 0;
 }
+
+static ImportDiskPlan PlanInstallation(string imagePath, IReadOnlyList<string> cueLines, string gobPath, string output)
+{
+    var assets = new List<PlannedImportAsset>();
+    using (var image = new RawMode1Image(imagePath, CueSheet.DataTrackSectors(cueLines)))
+    {
+        var iso = new Iso9660(image);
+        foreach (var file in iso.Files.Where(file => IsSupportedDiscFile(file.Path)))
+        {
+            var relative = Path.Combine("Raw", string.Join(Path.DirectorySeparatorChar,
+                file.Path.Split('/').Select(ResourcePaths.SafeName)));
+            assets.Add(new(relative, file.Size));
+            if (!DynamixArchive.HasContainerExtension(file.Path)) continue;
+            var archive = new DynamixArchive(iso.ReadFile(file), file.Path);
+            foreach (var entry in archive.Entries.Where(DynamixArchive.CanDecode))
+                assets.Add(new(Path.Combine("Decoded", ResourcePaths.DecodedArchiveFolder(file.Path),
+                    $"{entry.Index:0000}-{ResourcePaths.SafeName(entry.Name)}"), entry.ExpandedSize));
+        }
+    }
+
+    assets.Add(new(Path.Combine("Archives", "C1086.GOB"), new FileInfo(gobPath).Length));
+    var gob = new DynamixArchive(gobPath);
+    foreach (var entry in gob.Entries.Where(DynamixArchive.CanDecode))
+        assets.Add(new(Path.Combine("Decoded", ResourcePaths.DecodedArchiveFolder("C1086.GOB"),
+            $"{entry.Index:0000}-{ResourcePaths.SafeName(entry.Name)}"), entry.ExpandedSize));
+
+    var tracks = CueSheet.Tracks(cueLines);
+    var imageSectors = new FileInfo(imagePath).Length / CddaWave.BytesPerSector;
+    for (var index = 0; index < tracks.Length; index++)
+    {
+        var track = tracks[index];
+        if (!track.Mode.Equals("AUDIO", StringComparison.OrdinalIgnoreCase)) continue;
+        var endSector = index + 1 < tracks.Length ? tracks[index + 1].StartSector : imageSectors;
+        assets.Add(new(Path.Combine("Audio", $"track{track.Number:00}.wav"),
+            checked(44L + (endSector - track.StartSector) * CddaWave.BytesPerSector)));
+    }
+    return ImportDiskPlanner.Calculate(output, assets);
+}
+
+static bool IsSupportedDiscFile(string path) => Path.GetExtension(path).ToUpperInvariant() is
+    ".SMK" or ".RES" or ".CSF" or ".PCX" or ".PCC" or ".LOW" or ".WAV" or ".MID";
 
 static string Kind(string path) => Path.GetExtension(path).ToUpperInvariant() switch
 {

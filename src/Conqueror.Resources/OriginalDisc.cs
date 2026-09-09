@@ -28,6 +28,35 @@ public sealed record ImportManifest(int Version, string SourceImageSha256, Impor
 }
 
 public sealed record InstalledFile(string Path, long Size, string Sha256, bool Changed);
+public sealed record PlannedImportAsset(string Path, long Size);
+public sealed record ImportDiskPlan(long InstalledBytes, long NewBytes, long ReplacementScratchBytes)
+{
+    public long RequiredAvailableBytes => checked(NewBytes + ReplacementScratchBytes);
+}
+
+public static class ImportDiskPlanner
+{
+    public static ImportDiskPlan Calculate(string root, IEnumerable<PlannedImportAsset> assets)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(root);
+        ArgumentNullException.ThrowIfNull(assets);
+        long installed = 0;
+        long newBytes = 0;
+        long replacementScratch = 0;
+        var paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var asset in assets)
+        {
+            if (asset.Size < 0) throw new InvalidDataException("Planned asset has a negative size.");
+            if (Path.IsPathFullyQualified(asset.Path)) throw new InvalidDataException("Planned asset path must be relative.");
+            var target = ResourcePaths.SafeTarget(root, asset.Path);
+            if (!paths.Add(target)) throw new InvalidDataException("Planned asset paths are not unique.");
+            installed = checked(installed + asset.Size);
+            if (File.Exists(target)) replacementScratch = Math.Max(replacementScratch, asset.Size);
+            else newBytes = checked(newBytes + asset.Size);
+        }
+        return new(installed, newBytes, replacementScratch);
+    }
+}
 
 public static class GeneratedContentInstaller
 {
