@@ -105,6 +105,12 @@ The 486 GOB records and 13,147 scene records produce this extension-level invent
 
 The five kind-2 resources are four strictly validated 640x480 `.PCX` entries and one exactly expanded `.666` sound bank. This distribution, the image structure, and the sound-bank framing below are **Confirmed**; most other extensions remain unknown.
 
+## Raw scene textures
+
+The 99 scene containers contain 12,982 headerless `TEX` resources. Their directory names carry the complete rectangular layout as three whitespace-separated fields: `TEXnnn width height`, where `nnn` is a three-digit decimal texture index and width and height are positive decimal integers. For every texture in the hashed release, the decoded payload length is exactly `width * height`, establishing one byte per pixel with no row padding or embedded header. The meaning of each byte and its palette association are not yet confirmed.
+
+Paired scene tiers commonly use different dimensions: `.LOW` entries are generally 64 pixels wide while matching `.RES` entries are generally 128 pixels wide. `DynamixSceneTextureDecoder` validates the three name fields, limits either dimension to 4,096, checks the product without integer overflow, requires exact payload consumption, and returns an owned index buffer. `scene-texture-report.txt` records only counts and distinct dimensions per archive. The naming grammar, dimensions, payload relationship, and complete 12,982-resource population are **Confirmed for the hashed release**; pixel ordering, palette selection, and texture-to-surface mapping remain **Provisional**.
+
 ## Dynamix `.666` sound banks
 
 All 26 decoded `.666` resources use the same rate-tagged sample sequence:
@@ -269,6 +275,7 @@ The raw-sector bounds, ISO directory traversal, cue timestamps, and WAV sample p
 - `gob-directory.txt`: outer GOB directory fields.
 - `gob-compression-report.txt`: kind-1 block counts plus complete kind-1 and kind-2 decoding validation.
 - `scene-res-report.txt`: per-scene entry, storage-kind, and block totals.
+- `scene-texture-report.txt`: per-scene raw-texture counts and distinct dimensions.
 - `resource-extension-report.txt`: aggregate extension and storage-kind inventory.
 - `stored-image-report.txt`: dimensions and decoded pixel-index hashes for stored, kind-1, and kind-2 PCX-compatible payloads.
 - `csf-report.txt`: storage kind, chunk sizes, dimensions, decoded segment totals, and stable frame-sequence hashes for byte-stored and kind-1 CSF containers.
@@ -287,4 +294,4 @@ The reports are regenerated from the user's installation and must never be commi
 
 1. Recover the semantic meaning of directory field `0x24` and test whether data extents may alias or overlap.
 2. Specify nested chunk headers and the exact compression selector used inside decoded resources.
-3. Associate CSF sequences with their screen palettes, confirm `.666` event bindings, and specify the remaining PCC, scene `Viewer`/`Scenario`/`TEX` payloads, RAT, and FNT semantics as each decoder is validated.
+3. Associate CSF sequences and scene textures with their palettes, confirm `.666` event bindings, and specify the remaining PCC, scene `Viewer`/`Scenario`, RAT, and FNT semantics as each decoder is validated.

@@ -254,12 +254,14 @@ if (File.Exists(gobPath))
 }
 
 var sceneReport = new StringBuilder("# Result  Entries  Stored  Kind1  Kind2  CompressedBlocks  StoredBlocks  ISO path\n");
+var sceneTextureReport = new StringBuilder("# Textures  Dimensions  ISO path\n");
 var paletteReport = new StringBuilder("# Minimum  Maximum  SHA-256  Resource  ISO path\n");
 var sceneContainers = 0;
 var sceneEntries = 0;
 var sceneStoredEntries = 0;
 var sceneCompressedBlocks = 0;
 var sceneVerbatimBlocks = 0;
+var sceneTextures = 0;
 foreach (var file in files.Where(x => DynamixArchive.HasContainerExtension(x.Path)))
 {
     try
@@ -287,6 +289,12 @@ foreach (var file in files.Where(x => DynamixArchive.HasContainerExtension(x.Pat
         sceneCompressedBlocks += compressedBlocks;
         sceneVerbatimBlocks += verbatimBlocks;
         resourceInventory.AddRange(archive.Entries.Select(x => ("SCENE", x)));
+        var textures = archive.Entries.Where(entry => entry.Name.StartsWith("TEX", StringComparison.OrdinalIgnoreCase))
+            .Select(entry => DynamixSceneTextureDecoder.Decode(entry.Name, archive.ReadDecoded(entry))).ToArray();
+        sceneTextures += textures.Length;
+        var dimensions = string.Join(',', textures.Select(texture => $"{texture.Width}x{texture.Height}")
+            .Distinct().Order(StringComparer.Ordinal));
+        sceneTextureReport.AppendLine($"{textures.Length,8}  {dimensions,-40}  {file.Path}");
         foreach (var entry in archive.Entries.Where(x => DynamixArchive.CanDecode(x)
             && Path.GetExtension(x.Name).Equals(".666", StringComparison.OrdinalIgnoreCase)))
             AppendSoundBankReport(soundBankReport, file.Path, entry.Name, archive.ReadDecoded(entry));
@@ -309,6 +317,8 @@ foreach (var file in files.Where(x => DynamixArchive.HasContainerExtension(x.Pat
     }
 }
 File.WriteAllText(Path.Combine(output, "scene-res-report.txt"), sceneReport.ToString());
+sceneTextureReport.AppendLine($"# total textures: {sceneTextures}");
+File.WriteAllText(Path.Combine(output, "scene-texture-report.txt"), sceneTextureReport.ToString());
 File.WriteAllText(Path.Combine(output, "stored-palette-report.txt"), paletteReport.ToString());
 File.WriteAllText(Path.Combine(output, "sound-bank-report.txt"), soundBankReport.ToString());
 var extensionReport = new StringBuilder("# Extension  Total  Stored  Kind1  Kind2  Other  Scopes\n");

@@ -27,6 +27,28 @@ public sealed class ResourceAndDefinitionTests
         Assert.Throws<InvalidDataException>(() => ResourcePaths.DecodedArchiveFolder(".."));
     }
 
+    [Theory]
+    [InlineData("TEX000 16 16", 256, 0, 16, 16)]
+    [InlineData("TEX081 128 156", 19968, 81, 128, 156)]
+    [InlineData("tex241 64 91", 5824, 241, 64, 91)]
+    public void SceneTextureNamesBoundRawIndexedPixelDimensions(
+        string name, int length, int index, int width, int height)
+    {
+        var texture = DynamixSceneTextureDecoder.Decode(name, new byte[length]);
+        Assert.Equal((index, width, height, length),
+            (texture.Index, texture.Width, texture.Height, texture.Indices.Length));
+    }
+
+    [Fact]
+    public void SceneTextureDecoderRejectsMalformedOrInconsistentResources()
+    {
+        Assert.Throws<InvalidDataException>(() => DynamixSceneTextureDecoder.Decode("PIC000 16 16", new byte[256]));
+        Assert.Throws<InvalidDataException>(() => DynamixSceneTextureDecoder.Decode("TEX+01 16 16", new byte[256]));
+        Assert.Throws<InvalidDataException>(() => DynamixSceneTextureDecoder.Decode("TEX000 +16 16", new byte[256]));
+        Assert.Throws<InvalidDataException>(() => DynamixSceneTextureDecoder.Decode("TEX000 16 16", new byte[255]));
+        Assert.Throws<InvalidDataException>(() => DynamixSceneTextureDecoder.Decode("TEX000 11", new byte[11]));
+    }
+
     [Fact]
     public void Kind1DecodesLiteralCopyAndRunTokens()
     {
