@@ -546,7 +546,7 @@ Local static-analysis tool: Ghidra 12.1.3 is installed user-wide at `C:\Users\ki
 - [x] Decode and palette-verify all four `BUYSELL.CSF` overlays, then select blank/View and Sell/Purchase states from store metadata and current ownership through typed presentation definitions.
 - [x] Identify `ICONTEMP.PCX`/`ICONMAP.HAT` as the estate/travel shell, activate its exact viewport, inset-map, tab, information, and navigation regions, and retain a no-media map fallback.
 - [x] Replace farm input branching and separately maintained help strings with one typed command/action registry.
-- [x] Add shared data-driven visual-scene hover labels and confirm the separate Blacksmith/Buy-Sell `VSMITH.HAT` targets. Home uses the same infrastructure but stays disabled after controlled observation disproved an order-based `FCASTLE.HAT` label mapping.
+- [x] Add shared data-driven visual-scene hover labels and confirm the separate Blacksmith/Buy-Sell `VSMITH.HAT` targets. Correct the Home descriptor from `FCASTLE.HAT` to `FOPTS.HAT` and activate its seven visually/evidence-correlated office objects; three ambiguous targets remain disabled.
 - [x] Decode and classify all 26 `.666` sound banks with bounded length/rate validation; the ignored population report accounts for 102 samples and zero rejects.
 - [x] Confirm unsigned 8-bit mono PCM from waveform centering, identify the identical shared UI sample across 17 screen banks, and activate its one-time-converted runtime buffer for mouse actions.
 - [ ] Trace the complete startup/menu state machine, input timing, cursor behavior, and region-action dispatch from `CONQUER.EXE`; keep semantics corroborated until each executable branch is confirmed.
@@ -555,7 +555,7 @@ The resource-decoding sprint is first because it unlocks exact dialogue, screen 
 
 ## Next implementation priorities
 
-1. Continue tracing startup/menu input timing and HAT region-action dispatch from `CONQUER.EXE`; the five-slot load/resume UI and `campaign.json` compatibility path are implemented, while exact original dispatch/timing remains to be confirmed.
+1. Continue tracing startup/menu input timing and HAT region-action dispatch from `CONQUER.EXE`; filename-preserving HAT reports corrected the Home descriptor and seven office objects are active, while its two exits, small desk object, and exact original dispatch/timing remain to be confirmed.
 2. [Completed 2026-09-08] Bind the decoded five-definition age groups to campaign state using the executable-confirmed per-age selection policy; keep original prose local and retain built-in fallback summaries.
 3. In progress: bind menu CSF sequences to verified palettes and roles. `OPTION.CSF` static ON/OFF and Resume frames use `OPTFIN.PCX`; `SWORDS.CSF` item art and `BUYSELL.CSF` control states use `SWDTEMP.PCX`; `FFMOUSE.CSF` default sword frame uses the estate/interface palette. Alternate cursor frames and other menu sequences still require dispatch and timing evidence.
 4. [Completed 2026-09-08] Add legal-boundary automation that fails if imported media or generated analysis artifacts enter Git, then add CI restore/build/test coverage. `tools/Verify-Repository.ps1` interprets the data-only `repository-policy.json`; the local test launcher and Windows GitHub Actions workflow both enforce it before compiling.

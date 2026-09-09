@@ -105,7 +105,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _dilemmaContinueBounds = YouthDilemmaPresentationDefinitions.ContinueFrom(dilemmaLayout);
         var estateLayoutId = _importedContent?.FindId("resource", ":iconmap.hat");
         _estateLayout = EstatePresentationDefinitions.From(estateLayoutId is null ? null : _importedContent?.DecodeHat(estateLayoutId));
-        var homeLayoutId = _importedContent?.FindId("resource", ":fcastle.hat");
+        var homeLayoutId = _importedContent?.FindId("resource", ":fopts.hat");
         _homeHotspots = HomePresentationDefinitions.HotspotsFrom(homeLayoutId is null ? null : _importedContent?.DecodeHat(homeLayoutId));
         var blacksmithLayoutId = _importedContent?.FindId("resource", ":vsmith.hat");
         var blacksmithLayout = blacksmithLayoutId is null ? null : _importedContent?.DecodeHat(blacksmithLayoutId);

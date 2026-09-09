@@ -251,7 +251,7 @@ The decoded `.HAT` population uses a compact fixed-header layout. Integer fields
 
 Each region record contains six 32-bit fields: identifier, X, Y, width, height, and enabled flag. Some rectangles deliberately extend beyond the 640x480 viewport and are clipped, so the bounded parser requires intersection rather than full containment. One observed file ends with the DOS text marker `0D 0A 1A`; no other trailing data is accepted. `hat-layout-report.txt` records every decoded descriptor without exporting its original bytes.
 
-`CGOPTS.HAT` maps `CHAR_OPS.PCX` regions 0–2 to Generate New Character, Choose Pre-generated Character, and Choose Character Name, followed by red, green, and blue shield regions 3–5. `PREGEN.HAT` maps `PREGEN.PCX` region identifiers 0–5 to the six profile panels. The geometry and numeric identifiers are **Confirmed**; action semantics are **Corroborated** by their alignment with labeled artwork and runtime flow.
+`CGOPTS.HAT` maps `CHAR_OPS.PCX` regions 0–2 to Generate New Character, Choose Pre-generated Character, and Choose Character Name, followed by red, green, and blue shield regions 3–5. `PREGEN.HAT` maps `PREGEN.PCX` region identifiers 0–5 to the six profile panels. `FOPTS.HAT` is screen 16's `TACTICAL.PCX` office descriptor; `FCASTLE.HAT` instead declares screen 19 and `FIEFMGMT.PCX`. The geometry, numeric identifiers, filenames, and backgrounds are **Confirmed**; action semantics are **Corroborated** by labeled-art alignment and runtime flow.
 
 ## Disc image and audio
 
@@ -271,7 +271,8 @@ The raw-sector bounds, ISO directory traversal, cue timestamps, and WAV sample p
 - `stored-image-report.txt`: dimensions and decoded pixel-index hashes for stored, kind-1, and kind-2 PCX-compatible payloads.
 - `csf-report.txt`: storage kind, chunk sizes, dimensions, decoded segment totals, and stable frame-sequence hashes for byte-stored and kind-1 CSF containers.
 - `stored-palette-report.txt`: provenance, component ranges, and hashes for validated 256-color RGB palettes.
-- `hat-layout-report.txt`: decoded screen identifiers, background names, and region records for HAT layout descriptors.
+- `hat-layout-report.txt`: resource filenames, decoded screen identifiers, background names, and region records for HAT layout descriptors.
+- `executable-data-xrefs.txt`: instruction addresses that reference requested object-relative LE data offsets.
 - `dilemma-text-report.txt`: stable dilemma/scene identifiers plus choice, outcome, modifier, and text-length counts without original prose.
 - `dilemma-rules-report.txt`: choice scoring attributes, low/high breakpoints, and outcome modifiers without original prose.
 - `weapon-store-report.txt`: store record indices, movie presence, unknown numeric values, image/item indices, prices, and description lengths without original prose.

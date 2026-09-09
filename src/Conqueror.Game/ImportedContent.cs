@@ -42,7 +42,7 @@ public static class ImportedLayouts
         new("Character.Pregenerated", ":pregen.hat"),
         new("Dilemma", ":chargen.hat"),
         new("Estate", ":iconmap.hat"),
-        new("Home.Office", ":fcastle.hat"),
+        new("Home.Office", ":fopts.hat"),
         new("Blacksmith.Workshop", ":vsmith.hat")
     ];
 }

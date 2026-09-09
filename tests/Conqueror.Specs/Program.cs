@@ -35,6 +35,7 @@ Check(EstatePresentationDefinitions.From(null).Controls.Select(x => x.Action).Di
 Check(EstatePresentationDefinitions.TileAtlases.Count == 3 && EstatePresentationDefinitions.TileFrames.Count == Enum.GetValues<EstateTerrainKind>().Length, "seasonal estate tile atlases are definition driven");
 Check(FarmPresentationDefinitions.Commands.Select(x => x.Key).Distinct().Count() == FarmPresentationDefinitions.Commands.Count, "farm commands are unique definitions");
 Check(BlacksmithPresentationDefinitions.Hotspots.All(x => !string.IsNullOrWhiteSpace(x.HoverLabel)), "confirmed visual scene hotspots define hover labels");
+Check(HomePresentationDefinitions.Hotspots.Select(x => x.Action).SequenceEqual([SceneNavigationAction.Overview, SceneNavigationAction.Castle, SceneNavigationAction.Farm, SceneNavigationAction.Village, SceneNavigationAction.Forest, SceneNavigationAction.Orders, SceneNavigationAction.Map]), "corroborated Home object hotspots are definition driven");
 Check(CharacterCreationDefinitions.Options.Select(x => x.Action).Distinct().Count() == Enum.GetValues<CharacterCreationAction>().Length, "character option actions are unique definitions");
 Check(CharacterCreationDefinitions.PregeneratedCharacters.Count == Balance.Templates.Length && CharacterCreationDefinitions.HeraldicColors.Select(x => x.Name).SequenceEqual(["Red", "Green", "Blue"]), "original character selection hotspots are defined");
 

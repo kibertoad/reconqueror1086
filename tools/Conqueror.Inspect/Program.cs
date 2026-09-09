@@ -50,12 +50,20 @@ var inspectionOptions = args.Skip(2).Where(x => !string.IsNullOrWhiteSpace(x)).T
 var renderCsfName = OptionValue(inspectionOptions, "--render-csf=");
 var palettePcxName = OptionValue(inspectionOptions, "--palette-pcx=");
 var disassembleAddresses = OptionValue(inspectionOptions, "--disassemble=");
+var xrefDataOffsets = OptionValue(inspectionOptions, "--xref-data=");
 if (disassembleAddresses is not null)
 {
     var executable = Directory.EnumerateFiles(artifactRoot, "CONQUER.EXE", SearchOption.AllDirectories).Single();
     var addresses = disassembleAddresses.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
         .Select(ParseAddress).ToArray();
     File.WriteAllText(Path.Combine(output, "executable-disassembly-report.txt"), DisassembleLinearExecutable(executable, addresses));
+}
+if (xrefDataOffsets is not null)
+{
+    var executable = Directory.EnumerateFiles(artifactRoot, "CONQUER.EXE", SearchOption.AllDirectories).Single();
+    var offsets = xrefDataOffsets.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .Select(ParseAddress).ToArray();
+    File.WriteAllText(Path.Combine(output, "executable-data-xrefs.txt"), FindLinearExecutableDataReferences(executable, offsets));
 }
 var terms = inspectionOptions.Where(x => !x.StartsWith("--", StringComparison.Ordinal)).ToArray();
 if (terms.Length > 0)
@@ -164,14 +172,14 @@ if (File.Exists(gobPath))
     }
     File.WriteAllText(Path.Combine(output, "csf-report.txt"), csfReport.ToString());
 
-    var hatReport = new StringBuilder("# Screen  Origin  Size  Regions  Tag  Background  Region records (id:x,y,width,height,enabled)\n");
+    var hatReport = new StringBuilder("# Name  Screen  Origin  Size  Regions  Tag  Background  Region records (id:x,y,width,height,enabled)\n");
     foreach (var entry in gob.Entries.Where(x => (x.IsStored || x.Flags == 1) && Path.GetExtension(x.Name).Equals(".HAT", StringComparison.OrdinalIgnoreCase)))
     {
         try
         {
             var layout = new HatLayout(gob.ReadDecoded(entry));
             var regions = string.Join(' ', layout.Regions.Select(x => $"{x.Id}:{x.X},{x.Y},{x.Width},{x.Height},{x.Enabled}"));
-            hatReport.AppendLine($"{layout.ScreenId,6}  {layout.OriginX},{layout.OriginY}  {layout.Width}x{layout.Height}  {layout.Regions.Count,7}  0x{layout.UnknownTag:X6}  {layout.BackgroundName}  {regions}");
+            hatReport.AppendLine($"{entry.Name,-16}  {layout.ScreenId,6}  {layout.OriginX},{layout.OriginY}  {layout.Width}x{layout.Height}  {layout.Regions.Count,7}  0x{layout.UnknownTag:X6}  {layout.BackgroundName}  {regions}");
         }
         catch (InvalidDataException error)
         {
@@ -394,6 +402,53 @@ static string DisassembleLinearExecutable(string path, IReadOnlyList<uint> addre
             break;
         }
         if (!mapped) report.AppendLine($"# VA 0x{address:X8} is outside mapped objects.");
+    }
+    return report.ToString();
+}
+
+static string FindLinearExecutableDataReferences(string path, IReadOnlyList<uint> offsets)
+{
+    var bytes = File.ReadAllBytes(path);
+    var le = Enumerable.Range(0, bytes.Length - 0x84)
+        .FirstOrDefault(index => bytes[index] == (byte)'L' && bytes[index + 1] == (byte)'E'
+            && bytes[index + 2] == 0 && bytes[index + 3] == 0
+            && BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(index + 0x44, 4)) is > 0 and < 64
+            && BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(index + 0x28, 4)) is >= 512 and <= 65536);
+    if (le == 0) throw new InvalidDataException("Linear Executable header was not found.");
+    var pageSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(le + 0x28, 4));
+    var objectTable = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(le + 0x40, 4));
+    var objectCount = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(le + 0x44, 4));
+    var dataPages = checked((uint)le + BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(le + 0x80, 4)));
+    var report = new StringBuilder("# 32-bit LE references to object-relative data offsets (derived metadata; original bytes omitted)\n");
+    report.AppendLine($"# requested: {string.Join(',', offsets.Select(offset => $"0x{offset:X}"))}");
+
+    for (var objectIndex = 0; objectIndex < objectCount; objectIndex++)
+    {
+        var descriptor = checked(le + (int)objectTable + objectIndex * 24);
+        var virtualSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor, 4));
+        var baseAddress = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor + 4, 4));
+        var pageIndex = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor + 12, 4));
+        var fileOffset = checked(dataPages + (pageIndex - 1) * pageSize);
+        var available = Math.Min(checked((int)virtualSize), bytes.Length - checked((int)fileOffset));
+        var reader = new ByteArrayCodeReader(bytes.AsSpan(checked((int)fileOffset), available).ToArray());
+        var decoder = Iced.Intel.Decoder.Create(32, reader);
+        decoder.IP = baseAddress;
+        var formatter = new IntelFormatter();
+        while (decoder.IP < baseAddress + (uint)available)
+        {
+            decoder.Decode(out var instruction);
+            if (instruction.IsInvalid) continue;
+            var formatted = new StringOutput();
+            formatter.Format(instruction, formatted);
+            var text = formatted.ToString();
+            foreach (var offset in offsets)
+            {
+                var pattern = $@"(?<![0-9A-F])0*{offset:X}h(?![0-9A-F])";
+                if (System.Text.RegularExpressions.Regex.IsMatch(text, pattern,
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                    report.AppendLine($"0x{instruction.IP:X8}  data+0x{offset:X}  {text}");
+            }
+        }
     }
     return report.ToString();
 }

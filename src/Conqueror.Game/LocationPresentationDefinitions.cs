@@ -37,9 +37,19 @@ public sealed record SceneHotspot(SceneNavigationAction Action, string HoverLabe
 public static class HomePresentationDefinitions
 {
     public static UiBounds HoverLabelBounds { get; } = new(1, 443, 638, 35);
-    // FCASTLE.HAT provides rectangles but not their action/label bindings. Keep this empty until
-    // executable dispatch or controlled hover observations establish the region-to-target mapping.
-    public static IReadOnlyList<SceneHotspot> Hotspots { get; } = [];
+    // FOPTS.HAT is the TACTICAL.PCX office descriptor. The executable's adjacent label trio maps
+    // the three left-to-right ledger spines to Farm, Village, and Forest. Exits and the small desk
+    // object still require dispatch evidence.
+    public static IReadOnlyList<SceneHotspot> Hotspots { get; } =
+    [
+        new(SceneNavigationAction.Overview, "Overview", 0, new UiBounds(248, 184, 64, 31)),
+        new(SceneNavigationAction.Castle, "Castle", 1, new UiBounds(172, 153, 72, 44)),
+        new(SceneNavigationAction.Farm, "Farm", 2, new UiBounds(277, 146, 17, 38)),
+        new(SceneNavigationAction.Village, "Village", 3, new UiBounds(295, 141, 18, 43)),
+        new(SceneNavigationAction.Forest, "Forest", 4, new UiBounds(314, 147, 15, 39)),
+        new(SceneNavigationAction.Orders, "Orders", 5, new UiBounds(359, 123, 35, 76)),
+        new(SceneNavigationAction.Map, "Map", 8, new UiBounds(200, 55, 68, 85))
+    ];
 
     public static IReadOnlyList<SceneHotspot> HotspotsFrom(HatLayout? layout) => Hotspots
         .Select(hotspot => layout?.FindRegion(hotspot.HatRegionId) is { Enabled: not 0 } region

@@ -143,8 +143,17 @@ public sealed class ResourceAndDefinitionTests
             Assert.InRange(control.Bounds.Y + control.Bounds.Height, 1, 480);
         });
         Assert.Contains(ImportedLayouts.Definitions,
-            definition => definition.Role == "Home.Office" && definition.IdSuffix == ":fcastle.hat");
-        Assert.Empty(HomePresentationDefinitions.Hotspots);
+            definition => definition.Role == "Home.Office" && definition.IdSuffix == ":fopts.hat");
+        Assert.Equal(
+            [(SceneNavigationAction.Overview, "Overview", 0, new UiBounds(248, 184, 64, 31)),
+             (SceneNavigationAction.Castle, "Castle", 1, new UiBounds(172, 153, 72, 44)),
+             (SceneNavigationAction.Farm, "Farm", 2, new UiBounds(277, 146, 17, 38)),
+             (SceneNavigationAction.Village, "Village", 3, new UiBounds(295, 141, 18, 43)),
+             (SceneNavigationAction.Forest, "Forest", 4, new UiBounds(314, 147, 15, 39)),
+             (SceneNavigationAction.Orders, "Orders", 5, new UiBounds(359, 123, 35, 76)),
+             (SceneNavigationAction.Map, "Map", 8, new UiBounds(200, 55, 68, 85))],
+            HomePresentationDefinitions.Hotspots.Select(hotspot =>
+                (hotspot.Action, hotspot.HoverLabel, hotspot.HatRegionId, hotspot.Bounds)));
         Assert.Equal(
             [(SceneNavigationAction.BlacksmithDialogue, "Blacksmith", new UiBounds(253, 109, 107, 164)),
              (SceneNavigationAction.Shop, "Buy/Sell", new UiBounds(54, 2, 180, 141))],
