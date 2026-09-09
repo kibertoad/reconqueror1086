@@ -395,7 +395,6 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             _notice = $"{option.Label.ToUpperInvariant()} REQUIRES AN ACTIVE CAMPAIGN";
             return;
         }
-
         switch (option.Action)
         {
             case OptionsHubAction.NewGame: _screen = Screen.CharacterOptions; break;
@@ -577,6 +576,11 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void UpdateLoadGame(Func<Keys, bool> press, MouseState mouse, bool click)
     {
+        if (press(Keys.F8))
+        {
+            LoadAutosave();
+            return;
+        }
         if (press(Keys.R))
         {
             ResumeFromLoadGame();
@@ -613,17 +617,33 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             return;
         }
 
-        _campaign = campaign!;
+        ApplyLoadedCampaign(campaign!);
+        _activeSaveSlot = number;
+        _notice = $"CAMPAIGN LOADED FROM SLOT {number}";
+    }
+
+    private void LoadAutosave()
+    {
+        if (!_saveSlots.TryLoadAutosave(out var campaign, out var error))
+        {
+            _notice = error ?? "AUTOSAVE COULD NOT BE LOADED";
+            return;
+        }
+        ApplyLoadedCampaign(campaign!);
+        _notice = "AUTOSAVE LOADED";
+    }
+
+    private void ApplyLoadedCampaign(Campaign campaign)
+    {
+        _campaign = campaign;
         ResetConversationSession();
         _fiefCheckpoint = null;
         _hasActiveCampaign = true;
         _fieldBattle = null;
         _siege = null;
         _youthDilemmaResult = null;
-        _activeSaveSlot = number;
         _selectedLocation = _campaign.State.CurrentLocation;
         _screen = CampaignScreen();
-        _notice = $"CAMPAIGN LOADED FROM SLOT {number}";
     }
 
     private void ResumeFromLoadGame()
@@ -730,6 +750,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         {
             var days = _campaign.TravelTo(_selectedLocation);
             _notice = days == 0 ? $"ALREADY AT {World.Locations[_selectedLocation].Name}" : $"TRAVELLED {days} DAYS TO {World.Locations[_selectedLocation].Name}";
+            if (days > 0) Autosave();
             if (_campaign.HasPendingFieldBattle) { BeginFieldBattle("YOUR ARMY HAS BEEN INTERCEPTED"); return; }
         }
         if (press(Keys.H) && _campaign.State.CurrentLocation == 0) _screen = Screen.Home;
@@ -755,7 +776,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             : "SPY NOT SENT (NEED HOSTILE CASTLE AND 80S)";
         if (press(Keys.C)) _notice = "TO CLAIM THE CROWN, TRAVEL TO LONDON AND PRESS S TO BESIEGE IT";
         if (press(Keys.D)) _campaign.AttemptDragon();
-        if (press(Keys.E)) _campaign.AdvanceDays(_campaign.State.DaySpeed);
+        if (press(Keys.E)) { _campaign.AdvanceDays(_campaign.State.DaySpeed); Autosave(); }
         if (press(Keys.OemPlus) || press(Keys.Add)) _campaign.State.DaySpeed = Math.Min(15, _campaign.State.DaySpeed + 1);
         if (press(Keys.OemMinus) || press(Keys.Subtract)) _campaign.State.DaySpeed = Math.Max(1, _campaign.State.DaySpeed - 1);
         if (!click || !_originalArt.ContainsKey("Estate.Shell")) return;
@@ -840,6 +861,12 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _selectedLocation = _campaign.State.CurrentLocation;
         _notice = "YOUR CAMPAIGN BEGINS";
         _screen = Screen.Map;
+        Autosave();
+    }
+
+    private void Autosave()
+    {
+        if (_hasActiveCampaign) _saveSlots.SaveAutosave(_campaign);
     }
 
     private void UpdateHome(Func<Keys, bool> press, MouseState mouse, bool click)
@@ -1226,17 +1253,17 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (press(Keys.R))
         {
             if (_activePracticeCombat is not null) { FinishPracticeCombat("PRACTICE ENDED"); return; }
-            _campaign.FinishSiege(_siege); var lost = _campaign.Retreat(); _siege = null; _screen = Screen.Map; _notice = $"RETREATED - {lost} SOLDIERS LOST"; return;
+            _campaign.FinishSiege(_siege); var lost = _campaign.Retreat(); _siege = null; _screen = Screen.Map; _notice = $"RETREATED - {lost} SOLDIERS LOST"; Autosave(); return;
         }
         if (_siege.Won)
         {
             if (_activePracticeCombat is not null) FinishPracticeCombat("PRACTICE WON");
-            else { _campaign.FinishSiege(_siege); _siege = null; _screen = Screen.Map; _notice = "THE CASTLE IS YOURS"; }
+            else { _campaign.FinishSiege(_siege); _siege = null; _screen = Screen.Map; _notice = "THE CASTLE IS YOURS"; Autosave(); }
         }
         else if (_siege.Defeated)
         {
             if (_activePracticeCombat is not null) FinishPracticeCombat("PRACTICE LOST");
-            else { _campaign.FinishSiege(_siege); _siege = null; _screen = Screen.Map; _notice = "YOU ARE CARRIED FROM THE CASTLE"; }
+            else { _campaign.FinishSiege(_siege); _siege = null; _screen = Screen.Map; _notice = "YOU ARE CARRIED FROM THE CASTLE"; Autosave(); }
         }
     }
 
@@ -1267,7 +1294,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                 FinishPracticeCombat($"WAR PRACTICE: {result}".ToUpperInvariant());
                 return;
             }
-            var outcome = _campaign.FinishFieldBattle(_fieldBattle); _fieldBattle = null; _screen = Screen.Map; _notice = $"FIELD BATTLE: {outcome}";
+            var outcome = _campaign.FinishFieldBattle(_fieldBattle); _fieldBattle = null; _screen = Screen.Map; _notice = $"FIELD BATTLE: {outcome}"; Autosave();
         }
     }
 
@@ -1578,7 +1605,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         }
 
         if (!original) DrawText("ESC OR R  RESUME", 150, 640, Color.LightGreen, 2);
-        DrawText("ARROWS/1-5 LOAD   ESC RESUME", 250, 710, Color.Wheat, 2);
+        DrawText("ARROWS/1-5 LOAD   F8 AUTOSAVE   ESC RESUME", 190, 710, Color.Wheat, 2);
         if (!string.IsNullOrEmpty(_notice)) DrawText(_notice, 250, 740, Color.Gold, 2);
     }
 

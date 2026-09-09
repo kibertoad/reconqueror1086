@@ -1139,6 +1139,36 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void AutosaveUsesItsOwnRecoverableStreamWithoutConsumingManualSlots()
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"conqueror-autosave-{Guid.NewGuid():N}");
+        try
+        {
+            var slots = new CampaignSaveSlots(root);
+            var campaign = new Campaign(Campaign.NewFromTemplate(0));
+            campaign.State.Player.Wealth = 100;
+            slots.SaveAutosave(campaign);
+            Assert.True(slots.InspectAutosave().IsValid);
+            Assert.All(slots.Inspect(), slot => Assert.False(slot.Exists));
+
+            campaign.State.Player.Wealth = 200;
+            slots.SaveAutosave(campaign);
+            Assert.True(File.Exists(slots.AutosaveBackupPath));
+            File.WriteAllText(slots.AutosavePath, "interrupted");
+            var info = slots.InspectAutosave();
+            Assert.True(info.IsValid);
+            Assert.True(info.RecoveredFromBackup);
+            Assert.True(slots.TryLoadAutosave(out var recovered, out var error));
+            Assert.Null(error);
+            Assert.Equal(100, recovered!.State.Player.Wealth);
+        }
+        finally
+        {
+            if (Directory.Exists(root)) Directory.Delete(root, true);
+        }
+    }
+
+    [Fact]
     public void UnversionedSavesMigrateAndFutureSchemasAreRejected()
     {
         var root = Path.Combine(Path.GetTempPath(), $"conqueror-schema-{Guid.NewGuid():N}");

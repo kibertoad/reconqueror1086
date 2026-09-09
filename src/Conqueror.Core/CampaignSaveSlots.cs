@@ -27,7 +27,13 @@ public sealed class CampaignSaveSlots
     public CampaignSaveSlot Inspect(int number)
     {
         Validate(number);
-        var paths = ExistingPaths(number);
+        return InspectPaths(number, ExistingPaths(number));
+    }
+
+    public CampaignSaveSlot InspectAutosave() => InspectPaths(0, ExistingAutosavePaths());
+
+    private static CampaignSaveSlot InspectPaths(int number, IReadOnlyList<(string Path, bool IsBackup)> paths)
+    {
         if (paths.Count == 0) return new(number, false, false, "EMPTY", null, null);
 
         Exception? firstError = null;
@@ -48,18 +54,27 @@ public sealed class CampaignSaveSlots
     {
         ArgumentNullException.ThrowIfNull(campaign);
         var path = SlotPath(number);
-        if (File.Exists(path) && IsReadable(path)) ReplaceBackup(path, BackupPath(number));
-        campaign.Save(path);
+        SaveTo(campaign, path, BackupPath(number));
     }
+
+    public void SaveAutosave(Campaign campaign) => SaveTo(campaign, AutosavePath, AutosaveBackupPath);
 
     public bool TryLoad(int number, out Campaign? campaign, out string? error)
     {
         Validate(number);
-        var paths = ExistingPaths(number);
+        return TryLoadPaths(ExistingPaths(number), "THAT SAVE SLOT IS EMPTY", out campaign, out error);
+    }
+
+    public bool TryLoadAutosave(out Campaign? campaign, out string? error) => TryLoadPaths(
+        ExistingAutosavePaths(), "NO AUTOSAVE IS AVAILABLE", out campaign, out error);
+
+    private static bool TryLoadPaths(IReadOnlyList<(string Path, bool IsBackup)> paths, string emptyError,
+        out Campaign? campaign, out string? error)
+    {
         if (paths.Count == 0)
         {
             campaign = null;
-            error = "THAT SAVE SLOT IS EMPTY";
+            error = emptyError;
             return false;
         }
 
@@ -90,6 +105,9 @@ public sealed class CampaignSaveSlots
         return SlotPath(number) + ".bak";
     }
 
+    public string AutosavePath => Path.Combine(_root, "autosave.json");
+    public string AutosaveBackupPath => AutosavePath + ".bak";
+
     private IReadOnlyList<(string Path, bool IsBackup)> ExistingPaths(int number)
     {
         var result = new List<(string, bool)>();
@@ -102,6 +120,21 @@ public sealed class CampaignSaveSlots
         var legacy = Path.Combine(_root, "campaign.json");
         if (number == 1 && File.Exists(legacy)) result.Add((legacy, false));
         return result;
+    }
+
+    private IReadOnlyList<(string Path, bool IsBackup)> ExistingAutosavePaths()
+    {
+        var result = new List<(string, bool)>();
+        if (File.Exists(AutosavePath)) result.Add((AutosavePath, false));
+        if (File.Exists(AutosaveBackupPath)) result.Add((AutosaveBackupPath, true));
+        return result;
+    }
+
+    private static void SaveTo(Campaign campaign, string path, string backup)
+    {
+        ArgumentNullException.ThrowIfNull(campaign);
+        if (File.Exists(path) && IsReadable(path)) ReplaceBackup(path, backup);
+        campaign.Save(path);
     }
 
     private static bool IsReadable(string path)

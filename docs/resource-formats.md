@@ -320,6 +320,8 @@ Campaign slots are UTF-8 JSON representations of `CampaignState`. Schema 1 adds 
 
 Each numbered slot uses `campaign-N.json`, for N from 1 through 5. A save is written and flushed to a uniquely named file in the same directory, then moved over the destination so a partial JSON document is never exposed as the current slot. Before replacing a readable current slot, the slot manager atomically refreshes `campaign-N.json.bak`; it deliberately preserves an existing valid backup when the current primary is already corrupt. Inspection and loading try the primary, then its backup, and finally the old slot-1 filename. These rules are independently authored reimplementation behavior rather than claims about the original save format.
 
+`autosave.json` and `autosave.json.bak` use the same schema, atomic replacement, and recovery ordering as manual slots but form a separate stream. Stable campaign entry, travel/time advancement, and resolved battle transitions update it; loading it never changes or consumes the selected manual slot.
+
 `settings.json` is a separate version-2 reimplementation document containing CD music, effects, speech, animation, fullscreen, integer-scaling, three normalized channel volumes, and reduced-motion state. Version 1 migrates additively with default volumes and motion behavior. The file uses the same atomic-write and previous-valid-generation recovery policy as campaign slots; malformed, missing, and future-version settings fall back safely to defaults. Settings never alter campaign simulation state.
 
 ## Disc image and audio
