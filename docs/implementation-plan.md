@@ -32,7 +32,7 @@ The repository currently provides:
 - An end-user importer that installs byte-stored, kind-1, and kind-2 owned resources plus lossless CDDA WAV files under ignored local storage.
 - A runtime imported-content catalog, CD music playback, and definition-driven original art for the title, options hub, character options, pre-generated characters, animated youth dilemmas, estate/travel shell, England map, load screen, Home/farm/blacksmith flows, and a tournament portrait.
 - An executable-confirmed `TITLE.HAT`/`FFTITLE.PCX` title load followed by a corroborated character-options flow whose exact geometry comes from installed `CGOPTS.HAT` and `PREGEN.HAT`.
-- Forty-six xUnit test cases and 134 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
+- Forty-seven xUnit test cases and 134 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
 
 ## Dependency map
 
@@ -507,7 +507,7 @@ Status is conservative: “prototype” means the route is playable but substant
 
 | Milestone | Phases | Status (2026-09-09) | Remaining completion gate |
 | --- | --- | --- | --- |
-| M1: Decoded content | 1-2 | In progress: archive kinds 1 and 2, all `.RES`/`.LOW` scene archives, raw `TEX` dimensions, PCX/PCC, CSF, palettes, HAT layouts, dilemma text, `.666` sound-bank framing, SMK container/index/palette/audio decoding, collision-free installer, and evidence reports work. | Decode remaining scene/dialogue/text structures, SMK video payloads, texture palettes/surface mappings, and audio event bindings; complete executable table recovery and controlled observations. |
+| M1: Decoded content | 1-2 | In progress: archive kinds 1 and 2, all `.RES`/`.LOW` scene archives, raw `TEX` dimensions, PCX/PCC, CSF, palettes, HAT layouts, dilemma text, `.666` sound-bank framing, complete owned-release SMK codecs, collision-free installer, and evidence reports work. | Decode remaining scene/dialogue/text structures, texture palettes/surface mappings, and audio event bindings; complete executable table recovery and controlled observations. |
 | M2: Feudal simulation | 3-4 | Playable prototype: the original estate shell and typed panel/navigation layout are active, and farm commands/help share one definition registry. | Exact terrain sprites and map/economy data, tile-based fief construction, multiple managed estates, full dialogue/quests, and political orders. |
 | M3: Knightly competition | 5 | Playable prototype. | Exact opponent tables plus faithful first-person jousting and tactical tournament melee. |
 | M4: Conquest | 6-7 | Playable prototype: the manual-confirmed five-division War Planning roster, company editing, membership, field state, persistent spies, joined-division combat, and persisted captain-commanded movement are active. | Exact route interaction and captain battle rules, remaining original strategic rules, battlefield systems, castle layouts, combat balance, retainers, and loot. |

@@ -17,6 +17,8 @@ public sealed record SmackerFrameLayout(
     IReadOnlyList<SmackerAudioPacket> AudioPackets,
     SmackerDataSegment Video);
 
+public sealed record SmackerTreeSizes(int MMap, int MClr, int Full, int Type);
+
 public sealed record SmackerMovie(
     int Version,
     int Width,
@@ -25,6 +27,7 @@ public sealed record SmackerMovie(
     uint Flags,
     int TreeOffset,
     int TreeLength,
+    SmackerTreeSizes TreeSizes,
     IReadOnlyList<SmackerAudioTrack> AudioTracks,
     IReadOnlyList<SmackerFrame> Frames);
 
@@ -145,6 +148,11 @@ public static class SmackerMovieDecoder
         }
 
         var treeLength = ReadUInt32(source, 52);
+        var treeSizes = new SmackerTreeSizes(
+            ReadBoundedInt(source, 56, MaximumMovieBytes, "MMap tree size"),
+            ReadBoundedInt(source, 60, MaximumMovieBytes, "MClr tree size"),
+            ReadBoundedInt(source, 64, MaximumMovieBytes, "Full tree size"),
+            ReadBoundedInt(source, 68, MaximumMovieBytes, "Type tree size"));
         var tableLength = checked(frameCount * 5);
         var treeOffset = checked((long)HeaderSize + tableLength);
         var frameDataOffset = checked(treeOffset + treeLength);
@@ -168,7 +176,7 @@ public static class SmackerMovieDecoder
             throw new InvalidDataException("Smacker frame extents do not consume the movie exactly.");
 
         return new SmackerMovie(version, width, height, new TimeSpan(durationTicks), flags,
-            checked((int)treeOffset), checked((int)treeLength), audioTracks, frames);
+            checked((int)treeOffset), checked((int)treeLength), treeSizes, audioTracks, frames);
     }
 
     private static int ReadBoundedInt(ReadOnlySpan<byte> source, int offset, int maximum, string field)

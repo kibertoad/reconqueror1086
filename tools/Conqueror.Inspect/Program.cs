@@ -48,6 +48,7 @@ foreach (var path in Directory.EnumerateFiles(artifactRoot, "*", SearchOption.Al
 File.WriteAllText(Path.Combine(output, "artifact-hashes.txt"), report.ToString());
 var inspectionOptions = args.Skip(2).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
 var renderCsfName = OptionValue(inspectionOptions, "--render-csf=");
+var renderSmkName = OptionValue(inspectionOptions, "--render-smk=");
 var palettePcxName = OptionValue(inspectionOptions, "--palette-pcx=");
 var disassembleAddresses = OptionValue(inspectionOptions, "--disassemble=");
 var xrefDataOffsets = OptionValue(inspectionOptions, "--xref-data=");
@@ -321,7 +322,7 @@ sceneTextureReport.AppendLine($"# total textures: {sceneTextures}");
 File.WriteAllText(Path.Combine(output, "scene-texture-report.txt"), sceneTextureReport.ToString());
 File.WriteAllText(Path.Combine(output, "stored-palette-report.txt"), paletteReport.ToString());
 File.WriteAllText(Path.Combine(output, "sound-bank-report.txt"), soundBankReport.ToString());
-var smackerReport = new StringBuilder("# Version  Dimensions  Frames  Frame ms  Palette changes  Audio packets  Decoded audio  Audio tracks  Bytes  ISO path\n");
+var smackerReport = new StringBuilder("# Version  Dimensions  Frames  Frame ms  Palette changes  Audio packets  Decoded audio  Final frame SHA-256  Audio tracks  Bytes  ISO path\n");
 var smackerMovies = 0;
 long smackerBytes = 0;
 long smackerFrames = 0;
@@ -334,6 +335,8 @@ foreach (var file in files.Where(x => Path.GetExtension(x.Path).Equals(".SMK", S
     {
         var source = iso.ReadFile(file);
         var movie = SmackerMovieDecoder.Decode(source);
+        var videoDecoder = new SmackerVideoDecoder(movie, source);
+        var indices = new byte[checked(movie.Width * movie.Height)];
         var palette = new byte[768];
         var paletteChanges = 0;
         var audioPackets = 0;
@@ -342,6 +345,8 @@ foreach (var file in files.Where(x => Path.GetExtension(x.Path).Equals(".SMK", S
         {
             var frame = SmackerMovieDecoder.DecodeFrameLayout(movie, index, source, palette);
             palette = frame.Palette;
+            videoDecoder.DecodeFrame(source.AsSpan(frame.Video.Offset, frame.Video.Length), indices,
+                movie.Frames[index].IsKeyFrame);
             if (frame.PaletteChanged) paletteChanges++;
             audioPackets += frame.AudioPackets.Count;
             foreach (var packet in frame.AudioPackets)
@@ -353,8 +358,16 @@ foreach (var file in files.Where(x => Path.GetExtension(x.Path).Equals(".SMK", S
         }
         var audio = string.Join(',', movie.AudioTracks.Select(track =>
             $"{track.Index}:{track.SampleRate}/{(track.IsCompressed ? "packed" : "pcm")}/{(track.Is16Bit ? 16 : 8)}/{(track.IsStereo ? 2 : 1)}"));
+        var frameHash = Convert.ToHexString(SHA256.HashData(indices)).ToLowerInvariant();
+        if (renderSmkName is not null && Path.GetFileName(file.Path).Equals(renderSmkName, StringComparison.OrdinalIgnoreCase))
+        {
+            var renderRoot = Path.Combine(artifactRoot, "smacker");
+            Directory.CreateDirectory(renderRoot);
+            WriteIndexedPpm(Path.Combine(renderRoot, $"{SafeName(Path.GetFileNameWithoutExtension(file.Path))}-last.ppm"),
+                movie.Width, movie.Height, indices, palette);
+        }
         smackerReport.AppendLine(FormattableString.Invariant(
-            $"SMK{movie.Version,-4}  {movie.Width}x{movie.Height,-10}  {movie.Frames.Count,6}  {movie.FrameDuration.TotalMilliseconds,8:0.###}  {paletteChanges,15}  {audioPackets,13}  {decodedAudioBytes,13}  {audio,-28}  {file.Size,9}  {file.Path}"));
+            $"SMK{movie.Version,-4}  {movie.Width}x{movie.Height,-10}  {movie.Frames.Count,6}  {movie.FrameDuration.TotalMilliseconds,8:0.###}  {paletteChanges,15}  {audioPackets,13}  {decodedAudioBytes,13}  {frameHash}  {audio,-28}  {file.Size,9}  {file.Path}"));
         smackerMovies++;
         smackerBytes += file.Size;
         smackerFrames += movie.Frames.Count;
@@ -554,6 +567,24 @@ static void WritePpm(string path, CsfFrame frame, byte[] palette, int scale)
             bytes[target++] = palette[color + 1];
             bytes[target++] = palette[color + 2];
         }
+    }
+    File.WriteAllBytes(path, bytes);
+}
+
+static void WriteIndexedPpm(string path, int width, int height, ReadOnlySpan<byte> indices, ReadOnlySpan<byte> palette)
+{
+    if (width <= 0 || height <= 0 || indices.Length != checked(width * height) || palette.Length != 768)
+        throw new InvalidDataException("Indexed image buffers are inconsistent.");
+    var header = Encoding.ASCII.GetBytes($"P6\n{width} {height}\n255\n");
+    var bytes = new byte[checked(header.Length + indices.Length * 3)];
+    header.CopyTo(bytes, 0);
+    var target = header.Length;
+    foreach (var index in indices)
+    {
+        var color = index * 3;
+        bytes[target++] = palette[color];
+        bytes[target++] = palette[color + 1];
+        bytes[target++] = palette[color + 2];
     }
     File.WriteAllBytes(path, bytes);
 }

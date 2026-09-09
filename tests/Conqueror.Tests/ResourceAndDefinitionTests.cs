@@ -112,6 +112,20 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void SmackerVideoTreesDecodeFourByFourBlocksIntoPriorFrameBuffer()
+    {
+        var source = SyntheticSmackerVideo();
+        var movie = SmackerMovieDecoder.Decode(source);
+        var layout = SmackerMovieDecoder.DecodeFrameLayout(movie, 0, source, new byte[768]);
+        var decoder = new SmackerVideoDecoder(movie, source);
+        var indices = Enumerable.Repeat((byte)9, 16).ToArray();
+
+        decoder.DecodeFrame(source.AsSpan(layout.Video.Offset, layout.Video.Length), indices, true);
+
+        Assert.All(indices, value => Assert.Equal(0, value));
+    }
+
+    [Fact]
     public void SmackerMovieRejectsInvalidHeadersAndFrameExtents()
     {
         var badMagic = SyntheticSmacker();
@@ -885,6 +899,10 @@ public sealed class ResourceAndDefinitionTests
         BinaryPrimitives.WriteInt32LittleEndian(source.AsSpan(16, 4), 100);
         BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(24, 4), 4096);
         BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(52, 4), 4);
+        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(56, 4), 4);
+        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(60, 4), 4);
+        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(64, 4), 4);
+        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(68, 4), 4);
         BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(72, 4), 0xC000_0000u | 22050);
         BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(104, 4), 13);
         BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(108, 4), 12);
@@ -895,6 +913,23 @@ public sealed class ResourceAndDefinitionTests
         source[123] = 0xFF;
         BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(130, 4), 8);
         BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(134, 4), 3);
+        return source;
+    }
+
+    private static byte[] SyntheticSmackerVideo()
+    {
+        var source = new byte[120];
+        "SMK2"u8.CopyTo(source);
+        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(4, 4), 4);
+        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(8, 4), 4);
+        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(12, 4), 1);
+        BinaryPrimitives.WriteInt32LittleEndian(source.AsSpan(16, 4), 100);
+        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(52, 4), 7);
+        for (var offset = 56; offset <= 68; offset += 4)
+            BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(offset, 4), 4);
+        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(104, 4), 5);
+        source[109] = 0x08;
+        source[115] = 0x80;
         return source;
     }
 
