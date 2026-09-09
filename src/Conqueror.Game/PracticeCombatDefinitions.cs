@@ -23,11 +23,11 @@ public static class PracticeCombatDefinitions
         return new FieldBattleSession(friendly, enemy, seed);
     }
 
-    public static SiegeSession CreateMelee(int seed = 1086) =>
-        new(CreateParticipant(), Army(8, 0, 0), garrison: 6, seed: seed);
+    public static SiegeSession CreateMelee(int seed = 1086, SiegeLayout? layout = null) =>
+        new(CreateParticipant(), Army(8, 0, 0), garrison: 6, seed: seed, layout: layout);
 
-    public static SiegeSession CreateCastleSkirmish(int seed = 1086) =>
-        new(CreateParticipant(), Army(10, 4, 2), garrison: 18, seed: seed);
+    public static SiegeSession CreateCastleSkirmish(int seed = 1086, SiegeLayout? layout = null) =>
+        new(CreateParticipant(), Army(10, 4, 2), garrison: 18, seed: seed, layout: layout);
 
     private static Player CreateParticipant() => new()
     {

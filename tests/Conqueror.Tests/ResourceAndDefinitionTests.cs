@@ -50,6 +50,65 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void SceneDecoderReadsColumnMajorMapViewerAndNamedBlocks()
+    {
+        var source = SyntheticScene();
+        var scene = DynamixSceneDecoder.Decode(source.Viewer, source.Scenario, source.Map, source.Blocks);
+
+        Assert.Equal((10, 20, 16384), (scene.Viewer.CellX, scene.Viewer.CellY, scene.Viewer.Heading));
+        Assert.Equal((7, 2, 1), (scene.Blocks.Count, scene.TextureCount, scene.SoundEffectCount));
+        Assert.Equal("arched door", scene.BlockAt(11, 20).Name);
+        Assert.Equal("Secret Passage", scene.BlockAt(10, 21).Name);
+        Assert.Equal("meal", scene.BlockAt(12, 20).Name);
+        Assert.Equal("knight", scene.BlockAt(13, 20).Name);
+        Assert.Equal("champion", scene.BlockAt(14, 20).Name);
+        Assert.Equal((ushort)0, scene.BlockIndexAt(20, 11));
+    }
+
+    [Fact]
+    public void SceneDecoderRejectsMalformedRecordsReferencesAndViewer()
+    {
+        var source = SyntheticScene();
+        var missingSentinel = source.Blocks.ToArray();
+        missingSentinel[94] = 0;
+        Assert.Throws<InvalidDataException>(() => DynamixSceneDecoder.Decode(
+            source.Viewer, source.Scenario, source.Map, missingSentinel));
+
+        var missingBlock = source.Map.ToArray();
+        BinaryPrimitives.WriteUInt16LittleEndian(missingBlock.AsSpan(0, 2), 7);
+        Assert.Throws<InvalidDataException>(() => DynamixSceneDecoder.Decode(
+            source.Viewer, source.Scenario, missingBlock, source.Blocks));
+
+        var outsideViewer = source.Viewer.ToArray();
+        WriteInt(outsideViewer, 0, 128 << 8);
+        Assert.Throws<InvalidDataException>(() => DynamixSceneDecoder.Decode(
+            outsideViewer, source.Scenario, source.Map, source.Blocks));
+        Assert.Throws<InvalidDataException>(() => DynamixSceneDecoder.Decode(
+            source.Viewer, source.Scenario, source.Map, source.Blocks[..^1]));
+    }
+
+    [Fact]
+    public void ImportedSceneLayoutPreservesInteractiveTilesSpawnsAndFacing()
+    {
+        var source = SyntheticScene();
+        var scene = DynamixSceneDecoder.Decode(source.Viewer, source.Scenario, source.Map, source.Blocks);
+        var layout = ImportedSiegeLayouts.Convert(scene);
+        var siege = new SiegeSession(new Player(), new Army(), 999, 17, layout);
+
+        Assert.Equal((128, 128, 10, 20, Facing.East),
+            (siege.Width, siege.Height, siege.PlayerX, siege.PlayerY, siege.Facing));
+        Assert.Equal(SiegeTile.Door, siege.TileAt(11, 20));
+        Assert.Equal(SiegeTile.SecretDoor, siege.TileAt(10, 21));
+        Assert.Equal(SiegeTile.Barrel, siege.TileAt(12, 20));
+        Assert.Equal(SiegeTile.Treasure, siege.TileAt(9, 20));
+        Assert.Equal(2, siege.Enemies.Count);
+        Assert.Contains(siege.Enemies, enemy => (enemy.X, enemy.Y, enemy.Champion) == (13, 20, false));
+        Assert.Contains(siege.Enemies, enemy => (enemy.X, enemy.Y, enemy.Champion) == (14, 20, true));
+        Assert.Equal(SiegeSession.Rules.BaseChampionHealth,
+            Assert.Single(siege.Enemies, enemy => enemy.Champion).Health);
+    }
+
+    [Fact]
     public void ConversationDatabaseDecodesIndexedPromptsResponsesAndLinks()
     {
         var first = ConversationNode(["GERARD.PCC", "Earl Gerard", "Greetings.", "Ask about the dragon.", "Farewell."],
@@ -1502,6 +1561,42 @@ public sealed class ResourceAndDefinitionTests
     }
 
     private static void WriteInt(byte[] target, int offset, int value) => BinaryPrimitives.WriteInt32LittleEndian(target.AsSpan(offset, 4), value);
+
+    private static (byte[] Viewer, byte[] Scenario, byte[] Map, byte[] Blocks) SyntheticScene()
+    {
+        var names = new[] { "ground", "arched door", "Secret Passage", "meal", "bag of coins", "knight", "champion" };
+        var viewer = new byte[DynamixSceneDecoder.ViewerSize];
+        WriteInt(viewer, 0, 10 << 8);
+        WriteInt(viewer, 4, 20 << 8);
+        WriteInt(viewer, 8, 48);
+        WriteInt(viewer, 12, 16384);
+
+        var scenario = new byte[DynamixSceneDecoder.ScenarioSize];
+        WriteInt(scenario, 20, 2);
+        WriteInt(scenario, 24, names.Length);
+        WriteInt(scenario, 28, 1);
+
+        var blocks = new byte[names.Length * DynamixSceneDecoder.BlockSize];
+        for (var index = 0; index < names.Length; index++)
+        {
+            var offset = index * DynamixSceneDecoder.BlockSize;
+            System.Text.Encoding.ASCII.GetBytes(names[index]).CopyTo(blocks, offset + 78);
+            blocks[offset + 94] = 0xcc;
+            blocks[offset + 95] = 0xcc;
+        }
+
+        var map = new byte[DynamixSceneDecoder.MapSize];
+        SetSceneCell(map, 11, 20, 1);
+        SetSceneCell(map, 10, 21, 2);
+        SetSceneCell(map, 12, 20, 3);
+        SetSceneCell(map, 9, 20, 4);
+        SetSceneCell(map, 13, 20, 5);
+        SetSceneCell(map, 14, 20, 6);
+        return (viewer, scenario, map, blocks);
+    }
+
+    private static void SetSceneCell(byte[] map, int x, int y, ushort block) =>
+        BinaryPrimitives.WriteUInt16LittleEndian(map.AsSpan((x * DynamixScene.MapHeight + y) * 2, 2), block);
 
     private sealed class TestActionState(IReadOnlyList<int> initial) : IDynamixActionState
     {

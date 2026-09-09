@@ -239,6 +239,27 @@ public sealed class ImportedContentCatalog
         }
     }
 
+    public DynamixScene? DecodeScene(string archiveId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(archiveId);
+        var prefix = archiveId.Replace('\\', '/');
+        var viewerId = _assets.FirstOrDefault(x => x.Id.Equals($"{prefix}#0:Viewer", StringComparison.OrdinalIgnoreCase))?.Id;
+        var scenarioId = _assets.FirstOrDefault(x => x.Id.Equals($"{prefix}#1:Scenario", StringComparison.OrdinalIgnoreCase))?.Id;
+        var mapId = _assets.FirstOrDefault(x => x.Id.EndsWith(":Map", StringComparison.OrdinalIgnoreCase) &&
+            x.Id.StartsWith(prefix + "#", StringComparison.OrdinalIgnoreCase))?.Id;
+        var blocksId = _assets.FirstOrDefault(x => x.Id.EndsWith(":Blocks", StringComparison.OrdinalIgnoreCase) &&
+            x.Id.StartsWith(prefix + "#", StringComparison.OrdinalIgnoreCase))?.Id;
+        if (viewerId is null || scenarioId is null || mapId is null || blocksId is null) return null;
+        try
+        {
+            return DynamixSceneDecoder.Decode(ReadBytes(viewerId), ReadBytes(scenarioId), ReadBytes(mapId), ReadBytes(blocksId));
+        }
+        catch (InvalidDataException)
+        {
+            return null;
+        }
+    }
+
     public DynamixConversationDatabase? DecodeConversations(string bodyId, string indexId)
     {
         using var body = Open(bodyId);
@@ -256,6 +277,14 @@ public sealed class ImportedContentCatalog
         {
             return null;
         }
+    }
+
+    private byte[] ReadBytes(string id)
+    {
+        using var stream = Open(id) ?? throw new InvalidDataException($"Imported asset '{id}' is unavailable.");
+        using var memory = new MemoryStream();
+        stream.CopyTo(memory);
+        return memory.ToArray();
     }
 
     public DynamixActionTreeDatabase? DecodeActionTrees(string bodyId, string indexId)

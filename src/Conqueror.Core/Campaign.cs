@@ -519,12 +519,12 @@ public sealed class Campaign
         }
     }
 
-    public SiegeSession CreateSiege()
+    public SiegeSession CreateSiege(SiegeLayout? layout = null)
     {
         if (State.PendingSiegeLocation < 0) throw new InvalidOperationException("No siege has been started.");
         var target = World.Locations[State.PendingSiegeLocation];
         return new SiegeSession(State.Player, State.Player.ArmyAt(ActiveArmyIndex()), target.Garrison,
-            State.Date.DayOfYear + State.PendingSiegeLocation * 1086);
+            State.Date.DayOfYear + State.PendingSiegeLocation * 1086, layout);
     }
 
     public bool FinishSiege(SiegeSession siege)

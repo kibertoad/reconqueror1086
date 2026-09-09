@@ -111,6 +111,14 @@ The 99 scene containers contain 12,982 headerless `TEX` resources. Their directo
 
 Paired scene tiers commonly use different dimensions: `.LOW` entries are generally 64 pixels wide while matching `.RES` entries are generally 128 pixels wide. `DynamixSceneTextureDecoder` validates the three name fields, limits either dimension to 4,096, checks the product without integer overflow, requires exact payload consumption, and returns an owned index buffer. `scene-texture-report.txt` records only counts and distinct dimensions per archive. The naming grammar, dimensions, payload relationship, and complete 12,982-resource population are **Confirmed for the hashed release**; pixel ordering, palette selection, and texture-to-surface mapping remain **Provisional**.
 
+## First-person scene structure
+
+The decoded `MELEE*.RES`, `DEFEND*.RES`, and `BAR*.RES` archives contain four structural resources used by the first-person scenes. `Viewer` is exactly 108 bytes; its first four signed little-endian integers are X, Y, elevation, and heading. X and Y are 8.8 fixed-point map coordinates, and heading spans one unsigned 16-bit turn. `Scenario` is exactly 568 bytes; the little-endian integers at offsets 20, 24, and 28 give texture, block, and sound-effect counts. The remainder is retained as unknown rather than interpreted as stable serialized pointers.
+
+`Map` is exactly 32,768 bytes: 128 by 128 unsigned 16-bit block indices stored in column-major order (`x * 128 + y`). `Blocks` contains exactly the Scenario block count times 96 bytes. Each record ends in `CC CC` and contains a null-terminated printable ASCII label at offset 78 with a 16-byte field. Observed labels identify terrain and interactive roles including ground and floor materials, doors, portcullises, Secret Passage, stairs, Exit, food, treasure/equipment, and knight, footman, bowman, and champion occupants. The bounded decoder verifies all sizes, counts, record sentinels, labels, map references, viewer coordinates, and heading before exposing a scene.
+
+The structure, sizes, column ordering, fixed-point viewer position, and named block roles are **Confirmed for the hashed release** by cross-checking multiple scene variants and locating their Viewer positions in the decoded maps. The meanings of the other block fields, exact heading orientation, surface/texture assignment, animation, collision variants, and state-transition records remain **Provisional**.
+
 ## Smacker movie container
 
 The CD contains 2,131 Smacker movies occupying 288,867,980 bytes and indexing 182,360 frames. Every movie uses the `SMK2` version. The bounded container parser validates the fixed header, optional ring-frame adjustment, frame-size table, frame-flags table, tree extent, and every aligned frame extent through exact end of file. It supports `SMK4` framing synthetically so the playback boundary is explicit, but no `SMK4` file occurs in this release.

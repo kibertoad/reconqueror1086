@@ -20,11 +20,12 @@ Gameplay content is described in typed definition records in `Balance.cs` and in
 | `YouthDilemmaPoolDefinition` | age range, variants per age and stable resource-number mapping | campaign youth selection |
 | `YouthDilemmaPresentationDefinitions` | original HAT-derived choice hitboxes | dilemma mouse input and highlighting |
 | `SiegeDefinition` | map size, garrison scaling, champion health, healing and break chance | `SiegeSession` |
+| `SiegeLayout` / `SiegeSpawn` | imported collision tiles, viewer start/facing, and original defender positions | `SiegeSession` |
 | `FieldBattleDefinition` | battlefield size, counter bonus, morale and withdrawal pressure | `FieldBattleSession` |
 | `StrategicDefinition` | spy cost, interception chance and minimum field force | campaign travel and reconnaissance |
 | `TournamentOpponentDefinition` | wager, joust tolerance and eight-man melee composition | joust and tournament skirmish settlement |
 
-The remaining switches in the core are state adapters: they map typed equipment slots, building kinds, and dilemma attributes to serialized player fields. They contain no prices, balance coefficients, content names, reward order, or eligibility rules. Imported resource names are translated once by `ImportedDilemmaAdapter`; screen code never branches on an attribute string or dilemma number.
+The remaining switches in the core are state adapters: they map typed equipment slots, building kinds, and dilemma attributes to serialized player fields. They contain no prices, balance coefficients, content names, reward order, or eligibility rules. Imported resource names are translated at boundaries such as `ImportedDilemmaAdapter` and `ImportedSiegeLayouts`; screen code does not interpret raw resource records.
 
 ## Validation
 

@@ -13,6 +13,38 @@ public sealed class SiegeEnemy
 }
 
 public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int GarrisonPerEnemy, int BaseChampionHealth, int FoodHealing, int WeaponBreakPercent);
+public sealed record SiegeSpawn(int X, int Y, bool Champion);
+
+public sealed class SiegeLayout
+{
+    private readonly SiegeTile[,] _tiles;
+
+    public SiegeLayout(SiegeTile[,] tiles, int playerX, int playerY, Facing facing, IReadOnlyList<SiegeSpawn> enemies)
+    {
+        ArgumentNullException.ThrowIfNull(tiles);
+        ArgumentNullException.ThrowIfNull(enemies);
+        if (tiles.GetLength(0) < 1 || tiles.GetLength(1) < 1) throw new ArgumentException("Siege layout cannot be empty.", nameof(tiles));
+        if (playerX < 0 || playerY < 0 || playerX >= tiles.GetLength(0) || playerY >= tiles.GetLength(1))
+            throw new ArgumentOutOfRangeException(nameof(playerX), "Siege player start is outside the layout.");
+        if (tiles[playerX, playerY] != SiegeTile.Floor) throw new ArgumentException("Siege player must start on a floor tile.", nameof(tiles));
+        if (enemies.Any(enemy => enemy.X < 0 || enemy.Y < 0 || enemy.X >= tiles.GetLength(0) || enemy.Y >= tiles.GetLength(1)))
+            throw new ArgumentException("Siege enemy starts outside the layout.", nameof(enemies));
+        if (enemies.GroupBy(enemy => (enemy.X, enemy.Y)).Any(group => group.Count() > 1))
+            throw new ArgumentException("Siege enemies cannot share a map cell.", nameof(enemies));
+
+        _tiles = (SiegeTile[,])tiles.Clone();
+        PlayerX = playerX;
+        PlayerY = playerY;
+        Facing = facing;
+        Enemies = enemies.ToArray();
+    }
+
+    public int PlayerX { get; }
+    public int PlayerY { get; }
+    public Facing Facing { get; }
+    public IReadOnlyList<SiegeSpawn> Enemies { get; }
+    public SiegeTile[,] CopyTiles() => (SiegeTile[,])_tiles.Clone();
+}
 
 public sealed class SiegeSession
 {
@@ -45,19 +77,38 @@ public sealed class SiegeSession
     }
 
     public SiegeSession(Player player, Army army, int garrison, int seed)
+        : this(player, army, garrison, seed, null)
+    {
+    }
+
+    public SiegeSession(Player player, Army army, int garrison, int seed, SiegeLayout? layout)
     {
         _player = player;
         _random = new Random(seed);
-        _map = GenerateMap(Rules.Width, Rules.Height);
+        _map = layout?.CopyTiles() ?? GenerateMap(Rules.Width, Rules.Height);
+        if (layout is not null)
+        {
+            PlayerX = layout.PlayerX;
+            PlayerY = layout.PlayerY;
+            Facing = layout.Facing;
+        }
         MaxHealth = 80 + player.Stats.Stamina * 5;
         Health = MaxHealth;
         AlliesStarted = Math.Clamp(1 + army.Total / 10, 1, 5);
         AlliesAlive = AlliesStarted;
-        var count = Rules.BaseEnemies + Math.Max(0, garrison / Rules.GarrisonPerEnemy);
-        for (var i = 0; i < count; i++)
+        if (layout is not null)
         {
-            var point = EmptySpawn(i);
-            _enemies.Add(new SiegeEnemy { X = point.X, Y = point.Y, Health = i == count - 1 ? Rules.BaseChampionHealth : 1, Champion = i == count - 1 });
+            foreach (var spawn in layout.Enemies)
+                _enemies.Add(new SiegeEnemy { X = spawn.X, Y = spawn.Y, Health = spawn.Champion ? Rules.BaseChampionHealth : 1, Champion = spawn.Champion });
+        }
+        else
+        {
+            var count = Rules.BaseEnemies + Math.Max(0, garrison / Rules.GarrisonPerEnemy);
+            for (var i = 0; i < count; i++)
+            {
+                var point = EmptySpawn(i);
+                _enemies.Add(new SiegeEnemy { X = point.X, Y = point.Y, Health = i == count - 1 ? Rules.BaseChampionHealth : 1, Champion = i == count - 1 });
+            }
         }
     }
 

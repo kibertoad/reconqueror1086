@@ -478,13 +478,15 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                 break;
             case PracticeAction.Melee:
                 _activePracticeCombat = PracticeCombatKind.Melee;
-                _siege = PracticeCombatDefinitions.CreateMelee(Environment.TickCount);
+                _siege = PracticeCombatDefinitions.CreateMelee(Environment.TickCount,
+                    ImportedSiegeLayouts.ForPracticeMelee(_importedContent));
                 _screen = Screen.Siege;
                 _notice = "MELEE PRACTICE";
                 break;
             case PracticeAction.CastleSkirmish:
                 _activePracticeCombat = PracticeCombatKind.CastleSkirmish;
-                _siege = PracticeCombatDefinitions.CreateCastleSkirmish(Environment.TickCount);
+                _siege = PracticeCombatDefinitions.CreateCastleSkirmish(Environment.TickCount,
+                    ImportedSiegeLayouts.ForPracticeCastleSkirmish(_importedContent));
                 _screen = Screen.Siege;
                 _notice = "CASTLE SKIRMISH PRACTICE";
                 break;
@@ -757,7 +759,12 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (press(Keys.V)) _screen = Screen.Village;
         if (press(Keys.T) && _campaign.IsTournamentHere) _screen = Screen.Tournament;
         if (press(Keys.O)) EnterOverview(Screen.Map);
-        if (press(Keys.S) && _campaign.StartSiege(_selectedLocation)) { _siege = _campaign.CreateSiege(); _showRadar = true; _screen = Screen.Siege; }
+        if (press(Keys.S) && _campaign.StartSiege(_selectedLocation))
+        {
+            _siege = _campaign.CreateSiege(ImportedSiegeLayouts.ForCampaignLocation(_importedContent, _selectedLocation));
+            _showRadar = true;
+            _screen = Screen.Siege;
+        }
         if (press(Keys.A))
         {
             var armyName = _campaign.State.Player.ArmyNameAt(_warPlanningArmyIndex);
@@ -2291,7 +2298,9 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void DrawRadar(SiegeSession siege)
     {
-        const int scale = 9; const int ox = 880; const int oy = 85;
+        var scale = Math.Clamp(128 / Math.Max(siege.Width, siege.Height), 1, 9);
+        var ox = 1004 - siege.Width * scale;
+        const int oy = 85;
         Fill(new Rectangle(ox - 8, oy - 8, siege.Width * scale + 16, siege.Height * scale + 16), new Color(10, 10, 10, 220));
         for (var x = 0; x < siege.Width; x++) for (var y = 0; y < siege.Height; y++)
         {
