@@ -1162,6 +1162,45 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void ImportedContentVerificationDetectsDamageAndUnsafeManifestRecords()
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"conqueror-verify-{Guid.NewGuid():N}");
+        try
+        {
+            Directory.CreateDirectory(root);
+            var relative = Path.Combine("Decoded", "fixture.bin");
+            var path = Path.Combine(root, relative);
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            File.WriteAllBytes(path, [1, 2, 3, 4]);
+            var sourceHash = new string('a', 64);
+            var valid = new ImportedAsset("fixture", relative, "resource", 4, ResourceHash.Sha256(path));
+            var manifest = new ImportManifest(1, sourceHash, [valid]);
+            Assert.True(ImportManifestVerifier.Verify(root, manifest).IsValid);
+
+            File.WriteAllBytes(path, [4, 3, 2, 1]);
+            var damaged = ImportManifestVerifier.Verify(root, manifest);
+            Assert.False(damaged.IsValid);
+            Assert.Contains(damaged.Issues, issue => issue.Reason == "SHA-256 mismatch");
+
+            var unsafeManifest = new ImportManifest(1, sourceHash,
+            [
+                valid,
+                valid with { Path = "../escape.bin" },
+                valid with { Id = "bad-hash", Path = Path.Combine("Decoded", "other.bin"), Sha256 = "bad" }
+            ]);
+            var unsafeResult = ImportManifestVerifier.Verify(root, unsafeManifest);
+            Assert.False(unsafeResult.IsValid);
+            Assert.Contains(unsafeResult.Issues, issue => issue.Reason.Contains("escapes", StringComparison.Ordinal));
+            Assert.Contains(unsafeResult.Issues, issue => issue.Reason.Contains("duplicate", StringComparison.Ordinal));
+            Assert.Contains(unsafeResult.Issues, issue => issue.Reason.Contains("SHA-256", StringComparison.Ordinal));
+        }
+        finally
+        {
+            if (Directory.Exists(root)) Directory.Delete(root, true);
+        }
+    }
+
+    [Fact]
     public void DilemmaTextIsParsedIntoDataDrivenChoicesAndOutcomes()
     {
         var dilemma = DilemmaTextDecoder.Decode(System.Text.Encoding.ASCII.GetBytes(SyntheticDilemma()));

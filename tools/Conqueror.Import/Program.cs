@@ -2,8 +2,15 @@ using Conqueror.Resources;
 
 try
 {
-var install = args.Length > 0 ? Path.GetFullPath(args[0]) : @"C:\GOG Games\Conqueror AD1086";
-var output = args.Length > 1 ? Path.GetFullPath(args[1]) : Path.GetFullPath("UserContent");
+var operation = args.FirstOrDefault()?.ToLowerInvariant();
+if (operation == "--verify")
+{
+    var verifyRoot = args.Length > 1 ? Path.GetFullPath(args[1]) : Path.GetFullPath("UserContent");
+    return VerifyInstalledContent(verifyRoot);
+}
+var positionalOffset = operation == "--repair" ? 1 : 0;
+var install = args.Length > positionalOffset ? Path.GetFullPath(args[positionalOffset]) : @"C:\GOG Games\Conqueror AD1086";
+var output = args.Length > positionalOffset + 1 ? Path.GetFullPath(args[positionalOffset + 1]) : Path.GetFullPath("UserContent");
 var imagePath = Path.Combine(install, "game.gog");
 var cuePath = Path.Combine(install, "game.ins");
 var gobPath = Path.Combine(install, "C1086.GOB");
@@ -56,13 +63,43 @@ for (var index = 0; index < tracks.Length; index++)
 
 var manifest = new ImportManifest(1, ResourceHash.Sha256(imagePath), entries.OrderBy(x => x.Id, StringComparer.OrdinalIgnoreCase).ToArray());
 manifest.Write(Path.Combine(output, "manifest.json"));
-Console.WriteLine($"Installed {entries.Count} owned resources into {output}.");
+var verification = ImportManifestVerifier.Verify(output, manifest);
+if (!verification.IsValid)
+{
+    foreach (var issue in verification.Issues.Take(20))
+        Console.Error.WriteLine($"{issue.AssetId}: {issue.Reason} ({issue.Path})");
+    Console.Error.WriteLine($"Installation verification failed with {verification.Issues.Count} issue(s).");
+    return 3;
+}
+Console.WriteLine($"{(operation == "--repair" ? "Repaired" : "Installed")} and verified {entries.Count} owned resources in {output}.");
 return 0;
 }
-catch (Exception error) when (error is IOException or UnauthorizedAccessException or InvalidDataException or ArgumentException or OverflowException)
+
+catch (Exception error) when (error is IOException or UnauthorizedAccessException or InvalidDataException or ArgumentException or OverflowException or System.Text.Json.JsonException)
 {
     Console.Error.WriteLine($"Resource installation failed: {error.Message}");
     return 1;
+}
+
+static int VerifyInstalledContent(string root)
+{
+    var manifestPath = Path.Combine(root, "manifest.json");
+    if (!File.Exists(manifestPath))
+    {
+        Console.Error.WriteLine($"No imported-content manifest exists in {root}.");
+        return 2;
+    }
+    var manifest = ImportManifest.Read(manifestPath);
+    var result = ImportManifestVerifier.Verify(root, manifest);
+    foreach (var issue in result.Issues.Take(20))
+        Console.Error.WriteLine($"{issue.AssetId}: {issue.Reason} ({issue.Path})");
+    if (!result.IsValid)
+    {
+        Console.Error.WriteLine($"Verification failed: {result.Issues.Count} issue(s) across {result.CheckedAssets} assets.");
+        return 3;
+    }
+    Console.WriteLine($"Verified {result.CheckedAssets} imported assets in {root}.");
+    return 0;
 }
 
 static string Kind(string path) => Path.GetExtension(path).ToUpperInvariant() switch

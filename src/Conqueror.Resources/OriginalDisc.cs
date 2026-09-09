@@ -17,6 +17,75 @@ public sealed record ImportManifest(int Version, string SourceImageSha256, Impor
     public void Write(string path) => File.WriteAllText(path, JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true }));
 }
 
+public sealed record ImportVerificationIssue(string AssetId, string Path, string Reason);
+
+public sealed record ImportVerificationResult(int CheckedAssets, IReadOnlyList<ImportVerificationIssue> Issues)
+{
+    public bool IsValid => Issues.Count == 0;
+}
+
+public static class ImportManifestVerifier
+{
+    public static ImportVerificationResult Verify(string root, ImportManifest manifest)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(root);
+        ArgumentNullException.ThrowIfNull(manifest);
+        var issues = new List<ImportVerificationIssue>();
+        var ids = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (manifest.Version != 1)
+            issues.Add(new("manifest", "manifest.json", $"unsupported manifest version {manifest.Version}"));
+        if (!IsSha256(manifest.SourceImageSha256))
+            issues.Add(new("manifest", "manifest.json", "invalid source-image SHA-256"));
+
+        var assets = manifest.Assets ?? [];
+        foreach (var asset in assets)
+        {
+            if (asset is null)
+            {
+                issues.Add(new("(null)", "", "null asset record"));
+                continue;
+            }
+            var assetId = asset.Id ?? "";
+            var assetPath = asset.Path ?? "";
+            if (string.IsNullOrWhiteSpace(assetId) || !ids.Add(assetId))
+                issues.Add(new(assetId, assetPath, "empty or duplicate asset identifier"));
+            if (string.IsNullOrWhiteSpace(assetPath) || Path.IsPathFullyQualified(assetPath) || !paths.Add(assetPath))
+            {
+                issues.Add(new(assetId, assetPath, "empty, absolute, or duplicate asset path"));
+                continue;
+            }
+            if (asset.Size < 0 || !IsSha256(asset.Sha256))
+            {
+                issues.Add(new(assetId, assetPath, "invalid declared size or SHA-256"));
+                continue;
+            }
+
+            string target;
+            try { target = ResourcePaths.SafeTarget(root, assetPath); }
+            catch (InvalidDataException)
+            {
+                issues.Add(new(assetId, assetPath, "path escapes the imported-content root"));
+                continue;
+            }
+            if (!File.Exists(target))
+            {
+                issues.Add(new(assetId, assetPath, "file is missing"));
+                continue;
+            }
+            var info = new FileInfo(target);
+            if (info.Length != asset.Size)
+                issues.Add(new(assetId, assetPath, $"size mismatch: expected {asset.Size}, found {info.Length}"));
+            else if (!ResourceHash.Sha256(target).Equals(asset.Sha256, StringComparison.OrdinalIgnoreCase))
+                issues.Add(new(assetId, assetPath, "SHA-256 mismatch"));
+        }
+        return new(assets.Length, issues);
+    }
+
+    private static bool IsSha256(string? value) => value is { Length: 64 }
+        && value.All(character => character is >= '0' and <= '9' or >= 'a' and <= 'f' or >= 'A' and <= 'F');
+}
+
 public static class ResourcePaths
 {
     public static string SafeName(string name) => string.Concat(name.Where(c => char.IsLetterOrDigit(c) || c is '.' or '_' or '-'));

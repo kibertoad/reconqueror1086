@@ -304,6 +304,12 @@ Each region record contains six 32-bit fields: identifier, X, Y, width, height, 
 
 `FWARPLAN.HAT` declares five 40×38 army buttons in regions 0–4, a 114×38 Field Army control in region 5, a 138×38 Send Out Spy control in region 6, a 198×38 membership control in region 7, three 300×14 unit rows in regions 8–10, OK/Cancel in regions 11–12, and a 100×20 army-name field in region 13. Decoded `WARPLAN.CSF` has 22 frames whose dimensions match those controls exactly: frames 0–14 are five selected/normal/disabled army triplets, frames 15–17 are Join/blank/Leave Selected Army, frames 18–19 are Field Army/blank, and frames 20–21 are two Send Out Spy states. Geometry, dimensions, palette association, visible frame identities, and the name field are **Confirmed**; independent army movement dispatch remains **Provisional**.
 
+## Imported-content manifest
+
+`UserContent/manifest.json` is a version-1 UTF-8 JSON document with the SHA-256 of the source disc image and an asset array. Every asset records a stable source identifier, root-relative generated path, runtime kind, exact byte length, and lowercase SHA-256. Identifiers and paths must be nonempty and case-insensitively unique; paths must be relative and resolve beneath `UserContent`; sizes must be non-negative; both digests must contain exactly 64 hexadecimal characters.
+
+`Conqueror.Import --verify` checks those structural invariants and then requires every listed file to exist with the declared size and digest. The install and repair paths run the same verification after writing the manifest. These manifest rules describe independently authored importer metadata, not an original-game format.
+
 ## Reimplementation save format
 
 Campaign slots are UTF-8 JSON representations of `CampaignState`. Schema 1 adds the required non-negative `SchemaVersion` field; a missing field identifies schema 0, the unversioned format written by every earlier prototype. Loading migrates schema 0 in memory before campaign-state repair, accepts schema 1, and rejects negative or future versions rather than silently discarding unknown state. The former `campaign.json` filename remains a schema-independent slot-1 fallback.
