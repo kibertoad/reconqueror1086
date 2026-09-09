@@ -321,6 +321,30 @@ sceneTextureReport.AppendLine($"# total textures: {sceneTextures}");
 File.WriteAllText(Path.Combine(output, "scene-texture-report.txt"), sceneTextureReport.ToString());
 File.WriteAllText(Path.Combine(output, "stored-palette-report.txt"), paletteReport.ToString());
 File.WriteAllText(Path.Combine(output, "sound-bank-report.txt"), soundBankReport.ToString());
+var smackerReport = new StringBuilder("# Version  Dimensions  Frames  Frame ms  Audio tracks  Bytes  ISO path\n");
+var smackerMovies = 0;
+long smackerBytes = 0;
+long smackerFrames = 0;
+foreach (var file in files.Where(x => Path.GetExtension(x.Path).Equals(".SMK", StringComparison.OrdinalIgnoreCase)))
+{
+    try
+    {
+        var movie = SmackerMovieDecoder.Decode(iso.ReadFile(file));
+        var audio = string.Join(',', movie.AudioTracks.Select(track =>
+            $"{track.Index}:{track.SampleRate}/{(track.IsCompressed ? "packed" : "pcm")}/{(track.Is16Bit ? 16 : 8)}/{(track.IsStereo ? 2 : 1)}"));
+        smackerReport.AppendLine(FormattableString.Invariant(
+            $"SMK{movie.Version,-4}  {movie.Width}x{movie.Height,-10}  {movie.Frames.Count,6}  {movie.FrameDuration.TotalMilliseconds,8:0.###}  {audio,-28}  {file.Size,9}  {file.Path}"));
+        smackerMovies++;
+        smackerBytes += file.Size;
+        smackerFrames += movie.Frames.Count;
+    }
+    catch (Exception error) when (error is InvalidDataException or OverflowException or ArgumentException)
+    {
+        smackerReport.AppendLine($"rejected: {error.Message.Replace('\r', ' ').Replace('\n', ' ')}  {file.Path}");
+    }
+}
+smackerReport.AppendLine($"# totals: {smackerMovies} movies, {smackerFrames} frames, {smackerBytes} bytes");
+File.WriteAllText(Path.Combine(output, "smacker-report.txt"), smackerReport.ToString());
 var extensionReport = new StringBuilder("# Extension  Total  Stored  Kind1  Kind2  Other  Scopes\n");
 foreach (var group in resourceInventory.GroupBy(x => Path.GetExtension(x.Entry.Name).ToUpperInvariant()).OrderBy(x => x.Key))
 {
@@ -332,7 +356,7 @@ foreach (var group in resourceInventory.GroupBy(x => Path.GetExtension(x.Entry.N
     extensionReport.AppendLine($"{extension,-10}  {group.Count(),5}  {stored,6}  {kind1,5}  {kind2,5}  {other,5}  {string.Join(',', group.Select(x => x.Scope).Distinct().Order())}");
 }
 File.WriteAllText(Path.Combine(output, "resource-extension-report.txt"), extensionReport.ToString());
-Console.WriteLine($"Indexed {files.Length} CD files, {gobEntries} GOB entries ({gobStoredEntries} stored, {kind1Blocks} kind-1 blocks), and {sceneContainers} scene containers ({sceneEntries} entries, {sceneStoredEntries} stored, {sceneCompressedBlocks} compressed-marker blocks, {sceneVerbatimBlocks} verbatim blocks); extracted {extracted} inspectable artifacts to {output}.");
+Console.WriteLine($"Indexed {files.Length} CD files, {gobEntries} GOB entries ({gobStoredEntries} stored, {kind1Blocks} kind-1 blocks), {sceneContainers} scene containers ({sceneEntries} entries, {sceneStoredEntries} stored, {sceneCompressedBlocks} compressed-marker blocks, {sceneVerbatimBlocks} verbatim blocks), and {smackerMovies} Smacker movies; extracted {extracted} inspectable artifacts to {output}.");
 return 0;
 }
 catch (Exception error) when (error is IOException or UnauthorizedAccessException or InvalidDataException or ArgumentException or OverflowException)

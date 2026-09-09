@@ -50,6 +50,40 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void SmackerMovieHeaderAndFrameIndexAreBounded()
+    {
+        var movie = SmackerMovieDecoder.Decode(SyntheticSmacker());
+
+        Assert.Equal((2, 196, 204, 2), (movie.Version, movie.Width, movie.Height, movie.Frames.Count));
+        Assert.Equal(TimeSpan.FromMilliseconds(100), movie.FrameDuration);
+        Assert.Equal((114, 4), (movie.TreeOffset, movie.TreeLength));
+        var track = Assert.Single(movie.AudioTracks);
+        Assert.Equal((0, 22050, 4096, true, false, false),
+            (track.Index, track.SampleRate, track.MaximumDecodedBytes,
+                track.IsCompressed, track.Is16Bit, track.IsStereo));
+        Assert.Equal((118, 8, true, (byte)1),
+            (movie.Frames[0].Offset, movie.Frames[0].Length, movie.Frames[0].IsKeyFrame, movie.Frames[0].Flags));
+        Assert.Equal((126, 12, false, (byte)2),
+            (movie.Frames[1].Offset, movie.Frames[1].Length, movie.Frames[1].IsKeyFrame, movie.Frames[1].Flags));
+    }
+
+    [Fact]
+    public void SmackerMovieRejectsInvalidHeadersAndFrameExtents()
+    {
+        var badMagic = SyntheticSmacker();
+        badMagic[0] = (byte)'X';
+        Assert.Throws<InvalidDataException>(() => SmackerMovieDecoder.Decode(badMagic));
+
+        var badExtent = SyntheticSmacker();
+        BinaryPrimitives.WriteUInt32LittleEndian(badExtent.AsSpan(108, 4), 16);
+        Assert.Throws<InvalidDataException>(() => SmackerMovieDecoder.Decode(badExtent));
+
+        var badDimensions = SyntheticSmacker();
+        BinaryPrimitives.WriteUInt32LittleEndian(badDimensions.AsSpan(4, 4), 195);
+        Assert.Throws<InvalidDataException>(() => SmackerMovieDecoder.Decode(badDimensions));
+    }
+
+    [Fact]
     public void Kind1DecodesLiteralCopyAndRunTokens()
     {
         byte[] compressed = [13, 0, 0x40, 0, 0x18, 0, (byte)'A', (byte)'B', (byte)'C', 0, 0x30, 0, 0, 0, (byte)'Z'];
@@ -796,6 +830,24 @@ public sealed class ResourceAndDefinitionTests
     }
 
     private static void WriteInt(byte[] target, int offset, int value) => BinaryPrimitives.WriteInt32LittleEndian(target.AsSpan(offset, 4), value);
+
+    private static byte[] SyntheticSmacker()
+    {
+        var source = new byte[138];
+        "SMK2"u8.CopyTo(source);
+        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(4, 4), 196);
+        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(8, 4), 204);
+        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(12, 4), 2);
+        BinaryPrimitives.WriteInt32LittleEndian(source.AsSpan(16, 4), 100);
+        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(24, 4), 4096);
+        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(52, 4), 4);
+        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(72, 4), 0xC000_0000u | 22050);
+        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(104, 4), 9);
+        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(108, 4), 12);
+        source[112] = 1;
+        source[113] = 2;
+        return source;
+    }
 
     private static byte[] PackMsbCodes(IEnumerable<(int Code, int Width)> codes)
     {

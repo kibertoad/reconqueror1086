@@ -111,6 +111,27 @@ The 99 scene containers contain 12,982 headerless `TEX` resources. Their directo
 
 Paired scene tiers commonly use different dimensions: `.LOW` entries are generally 64 pixels wide while matching `.RES` entries are generally 128 pixels wide. `DynamixSceneTextureDecoder` validates the three name fields, limits either dimension to 4,096, checks the product without integer overflow, requires exact payload consumption, and returns an owned index buffer. `scene-texture-report.txt` records only counts and distinct dimensions per archive. The naming grammar, dimensions, payload relationship, and complete 12,982-resource population are **Confirmed for the hashed release**; pixel ordering, palette selection, and texture-to-surface mapping remain **Provisional**.
 
+## Smacker movie container
+
+The CD contains 2,131 Smacker movies occupying 288,867,980 bytes and indexing 182,360 frames. Every movie uses the `SMK2` version. The bounded container parser validates the fixed header, optional ring-frame adjustment, frame-size table, frame-flags table, tree extent, and every aligned frame extent through exact end of file. It supports `SMK4` framing synthetically so the playback boundary is explicit, but no `SMK4` file occurs in this release.
+
+| Offset | Size | Meaning |
+| ---: | ---: | --- |
+| `0x00` | 4 | ASCII `SMK2` or `SMK4` |
+| `0x04` | 12 | width, height, and declared frame count as `UINT32LE` |
+| `0x10` | 4 | signed frame-duration field |
+| `0x14` | 4 | video flags; bit 0 adds a ring frame |
+| `0x18` | 28 | maximum decoded byte count for each of seven audio tracks |
+| `0x34` | 20 | combined tree length followed by four tree descriptors |
+| `0x48` | 28 | seven packed sample-rate/audio-flag words |
+| `0x64` | 4 | reserved padding |
+| `0x68` | `frames * 4` | encoded frame lengths; low bits carry frame flags and the remaining bits are the aligned extent |
+| next | `frames` | per-frame palette/audio-presence flags |
+| next | declared tree length | shared Huffman tree data |
+| next | sum of aligned frame lengths | frame payloads, ending exactly at EOF |
+
+Of the 2,131 files, 2,095 declare one packed 8-bit mono audio track: 2,093 at 22,050 Hz and two at 11,025 Hz. The other 36 are silent. The dominant geometry is 196x204 (2,068 files); larger and special-purpose movies span eight other observed dimensions up to 640x480. This uniform `SMK2` population makes direct decoding a viable primary strategy; installation-time transcoding remains a fallback rather than a prerequisite. Video-tree, palette-delta, block, and packed-audio decoding are still incomplete.
+
 ## Dynamix `.666` sound banks
 
 All 26 decoded `.666` resources use the same rate-tagged sample sequence:
@@ -276,6 +297,7 @@ The raw-sector bounds, ISO directory traversal, cue timestamps, and WAV sample p
 - `gob-compression-report.txt`: kind-1 block counts plus complete kind-1 and kind-2 decoding validation.
 - `scene-res-report.txt`: per-scene entry, storage-kind, and block totals.
 - `scene-texture-report.txt`: per-scene raw-texture counts and distinct dimensions.
+- `smacker-report.txt`: version, dimensions, timing, frame counts, audio profiles, and exact container validation for every movie.
 - `resource-extension-report.txt`: aggregate extension and storage-kind inventory.
 - `stored-image-report.txt`: dimensions and decoded pixel-index hashes for stored, kind-1, and kind-2 PCX-compatible payloads.
 - `csf-report.txt`: storage kind, chunk sizes, dimensions, decoded segment totals, and stable frame-sequence hashes for byte-stored and kind-1 CSF containers.
