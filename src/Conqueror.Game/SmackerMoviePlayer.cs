@@ -17,12 +17,13 @@ public sealed class SmackerMoviePlayer : IDisposable
     private byte[] _palette = new byte[768];
     private int _nextFrame;
     private TimeSpan _elapsed;
+    private bool _paused;
     private bool _disposed;
 
     public Texture2D Texture { get; }
     public bool IsComplete { get; private set; }
 
-    public SmackerMoviePlayer(GraphicsDevice graphicsDevice, Stream source)
+    public SmackerMoviePlayer(GraphicsDevice graphicsDevice, Stream source, float volume = 1f)
     {
         ArgumentNullException.ThrowIfNull(graphicsDevice);
         ArgumentNullException.ThrowIfNull(source);
@@ -35,14 +36,17 @@ public sealed class SmackerMoviePlayer : IDisposable
         Texture = new Texture2D(graphicsDevice, _movie.Width, _movie.Height, false, SurfaceFormat.Color);
         _audioTrack = _movie.AudioTracks.FirstOrDefault();
         if (_audioTrack is { IsCompressed: true, Is16Bit: false, IsStereo: false })
+        {
             _audio = new DynamicSoundEffectInstance(_audioTrack.SampleRate, AudioChannels.Mono);
+            _audio.Volume = Math.Clamp(volume, 0, 1);
+        }
         DecodeNextFrame();
     }
 
     public void Update(TimeSpan elapsed)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
-        if (IsComplete || elapsed < TimeSpan.Zero) return;
+        if (IsComplete || _paused || elapsed < TimeSpan.Zero) return;
         _elapsed += elapsed;
         while (_elapsed >= _movie.FrameDuration && !IsComplete)
         {
@@ -57,6 +61,26 @@ public sealed class SmackerMoviePlayer : IDisposable
         if (_disposed) return;
         IsComplete = true;
         _audio?.Stop();
+    }
+
+    public void Pause()
+    {
+        if (_disposed || _paused) return;
+        _paused = true;
+        if (_audio?.State == SoundState.Playing) _audio.Pause();
+    }
+
+    public void Resume()
+    {
+        if (_disposed || !_paused) return;
+        _paused = false;
+        if (_audio is { State: SoundState.Paused }) _audio.Resume();
+    }
+
+    public void SetVolume(float volume)
+    {
+        if (_disposed) return;
+        if (_audio is not null) _audio.Volume = Math.Clamp(volume, 0, 1);
     }
 
     private void DecodeNextFrame()
@@ -88,7 +112,7 @@ public sealed class SmackerMoviePlayer : IDisposable
                     framePayload.Slice(packet.Data.Offset, packet.Data.Length), audioTrack);
                 _audio.SubmitBuffer(decoded.ToPcm16LittleEndian());
             }
-            if (_audio.PendingBufferCount > 0 && _audio.State != SoundState.Playing) _audio.Play();
+            if (!_paused && _audio.PendingBufferCount > 0 && _audio.State != SoundState.Playing) _audio.Play();
         }
         _nextFrame++;
     }

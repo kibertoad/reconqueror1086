@@ -3,18 +3,24 @@ using Conqueror.Resources;
 
 namespace Conqueror.Game;
 
-public sealed record GameSettings(
-    int Version = GameSettingsStore.CurrentVersion,
-    bool CdMusic = true,
-    bool SoundEffects = true,
-    bool Speech = true,
-    bool Animation = true,
-    bool Fullscreen = false,
-    bool IntegerScaling = false);
+public sealed record GameSettings
+{
+    public int Version { get; init; } = GameSettingsStore.CurrentVersion;
+    public bool CdMusic { get; init; } = true;
+    public bool SoundEffects { get; init; } = true;
+    public bool Speech { get; init; } = true;
+    public bool Animation { get; init; } = true;
+    public bool Fullscreen { get; init; }
+    public bool IntegerScaling { get; init; }
+    public float MusicVolume { get; init; } = .35f;
+    public float EffectsVolume { get; init; } = 1f;
+    public float SpeechVolume { get; init; } = 1f;
+    public bool ReducedMotion { get; init; }
+}
 
 public sealed class GameSettingsStore(string path)
 {
-    public const int CurrentVersion = 1;
+    public const int CurrentVersion = 2;
 
     private readonly string _path = Path.GetFullPath(path);
     public string BackupPath => _path + ".bak";
@@ -40,7 +46,15 @@ public sealed class GameSettingsStore(string path)
         try
         {
             settings = JsonSerializer.Deserialize<GameSettings>(File.ReadAllText(path));
-            return settings?.Version == CurrentVersion;
+            if (settings?.Version == 1) settings = settings with { Version = CurrentVersion };
+            if (settings?.Version != CurrentVersion) return false;
+            settings = settings with
+            {
+                MusicVolume = Math.Clamp(settings.MusicVolume, 0, 1),
+                EffectsVolume = Math.Clamp(settings.EffectsVolume, 0, 1),
+                SpeechVolume = Math.Clamp(settings.SpeechVolume, 0, 1)
+            };
+            return true;
         }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException or JsonException
                                       or NotSupportedException or ArgumentException)

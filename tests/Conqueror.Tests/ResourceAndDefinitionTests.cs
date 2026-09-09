@@ -1282,8 +1282,18 @@ public sealed class ResourceAndDefinitionTests
             var store = new GameSettingsStore(path);
             Assert.Equal(new GameSettings(), store.Load());
 
-            var first = new GameSettings(CdMusic: false, SoundEffects: true, Speech: false,
-                Animation: true, Fullscreen: true);
+            var first = new GameSettings
+            {
+                CdMusic = false,
+                SoundEffects = true,
+                Speech = false,
+                Animation = true,
+                Fullscreen = true,
+                MusicVolume = .7f,
+                EffectsVolume = .4f,
+                SpeechVolume = .8f,
+                ReducedMotion = true
+            };
             store.Save(first);
             Assert.Equal(first, store.Load());
             var second = first with { SoundEffects = false, Fullscreen = false };
@@ -1295,7 +1305,17 @@ public sealed class ResourceAndDefinitionTests
             Assert.Equal(first, store.Load());
             File.WriteAllText(store.BackupPath, "corrupt too");
             Assert.Equal(new GameSettings(), store.Load());
-            Assert.Throws<InvalidDataException>(() => store.Save(first with { Version = 2 }));
+            Assert.Throws<InvalidDataException>(() => store.Save(first with
+                { Version = GameSettingsStore.CurrentVersion + 1 }));
+
+            var legacyJson = "{\"Version\":1,\"CdMusic\":false,\"Fullscreen\":true}";
+            File.WriteAllText(path, legacyJson);
+            File.Delete(store.BackupPath);
+            var migrated = store.Load();
+            Assert.Equal(GameSettingsStore.CurrentVersion, migrated.Version);
+            Assert.False(migrated.CdMusic);
+            Assert.True(migrated.Fullscreen);
+            Assert.Equal(.35f, migrated.MusicVolume);
         }
         finally
         {

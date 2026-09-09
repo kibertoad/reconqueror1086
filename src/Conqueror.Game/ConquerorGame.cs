@@ -96,6 +96,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private bool _soundEffectsEnabled = true;
     private bool _speechEnabled = true;
     private bool _animationEnabled = true;
+    private bool _paused;
+    private bool _musicPausedByGame;
     private readonly CampaignSaveSlots _saveSlots = new(Path.Combine(AppContext.BaseDirectory, "saves"));
     private readonly GameSettingsStore _settingsStore = new(Path.Combine(AppContext.BaseDirectory, "settings.json"));
     private GameSettings _settings = new();
@@ -205,7 +207,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                 _importedMusic = SoundEffect.FromStream(music);
                 _musicInstance = _importedMusic.CreateInstance();
                 _musicInstance.IsLooped = true;
-                _musicInstance.Volume = .35f;
+                _musicInstance.Volume = _settings.MusicVolume;
                 StartMusic();
             }
             catch (Exception error) when (error is InvalidDataException or NotSupportedException)
@@ -245,8 +247,17 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         var rightClick = mouse.RightButton == ButtonState.Pressed && _lastMouse.RightButton == ButtonState.Released;
         if (Press(Keys.F11)) ToggleFullscreen();
         if (Press(Keys.F10)) ToggleIntegerScaling();
+        if (Press(Keys.Pause)) TogglePause();
+        if (_paused)
+        {
+            _last = keys;
+            _lastMouse = mouse;
+            base.Update(gameTime);
+            return;
+        }
         if (click && _soundEffectsEnabled) PlayOriginalSound("Interface.Activate");
-        var pressAny = keys.GetPressedKeys().Any(key => key is not Keys.Escape and not Keys.F10 and not Keys.F11 && !_last.IsKeyDown(key));
+        var pressAny = keys.GetPressedKeys().Any(key => key is not Keys.Escape and not Keys.F10
+            and not Keys.F11 and not Keys.Pause && !_last.IsKeyDown(key));
         if (Press(Keys.F5) && _screen is Screen.Farm or Screen.WarPlanning)
         {
             _notice = "CONFIRM OR CANCEL PENDING MANAGEMENT CHANGES BEFORE SAVING";
@@ -350,6 +361,14 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     {
         if (press(Keys.Up)) _optionsHubOption = (_optionsHubOption + _optionsHubOptions.Count - 1) % _optionsHubOptions.Count;
         if (press(Keys.Down)) _optionsHubOption = (_optionsHubOption + 1) % _optionsHubOptions.Count;
+        if (press(Keys.Left)) AdjustSelectedVolume(-.1f);
+        if (press(Keys.Right)) AdjustSelectedVolume(.1f);
+        if (press(Keys.R))
+        {
+            _settings = _settings with { ReducedMotion = !_settings.ReducedMotion };
+            _notice = $"REDUCED MOTION {OnOff(_settings.ReducedMotion)}";
+            SaveSettings();
+        }
         var selected = press(Keys.Enter) ? _optionsHubOption : -1;
         var (x, y) = OriginalPoint(mouse);
         if (pointerPressed)
@@ -492,6 +511,55 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _notice = $"INTEGER SCALING {OnOff(_settings.IntegerScaling)}";
         SaveSettings();
     }
+
+    private void TogglePause()
+    {
+        _paused = !_paused;
+        if (_paused)
+        {
+            _titleMovie?.Pause();
+            _eventMovie?.Pause();
+            _musicPausedByGame = _musicInstance?.State == SoundState.Playing;
+            if (_musicPausedByGame) _musicInstance!.Pause();
+        }
+        else
+        {
+            _titleMovie?.Resume();
+            _eventMovie?.Resume();
+            if (_musicPausedByGame) StartMusic();
+            _musicPausedByGame = false;
+        }
+    }
+
+    private void AdjustSelectedVolume(float delta)
+    {
+        var setting = _optionsHubOptions[_optionsHubOption].Setting;
+        switch (setting)
+        {
+            case OptionsHubSetting.CdMusic:
+                _settings = _settings with { MusicVolume = StepVolume(_settings.MusicVolume, delta) };
+                if (_musicInstance is not null) _musicInstance.Volume = _settings.MusicVolume;
+                _notice = $"CD MUSIC VOLUME {VolumePercent(_settings.MusicVolume)}";
+                break;
+            case OptionsHubSetting.SoundEffects:
+                _settings = _settings with { EffectsVolume = StepVolume(_settings.EffectsVolume, delta) };
+                _notice = $"EFFECTS VOLUME {VolumePercent(_settings.EffectsVolume)}";
+                break;
+            case OptionsHubSetting.Speech:
+                _settings = _settings with { SpeechVolume = StepVolume(_settings.SpeechVolume, delta) };
+                _titleMovie?.SetVolume(_settings.SpeechVolume);
+                _eventMovie?.SetVolume(_settings.SpeechVolume);
+                _notice = $"SPEECH/MOVIE VOLUME {VolumePercent(_settings.SpeechVolume)}";
+                break;
+            default: return;
+        }
+        SaveSettings();
+    }
+
+    private static float StepVolume(float value, float delta) => Math.Clamp(
+        MathF.Round((value + delta) * 10) / 10, 0, 1);
+
+    private static string VolumePercent(float value) => $"{MathF.Round(value * 100):0}%";
 
     private void SaveSettings()
     {
@@ -1226,6 +1294,13 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (_screen is not Screen.Title and not Screen.Movie and not Screen.LoadGame
             and not Screen.Character and not Screen.Dilemma and not Screen.Briefing and not Screen.Inn and not Screen.InnDialogue)
             DrawText(_notice, 24, 730, Color.Gold, 2);
+        if (_paused)
+        {
+            Fill(new Rectangle(0, 0, PresentationScaling.VirtualWidth, PresentationScaling.VirtualHeight),
+                new Color(0, 0, 0, 170));
+            DrawText("PAUSED", 405, 350, Color.White, 4);
+            DrawText("PRESS PAUSE TO CONTINUE", 325, 405, Color.Wheat, 2);
+        }
         if (_screen != Screen.Movie && !(_screen == Screen.Title && _titleMovie is { IsComplete: false }))
             DrawOriginalCursor();
         _batch.End();
@@ -1328,7 +1403,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         }
         try
         {
-            return new SmackerMoviePlayer(GraphicsDevice, source);
+            return new SmackerMoviePlayer(GraphicsDevice, source, _settings.SpeechVolume);
         }
         catch (Exception error) when (error is InvalidDataException or NotSupportedException or IOException)
         {
@@ -1368,7 +1443,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void PlayOriginalSound(string role)
     {
-        if (_originalSounds.TryGetValue(role, out var sound)) sound.Play();
+        if (_originalSounds.TryGetValue(role, out var sound))
+            sound.Play(_settings.EffectsVolume, pitch: 0, pan: 0);
     }
 
     private void DisposeOriginalSounds()
@@ -1603,7 +1679,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     {
         var animation = GetDilemmaAnimation(dilemma.SceneFile);
         if (animation is null) return;
-        var localFrame = _animationEnabled ? (int)(_presentationSeconds * 5) % animation.FramesPerChoice : 0;
+        var localFrame = _animationEnabled && !_settings.ReducedMotion
+            ? (int)(_presentationSeconds * 5) % animation.FramesPerChoice : 0;
         for (var choice = 0; choice < YouthDilemmaPresentationDefinitions.ChoiceCount; choice++)
             _batch.Draw(animation.Frames[choice * animation.FramesPerChoice + localFrame],
                 ScaleBounds(_dilemmaChoiceBounds[choice]), Color.White);
