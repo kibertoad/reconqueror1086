@@ -216,7 +216,7 @@ if (File.Exists(gobPath))
     }
     File.WriteAllText(Path.Combine(output, "weapon-store-report.txt"), weaponStoreReport.ToString());
 
-    var conversationReport = new StringBuilder("# Nodes  Empty  PromptVariants  Responses  TerminalResponses  LinkedResponses  Continuations  TerminalContinuations  Body  Index\n");
+    var conversationReport = new StringBuilder("# Nodes  Empty  PromptVariants  Responses  TerminalResponses  LinkedResponses  Continuations  TerminalContinuations  NodeActions  ResponseActions  Body  Index\n");
     var conversationBody = gob.Entries.FirstOrDefault(x => x.Name.Equals("all.cbf", StringComparison.OrdinalIgnoreCase));
     var conversationIndex = gob.Entries.FirstOrDefault(x => x.Name.Equals("all.cif", StringComparison.OrdinalIgnoreCase));
     if (conversationBody is not null && conversationIndex is not null
@@ -228,15 +228,17 @@ if (File.Exists(gobPath))
                 gob.ReadDecoded(conversationBody), gob.ReadDecoded(conversationIndex));
             var nodes = conversations.Nodes.Values.ToArray();
             var responses = nodes.SelectMany(node => node.Responses).ToArray();
-            conversationReport.AppendLine($"{nodes.Length,7}  {nodes.Count(node => node.PortraitFile is null),5}  {nodes.Sum(node => node.PromptVariants.Count),14}  {responses.Length,9}  {responses.Count(response => response.TargetNodeId == 0),17}  {responses.Count(response => response.TargetNodeId != 0),15}  {nodes.Count(node => node.ContinuationNodeId is not null),13}  {nodes.Count(node => node.ContinuationNodeId == 0),21}  {conversationBody.Name}  {conversationIndex.Name}");
+            conversationReport.AppendLine($"{nodes.Length,7}  {nodes.Count(node => node.PortraitFile is null),5}  {nodes.Sum(node => node.PromptVariants.Count),14}  {responses.Length,9}  {responses.Count(response => response.TargetNodeId == 0),17}  {responses.Count(response => response.TargetNodeId != 0),15}  {nodes.Count(node => node.ContinuationNodeId is not null),13}  {nodes.Count(node => node.ContinuationNodeId == 0),21}  {nodes.Sum(node => node.ActionIds.Count),11}  {responses.Sum(response => response.ActionIds.Count),15}  {conversationBody.Name}  {conversationIndex.Name}");
             if (conversationNodeIds is not null)
             {
-                var nodeReport = new StringBuilder("# Id  Offset  Continuation  Prompts  Responses  Portrait  Speaker\n");
+                var nodeReport = new StringBuilder("# Id  Offset  Continuation  Prompts  Responses  NodeActionIds  ResponseActionIds  Portrait  Speaker\n");
                 foreach (var id in conversationNodeIds.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(ParseNodeId))
                 {
                     var node = conversations.Find(id)
                         ?? throw new ArgumentException($"Conversation node {id} was not found.");
-                    nodeReport.AppendLine($"{node.Id,6}  0x{node.SourceOffset:X8}  {node.ContinuationNodeId?.ToString() ?? "-",12}  {node.PromptVariants.Count,7}  {node.Responses.Count,9}  {node.PortraitFile ?? "-"}  {node.Speaker ?? "-"}");
+                    var responseActionIds = string.Join('|', node.Responses.Select((response, index) =>
+                        $"{index}:{string.Join(',', response.ActionIds)}"));
+                    nodeReport.AppendLine($"{node.Id,6}  0x{node.SourceOffset:X8}  {node.ContinuationNodeId?.ToString() ?? "-",12}  {node.PromptVariants.Count,7}  {node.Responses.Count,9}  {string.Join(',', node.ActionIds),13}  {responseActionIds,-24}  {node.PortraitFile ?? "-"}  {node.Speaker ?? "-"}");
                 }
                 File.WriteAllText(Path.Combine(output, "conversation-node-report.txt"), nodeReport.ToString());
             }

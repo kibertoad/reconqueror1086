@@ -52,7 +52,8 @@ public sealed class ResourceAndDefinitionTests
     [Fact]
     public void ConversationDatabaseDecodesIndexedPromptsResponsesAndLinks()
     {
-        var first = ConversationNode(["GERARD.PCC", "Earl Gerard", "Greetings.", "Ask about the dragon.", "Farewell."], [1102, 0]);
+        var first = ConversationNode(["GERARD.PCC", "Earl Gerard", "Greetings.", "Ask about the dragon.", "Farewell."],
+            [1102, 0], nodeActions: [10, 11], responseActions: [[20], []]);
         var second = ConversationNode(["BARKEEP.PCC", "Bartender", "Good day."], [], 1101);
         var body = first.Concat(second).ToArray();
         var index = new byte[16];
@@ -65,7 +66,11 @@ public sealed class ResourceAndDefinitionTests
         var gerard = Assert.IsType<DynamixConversationNode>(database.Find(1101));
         Assert.Equal(("GERARD.PCC", "Earl Gerard"), (gerard.PortraitFile, gerard.Speaker));
         Assert.Equal(["Greetings."], gerard.PromptVariants);
-        Assert.Equal([new DynamixConversationResponse("Ask about the dragon.", 1102), new DynamixConversationResponse("Farewell.", 0)], gerard.Responses);
+        Assert.Equal(["Ask about the dragon.", "Farewell."], gerard.Responses.Select(response => response.Text));
+        Assert.Equal([1102, 0], gerard.Responses.Select(response => response.TargetNodeId));
+        Assert.Equal([20], gerard.Responses[0].ActionIds);
+        Assert.Empty(gerard.Responses[1].ActionIds);
+        Assert.Equal([10, 11], gerard.ActionIds);
         var barkeep = Assert.IsType<DynamixConversationNode>(database.Find(1102));
         Assert.Equal(("Bartender", 1101), (barkeep.Speaker, barkeep.ContinuationNodeId));
         Assert.Null(gerard.ContinuationNodeId);
@@ -94,6 +99,8 @@ public sealed class ResourceAndDefinitionTests
         Assert.Throws<InvalidDataException>(() => DynamixConversationDecoder.Decode(badLink, oneIndex));
         var badContinuation = ConversationNode(["GERARD.PCC", "Earl Gerard", "Greetings."], [], 99);
         Assert.Throws<InvalidDataException>(() => DynamixConversationDecoder.Decode(badContinuation, oneIndex));
+        var badAction = valid.ToArray(); WriteInt(badAction, 0x2b8, -2);
+        Assert.Throws<InvalidDataException>(() => DynamixConversationDecoder.Decode(badAction, oneIndex));
     }
 
     [Fact]
@@ -101,10 +108,10 @@ public sealed class ResourceAndDefinitionTests
     {
         var nodes = new Dictionary<int, DynamixConversationNode>
         {
-            [1] = new(1, 0, null, null, [], [], 2),
+            [1] = new(1, 0, null, null, [], [], 2, []),
             [2] = new(2, 0, "GERARD.PCC", "Earl Gerard", ["First.", "Second."],
-                [new DynamixConversationResponse("Continue.", 3)], null),
-            [3] = new(3, 0, "BARKEEP.PCC", "Bartender", ["Farewell."], [], 0)
+                [new DynamixConversationResponse("Continue.", 3, [])], null, []),
+            [3] = new(3, 0, "BARKEEP.PCC", "Bartender", ["Farewell."], [], 0, [])
         };
         var session = new ImportedConversationSession(new DynamixConversationDatabase(nodes));
 
@@ -116,7 +123,7 @@ public sealed class ResourceAndDefinitionTests
         Assert.True(session.IsComplete);
 
         var cycle = new ImportedConversationSession(new DynamixConversationDatabase(
-            new Dictionary<int, DynamixConversationNode> { [1] = new(1, 0, null, null, [], [], 1) }));
+            new Dictionary<int, DynamixConversationNode> { [1] = new(1, 0, null, null, [], [], 1, []) }));
         Assert.Throws<InvalidDataException>(() => cycle.Start(1, _ => 0));
     }
 
@@ -1015,15 +1022,28 @@ public sealed class ResourceAndDefinitionTests
         return text.Append('\u001a').ToString();
     }
 
-    private static byte[] ConversationNode(IReadOnlyList<string> strings, IReadOnlyList<int> targets, int continuationNodeId = 0)
+    private static byte[] ConversationNode(
+        IReadOnlyList<string> strings,
+        IReadOnlyList<int> targets,
+        int continuationNodeId = 0,
+        IReadOnlyList<int>? nodeActions = null,
+        IReadOnlyList<IReadOnlyList<int>>? responseActions = null)
     {
         var encoded = strings.Select(System.Text.Encoding.ASCII.GetBytes).ToArray();
         var result = new byte[0x348 + encoded.Sum(bytes => bytes.Length + 1)];
         result[0x48] = checked((byte)targets.Count);
         result[0x08] = checked((byte)(strings.Count == 0 ? 0 : strings.Count - 2 - targets.Count));
         result[0x49] = 0x65; result[0x4a] = 0x3a; result[0x4b] = 0x5c;
+        for (var response = 0; response < 5; response++)
+        for (var action = 0; action < 30; action++)
+            WriteInt(result, 0x60 + response * 0x78 + action * 4, -1);
+        for (var action = 0; action < 30; action++) WriteInt(result, 0x2b8 + action * 4, -1);
         if (targets.Count == 0) WriteInt(result, 0x4c, continuationNodeId);
         for (var index = 0; index < targets.Count; index++) WriteInt(result, 0x4c + index * 4, targets[index]);
+        for (var index = 0; index < (nodeActions?.Count ?? 0); index++) WriteInt(result, 0x2b8 + index * 4, nodeActions![index]);
+        for (var response = 0; response < (responseActions?.Count ?? 0); response++)
+        for (var action = 0; action < responseActions![response].Count; action++)
+            WriteInt(result, 0x60 + response * 0x78 + action * 4, responseActions[response][action]);
         var position = 0x348;
         foreach (var bytes in encoded)
         {

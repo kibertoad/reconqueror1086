@@ -3,7 +3,10 @@ using System.Text;
 
 namespace Conqueror.Resources;
 
-public sealed record DynamixConversationResponse(string Text, int TargetNodeId);
+public sealed record DynamixConversationResponse(
+    string Text,
+    int TargetNodeId,
+    IReadOnlyList<int> ActionIds);
 
 public sealed record DynamixConversationNode(
     int Id,
@@ -12,7 +15,8 @@ public sealed record DynamixConversationNode(
     string? Speaker,
     IReadOnlyList<string> PromptVariants,
     IReadOnlyList<DynamixConversationResponse> Responses,
-    int? ContinuationNodeId);
+    int? ContinuationNodeId,
+    IReadOnlyList<int> ActionIds);
 
 public sealed class DynamixConversationDatabase(IReadOnlyDictionary<int, DynamixConversationNode> nodes)
 {
@@ -28,6 +32,10 @@ public static class DynamixConversationDecoder
     private const int PromptVariantCountOffset = 0x08;
     private const int ResponseCountOffset = 0x48;
     private const int ResponseTargetsOffset = 0x4c;
+    private const int ResponseActionOffset = 0x60;
+    private const int ResponseSlotSize = 0x78;
+    private const int NodeActionOffset = 0x2b8;
+    private const int ActionSlotCount = 30;
     private const int MaximumNodes = 100_000;
     private const int MaximumResponses = 5;
 
@@ -77,12 +85,13 @@ public static class DynamixConversationDecoder
                     record.Slice(ResponseTargetsOffset + response * 4, 4));
 
             var strings = DecodeStrings(record[NodeHeaderSize..]);
+            var nodeActions = DecodeActionIds(record.Slice(NodeActionOffset, ActionSlotCount * 4));
             if (strings.Count == 0)
             {
                 if (responseCount != 0) throw new InvalidDataException("Empty conversation node declares responses.");
                 if (record[PromptVariantCountOffset] != 0)
                     throw new InvalidDataException("Empty conversation node declares prompt variants.");
-                nodes.Add(entry.Id, new(entry.Id, entry.Offset, null, null, [], [], continuationNodeId));
+                nodes.Add(entry.Id, new(entry.Id, entry.Offset, null, null, [], [], continuationNodeId, nodeActions));
                 continue;
             }
             if (strings.Count < 3 + responseCount)
@@ -91,11 +100,15 @@ public static class DynamixConversationDecoder
             var promptCount = strings.Count - 2 - responseCount;
             if (record[PromptVariantCountOffset] != promptCount)
                 throw new InvalidDataException("Conversation prompt-variant count does not match its string table.");
-            var responses = Enumerable.Range(0, responseCount)
-                .Select(response => new DynamixConversationResponse(strings[2 + promptCount + response], targets[response]))
-                .ToArray();
+            var responses = new DynamixConversationResponse[responseCount];
+            for (var response = 0; response < responseCount; response++)
+                responses[response] = new DynamixConversationResponse(
+                    strings[2 + promptCount + response],
+                    targets[response],
+                    DecodeActionIds(record.Slice(
+                        ResponseActionOffset + response * ResponseSlotSize, ActionSlotCount * 4)));
             nodes.Add(entry.Id, new(entry.Id, entry.Offset, strings[0], strings[1],
-                strings.Skip(2).Take(promptCount).ToArray(), responses, continuationNodeId));
+                strings.Skip(2).Take(promptCount).ToArray(), responses, continuationNodeId, nodeActions));
         }
 
         foreach (var node in nodes.Values)
@@ -108,6 +121,19 @@ public static class DynamixConversationDecoder
         }
 
         return new DynamixConversationDatabase(nodes);
+    }
+
+    private static IReadOnlyList<int> DecodeActionIds(ReadOnlySpan<byte> source)
+    {
+        var actions = new List<int>();
+        for (var offset = 0; offset < source.Length; offset += 4)
+        {
+            var id = BinaryPrimitives.ReadInt32LittleEndian(source.Slice(offset, 4));
+            if (id == -1) continue;
+            if (id < 0) throw new InvalidDataException("Conversation action identifier is invalid.");
+            actions.Add(id);
+        }
+        return actions;
     }
 
     private static IReadOnlyList<string> DecodeStrings(ReadOnlySpan<byte> source)
