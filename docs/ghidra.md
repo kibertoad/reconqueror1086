@@ -111,6 +111,8 @@ dotnet run --project tools\Conqueror.Inspect -- `
 
 `--executable-only` returns after artifact extraction and requested executable string, disassembly, or relocation reports. Use it for iterative static analysis so unrelated GOB, scene-container, and movie population scans are not repeated.
 
+For bounded conversation entry-point analysis, pass decimal or hexadecimal node identifiers with `--conversation-nodes=1100,0x44C`. The ignored `conversation-node-report.txt` records only structural metadata plus portrait and speaker identifiers; it does not copy prompts or response text into the repository.
+
 ## Evidence discipline
 
 - Hash the executable before analysis and compare it with the reference hash above.

@@ -53,7 +53,7 @@ public sealed class ResourceAndDefinitionTests
     public void ConversationDatabaseDecodesIndexedPromptsResponsesAndLinks()
     {
         var first = ConversationNode(["GERARD.PCC", "Earl Gerard", "Greetings.", "Ask about the dragon.", "Farewell."], [1102, 0]);
-        var second = ConversationNode(["BARKEEP.PCC", "Bartender", "Good day."], []);
+        var second = ConversationNode(["BARKEEP.PCC", "Bartender", "Good day."], [], 1101);
         var body = first.Concat(second).ToArray();
         var index = new byte[16];
         WriteInt(index, 0, 1102); WriteInt(index, 4, first.Length);
@@ -66,7 +66,9 @@ public sealed class ResourceAndDefinitionTests
         Assert.Equal(("GERARD.PCC", "Earl Gerard"), (gerard.PortraitFile, gerard.Speaker));
         Assert.Equal(["Greetings."], gerard.PromptVariants);
         Assert.Equal([new DynamixConversationResponse("Ask about the dragon.", 1102), new DynamixConversationResponse("Farewell.", 0)], gerard.Responses);
-        Assert.Equal("Bartender", database.Find(1102)?.Speaker);
+        var barkeep = Assert.IsType<DynamixConversationNode>(database.Find(1102));
+        Assert.Equal(("Bartender", 1101), (barkeep.Speaker, barkeep.ContinuationNodeId));
+        Assert.Null(gerard.ContinuationNodeId);
     }
 
     [Fact]
@@ -84,10 +86,14 @@ public sealed class ResourceAndDefinitionTests
         WriteInt(oneIndex, 0, 1); WriteInt(oneIndex, 4, 0);
         var badMarker = valid.ToArray(); badMarker[0x49] = 0;
         Assert.Throws<InvalidDataException>(() => DynamixConversationDecoder.Decode(badMarker, oneIndex));
+        var badPromptCount = valid.ToArray(); badPromptCount[0x08]++;
+        Assert.Throws<InvalidDataException>(() => DynamixConversationDecoder.Decode(badPromptCount, oneIndex));
         var badText = valid.ToArray(); badText[^1] = (byte)'X';
         Assert.Throws<InvalidDataException>(() => DynamixConversationDecoder.Decode(badText, oneIndex));
         var badLink = ConversationNode(["GERARD.PCC", "Earl Gerard", "Greetings.", "Continue."], [99]);
         Assert.Throws<InvalidDataException>(() => DynamixConversationDecoder.Decode(badLink, oneIndex));
+        var badContinuation = ConversationNode(["GERARD.PCC", "Earl Gerard", "Greetings."], [], 99);
+        Assert.Throws<InvalidDataException>(() => DynamixConversationDecoder.Decode(badContinuation, oneIndex));
     }
 
     [Fact]
@@ -983,12 +989,14 @@ public sealed class ResourceAndDefinitionTests
         return text.Append('\u001a').ToString();
     }
 
-    private static byte[] ConversationNode(IReadOnlyList<string> strings, IReadOnlyList<int> targets)
+    private static byte[] ConversationNode(IReadOnlyList<string> strings, IReadOnlyList<int> targets, int continuationNodeId = 0)
     {
         var encoded = strings.Select(System.Text.Encoding.ASCII.GetBytes).ToArray();
         var result = new byte[0x348 + encoded.Sum(bytes => bytes.Length + 1)];
         result[0x48] = checked((byte)targets.Count);
+        result[0x08] = checked((byte)(strings.Count - 2 - targets.Count));
         result[0x49] = 0x65; result[0x4a] = 0x3a; result[0x4b] = 0x5c;
+        if (targets.Count == 0) WriteInt(result, 0x4c, continuationNodeId);
         for (var index = 0; index < targets.Count; index++) WriteInt(result, 0x4c + index * 4, targets[index]);
         var position = 0x348;
         foreach (var bytes in encoded)

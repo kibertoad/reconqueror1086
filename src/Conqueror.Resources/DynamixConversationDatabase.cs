@@ -11,7 +11,8 @@ public sealed record DynamixConversationNode(
     string? PortraitFile,
     string? Speaker,
     IReadOnlyList<string> PromptVariants,
-    IReadOnlyList<DynamixConversationResponse> Responses);
+    IReadOnlyList<DynamixConversationResponse> Responses,
+    int? ContinuationNodeId);
 
 public sealed class DynamixConversationDatabase(IReadOnlyDictionary<int, DynamixConversationNode> nodes)
 {
@@ -24,6 +25,7 @@ public static class DynamixConversationDecoder
 {
     private const int IndexRecordSize = 8;
     private const int NodeHeaderSize = 0x348;
+    private const int PromptVariantCountOffset = 0x08;
     private const int ResponseCountOffset = 0x48;
     private const int ResponseTargetsOffset = 0x4c;
     private const int MaximumNodes = 100_000;
@@ -65,6 +67,9 @@ public static class DynamixConversationDecoder
                 throw new InvalidDataException("Conversation record marker is invalid.");
             var responseCount = record[ResponseCountOffset];
             if (responseCount > MaximumResponses) throw new InvalidDataException("Conversation response count exceeds the format limit.");
+            int? continuationNodeId = responseCount == 0
+                ? BinaryPrimitives.ReadInt32LittleEndian(record.Slice(ResponseTargetsOffset, 4))
+                : null;
 
             var targets = new int[responseCount];
             for (var response = 0; response < responseCount; response++)
@@ -75,24 +80,32 @@ public static class DynamixConversationDecoder
             if (strings.Count == 0)
             {
                 if (responseCount != 0) throw new InvalidDataException("Empty conversation node declares responses.");
-                nodes.Add(entry.Id, new(entry.Id, entry.Offset, null, null, [], []));
+                if (record[PromptVariantCountOffset] != 0)
+                    throw new InvalidDataException("Empty conversation node declares prompt variants.");
+                nodes.Add(entry.Id, new(entry.Id, entry.Offset, null, null, [], [], continuationNodeId));
                 continue;
             }
             if (strings.Count < 3 + responseCount)
                 throw new InvalidDataException("Conversation node lacks a portrait, speaker, prompt, or response label.");
 
             var promptCount = strings.Count - 2 - responseCount;
+            if (record[PromptVariantCountOffset] != promptCount)
+                throw new InvalidDataException("Conversation prompt-variant count does not match its string table.");
             var responses = Enumerable.Range(0, responseCount)
                 .Select(response => new DynamixConversationResponse(strings[2 + promptCount + response], targets[response]))
                 .ToArray();
             nodes.Add(entry.Id, new(entry.Id, entry.Offset, strings[0], strings[1],
-                strings.Skip(2).Take(promptCount).ToArray(), responses));
+                strings.Skip(2).Take(promptCount).ToArray(), responses, continuationNodeId));
         }
 
         foreach (var node in nodes.Values)
+        {
+            if (node.ContinuationNodeId is not (null or 0) && !nodes.ContainsKey(node.ContinuationNodeId.Value))
+                throw new InvalidDataException("Conversation continuation targets an unknown node.");
             foreach (var response in node.Responses)
                 if (response.TargetNodeId != 0 && !nodes.ContainsKey(response.TargetNodeId))
                     throw new InvalidDataException("Conversation response targets an unknown node.");
+        }
 
         return new DynamixConversationDatabase(nodes);
     }
