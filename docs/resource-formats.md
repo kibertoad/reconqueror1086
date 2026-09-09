@@ -60,7 +60,7 @@ The next length begins immediately after the preceding payload. Zero lengths, tr
 
 Each block expands to 16,384 bytes except the final block of an entry, which expands to the remaining bytes. Consequently, an entry has exactly `ceil(expanded length / 16384)` blocks. A `0x80` block contains those output bytes directly, so its framed payload length is the expected output length plus one marker byte. The decoder validates this relationship before copying it.
 
-Across the hashed release, all 471 kind-1 GOB entries consume exactly as 2,963 blocks: 2,940 use `0x40` and 23 use `0x80`. All 11,372 kind-1 entries in the 50 CD scene containers consume exactly as 17,418 blocks: 17,410 use `0x40` and eight use `0x80`. Every one of these 20,381 blocks decodes to its expected slice length. No scene entry uses kind 2. These population-wide results make the framing, marker meanings, output block size, and decoder **Confirmed for this release**, not necessarily for every game using a `.RES` signature.
+Across the hashed release, all 471 kind-1 GOB entries consume exactly as 2,963 blocks: 2,940 use `0x40` and 23 use `0x80`. The 99 CD `.RES`/`.LOW` scene containers add 29,126 blocks: 29,118 use `0x40` and eight use `0x80`. Every one of these 32,089 blocks decodes to its expected slice length. No scene entry uses kind 2. These population-wide results make the framing, marker meanings, output block size, and decoder **Confirmed for this release**, not necessarily for every game using a `.RES` signature.
 
 ### Kind-1 compressed token grammar
 
@@ -119,7 +119,7 @@ All 26 decoded `.666` resources use the same rate-tagged sample sequence:
 
 The GOB and scene population contains 26 banks and 102 sample payloads. Observed rates are 11,025, 11,050, and 22,050 Hz; every bank consumes its decoded resource exactly, including kind-2 `CONFIGIT.666`. `VSMITH.666` contains two samples (32,132 payload bytes total at 11,025 and 22,050 Hz), so the earlier hypothesis that it contains blacksmith dialogue nodes is **Disproved**.
 
-The framing, lengths, sample counts, and rates are **Confirmed for the hashed release**. Payload analysis confirms unsigned 8-bit mono PCM: the shared 2,159-byte interface sample has mean 127.51, begins with quiet values around 127-128, spans 36-242, and contains no zero-valued silence. Interpreting those bytes as signed PCM would create a near-full-scale DC offset. At game startup the runtime groups registered sounds by bank, decodes each referenced bank once, converts every bound sample once to signed 16-bit little-endian PCM with `(value - 128) << 8`, and retains ready-to-play audio objects for the session. This preserves the full source range without clipping and keeps conversion out of the input/playback path.
+The framing, lengths, sample counts, and rates are **Confirmed for the hashed release**. Payload analysis confirms unsigned 8-bit mono PCM: the shared 2,159-byte interface sample has mean 127.51, begins with quiet values around 127-128, spans 36-242, and contains no zero-valued silence. Interpreting those bytes as signed PCM would create a near-full-scale DC offset. At game startup the runtime decodes every installed bank once, converts every sample once to signed 16-bit little-endian PCM with `(value - 128) << 8`, and retains the ready buffers for the session. This preserves the full source range without clipping and keeps conversion out of the input/playback path.
 
 That same 2,159-byte payload (SHA-256 prefix `694de4a160413462`) occurs bit-for-bit in 17 screen-specific banks, always at 11,025 Hz: `ICONMAP`, `MONYLNDR`, `FOPTS`, `TOPTS`, `VINN`, `VOPTS`, `VSMITH`, `WAR`, `CGOPTS`, `CHARGEN`, `DKING`, `FIEFMGMT`, `FOVIEW`, `FWARPLAN`, `GAMEOPTS`, `TENTS`, and `UTILITY`. Its reuse and position as the sole `GAMEOPTS.666` sample identify it as a shared interface activation sound with **Corroborated** confidence. Exact event bindings for the other 101 samples remain **Provisional**.
 
@@ -287,4 +287,4 @@ The reports are regenerated from the user's installation and must never be commi
 
 1. Recover the semantic meaning of directory field `0x24` and test whether data extents may alias or overlap.
 2. Specify nested chunk headers and the exact compression selector used inside decoded resources.
-3. Associate CSF sequences with their screen palettes, confirm `.666` PCM encoding/event bindings, and specify the remaining PCC, LOW, palette, RAT, and FNT payload semantics as each decoder is validated.
+3. Associate CSF sequences with their screen palettes, confirm `.666` event bindings, and specify the remaining PCC, scene `Viewer`/`Scenario`/`TEX` payloads, RAT, and FNT semantics as each decoder is validated.

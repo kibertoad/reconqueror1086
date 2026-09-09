@@ -21,6 +21,15 @@ public static class ResourcePaths
 {
     public static string SafeName(string name) => string.Concat(name.Where(c => char.IsLetterOrDigit(c) || c is '.' or '_' or '-'));
 
+    public static string DecodedArchiveFolder(string archiveId)
+    {
+        ArgumentNullException.ThrowIfNull(archiveId);
+        var folder = SafeName(Path.GetFileName(archiveId));
+        return string.IsNullOrWhiteSpace(folder) || folder is "." or ".."
+            ? throw new InvalidDataException("Archive identifier has no safe filename.")
+            : folder;
+    }
+
     public static string SafeTarget(string root, string relative)
     {
         var fullRoot = Path.GetFullPath(root) + Path.DirectorySeparatorChar;

@@ -107,7 +107,7 @@ static void InstallDecodedEntries(DynamixArchive archive, string archiveId, stri
 {
     foreach (var entry in archive.Entries.Where(DynamixArchive.CanDecode))
     {
-        var folder = ResourcePaths.SafeName(Path.GetFileNameWithoutExtension(archiveId));
+        var folder = ResourcePaths.DecodedArchiveFolder(archiveId);
         var relative = Path.Combine("Decoded", folder, $"{entry.Index:0000}-{ResourcePaths.SafeName(entry.Name)}");
         var target = ResourcePaths.SafeTarget(output, relative);
         Directory.CreateDirectory(Path.GetDirectoryName(target)!);

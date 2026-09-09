@@ -18,6 +18,16 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void DecodedArchiveFoldersPreserveExtensionsToSeparateSceneTiers()
+    {
+        Assert.Equal("BAR0.LOW", ResourcePaths.DecodedArchiveFolder("CONQUER/BAR0.LOW"));
+        Assert.Equal("BAR0.RES", ResourcePaths.DecodedArchiveFolder("CONQUER/BAR0.RES"));
+        Assert.NotEqual(ResourcePaths.DecodedArchiveFolder("CONQUER/BAR0.LOW"),
+            ResourcePaths.DecodedArchiveFolder("CONQUER/BAR0.RES"));
+        Assert.Throws<InvalidDataException>(() => ResourcePaths.DecodedArchiveFolder(".."));
+    }
+
+    [Fact]
     public void Kind1DecodesLiteralCopyAndRunTokens()
     {
         byte[] compressed = [13, 0, 0x40, 0, 0x18, 0, (byte)'A', (byte)'B', (byte)'C', 0, 0x30, 0, 0, 0, (byte)'Z'];
