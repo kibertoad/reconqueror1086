@@ -30,6 +30,7 @@ Check(Balance.Victories[VictoryKind.Dragon].RequiredItems.All(rewardItems.Contai
 Check(Balance.Strategy == new StrategicDefinition(80, 98, 9), "strategic warfare definitions");
 Check(Balance.TournamentOpponents.Length == 5 && Balance.TournamentOpponents.All(x => x.Wager is >= 20 and <= 80 && x.Swordsmen + x.Halberdiers + x.Knights == 8), "tournament opponent definitions valid");
 Check(ImportedArt.Definitions.Select(x => x.Role).Distinct(StringComparer.OrdinalIgnoreCase).Count() == ImportedArt.Definitions.Count, "imported art roles are unique definitions");
+Check(ImportedArt.Definitions.Any(x => x is { Role: "Campaign.Briefing", IdSuffix: ":fluff.pcx" }), "campaign briefing uses the screenshot-confirmed FLUFF resource");
 Check(ImportedAnimations.Definitions.Any(x => x is { Role: "Interface.Cursor", IdSuffix: ":ffmouse.csf" }), "original cursor role is definition driven");
 Check(ImportedMovies.Definitions.Any(x => x is { Role: "Title.Intro", IdSuffix: "/title.smk" }), "original title movie role uses the disc-file identifier shape");
 Check(ImportedMovies.Definitions.Any(x => x is { Role: "Options.Credits", IdSuffix: "/creditzz.smk" }), "original credits movie role is definition driven");

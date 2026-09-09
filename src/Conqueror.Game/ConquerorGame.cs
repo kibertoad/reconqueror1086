@@ -14,7 +14,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private const string OriginalCursorRole = "Interface.Cursor";
     private const int OriginalDefaultCursorFrame = 0;
 
-    private enum Screen { Title, Movie, OptionsHub, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Map, Home, WarPlanning, Farm, Village, Blacksmith, BlacksmithDialogue, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
+    private enum Screen { Title, Movie, OptionsHub, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Briefing, Map, Home, WarPlanning, Farm, Village, Blacksmith, BlacksmithDialogue, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _batch = null!;
     private Texture2D _pixel = null!;
@@ -227,6 +227,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             else if (_screen == Screen.CharacterName) _screen = Screen.CharacterOptions;
             else if (_screen == Screen.CharacterOptions) _screen = Screen.Title;
             else if (_screen == Screen.Character) _screen = Screen.CharacterOptions;
+            else if (_screen == Screen.Briefing) EnterCampaignMap();
             else if (_screen == Screen.Farm) CancelFiefManagement();
             else if (_screen == Screen.WarPlanning) CancelWarPlanning();
             else if (_screen == Screen.Overview) _screen = _overviewReturnScreen;
@@ -268,6 +269,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                 UpdatePregeneratedCharacters(Press, mouse, click);
                 break;
             case Screen.Dilemma: UpdateDilemma(Press, mouse, click); break;
+            case Screen.Briefing: if (pressAny || click) EnterCampaignMap(); break;
             case Screen.Map: UpdateMap(Press, mouse, click); break;
             case Screen.Home: UpdateHome(Press, mouse, click); break;
             case Screen.WarPlanning: UpdateWarPlanning(Press, mouse, click, rightClick); break;
@@ -487,7 +489,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     {
         _campaign = new Campaign(Campaign.NewFromTemplate(index));
         _hasActiveCampaign = true;
-        _screen = Screen.Map;
+        _selectedLocation = 0;
+        _screen = Screen.Briefing;
     }
 
     private string NormalizedCharacterName() => _characterName.Trim() is { Length: > 4 } name ? name : "Sir Custom";
@@ -610,8 +613,15 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     {
         if (_campaign.State.YouthDilemmasAnswered < Youth.OriginalPool.StageCount) return;
         _selectedLocation = 0;
-        _screen = Screen.Map;
         _notice = "YOUR YEARS OF TRAINING ARE COMPLETE";
+        _screen = Screen.Briefing;
+    }
+
+    private void EnterCampaignMap()
+    {
+        _selectedLocation = _campaign.State.CurrentLocation;
+        _notice = "YOUR CAMPAIGN BEGINS";
+        _screen = Screen.Map;
     }
 
     private void UpdateHome(Func<Keys, bool> press, MouseState mouse, bool click)
@@ -950,12 +960,13 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _batch.Begin(samplerState: SamplerState.PointClamp);
         switch (_screen)
         {
-            case Screen.Title: DrawTitle(); break; case Screen.Movie: DrawEventMovie(); break; case Screen.OptionsHub: DrawOptionsHub(); break; case Screen.LoadGame: DrawLoadGame(); break; case Screen.CharacterOptions: DrawCharacterOptions(); break; case Screen.CharacterName: DrawCharacterName(); break; case Screen.Character: DrawCharacter(); break; case Screen.Dilemma: DrawDilemma(); break; case Screen.Map: DrawMap(); break;
+            case Screen.Title: DrawTitle(); break; case Screen.Movie: DrawEventMovie(); break; case Screen.OptionsHub: DrawOptionsHub(); break; case Screen.LoadGame: DrawLoadGame(); break; case Screen.CharacterOptions: DrawCharacterOptions(); break; case Screen.CharacterName: DrawCharacterName(); break; case Screen.Character: DrawCharacter(); break; case Screen.Dilemma: DrawDilemma(); break; case Screen.Briefing: DrawCampaignBriefing(); break; case Screen.Map: DrawMap(); break;
             case Screen.Home: DrawHome(); break; case Screen.WarPlanning: DrawWarPlanning(); break; case Screen.Farm: DrawFarm(); break; case Screen.Village: DrawVillage(); break; case Screen.Blacksmith: DrawBlacksmith(); break; case Screen.BlacksmithDialogue: DrawBlacksmithDialogue(); break; case Screen.Shop: DrawShop(); break; case Screen.Tournament: DrawTournament(); break; case Screen.FieldBattle: DrawFieldBattle(); break;
             case Screen.Siege: DrawSiege(); break; case Screen.Overview: DrawOverview(); break; case Screen.Ending: DrawEnding(); break;
         }
         if (_screen is not Screen.Title and not Screen.Movie and not Screen.LoadGame
-            and not Screen.Character and not Screen.Dilemma) DrawText(_notice, 24, 730, Color.Gold, 2);
+            and not Screen.Character and not Screen.Dilemma and not Screen.Briefing)
+            DrawText(_notice, 24, 730, Color.Gold, 2);
         if (_screen != Screen.Movie && !(_screen == Screen.Title && _titleMovie is { IsComplete: false }))
             DrawOriginalCursor();
         _batch.End();
@@ -1248,6 +1259,17 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             for (var i = 0; i < values.Length; i++) DrawText(values[i].ToString(), 320, 103 + i * 27, Color.Black, 2);
         }
         else DrawText($"STR {stats.Strength}  DEX {stats.Dexterity}  INT {stats.Intelligence}  PIETY {stats.Piety}  STAMINA {stats.Stamina}  HONOR {stats.Honor}", 70, 590, Color.Gold, 2);
+    }
+
+    private void DrawCampaignBriefing()
+    {
+        if (DrawOriginal("Campaign.Briefing", new Rectangle(0, 0, 1024, 768))) return;
+        DrawPanel("YOUR CAMPAIGN", "TWO ROADS TO GLORY LIE BEFORE YOU");
+        DrawText("Raise an army, conquer rival holdings, and challenge the crown in London.",
+            105, 230, Color.Wheat, 2, 810);
+        DrawText("Or strengthen your estate, compete at tournaments, and seek the path to the dragon.",
+            105, 355, Color.Wheat, 2, 810);
+        DrawText("PRESS ANY KEY TO BEGIN", 310, 585, Color.LightGreen, 2);
     }
 
     private void DrawDilemmaAnimation(YouthDilemmaDefinition dilemma)

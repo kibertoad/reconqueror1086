@@ -20,6 +20,7 @@ public static class ImportedArt
         new("Options.Background", "image", ":optfin.pcx"),
         new("Character.Options", "image", ":char_ops.pcx"),
         new("Character.Pregenerated", "image", ":pregen.pcx"),
+        new("Campaign.Briefing", "image", ":fluff.pcx"),
         new("Dilemma.Background", "image", ":morality.pcx"),
         new("Load.Background", "image", ":loadgame.pcx"),
         new("Estate.Shell", "image", ":icontemp.pcx"),
