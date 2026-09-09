@@ -61,7 +61,7 @@ Local reference filenames:
 - **Implemented:** decode `GAMEOPTS.HAT` into typed actions rather than branching on raw region numbers in screen code.
 - **Implemented:** New Game, Load, Save, Resume, Exit, Credits, Movie, and Practice have real state transitions. Credits plays `CREDITZZ.SMK`; Movie replays `TITLE.SMK`; Practice uses its original screen and five regions, plays `JOUSPRAC.SMK`, and returns from isolated practice combat without campaign mutation.
 - **Implemented, timing corroborated:** render `OPTION.CSF` frames 0/1 and 2/3 as enabled/disabled released/held states below each setting label and frame 4 as Resume when a campaign is active. Activation occurs only when the pointer is released inside its originally pressed HAT region; exact executable branch confirmation remains outstanding.
-- **Partially implemented:** CD music, sound effects, speech state, and animation toggles persist through an atomic recoverable settings file; `F11` switches windowed/borderless-fullscreen mode and persists it. MIDI remains explicitly unavailable; volume, integer scaling, subtitles, reduced motion, and remapping remain follow-ups.
+- **Partially implemented:** CD music, sound effects, speech state, and animation toggles persist through an atomic recoverable settings file; `F11` switches windowed/borderless-fullscreen mode and `F10` selects aspect-fit/integer scaling. A centered 1024×768 virtual canvas preserves layout, aspect ratio, and hotspot alignment. MIDI remains explicitly unavailable; volume, subtitles, reduced motion, and remapping remain follow-ups.
 - Replace Exit DOS wording only in fallback presentation; imported original-media mode may preserve the original label while exiting the application safely.
 
 ### Campaign briefing

@@ -17,6 +17,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _batch = null!;
     private Texture2D _pixel = null!;
+    private RenderTarget2D _canvas = null!;
     private Campaign _campaign = new();
     private Screen _screen = Screen.Title;
     private KeyboardState _last;
@@ -123,6 +124,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _batch = new SpriteBatch(GraphicsDevice);
         _pixel = new Texture2D(GraphicsDevice, 1, 1);
         _pixel.SetData([Color.White]);
+        _canvas = new RenderTarget2D(GraphicsDevice, PresentationScaling.VirtualWidth,
+            PresentationScaling.VirtualHeight, false, SurfaceFormat.Color, DepthFormat.None);
         _importedContent = ImportedContentCatalog.Discover();
         _importedSoundLibrary = _importedContent is null ? null : ImportedSoundLibrary.Load(_importedContent);
         _importedDialogue = _importedContent is null ? null : new ImportedDialogueRepository(_importedContent);
@@ -225,6 +228,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         foreach (var animation in _dilemmaAnimations.Values.OfType<DilemmaAnimation>())
             foreach (var texture in animation.Frames) texture.Dispose();
         DisposeOriginalSounds();
+        _canvas.Dispose();
         _pixel.Dispose();
         _batch.Dispose();
         base.UnloadContent();
@@ -240,8 +244,9 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         var release = mouse.LeftButton == ButtonState.Released && _lastMouse.LeftButton == ButtonState.Pressed;
         var rightClick = mouse.RightButton == ButtonState.Pressed && _lastMouse.RightButton == ButtonState.Released;
         if (Press(Keys.F11)) ToggleFullscreen();
+        if (Press(Keys.F10)) ToggleIntegerScaling();
         if (click && _soundEffectsEnabled) PlayOriginalSound("Interface.Activate");
-        var pressAny = keys.GetPressedKeys().Any(key => key is not Keys.Escape and not Keys.F11 && !_last.IsKeyDown(key));
+        var pressAny = keys.GetPressedKeys().Any(key => key is not Keys.Escape and not Keys.F10 and not Keys.F11 && !_last.IsKeyDown(key));
         if (Press(Keys.F5) && _screen is Screen.Farm or Screen.WarPlanning)
         {
             _notice = "CONFIRM OR CANCEL PENDING MANAGEMENT CHANGES BEFORE SAVING";
@@ -481,6 +486,13 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         SaveSettings();
     }
 
+    private void ToggleIntegerScaling()
+    {
+        _settings = _settings with { IntegerScaling = !_settings.IntegerScaling };
+        _notice = $"INTEGER SCALING {OnOff(_settings.IntegerScaling)}";
+        SaveSettings();
+    }
+
     private void SaveSettings()
     {
         _settings = _settings with
@@ -489,7 +501,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             SoundEffects = _soundEffectsEnabled,
             Speech = _speechEnabled,
             Animation = _animationEnabled,
-            Fullscreen = _graphics.IsFullScreen
+            Fullscreen = _graphics.IsFullScreen,
+            IntegerScaling = _settings.IntegerScaling
         };
         _settingsStore.Save(_settings);
     }
@@ -629,8 +642,10 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     }
 
     private string NormalizedCharacterName() => _characterName.Trim() is { Length: > 4 } name ? name : "Sir Custom";
-    private (int X, int Y) OriginalPoint(MouseState mouse) =>
-        (mouse.X * 640 / Math.Max(1, GraphicsDevice.Viewport.Width), mouse.Y * 480 / Math.Max(1, GraphicsDevice.Viewport.Height));
+    private (int X, int Y) OriginalPoint(MouseState mouse)
+    {
+        return PresentationScaling.ToLogical(mouse.X, mouse.Y, CanvasBounds(), 640, 480);
+    }
 
     private void UpdateMap(Func<Keys, bool> press, MouseState mouse, bool click)
     {
@@ -1199,6 +1214,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     protected override void Draw(GameTime gameTime)
     {
+        GraphicsDevice.SetRenderTarget(_canvas);
         GraphicsDevice.Clear(new Color(20, 25, 20));
         _batch.Begin(samplerState: SamplerState.PointClamp);
         switch (_screen)
@@ -1212,6 +1228,12 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             DrawText(_notice, 24, 730, Color.Gold, 2);
         if (_screen != Screen.Movie && !(_screen == Screen.Title && _titleMovie is { IsComplete: false }))
             DrawOriginalCursor();
+        _batch.End();
+
+        GraphicsDevice.SetRenderTarget(null);
+        GraphicsDevice.Clear(Color.Black);
+        _batch.Begin(samplerState: SamplerState.PointClamp);
+        _batch.Draw(_canvas, CanvasDestination(), Color.White);
         _batch.End();
         base.Draw(gameTime);
     }
@@ -2236,9 +2258,20 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         var frameIndex = OriginalCursorDefinitions.Frame(CurrentCursorKind(mouse));
         if (cursor.Frames.Count <= frameIndex) return;
         var frame = cursor.Frames[frameIndex];
-        _batch.Draw(frame, new Rectangle(mouse.X, mouse.Y,
+        var point = PresentationScaling.ToVirtual(mouse.X, mouse.Y, CanvasBounds());
+        _batch.Draw(frame, new Rectangle(point.X, point.Y,
             frame.Width * 1024 / 640, frame.Height * 768 / 480), Color.White);
     }
+
+    private Rectangle CanvasDestination()
+    {
+        var bounds = CanvasBounds();
+        return new Rectangle(bounds.X, bounds.Y, bounds.Width, bounds.Height);
+    }
+
+    private UiBounds CanvasBounds() => PresentationScaling.Destination(
+        GraphicsDevice.PresentationParameters.BackBufferWidth,
+        GraphicsDevice.PresentationParameters.BackBufferHeight, _settings.IntegerScaling);
 
     private OriginalCursorKind CurrentCursorKind(MouseState mouse)
     {

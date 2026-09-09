@@ -9,7 +9,8 @@ public sealed record GameSettings(
     bool SoundEffects = true,
     bool Speech = true,
     bool Animation = true,
-    bool Fullscreen = false);
+    bool Fullscreen = false,
+    bool IntegerScaling = false);
 
 public sealed class GameSettingsStore(string path)
 {

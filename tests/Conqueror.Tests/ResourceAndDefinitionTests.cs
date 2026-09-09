@@ -1304,6 +1304,22 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void PresentationScalingPreservesAspectRatioAndReversesPointerCoordinates()
+    {
+        Assert.Equal(new UiBounds(240, 0, 1440, 1080), PresentationScaling.Destination(1920, 1080, false));
+        Assert.Equal(new UiBounds(448, 156, 1024, 768), PresentationScaling.Destination(1920, 1080, true));
+        Assert.Equal(new UiBounds(0, 0, 800, 600), PresentationScaling.Destination(800, 600, true));
+
+        var destination = PresentationScaling.Destination(1920, 1080, false);
+        Assert.Equal((0, 0), PresentationScaling.ToVirtual(destination.X, destination.Y, destination));
+        Assert.Equal((512, 384), PresentationScaling.ToVirtual(960, 540, destination));
+        Assert.Equal((1023, 767), PresentationScaling.ToVirtual(destination.X + destination.Width - 1,
+            destination.Y + destination.Height - 1, destination));
+        Assert.True(PresentationScaling.ToVirtual(0, 0, destination).X < 0);
+        Assert.True(PresentationScaling.ToLogical(destination.X - 1, destination.Y, destination, 640, 480).X < 0);
+    }
+
+    [Fact]
     public void DilemmaTextIsParsedIntoDataDrivenChoicesAndOutcomes()
     {
         var dilemma = DilemmaTextDecoder.Decode(System.Text.Encoding.ASCII.GetBytes(SyntheticDilemma()));
