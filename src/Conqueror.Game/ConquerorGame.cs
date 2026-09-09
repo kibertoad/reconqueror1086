@@ -2369,8 +2369,11 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             textureIndex = ActorStateTexture(block, 1, enemy.VisualFrame, textureIndex);
         else if (enemy.VisualState == SiegeEnemyVisualState.Hit)
             textureIndex = ActorStateTexture(block, 2, (frame.DirectionOffset + 1) / 2, textureIndex);
+        else if (enemy.VisualState == SiegeEnemyVisualState.Dying)
+            textureIndex = ActorStateTexture(block, 3, enemy.VisualFrame, textureIndex);
         return (_siegeVisuals.Textures.GetValueOrDefault(textureIndex) ?? FirstSceneTexture(block),
-            enemy.VisualState == SiegeEnemyVisualState.Attack ? false : frame.FlipHorizontally);
+            enemy.VisualState is SiegeEnemyVisualState.Attack or SiegeEnemyVisualState.Dying
+                ? false : frame.FlipHorizontally);
     }
 
     private int ActorStateTexture(DynamixSceneBlock initial, int stateOffset, int frame, int fallback)
@@ -2504,7 +2507,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                 }
             }
         }
-        DrawText($"HEALTH {_siege.Health}/{_siege.MaxHealth}  ENEMIES {_siege.Enemies.Count}  ALLIES {_siege.AlliesAlive}", 25, 25, Color.White, 2);
+        DrawText($"HEALTH {_siege.Health}/{_siege.MaxHealth}  ENEMIES {_siege.Enemies.Count(enemy => enemy.Health > 0)}  ALLIES {_siege.AlliesAlive}", 25, 25, Color.White, 2);
         DrawText($"FACING {_siege.Facing}  ARMOR {_siege.ArmorRating()}  GOLD FOUND {_siege.GoldFound}", 25, 55, Color.Wheat, 2);
         if (_showRadar) DrawRadar(_siege);
         DrawText("W/S MOVE  A/D TURN  E OPEN  SPACE SWING  X CROSSBOW", 130, 655, Color.Gold, 2);

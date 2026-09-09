@@ -3,7 +3,7 @@ namespace Conqueror.Core;
 public enum Facing { North, East, South, West }
 public enum SiegeTile { Floor, Wall, Door, SecretDoor, OpeningDoor, Barrel, Treasure }
 public enum SiegeAction { None, Moved, Blocked, DoorOpened, Healed, Looted, Hit, Missed, WeaponBroke, Shot, NoAmmunition }
-public enum SiegeEnemyVisualState { Walk, Attack, Hit }
+public enum SiegeEnemyVisualState { Walk, Attack, Hit, Dying }
 
 public sealed class SiegeEnemy
 {
@@ -59,6 +59,7 @@ public sealed class SiegeSession
     public const double DoorOpeningSeconds = 0.36;
     public const double EnemyAttackFrameSeconds = 0.07;
     public const double EnemyHitSeconds = 0.20;
+    public const double EnemyDeathFrameSeconds = 0.09;
     private readonly Player _player;
     private readonly Random _random;
     private readonly SiegeTile[,] _map;
@@ -142,7 +143,7 @@ public sealed class SiegeSession
     }
 
     public SiegeTile TileAt(int x, int y) => x < 0 || y < 0 || x >= Width || y >= Height ? SiegeTile.Wall : _map[x, y];
-    public SiegeEnemy? EnemyAt(int x, int y) => _enemies.FirstOrDefault(e => e.X == x && e.Y == y);
+    public SiegeEnemy? EnemyAt(int x, int y) => _enemies.FirstOrDefault(e => e.Health > 0 && e.X == x && e.Y == y);
 
     public double? DoorOpeningProgress(int x, int y) => _openingDoors.TryGetValue((x, y), out var elapsed)
         ? Math.Clamp(elapsed / DoorOpeningSeconds, 0, 1)
@@ -169,13 +170,20 @@ public sealed class SiegeSession
     {
         if (!double.IsFinite(elapsedSeconds) || elapsedSeconds < 0)
             throw new ArgumentOutOfRangeException(nameof(elapsedSeconds));
-        foreach (var enemy in _enemies.Where(enemy => enemy.VisualState != SiegeEnemyVisualState.Walk))
+        foreach (var enemy in _enemies.Where(enemy => enemy.VisualState != SiegeEnemyVisualState.Walk).ToArray())
         {
             enemy.VisualElapsed += elapsedSeconds;
             if (enemy.VisualState == SiegeEnemyVisualState.Attack)
             {
                 enemy.VisualFrame = (int)(enemy.VisualElapsed / EnemyAttackFrameSeconds);
                 if (enemy.VisualFrame < 9) continue;
+            }
+            else if (enemy.VisualState == SiegeEnemyVisualState.Dying)
+            {
+                enemy.VisualFrame = (int)(enemy.VisualElapsed / EnemyDeathFrameSeconds);
+                if (enemy.VisualFrame < 8) continue;
+                _enemies.Remove(enemy);
+                continue;
             }
             else if (enemy.VisualElapsed < EnemyHitSeconds)
                 continue;
@@ -303,8 +311,8 @@ public sealed class SiegeSession
 
     private void TickEnemies()
     {
-        if (Won || Defeated) return;
-        foreach (var enemy in _enemies.ToArray())
+        if (Defeated || !_enemies.Any(enemy => enemy.Health > 0)) return;
+        foreach (var enemy in _enemies.Where(enemy => enemy.Health > 0).ToArray())
         {
             var distance = Math.Abs(enemy.X - PlayerX) + Math.Abs(enemy.Y - PlayerY);
             if (distance == 1)
@@ -329,9 +337,10 @@ public sealed class SiegeSession
                 enemy.WalkFrame = (enemy.WalkFrame + 1) % 3;
             }
         }
-        if (AlliesAlive > 0 && _enemies.Count > 1 && _random.Next(100) < AlliesAlive * 7)
+        var vulnerable = _enemies.Where(enemy => enemy.Health > 0 && !enemy.Champion).ToArray();
+        if (AlliesAlive > 0 && vulnerable.Length > 0 && _random.Next(100) < AlliesAlive * 7)
         {
-            var victim = _enemies.First(x => !x.Champion); victim.Health--; RemoveDead(); LastMessage = "Your retainers bring down a defender.";
+            var victim = vulnerable[0]; victim.Health--; RemoveDead(); LastMessage = "Your retainers bring down a defender.";
         }
         Health = Math.Max(0, Health);
     }
@@ -348,7 +357,15 @@ public sealed class SiegeSession
         return null;
     }
 
-    private void RemoveDead() => _enemies.RemoveAll(x => x.Health <= 0);
+    private void RemoveDead()
+    {
+        foreach (var enemy in _enemies.Where(enemy => enemy.Health <= 0 &&
+                     enemy.VisualState != SiegeEnemyVisualState.Dying))
+        {
+            enemy.Facing = DirectionToward(enemy.X, enemy.Y, PlayerX, PlayerY, enemy.Facing);
+            StartVisual(enemy, SiegeEnemyVisualState.Dying);
+        }
+    }
 
     private static void StartVisual(SiegeEnemy enemy, SiegeEnemyVisualState state)
     {

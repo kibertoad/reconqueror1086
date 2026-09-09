@@ -305,6 +305,31 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void DefeatedEnemiesStopBlockingButFinishTheirCollapseBeforeVictory()
+    {
+        var player = new Player();
+        player.Inventory.Weapon = "Heavy Crossbow";
+        player.Inventory.CrossbowBolts = 1;
+        var tiles = new SiegeTile[5, 3];
+        for (var x = 0; x < 5; x++)
+        for (var y = 0; y < 3; y++)
+            tiles[x, y] = x == 0 || y == 0 || x == 4 || y == 2 ? SiegeTile.Wall : SiegeTile.Floor;
+        var siege = new SiegeSession(player, new Army(), 0, 3,
+            new SiegeLayout(tiles, 1, 1, Facing.East, [new SiegeSpawn(2, 1, false, 99)]));
+
+        Assert.Equal(SiegeAction.Shot, siege.Shoot());
+        var dying = Assert.Single(siege.Enemies);
+        Assert.Equal(SiegeEnemyVisualState.Dying, dying.VisualState);
+        Assert.Null(siege.EnemyAt(2, 1));
+        Assert.False(siege.Won);
+        siege.AdvanceEnemyAnimations(SiegeSession.EnemyDeathFrameSeconds * 4.1);
+        Assert.Equal(4, dying.VisualFrame);
+        siege.AdvanceEnemyAnimations(SiegeSession.EnemyDeathFrameSeconds * 4);
+        Assert.Empty(siege.Enemies);
+        Assert.True(siege.Won);
+    }
+
+    [Fact]
     public void ConversationDatabaseDecodesIndexedPromptsResponsesAndLinks()
     {
         var first = ConversationNode(["GERARD.PCC", "Earl Gerard", "Greetings.", "Ask about the dragon.", "Farewell."],
