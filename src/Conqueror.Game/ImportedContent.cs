@@ -274,6 +274,22 @@ public sealed class ImportedContentCatalog
         }
     }
 
+    public DynamixVariableTable? DecodeVariableTable(string id)
+    {
+        using var stream = Open(id);
+        if (stream is null) return null;
+        try
+        {
+            using var memory = new MemoryStream();
+            stream.CopyTo(memory);
+            return DynamixVariableTableDecoder.Decode(memory.ToArray());
+        }
+        catch (InvalidDataException)
+        {
+            return null;
+        }
+    }
+
     public DynamixSoundBank? DecodeSoundBank(string id)
     {
         using var stream = Open(id);

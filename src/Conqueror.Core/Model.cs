@@ -240,4 +240,7 @@ public sealed class CampaignState
     public int YouthDilemmasAnswered { get; set; }
     public int? ActiveYouthDilemmaNumber { get; set; }
     public List<string> Journal { get; init; } = [];
+    public List<int> ConversationVariables { get; init; } = [];
+    public Dictionary<int, int> ConversationAttributes { get; init; } = [];
+    public Dictionary<int, int> ConversationItems { get; init; } = [];
 }

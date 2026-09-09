@@ -3,7 +3,9 @@ using Conqueror.Resources;
 namespace Conqueror.Game;
 
 /// <summary>Traverses decoded original conversation links while keeping presentation selection deterministic in tests.</summary>
-public sealed class ImportedConversationSession(DynamixConversationDatabase database)
+public sealed class ImportedConversationSession(
+    DynamixConversationDatabase database,
+    DynamixActionInterpreter? actions = null)
 {
     public DynamixConversationNode? CurrentNode { get; private set; }
     public int PromptVariantIndex { get; private set; }
@@ -17,7 +19,9 @@ public sealed class ImportedConversationSession(DynamixConversationDatabase data
         var node = CurrentNode ?? throw new InvalidOperationException("Conversation is not active.");
         if ((uint)responseIndex >= (uint)node.Responses.Count)
             throw new ArgumentOutOfRangeException(nameof(responseIndex));
-        return MoveTo(node.Responses[responseIndex].TargetNodeId, choosePrompt);
+        var response = node.Responses[responseIndex];
+        var result = actions?.Execute(response.ActionIds);
+        return MoveTo(result?.RedirectNodeId ?? response.TargetNodeId, choosePrompt);
     }
 
     public bool Continue(Func<int, int> choosePrompt)
@@ -37,6 +41,12 @@ public sealed class ImportedConversationSession(DynamixConversationDatabase data
             if (!visited.Add(nodeId)) throw new InvalidDataException("Conversation continuation cycle has no visible node.");
             var node = database.Find(nodeId)
                 ?? throw new InvalidDataException($"Conversation node {nodeId} is missing.");
+            var result = actions?.Execute(node.ActionIds);
+            if (result?.RedirectNodeId is { } redirect)
+            {
+                nodeId = redirect;
+                continue;
+            }
             if (node.PromptVariants.Count != 0)
             {
                 var selected = choosePrompt(node.PromptVariants.Count);

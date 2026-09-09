@@ -4,14 +4,14 @@ namespace Conqueror.Resources;
 
 public enum DynamixExpressionOperator
 {
-    And = 1,
-    Or = 2,
-    GreaterThan = 3,
-    LessThan = 4,
-    Equal = 5,
-    NotEqual = 6,
-    LessThanOrEqual = 7,
-    GreaterThanOrEqual = 8
+    NotEqual = 1,
+    LessThanOrEqual = 2,
+    GreaterThanOrEqual = 3,
+    And = 4,
+    Or = 5,
+    GreaterThan = 6,
+    LessThan = 7,
+    Equal = 8
 }
 
 public enum DynamixValueKind { Expression = 1, Literal = 2, Function = 3 }

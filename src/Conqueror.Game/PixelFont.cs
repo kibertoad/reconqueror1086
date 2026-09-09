@@ -33,11 +33,13 @@ internal static class PixelFont
 
     public static void Draw(SpriteBatch batch, Texture2D pixel, string text, Vector2 pos, Color color, int scale = 3, int wrap = 0)
     {
+        if (scale <= 0) throw new ArgumentOutOfRangeException(nameof(scale));
+        var renderedText = wrap > 0 ? PixelTextLayout.Wrap(text, Math.Max(1, wrap / (6 * scale))) : text;
         var x = (int)pos.X; var y = (int)pos.Y; var origin = x;
-        foreach (var raw in text.ToUpperInvariant())
+        foreach (var raw in renderedText.ToUpperInvariant())
         {
             var c = raw == '\n' ? raw : (Glyphs.ContainsKey(raw) ? raw : ' ');
-            if (c == '\n' || (wrap > 0 && x - origin + 6 * scale > wrap)) { x = origin; y += 9 * scale; if (c == '\n') continue; }
+            if (c == '\n') { x = origin; y += 9 * scale; continue; }
             if (c != ' ')
             {
                 var glyph = Glyphs[c];

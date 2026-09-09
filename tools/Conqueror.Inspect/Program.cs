@@ -52,7 +52,10 @@ var renderSmkName = OptionValue(inspectionOptions, "--render-smk=");
 var palettePcxName = OptionValue(inspectionOptions, "--palette-pcx=");
 var disassembleAddresses = OptionValue(inspectionOptions, "--disassemble=");
 var xrefDataOffsets = OptionValue(inspectionOptions, "--xref-data=");
+var fixupSourceAddresses = OptionValue(inspectionOptions, "--fixup-source=");
 var conversationNodeIds = OptionValue(inspectionOptions, "--conversation-nodes=");
+var integerResourceName = OptionValue(inspectionOptions, "--resource-integers=");
+var actionGroupIds = OptionValue(inspectionOptions, "--action-groups=");
 if (disassembleAddresses is not null)
 {
     var executable = Directory.EnumerateFiles(artifactRoot, "CONQUER.EXE", SearchOption.AllDirectories).Single();
@@ -66,6 +69,13 @@ if (xrefDataOffsets is not null)
     var offsets = xrefDataOffsets.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
         .Select(ParseAddress).ToArray();
     File.WriteAllText(Path.Combine(output, "executable-data-xrefs.txt"), FindLinearExecutableDataReferences(executable, offsets));
+}
+if (fixupSourceAddresses is not null)
+{
+    var executable = Directory.EnumerateFiles(artifactRoot, "CONQUER.EXE", SearchOption.AllDirectories).Single();
+    var addresses = fixupSourceAddresses.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .Select(ParseAddress).ToArray();
+    File.WriteAllText(Path.Combine(output, "executable-fixup-source-report.txt"), FindLinearExecutableFixupsBySource(executable, addresses));
 }
 var terms = inspectionOptions.Where(x => !x.StartsWith("--", StringComparison.Ordinal)).ToArray();
 if (terms.Length > 0)
@@ -99,6 +109,22 @@ if (File.Exists(gobPath))
     foreach (var entry in gob.Entries)
         directory.AppendLine($"{entry.Index,5}  {entry.Flags,5}  {entry.StoredSize,10}  {entry.ExpandedSize,10}  0x{entry.Offset:X8}  {entry.Name}");
     File.WriteAllText(Path.Combine(output, "gob-directory.txt"), directory.ToString());
+
+    if (integerResourceName is not null)
+    {
+        var integerEntry = gob.Entries.FirstOrDefault(x => x.Name.Equals(integerResourceName, StringComparison.OrdinalIgnoreCase))
+            ?? throw new ArgumentException($"GOB resource '{integerResourceName}' was not found.");
+        var integerBytes = gob.ReadDecoded(integerEntry);
+        if (integerBytes.Length > 64 * 1024 || integerBytes.Length % 4 != 0)
+            throw new InvalidDataException("Integer resource must contain at most 64 KiB of complete dwords.");
+        var integerReport = new StringBuilder("# Index  Offset  Signed  Hex\n");
+        for (var offset = 0; offset < integerBytes.Length; offset += 4)
+        {
+            var value = BinaryPrimitives.ReadInt32LittleEndian(integerBytes.AsSpan(offset, 4));
+            integerReport.AppendLine($"{offset / 4,7}  0x{offset:X4}  {value,11}  0x{unchecked((uint)value):X8}");
+        }
+        File.WriteAllText(Path.Combine(output, "resource-integer-report.txt"), integerReport.ToString());
+    }
 
     var compressionReport = new StringBuilder("# Index  Kind  Blocks  Compressed  Stored  Result  Name\n");
     foreach (var entry in gob.Entries.Where(x => !x.IsStored))
@@ -250,6 +276,22 @@ if (File.Exists(gobPath))
     }
     File.WriteAllText(Path.Combine(output, "conversation-report.txt"), conversationReport.ToString());
 
+    var variableTableReport = new StringBuilder("# Variables  ElementSize  ElementKind  NonzeroInitialValues  Name\n");
+    var variableTableEntry = gob.Entries.FirstOrDefault(x => x.Name.Equals("all.vtb", StringComparison.OrdinalIgnoreCase));
+    if (variableTableEntry is not null && DynamixArchive.CanDecode(variableTableEntry))
+    {
+        try
+        {
+            var variables = DynamixVariableTableDecoder.Decode(gob.ReadDecoded(variableTableEntry));
+            variableTableReport.AppendLine($"{variables.InitialValues.Count,9}  {variables.ElementSize,11}  {variables.ElementKind,11}  {variables.InitialValues.Count(value => value != 0),20}  {variableTableEntry.Name}");
+        }
+        catch (InvalidDataException error)
+        {
+            variableTableReport.AppendLine($"rejected  {error.Message.Replace('\r', ' ').Replace('\n', ' ')}");
+        }
+    }
+    File.WriteAllText(Path.Combine(output, "variable-table-report.txt"), variableTableReport.ToString());
+
     var actionTreeReport = new StringBuilder("# IndexHeader  Groups  Actions  Expressions  Values  MissingConversationIds  Body  Index\n");
     var actionBody = gob.Entries.FirstOrDefault(x => x.Name.Equals("all.tmb", StringComparison.OrdinalIgnoreCase));
     var actionIndex = gob.Entries.FirstOrDefault(x => x.Name.Equals("all.tmi", StringComparison.OrdinalIgnoreCase));
@@ -275,7 +317,21 @@ if (File.Exists(gobPath))
             actionTreeReport.AppendLine($"# ValueKinds   {string.Join(' ', actionTrees.Values.Values.GroupBy(x => x.Kind).OrderBy(x => x.Key).Select(x => $"{x.Key}:{x.Count()}"))}");
             actionTreeReport.AppendLine($"# Operators    {string.Join(' ', actionTrees.Expressions.Values.SelectMany(x => x.Operators).GroupBy(x => x).OrderBy(x => x.Key).Select(x => $"{x.Key}:{x.Count()}"))}");
             actionTreeReport.AppendLine($"# FunctionIds  {string.Join(' ', actionTrees.Values.Values.Where(x => x.Kind == DynamixValueKind.Function).GroupBy(x => x.Value).OrderBy(x => x.Key).Select(x => $"{x.Key}:{x.Count()}"))}");
+            actionTreeReport.AppendLine($"# FunctionSignatures  {string.Join(' ', actionTrees.Values.Values.Where(x => x.Kind == DynamixValueKind.Function).GroupBy(x => x.Value).OrderBy(x => x.Key).Select(x => $"{x.Key}[{string.Join(',', x.GroupBy(v => v.ArgumentExpressionOffsets.Count).OrderBy(v => v.Key).Select(v => $"{v.Key}:{v.Count()}"))}]"))}");
             if (missing.Length > 0) actionTreeReport.AppendLine($"# MissingIds   {string.Join(',', missing)}");
+            if (actionGroupIds is not null)
+            {
+                var groupReport = new StringBuilder("# Selected action groups; expressions are numeric metadata only\n");
+                foreach (var id in actionGroupIds.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(ParseNodeId))
+                {
+                    var group = actionTrees.Find(id)
+                        ?? throw new ArgumentException($"Action group {id} was not found.");
+                    groupReport.AppendLine($"group {id} offset=0x{group.SourceOffset:X} actions={group.ActionOffsets.Count}");
+                    foreach (var offset in group.ActionOffsets)
+                        AppendAction(groupReport, actionTrees, offset, "  ", []);
+                }
+                File.WriteAllText(Path.Combine(output, "action-group-report.txt"), groupReport.ToString());
+            }
         }
         catch (InvalidDataException error)
         {
@@ -623,6 +679,17 @@ static string FindLinearExecutableDataReferences(string path, IReadOnlyList<uint
     return report.ToString();
 }
 
+static string FindLinearExecutableFixupsBySource(string path, IReadOnlyList<uint> addresses)
+{
+    var fixups = LinearExecutableFixupReader.ReadInternalFixups(File.ReadAllBytes(path));
+    var report = new StringBuilder("# 32-bit LE fixups near requested source addresses (derived metadata)\n");
+    report.AppendLine($"# requested: {string.Join(',', addresses.Select(address => $"0x{address:X}"))}");
+    foreach (var fixup in fixups.Where(fixup => addresses.Any(address => Math.Abs((long)fixup.SourceAddress - address) <= 16))
+        .OrderBy(fixup => fixup.SourceAddress))
+        report.AppendLine($"0x{fixup.SourceAddress:X8}  object{fixup.TargetObject}+0x{fixup.TargetOffset:X}  source-type 0x{fixup.SourceType:X2}{(fixup.Additive ? " additive" : "")}{(fixup.Chained ? " chained" : "")}");
+    return report.ToString();
+}
+
 static void WritePpm(string path, CsfFrame frame, byte[] palette, int scale)
 {
     if (scale <= 0) throw new ArgumentOutOfRangeException(nameof(scale));
@@ -678,6 +745,44 @@ static string Hash(string path)
 {
     using var stream = File.OpenRead(path);
     return Convert.ToHexString(SHA256.HashData(stream)).ToLowerInvariant();
+}
+
+static void AppendAction(StringBuilder report, DynamixActionTreeDatabase database, int offset, string indent, HashSet<int> active)
+{
+    if (!active.Add(offset))
+    {
+        report.AppendLine($"{indent}action@0x{offset:X} cycle");
+        return;
+    }
+    var action = database.Actions[offset];
+    report.AppendLine($"{indent}{action.Kind}@0x{offset:X}: {FormatExpression(database, action.ExpressionOffset, [])}");
+    foreach (var branch in action.BranchActionOffsets)
+        AppendAction(report, database, branch, indent + "  ", active);
+    active.Remove(offset);
+}
+
+static string FormatExpression(DynamixActionTreeDatabase database, int offset, HashSet<int> active)
+{
+    if (!active.Add(offset)) return $"expr@0x{offset:X}:cycle";
+    var expression = database.Expressions[offset];
+    var result = FormatValue(database, expression.ValueOffsets[0], active);
+    for (var index = 0; index < expression.Operators.Count; index++)
+        result = $"({result} {expression.Operators[index]} {FormatValue(database, expression.ValueOffsets[index + 1], active)})";
+    active.Remove(offset);
+    return result;
+}
+
+static string FormatValue(DynamixActionTreeDatabase database, int offset, HashSet<int> active)
+{
+    var value = database.Values[offset];
+    var text = value.Kind switch
+    {
+        DynamixValueKind.Literal => value.Value.ToString(),
+        DynamixValueKind.Expression => FormatExpression(database, value.Value, active),
+        DynamixValueKind.Function => $"F{value.Value}({string.Join(',', value.ArgumentExpressionOffsets.Select(argument => FormatExpression(database, argument, active)))})",
+        _ => "?"
+    };
+    return value.Invert ? $"NOT({text})" : text;
 }
 
 static IEnumerable<(long Offset, string Value)> PrintableStrings(string path)

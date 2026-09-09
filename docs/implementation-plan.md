@@ -530,7 +530,8 @@ Local static-analysis tool: Ghidra 12.1.3 is installed user-wide at `C:\Users\ki
 - [x] Decode `ALL.CIF`/`ALL.CBF` conversation framing end to end; all 1,311 indexed nodes, 2,062 prompt variants, 2,696 terminal/linked responses, and 63 zero-response continuation slots validate through a bounded graph parser and runtime catalog adapter. Confirm the populated inn's ten selector roots and first named nodes against the owned database.
 - [x] Preserve all 423 node-level and 2,318 response-level action references from the fixed conversation headers, with exact 30-slot bounds and metadata-only reporting.
 - [x] Decode the indexed `ALL.TMI`/`ALL.TMB` structure with bounded recursive traversal; validate all 689 groups, 2,267 actions, 10,373 expressions, and 13,352 values and report the lone unresolved original reference `5011`.
-- [ ] Recover action function IDs 3-9 and execute their confirmed conversation conditions, redirects, and state mutations.
+- [x] Recover action function IDs 3-9, the relocated operator jump table, and the 190-value `ALL.VTB` initializer; execute the confirmed expression/branch grammar, persistent script variables, dialogue redirects, raw item counters, and wealth mutations from original inn conversations.
+- [ ] Map the remaining original character-attribute selectors and numeric quest-item identities onto the corresponding campaign fields and visible inventory rewards.
 - [x] Decode one byte-stored image/palette resource into runtime RGBA pixels end to end.
 - [x] Decode all five byte-stored CSF indexed-animation sequences into bounded palette indices and alpha masks.
 - [x] Validate and classify the five stored 256-color RGB palette resources.
@@ -547,7 +548,8 @@ Local static-analysis tool: Ghidra 12.1.3 is installed user-wide at `C:\Users\ki
 - [x] Decode HAT screen descriptors and use installed `CGOPTS.HAT`/`PREGEN.HAT` geometry at runtime with bounded fallback definitions.
 - [x] Split Home, farm management, blacksmith workshop, and blacksmith inventory into distinct runtime scenes using screenshot-verified `TACTICAL.PCX`, `FIEFMGMT.PCX`, `FORGESMI.PCX`, and `SWDTEMP.PCX` roles.
 - [x] Activate screenshot-confirmed `INNPEOPL.PCX`; bind its ten patrons, Exit, and footer through `VINN.HAT`; and use the executable-ordered name catalog plus matching PCC portraits in the shared conversation frame.
-- [x] Activate the populated inn's original conversation roots from the startup-decoded database: preload referenced portraits, select prompt variants, render all declared response rows, accept mouse/number selection, follow response and zero-choice continuation edges, and terminate on target zero. Keep mutation commands and redirect side effects explicitly pending.
+- [x] Activate the populated inn's original conversation roots from the startup-decoded database: preload referenced portraits, select prompt variants, render all declared response rows, accept mouse/number selection, execute node/response action programs, follow action redirects plus response and zero-choice continuation edges, and terminate on target zero.
+- [x] Replace character-slicing fallback text wrapping with word-boundary wrapping; preserve explicit paragraph breaks and keep a single oversized token intact, matching the original text control's explicit `WORDWRAP` behavior at the level supported by the fixed-width fallback font.
 - [x] Decode the 40-record `WEAPONS.DAT` store table and bind its prices, local descriptions, item order, and `SWORDS.CSF` frame indices to typed equipment definitions and the original inventory shell.
 - [x] Decode and palette-verify all four `BUYSELL.CSF` overlays, then select blank/View and Sell/Purchase states from store metadata and current ownership through typed presentation definitions.
 - [x] Identify `ICONTEMP.PCX`/`ICONMAP.HAT` as the estate/travel shell, activate its exact viewport, inset-map, tab, information, and navigation regions, and retain a no-media map fallback.

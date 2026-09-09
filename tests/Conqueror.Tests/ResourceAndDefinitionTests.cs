@@ -163,6 +163,70 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void PixelTextWrapsAtWordsAndKeepsOversizedWordsIntact()
+    {
+        Assert.Equal("ONE TWO\nTHREE", PixelTextLayout.Wrap("ONE TWO THREE", 7));
+        Assert.Equal("SUPERCALIFRAGILISTIC", PixelTextLayout.Wrap("SUPERCALIFRAGILISTIC", 5));
+        Assert.Equal("ONE\n\nTWO", PixelTextLayout.Wrap(" ONE  \r\n\r\n TWO ", 8));
+        Assert.Throws<ArgumentOutOfRangeException>(() => PixelTextLayout.Wrap("ONE", 0));
+    }
+
+    [Fact]
+    public void VariableTableAndActionInterpreterApplyPersistentMutationAndRedirect()
+    {
+        var variableBytes = new byte[20];
+        WriteInt(variableBytes, 0, 2); WriteInt(variableBytes, 4, 4); WriteInt(variableBytes, 8, 5);
+        WriteInt(variableBytes, 12, 3); WriteInt(variableBytes, 16, 0);
+        var table = DynamixVariableTableDecoder.Decode(variableBytes);
+        Assert.Equal([3, 0], table.InitialValues);
+        Assert.Throws<InvalidDataException>(() => DynamixVariableTableDecoder.Decode(variableBytes[..^1]));
+
+        var values = new Dictionary<int, DynamixValueNode>
+        {
+            [1] = new(1, DynamixValueKind.Literal, 0, false, []),
+            [2] = new(2, DynamixValueKind.Literal, 1, false, []),
+            [3] = new(3, DynamixValueKind.Function, 5, false, [10, 11, 11]),
+            [4] = new(4, DynamixValueKind.Function, 6, false, [10, 11]),
+            [5] = new(5, DynamixValueKind.Function, 3, false, [13]),
+            [6] = new(6, DynamixValueKind.Function, 3, false, [14])
+        };
+        var expressions = new Dictionary<int, DynamixExpressionNode>
+        {
+            [10] = new(10, [1], []), [11] = new(11, [2], []),
+            [12] = new(12, [3], []), [13] = new(13, [2], []),
+            [14] = new(14, [1], []),
+            [15] = new(15, [4, 2], [DynamixExpressionOperator.GreaterThanOrEqual]),
+            [16] = new(16, [5], []), [17] = new(17, [6], [])
+        };
+        var actions = new Dictionary<int, DynamixActionNode>
+        {
+            [20] = new(20, DynamixActionKind.Evaluate, 12, []),
+            [21] = new(21, DynamixActionKind.IfElse, 15, [22, 23]),
+            [22] = new(22, DynamixActionKind.Evaluate, 16, []),
+            [23] = new(23, DynamixActionKind.Evaluate, 17, [])
+        };
+        var database = new DynamixActionTreeDatabase(100,
+            new Dictionary<int, DynamixActionGroup> { [99] = new(99, 0, [20, 21]) }, actions, expressions, values);
+        var state = new TestActionState([3, 0]);
+
+        var result = new DynamixActionInterpreter(database, state).Execute([99]);
+
+        Assert.True(result.Success);
+        Assert.Equal(1, state.Variables[1]);
+        Assert.Equal(1, result.RedirectNodeId);
+        Assert.False(new DynamixActionInterpreter(database, state).Execute([5011]).Success);
+
+        var campaign = new CampaignState { Player = new Player { Wealth = 12 } };
+        var campaignState = new ImportedConversationActionState(campaign);
+        campaignState.Initialize(table.InitialValues);
+        Assert.True(campaignState.TryGetVariable(1, 0, out var wealth));
+        Assert.Equal(12, wealth);
+        Assert.True(campaignState.TrySetVariable(1, 0, -4));
+        Assert.Equal(0, campaign.Player.Wealth);
+        Assert.Equal([3, 0], campaign.ConversationVariables);
+    }
+
+    [Fact]
     public void SmackerMovieHeaderAndFrameIndexAreBounded()
     {
         var movie = SmackerMovieDecoder.Decode(SyntheticSmacker());
@@ -1089,6 +1153,28 @@ public sealed class ResourceAndDefinitionTests
     }
 
     private static void WriteInt(byte[] target, int offset, int value) => BinaryPrimitives.WriteInt32LittleEndian(target.AsSpan(offset, 4), value);
+
+    private sealed class TestActionState(IReadOnlyList<int> initial) : IDynamixActionState
+    {
+        public List<int> Variables { get; } = [.. initial];
+        private readonly Dictionary<int, int> _items = [];
+        public bool TryGetVariable(int scope, int index, out int value)
+        {
+            value = 0;
+            if (scope != 0 || (uint)index >= (uint)Variables.Count) return false;
+            value = Variables[index];
+            return true;
+        }
+        public bool TrySetVariable(int scope, int index, int value)
+        {
+            if (scope != 0 || (uint)index >= (uint)Variables.Count) return false;
+            Variables[index] = value;
+            return true;
+        }
+        public bool TryAddItem(int index) { _items[index] = _items.GetValueOrDefault(index) + 1; return true; }
+        public bool TryClearItem(int index) => _items.Remove(index);
+        public bool HasItem(int index) => _items.GetValueOrDefault(index) != 0;
+    }
 
     private static byte[] SyntheticSmacker()
     {

@@ -68,6 +68,9 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private ImportedSoundLibrary? _importedSoundLibrary;
     private ImportedDialogueRepository? _importedDialogue;
     private ImportedConversationSession? _conversationSession;
+    private DynamixConversationDatabase? _conversationDatabase;
+    private DynamixActionTreeDatabase? _conversationActionTrees;
+    private IReadOnlyList<int> _conversationInitialVariables = [];
     private WeaponStoreResource? _weaponStore;
     private YouthDilemmaResult? _youthDilemmaResult;
     private SoundEffect? _importedMusic;
@@ -415,6 +418,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         }
 
         _campaign = campaign!;
+        ResetConversationSession();
         _fiefCheckpoint = null;
         _hasActiveCampaign = true;
         _fieldBattle = null;
@@ -467,6 +471,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             case CharacterCreationAction.GenerateNew:
                 var seed = Environment.TickCount;
                 _campaign = new Campaign(Campaign.NewCustom(NormalizedCharacterName(), seed, _heraldicColors[_heraldicColor].Name), seed);
+                ResetConversationSession();
                 _hasActiveCampaign = true;
                 _youthDilemmaResult = null;
                 _screen = Screen.Dilemma;
@@ -502,6 +507,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private void StartPregeneratedCharacter(int index)
     {
         _campaign = new Campaign(Campaign.NewFromTemplate(index));
+        ResetConversationSession();
         _hasActiveCampaign = true;
         _selectedLocation = 0;
         _screen = Screen.Briefing;
@@ -1096,7 +1102,15 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         var indexId = _importedContent?.FindId("resource", ":all.cif");
         if (bodyId is null || indexId is null
             || _importedContent?.DecodeConversations(bodyId, indexId) is not { } database) return;
-        _conversationSession = new ImportedConversationSession(database);
+        _conversationDatabase = database;
+        var actionBodyId = _importedContent.FindId("resource", ":all.tmb");
+        var actionIndexId = _importedContent.FindId("resource", ":all.tmi");
+        var variableId = _importedContent.FindId("resource", ":all.vtb");
+        _conversationActionTrees = actionBodyId is not null && actionIndexId is not null
+            ? _importedContent.DecodeActionTrees(actionBodyId, actionIndexId) : null;
+        _conversationInitialVariables = variableId is not null
+            ? _importedContent.DecodeVariableTable(variableId)?.InitialValues ?? [] : [];
+        ResetConversationSession();
         foreach (var portraitFile in database.Nodes.Values
             .Select(node => node.PortraitFile)
             .OfType<string>()
@@ -1111,6 +1125,19 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             texture.SetData(image.ToRgba());
             _conversationPortraits.Add(portraitFile, texture);
         }
+    }
+
+    private void ResetConversationSession()
+    {
+        if (_conversationDatabase is null)
+        {
+            _conversationSession = null;
+            return;
+        }
+        var state = new ImportedConversationActionState(_campaign.State);
+        state.Initialize(_conversationInitialVariables);
+        var actions = _conversationActionTrees is null ? null : new DynamixActionInterpreter(_conversationActionTrees, state);
+        _conversationSession = new ImportedConversationSession(_conversationDatabase, actions);
     }
 
     private void LoadTitleMovie()
