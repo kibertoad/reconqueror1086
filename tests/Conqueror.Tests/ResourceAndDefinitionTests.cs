@@ -61,10 +61,29 @@ public sealed class ResourceAndDefinitionTests
         Assert.Equal((0, 22050, 4096, true, false, false),
             (track.Index, track.SampleRate, track.MaximumDecodedBytes,
                 track.IsCompressed, track.Is16Bit, track.IsStereo));
-        Assert.Equal((118, 8, true, (byte)1),
+        Assert.Equal((118, 12, true, (byte)1),
             (movie.Frames[0].Offset, movie.Frames[0].Length, movie.Frames[0].IsKeyFrame, movie.Frames[0].Flags));
-        Assert.Equal((126, 12, false, (byte)2),
+        Assert.Equal((130, 12, false, (byte)2),
             (movie.Frames[1].Offset, movie.Frames[1].Length, movie.Frames[1].IsKeyFrame, movie.Frames[1].Flags));
+    }
+
+    [Fact]
+    public void SmackerFrameLayoutDecodesPaletteAndAudioPacketBoundaries()
+    {
+        var source = SyntheticSmacker();
+        var movie = SmackerMovieDecoder.Decode(source);
+        var first = SmackerMovieDecoder.DecodeFrameLayout(movie, 0, source, new byte[768]);
+
+        Assert.True(first.PaletteChanged);
+        Assert.Empty(first.AudioPackets);
+        Assert.Equal((126, 4), (first.Video.Offset, first.Video.Length));
+
+        var second = SmackerMovieDecoder.DecodeFrameLayout(movie, 1, source, first.Palette);
+        Assert.False(second.PaletteChanged);
+        var audio = Assert.Single(second.AudioPackets);
+        Assert.Equal((0, 3, 134, 4),
+            (audio.TrackIndex, audio.DecodedLength, audio.Data.Offset, audio.Data.Length));
+        Assert.Equal((138, 4), (second.Video.Offset, second.Video.Length));
     }
 
     [Fact]
@@ -833,7 +852,7 @@ public sealed class ResourceAndDefinitionTests
 
     private static byte[] SyntheticSmacker()
     {
-        var source = new byte[138];
+        var source = new byte[142];
         "SMK2"u8.CopyTo(source);
         BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(4, 4), 196);
         BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(8, 4), 204);
@@ -842,10 +861,15 @@ public sealed class ResourceAndDefinitionTests
         BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(24, 4), 4096);
         BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(52, 4), 4);
         BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(72, 4), 0xC000_0000u | 22050);
-        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(104, 4), 9);
+        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(104, 4), 13);
         BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(108, 4), 12);
         source[112] = 1;
         source[113] = 2;
+        source[118] = 2;
+        source[122] = 0xFE;
+        source[123] = 0xFF;
+        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(130, 4), 8);
+        BinaryPrimitives.WriteUInt32LittleEndian(source.AsSpan(134, 4), 3);
         return source;
     }
 

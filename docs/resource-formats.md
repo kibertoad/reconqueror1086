@@ -130,7 +130,9 @@ The CD contains 2,131 Smacker movies occupying 288,867,980 bytes and indexing 18
 | next | declared tree length | shared Huffman tree data |
 | next | sum of aligned frame lengths | frame payloads, ending exactly at EOF |
 
-Of the 2,131 files, 2,095 declare one packed 8-bit mono audio track: 2,093 at 22,050 Hz and two at 11,025 Hz. The other 36 are silent. The dominant geometry is 196x204 (2,068 files); larger and special-purpose movies span eight other observed dimensions up to 640x480. This uniform `SMK2` population makes direct decoding a viable primary strategy; installation-time transcoding remains a fallback rather than a prerequisite. Video-tree, palette-delta, block, and packed-audio decoding are still incomplete.
+Of the 2,131 files, 2,095 declare one packed 8-bit mono audio track: 2,093 at 22,050 Hz and two at 11,025 Hz. The other 36 are silent. The dominant geometry is 196x204 (2,068 files); larger and special-purpose movies span eight other observed dimensions up to 640x480. Frame flags bind optional palette data followed by audio packets for tracks 0–6; the remainder is the video packet. Population-wide demultiplexing validates 2,135 palette changes and 161,884 audio packets while leaving a non-empty video packet in every frame. Palette packets copy the previous 256-entry RGB table, then apply bounded skip, old-palette copy, and new 6-bit RGB commands. Six-bit components expand with `value * 4 + value / 16`.
+
+This uniform `SMK2` population makes direct decoding a viable primary strategy; installation-time transcoding remains a fallback rather than a prerequisite. Video-tree, block, and packed-audio decoding are still incomplete.
 
 ## Dynamix `.666` sound banks
 
@@ -297,7 +299,7 @@ The raw-sector bounds, ISO directory traversal, cue timestamps, and WAV sample p
 - `gob-compression-report.txt`: kind-1 block counts plus complete kind-1 and kind-2 decoding validation.
 - `scene-res-report.txt`: per-scene entry, storage-kind, and block totals.
 - `scene-texture-report.txt`: per-scene raw-texture counts and distinct dimensions.
-- `smacker-report.txt`: version, dimensions, timing, frame counts, audio profiles, and exact container validation for every movie.
+- `smacker-report.txt`: version, dimensions, timing, frame counts, audio profiles, palette/audio packet totals, and exact container validation for every movie.
 - `resource-extension-report.txt`: aggregate extension and storage-kind inventory.
 - `stored-image-report.txt`: dimensions and decoded pixel-index hashes for stored, kind-1, and kind-2 PCX-compatible payloads.
 - `csf-report.txt`: storage kind, chunk sizes, dimensions, decoded segment totals, and stable frame-sequence hashes for byte-stored and kind-1 CSF containers.

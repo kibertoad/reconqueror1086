@@ -7,6 +7,16 @@ public sealed record SmackerAudioTrack(
 
 public sealed record SmackerFrame(int Index, int Offset, int Length, byte Flags, bool IsKeyFrame);
 
+public sealed record SmackerDataSegment(int Offset, int Length);
+
+public sealed record SmackerAudioPacket(int TrackIndex, int DecodedLength, SmackerDataSegment Data);
+
+public sealed record SmackerFrameLayout(
+    bool PaletteChanged,
+    byte[] Palette,
+    IReadOnlyList<SmackerAudioPacket> AudioPackets,
+    SmackerDataSegment Video);
+
 public sealed record SmackerMovie(
     int Version,
     int Width,
@@ -27,6 +37,66 @@ public static class SmackerMovieDecoder
     private const int MaximumMovieBytes = 256 * 1024 * 1024;
     private const int MaximumDimension = 4096;
     private const int MaximumFrames = 1_000_000;
+
+    public static SmackerFrameLayout DecodeFrameLayout(
+        SmackerMovie movie, int frameIndex, ReadOnlySpan<byte> source, ReadOnlySpan<byte> previousPalette)
+    {
+        ArgumentNullException.ThrowIfNull(movie);
+        if ((uint)frameIndex >= movie.Frames.Count)
+            throw new ArgumentOutOfRangeException(nameof(frameIndex));
+        if (previousPalette.Length != 256 * 3)
+            throw new ArgumentException("Smacker palette must contain exactly 256 RGB entries.", nameof(previousPalette));
+
+        var frame = movie.Frames[frameIndex];
+        if (frame.Offset < 0 || frame.Length <= 0 || frame.Offset > source.Length - frame.Length)
+            throw new InvalidDataException("Smacker frame lies outside the supplied movie.");
+        var palette = previousPalette.ToArray();
+        var cursor = frame.Offset;
+        var end = checked(frame.Offset + frame.Length);
+        var paletteChanged = (frame.Flags & 1) != 0;
+        if (paletteChanged)
+        {
+            var paletteLength = checked(source[cursor] * 4);
+            if (paletteLength == 0 || paletteLength > end - cursor)
+                throw new InvalidDataException("Smacker palette packet is invalid.");
+            DecodePalette(source.Slice(cursor + 1, paletteLength - 1), previousPalette, palette);
+            cursor += paletteLength;
+        }
+
+        var audioPackets = new List<SmackerAudioPacket>();
+        for (var trackIndex = 0; trackIndex < AudioTrackCount; trackIndex++)
+        {
+            if ((frame.Flags & (2 << trackIndex)) == 0) continue;
+            var track = movie.AudioTracks.SingleOrDefault(candidate => candidate.Index == trackIndex)
+                ?? throw new InvalidDataException("Smacker frame references an undeclared audio track.");
+            if (end - cursor < 4)
+                throw new InvalidDataException("Smacker audio packet header is truncated.");
+            var packetLength = ReadUInt32(source, cursor);
+            if (packetLength < 4 || packetLength > int.MaxValue || packetLength > end - cursor)
+                throw new InvalidDataException("Smacker audio packet extent is invalid.");
+            var dataOffset = checked(cursor + 4);
+            var dataLength = checked((int)packetLength - 4);
+            var decodedLength = dataLength;
+            if (track.IsCompressed)
+            {
+                if (dataLength < 4)
+                    throw new InvalidDataException("Smacker packed-audio packet is truncated.");
+                var declaredLength = ReadUInt32(source, dataOffset);
+                if (declaredLength == 0 || declaredLength > int.MaxValue
+                    || track.MaximumDecodedBytes > 0 && declaredLength > track.MaximumDecodedBytes)
+                    throw new InvalidDataException("Smacker packed-audio output length is invalid.");
+                decodedLength = checked((int)declaredLength);
+            }
+            audioPackets.Add(new SmackerAudioPacket(trackIndex, decodedLength,
+                new SmackerDataSegment(dataOffset, dataLength)));
+            cursor += checked((int)packetLength);
+        }
+
+        if (cursor >= end)
+            throw new InvalidDataException("Smacker frame has no video payload.");
+        return new SmackerFrameLayout(paletteChanged, palette, audioPackets,
+            new SmackerDataSegment(cursor, end - cursor));
+    }
 
     public static SmackerMovie Decode(ReadOnlySpan<byte> source)
     {
@@ -111,4 +181,45 @@ public static class SmackerMovieDecoder
 
     private static uint ReadUInt32(ReadOnlySpan<byte> source, int offset) =>
         BinaryPrimitives.ReadUInt32LittleEndian(source.Slice(offset, 4));
+
+    private static void DecodePalette(ReadOnlySpan<byte> packet, ReadOnlySpan<byte> previous, Span<byte> output)
+    {
+        var sourceOffset = 0;
+        var entry = 0;
+        while (entry < 256)
+        {
+            if (sourceOffset >= packet.Length)
+                throw new InvalidDataException("Smacker palette update is truncated.");
+            var command = packet[sourceOffset++];
+            if ((command & 0x80) != 0)
+            {
+                var count = (command & 0x7F) + 1;
+                if (count > 256 - entry)
+                    throw new InvalidDataException("Smacker palette skip exceeds the palette.");
+                entry += count;
+            }
+            else if ((command & 0x40) != 0)
+            {
+                if (sourceOffset >= packet.Length)
+                    throw new InvalidDataException("Smacker palette copy is truncated.");
+                var count = (command & 0x3F) + 1;
+                var oldEntry = packet[sourceOffset++];
+                if (count > 256 - entry || count > 256 - oldEntry)
+                    throw new InvalidDataException("Smacker palette copy exceeds the palette.");
+                previous.Slice(oldEntry * 3, count * 3).CopyTo(output.Slice(entry * 3, count * 3));
+                entry += count;
+            }
+            else
+            {
+                if (packet.Length - sourceOffset < 2)
+                    throw new InvalidDataException("Smacker palette color is truncated.");
+                output[entry * 3] = ExpandSixBit(command);
+                output[entry * 3 + 1] = ExpandSixBit((byte)(packet[sourceOffset++] & 0x3F));
+                output[entry * 3 + 2] = ExpandSixBit((byte)(packet[sourceOffset++] & 0x3F));
+                entry++;
+            }
+        }
+    }
+
+    private static byte ExpandSixBit(byte value) => checked((byte)(value * 4 + value / 16));
 }

@@ -321,29 +321,44 @@ sceneTextureReport.AppendLine($"# total textures: {sceneTextures}");
 File.WriteAllText(Path.Combine(output, "scene-texture-report.txt"), sceneTextureReport.ToString());
 File.WriteAllText(Path.Combine(output, "stored-palette-report.txt"), paletteReport.ToString());
 File.WriteAllText(Path.Combine(output, "sound-bank-report.txt"), soundBankReport.ToString());
-var smackerReport = new StringBuilder("# Version  Dimensions  Frames  Frame ms  Audio tracks  Bytes  ISO path\n");
+var smackerReport = new StringBuilder("# Version  Dimensions  Frames  Frame ms  Palette changes  Audio packets  Audio tracks  Bytes  ISO path\n");
 var smackerMovies = 0;
 long smackerBytes = 0;
 long smackerFrames = 0;
+long smackerPaletteChanges = 0;
+long smackerAudioPackets = 0;
 foreach (var file in files.Where(x => Path.GetExtension(x.Path).Equals(".SMK", StringComparison.OrdinalIgnoreCase)))
 {
     try
     {
-        var movie = SmackerMovieDecoder.Decode(iso.ReadFile(file));
+        var source = iso.ReadFile(file);
+        var movie = SmackerMovieDecoder.Decode(source);
+        var palette = new byte[768];
+        var paletteChanges = 0;
+        var audioPackets = 0;
+        for (var index = 0; index < movie.Frames.Count; index++)
+        {
+            var frame = SmackerMovieDecoder.DecodeFrameLayout(movie, index, source, palette);
+            palette = frame.Palette;
+            if (frame.PaletteChanged) paletteChanges++;
+            audioPackets += frame.AudioPackets.Count;
+        }
         var audio = string.Join(',', movie.AudioTracks.Select(track =>
             $"{track.Index}:{track.SampleRate}/{(track.IsCompressed ? "packed" : "pcm")}/{(track.Is16Bit ? 16 : 8)}/{(track.IsStereo ? 2 : 1)}"));
         smackerReport.AppendLine(FormattableString.Invariant(
-            $"SMK{movie.Version,-4}  {movie.Width}x{movie.Height,-10}  {movie.Frames.Count,6}  {movie.FrameDuration.TotalMilliseconds,8:0.###}  {audio,-28}  {file.Size,9}  {file.Path}"));
+            $"SMK{movie.Version,-4}  {movie.Width}x{movie.Height,-10}  {movie.Frames.Count,6}  {movie.FrameDuration.TotalMilliseconds,8:0.###}  {paletteChanges,15}  {audioPackets,13}  {audio,-28}  {file.Size,9}  {file.Path}"));
         smackerMovies++;
         smackerBytes += file.Size;
         smackerFrames += movie.Frames.Count;
+        smackerPaletteChanges += paletteChanges;
+        smackerAudioPackets += audioPackets;
     }
     catch (Exception error) when (error is InvalidDataException or OverflowException or ArgumentException)
     {
         smackerReport.AppendLine($"rejected: {error.Message.Replace('\r', ' ').Replace('\n', ' ')}  {file.Path}");
     }
 }
-smackerReport.AppendLine($"# totals: {smackerMovies} movies, {smackerFrames} frames, {smackerBytes} bytes");
+smackerReport.AppendLine($"# totals: {smackerMovies} movies, {smackerFrames} frames, {smackerPaletteChanges} palette changes, {smackerAudioPackets} audio packets, {smackerBytes} bytes");
 File.WriteAllText(Path.Combine(output, "smacker-report.txt"), smackerReport.ToString());
 var extensionReport = new StringBuilder("# Extension  Total  Stored  Kind1  Kind2  Other  Scopes\n");
 foreach (var group in resourceInventory.GroupBy(x => Path.GetExtension(x.Entry.Name).ToUpperInvariant()).OrderBy(x => x.Key))

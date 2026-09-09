@@ -32,7 +32,7 @@ The repository currently provides:
 - An end-user importer that installs byte-stored, kind-1, and kind-2 owned resources plus lossless CDDA WAV files under ignored local storage.
 - A runtime imported-content catalog, CD music playback, and definition-driven original art for the title, options hub, character options, pre-generated characters, animated youth dilemmas, estate/travel shell, England map, load screen, Home/farm/blacksmith flows, and a tournament portrait.
 - An executable-confirmed `TITLE.HAT`/`FFTITLE.PCX` title load followed by a corroborated character-options flow whose exact geometry comes from installed `CGOPTS.HAT` and `PREGEN.HAT`.
-- Forty-three xUnit test cases and 134 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
+- Forty-four xUnit test cases and 134 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
 
 ## Dependency map
 
