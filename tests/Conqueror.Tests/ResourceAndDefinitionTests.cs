@@ -144,14 +144,25 @@ public sealed class ResourceAndDefinitionTests
         });
         Assert.Contains(ImportedLayouts.Definitions,
             definition => definition.Role == "Home.Office" && definition.IdSuffix == ":fopts.hat");
+        Assert.Contains(ImportedArt.Definitions,
+            definition => definition.Role == "Home.Overview" && definition.IdSuffix == ":f_over.pcx");
+        Assert.Contains(ImportedArt.Definitions,
+            definition => definition.Role == "Home.WarPlanning" && definition.IdSuffix == ":warplan.pcx");
+        Assert.Contains(ImportedLayouts.Definitions,
+            definition => definition.Role == "Home.Overview" && definition.IdSuffix == ":foview.hat");
+        Assert.Contains(ImportedLayouts.Definitions,
+            definition => definition.Role == "Home.WarPlanning" && definition.IdSuffix == ":fwarplan.hat");
         Assert.Equal(
             [(SceneNavigationAction.Overview, "Overview", 0, new UiBounds(248, 184, 64, 31)),
              (SceneNavigationAction.Castle, "Castle", 1, new UiBounds(172, 153, 72, 44)),
              (SceneNavigationAction.Farm, "Farm", 2, new UiBounds(277, 146, 17, 38)),
              (SceneNavigationAction.Village, "Village", 3, new UiBounds(295, 141, 18, 43)),
              (SceneNavigationAction.Forest, "Forest", 4, new UiBounds(314, 147, 15, 39)),
-             (SceneNavigationAction.Orders, "Orders", 5, new UiBounds(359, 123, 35, 76)),
-             (SceneNavigationAction.Map, "Map", 8, new UiBounds(200, 55, 68, 85))],
+             (SceneNavigationAction.WarPlanning, "War Planning", 5, new UiBounds(359, 123, 35, 76)),
+             (SceneNavigationAction.Exit, "Exit", 6, new UiBounds(0, 113, 66, 210)),
+             (SceneNavigationAction.Jump, "JUMP!!", 7, new UiBounds(568, 84, 72, 200)),
+             (SceneNavigationAction.Map, "Map", 8, new UiBounds(200, 55, 68, 85)),
+             (SceneNavigationAction.Orders, "Orders", 9, new UiBounds(332, 180, 26, 37))],
             HomePresentationDefinitions.Hotspots.Select(hotspot =>
                 (hotspot.Action, hotspot.HoverLabel, hotspot.HatRegionId, hotspot.Bounds)));
         Assert.Equal(
@@ -387,6 +398,8 @@ public sealed class ResourceAndDefinitionTests
         Assert.Equal((7, "SCREEN.PCX", 0x45c06d), (layout.ScreenId, layout.BackgroundName, layout.UnknownTag));
         Assert.Equal(new HatRegion(0, 69, 18, 119, 133, 1), layout.FindRegion(0));
         Assert.Equal(new UiBounds(69, 18, 119, 133), CharacterCreationDefinitions.PregeneratedFrom(layout)[0]);
+        Assert.Equal(new UiBounds(69, 18, 119, 133),
+            HomePresentationDefinitions.HotspotsFrom(layout).Single(hotspot => hotspot.HatRegionId == 0).Bounds);
     }
 
     [Fact]

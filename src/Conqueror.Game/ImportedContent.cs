@@ -23,6 +23,8 @@ public static class ImportedArt
         new("Estate.Shell", "image", ":icontemp.pcx"),
         new("Map.England", "image", ":engmap1.pcx"),
         new("Home.Office", "image", ":tactical.pcx"),
+        new("Home.Overview", "image", ":f_over.pcx"),
+        new("Home.WarPlanning", "image", ":warplan.pcx"),
         new("Farm.Management", "image", ":fiefmgmt.pcx"),
         new("Blacksmith.Workshop", "image", ":forgesmi.pcx"),
         new("Blacksmith.Dialogue", "image", ":comscrn1.pcx"),
@@ -43,6 +45,8 @@ public static class ImportedLayouts
         new("Dilemma", ":chargen.hat"),
         new("Estate", ":iconmap.hat"),
         new("Home.Office", ":fopts.hat"),
+        new("Home.Overview", ":foview.hat"),
+        new("Home.WarPlanning", ":fwarplan.hat"),
         .. FarmPresentationDefinitions.Layouts.Select(layout =>
             new ImportedLayoutDefinition(layout.LayoutRole, layout.LayoutSuffix)),
         new("Blacksmith.Workshop", ":vsmith.hat")

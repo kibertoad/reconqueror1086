@@ -37,9 +37,9 @@ public sealed record SceneHotspot(SceneNavigationAction Action, string HoverLabe
 public static class HomePresentationDefinitions
 {
     public static UiBounds HoverLabelBounds { get; } = new(1, 443, 638, 35);
-    // FOPTS.HAT is the TACTICAL.PCX office descriptor. The executable's adjacent label trio maps
-    // the three left-to-right ledger spines to Farm, Village, and Forest. Exits and the small desk
-    // object still require dispatch evidence.
+    // FOPTS.HAT is the TACTICAL.PCX office descriptor. The executable stores a contiguous catalog
+    // of ten labels in the same ordinal sequence as its ten regions. The known Overview/Castle,
+    // three-ledger, and Map geometry anchors corroborate the complete ordinal mapping.
     public static IReadOnlyList<SceneHotspot> Hotspots { get; } =
     [
         new(SceneNavigationAction.Overview, "Overview", 0, new UiBounds(248, 184, 64, 31)),
@@ -47,8 +47,11 @@ public static class HomePresentationDefinitions
         new(SceneNavigationAction.Farm, "Farm", 2, new UiBounds(277, 146, 17, 38)),
         new(SceneNavigationAction.Village, "Village", 3, new UiBounds(295, 141, 18, 43)),
         new(SceneNavigationAction.Forest, "Forest", 4, new UiBounds(314, 147, 15, 39)),
-        new(SceneNavigationAction.Orders, "Orders", 5, new UiBounds(359, 123, 35, 76)),
-        new(SceneNavigationAction.Map, "Map", 8, new UiBounds(200, 55, 68, 85))
+        new(SceneNavigationAction.WarPlanning, "War Planning", 5, new UiBounds(359, 123, 35, 76)),
+        new(SceneNavigationAction.Exit, "Exit", 6, new UiBounds(0, 113, 66, 210)),
+        new(SceneNavigationAction.Jump, "JUMP!!", 7, new UiBounds(568, 84, 72, 200)),
+        new(SceneNavigationAction.Map, "Map", 8, new UiBounds(200, 55, 68, 85)),
+        new(SceneNavigationAction.Orders, "Orders", 9, new UiBounds(332, 180, 26, 37))
     ];
 
     public static IReadOnlyList<SceneHotspot> HotspotsFrom(HatLayout? layout) => Hotspots

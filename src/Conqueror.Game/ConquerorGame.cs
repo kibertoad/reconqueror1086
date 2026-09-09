@@ -14,7 +14,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private const string OriginalCursorRole = "Interface.Cursor";
     private const int OriginalDefaultCursorFrame = 0;
 
-    private enum Screen { Title, OptionsHub, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Map, Home, Farm, Village, Blacksmith, BlacksmithDialogue, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
+    private enum Screen { Title, OptionsHub, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Map, Home, WarPlanning, Farm, Village, Blacksmith, BlacksmithDialogue, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _batch = null!;
     private Texture2D _pixel = null!;
@@ -28,6 +28,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private int _loadSlot;
     private int _activeSaveSlot = 1;
     private Screen _loadReturnScreen = Screen.Title;
+    private Screen _overviewReturnScreen = Screen.Home;
     private IReadOnlyList<CampaignSaveSlot> _saveSlotInfo = [];
     private int _heraldicColor = 1;
     private string _characterName = "Sir ";
@@ -210,6 +211,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             else if (_screen == Screen.CharacterOptions) _screen = Screen.Title;
             else if (_screen == Screen.Character) _screen = Screen.CharacterOptions;
             else if (_screen == Screen.Farm) CancelFiefManagement();
+            else if (_screen == Screen.WarPlanning) _screen = Screen.Home;
+            else if (_screen == Screen.Overview) _screen = _overviewReturnScreen;
             else if (_screen == Screen.Blacksmith) _screen = Screen.Village;
             else if (_screen == Screen.BlacksmithDialogue) _screen = Screen.Blacksmith;
             else if (_screen == Screen.Shop) _screen = Screen.Blacksmith;
@@ -232,6 +235,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.Dilemma: UpdateDilemma(Press, mouse, click); break;
             case Screen.Map: UpdateMap(Press, mouse, click); break;
             case Screen.Home: UpdateHome(Press, mouse, click); break;
+            case Screen.WarPlanning: if (Press(Keys.Enter)) _screen = Screen.Home; break;
             case Screen.Farm: UpdateFarm(Press, mouse, click); break;
             case Screen.Village: UpdateVillage(Press); break;
             case Screen.Blacksmith: UpdateBlacksmith(Press, mouse, click); break;
@@ -240,7 +244,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.Tournament: UpdateTournament(Press); break;
             case Screen.FieldBattle: UpdateFieldBattle(Press, gameTime); break;
             case Screen.Siege: UpdateSiege(Press); break;
-            case Screen.Overview: if (Press(Keys.Enter) || Press(Keys.O)) _screen = Screen.Map; break;
+            case Screen.Overview: if (Press(Keys.Enter) || Press(Keys.O)) _screen = _overviewReturnScreen; break;
             case Screen.Ending: if (Press(Keys.Enter)) _screen = Screen.Title; break;
         }
         if (_campaign.State.Victory != VictoryKind.None && _screen is not Screen.Title and not Screen.LoadGame) _screen = Screen.Ending;
@@ -472,7 +476,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (press(Keys.H) && _campaign.State.CurrentLocation == 0) _screen = Screen.Home;
         if (press(Keys.V)) _screen = Screen.Village;
         if (press(Keys.T) && _campaign.IsTournamentHere) _screen = Screen.Tournament;
-        if (press(Keys.O)) _screen = Screen.Overview;
+        if (press(Keys.O)) EnterOverview(Screen.Map);
         if (press(Keys.S) && _campaign.StartSiege(_selectedLocation)) { _siege = _campaign.CreateSiege(); _showRadar = true; _screen = Screen.Siege; }
         if (press(Keys.B))
         {
@@ -686,20 +690,26 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (hotspot is null) return;
         switch (hotspot.Action)
         {
-            case SceneNavigationAction.Overview: _screen = Screen.Overview; break;
+            case SceneNavigationAction.Overview: EnterOverview(Screen.Home); break;
             case SceneNavigationAction.Castle: EnterFiefManagement(FarmPresentationDefinitions.Section.Castle); break;
             case SceneNavigationAction.Farm: EnterFiefManagement(FarmPresentationDefinitions.Section.Farm); break;
             case SceneNavigationAction.Village: EnterFiefManagement(FarmPresentationDefinitions.Section.Village); break;
             case SceneNavigationAction.Forest: EnterFiefManagement(FarmPresentationDefinitions.Section.Forest); break;
-            case SceneNavigationAction.WarPlanning: _notice = "WAR PLANNING IS NOT YET AVAILABLE"; break;
+            case SceneNavigationAction.WarPlanning: _screen = Screen.WarPlanning; break;
             case SceneNavigationAction.Exit: _screen = Screen.Map; break;
-            case SceneNavigationAction.Jump: _notice = "JUMP TARGET REQUIRES EXECUTABLE CONFIRMATION"; break;
+            case SceneNavigationAction.Jump: _notice = "JUMP ACTION REQUIRES EXECUTABLE CONFIRMATION"; break;
             case SceneNavigationAction.Map: _estatePanel = EstatePanel.Map; _screen = Screen.Map; break;
             case SceneNavigationAction.Orders: _estatePanel = EstatePanel.Orders; _screen = Screen.Map; break;
             case SceneNavigationAction.BlacksmithDialogue: _screen = Screen.BlacksmithDialogue; break;
             case SceneNavigationAction.Shop: _shopIndex = 0; _screen = Screen.Shop; break;
             default: throw new ArgumentOutOfRangeException(nameof(hotspot));
         }
+    }
+
+    private void EnterOverview(Screen returnScreen)
+    {
+        _overviewReturnScreen = returnScreen;
+        _screen = Screen.Overview;
     }
 
     private void UpdateShop(Func<Keys, bool> press, MouseState mouse, bool click)
@@ -801,7 +811,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         switch (_screen)
         {
             case Screen.Title: DrawTitle(); break; case Screen.OptionsHub: DrawOptionsHub(); break; case Screen.LoadGame: DrawLoadGame(); break; case Screen.CharacterOptions: DrawCharacterOptions(); break; case Screen.CharacterName: DrawCharacterName(); break; case Screen.Character: DrawCharacter(); break; case Screen.Dilemma: DrawDilemma(); break; case Screen.Map: DrawMap(); break;
-            case Screen.Home: DrawHome(); break; case Screen.Farm: DrawFarm(); break; case Screen.Village: DrawVillage(); break; case Screen.Blacksmith: DrawBlacksmith(); break; case Screen.BlacksmithDialogue: DrawBlacksmithDialogue(); break; case Screen.Shop: DrawShop(); break; case Screen.Tournament: DrawTournament(); break; case Screen.FieldBattle: DrawFieldBattle(); break;
+            case Screen.Home: DrawHome(); break; case Screen.WarPlanning: DrawWarPlanning(); break; case Screen.Farm: DrawFarm(); break; case Screen.Village: DrawVillage(); break; case Screen.Blacksmith: DrawBlacksmith(); break; case Screen.BlacksmithDialogue: DrawBlacksmithDialogue(); break; case Screen.Shop: DrawShop(); break; case Screen.Tournament: DrawTournament(); break; case Screen.FieldBattle: DrawFieldBattle(); break;
             case Screen.Siege: DrawSiege(); break; case Screen.Overview: DrawOverview(); break; case Screen.Ending: DrawEnding(); break;
         }
         if (_screen is not Screen.Title and not Screen.LoadGame and not Screen.Character and not Screen.Dilemma) DrawText(_notice, 24, 730, Color.Gold, 2);
@@ -1203,6 +1213,15 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         else DrawText("F  FARM MANAGEMENT    V  VILLAGE    ENTER  MAP", 80, 715, Color.Wheat, 2);
     }
 
+    private void DrawWarPlanning()
+    {
+        if (!DrawOriginal("Home.WarPlanning", new Rectangle(0, 0, 1024, 768)))
+        {
+            DrawPanel("WAR PLANNING", "ORIGINAL COMMAND DISPATCH IS STILL UNDER INVESTIGATION");
+            DrawText("ENTER OR ESC  RETURN TO OFFICE", 610, 720, Color.Wheat, 2, 390);
+        }
+    }
+
     private void DrawFarm()
     {
         var f = _campaign.State.Player.Home; var p = _campaign.State.Player;
@@ -1451,6 +1470,17 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private void DrawOverview()
     {
         var p = _campaign.State.Player; var s = p.Stats;
+        if (DrawOriginal("Home.Overview", new Rectangle(0, 0, 1024, 768)))
+        {
+            DrawText(p.Name, 325, 78, Color.Wheat, 2, 360);
+            DrawText($"{p.Age}", 130, 61, Color.Wheat, 2);
+            DrawText($"{p.Home.Population}", 175, 237, Color.Wheat, 2);
+            DrawText($"{p.Wealth}", 710, 157, Color.Wheat, 2);
+            DrawText($"{s.Strength}", 710, 200, Color.Wheat, 2);
+            DrawText($"{s.Piety}", 710, 239, Color.Wheat, 2);
+            DrawText($"{s.Honor}", 710, 278, Color.Wheat, 2);
+            return;
+        }
         DrawPanel("PERSONAL OVERVIEW", p.Name);
         DrawText($"STRENGTH {s.Strength} {s.DescribeStrength}", 100, 190, Color.White); DrawText($"DEXTERITY {s.Dexterity} {s.DescribeDexterity}", 100, 240, Color.White);
         DrawText($"PIETY {s.Piety} {s.DescribePiety}", 100, 290, Color.White); DrawText($"STAMINA {s.Stamina} {s.DescribeStamina}", 100, 340, Color.White);
