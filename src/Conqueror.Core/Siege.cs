@@ -11,6 +11,8 @@ public sealed class SiegeEnemy
     public int Health { get; set; }
     public bool Champion { get; init; }
     public int VisualId { get; init; } = -1;
+    public Facing Facing { get; set; }
+    public int WalkFrame { get; set; }
 }
 
 public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int GarrisonPerEnemy, int BaseChampionHealth, int FoodHealing, int WeaponBreakPercent);
@@ -102,14 +104,18 @@ public sealed class SiegeSession
         if (layout is not null)
         {
             foreach (var spawn in layout.Enemies)
-                _enemies.Add(new SiegeEnemy
+            {
+                var enemy = new SiegeEnemy
                 {
                     X = spawn.X,
                     Y = spawn.Y,
                     Health = spawn.Champion ? Rules.BaseChampionHealth : 1,
                     Champion = spawn.Champion,
                     VisualId = spawn.VisualId
-                });
+                };
+                enemy.Facing = DirectionToward(enemy.X, enemy.Y, PlayerX, PlayerY, Facing.South);
+                _enemies.Add(enemy);
+            }
         }
         else
         {
@@ -117,7 +123,14 @@ public sealed class SiegeSession
             for (var i = 0; i < count; i++)
             {
                 var point = EmptySpawn(i);
-                _enemies.Add(new SiegeEnemy { X = point.X, Y = point.Y, Health = i == count - 1 ? Rules.BaseChampionHealth : 1, Champion = i == count - 1 });
+                _enemies.Add(new SiegeEnemy
+                {
+                    X = point.X,
+                    Y = point.Y,
+                    Health = i == count - 1 ? Rules.BaseChampionHealth : 1,
+                    Champion = i == count - 1,
+                    Facing = DirectionToward(point.X, point.Y, PlayerX, PlayerY, Facing.South)
+                });
             }
         }
     }
@@ -264,6 +277,8 @@ public sealed class SiegeSession
             var distance = Math.Abs(enemy.X - PlayerX) + Math.Abs(enemy.Y - PlayerY);
             if (distance == 1)
             {
+                enemy.Facing = DirectionToward(enemy.X, enemy.Y, PlayerX, PlayerY, enemy.Facing);
+                enemy.WalkFrame = 0;
                 if (AlliesAlive > 0 && _random.Next(100) < 18) { AlliesAlive--; LastMessage = "A retainer falls defending you."; continue; }
                 var hitChance = Math.Clamp(70 - ArmorRating(), 5, 70);
                 if (_random.Next(100) < hitChance) Health -= Math.Max(2, 12 - _player.Stats.Stamina / 3);
@@ -273,7 +288,12 @@ public sealed class SiegeSession
             var dx = Math.Sign(PlayerX - enemy.X); var dy = Math.Sign(PlayerY - enemy.Y);
             if (Math.Abs(PlayerX - enemy.X) < Math.Abs(PlayerY - enemy.Y)) dx = 0; else dy = 0;
             var nx = enemy.X + dx; var ny = enemy.Y + dy;
-            if (TileAt(nx, ny) is SiegeTile.Floor or SiegeTile.Barrel or SiegeTile.Treasure && EnemyAt(nx, ny) is null && (nx != PlayerX || ny != PlayerY)) { enemy.X = nx; enemy.Y = ny; }
+            if (TileAt(nx, ny) is SiegeTile.Floor or SiegeTile.Barrel or SiegeTile.Treasure && EnemyAt(nx, ny) is null && (nx != PlayerX || ny != PlayerY))
+            {
+                enemy.Facing = DirectionToward(enemy.X, enemy.Y, nx, ny, enemy.Facing);
+                enemy.X = nx; enemy.Y = ny;
+                enemy.WalkFrame = (enemy.WalkFrame + 1) % 3;
+            }
         }
         if (AlliesAlive > 0 && _enemies.Count > 1 && _random.Next(100) < AlliesAlive * 7)
         {
@@ -319,6 +339,15 @@ public sealed class SiegeSession
     {
         Facing.North => (0, -1), Facing.East => (1, 0), Facing.South => (0, 1), _ => (-1, 0)
     };
+
+    private static Facing DirectionToward(int fromX, int fromY, int toX, int toY, Facing fallback)
+    {
+        var dx = toX - fromX;
+        var dy = toY - fromY;
+        if (Math.Abs(dx) > Math.Abs(dy)) return dx > 0 ? Facing.East : Facing.West;
+        if (dy != 0) return dy > 0 ? Facing.South : Facing.North;
+        return fallback;
+    }
 
     public readonly record struct Point(int X, int Y);
 }

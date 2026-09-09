@@ -268,6 +268,21 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void EnemyBillboardFramesSelectFiveAnglesAndMirrorTheOtherSide()
+    {
+        var enemy = new SiegeEnemy { X = 10, Y = 10, Facing = Facing.North };
+
+        Assert.Equal(new SiegeEnemyFrame(4, false), SiegeViewProjection.FrameFor(enemy, 10, 8));
+        Assert.Equal(new SiegeEnemyFrame(3, false), SiegeViewProjection.FrameFor(enemy, 9, 9));
+        Assert.Equal(new SiegeEnemyFrame(2, false), SiegeViewProjection.FrameFor(enemy, 8, 10));
+        Assert.Equal(new SiegeEnemyFrame(1, false), SiegeViewProjection.FrameFor(enemy, 9, 11));
+        Assert.Equal(new SiegeEnemyFrame(0, false), SiegeViewProjection.FrameFor(enemy, 10, 12));
+        Assert.Equal(new SiegeEnemyFrame(3, true), SiegeViewProjection.FrameFor(enemy, 11, 9));
+        Assert.Equal(new SiegeEnemyFrame(2, true), SiegeViewProjection.FrameFor(enemy, 12, 10));
+        Assert.Equal(new SiegeEnemyFrame(1, true), SiegeViewProjection.FrameFor(enemy, 11, 11));
+    }
+
+    [Fact]
     public void ConversationDatabaseDecodesIndexedPromptsResponsesAndLinks()
     {
         var first = ConversationNode(["GERARD.PCC", "Earl Gerard", "Greetings.", "Ask about the dragon.", "Farewell."],

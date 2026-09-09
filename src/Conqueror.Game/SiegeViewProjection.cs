@@ -8,6 +8,7 @@ public readonly record struct SiegeRayHit(
     double Distance, SiegeTile Tile, bool HitVerticalSide, SiegeWallFace Face,
     int MapX, int MapY, double TextureOffset);
 public readonly record struct SiegeEnemyProjection(double ScreenPosition, double ForwardDistance, SiegeEnemy Enemy);
+public readonly record struct SiegeEnemyFrame(int DirectionOffset, bool FlipHorizontally);
 
 public static class SiegeViewProjection
 {
@@ -85,6 +86,21 @@ public static class SiegeViewProjection
             result.Add(new SiegeEnemyProjection(screen, forward, enemy));
         }
         return result.OrderByDescending(item => item.ForwardDistance).ToArray();
+    }
+
+    public static SiegeEnemyFrame FrameFor(SiegeEnemy enemy, int viewerX, int viewerY)
+    {
+        ArgumentNullException.ThrowIfNull(enemy);
+        var (forwardX, forwardY) = Direction(enemy.Facing);
+        var viewX = viewerX - enemy.X;
+        var viewY = viewerY - enemy.Y;
+        if (viewX == 0 && viewY == 0) return new SiegeEnemyFrame(4, false);
+        var length = Math.Sqrt(viewX * viewX + viewY * viewY);
+        var dot = Math.Clamp((forwardX * viewX + forwardY * viewY) / length, -1, 1);
+        var angle = Math.Acos(dot);
+        var directionOffset = Math.Clamp(4 - (int)Math.Round(angle / (Math.PI / 4.0)), 0, 4);
+        var cross = forwardX * viewY - forwardY * viewX;
+        return new SiegeEnemyFrame(directionOffset, cross > 0);
     }
 
     private static bool IsSolid(SiegeTile tile) =>

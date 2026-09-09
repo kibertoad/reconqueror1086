@@ -2286,6 +2286,14 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
         var required = imported.Scene.Blocks.SelectMany(block => block.TextureReferences())
             .Where(index => index >= 0).ToHashSet();
+        foreach (var spawn in imported.Layout.Enemies.Where(spawn => spawn.VisualId >= 0 &&
+                     spawn.VisualId < imported.Scene.Blocks.Count))
+        {
+            var block = imported.Scene.Blocks[spawn.VisualId];
+            if (block.Kind != 4 || block.Surface0 < 0) continue;
+            for (var frame = 0; frame < 15 && block.Surface0 + frame < imported.Scene.TextureCount; frame++)
+                required.Add(block.Surface0 + frame);
+        }
         var textures = new Dictionary<int, Texture2D>();
         foreach (var id in _importedContent.Ids("resource").Where(id =>
                      id.StartsWith(imported.ArchiveId + "#", StringComparison.OrdinalIgnoreCase) &&
@@ -2337,11 +2345,17 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         return _siegeVisuals.Textures.GetValueOrDefault(block.TextureForFace(face));
     }
 
-    private Texture2D? SceneEnemyTexture(SiegeEnemy enemy)
+    private (Texture2D? Texture, bool Flip) SceneEnemyTexture(SiegeEnemy enemy)
     {
         if (_siegeVisuals is null || enemy.VisualId < 0 || enemy.VisualId >= _siegeVisuals.Scene.Blocks.Count)
-            return null;
-        return FirstSceneTexture(_siegeVisuals.Scene.Blocks[enemy.VisualId]);
+            return (null, false);
+        var block = _siegeVisuals.Scene.Blocks[enemy.VisualId];
+        var frame = _siege is null
+            ? new SiegeEnemyFrame(4, false)
+            : SiegeViewProjection.FrameFor(enemy, _siege.PlayerX, _siege.PlayerY);
+        var textureIndex = block.Surface0 + enemy.WalkFrame * 5 + frame.DirectionOffset;
+        return (_siegeVisuals.Textures.GetValueOrDefault(textureIndex) ?? FirstSceneTexture(block),
+            frame.FlipHorizontally);
     }
 
     private Texture2D? FirstSceneTexture(DynamixSceneBlock block)
@@ -2436,7 +2450,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         }
         foreach (var projection in SiegeViewProjection.ProjectEnemies(_siege))
         {
-            var enemyTexture = SceneEnemyTexture(projection.Enemy);
+            var (enemyTexture, flipEnemy) = SceneEnemyTexture(projection.Enemy);
             var wallHeight = viewport.Height / projection.ForwardDistance;
             var height = enemyTexture is null
                 ? Math.Clamp((int)(wallHeight * 0.75), 20, viewport.Height)
@@ -2455,6 +2469,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                 if (enemyTexture is not null)
                 {
                     var sourceX = Math.Clamp((x - left) * enemyTexture.Width / width, 0, enemyTexture.Width - 1);
+                    if (flipEnemy) sourceX = enemyTexture.Width - 1 - sourceX;
                     _batch.Draw(enemyTexture, new Rectangle(x, top, 1, height),
                         new Rectangle(sourceX, 0, 1, enemyTexture.Height), Color.White);
                 }
