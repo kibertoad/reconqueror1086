@@ -136,7 +136,7 @@ Packed audio uses one LSB-first Huffman tree of 8-bit deltas for this release's 
 
 Video uses four shared LSB-first adaptive Huffman trees for monochrome maps, monochrome colors, full-color pairs, and block types. Each frame resets the three recency slots in each tree, then reconstructs 4x4 blocks as two-color bitmap, full-color, previous-frame skip, or solid fill runs. The stateful decoder writes into the caller's retained index buffer so predicted frames require no full-frame intermediate allocation. All 182,360 frames decode within their packet bounds. A locally rendered final frame of `TITLE.SMK` confirms coherent palette, orientation, and block composition.
 
-This uniform `SMK2` population makes direct decoding the primary strategy; installation-time transcoding is unnecessary for the owned release. MonoGame texture/audio streaming and scene event bindings remain adapter work rather than codec work.
+This uniform `SMK2` population makes direct decoding the primary strategy; installation-time transcoding is unnecessary for the owned release. The MonoGame adapter now drives the original title sequence directly: it retains one indexed frame buffer, one RGBA upload buffer, and one `Texture2D`, advances frames at the container duration, submits decoded PCM16 packets through `DynamicSoundEffectInstance`, and supports skip/end transitions. It loads only the active title file. Broader scene-event bindings, seeking, and a file-backed path for long movies remain adapter work rather than codec work.
 
 ## Dynamix `.666` sound banks
 

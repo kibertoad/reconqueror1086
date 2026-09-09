@@ -69,6 +69,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private YouthDilemmaResult? _youthDilemmaResult;
     private SoundEffect? _importedMusic;
     private SoundEffectInstance? _musicInstance;
+    private SmackerMoviePlayer? _titleMovie;
     private readonly Dictionary<string, SoundEffect> _originalSounds = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, Texture2D> _originalArt = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, byte[]> _originalPalettes = new(StringComparer.OrdinalIgnoreCase);
@@ -159,6 +160,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         }
         IsMouseVisible = !_originalAnimations.ContainsKey(OriginalCursorRole);
         LoadOriginalSounds();
+        LoadTitleMovie();
         if (_importedContent?.Open("CDDA/TRACK02") is { } music)
         {
             using (music)
@@ -168,7 +170,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                 _musicInstance = _importedMusic.CreateInstance();
                 _musicInstance.IsLooped = true;
                 _musicInstance.Volume = .35f;
-                _musicInstance.Play();
+                StartMusic();
             }
             catch (Exception error) when (error is InvalidDataException or NotSupportedException)
             {
@@ -179,6 +181,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     protected override void UnloadContent()
     {
+        _titleMovie?.Dispose();
         _musicInstance?.Dispose();
         _importedMusic?.Dispose();
         foreach (var texture in _originalArt.Values) texture.Dispose();
@@ -233,7 +236,17 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         switch (_screen)
         {
             case Screen.Title:
-                if (pressAny || click) _screen = Screen.OptionsHub;
+                if (_titleMovie is { IsComplete: false })
+                {
+                    _titleMovie.Update(gameTime.ElapsedGameTime);
+                    if (_titleMovie.IsComplete) StartMusic();
+                }
+                if (pressAny || click)
+                {
+                    _titleMovie?.Skip();
+                    StartMusic();
+                    _screen = Screen.OptionsHub;
+                }
                 break;
             case Screen.OptionsHub: UpdateOptionsHub(Press, mouse, click); break;
             case Screen.LoadGame: UpdateLoadGame(Press, mouse, click); break;
@@ -305,7 +318,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             case OptionsHubAction.Resume: _screen = CampaignScreen(); break;
             case OptionsHubAction.ToggleCdMusic:
                 _cdMusicEnabled = !_cdMusicEnabled;
-                if (_cdMusicEnabled) _musicInstance?.Resume(); else _musicInstance?.Pause();
+                if (_cdMusicEnabled) StartMusic();
+                else if (_musicInstance?.State == SoundState.Playing) _musicInstance.Pause();
                 _notice = $"CD MUSIC {OnOff(_cdMusicEnabled)}";
                 break;
             case OptionsHubAction.ToggleSoundEffects:
@@ -937,6 +951,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     {
         if (disposing)
         {
+            _titleMovie?.Dispose();
             _musicInstance?.Dispose();
             _importedMusic?.Dispose();
             DisposeOriginalSounds();
@@ -960,6 +975,31 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         }
     }
 
+    private void LoadTitleMovie()
+    {
+        var definition = ImportedMovies.Definitions.Single(movie => movie.Role == "Title.Intro");
+        var id = _importedContent?.FindId("movie", definition.IdSuffix);
+        if (id is null || _importedContent?.Open(id) is not { } source) return;
+        using (source)
+        try
+        {
+            using var memory = new MemoryStream();
+            source.CopyTo(memory);
+            _titleMovie = new SmackerMoviePlayer(GraphicsDevice, memory.ToArray());
+        }
+        catch (Exception error) when (error is InvalidDataException or NotSupportedException or IOException)
+        {
+            _notice = "ORIGINAL TITLE MOVIE COULD NOT BE PLAYED";
+        }
+    }
+
+    private void StartMusic()
+    {
+        if (!_cdMusicEnabled || _titleMovie is { IsComplete: false } || _musicInstance is null) return;
+        if (_musicInstance.State == SoundState.Paused) _musicInstance.Resume();
+        else if (_musicInstance.State == SoundState.Stopped) _musicInstance.Play();
+    }
+
     private void PlayOriginalSound(string role)
     {
         if (_originalSounds.TryGetValue(role, out var sound)) sound.Play();
@@ -973,6 +1013,11 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void DrawTitle()
     {
+        if (_titleMovie is { IsComplete: false })
+        {
+            _batch.Draw(_titleMovie.Texture, new Rectangle(0, 0, 1024, 768), Color.White);
+            return;
+        }
         var hasTitle = DrawOriginal("Title.Background", new Rectangle(0, 0, 1024, 768));
         if (!hasTitle)
         {

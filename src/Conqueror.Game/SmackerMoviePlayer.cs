@@ -1,0 +1,99 @@
+using Conqueror.Resources;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
+
+namespace Conqueror.Game;
+
+public sealed class SmackerMoviePlayer : IDisposable
+{
+    private readonly byte[] _source;
+    private readonly SmackerMovie _movie;
+    private readonly SmackerVideoDecoder _videoDecoder;
+    private readonly byte[] _indices;
+    private readonly byte[] _rgba;
+    private readonly SmackerAudioTrack? _audioTrack;
+    private readonly DynamicSoundEffectInstance? _audio;
+    private byte[] _palette = new byte[768];
+    private int _nextFrame;
+    private TimeSpan _elapsed;
+    private bool _disposed;
+
+    public Texture2D Texture { get; }
+    public bool IsComplete { get; private set; }
+
+    public SmackerMoviePlayer(GraphicsDevice graphicsDevice, byte[] source)
+    {
+        ArgumentNullException.ThrowIfNull(graphicsDevice);
+        ArgumentNullException.ThrowIfNull(source);
+        _source = source;
+        _movie = SmackerMovieDecoder.Decode(source);
+        _videoDecoder = new SmackerVideoDecoder(_movie, source);
+        _indices = new byte[checked(_movie.Width * _movie.Height)];
+        _rgba = new byte[checked(_indices.Length * 4)];
+        Texture = new Texture2D(graphicsDevice, _movie.Width, _movie.Height, false, SurfaceFormat.Color);
+        _audioTrack = _movie.AudioTracks.FirstOrDefault();
+        if (_audioTrack is { IsCompressed: true, Is16Bit: false, IsStereo: false })
+            _audio = new DynamicSoundEffectInstance(_audioTrack.SampleRate, AudioChannels.Mono);
+        DecodeNextFrame();
+    }
+
+    public void Update(TimeSpan elapsed)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        if (IsComplete || elapsed < TimeSpan.Zero) return;
+        _elapsed += elapsed;
+        while (_elapsed >= _movie.FrameDuration && !IsComplete)
+        {
+            _elapsed -= _movie.FrameDuration;
+            if (_nextFrame < _movie.Frames.Count) DecodeNextFrame();
+            else IsComplete = true;
+        }
+    }
+
+    public void Skip()
+    {
+        if (_disposed) return;
+        IsComplete = true;
+        _audio?.Stop();
+    }
+
+    private void DecodeNextFrame()
+    {
+        var descriptor = _movie.Frames[_nextFrame];
+        var frame = SmackerMovieDecoder.DecodeFrameLayout(_movie, _nextFrame, _source, _palette);
+        _palette = frame.Palette;
+        _videoDecoder.DecodeFrame(_source.AsSpan(frame.Video.Offset, frame.Video.Length), _indices,
+            descriptor.IsKeyFrame);
+        for (var index = 0; index < _indices.Length; index++)
+        {
+            var color = _indices[index] * 3;
+            var target = index * 4;
+            _rgba[target] = _palette[color];
+            _rgba[target + 1] = _palette[color + 1];
+            _rgba[target + 2] = _palette[color + 2];
+            _rgba[target + 3] = 255;
+        }
+        Texture.SetData(_rgba);
+
+        if (_audio is not null)
+        {
+            var audioTrack = _audioTrack!;
+            foreach (var packet in frame.AudioPackets.Where(packet => packet.TrackIndex == audioTrack.Index))
+            {
+                var decoded = SmackerAudioDecoder.Decode(
+                    _source.AsSpan(packet.Data.Offset, packet.Data.Length), audioTrack);
+                _audio.SubmitBuffer(decoded.ToPcm16LittleEndian());
+            }
+            if (_audio.PendingBufferCount > 0 && _audio.State != SoundState.Playing) _audio.Play();
+        }
+        _nextFrame++;
+    }
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+        _audio?.Dispose();
+        Texture.Dispose();
+    }
+}

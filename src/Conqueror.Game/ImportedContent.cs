@@ -9,6 +9,7 @@ public sealed record ImportedArtDefinition(string Role, string Kind, string IdSu
 public sealed record ImportedLayoutDefinition(string Role, string IdSuffix);
 public sealed record ImportedAnimationDefinition(string Role, string IdSuffix, string PaletteArtRole);
 public sealed record ImportedSoundDefinition(string Role, string IdSuffix, int SampleIndex);
+public sealed record ImportedMovieDefinition(string Role, string IdSuffix);
 public sealed record PreparedImportedSound(string BankId, int SampleIndex, int SampleRate, byte[] Pcm16LittleEndian);
 
 public static class ImportedArt
@@ -73,6 +74,14 @@ public static class ImportedSounds
     public static IReadOnlyList<ImportedSoundDefinition> Definitions { get; } =
     [
         new("Interface.Activate", ":gameopts.666", 0)
+    ];
+}
+
+public static class ImportedMovies
+{
+    public static IReadOnlyList<ImportedMovieDefinition> Definitions { get; } =
+    [
+        new("Title.Intro", ":title.smk")
     ];
 }
 
