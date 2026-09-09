@@ -41,6 +41,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private EstatePanel _estatePanel = EstatePanel.Map;
     private FarmPresentationDefinitions.Section _fiefSection = FarmPresentationDefinitions.Section.Farm;
     private FiefManagementCheckpoint? _fiefCheckpoint;
+    private int _fiefRowOffset;
     private IReadOnlyDictionary<FarmPresentationDefinitions.Section, FarmPresentationDefinitions.Layout> _fiefLayouts =
         FarmPresentationDefinitions.Layouts.ToDictionary(layout => layout.Section);
     private IReadOnlyList<SceneHotspot> _homeHotspots = HomePresentationDefinitions.Hotspots;
@@ -574,21 +575,33 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void UpdateFarm(Func<Keys, bool> press, MouseState mouse, bool click)
     {
+        var layout = _fiefLayouts[_fiefSection];
+        var entries = FarmPresentationDefinitions.EntriesFor(_fiefSection);
+        var maximumOffset = Math.Max(0, entries.Count - layout.Rows.Count);
+        if (press(Keys.Up)) _fiefRowOffset = Math.Max(0, _fiefRowOffset - 1);
+        if (press(Keys.Down)) _fiefRowOffset = Math.Min(maximumOffset, _fiefRowOffset + 1);
         var command = FarmPresentationDefinitions.CommandsFor(_fiefSection).FirstOrDefault(item => press(item.Key));
         if (command is not null) ActivateFarmAction(command.Action);
         if (!click) return;
         var (x, y) = OriginalPoint(mouse);
-        var layout = _fiefLayouts[_fiefSection];
+        var row = Enumerable.Range(0, layout.Rows.Count).FirstOrDefault(index => layout.Rows[index].Contains(x, y), -1);
+        if (row >= 0 && row + _fiefRowOffset < entries.Count && entries[row + _fiefRowOffset].Action is { } action)
+        {
+            ActivateFarmAction(action);
+            return;
+        }
         switch (FarmPresentationDefinitions.FooterActionAt(layout, x, y))
         {
             case FarmPresentationDefinitions.FooterAction.Okay: CommitFiefManagement(); break;
             case FarmPresentationDefinitions.FooterAction.Cancel: CancelFiefManagement(); break;
+            case FarmPresentationDefinitions.FooterAction.FullScreen: _graphics.ToggleFullScreen(); break;
         }
     }
 
     private void EnterFiefManagement(FarmPresentationDefinitions.Section section)
     {
         _fiefSection = section;
+        _fiefRowOffset = 0;
         _fiefCheckpoint = FiefManagementCheckpoint.Capture(_campaign.State);
         _screen = Screen.Farm;
     }
@@ -1200,24 +1213,47 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
         var accountColor = original ? Color.Black : Color.White;
         DrawText(layout.Title, 55, 70, accountColor, 3);
+        if (original)
+        {
+            var entries = FarmPresentationDefinitions.EntriesFor(_fiefSection);
+            for (var row = 0; row < layout.Rows.Count && row + _fiefRowOffset < entries.Count; row++)
+            {
+                var entry = entries[row + _fiefRowOffset];
+                var bounds = ScaleBounds(layout.Rows[row]);
+                var value = FiefEntryValue(entry);
+                DrawText(value.Length == 0 ? entry.Label : $"{entry.Label,-22} {value}",
+                    bounds.X + 4, bounds.Y + 2, accountColor, 1, bounds.Width - 8);
+            }
+            var okay = ScaleBounds(layout.Okay);
+            var cancel = ScaleBounds(layout.Cancel);
+            DrawText("OK", okay.X + 4, okay.Y + 3, Color.White, 1, okay.Width - 8);
+            DrawText("CANCEL", cancel.X + 4, cancel.Y + 3, Color.White, 1, cancel.Width - 8);
+            if (entries.Count > layout.Rows.Count)
+                DrawText($"UP/DOWN  {_fiefRowOffset + 1}-{Math.Min(entries.Count, _fiefRowOffset + layout.Rows.Count)} OF {entries.Count}", 400, 680, Color.Wheat, 1);
+            return;
+        }
         DrawText($"WEALTH          {p.Wealth}", 55, 120, accountColor, 2);
         DrawText($"POPULATION      {f.Population}", 55, 155, accountColor, 2);
         DrawText($"SERFS AVAILABLE {f.AvailableSerfs}", 55, 190, accountColor, 2);
         DrawText($"PRODUCTIVITY    {f.Productivity()}%", 55, 225, accountColor, 2);
         DrawText($"HOUSES          {f.Houses}", 55, 260, accountColor, 2);
-        if (original)
-        {
-            var wealth = ScaleBounds(layout.Wealth);
-            DrawText($"{p.Wealth}S", wealth.X + 4, wealth.Y + 3, Color.White, 1, wealth.Width - 8);
-            var okay = ScaleBounds(layout.Okay);
-            var cancel = ScaleBounds(layout.Cancel);
-            DrawText("OK", okay.X + 4, okay.Y + 3, Color.White, 1, okay.Width - 8);
-            DrawText("CANCEL", cancel.X + 4, cancel.Y + 3, Color.White, 1, cancel.Width - 8);
-        }
         var helpRows = FarmPresentationDefinitions.HelpRowsFor(_fiefSection);
         for (var row = 0; row < helpRows.Count; row++)
             DrawText(helpRows[row], 55, 525 + row * 36,
                 row == helpRows.Count - 1 ? Color.Gold : Color.Wheat, 1, 900);
+    }
+
+    private string FiefEntryValue(FarmPresentationDefinitions.Entry entry)
+    {
+        var fief = _campaign.State.Player.Home;
+        return entry.Action switch
+        {
+            BuildFarmAction { Building: BuildingKind.House } => fief.Houses.ToString(),
+            BuildFarmAction build => fief.Has(build.Building) ? "YES" : "NO",
+            PlantFarmAction plant => fief.Crops[plant.Crop].ToString(),
+            DevelopForestFarmAction forest => fief.Forest[forest.Industry].ToString(),
+            _ => ""
+        };
     }
 
     private void DrawFarmTerrain(UiBounds originalBounds)

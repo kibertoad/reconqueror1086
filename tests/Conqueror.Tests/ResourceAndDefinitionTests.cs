@@ -236,7 +236,7 @@ public sealed class ResourceAndDefinitionTests
              (FarmPresentationDefinitions.Section.Farm, ":ffarm.hat", 9, 11, 12),
              (FarmPresentationDefinitions.Section.Forest, ":fforest.hat", 8, 10, 11)],
             FarmPresentationDefinitions.Layouts.Select(layout =>
-                (layout.Section, layout.LayoutSuffix, layout.AccountRowCount, layout.TerrainRegionId, layout.WealthRegionId)));
+                (layout.Section, layout.LayoutSuffix, layout.AccountRowCount, layout.TerrainRegionId, layout.FullScreenRegionId)));
         Assert.All(FarmPresentationDefinitions.Layouts, layout =>
             Assert.Contains(ImportedLayouts.Definitions,
                 imported => imported.Role == layout.LayoutRole && imported.IdSuffix == layout.LayoutSuffix));
@@ -247,9 +247,9 @@ public sealed class ResourceAndDefinitionTests
             Assert.All(FarmPresentationDefinitions.HelpRowsFor(section), row => Assert.False(string.IsNullOrWhiteSpace(row)));
         });
         Assert.All(FarmPresentationDefinitions.CommandsFor(FarmPresentationDefinitions.Section.Castle),
-            command => Assert.True(command.Action is BuildFarmAction or RecruitFarmAction or LeaveFarmAction));
+            command => Assert.True(command.Action is BuildFarmAction or LeaveFarmAction));
         Assert.All(FarmPresentationDefinitions.CommandsFor(FarmPresentationDefinitions.Section.Village),
-            command => Assert.IsType<LeaveFarmAction>(command.Action));
+            command => Assert.True(command.Action is BuildFarmAction or LeaveFarmAction));
         Assert.All(FarmPresentationDefinitions.CommandsFor(FarmPresentationDefinitions.Section.Farm),
             command => Assert.True(command.Action is PlantFarmAction or LeaveFarmAction));
         Assert.All(FarmPresentationDefinitions.CommandsFor(FarmPresentationDefinitions.Section.Forest),
@@ -267,14 +267,29 @@ public sealed class ResourceAndDefinitionTests
         var importedFarm = FarmPresentationDefinitions.LayoutFrom(
             FarmPresentationDefinitions.Section.Farm, new HatLayout(bytes));
         Assert.Equal(new UiBounds(11, 11, 1, 1), importedFarm.Terrain);
-        Assert.Equal(new UiBounds(12, 12, 1, 1), importedFarm.Wealth);
+        Assert.Equal(new UiBounds(12, 12, 1, 1), importedFarm.FullScreen);
+        Assert.Equal(9, importedFarm.Rows.Count);
+        Assert.Equal(new UiBounds(0, 0, 1, 1), importedFarm.Rows[0]);
         Assert.Equal(new UiBounds(9, 9, 1, 1), importedFarm.Okay);
         Assert.Equal(new UiBounds(10, 10, 1, 1), importedFarm.Cancel);
         Assert.Equal(FarmPresentationDefinitions.FooterAction.Okay,
             FarmPresentationDefinitions.FooterActionAt(importedFarm, 9, 9));
         Assert.Equal(FarmPresentationDefinitions.FooterAction.Cancel,
             FarmPresentationDefinitions.FooterActionAt(importedFarm, 10, 10));
+        Assert.Equal(FarmPresentationDefinitions.FooterAction.FullScreen,
+            FarmPresentationDefinitions.FooterActionAt(importedFarm, 12, 12));
         Assert.Null(FarmPresentationDefinitions.FooterActionAt(importedFarm, 20, 20));
+
+        Assert.Equal(["Wall", "Tower", "Great Hall", "Servant Room", "Guardhouse", "Gate House", "Storehouse",
+            "Chapel", "Well", "Stable", "Steward", "Beadle", "Guard Captain", "Guard", "Priest", "Mason", "Serf"],
+            FarmPresentationDefinitions.EntriesFor(FarmPresentationDefinitions.Section.Castle).Select(entry => entry.Label));
+        Assert.Equal(["Clear Land", "Road", "Mill", "Tavern", "Bakery", "Inn", "Carpenter", "Smith", "Tanner",
+            "Merchant", "Church", "Monastery", "Barber", "Houses", "Livestock", "Horses", "Granary"],
+            FarmPresentationDefinitions.EntriesFor(FarmPresentationDefinitions.Section.Village).Select(entry => entry.Label));
+        Assert.Equal(["Grain", "Beans", "Vegetables", "Fruit"],
+            FarmPresentationDefinitions.EntriesFor(FarmPresentationDefinitions.Section.Farm).Select(entry => entry.Label));
+        Assert.Equal(["Cut Timber", "Iron Mine", "Woodward", "Coal Mine", "Gold Mine", "Silver Mine", "Prospector"],
+            FarmPresentationDefinitions.EntriesFor(FarmPresentationDefinitions.Section.Forest).Select(entry => entry.Label));
     }
 
     [Fact]

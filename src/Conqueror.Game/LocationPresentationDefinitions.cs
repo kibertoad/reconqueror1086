@@ -146,7 +146,8 @@ public static class BlacksmithDialoguePresentationDefinitions
 public static class FarmPresentationDefinitions
 {
     public enum Section { Castle, Village, Farm, Forest }
-    public enum FooterAction { Okay, Cancel }
+    public enum FooterAction { Okay, Cancel, FullScreen }
+    public sealed record Entry(string Label, FarmAction? Action = null);
 
     public sealed record Layout(
         Section Section,
@@ -158,12 +159,15 @@ public static class FarmPresentationDefinitions
         int CancelRegionId,
         int? ExtraRegionId,
         int TerrainRegionId,
-        int WealthRegionId,
+        int FullScreenRegionId,
         UiBounds Terrain,
-        UiBounds Wealth,
+        UiBounds FullScreen,
         UiBounds Okay,
         UiBounds Cancel,
-        UiBounds? Extra);
+        UiBounds? Extra)
+    {
+        public IReadOnlyList<UiBounds> Rows { get; init; } = [];
+    }
 
     public static UiBounds Information { get; } = new(20, 22, 330, 390);
     public static UiBounds Terrain { get; } = new(382, 22, 238, 390);
@@ -172,19 +176,53 @@ public static class FarmPresentationDefinitions
     [
         new(Section.Castle, "CASTLE MANAGEMENT", "Fief.Castle", ":fcastle.hat", 18, 18, 19, null, 20, 21,
             new UiBounds(383, 20, 232, 380), new UiBounds(532, 0, 86, 16),
-            new UiBounds(30, 435, 30, 20), new UiBounds(70, 435, 70, 20), null),
+            new UiBounds(30, 435, 30, 20), new UiBounds(70, 435, 70, 20), null) { Rows = DefaultRows(18) },
         new(Section.Village, "VILLAGE MANAGEMENT", "Fief.Village", ":fvillage.hat", 14, 14, 15, 16, 17, 18,
             new UiBounds(383, 20, 232, 380), new UiBounds(532, 0, 86, 16),
-            new UiBounds(30, 435, 30, 20), new UiBounds(70, 435, 70, 20), new UiBounds(250, 435, 80, 20)),
+            new UiBounds(30, 435, 30, 20), new UiBounds(70, 435, 70, 20), new UiBounds(250, 435, 80, 20)) { Rows = DefaultRows(14) },
         new(Section.Farm, "FARM MANAGEMENT", "Fief.Farm", ":ffarm.hat", 9, 9, 10, null, 11, 12,
             new UiBounds(383, 20, 232, 380), new UiBounds(532, 0, 86, 16),
-            new UiBounds(30, 435, 30, 20), new UiBounds(70, 435, 70, 20), null),
+            new UiBounds(30, 435, 30, 20), new UiBounds(70, 435, 70, 20), null) { Rows = DefaultRows(9) },
         new(Section.Forest, "FOREST MANAGEMENT", "Fief.Forest", ":fforest.hat", 8, 8, 9, null, 10, 11,
             new UiBounds(383, 20, 232, 380), new UiBounds(532, 0, 86, 16),
-            new UiBounds(30, 435, 30, 20), new UiBounds(70, 435, 70, 20), null)
+            new UiBounds(30, 435, 30, 20), new UiBounds(70, 435, 70, 20), null) { Rows = DefaultRows(8) }
     ];
 
+    private static IReadOnlyDictionary<Section, IReadOnlyList<Entry>> Entries { get; } =
+        new Dictionary<Section, IReadOnlyList<Entry>>
+        {
+            [Section.Castle] =
+            [
+                new("Wall"), new("Tower"), new("Great Hall"), new("Servant Room", new BuildFarmAction(BuildingKind.ServantRoom)),
+                new("Guardhouse"), new("Gate House"), new("Storehouse"), new("Chapel"), new("Well"), new("Stable"),
+                new("Steward", new BuildFarmAction(BuildingKind.Steward)), new("Beadle", new BuildFarmAction(BuildingKind.Beadle)),
+                new("Guard Captain"), new("Guard"), new("Priest", new BuildFarmAction(BuildingKind.Priest)), new("Mason"), new("Serf")
+            ],
+            [Section.Village] =
+            [
+                new("Clear Land"), new("Road"), new("Mill"), new("Tavern"), new("Bakery"), new("Inn"),
+                new("Carpenter"), new("Smith"), new("Tanner"), new("Merchant"), new("Church", new BuildFarmAction(BuildingKind.Church)),
+                new("Monastery", new BuildFarmAction(BuildingKind.Monastery)), new("Barber"), new("Houses", new BuildFarmAction(BuildingKind.House)),
+                new("Livestock"), new("Horses"), new("Granary")
+            ],
+            [Section.Farm] =
+            [
+                new("Grain", new PlantFarmAction(CropType.Grain)), new("Beans", new PlantFarmAction(CropType.Beans)),
+                new("Vegetables", new PlantFarmAction(CropType.Vegetables)), new("Fruit", new PlantFarmAction(CropType.Fruit))
+            ],
+            [Section.Forest] =
+            [
+                new("Cut Timber", new DevelopForestFarmAction(ForestIndustry.Timber)),
+                new("Iron Mine", new DevelopForestFarmAction(ForestIndustry.IronMine)),
+                new("Woodward", new BuildFarmAction(BuildingKind.Woodward)),
+                new("Coal Mine", new DevelopForestFarmAction(ForestIndustry.CoalMine)),
+                new("Gold Mine", new DevelopForestFarmAction(ForestIndustry.GoldMine)),
+                new("Silver Mine", new DevelopForestFarmAction(ForestIndustry.SilverMine)), new("Prospector")
+            ]
+        };
+
     public static IReadOnlyList<Layout> Layouts { get; } = FallbackLayouts;
+    public static IReadOnlyList<Entry> EntriesFor(Section section) => Entries[section];
 
     public static Layout LayoutFrom(Section section, HatLayout? source)
     {
@@ -192,12 +230,15 @@ public static class FarmPresentationDefinitions
         return fallback with
         {
             Terrain = RegionBounds(source, fallback.TerrainRegionId, fallback.Terrain),
-            Wealth = RegionBounds(source, fallback.WealthRegionId, fallback.Wealth),
+            FullScreen = RegionBounds(source, fallback.FullScreenRegionId, fallback.FullScreen),
             Okay = RegionBounds(source, fallback.OkayRegionId, fallback.Okay),
             Cancel = RegionBounds(source, fallback.CancelRegionId, fallback.Cancel),
             Extra = fallback.ExtraRegionId is { } extraId
                 ? RegionBounds(source, extraId, fallback.Extra!)
-                : null
+                : null,
+            Rows = Enumerable.Range(0, fallback.AccountRowCount)
+                .Select(id => RegionBounds(source, id, fallback.Rows[id]))
+                .ToArray()
         };
     }
 
@@ -228,7 +269,15 @@ public static class FarmPresentationDefinitions
     public static IReadOnlyList<FarmCommand> CommandsFor(Section section) => Commands
         .Where(command => command.Action switch
         {
-            BuildFarmAction or RecruitFarmAction => section == Section.Castle,
+            BuildFarmAction build => section switch
+            {
+                Section.Castle => build.Building is BuildingKind.Steward or BuildingKind.Beadle
+                    or BuildingKind.Priest or BuildingKind.ServantRoom,
+                Section.Village => build.Building is BuildingKind.House or BuildingKind.Church or BuildingKind.Monastery,
+                Section.Forest => build.Building == BuildingKind.Woodward,
+                _ => false
+            },
+            RecruitFarmAction => false,
             PlantFarmAction => section == Section.Farm,
             DevelopForestFarmAction => section == Section.Forest,
             LeaveFarmAction => true,
@@ -246,6 +295,7 @@ public static class FarmPresentationDefinitions
     {
         if (layout.Okay.Contains(x, y)) return FooterAction.Okay;
         if (layout.Cancel.Contains(x, y)) return FooterAction.Cancel;
+        if (layout.FullScreen.Contains(x, y)) return FooterAction.FullScreen;
         return null;
     }
 
@@ -253,6 +303,10 @@ public static class FarmPresentationDefinitions
         layout?.FindRegion(id) is { Enabled: not 0 } region
             ? new UiBounds(region.X, region.Y, region.Width, region.Height)
             : fallback;
+
+    private static IReadOnlyList<UiBounds> DefaultRows(int count) => Enumerable.Range(0, count)
+        .Select(row => new UiBounds(37, 68 + row * 14, 300, 14))
+        .ToArray();
 }
 
 public abstract record FarmAction;
