@@ -36,22 +36,35 @@ public sealed record SceneHotspot(SceneNavigationAction Action, string HoverLabe
 
 public static class HomePresentationDefinitions
 {
+    private const int OverviewRegionId = 0;
+    private const int CastleRegionId = 1;
+    private const int FarmBookRegionId = 2;
+    private const int VillageBookRegionId = 3;
+    private const int ForestBookRegionId = 4;
+    private const int WarPlanningRegionId = 5;
+    private const int LeftExitRegionId = 6;
+    private const int RightExitRegionId = 7;
+    private const int MapRegionId = 8;
+    private const int OrdersRegionId = 9;
+
     public static UiBounds HoverLabelBounds { get; } = new(1, 443, 638, 35);
     // FOPTS.HAT is the TACTICAL.PCX office descriptor. The executable stores a contiguous catalog
     // of ten labels in the same ordinal sequence as its ten regions. The known Overview/Castle,
     // three-ledger, and Map geometry anchors corroborate the complete ordinal mapping.
     public static IReadOnlyList<SceneHotspot> Hotspots { get; } =
     [
-        new(SceneNavigationAction.Overview, "Overview", 0, new UiBounds(248, 184, 64, 31)),
-        new(SceneNavigationAction.Castle, "Castle", 1, new UiBounds(172, 153, 72, 44)),
-        new(SceneNavigationAction.Farm, "Farm", 2, new UiBounds(277, 146, 17, 38)),
-        new(SceneNavigationAction.Village, "Village", 3, new UiBounds(295, 141, 18, 43)),
-        new(SceneNavigationAction.Forest, "Forest", 4, new UiBounds(314, 147, 15, 39)),
-        new(SceneNavigationAction.WarPlanning, "War Planning", 5, new UiBounds(359, 123, 35, 76)),
-        new(SceneNavigationAction.Exit, "Exit", 6, new UiBounds(0, 113, 66, 210)),
-        new(SceneNavigationAction.Jump, "JUMP!!", 7, new UiBounds(568, 84, 72, 200)),
-        new(SceneNavigationAction.Map, "Map", 8, new UiBounds(200, 55, 68, 85)),
-        new(SceneNavigationAction.Orders, "Orders", 9, new UiBounds(332, 180, 26, 37))
+        new(SceneNavigationAction.Overview, "Overview", OverviewRegionId, new UiBounds(248, 184, 64, 31)),
+        new(SceneNavigationAction.Castle, "Castle", CastleRegionId, new UiBounds(172, 153, 72, 44)),
+        // These are three adjacent books on the desk, not one compound control. Keeping their
+        // FOPTS.HAT ids explicit mirrors the smith/weapon-display mapping in VSMITH.HAT.
+        new(SceneNavigationAction.Farm, "Farm", FarmBookRegionId, new UiBounds(277, 146, 17, 38)),
+        new(SceneNavigationAction.Village, "Village", VillageBookRegionId, new UiBounds(295, 141, 18, 43)),
+        new(SceneNavigationAction.Forest, "Forest", ForestBookRegionId, new UiBounds(314, 147, 15, 39)),
+        new(SceneNavigationAction.WarPlanning, "War Planning", WarPlanningRegionId, new UiBounds(359, 123, 35, 76)),
+        new(SceneNavigationAction.Exit, "Exit", LeftExitRegionId, new UiBounds(0, 113, 66, 210)),
+        new(SceneNavigationAction.Jump, "JUMP!!", RightExitRegionId, new UiBounds(568, 84, 72, 200)),
+        new(SceneNavigationAction.Map, "Map", MapRegionId, new UiBounds(200, 55, 68, 85)),
+        new(SceneNavigationAction.Orders, "Orders", OrdersRegionId, new UiBounds(332, 180, 26, 37))
     ];
 
     public static IReadOnlyList<SceneHotspot> HotspotsFrom(HatLayout? layout) => Hotspots

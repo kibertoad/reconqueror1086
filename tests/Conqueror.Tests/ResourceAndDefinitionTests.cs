@@ -488,6 +488,34 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void HomeDeskBooksRemainThreeDistinctDescriptorDrivenHotspots()
+    {
+        var bytes = new byte[40 + 10 * 24];
+        WriteInt(bytes, 12, 640); WriteInt(bytes, 16, 480); WriteInt(bytes, 20, 10);
+        for (var id = 0; id < 10; id++)
+        {
+            var offset = 40 + id * 24;
+            WriteInt(bytes, offset, id);
+            WriteInt(bytes, offset + 4, 10 + id * 20);
+            WriteInt(bytes, offset + 8, 100 + id);
+            WriteInt(bytes, offset + 12, 11 + id);
+            WriteInt(bytes, offset + 16, 21 + id);
+            WriteInt(bytes, offset + 20, 1);
+        }
+
+        var books = HomePresentationDefinitions.HotspotsFrom(new HatLayout(bytes))
+            .Where(hotspot => hotspot.Action is SceneNavigationAction.Farm
+                or SceneNavigationAction.Village or SceneNavigationAction.Forest)
+            .ToArray();
+
+        Assert.Equal(
+            [(SceneNavigationAction.Farm, 2, new UiBounds(50, 102, 13, 23)),
+             (SceneNavigationAction.Village, 3, new UiBounds(70, 103, 14, 24)),
+             (SceneNavigationAction.Forest, 4, new UiBounds(90, 104, 15, 25))],
+            books.Select(book => (book.Action, book.HatRegionId, book.Bounds)));
+    }
+
+    [Fact]
     public void HatLayoutRejectsOutOfBoundsRegions()
     {
         var bytes = new byte[64];
