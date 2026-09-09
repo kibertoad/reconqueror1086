@@ -68,6 +68,16 @@ public static class OptionsHubDefinitions
         height);
 
     public const int EnabledStatusFrame = 0;
+    public const int EnabledPressedStatusFrame = 1;
     public const int DisabledStatusFrame = 2;
+    public const int DisabledPressedStatusFrame = 3;
     public const int ResumeFrame = 4;
+
+    public static int StatusFrame(bool enabled, bool pressed) => (enabled, pressed) switch
+    {
+        (true, false) => EnabledStatusFrame,
+        (true, true) => EnabledPressedStatusFrame,
+        (false, false) => DisabledStatusFrame,
+        (false, true) => DisabledPressedStatusFrame
+    };
 }

@@ -488,8 +488,20 @@ public sealed class ResourceAndDefinitionTests
             definition => definition.Role == "Options.Background" && definition.IdSuffix == ":optfin.pcx");
         Assert.Equal(5, OptionsHubDefinitions.Options.Count(option => option.Setting.HasValue));
         Assert.Equal(5, OptionsHubDefinitions.Options.Select(option => option.Setting).OfType<OptionsHubSetting>().Distinct().Count());
+        Assert.Equal(OptionsHubDefinitions.EnabledStatusFrame, OptionsHubDefinitions.StatusFrame(enabled: true, pressed: false));
+        Assert.Equal(OptionsHubDefinitions.EnabledPressedStatusFrame, OptionsHubDefinitions.StatusFrame(enabled: true, pressed: true));
+        Assert.Equal(OptionsHubDefinitions.DisabledStatusFrame, OptionsHubDefinitions.StatusFrame(enabled: false, pressed: false));
+        Assert.Equal(OptionsHubDefinitions.DisabledPressedStatusFrame, OptionsHubDefinitions.StatusFrame(enabled: false, pressed: true));
         var optionsAnimation = Assert.Single(ImportedAnimations.Definitions, definition => definition.Role == "Options.Widgets");
         Assert.Equal("Options.Background", optionsAnimation.PaletteArtRole);
+    }
+
+    [Fact]
+    public void OriginalCursorFramesRetainTheirDecodedOrder()
+    {
+        Assert.Equal(OriginalCursorDefinitions.FrameCount, Enum.GetValues<OriginalCursorKind>().Length);
+        Assert.Equal(Enumerable.Range(0, OriginalCursorDefinitions.FrameCount),
+            Enum.GetValues<OriginalCursorKind>().Select(OriginalCursorDefinitions.Frame));
     }
 
     [Fact]

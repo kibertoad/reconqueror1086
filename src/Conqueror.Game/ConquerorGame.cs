@@ -11,8 +11,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 {
     private sealed record DilemmaAnimation(IReadOnlyList<Texture2D> Frames, int FramesPerChoice);
     private sealed record OriginalAnimation(IReadOnlyList<Texture2D> Frames);
-    private const string OriginalCursorRole = "Interface.Cursor";
-    private const int OriginalDefaultCursorFrame = 0;
+    private const string OriginalCursorAnimationRole = "Interface.Cursor";
 
     private enum Screen { Title, Movie, OptionsHub, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Briefing, Map, Home, WarPlanning, Farm, Village, Inn, InnDialogue, Blacksmith, BlacksmithDialogue, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
     private readonly GraphicsDeviceManager _graphics;
@@ -24,6 +23,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private MouseState _lastMouse;
     private int _characterOption;
     private int _optionsHubOption;
+    private int _pressedOptionsHubOption = -1;
     private int _characterTemplate;
     private int _loadSlot;
     private int _activeSaveSlot = 1;
@@ -172,7 +172,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             }).ToArray();
             _originalAnimations.Add(definition.Role, new OriginalAnimation(frames));
         }
-        IsMouseVisible = !_originalAnimations.ContainsKey(OriginalCursorRole);
+        IsMouseVisible = !_originalAnimations.ContainsKey(OriginalCursorAnimationRole);
         LoadOriginalSounds();
         LoadTitleMovie();
         if (_importedContent?.Open("CDDA/TRACK02") is { } music)
@@ -218,6 +218,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         var mouse = Mouse.GetState();
         bool Press(Keys key) => keys.IsKeyDown(key) && !_last.IsKeyDown(key);
         var click = mouse.LeftButton == ButtonState.Pressed && _lastMouse.LeftButton == ButtonState.Released;
+        var release = mouse.LeftButton == ButtonState.Released && _lastMouse.LeftButton == ButtonState.Pressed;
         var rightClick = mouse.RightButton == ButtonState.Pressed && _lastMouse.RightButton == ButtonState.Released;
         if (click && _soundEffectsEnabled) PlayOriginalSound("Interface.Activate");
         var pressAny = keys.GetPressedKeys().Any(key => key != Keys.Escape && !_last.IsKeyDown(key));
@@ -276,7 +277,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                     if (pressAny || click || _eventMovie.IsComplete) FinishEventMovie();
                 }
                 break;
-            case Screen.OptionsHub: UpdateOptionsHub(Press, mouse, click); break;
+            case Screen.OptionsHub: UpdateOptionsHub(Press, mouse, click, release); break;
             case Screen.LoadGame: UpdateLoadGame(Press, mouse, click); break;
             case Screen.CharacterOptions: UpdateCharacterOptions(Press, mouse, click); break;
             case Screen.CharacterName: UpdateCharacterName(Press); break;
@@ -316,22 +317,31 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _notice = "SELECT A SAVED CAMPAIGN OR RESUME";
     }
 
-    private void UpdateOptionsHub(Func<Keys, bool> press, MouseState mouse, bool click)
+    private void UpdateOptionsHub(Func<Keys, bool> press, MouseState mouse, bool pointerPressed, bool pointerReleased)
     {
         if (press(Keys.Up)) _optionsHubOption = (_optionsHubOption + _optionsHubOptions.Count - 1) % _optionsHubOptions.Count;
         if (press(Keys.Down)) _optionsHubOption = (_optionsHubOption + 1) % _optionsHubOptions.Count;
         var selected = press(Keys.Enter) ? _optionsHubOption : -1;
-        if (selected < 0 && click)
+        var (x, y) = OriginalPoint(mouse);
+        if (pointerPressed)
         {
-            var (x, y) = OriginalPoint(mouse);
-            selected = Enumerable.Range(0, _optionsHubOptions.Count)
+            _pressedOptionsHubOption = Enumerable.Range(0, _optionsHubOptions.Count)
                 .FirstOrDefault(index => _optionsHubOptions[index].OriginalBounds.Contains(x, y), -1);
+            if (_pressedOptionsHubOption >= 0) _optionsHubOption = _pressedOptionsHubOption;
+        }
+        if (pointerReleased)
+        {
+            if (_pressedOptionsHubOption >= 0
+                && _optionsHubOptions[_pressedOptionsHubOption].OriginalBounds.Contains(x, y))
+                selected = _pressedOptionsHubOption;
+            _pressedOptionsHubOption = -1;
         }
         if (selected >= 0) ActivateOptionsHub(_optionsHubOptions[selected]);
     }
 
     private void ActivateOptionsHub(OptionsHubOption option)
     {
+        _pressedOptionsHubOption = -1;
         if (option.RequiresCampaign && !_hasActiveCampaign)
         {
             _notice = $"{option.Label.ToUpperInvariant()} REQUIRES AN ACTIVE CAMPAIGN";
@@ -1270,11 +1280,13 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (!_originalAnimations.TryGetValue("Options.Widgets", out var animation)
             || animation.Frames.Count <= OptionsHubDefinitions.ResumeFrame) return;
 
-        foreach (var option in _optionsHubOptions.Where(option => option.Setting.HasValue))
+        foreach (var indexed in _optionsHubOptions.Select((option, index) => (option, index))
+                     .Where(indexed => indexed.option.Setting.HasValue))
         {
-            var frameIndex = SettingEnabled(option.Setting!.Value)
-                ? OptionsHubDefinitions.EnabledStatusFrame
-                : OptionsHubDefinitions.DisabledStatusFrame;
+            var option = indexed.option;
+            var pressed = indexed.index == _pressedOptionsHubOption
+                && Mouse.GetState().LeftButton == ButtonState.Pressed;
+            var frameIndex = OptionsHubDefinitions.StatusFrame(SettingEnabled(option.Setting!.Value), pressed);
             var frame = animation.Frames[frameIndex];
             var bounds = OptionsHubDefinitions.StatusBounds(option, frame.Width, frame.Height);
             _batch.Draw(frame, ScaleBounds(bounds), Color.White);
@@ -2064,12 +2076,30 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     }
     private void DrawOriginalCursor()
     {
-        if (!_originalAnimations.TryGetValue(OriginalCursorRole, out var cursor)
-            || cursor.Frames.Count <= OriginalDefaultCursorFrame) return;
-        var frame = cursor.Frames[OriginalDefaultCursorFrame];
+        if (!_originalAnimations.TryGetValue(OriginalCursorAnimationRole, out var cursor)) return;
         var mouse = Mouse.GetState();
+        var frameIndex = OriginalCursorDefinitions.Frame(CurrentCursorKind(mouse));
+        if (cursor.Frames.Count <= frameIndex) return;
+        var frame = cursor.Frames[frameIndex];
         _batch.Draw(frame, new Rectangle(mouse.X, mouse.Y,
             frame.Width * 1024 / 640, frame.Height * 768 / 480), Color.White);
+    }
+
+    private OriginalCursorKind CurrentCursorKind(MouseState mouse)
+    {
+        if (mouse.LeftButton == ButtonState.Pressed || mouse.RightButton == ButtonState.Pressed)
+            return OriginalCursorKind.Hand;
+        var (x, y) = OriginalPoint(mouse);
+        return _screen switch
+        {
+            Screen.Map => OriginalCursorKind.Travel,
+            Screen.FieldBattle or Screen.Siege => OriginalCursorKind.Target,
+            Screen.Inn when _innLayout.Patrons.Any(patron => patron.Bounds.Contains(x, y)) => OriginalCursorKind.Talk,
+            Screen.InnDialogue or Screen.BlacksmithDialogue => OriginalCursorKind.Talk,
+            Screen.Blacksmith when HitSceneHotspot(_blacksmithHotspots, mouse)?.Action
+                == SceneNavigationAction.BlacksmithDialogue => OriginalCursorKind.Talk,
+            _ => OriginalCursorKind.Sword
+        };
     }
     private void DrawText(string text, int x, int y, Color color, int scale = 3, int wrap = 0) => PixelFont.Draw(_batch, _pixel, text, new Vector2(x, y), color, scale, wrap);
 }
