@@ -208,6 +208,22 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void FifteenCastlesSelectTheirOrderedThreeByFiveMeleeScenes()
+    {
+        Assert.Equal("MELEE1.RES", ImportedSiegeLayouts.SceneNameForCampaignLocation(1));
+        Assert.Equal("MELEE00.RES", ImportedSiegeLayouts.SceneNameForCampaignLocation(2));
+        Assert.Equal("MELEE04.RES", ImportedSiegeLayouts.SceneNameForCampaignLocation(6));
+        Assert.Equal("MELEE10.RES", ImportedSiegeLayouts.SceneNameForCampaignLocation(7));
+        Assert.Equal("MELEE14.RES", ImportedSiegeLayouts.SceneNameForCampaignLocation(11));
+        Assert.Equal("MELEE20.RES", ImportedSiegeLayouts.SceneNameForCampaignLocation(12));
+        Assert.Equal("MELEE24.RES", ImportedSiegeLayouts.SceneNameForCampaignLocation(16));
+        Assert.Null(ImportedSiegeLayouts.SceneNameForCampaignLocation(0));
+        Assert.Null(ImportedSiegeLayouts.SceneNameForCampaignLocation(17));
+        Assert.Null(ImportedSiegeLayouts.SceneNameForCampaignLocation(-1));
+        Assert.Null(ImportedSiegeLayouts.SceneNameForCampaignLocation(World.Locations.Length));
+    }
+
+    [Fact]
     public void ImportedSceneLayoutCropsDisconnectedTemplateGallery()
     {
         var source = SyntheticScene();

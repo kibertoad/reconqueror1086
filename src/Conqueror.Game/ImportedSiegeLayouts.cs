@@ -9,10 +9,17 @@ public sealed record ImportedSiegeScene(
 
 public static class ImportedSiegeLayouts
 {
-    private static readonly string[] CampaignScenes = ["MELEE0.RES", "MELEE1.RES", "MELEE2.RES"];
+    public static string? SceneNameForCampaignLocation(int location)
+    {
+        if (location < 0 || location >= World.Locations.Length) return null;
+        if (World.Locations[location].Kind == LocationKind.London) return "MELEE1.RES";
+        if (World.Locations[location].Kind != LocationKind.Castle) return null;
+        var castle = World.Locations.Take(location).Count(candidate => candidate.Kind == LocationKind.Castle);
+        return $"MELEE{castle / 5}{castle % 5}.RES";
+    }
 
     public static ImportedSiegeScene? ForCampaignLocation(ImportedContentCatalog? catalog, int location) =>
-        Load(catalog, CampaignScenes[Math.Abs(location % CampaignScenes.Length)]);
+        SceneNameForCampaignLocation(location) is { } name ? Load(catalog, name) : null;
 
     public static ImportedSiegeScene? ForPracticeMelee(ImportedContentCatalog? catalog) => Load(catalog, "MELEE0.RES");
     public static ImportedSiegeScene? ForPracticeCastleSkirmish(ImportedContentCatalog? catalog) => Load(catalog, "DEFEND0.RES");
