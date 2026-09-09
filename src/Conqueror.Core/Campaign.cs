@@ -114,6 +114,52 @@ public sealed class Campaign
         return true;
     }
 
+    public bool AdjustArmyCompany(int armyIndex, UnitType type, int companies)
+    {
+        if (armyIndex is < 0 or >= Player.ArmyDivisionLimit || companies is not (-1 or 1)) return false;
+        var player = State.Player;
+        player.EnsureArmyRoster();
+        if (player.ArmyLocationAt(armyIndex) != 0) return false;
+        var army = player.ArmyAt(armyIndex);
+        var amount = checked(companies * WarPlanningCheckpoint.CompanySize);
+        if (amount > 0 && (player.AvailableSerfs < amount
+            || army.Total + amount > WarPlanningCheckpoint.MaximumCompaniesPerArmy * WarPlanningCheckpoint.CompanySize)) return false;
+        if (amount < 0 && army.Units[type] < -amount) return false;
+        army.Units[type] += amount;
+        Log($"Army {armyIndex + 1}: {(amount > 0 ? "raised" : "disbanded")} {Math.Abs(amount)} {type}.");
+        return true;
+    }
+
+    public bool FieldArmy(int armyIndex)
+    {
+        if (armyIndex is < 0 or >= Player.ArmyDivisionLimit || State.CurrentLocation != 0) return false;
+        var player = State.Player;
+        player.EnsureArmyRoster();
+        if (player.ArmyAt(armyIndex).Total == 0 || player.ArmyLocationAt(armyIndex) != 0) return false;
+        player.SetArmyFieldState(armyIndex, true, 0);
+        Log($"{player.ArmyNameAt(armyIndex)} is fielded.");
+        return true;
+    }
+
+    public bool ToggleArmyMembership(int armyIndex)
+    {
+        if (armyIndex is < 0 or >= Player.ArmyDivisionLimit) return false;
+        var player = State.Player;
+        player.EnsureArmyRoster();
+        if (player.ArmyAt(armyIndex).Total == 0) return false;
+        player.JoinedArmyIndex = player.JoinedArmyIndex == armyIndex ? null : armyIndex;
+        Log(player.JoinedArmyIndex is null ? "You leave the selected army." : $"You join {player.ArmyNameAt(armyIndex)}.");
+        return true;
+    }
+
+    public bool AssignSpy()
+    {
+        if (!Spend(Balance.Strategy.SpyCost, "assign spy")) return false;
+        State.Player.ActiveSpies++;
+        Log("A spy is sent to observe troop movements across England.");
+        return true;
+    }
+
     public bool StartSiege(int location)
     {
         if (location <= 0 || location >= World.Locations.Length || location != State.CurrentLocation || State.Player.Army.Total == 0
@@ -258,7 +304,9 @@ public sealed class Campaign
         revenue += f.Forest.Sum(x => x.Value * Balance.Forest[x.Key].RevenueAt50);
         revenue = (int)Math.Round(revenue * productivity / 50d);
         revenue += (int)Math.Round(f.Population * f.TaxRate / 1200d);
-        var upkeep = p.Army.Units.Sum(x => x.Value * Balance.ScaleFrom50(Balance.Units[x.Key].UpkeepAt50, Balance.Units[x.Key].UpkeepAt100, productivity));
+        p.EnsureArmyRoster();
+        var upkeep = Enumerable.Range(0, Player.ArmyDivisionLimit).Sum(index => p.ArmyAt(index).Units.Sum(x =>
+            x.Value * Balance.ScaleFrom50(Balance.Units[x.Key].UpkeepAt50, Balance.Units[x.Key].UpkeepAt100, productivity)));
         p.Wealth += revenue - upkeep;
 
         var capacity = Math.Min(f.Houses, f.FoodTiles) * 100;
@@ -274,6 +322,7 @@ public sealed class Campaign
             else { Log("The moneylender sends Drogo to collect the harvest debt."); }
             p.Debt = 0;
         }
+        ResolveSpyReports();
         Log($"Month settled: +{revenue}s revenue, -{upkeep}s upkeep, {productivity}% productivity.");
     }
 
@@ -356,10 +405,24 @@ public sealed class Campaign
 
     private void EnsureStrategicState()
     {
+        State.Player.EnsureArmyRoster();
         foreach (var (location, index) in World.Locations.Select((location, index) => (location, index)))
             if (location.Kind is LocationKind.Castle or LocationKind.London)
                 State.GarrisonStrength.TryAdd(index, State.ConqueredLocations.Contains(index) ? 0 : location.Garrison);
         if (State.PendingFieldLocation < 0) State.PendingEnemyArmy = null;
+    }
+
+    private void ResolveSpyReports()
+    {
+        for (var report = 0; report < State.Player.ActiveSpies; report++)
+        {
+            var targets = Enumerable.Range(1, World.Locations.Length - 1)
+                .Where(index => IsHostileStronghold(index) && !State.SpiedLocations.Contains(index)).ToArray();
+            if (targets.Length == 0) return;
+            var target = targets[_random.Next(targets.Length)];
+            State.SpiedLocations.Add(target);
+            Log($"A spy reports {GarrisonAt(target)} soldiers guarding {World.Locations[target].Name}.");
+        }
     }
 
     public SiegeSession CreateSiege()

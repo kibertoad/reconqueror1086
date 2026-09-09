@@ -71,7 +71,7 @@ public static class WarPlanningPresentationDefinitions
         IReadOnlyList<UiBounds> UnitRows,
         UiBounds Okay,
         UiBounds Cancel,
-        UiBounds Target);
+        UiBounds ArmyName);
 
     public const int ArmyCount = 5;
     public const int ArmyFrameStates = 3;
@@ -102,7 +102,7 @@ public static class WarPlanningPresentationDefinitions
         Enumerable.Range(0, 3).Select(index => Region(layout, 8 + index, Fallback.UnitRows[index])).ToArray(),
         Region(layout, 11, Fallback.Okay),
         Region(layout, 12, Fallback.Cancel),
-        Region(layout, 13, Fallback.Target));
+        Region(layout, 13, Fallback.ArmyName));
 
     public static int ArmyFrame(int armyIndex, bool selected, bool available) =>
         checked(armyIndex * ArmyFrameStates + (available ? selected ? 0 : 1 : 2));

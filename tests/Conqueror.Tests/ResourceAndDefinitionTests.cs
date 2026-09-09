@@ -341,6 +341,80 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void WarPlanningUsesFiveArmiesAndHundredSerfCompanies()
+    {
+        var campaign = new Campaign();
+        var player = campaign.State.Player;
+        Assert.Equal(Player.ArmyDivisionLimit - 1, player.AdditionalArmies.Count);
+
+        Assert.True(campaign.AdjustArmyCompany(4, UnitType.Knights, 1));
+        Assert.Equal(100, player.ArmyAt(4).Units[UnitType.Knights]);
+        Assert.Equal(1100, player.AvailableSerfs);
+        Assert.True(campaign.AdjustArmyCompany(4, UnitType.Knights, -1));
+        Assert.Equal(0, player.ArmyAt(4).Total);
+        Assert.False(campaign.AdjustArmyCompany(4, UnitType.Knights, -1));
+
+        player.Home.Population = 10_000;
+        for (var company = 0; company < WarPlanningCheckpoint.MaximumCompaniesPerArmy; company++)
+            Assert.True(campaign.AdjustArmyCompany(0, UnitType.Swordsmen, 1));
+        Assert.Equal(6000, player.Army.Total);
+        Assert.False(campaign.AdjustArmyCompany(0, UnitType.Swordsmen, 1));
+
+        player.AdditionalArmies[3].Location = 2;
+        Assert.False(campaign.AdjustArmyCompany(4, UnitType.Swordsmen, 1));
+    }
+
+    [Fact]
+    public void ArmyRosterRepairsLegacySlotsAndRejectsOverflow()
+    {
+        var player = new Player { AdditionalArmies = [] };
+        player.EnsureArmyRoster();
+        Assert.Equal(["Army 2", "Army 3", "Army 4", "Army 5"],
+            player.AdditionalArmies.Select(army => army.Name));
+
+        player.AdditionalArmies.Add(new StrategicArmyDivision { Name = "Army 6" });
+        Assert.Throws<InvalidDataException>(player.EnsureArmyRoster);
+    }
+
+    [Fact]
+    public void WarPlanningCheckpointRollsBackAllDivisionsSpiesAndMembership()
+    {
+        var campaign = new Campaign();
+        campaign.State.Player.Wealth = 500;
+        var checkpoint = new WarPlanningCheckpoint(campaign);
+
+        Assert.True(campaign.AdjustArmyCompany(2, UnitType.Halberdiers, 1));
+        campaign.State.Player.SetArmyName(2, "Northern Guard");
+        Assert.True(campaign.FieldArmy(2));
+        Assert.True(campaign.ToggleArmyMembership(2));
+        Assert.True(campaign.AssignSpy());
+        checkpoint.Restore(campaign);
+
+        var player = campaign.State.Player;
+        Assert.Equal(500, player.Wealth);
+        Assert.Equal(0, player.ArmyAt(2).Total);
+        Assert.Equal("Army 3", player.ArmyNameAt(2));
+        Assert.False(player.ArmyIsFielded(2));
+        Assert.Equal(0, player.JoinedArmyIndex);
+        Assert.Equal(0, player.ActiveSpies);
+        Assert.Empty(campaign.State.Journal);
+    }
+
+    [Fact]
+    public void ActiveSpiesProduceRecurringMonthlyIntel()
+    {
+        var campaign = new Campaign(seed: 17);
+        campaign.State.Player.Wealth = 500;
+
+        Assert.True(campaign.AssignSpy());
+        Assert.Equal((420, 1), (campaign.State.Player.Wealth, campaign.State.Player.ActiveSpies));
+        campaign.SettleMonth();
+
+        Assert.Single(campaign.State.SpiedLocations);
+        Assert.Contains(campaign.State.Journal, entry => entry.Contains("A spy reports", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void WeaponStoreTableParsesBoundedSixLineRecords()
     {
         var text = "first.smk\r\n2\r\n7\r\n9\r\n500\r\nA synthetic sword.\r\n#\r\n3\r\n8\r\n10\r\n120\r\nSynthetic armor.";
@@ -463,6 +537,11 @@ public sealed class ResourceAndDefinitionTests
 
             var campaign = new Campaign(Campaign.NewFromTemplate(0));
             campaign.State.Date = new DateTime(1087, 4, 3);
+            campaign.State.Player.AdditionalArmies[1].Name = "March Wardens";
+            campaign.State.Player.AdditionalArmies[1].Force.Units[UnitType.Knights] = 200;
+            campaign.State.Player.AdditionalArmies[1].IsFielded = true;
+            campaign.State.Player.JoinedArmyIndex = 2;
+            campaign.State.Player.ActiveSpies = 3;
             slots.Save(campaign, 3);
 
             var third = slots.Inspect(3);
@@ -472,6 +551,12 @@ public sealed class ResourceAndDefinitionTests
             Assert.True(slots.TryLoad(3, out var loaded, out var error));
             Assert.Null(error);
             Assert.Equal(campaign.State.Player.Name, loaded!.State.Player.Name);
+            Assert.Equal(("March Wardens", 200, true, 2, 3),
+                (loaded.State.Player.AdditionalArmies[1].Name,
+                 loaded.State.Player.AdditionalArmies[1].Force.Units[UnitType.Knights],
+                 loaded.State.Player.AdditionalArmies[1].IsFielded,
+                 loaded.State.Player.JoinedArmyIndex,
+                 loaded.State.Player.ActiveSpies));
 
             campaign.Save(Path.Combine(root, "campaign.json"));
             Assert.True(slots.Inspect(1).IsValid);

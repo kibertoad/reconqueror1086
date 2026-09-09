@@ -200,6 +200,15 @@ Check(traveler.StartSiege(york), "siege requires arrival and army");
 traveler.WinSiege();
 Check(traveler.State.ConqueredLocations.Contains(york) && traveler.State.Player.Fiefs == 2, "location conquest persists");
 
+var warPlanner = new Campaign(Campaign.NewFromTemplate(1));
+var warCheckpoint = new WarPlanningCheckpoint(warPlanner);
+Check(warPlanner.AdjustArmyCompany(3, UnitType.Swordsmen, 1) && warPlanner.State.Player.ArmyAt(3).Total == 100,
+    "war planning raises hundred-serf companies in any of five divisions");
+Check(warPlanner.FieldArmy(3) && warPlanner.ToggleArmyMembership(3), "war planning fields and joins a selected division");
+warCheckpoint.Restore(warPlanner);
+Check(warPlanner.State.Player.ArmyAt(3).Total == 0 && warPlanner.State.Player.JoinedArmyIndex == 0,
+    "war planning cancellation restores every division and membership");
+
 var spyCampaign = new Campaign(Campaign.NewFromTemplate(1));
 Check(!spyCampaign.HasGarrisonIntel(york) && spyCampaign.SendSpy(york), "spy reveals a hostile garrison");
 Check(spyCampaign.State.Player.Wealth == 410 && spyCampaign.HasGarrisonIntel(york) && spyCampaign.GarrisonAt(york) == World.Locations[york].Garrison, "spy report uses persistent garrison data");

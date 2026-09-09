@@ -71,13 +71,13 @@ Local reference filenames:
 - **Implemented:** insert the original `FORGESMI.PCX` workshop between Village and the store, with the smith hotspot sourced from `VSMITH.HAT`.
 - **Corrected:** `FOPTS.HAT`, not `FCASTLE.HAT`, supplies the ten `TACTICAL.PCX` Home rectangles. The old generated report omitted resource names, concealing that `FCASTLE.HAT` actually describes screen 19's `FIEFMGMT.PCX` table.
 - **Implemented:** all ten Home regions follow the executable's ordered label catalog: Overview, Castle, Farm, Village, Forest, War Planning, Exit, JUMP!!, Map, and Orders. The first five and Map geometries independently anchor the ordinal interpretation; the original `F_OVER.PCX` and `WARPLAN.PCX` backgrounds are active for the corresponding destinations.
-- **Implemented:** decode and render all 22 `WARPLAN.CSF` controls through the exact `FWARPLAN.HAT` rectangles. Army 1 reflects the current aggregate army, unavailable army slots use their original disabled frames, Field Army returns the active army to strategic orders, and Send Out Spy invokes the existing strategic spy action. Join/Leave remains non-mutating until the multi-army model is recovered.
+- **Implemented:** decode and render all 22 `WARPLAN.CSF` controls through the exact `FWARPLAN.HAT` rectangles. The manual-confirmed five-division roster persists named forces, left/right row clicks add/remove 100-serf companies, the 60-company and away-from-home restrictions are enforced, Join/Leave and Field Army state persist, spies produce recurring monthly intelligence, and OK/Cancel commit or restore the complete plan.
 - **Implemented:** keep the smith and Buy/Sell hotspots distinct. The smith opens the conversation frame; the weapon-rack region opens inventory.
 - **Implemented:** render `SWDTEMP.PCX` as the store shell; parse `WEAPONS.DAT`; bind each shop definition to its original record; render the selected `SWORDS.CSF` frame, local description, and exact price; and route previous, next, transaction, and exit through typed 640x480 controls.
 - Map the village-image suffixes to world locations before activating `V66_1111.PCX` outside its confirmed Sabine's Keep role.
 - Locate the actual blacksmith dialogue-node source and bind it to `COMSCRN1.PCX`, `BLACKSMI.PCC`, scroll regions, and choices through the generic dialogue interpreter planned in Phase 1.2. Do not repeat the disproved `VSMITH.666` text hypothesis.
 - **Implemented:** render `BUYSELL.CSF` through the store palette using data-driven overlay definitions: hide/show View from the record's movie marker and switch Purchase/Sell from current ownership. Exact mouse-down timing remains to be traced.
-- Recover War Planning's multi-army membership model and the `JUMP!!` effect, then recover behavior/cost semantics for currently display-only management rows and replace the provisional terrain fill with editable tiles.
+- Integrate independently fielded divisions with map travel and combat and recover exact spy timing/cost and the `JUMP!!` effect; then recover behavior/cost semantics for currently display-only management rows and replace the provisional terrain fill with editable tiles.
 
 ## Acceptance reference
 

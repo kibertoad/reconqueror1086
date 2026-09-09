@@ -81,6 +81,14 @@ public sealed class Army
     }
 }
 
+public sealed class StrategicArmyDivision
+{
+    public string Name { get; set; } = "Army";
+    public Army Force { get; init; } = new();
+    public bool IsFielded { get; set; }
+    public int Location { get; set; }
+}
+
 public sealed class Fief
 {
     public string Name { get; init; } = "Home Fief";
@@ -134,6 +142,7 @@ public sealed class Fief
 
 public sealed class Player
 {
+    public const int ArmyDivisionLimit = 5;
     public string Name { get; set; } = "Sir Ronald DeMille";
     public string HeraldicColor { get; set; } = "Green";
     public CharacterStats Stats { get; set; } = new(9, 8, 8, 10, 10);
@@ -152,7 +161,57 @@ public sealed class Player
     public int Villages { get; set; } = 1;
     public Inventory Inventory { get; init; } = new();
     public Army Army { get; init; } = new();
+    public string PrimaryArmyName { get; set; } = "Army 1";
+    public bool PrimaryArmyIsFielded { get; set; }
+    public int PrimaryArmyLocation { get; set; }
+    public List<StrategicArmyDivision> AdditionalArmies { get; set; } =
+        Enumerable.Range(2, ArmyDivisionLimit - 1)
+            .Select(number => new StrategicArmyDivision { Name = $"Army {number}" }).ToList();
+    public int? JoinedArmyIndex { get; set; } = 0;
+    public int ActiveSpies { get; set; }
     public Fief Home { get; init; } = new();
+
+    public void EnsureArmyRoster()
+    {
+        AdditionalArmies ??= [];
+        if (AdditionalArmies.Count > ArmyDivisionLimit - 1)
+            throw new InvalidDataException("Campaign contains more than five army divisions.");
+        while (AdditionalArmies.Count < ArmyDivisionLimit - 1)
+            AdditionalArmies.Add(new StrategicArmyDivision { Name = $"Army {AdditionalArmies.Count + 2}" });
+        if (string.IsNullOrWhiteSpace(PrimaryArmyName)) PrimaryArmyName = "Army 1";
+        for (var index = 0; index < AdditionalArmies.Count; index++)
+            if (string.IsNullOrWhiteSpace(AdditionalArmies[index].Name)) AdditionalArmies[index].Name = $"Army {index + 2}";
+        JoinedArmyIndex = JoinedArmyIndex is >= 0 and < ArmyDivisionLimit ? JoinedArmyIndex : null;
+    }
+
+    public Army ArmyAt(int index) => index switch
+    {
+        0 => Army,
+        >= 1 and < ArmyDivisionLimit => AdditionalArmies[index - 1].Force,
+        _ => throw new ArgumentOutOfRangeException(nameof(index))
+    };
+
+    public string ArmyNameAt(int index) => index == 0 ? PrimaryArmyName : AdditionalArmies[index - 1].Name;
+    public void SetArmyName(int index, string name)
+    {
+        ArgumentNullException.ThrowIfNull(name);
+        if (name.Length > 16) throw new ArgumentOutOfRangeException(nameof(name));
+        if (index == 0) PrimaryArmyName = name;
+        else AdditionalArmies[index - 1].Name = name;
+    }
+    public bool ArmyIsFielded(int index) => index == 0 ? PrimaryArmyIsFielded : AdditionalArmies[index - 1].IsFielded;
+    public int ArmyLocationAt(int index) => index == 0 ? PrimaryArmyLocation : AdditionalArmies[index - 1].Location;
+
+    public void SetArmyFieldState(int index, bool fielded, int location)
+    {
+        if (index == 0) { PrimaryArmyIsFielded = fielded; PrimaryArmyLocation = location; return; }
+        var division = AdditionalArmies[index - 1];
+        division.IsFielded = fielded;
+        division.Location = location;
+    }
+
+    public int TotalArmyPopulation => Enumerable.Range(0, ArmyDivisionLimit).Sum(index => ArmyAt(index).Total);
+    public int AvailableSerfs => Math.Max(0, Home.AvailableSerfs - TotalArmyPopulation);
 }
 
 public sealed class CampaignState

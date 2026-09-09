@@ -43,8 +43,10 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private EstatePanel _estatePanel = EstatePanel.Map;
     private FarmPresentationDefinitions.Section _fiefSection = FarmPresentationDefinitions.Section.Farm;
     private FiefManagementCheckpoint? _fiefCheckpoint;
+    private WarPlanningCheckpoint? _warPlanningCheckpoint;
     private int _fiefRowOffset;
     private int _warPlanningArmyIndex;
+    private bool _editingWarPlanningArmyName;
     private IReadOnlyDictionary<FarmPresentationDefinitions.Section, FarmPresentationDefinitions.Layout> _fiefLayouts =
         FarmPresentationDefinitions.Layouts.ToDictionary(layout => layout.Section);
     private IReadOnlyList<SceneHotspot> _homeHotspots = HomePresentationDefinitions.Hotspots;
@@ -195,11 +197,12 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         var mouse = Mouse.GetState();
         bool Press(Keys key) => keys.IsKeyDown(key) && !_last.IsKeyDown(key);
         var click = mouse.LeftButton == ButtonState.Pressed && _lastMouse.LeftButton == ButtonState.Released;
+        var rightClick = mouse.RightButton == ButtonState.Pressed && _lastMouse.RightButton == ButtonState.Released;
         if (click && _soundEffectsEnabled) PlayOriginalSound("Interface.Activate");
         var pressAny = keys.GetPressedKeys().Any(key => key != Keys.Escape && !_last.IsKeyDown(key));
-        if (Press(Keys.F5) && _screen == Screen.Farm)
+        if (Press(Keys.F5) && _screen is Screen.Farm or Screen.WarPlanning)
         {
-            _notice = "CONFIRM OR CANCEL FIEF CHANGES BEFORE SAVING";
+            _notice = "CONFIRM OR CANCEL PENDING MANAGEMENT CHANGES BEFORE SAVING";
         }
         else if (Press(Keys.F5) && _screen is not Screen.Title and not Screen.LoadGame)
         {
@@ -216,7 +219,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             else if (_screen == Screen.CharacterOptions) _screen = Screen.Title;
             else if (_screen == Screen.Character) _screen = Screen.CharacterOptions;
             else if (_screen == Screen.Farm) CancelFiefManagement();
-            else if (_screen == Screen.WarPlanning) _screen = Screen.Home;
+            else if (_screen == Screen.WarPlanning) CancelWarPlanning();
             else if (_screen == Screen.Overview) _screen = _overviewReturnScreen;
             else if (_screen == Screen.Blacksmith) _screen = Screen.Village;
             else if (_screen == Screen.BlacksmithDialogue) _screen = Screen.Blacksmith;
@@ -240,7 +243,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.Dilemma: UpdateDilemma(Press, mouse, click); break;
             case Screen.Map: UpdateMap(Press, mouse, click); break;
             case Screen.Home: UpdateHome(Press, mouse, click); break;
-            case Screen.WarPlanning: UpdateWarPlanning(Press, mouse, click); break;
+            case Screen.WarPlanning: UpdateWarPlanning(Press, mouse, click, rightClick); break;
             case Screen.Farm: UpdateFarm(Press, mouse, click); break;
             case Screen.Village: UpdateVillage(Press); break;
             case Screen.Blacksmith: UpdateBlacksmith(Press, mouse, click); break;
@@ -582,42 +585,66 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (click) ActivateSceneHotspot(HitSceneHotspot(_homeHotspots, mouse));
     }
 
-    private void UpdateWarPlanning(Func<Keys, bool> press, MouseState mouse, bool click)
+    private void UpdateWarPlanning(Func<Keys, bool> press, MouseState mouse, bool click, bool rightClick)
     {
-        if (press(Keys.Enter)) { _screen = Screen.Home; return; }
+        var player = _campaign.State.Player;
+        if (_editingWarPlanningArmyName)
+        {
+            var name = player.ArmyNameAt(_warPlanningArmyIndex);
+            if (press(Keys.Back) && name.Length > 0) player.SetArmyName(_warPlanningArmyIndex, name[..^1]);
+            if (press(Keys.Space) && name.Length < 16 && !name.EndsWith(' ')) player.SetArmyName(_warPlanningArmyIndex, name + " ");
+            for (var value = (int)Keys.A; value <= (int)Keys.Z && player.ArmyNameAt(_warPlanningArmyIndex).Length < 16; value++)
+                if (press((Keys)value)) player.SetArmyName(_warPlanningArmyIndex,
+                    player.ArmyNameAt(_warPlanningArmyIndex) + (char)('A' + value - (int)Keys.A));
+            if (press(Keys.Enter)) { _editingWarPlanningArmyName = false; return; }
+        }
+        else if (press(Keys.Enter)) { CommitWarPlanning(); return; }
         if (press(Keys.Up)) _warPlanningArmyIndex = Math.Max(0, _warPlanningArmyIndex - 1);
         if (press(Keys.Down)) _warPlanningArmyIndex = Math.Min(WarPlanningPresentationDefinitions.ArmyCount - 1, _warPlanningArmyIndex + 1);
-        if (!click) return;
+        if (!click && !rightClick) return;
 
         var (x, y) = OriginalPoint(mouse);
-        if (_warPlanningLayout.Okay.Contains(x, y) || _warPlanningLayout.Cancel.Contains(x, y))
+        if (click && _warPlanningLayout.ArmyName.Contains(x, y))
         {
-            _screen = Screen.Home;
+            _editingWarPlanningArmyName = true;
             return;
         }
+        _editingWarPlanningArmyName = false;
+        if (click && _warPlanningLayout.Okay.Contains(x, y)) { CommitWarPlanning(); return; }
+        if (click && _warPlanningLayout.Cancel.Contains(x, y)) { CancelWarPlanning(); return; }
         var army = Enumerable.Range(0, _warPlanningLayout.ArmyButtons.Count)
             .FirstOrDefault(index => _warPlanningLayout.ArmyButtons[index].Contains(x, y), -1);
         if (army >= 0)
         {
-            if (army == 0) _warPlanningArmyIndex = army;
-            else _notice = $"ARMY {army + 1} IS NOT YET FIELDED";
+            _warPlanningArmyIndex = army;
             return;
         }
-        if (_warPlanningLayout.FieldArmy.Contains(x, y))
+        var unitRow = Enumerable.Range(0, _warPlanningLayout.UnitRows.Count)
+            .FirstOrDefault(index => _warPlanningLayout.UnitRows[index].Contains(x, y), -1);
+        if (unitRow >= 0)
         {
-            if (_campaign.State.Player.Army.Total == 0) _notice = "YOU HAVE NO TROOPS TO FIELD";
-            else { _screen = Screen.Map; _notice = "ARMY 1 IS READY FOR ORDERS"; }
+            var unit = Enum.GetValues<UnitType>()[unitRow];
+            _notice = _campaign.AdjustArmyCompany(_warPlanningArmyIndex, unit, rightClick ? -1 : 1)
+                ? $"{_campaign.State.Player.ArmyNameAt(_warPlanningArmyIndex).ToUpperInvariant()}: {unit.ToString().ToUpperInvariant()} UPDATED"
+                : "THAT COMPANY CHANGE IS NOT AVAILABLE";
             return;
         }
-        if (_warPlanningLayout.SendSpy.Contains(x, y))
+        if (click && _warPlanningLayout.FieldArmy.Contains(x, y))
         {
-            _notice = _campaign.SendSpy(_selectedLocation)
-                ? $"SPY SENT TO {World.Locations[_selectedLocation].Name.ToUpperInvariant()}"
-                : "A SPY CANNOT BE SENT TO THAT DESTINATION";
+            _notice = _campaign.FieldArmy(_warPlanningArmyIndex)
+                ? $"{_campaign.State.Player.ArmyNameAt(_warPlanningArmyIndex).ToUpperInvariant()} FIELDED"
+                : "THAT ARMY CANNOT BE FIELDED";
             return;
         }
-        if (_warPlanningLayout.Membership.Contains(x, y))
-            _notice = "JOIN AND LEAVE ARMY STATE REQUIRES MULTI-ARMY RECOVERY";
+        if (click && _warPlanningLayout.SendSpy.Contains(x, y))
+        {
+            _notice = _campaign.AssignSpy() ? "SPY ASSIGNED" : "YOU CANNOT ASSIGN ANOTHER SPY";
+            return;
+        }
+        if (click && _warPlanningLayout.Membership.Contains(x, y))
+            _notice = _campaign.ToggleArmyMembership(_warPlanningArmyIndex)
+                ? "ARMY MEMBERSHIP UPDATED"
+                : "YOU CANNOT JOIN THAT ARMY";
     }
 
     private void UpdateFarm(Func<Keys, bool> press, MouseState mouse, bool click)
@@ -738,7 +765,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             case SceneNavigationAction.Farm: EnterFiefManagement(FarmPresentationDefinitions.Section.Farm); break;
             case SceneNavigationAction.Village: EnterFiefManagement(FarmPresentationDefinitions.Section.Village); break;
             case SceneNavigationAction.Forest: EnterFiefManagement(FarmPresentationDefinitions.Section.Forest); break;
-            case SceneNavigationAction.WarPlanning: _screen = Screen.WarPlanning; break;
+            case SceneNavigationAction.WarPlanning: EnterWarPlanning(); break;
             case SceneNavigationAction.Exit: _screen = Screen.Map; break;
             case SceneNavigationAction.Jump: _notice = "JUMP ACTION REQUIRES EXECUTABLE CONFIRMATION"; break;
             case SceneNavigationAction.Map: _estatePanel = EstatePanel.Map; _screen = Screen.Map; break;
@@ -753,6 +780,38 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     {
         _overviewReturnScreen = returnScreen;
         _screen = Screen.Overview;
+    }
+
+    private void EnterWarPlanning()
+    {
+        _campaign.State.Player.EnsureArmyRoster();
+        _warPlanningCheckpoint = new WarPlanningCheckpoint(_campaign);
+        _warPlanningArmyIndex = 0;
+        _editingWarPlanningArmyName = false;
+        _screen = Screen.WarPlanning;
+    }
+
+    private void CommitWarPlanning()
+    {
+        var player = _campaign.State.Player;
+        for (var index = 0; index < Player.ArmyDivisionLimit; index++)
+        {
+            var name = player.ArmyNameAt(index).Trim();
+            player.SetArmyName(index, name.Length == 0 ? $"Army {index + 1}" : name);
+        }
+        _editingWarPlanningArmyName = false;
+        _warPlanningCheckpoint = null;
+        _screen = Screen.Home;
+        _notice = "WAR PLANS CONFIRMED";
+    }
+
+    private void CancelWarPlanning()
+    {
+        _warPlanningCheckpoint?.Restore(_campaign);
+        _editingWarPlanningArmyName = false;
+        _warPlanningCheckpoint = null;
+        _screen = Screen.Home;
+        _notice = "WAR PLANS CANCELLED";
     }
 
     private void UpdateShop(Func<Keys, bool> press, MouseState mouse, bool click)
@@ -1274,32 +1333,52 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
         for (var index = 0; index < _warPlanningLayout.ArmyButtons.Count; index++)
         {
-            var available = index == 0;
+            var available = _campaign.State.Player.ArmyLocationAt(index) == 0;
             DrawWarPlanningFrame(animation,
                 WarPlanningPresentationDefinitions.ArmyFrame(index, index == _warPlanningArmyIndex, available),
                 _warPlanningLayout.ArmyButtons[index]);
         }
-        var hasArmy = _campaign.State.Player.Army.Total > 0;
-        DrawWarPlanningFrame(animation, hasArmy
+        var player = _campaign.State.Player;
+        var selectedArmy = player.ArmyAt(_warPlanningArmyIndex);
+        var hasArmy = selectedArmy.Total > 0;
+        var editableAtHome = player.ArmyLocationAt(_warPlanningArmyIndex) == 0;
+        DrawWarPlanningFrame(animation, hasArmy && editableAtHome
             ? WarPlanningPresentationDefinitions.FieldArmyFrame
             : WarPlanningPresentationDefinitions.FieldArmyUnavailableFrame, _warPlanningLayout.FieldArmy);
-        DrawWarPlanningFrame(animation, _selectedLocation > 0 && _campaign.State.Player.Wealth >= Balance.Strategy.SpyCost
+        DrawWarPlanningFrame(animation, player.Wealth >= Balance.Strategy.SpyCost
             ? WarPlanningPresentationDefinitions.SendSpyFrame
             : WarPlanningPresentationDefinitions.SendSpyUnavailableFrame, _warPlanningLayout.SendSpy);
-        DrawWarPlanningFrame(animation, hasArmy
-            ? WarPlanningPresentationDefinitions.LeaveFrame
-            : WarPlanningPresentationDefinitions.MembershipUnavailableFrame, _warPlanningLayout.Membership);
+        DrawWarPlanningFrame(animation, !hasArmy
+            ? WarPlanningPresentationDefinitions.MembershipUnavailableFrame
+            : player.JoinedArmyIndex == _warPlanningArmyIndex
+                ? WarPlanningPresentationDefinitions.LeaveFrame
+                : WarPlanningPresentationDefinitions.JoinFrame,
+            _warPlanningLayout.Membership);
 
         var unitTypes = Enum.GetValues<UnitType>();
         for (var index = 0; index < _warPlanningLayout.UnitRows.Count && index < unitTypes.Length; index++)
         {
             var unit = unitTypes[index];
             var bounds = ScaleBounds(_warPlanningLayout.UnitRows[index]);
-            DrawText($"{unit,-18} {_campaign.State.Player.Army.Units[unit],4}", bounds.X + 4, bounds.Y + 2,
-                Color.SaddleBrown, 2, bounds.Width - 8);
+            DrawText($"{unit,-18} {selectedArmy.Units[unit],4}", bounds.X + 4, bounds.Y + 2,
+                editableAtHome ? Color.SaddleBrown : Color.Gray, 2, bounds.Width - 8);
         }
-        var target = ScaleBounds(_warPlanningLayout.Target);
-        DrawText(World.Locations[_selectedLocation].Name, target.X + 4, target.Y + 3, Color.SaddleBrown, 2, target.Width - 8);
+        var armyName = ScaleBounds(_warPlanningLayout.ArmyName);
+        DrawText(player.ArmyNameAt(_warPlanningArmyIndex) + (_editingWarPlanningArmyName ? "_" : ""), armyName.X + 4, armyName.Y + 3,
+            Color.SaddleBrown, 2, armyName.Width - 8);
+        DrawText($"TOTAL POPULATION       {player.Home.Population}", 180, 355, Color.SaddleBrown, 2);
+        DrawText($"TOTAL SERFS AVAILABLE  {player.AvailableSerfs}", 180, 380, Color.SaddleBrown, 2);
+        DrawText($"TOTAL MONTHLY COST     {WarPlanningMonthlyCost(player)}", 180, 405, Color.SaddleBrown, 2);
+        DrawText($"TOTAL WEALTH           {player.Wealth}", 180, 430, Color.SaddleBrown, 2);
+        DrawText($"ACTIVE SPIES           {player.ActiveSpies}", 680, 355, Color.SaddleBrown, 2, 280);
+    }
+
+    private static int WarPlanningMonthlyCost(Player player)
+    {
+        var productivity = player.Home.Productivity(false);
+        return Enumerable.Range(0, Player.ArmyDivisionLimit).Sum(index => player.ArmyAt(index).Units.Sum(pair =>
+            pair.Value * Balance.ScaleFrom50(Balance.Units[pair.Key].UpkeepAt50,
+                Balance.Units[pair.Key].UpkeepAt100, productivity)));
     }
 
     private void DrawWarPlanningFrame(OriginalAnimation animation, int frameIndex, UiBounds bounds)
