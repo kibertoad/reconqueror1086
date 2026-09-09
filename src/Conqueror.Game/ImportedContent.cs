@@ -260,6 +260,21 @@ public sealed class ImportedContentCatalog
         }
     }
 
+    public DynamixSceneTexture? DecodeSceneTexture(string id)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(id);
+        var separator = id.LastIndexOf(':');
+        if (separator < 0 || separator == id.Length - 1) return null;
+        try
+        {
+            return DynamixSceneTextureDecoder.Decode(id[(separator + 1)..], ReadBytes(id));
+        }
+        catch (InvalidDataException)
+        {
+            return null;
+        }
+    }
+
     public DynamixConversationDatabase? DecodeConversations(string bodyId, string indexId)
     {
         using var body = Open(bodyId);

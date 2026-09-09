@@ -3,15 +3,17 @@ using Conqueror.Resources;
 
 namespace Conqueror.Game;
 
+public sealed record ImportedSiegeScene(string ArchiveId, DynamixScene Scene, SiegeLayout Layout);
+
 public static class ImportedSiegeLayouts
 {
     private static readonly string[] CampaignScenes = ["MELEE0.RES", "MELEE1.RES", "MELEE2.RES"];
 
-    public static SiegeLayout? ForCampaignLocation(ImportedContentCatalog? catalog, int location) =>
+    public static ImportedSiegeScene? ForCampaignLocation(ImportedContentCatalog? catalog, int location) =>
         Load(catalog, CampaignScenes[Math.Abs(location % CampaignScenes.Length)]);
 
-    public static SiegeLayout? ForPracticeMelee(ImportedContentCatalog? catalog) => Load(catalog, "MELEE0.RES");
-    public static SiegeLayout? ForPracticeCastleSkirmish(ImportedContentCatalog? catalog) => Load(catalog, "DEFEND0.RES");
+    public static ImportedSiegeScene? ForPracticeMelee(ImportedContentCatalog? catalog) => Load(catalog, "MELEE0.RES");
+    public static ImportedSiegeScene? ForPracticeCastleSkirmish(ImportedContentCatalog? catalog) => Load(catalog, "DEFEND0.RES");
 
     public static SiegeLayout Convert(DynamixScene scene)
     {
@@ -33,10 +35,11 @@ public static class ImportedSiegeLayouts
         return new SiegeLayout(tiles, scene.Viewer.CellX, scene.Viewer.CellY, facing, enemies);
     }
 
-    private static SiegeLayout? Load(ImportedContentCatalog? catalog, string name)
+    private static ImportedSiegeScene? Load(ImportedContentCatalog? catalog, string name)
     {
-        var scene = catalog?.DecodeScene($"CONQUER/{name}");
-        return scene is null ? null : Convert(scene);
+        var archiveId = $"CONQUER/{name}";
+        var scene = catalog?.DecodeScene(archiveId);
+        return scene is null ? null : new ImportedSiegeScene(archiveId, scene, Convert(scene));
     }
 
     private static SiegeTile TileFor(string name)

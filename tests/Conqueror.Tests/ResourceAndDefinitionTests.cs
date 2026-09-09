@@ -56,13 +56,15 @@ public sealed class ResourceAndDefinitionTests
         var scene = DynamixSceneDecoder.Decode(source.Viewer, source.Scenario, source.Map, source.Blocks);
 
         Assert.Equal((10, 20, 16384), (scene.Viewer.CellX, scene.Viewer.CellY, scene.Viewer.Heading));
-        Assert.Equal((7, 2, 1), (scene.Blocks.Count, scene.TextureCount, scene.SoundEffectCount));
+        Assert.Equal((7, 32, 1), (scene.Blocks.Count, scene.TextureCount, scene.SoundEffectCount));
         Assert.Equal("arched door", scene.BlockAt(11, 20).Name);
         Assert.Equal("Secret Passage", scene.BlockAt(10, 21).Name);
         Assert.Equal("meal", scene.BlockAt(12, 20).Name);
         Assert.Equal("knight", scene.BlockAt(13, 20).Name);
         Assert.Equal("champion", scene.BlockAt(14, 20).Name);
         Assert.Equal((ushort)0, scene.BlockIndexAt(20, 11));
+        Assert.Equal((12, 13, 14, 15), (scene.Blocks[0].Surface0, scene.Blocks[0].Surface1,
+            scene.Blocks[0].Surface2, scene.Blocks[0].Surface3));
     }
 
     [Fact]
@@ -83,6 +85,11 @@ public sealed class ResourceAndDefinitionTests
         WriteInt(outsideViewer, 0, 128 << 8);
         Assert.Throws<InvalidDataException>(() => DynamixSceneDecoder.Decode(
             outsideViewer, source.Scenario, source.Map, source.Blocks));
+
+        var missingTexture = source.Blocks.ToArray();
+        WriteInt(missingTexture, 44, 32);
+        Assert.Throws<InvalidDataException>(() => DynamixSceneDecoder.Decode(
+            source.Viewer, source.Scenario, source.Map, missingTexture));
         Assert.Throws<InvalidDataException>(() => DynamixSceneDecoder.Decode(
             source.Viewer, source.Scenario, source.Map, source.Blocks[..^1]));
     }
@@ -125,6 +132,8 @@ public sealed class ResourceAndDefinitionTests
         Assert.Equal(SiegeTile.Door, center.Tile);
         Assert.InRange(center.Distance, 2.49, 2.51);
         Assert.True(center.HitVerticalSide);
+        Assert.Equal((4, 2), (center.MapX, center.MapY));
+        Assert.InRange(center.TextureOffset, 0.499, 0.501);
         Assert.InRange(enemy.ScreenPosition, 0.499, 0.501);
         Assert.Equal(1, enemy.ForwardDistance);
     }
@@ -1593,7 +1602,7 @@ public sealed class ResourceAndDefinitionTests
         WriteInt(viewer, 12, 16384);
 
         var scenario = new byte[DynamixSceneDecoder.ScenarioSize];
-        WriteInt(scenario, 20, 2);
+        WriteInt(scenario, 20, 32);
         WriteInt(scenario, 24, names.Length);
         WriteInt(scenario, 28, 1);
 
@@ -1602,6 +1611,10 @@ public sealed class ResourceAndDefinitionTests
         {
             var offset = index * DynamixSceneDecoder.BlockSize;
             System.Text.Encoding.ASCII.GetBytes(names[index]).CopyTo(blocks, offset + 78);
+            WriteInt(blocks, offset + 44, 12 + index);
+            WriteInt(blocks, offset + 48, 13 + index);
+            WriteInt(blocks, offset + 52, 14 + index);
+            WriteInt(blocks, offset + 56, 15 + index);
             blocks[offset + 94] = 0xcc;
             blocks[offset + 95] = 0xcc;
         }

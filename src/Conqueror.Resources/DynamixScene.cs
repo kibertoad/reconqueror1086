@@ -16,6 +16,10 @@ public sealed record DynamixSceneBlock(
     int Flags,
     int Width,
     int Height,
+    int Surface0,
+    int Surface1,
+    int Surface2,
+    int Surface3,
     string Name);
 
 public sealed class DynamixScene
@@ -88,14 +92,22 @@ public static class DynamixSceneDecoder
             var record = blocks.Slice(index * BlockSize, BlockSize);
             if (record[^2] != 0xcc || record[^1] != 0xcc)
                 throw new InvalidDataException($"Scene block {index} is missing its record sentinel.");
-            decodedBlocks[index] = new(
+            var decoded = new DynamixSceneBlock(
                 index,
                 ReadInt32(record, 0),
                 ReadInt32(record, 4),
                 ReadInt32(record, 8),
                 ReadInt32(record, 24),
                 ReadInt32(record, 32),
+                ReadInt32(record, 44),
+                ReadInt32(record, 48),
+                ReadInt32(record, 52),
+                ReadInt32(record, 56),
                 DecodeName(record.Slice(BlockNameOffset, BlockNameSize), index));
+            if (new[] { decoded.Surface0, decoded.Surface1, decoded.Surface2, decoded.Surface3 }
+                .Any(surface => surface < -1 || surface >= textureCount))
+                throw new InvalidDataException($"Scene block {index} references a texture outside the Scenario table.");
+            decodedBlocks[index] = decoded;
         }
 
         var cells = new ushort[DynamixScene.MapWidth * DynamixScene.MapHeight];

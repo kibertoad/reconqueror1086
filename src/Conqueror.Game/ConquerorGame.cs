@@ -11,6 +11,15 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 {
     private sealed record DilemmaAnimation(IReadOnlyList<Texture2D> Frames, int FramesPerChoice);
     private sealed record OriginalAnimation(IReadOnlyList<Texture2D> Frames);
+    private sealed class SiegeVisuals(DynamixScene scene, IReadOnlyDictionary<int, Texture2D> textures) : IDisposable
+    {
+        public DynamixScene Scene { get; } = scene;
+        public IReadOnlyDictionary<int, Texture2D> Textures { get; } = textures;
+        public void Dispose()
+        {
+            foreach (var texture in Textures.Values) texture.Dispose();
+        }
+    }
     private const string OriginalCursorAnimationRole = "Interface.Cursor";
 
     private enum Screen { Title, Movie, OptionsHub, Practice, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Briefing, Map, Home, WarPlanning, Farm, Village, Inn, InnDialogue, Blacksmith, BlacksmithDialogue, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
@@ -58,6 +67,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private InnPatronHotspot? _innPatron;
     private int _joustCursor;
     private SiegeSession? _siege;
+    private SiegeVisuals? _siegeVisuals;
     private bool _showRadar = true;
     private FieldBattleSession? _fieldBattle;
     private PracticeCombatKind? _activePracticeCombat;
@@ -221,6 +231,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     {
         _titleMovie?.Dispose();
         _eventMovie?.Dispose();
+        ClearSiegeVisuals();
         _musicInstance?.Dispose();
         _importedMusic?.Dispose();
         foreach (var texture in _originalArt.Values) texture.Dispose();
@@ -478,15 +489,17 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                 break;
             case PracticeAction.Melee:
                 _activePracticeCombat = PracticeCombatKind.Melee;
-                _siege = PracticeCombatDefinitions.CreateMelee(Environment.TickCount,
-                    ImportedSiegeLayouts.ForPracticeMelee(_importedContent));
+                var meleeScene = ImportedSiegeLayouts.ForPracticeMelee(_importedContent);
+                ActivateSiegeVisuals(meleeScene);
+                _siege = PracticeCombatDefinitions.CreateMelee(Environment.TickCount, meleeScene?.Layout);
                 _screen = Screen.Siege;
                 _notice = "MELEE PRACTICE";
                 break;
             case PracticeAction.CastleSkirmish:
                 _activePracticeCombat = PracticeCombatKind.CastleSkirmish;
-                _siege = PracticeCombatDefinitions.CreateCastleSkirmish(Environment.TickCount,
-                    ImportedSiegeLayouts.ForPracticeCastleSkirmish(_importedContent));
+                var castleScene = ImportedSiegeLayouts.ForPracticeCastleSkirmish(_importedContent);
+                ActivateSiegeVisuals(castleScene);
+                _siege = PracticeCombatDefinitions.CreateCastleSkirmish(Environment.TickCount, castleScene?.Layout);
                 _screen = Screen.Siege;
                 _notice = "CASTLE SKIRMISH PRACTICE";
                 break;
@@ -643,6 +656,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _hasActiveCampaign = true;
         _fieldBattle = null;
         _siege = null;
+        ClearSiegeVisuals();
         _youthDilemmaResult = null;
         _selectedLocation = _campaign.State.CurrentLocation;
         _screen = CampaignScreen();
@@ -761,7 +775,9 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (press(Keys.O)) EnterOverview(Screen.Map);
         if (press(Keys.S) && _campaign.StartSiege(_selectedLocation))
         {
-            _siege = _campaign.CreateSiege(ImportedSiegeLayouts.ForCampaignLocation(_importedContent, _selectedLocation));
+            var importedScene = ImportedSiegeLayouts.ForCampaignLocation(_importedContent, _selectedLocation);
+            ActivateSiegeVisuals(importedScene);
+            _siege = _campaign.CreateSiege(importedScene?.Layout);
             _showRadar = true;
             _screen = Screen.Siege;
         }
@@ -1260,17 +1276,17 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (press(Keys.R))
         {
             if (_activePracticeCombat is not null) { FinishPracticeCombat("PRACTICE ENDED"); return; }
-            _campaign.FinishSiege(_siege); var lost = _campaign.Retreat(); _siege = null; _screen = Screen.Map; _notice = $"RETREATED - {lost} SOLDIERS LOST"; Autosave(); return;
+            _campaign.FinishSiege(_siege); var lost = _campaign.Retreat(); _siege = null; ClearSiegeVisuals(); _screen = Screen.Map; _notice = $"RETREATED - {lost} SOLDIERS LOST"; Autosave(); return;
         }
         if (_siege.Won)
         {
             if (_activePracticeCombat is not null) FinishPracticeCombat("PRACTICE WON");
-            else { _campaign.FinishSiege(_siege); _siege = null; _screen = Screen.Map; _notice = "THE CASTLE IS YOURS"; Autosave(); }
+            else { _campaign.FinishSiege(_siege); _siege = null; ClearSiegeVisuals(); _screen = Screen.Map; _notice = "THE CASTLE IS YOURS"; Autosave(); }
         }
         else if (_siege.Defeated)
         {
             if (_activePracticeCombat is not null) FinishPracticeCombat("PRACTICE LOST");
-            else { _campaign.FinishSiege(_siege); _siege = null; _screen = Screen.Map; _notice = "YOU ARE CARRIED FROM THE CASTLE"; Autosave(); }
+            else { _campaign.FinishSiege(_siege); _siege = null; ClearSiegeVisuals(); _screen = Screen.Map; _notice = "YOU ARE CARRIED FROM THE CASTLE"; Autosave(); }
         }
     }
 
@@ -1309,6 +1325,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     {
         _fieldBattle = null;
         _siege = null;
+        ClearSiegeVisuals();
         _activePracticeCombat = null;
         _screen = Screen.Practice;
         _notice = notice;
@@ -2252,6 +2269,64 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         DrawText("SPACE JOUST   K SKIRMISH   ENTER LEAVE", 250, 610, Color.LightGreen, 2);
     }
 
+    private void ActivateSiegeVisuals(ImportedSiegeScene? imported)
+    {
+        ClearSiegeVisuals();
+        if (imported is null || _importedContent is null) return;
+        var paletteId = _importedContent.FindId("resource", ":skirmish.pal");
+        var palette = paletteId is null ? null : _importedContent.DecodePalette(paletteId);
+        if (palette is null) return;
+
+        var required = imported.Scene.Blocks
+            .SelectMany(block => new[] { block.Surface0, block.Surface1, block.Surface2, block.Surface3 })
+            .Where(index => index >= 0)
+            .ToHashSet();
+        var textures = new Dictionary<int, Texture2D>();
+        foreach (var id in _importedContent.Ids("resource").Where(id =>
+                     id.StartsWith(imported.ArchiveId + "#", StringComparison.OrdinalIgnoreCase) &&
+                     id.Contains(":TEX", StringComparison.OrdinalIgnoreCase)))
+        {
+            var decoded = _importedContent.DecodeSceneTexture(id);
+            if (decoded is null || !required.Contains(decoded.Index) || textures.ContainsKey(decoded.Index)) continue;
+            var texture = new Texture2D(GraphicsDevice, decoded.Width, decoded.Height, false, SurfaceFormat.Color);
+            texture.SetData(IndexedRgba(decoded.Indices, palette.Rgb));
+            textures.Add(decoded.Index, texture);
+        }
+        _siegeVisuals = new SiegeVisuals(imported.Scene, textures);
+    }
+
+    private Texture2D? SceneWallTexture(SiegeRayHit hit)
+    {
+        if (_siegeVisuals is null || hit.MapX is < 0 or >= DynamixScene.MapWidth ||
+            hit.MapY is < 0 or >= DynamixScene.MapHeight) return null;
+        var block = _siegeVisuals.Scene.BlockAt(hit.MapX, hit.MapY);
+        foreach (var index in new[] { block.Surface0, block.Surface1, block.Surface2, block.Surface3 })
+            if (_siegeVisuals.Textures.TryGetValue(index, out var texture)) return texture;
+        return null;
+    }
+
+    private void ClearSiegeVisuals()
+    {
+        _siegeVisuals?.Dispose();
+        _siegeVisuals = null;
+    }
+
+    private static byte[] IndexedRgba(ReadOnlySpan<byte> indices, ReadOnlySpan<byte> palette)
+    {
+        if (palette.Length != IndexedPalette.ByteSize) throw new InvalidDataException("Scene palette is incomplete.");
+        var rgba = new byte[checked(indices.Length * 4)];
+        for (var pixel = 0; pixel < indices.Length; pixel++)
+        {
+            var source = indices[pixel] * 3;
+            var target = pixel * 4;
+            rgba[target] = palette[source];
+            rgba[target + 1] = palette[source + 1];
+            rgba[target + 2] = palette[source + 2];
+            rgba[target + 3] = indices[pixel] == 0 ? (byte)0 : (byte)255;
+        }
+        return rgba;
+    }
+
     private void DrawSiege()
     {
         if (_siege is null) return;
@@ -2275,7 +2350,16 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             };
             var distanceShade = Math.Clamp(1.05f - (float)hit.Distance / 32f, 0.22f, 1f);
             if (!hit.HitVerticalSide) distanceShade *= 0.78f;
-            Fill(new Rectangle(viewport.X + column, top, 1, wallHeight), baseColor * distanceShade);
+            if (SceneWallTexture(hit) is { } wallTexture)
+            {
+                var sourceX = Math.Clamp((int)(hit.TextureOffset * wallTexture.Width), 0, wallTexture.Width - 1);
+                _batch.Draw(wallTexture, new Rectangle(viewport.X + column, top, 1, wallHeight),
+                    new Rectangle(sourceX, 0, 1, wallTexture.Height), Color.White * distanceShade);
+            }
+            else
+            {
+                Fill(new Rectangle(viewport.X + column, top, 1, wallHeight), baseColor * distanceShade);
+            }
         }
         foreach (var projection in SiegeViewProjection.ProjectEnemies(_siege))
         {

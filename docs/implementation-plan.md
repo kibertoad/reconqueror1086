@@ -371,7 +371,7 @@ Deliverables:
 - Track conquest spoils separately in the economics overview.
 - Apply correct estate transfer, fame, experience, strength, and victory effects.
 
-Current progress: the owned scene archives' bounded `Viewer`, `Scenario`, `Map`, and `Blocks` records now drive 128x128 collision maps, initial position/facing, named doors and secret passages, food/treasure roles, and defender/champion placements in practice and campaign siege sessions. A map-aware raycast viewport renders distance/side-shaded structural columns and wall-occluded defender billboards; the generated 12x12 keep remains the no-media fallback. Exact per-location archive selection, block state transitions, original textures/palettes, animation, AI, timing, balance, retainers, and loot/consequence tables remain open.
+Current progress: the owned scene archives' bounded `Viewer`, `Scenario`, `Map`, and `Blocks` records now drive 128x128 collision maps, initial position/facing, named doors and secret passages, food/treasure roles, and defender/champion placements in practice and campaign siege sessions. A map-aware raycast viewport renders wall-occluded defender billboards and original indexed wall/door planes selected by bounded block references; missing media uses shaded structural columns, and the generated 12x12 keep remains the no-media fallback. Exact per-location archive selection, four-side texture ordering, block state transitions, palette confirmation, sprite animation, AI, timing, balance, retainers, and loot/consequence tables remain open.
 
 Acceptance criteria:
 
@@ -574,7 +574,7 @@ The resource-decoding sprint is first because it unlocks exact dialogue, screen 
 
 ## Next implementation priorities
 
-1. Continue first-person combat recovery: bind block surface/texture records and palette, recover state transitions and exact scene selection, then replace the placeholder perspective art and provisional combat/AI rules.
+1. Continue first-person combat recovery: confirm the four-side surface order and palette path in the executable, recover block state transitions, sprite animation and exact scene selection, then replace the remaining provisional combat/AI rules.
 2. Continue tracing startup/menu input timing and HAT region-action dispatch from `CONQUER.EXE`; all ten Home labels, War Planning controls, and independent division movement are active, while exact path interaction, spy timing/cost, `JUMP!!`, and original input timing remain to be confirmed.
 3. [Completed 2026-09-08] Bind the decoded five-definition age groups to campaign state using the executable-confirmed per-age selection policy; keep original prose local and retain built-in fallback summaries.
 4. In progress: bind menu CSF sequences to verified palettes and roles. `OPTION.CSF` ON/OFF held/released and Resume frames use `OPTFIN.PCX`; `SWORDS.CSF` item art and `BUYSELL.CSF` control states use `SWDTEMP.PCX`; all six `FFMOUSE.CSF` frames are classified and contextual travel/talk/target/pressed-hand selection is active. Exact cursor timing, hourglass dispatch, and other menu sequences still require evidence.
