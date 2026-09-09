@@ -29,10 +29,12 @@ The repository currently provides:
 - Character templates, representative fallback youth dilemmas, the executable-confirmed original 30-dilemma selection/outcome interpreter for imported content, economy, construction counters, army recruitment, travel, tournaments, courtship, equipment, field battles, sieges, crown victory, dragon victory, and the age limit.
 - Persistent strategic garrisons, spying, interception, retreat, conquest, and JSON saves.
 - A read-only original-disc inspector with ISO inventory, hashes, executable-string offsets, archive/compression reports, CSF previews, and HAT layout reports.
-- Bounded parsers for GOB/RES directories, kind-1 LZ/RLE blocks, indexed PCX/PCC images, CSF animation frames, raw RGB palettes, HAT screen descriptors, and rate-tagged `.666` sound banks.
+- Bounded parsers for GOB/RES directories, kind-1 LZ/RLE blocks, indexed PCX/PCC images, headerless indexed screen planes, CSF animation frames, raw RGB palettes, HAT screen descriptors, and rate-tagged `.666` sound banks.
 - An end-user importer that installs byte-stored, kind-1, and kind-2 owned resources plus lossless CDDA WAV files under ignored local storage.
 - A runtime imported-content catalog, CD music playback, and definition-driven original art for the title, options hub, character options, pre-generated characters, campaign briefing, animated youth dilemmas, estate/travel shell, England map, load screen, Home/farm/blacksmith flows, and a tournament portrait.
 - An executable-confirmed `TITLE.HAT`/`FFTITLE.PCX` title load followed by a corroborated character-options flow whose exact geometry comes from installed `CGOPTS.HAT` and `PREGEN.HAT`.
+- Self-contained Windows x64, Linux x64, macOS arm64, and macOS x64 packaging automation, with a smart ownership-aware Windows installer and a pinned four-artifact release workflow.
+- A repository-wide 1,000-line compiled-source ceiling; the game shell and resource regression suite are split into focused partial modules so the limit passes without exemptions.
 - Ninety-seven xUnit test cases and 143 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
 
 ## Dependency map
@@ -508,7 +510,7 @@ All parser fixtures must be synthetic or independently authored; never commit ex
 
 Status is conservative: “prototype” means the route is playable but substantial original behavior or balance remains provisional; only acceptance-criteria completion can mark a milestone complete.
 
-| Milestone | Phases | Status (2026-09-09) | Remaining completion gate |
+| Milestone | Phases | Status (2026-09-10) | Remaining completion gate |
 | --- | --- | --- | --- |
 | M1: Decoded content | 1-2 | In progress: archive kinds 1 and 2, all `.RES`/`.LOW` scene archives, raw `TEX` dimensions, PCX/PCC, CSF, palettes, HAT layouts, dilemma text, the 1,311-node `ALL.CIF`/`ALL.CBF` conversation graph, `.666` sound-bank framing, complete owned-release SMK codecs, collision-free installer, and evidence reports work. Scene decoding now includes Viewer/Scenario metadata, maps, typed block face and billboard references, backdrop images, and all 128 indexed color-remap tables. | Decode remaining conversation conditions/mutations and scene/text structures, confirm exact scene surface ordering and color-map selection, bind remaining audio events, and complete executable table recovery and controlled observations. |
 | M2: Feudal simulation | 3-4 | Playable prototype: the original estate shell and typed panel/navigation layout are active, and farm commands/help share one definition registry. | Exact terrain sprites and map/economy data, tile-based fief construction, multiple managed estates, full dialogue/quests, and political orders. |
@@ -589,3 +591,9 @@ The resource-decoding sprint is first because it unlocks exact dialogue, screen 
 5. [Completed 2026-09-10] Add legal-boundary automation that fails if imported media or generated analysis artifacts enter Git, then add Windows x64, Linux x64, macOS arm64, and macOS x64 CI restore/build/test/publish coverage plus native installer checks. `tools/Verify-Repository.ps1` interprets the data-only `repository-policy.json`; the local test launcher and every GitHub Actions package workflow enforce it before compiling.
 6. In progress: `ICA`/`ICS`/`ICW` are decoded and active as seasonal 337-frame estate atlases using the `ICONTEMP.PCX` palette. Recover the executable's exact terrain/frame table plus roads, shield, cursor, and layout data; current semantic frame assignments remain provisional.
 7. In progress: unsigned 8-bit mono PCM is confirmed; all imported samples are eagerly converted into a retained startup cache and the shared 2,159-byte interface sample is active. Trace and bind the remaining 101 sample event identifiers; `VSMITH.666` is audio, not the blacksmith dialogue database.
+
+## Session checkpoint: 2026-09-10
+
+The current `main` baseline builds with zero warnings under the enforced 1,000-line source limit. All 97 xUnit cases and 143 executable specifications pass. The Inno Setup 7.1.0 package compiles, installs into an isolated directory, launches through its generated **ReConqueror A.D. 1086** Start-menu shortcut, and removes that shortcut during uninstall. Repository policy passes with the expanded proprietary-image boundary.
+
+First-person combat now has the original `SKIRMISH.PCX` shell, exact viewport and panel geometry, scene-driven walls and actors, animated foreground weapons and blood effects, and the generated no-media fallback. The immediate continuation point is executable confirmation of its remaining provisional rendering rules. The `Pal%d` diagnostic string maps to LE object 2 offset `0x527D` (virtual address `0x9527D`); trace references and surrounding branches before changing the current isolated color-map selection rule. After that, confirm cardinal face ordering, foreground cadence and dispatch, London/base-scene selection, non-door transitions, and then combat AI/balance/consequences in that order.
