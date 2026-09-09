@@ -72,7 +72,7 @@ jobs:
         run: |
           ./tools/Verify-Repository.ps1
           dotnet test --project tests/Conqueror.Tests/Conqueror.Tests.csproj `
-            --no-progress --minimum-expected-tests 97 -v minimal
+            --no-progress --minimum-expected-tests 98 -v minimal
           if ($LASTEXITCODE -ne 0) { throw 'xUnit suite failed.' }
           dotnet run --project tests/Conqueror.Specs/Conqueror.Specs.csproj
           if ($LASTEXITCODE -ne 0) { throw 'Executable specifications failed.' }
@@ -145,8 +145,12 @@ jobs:
               [IO.Path]::GetFullPath($link.TargetPath) -ne $expectedTarget) {
             throw "Shortcut target '$($link.TargetPath)' is not '$expectedTarget'."
           }
+          foreach ($nativeLibrary in @('SDL2.dll', 'openal.dll')) {
+            $nativePath = Join-Path (Split-Path -Parent $link.TargetPath) $nativeLibrary
+            if (-not [IO.File]::Exists($nativePath)) { throw "Installed native library is missing: $nativePath" }
+          }
           $game = Start-Process -FilePath $link.TargetPath `
-            -ArgumentList '--smoke-test' -WorkingDirectory $link.WorkingDirectory `
+            -ArgumentList '--platform-smoke-test' -WorkingDirectory $link.WorkingDirectory `
             -Wait -PassThru -WindowStyle Hidden
           if ($game.ExitCode -ne 0) { throw "Packaged game returned $($game.ExitCode)." }
           $uninstall = Start-Process -FilePath (Join-Path $testRoot 'unins000.exe') `

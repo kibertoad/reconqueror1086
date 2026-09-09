@@ -31,8 +31,6 @@ $common = @(
     '--configuration', 'Release',
     '--runtime', 'win-x64',
     '--self-contained', 'true',
-    '-p:PublishSingleFile=true',
-    '-p:IncludeNativeLibrariesForSelfExtract=true',
     '-p:DebugType=None',
     '-p:DebugSymbols=false',
     '-p:UseSharedCompilation=false',
@@ -42,7 +40,8 @@ $common = @(
 )
 & dotnet publish (Join-Path $repositoryRoot 'src/Conqueror.Game/Conqueror.Game.csproj') @common --output $gameOutput
 if ($LASTEXITCODE -ne 0) { throw 'Game publish failed.' }
-& dotnet publish (Join-Path $repositoryRoot 'tools/Conqueror.Import/Conqueror.Import.csproj') @common --output $toolOutput
+& dotnet publish (Join-Path $repositoryRoot 'tools/Conqueror.Import/Conqueror.Import.csproj') @common `
+    '-p:PublishSingleFile=true' --output $toolOutput
 if ($LASTEXITCODE -ne 0) { throw 'Importer publish failed.' }
 Remove-Item -LiteralPath $buildRoot -Recurse -Force
 
@@ -53,6 +52,13 @@ Copy-Item -LiteralPath (Join-Path $repositoryRoot 'README.md') -Destination $pac
 
 & (Join-Path $gameOutput 'Conqueror.Game.exe') --smoke-test
 if ($LASTEXITCODE -ne 0) { throw 'Packaged game smoke check failed.' }
+& (Join-Path $gameOutput 'Conqueror.Game.exe') --platform-smoke-test
+if ($LASTEXITCODE -ne 0) { throw 'Packaged game could not initialize its native platform libraries.' }
+foreach ($nativeLibrary in @('SDL2.dll', 'openal.dll')) {
+    if (-not (Test-Path -LiteralPath (Join-Path $gameOutput $nativeLibrary))) {
+        throw "Packaged game is missing native library '$nativeLibrary'."
+    }
+}
 & (Join-Path $toolOutput 'Conqueror.Import.exe') --verify (Join-Path $packageRoot 'UserContent')
 if ($LASTEXITCODE -ne 2) { throw 'Packaged importer smoke check returned an unexpected result.' }
 
