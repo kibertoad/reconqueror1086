@@ -2,8 +2,11 @@ using Conqueror.Core;
 
 namespace Conqueror.Game;
 
+public enum SiegeWallFace { North, East, South, West }
+
 public readonly record struct SiegeRayHit(
-    double Distance, SiegeTile Tile, bool HitVerticalSide, int MapX, int MapY, double TextureOffset);
+    double Distance, SiegeTile Tile, bool HitVerticalSide, SiegeWallFace Face,
+    int MapX, int MapY, double TextureOffset);
 public readonly record struct SiegeEnemyProjection(double ScreenPosition, double ForwardDistance, SiegeEnemy Enemy);
 
 public static class SiegeViewProjection
@@ -54,10 +57,13 @@ public static class SiegeViewProjection
             var textureOffset = vertical ? originY + rayY * distance : originX + rayX * distance;
             textureOffset -= Math.Floor(textureOffset);
             if ((vertical && rayX > 0) || (!vertical && rayY < 0)) textureOffset = 1.0 - textureOffset;
-            return new SiegeRayHit(corrected, tile, vertical, mapX, mapY, textureOffset);
+            var face = vertical
+                ? stepX > 0 ? SiegeWallFace.West : SiegeWallFace.East
+                : stepY > 0 ? SiegeWallFace.North : SiegeWallFace.South;
+            return new SiegeRayHit(corrected, tile, vertical, face, mapX, mapY, textureOffset);
         }
 
-        return new SiegeRayHit(MaximumDistance, SiegeTile.Wall, false, mapX, mapY, 0);
+        return new SiegeRayHit(MaximumDistance, SiegeTile.Wall, false, SiegeWallFace.North, mapX, mapY, 0);
     }
 
     public static IReadOnlyList<SiegeEnemyProjection> ProjectEnemies(SiegeSession siege)

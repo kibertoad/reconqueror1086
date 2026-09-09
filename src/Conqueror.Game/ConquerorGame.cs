@@ -2283,10 +2283,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         var palette = paletteId is null ? null : _importedContent.DecodePalette(paletteId);
         if (palette is null) return;
 
-        var required = imported.Scene.Blocks
-            .SelectMany(block => new[] { block.Surface0, block.Surface1, block.Surface2, block.Surface3 })
-            .Where(index => index >= 0)
-            .ToHashSet();
+        var required = imported.Scene.Blocks.SelectMany(block => block.TextureReferences())
+            .Where(index => index >= 0).ToHashSet();
         var textures = new Dictionary<int, Texture2D>();
         foreach (var id in _importedContent.Ids("resource").Where(id =>
                      id.StartsWith(imported.ArchiveId + "#", StringComparison.OrdinalIgnoreCase) &&
@@ -2317,7 +2315,14 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (sourceX is < 0 or >= DynamixScene.MapWidth || sourceY is < 0 or >= DynamixScene.MapHeight)
             return null;
         var block = _siegeVisuals.Scene.BlockAt(sourceX, sourceY);
-        return FirstSceneTexture(block);
+        var face = hit.Face switch
+        {
+            SiegeWallFace.North => DynamixSceneFace.North,
+            SiegeWallFace.East => DynamixSceneFace.East,
+            SiegeWallFace.South => DynamixSceneFace.South,
+            _ => DynamixSceneFace.West
+        };
+        return _siegeVisuals.Textures.GetValueOrDefault(block.TextureForFace(face));
     }
 
     private Texture2D? SceneEnemyTexture(SiegeEnemy enemy)
@@ -2330,7 +2335,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private Texture2D? FirstSceneTexture(DynamixSceneBlock block)
     {
         if (_siegeVisuals is null) return null;
-        foreach (var index in new[] { block.Surface0, block.Surface1, block.Surface2, block.Surface3 })
+        foreach (var index in block.TextureReferences())
             if (_siegeVisuals.Textures.TryGetValue(index, out var texture)) return texture;
         return null;
     }

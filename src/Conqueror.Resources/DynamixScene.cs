@@ -9,6 +9,14 @@ public sealed record DynamixSceneViewer(int X, int Y, int Elevation, int Heading
     public int CellY => Y >> 8;
 }
 
+public enum DynamixSceneFace
+{
+    North,
+    East,
+    South,
+    West
+}
+
 public sealed record DynamixSceneBlock(
     int Index,
     int Kind,
@@ -20,7 +28,30 @@ public sealed record DynamixSceneBlock(
     int Surface1,
     int Surface2,
     int Surface3,
-    string Name);
+    string Name)
+{
+    public int TextureForFace(DynamixSceneFace face) => face switch
+    {
+        DynamixSceneFace.North => Surface0,
+        DynamixSceneFace.East => Surface1,
+        DynamixSceneFace.South => Surface2,
+        _ => Surface3
+    };
+
+    public IEnumerable<int> TextureReferences()
+    {
+        // Kind 4 is a camera-facing sprite: offset 44 is its image while the
+        // following fields carry orientation/state data rather than wall faces.
+        if (Kind == 4)
+        {
+            yield return Surface0;
+            yield break;
+        }
+
+        foreach (var texture in new[] { Surface0, Surface1, Surface2, Surface3 })
+            yield return texture;
+    }
+}
 
 public sealed class DynamixScene
 {
@@ -104,7 +135,7 @@ public static class DynamixSceneDecoder
                 ReadInt32(record, 52),
                 ReadInt32(record, 56),
                 DecodeName(record.Slice(BlockNameOffset, BlockNameSize), index));
-            if (new[] { decoded.Surface0, decoded.Surface1, decoded.Surface2, decoded.Surface3 }
+            if (decoded.TextureReferences()
                 .Any(surface => surface < -1 || surface >= textureCount))
                 throw new InvalidDataException($"Scene block {index} references a texture outside the Scenario table.");
             decodedBlocks[index] = decoded;

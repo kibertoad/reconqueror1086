@@ -84,6 +84,8 @@ public sealed class ResourceAndDefinitionTests
         Assert.Equal((ushort)0, scene.BlockIndexAt(20, 11));
         Assert.Equal((12, 13, 14, 15), (scene.Blocks[0].Surface0, scene.Blocks[0].Surface1,
             scene.Blocks[0].Surface2, scene.Blocks[0].Surface3));
+        Assert.Equal([12, 13, 14, 15], Enum.GetValues<DynamixSceneFace>()
+            .Select(scene.Blocks[0].TextureForFace));
     }
 
     [Fact]
@@ -111,6 +113,24 @@ public sealed class ResourceAndDefinitionTests
             source.Viewer, source.Scenario, source.Map, missingTexture));
         Assert.Throws<InvalidDataException>(() => DynamixSceneDecoder.Decode(
             source.Viewer, source.Scenario, source.Map, source.Blocks[..^1]));
+    }
+
+    [Fact]
+    public void SceneBillboardsExposeOnlyTheirPrimaryTextureField()
+    {
+        var source = SyntheticScene();
+        WriteInt(source.Blocks, 0, 4);
+        WriteInt(source.Blocks, 44, 12);
+        WriteInt(source.Blocks, 48, 0);
+        WriteInt(source.Blocks, 52, 36);
+        WriteInt(source.Blocks, 56, 190);
+
+        var scene = DynamixSceneDecoder.Decode(source.Viewer, source.Scenario, source.Map, source.Blocks);
+
+        Assert.Equal([12], scene.Blocks[0].TextureReferences());
+        WriteInt(source.Blocks, 44, 32);
+        Assert.Throws<InvalidDataException>(() => DynamixSceneDecoder.Decode(
+            source.Viewer, source.Scenario, source.Map, source.Blocks));
     }
 
     [Fact]
@@ -175,10 +195,33 @@ public sealed class ResourceAndDefinitionTests
         Assert.Equal(SiegeTile.Door, center.Tile);
         Assert.InRange(center.Distance, 2.49, 2.51);
         Assert.True(center.HitVerticalSide);
+        Assert.Equal(SiegeWallFace.West, center.Face);
         Assert.Equal((4, 2), (center.MapX, center.MapY));
         Assert.InRange(center.TextureOffset, 0.499, 0.501);
         Assert.InRange(enemy.ScreenPosition, 0.499, 0.501);
         Assert.Equal(1, enemy.ForwardDistance);
+    }
+
+    [Fact]
+    public void FirstPersonProjectionIdentifiesTheContactedWallFace()
+    {
+        var tiles = new SiegeTile[5, 5];
+        for (var x = 0; x < 5; x++)
+        for (var y = 0; y < 5; y++)
+            tiles[x, y] = x == 0 || y == 0 || x == 4 || y == 4 ? SiegeTile.Wall : SiegeTile.Floor;
+
+        foreach (var (facing, expected) in new[]
+        {
+            (Facing.North, SiegeWallFace.South),
+            (Facing.East, SiegeWallFace.West),
+            (Facing.South, SiegeWallFace.North),
+            (Facing.West, SiegeWallFace.East)
+        })
+        {
+            var layout = new SiegeLayout(tiles, 2, 2, facing, []);
+            var siege = new SiegeSession(new Player(), new Army(), 0, 9, layout);
+            Assert.Equal(expected, SiegeViewProjection.Cast(siege, 0).Face);
+        }
     }
 
     [Fact]
