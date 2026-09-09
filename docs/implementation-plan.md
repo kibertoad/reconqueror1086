@@ -548,6 +548,7 @@ Local static-analysis tool: Ghidra 12.1.3 is installed user-wide at `C:\Users\ki
 - [x] Replace farm input branching and separately maintained help strings with one typed command/action registry.
 - [x] Add shared data-driven visual-scene hover labels and confirm the separate Blacksmith/Buy-Sell `VSMITH.HAT` targets. Home uses the same infrastructure but stays disabled after controlled observation disproved an order-based `FCASTLE.HAT` label mapping.
 - [x] Decode and classify all 26 `.666` sound banks with bounded length/rate validation; the ignored population report accounts for 102 samples and zero rejects.
+- [x] Confirm unsigned 8-bit mono PCM from waveform centering, identify the identical shared UI sample across 17 screen banks, and activate its one-time-converted runtime buffer for mouse actions.
 - [ ] Trace the complete startup/menu state machine, input timing, cursor behavior, and region-action dispatch from `CONQUER.EXE`; keep semantics corroborated until each executable branch is confirmed.
 
 The resource-decoding sprint is first because it unlocks exact dialogue, screen mappings, opponent identities, construction data, and balance tables needed by most later phases.
@@ -559,4 +560,4 @@ The resource-decoding sprint is first because it unlocks exact dialogue, screen 
 3. In progress: bind menu CSF sequences to verified palettes and roles. `OPTION.CSF` static ON/OFF and Resume frames use `OPTFIN.PCX`; `SWORDS.CSF` item art and `BUYSELL.CSF` control states use `SWDTEMP.PCX`; `FFMOUSE.CSF` default sword frame uses the estate/interface palette. Alternate cursor frames and other menu sequences still require dispatch and timing evidence.
 4. [Completed 2026-09-08] Add legal-boundary automation that fails if imported media or generated analysis artifacts enter Git, then add CI restore/build/test coverage. `tools/Verify-Repository.ps1` interprets the data-only `repository-policy.json`; the local test launcher and Windows GitHub Actions workflow both enforce it before compiling.
 5. In progress: `ICA`/`ICS`/`ICW` are decoded and active as seasonal 337-frame estate atlases using the `ICONTEMP.PCX` palette. Recover the executable's exact terrain/frame table plus roads, shield, cursor, and layout data; current semantic frame assignments remain provisional.
-6. Trace `.666` sample event identifiers and confirm the likely unsigned 8-bit mono PCM interpretation before enabling playback; `VSMITH.666` is audio, not the blacksmith dialogue database.
+6. In progress: unsigned 8-bit mono PCM is confirmed and the shared 2,159-byte interface sample is active. Trace and bind the remaining 101 sample event identifiers; `VSMITH.666` is audio, not the blacksmith dialogue database.

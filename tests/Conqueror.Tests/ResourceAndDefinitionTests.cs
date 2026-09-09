@@ -61,6 +61,8 @@ public sealed class ResourceAndDefinitionTests
         Assert.Equal(11025, bank.Samples[0].SampleRate);
         Assert.Equal(new byte[] { 0x7f, 0x80, 0x81 }, bank.Samples[0].Samples);
         Assert.Equal(22050, bank.Samples[1].SampleRate);
+        Assert.Equal(new byte[] { 0x00, 0xFF, 0x00, 0x00, 0x00, 0x01 },
+            bank.Samples[0].ToPcm16LittleEndian());
         Assert.Throws<InvalidDataException>(() => DynamixSoundBankDecoder.Decode(bytes[..^1]));
         bytes[0] = 0;
         Assert.Throws<InvalidDataException>(() => DynamixSoundBankDecoder.Decode(bytes));
@@ -77,6 +79,10 @@ public sealed class ResourceAndDefinitionTests
         Assert.Equal(ImportedArt.Definitions.Count, ImportedArt.Definitions.Select(x => x.Role).Distinct(StringComparer.OrdinalIgnoreCase).Count());
         Assert.Equal(ImportedAnimations.Definitions.Count,
             ImportedAnimations.Definitions.Select(x => x.Role).Distinct(StringComparer.OrdinalIgnoreCase).Count());
+        Assert.Equal(ImportedSounds.Definitions.Count,
+            ImportedSounds.Definitions.Select(x => x.Role).Distinct(StringComparer.OrdinalIgnoreCase).Count());
+        Assert.Contains(ImportedSounds.Definitions,
+            sound => sound is { Role: "Interface.Activate", IdSuffix: ":gameopts.666", SampleIndex: 0 });
         Assert.Contains(ImportedAnimations.Definitions,
             definition => definition is { Role: "Interface.Cursor", IdSuffix: ":ffmouse.csf", PaletteArtRole: "Estate.Shell" });
     }

@@ -8,6 +8,7 @@ namespace Conqueror.Game;
 public sealed record ImportedArtDefinition(string Role, string Kind, string IdSuffix);
 public sealed record ImportedLayoutDefinition(string Role, string IdSuffix);
 public sealed record ImportedAnimationDefinition(string Role, string IdSuffix, string PaletteArtRole);
+public sealed record ImportedSoundDefinition(string Role, string IdSuffix, int SampleIndex);
 
 public static class ImportedArt
 {
@@ -56,6 +57,14 @@ public static class ImportedAnimations
         new("Interface.Cursor", ":ffmouse.csf", "Estate.Shell"),
         .. EstatePresentationDefinitions.TileAtlases.Select(atlas =>
             new ImportedAnimationDefinition(atlas.Role, atlas.IdSuffix, "Estate.Shell"))
+    ];
+}
+
+public static class ImportedSounds
+{
+    public static IReadOnlyList<ImportedSoundDefinition> Definitions { get; } =
+    [
+        new("Interface.Activate", ":gameopts.666", 0)
     ];
 }
 
@@ -197,6 +206,22 @@ public sealed class ImportedContentCatalog
             using var memory = new MemoryStream();
             stream.CopyTo(memory);
             return WeaponStoreDecoder.Decode(memory.ToArray());
+        }
+        catch (InvalidDataException)
+        {
+            return null;
+        }
+    }
+
+    public DynamixSoundBank? DecodeSoundBank(string id)
+    {
+        using var stream = Open(id);
+        if (stream is null) return null;
+        try
+        {
+            using var memory = new MemoryStream();
+            stream.CopyTo(memory);
+            return DynamixSoundBankDecoder.Decode(memory.ToArray());
         }
         catch (InvalidDataException)
         {

@@ -54,6 +54,7 @@ BinaryPrimitives.WriteUInt32LittleEndian(soundBankFixture.AsSpan(8), 11025);
 soundBankFixture[12] = 0x7f; soundBankFixture[13] = 0x80; soundBankFixture[14] = 0x81;
 var soundBank = DynamixSoundBankDecoder.Decode(soundBankFixture);
 Check(soundBank.Samples is [{ SampleRate: 11025, Samples.Length: 3 }], "Dynamix sound bank parses bounded rate-tagged samples");
+Check(soundBank.Samples[0].ToPcm16LittleEndian().SequenceEqual(new byte[] { 0, 255, 0, 0, 0, 1 }), "unsigned 8-bit samples convert to signed 16-bit PCM");
 Check(Throws<InvalidDataException>(() => DynamixSoundBankDecoder.Decode(soundBankFixture[..^1])), "Dynamix sound bank rejects truncated samples");
 
 var lzwFixture = PackLsbCodes([65, 66, 257, 259], 9);
@@ -290,6 +291,7 @@ try
     File.WriteAllBytes(Path.Combine(contentRoot, "portrait.pcc"), CreateSyntheticPcx());
     File.WriteAllBytes(Path.Combine(contentRoot, "animation.csf"), CreateSyntheticCsf(CreateSyntheticCsfFrame()));
     File.WriteAllBytes(Path.Combine(contentRoot, "screen.pal"), new byte[IndexedPalette.ByteSize]);
+    File.WriteAllBytes(Path.Combine(contentRoot, "interface.666"), soundBankFixture);
     File.WriteAllText(Path.Combine(contentRoot, "dilem7.dat"), CreateSyntheticDilemma());
     var manifest = new
     {
@@ -301,6 +303,7 @@ try
             new { Id = "IMAGE", Path = "portrait.pcc", Kind = "image", Size = CreateSyntheticPcx().Length, Sha256 = "test" },
             new { Id = "ANIMATION", Path = "animation.csf", Kind = "indexed-animation", Size = 0, Sha256 = "test" },
             new { Id = "PALETTE", Path = "screen.pal", Kind = "palette", Size = IndexedPalette.ByteSize, Sha256 = "test" },
+            new { Id = "SOUND", Path = "interface.666", Kind = "sound-bank", Size = soundBankFixture.Length, Sha256 = "test" },
             new { Id = "C1086.GOB#177:dilem7.dat", Path = "dilem7.dat", Kind = "resource", Size = 0, Sha256 = "test" },
             new { Id = "UNSAFE", Path = "../outside.bin", Kind = "resource", Size = 0, Sha256 = "test" }
         }
@@ -309,12 +312,13 @@ try
     Environment.SetEnvironmentVariable("CONQUEROR_USER_CONTENT", contentRoot);
     var catalog = ImportedContentCatalog.Discover();
     using var importedTrack = catalog?.Open("CDDA/TRACK02");
-    Check(catalog?.Count == 6 && importedTrack?.Length == 4 && catalog.Ids("audio").SequenceEqual(["CDDA/TRACK02"]), "imported content manifest is discoverable");
+    Check(catalog?.Count == 7 && importedTrack?.Length == 4 && catalog.Ids("audio").SequenceEqual(["CDDA/TRACK02"]), "imported content manifest is discoverable");
     Check(catalog?.FindId("image", "aGe") == "IMAGE" && catalog.FindId("audio", "aGe") is null, "imported content finds role candidates by kind and suffix");
     Check(catalog?.DecodePcx("IMAGE") is { Width: 3, Height: 1 }, "runtime catalog decodes imported PCX-compatible images");
     var importedSequence = catalog?.DecodeCsf("ANIMATION");
     Check(importedSequence?.DecodeFrame(importedSequence.Chunks[0]) is { Width: 5, Height: 2 }, "runtime catalog decodes imported CSF frame sequences");
     Check(catalog?.DecodePalette("PALETTE")?.Rgb.Length == IndexedPalette.ByteSize, "runtime catalog decodes imported RGB palettes");
+    Check(catalog?.DecodeSoundBank("SOUND")?.Samples is [{ SampleRate: 11025, Samples.Length: 3 }], "runtime catalog decodes imported sound banks");
     var dialogue = catalog is null ? null : new ImportedDialogueRepository(catalog).GetDilemma(7);
     Check(dialogue is { Number: 7, Age: 12, Choices.Count: 3 }, "runtime dialogue repository loads a dilemma by stable number");
     Check(catalog is not null && new ImportedDialogueRepository(catalog).GetDilemmasForAge(12).Select(x => x.Number).SequenceEqual([7]), "runtime dialogue repository groups definitions by declared age");
