@@ -8,6 +8,15 @@ namespace Conqueror.Tests;
 
 public sealed class ResourceAndDefinitionTests
 {
+    [Theory]
+    [InlineData("scene.RES", true)]
+    [InlineData("scene.low", true)]
+    [InlineData("image.PCX", false)]
+    public void DynamixContainerExtensionsIncludeLowSceneArchives(string path, bool expected)
+    {
+        Assert.Equal(expected, DynamixArchive.HasContainerExtension(path));
+    }
+
     [Fact]
     public void Kind1DecodesLiteralCopyAndRunTokens()
     {

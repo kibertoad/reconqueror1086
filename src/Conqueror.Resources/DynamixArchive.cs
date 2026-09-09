@@ -79,4 +79,12 @@ public sealed class DynamixArchive
     }
 
     public static bool CanDecode(DynamixEntry entry) => entry.IsStored || CompressionDecoders.ContainsKey(entry.Flags);
+
+    public static bool HasContainerExtension(string path)
+    {
+        ArgumentNullException.ThrowIfNull(path);
+        var extension = Path.GetExtension(path);
+        return extension.Equals(".RES", StringComparison.OrdinalIgnoreCase)
+            || extension.Equals(".LOW", StringComparison.OrdinalIgnoreCase);
+    }
 }

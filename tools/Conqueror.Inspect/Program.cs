@@ -260,7 +260,7 @@ var sceneEntries = 0;
 var sceneStoredEntries = 0;
 var sceneCompressedBlocks = 0;
 var sceneVerbatimBlocks = 0;
-foreach (var file in files.Where(x => Path.GetExtension(x.Path).Equals(".RES", StringComparison.OrdinalIgnoreCase)))
+foreach (var file in files.Where(x => DynamixArchive.HasContainerExtension(x.Path)))
 {
     try
     {

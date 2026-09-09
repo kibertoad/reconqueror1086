@@ -27,7 +27,7 @@ using (var image = new RawMode1Image(imagePath, CueSheet.DataTrackSectors(cueLin
         Directory.CreateDirectory(Path.GetDirectoryName(target)!);
         File.WriteAllBytes(target, iso.ReadFile(file));
         entries.Add(NewEntry(file.Path, relative, Kind(file.Path), target));
-        if (Path.GetExtension(file.Path).Equals(".RES", StringComparison.OrdinalIgnoreCase))
+        if (DynamixArchive.HasContainerExtension(file.Path))
             InstallDecodedEntries(new DynamixArchive(target), file.Path, output, entries);
     }
 }

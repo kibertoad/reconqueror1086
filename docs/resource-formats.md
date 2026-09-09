@@ -4,9 +4,9 @@ This document is the clean-room, byte-level specification for formats observed i
 
 Confidence terms have the same meaning as the evidence register: **Confirmed** is directly measured across the named sample, **Corroborated** combines local evidence with independent documentation, **Provisional** remains a working hypothesis, and **Disproved** records a rejected interpretation.
 
-## Indexed `.RES` container
+## Indexed `.RES`/`.LOW` container
 
-The loose `C1086.GOB` and the 50 `.RES` scene files on the CD use the same outer indexed container. The `.GOB` extension does not imply the unrelated LucasArts GOB format.
+The loose `C1086.GOB`, 50 `.RES` scene files, and 49 `.LOW` low-detail scene files on the CD use the same outer indexed container and `.RES` signature. The `.LOW` suffix is a presentation tier, not an image format; the `.GOB` extension does not imply the unrelated LucasArts GOB format.
 
 ### Header
 

@@ -113,7 +113,7 @@ Acceptance criteria:
 
 Deliverables:
 
-- Decode the observed PCX/PCC/LOW/palette variants into runtime textures or locally generated PNG files.
+- Decode the observed PCX/PCC/palette variants into runtime textures or locally generated PNG files; treat `.LOW` files as the confirmed Dynamix scene archives they are rather than as images.
 - Preserve indexed palettes, transparency keys, dimensions, frame origins, and animation metadata.
 - Add asset-role mappings for portraits, maps, rooms, inventory, cursors, and combat sprites.
 
