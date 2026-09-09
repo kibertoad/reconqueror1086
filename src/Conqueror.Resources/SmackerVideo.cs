@@ -20,15 +20,19 @@ public sealed class SmackerVideoDecoder
     private readonly HuffmanTree _type;
 
     public SmackerVideoDecoder(SmackerMovie movie, ReadOnlySpan<byte> source)
+        : this(movie, ExtractTreeData(movie, source), true)
+    {
+    }
+
+    private SmackerVideoDecoder(SmackerMovie movie, ReadOnlySpan<byte> treeData, bool treeOnly)
     {
         ArgumentNullException.ThrowIfNull(movie);
-        if (movie.TreeOffset < 0 || movie.TreeLength <= 0
-            || movie.TreeOffset > source.Length - movie.TreeLength)
-            throw new InvalidDataException("Smacker tree data lies outside the supplied movie.");
+        if (!treeOnly || treeData.Length != movie.TreeLength)
+            throw new InvalidDataException("Smacker tree data has an invalid length.");
         _version = movie.Version;
         _width = movie.Width;
         _height = movie.Height;
-        var reader = new LittleEndianBitReader(source.Slice(movie.TreeOffset, movie.TreeLength));
+        var reader = new LittleEndianBitReader(treeData);
         var skipped = 0;
         _mMap = ReadHeaderTree(ref reader, movie.TreeSizes.MMap, ref skipped);
         _mClr = ReadHeaderTree(ref reader, movie.TreeSizes.MClr, ref skipped);
@@ -36,6 +40,18 @@ public sealed class SmackerVideoDecoder
         _type = ReadHeaderTree(ref reader, movie.TreeSizes.Type, ref skipped);
         if (skipped == 4)
             throw new InvalidDataException("Smacker movie omits every video tree.");
+    }
+
+    public static SmackerVideoDecoder FromTreeData(SmackerMovie movie, ReadOnlySpan<byte> treeData) =>
+        new(movie, treeData, true);
+
+    private static ReadOnlySpan<byte> ExtractTreeData(SmackerMovie movie, ReadOnlySpan<byte> source)
+    {
+        ArgumentNullException.ThrowIfNull(movie);
+        if (movie.TreeOffset < 0 || movie.TreeLength <= 0
+            || movie.TreeOffset > source.Length - movie.TreeLength)
+            throw new InvalidDataException("Smacker tree data lies outside the supplied movie.");
+        return source.Slice(movie.TreeOffset, movie.TreeLength);
     }
 
     public void DecodeFrame(ReadOnlySpan<byte> packet, Span<byte> indices, bool isKeyFrame)

@@ -87,6 +87,24 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void SmackerStreamReaderRetainsOnlyIndexTreesAndOneFrame()
+    {
+        var source = SyntheticSmacker();
+        using var stream = new MemoryStream(source);
+        using var reader = new SmackerMovieStream(stream, leaveOpen: true);
+        var frameBuffer = new byte[reader.MaximumFrameLength];
+
+        Assert.Equal(source.AsSpan(114, 4).ToArray(), reader.TreeData);
+        Assert.Equal(12, reader.ReadFrame(1, frameBuffer));
+        var frame = SmackerMovieDecoder.DecodeFramePayload(
+            reader.Movie, 1, frameBuffer, new byte[768]);
+        var audio = Assert.Single(frame.AudioPackets);
+        Assert.Equal((4, 4, 8, 4),
+            (audio.Data.Offset, audio.Data.Length, frame.Video.Offset, frame.Video.Length));
+        Assert.True(stream.CanRead);
+    }
+
+    [Fact]
     public void SmackerPackedMonoAudioDecodesPredictiveHuffmanSamples()
     {
         var packet = new byte[7];

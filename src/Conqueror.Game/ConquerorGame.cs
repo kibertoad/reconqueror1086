@@ -980,15 +980,13 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         var definition = ImportedMovies.Definitions.Single(movie => movie.Role == "Title.Intro");
         var id = _importedContent?.FindId("movie", definition.IdSuffix);
         if (id is null || _importedContent?.Open(id) is not { } source) return;
-        using (source)
         try
         {
-            using var memory = new MemoryStream();
-            source.CopyTo(memory);
-            _titleMovie = new SmackerMoviePlayer(GraphicsDevice, memory.ToArray());
+            _titleMovie = new SmackerMoviePlayer(GraphicsDevice, source);
         }
         catch (Exception error) when (error is InvalidDataException or NotSupportedException or IOException)
         {
+            source.Dispose();
             _notice = "ORIGINAL TITLE MOVIE COULD NOT BE PLAYED";
         }
     }

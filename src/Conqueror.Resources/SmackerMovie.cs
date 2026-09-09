@@ -53,9 +53,31 @@ public static class SmackerMovieDecoder
         var frame = movie.Frames[frameIndex];
         if (frame.Offset < 0 || frame.Length <= 0 || frame.Offset > source.Length - frame.Length)
             throw new InvalidDataException("Smacker frame lies outside the supplied movie.");
+        return DecodeFramePayloadCore(movie, frame,
+            source.Slice(frame.Offset, frame.Length), previousPalette, frame.Offset);
+    }
+
+    public static SmackerFrameLayout DecodeFramePayload(
+        SmackerMovie movie, int frameIndex, ReadOnlySpan<byte> framePayload, ReadOnlySpan<byte> previousPalette)
+    {
+        ArgumentNullException.ThrowIfNull(movie);
+        if ((uint)frameIndex >= movie.Frames.Count)
+            throw new ArgumentOutOfRangeException(nameof(frameIndex));
+        var frame = movie.Frames[frameIndex];
+        if (framePayload.Length != frame.Length)
+            throw new InvalidDataException("Smacker frame payload length is inconsistent with its index.");
+        return DecodeFramePayloadCore(movie, frame, framePayload, previousPalette, 0);
+    }
+
+    private static SmackerFrameLayout DecodeFramePayloadCore(
+        SmackerMovie movie, SmackerFrame frame, ReadOnlySpan<byte> source,
+        ReadOnlySpan<byte> previousPalette, int segmentBase)
+    {
+        if (previousPalette.Length != 256 * 3)
+            throw new ArgumentException("Smacker palette must contain exactly 256 RGB entries.", nameof(previousPalette));
         var palette = previousPalette.ToArray();
-        var cursor = frame.Offset;
-        var end = checked(frame.Offset + frame.Length);
+        var cursor = 0;
+        var end = source.Length;
         var paletteChanged = (frame.Flags & 1) != 0;
         if (paletteChanged)
         {
@@ -91,19 +113,22 @@ public static class SmackerMovieDecoder
                 decodedLength = checked((int)declaredLength);
             }
             audioPackets.Add(new SmackerAudioPacket(trackIndex, decodedLength,
-                new SmackerDataSegment(dataOffset, dataLength)));
+                new SmackerDataSegment(checked(segmentBase + dataOffset), dataLength)));
             cursor += checked((int)packetLength);
         }
 
         if (cursor >= end)
             throw new InvalidDataException("Smacker frame has no video payload.");
         return new SmackerFrameLayout(paletteChanged, palette, audioPackets,
-            new SmackerDataSegment(cursor, end - cursor));
+            new SmackerDataSegment(checked(segmentBase + cursor), end - cursor));
     }
 
-    public static SmackerMovie Decode(ReadOnlySpan<byte> source)
+    public static SmackerMovie Decode(ReadOnlySpan<byte> source) => DecodeIndex(source, source.Length);
+
+    internal static SmackerMovie DecodeIndex(ReadOnlySpan<byte> source, int sourceLength)
     {
-        if (source.Length < HeaderSize || source.Length > MaximumMovieBytes)
+        if (sourceLength < HeaderSize || sourceLength > MaximumMovieBytes || source.Length < HeaderSize
+            || source.Length > sourceLength)
             throw new InvalidDataException("Smacker movie has an invalid length.");
 
         var magic = ReadUInt32(source, 0);
@@ -165,14 +190,14 @@ public static class SmackerMovieDecoder
         {
             var encodedLength = ReadUInt32(source, checked(HeaderSize + (int)index * 4));
             var length = encodedLength & 0xFFFF_FFFCu;
-            if (length == 0 || length > int.MaxValue || offset + length > source.Length)
+            if (length == 0 || length > int.MaxValue || offset + length > sourceLength)
                 throw new InvalidDataException("Smacker frame extent is invalid.");
             var frameFlags = source[checked(HeaderSize + (int)(frameCount * 4) + (int)index)];
             frames.Add(new SmackerFrame(index, checked((int)offset), checked((int)length), frameFlags,
                 index == 0 || (encodedLength & 1) != 0));
             offset += length;
         }
-        if (offset != source.Length)
+        if (offset != sourceLength)
             throw new InvalidDataException("Smacker frame extents do not consume the movie exactly.");
 
         return new SmackerMovie(version, width, height, new TimeSpan(durationTicks), flags,

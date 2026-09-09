@@ -6,9 +6,10 @@ namespace Conqueror.Game;
 
 public sealed class SmackerMoviePlayer : IDisposable
 {
-    private readonly byte[] _source;
+    private readonly SmackerMovieStream _source;
     private readonly SmackerMovie _movie;
     private readonly SmackerVideoDecoder _videoDecoder;
+    private readonly byte[] _compressedFrame;
     private readonly byte[] _indices;
     private readonly byte[] _rgba;
     private readonly SmackerAudioTrack? _audioTrack;
@@ -21,13 +22,14 @@ public sealed class SmackerMoviePlayer : IDisposable
     public Texture2D Texture { get; }
     public bool IsComplete { get; private set; }
 
-    public SmackerMoviePlayer(GraphicsDevice graphicsDevice, byte[] source)
+    public SmackerMoviePlayer(GraphicsDevice graphicsDevice, Stream source)
     {
         ArgumentNullException.ThrowIfNull(graphicsDevice);
         ArgumentNullException.ThrowIfNull(source);
-        _source = source;
-        _movie = SmackerMovieDecoder.Decode(source);
-        _videoDecoder = new SmackerVideoDecoder(_movie, source);
+        _source = new SmackerMovieStream(source);
+        _movie = _source.Movie;
+        _videoDecoder = SmackerVideoDecoder.FromTreeData(_movie, _source.TreeData);
+        _compressedFrame = new byte[_source.MaximumFrameLength];
         _indices = new byte[checked(_movie.Width * _movie.Height)];
         _rgba = new byte[checked(_indices.Length * 4)];
         Texture = new Texture2D(graphicsDevice, _movie.Width, _movie.Height, false, SurfaceFormat.Color);
@@ -60,9 +62,11 @@ public sealed class SmackerMoviePlayer : IDisposable
     private void DecodeNextFrame()
     {
         var descriptor = _movie.Frames[_nextFrame];
-        var frame = SmackerMovieDecoder.DecodeFrameLayout(_movie, _nextFrame, _source, _palette);
+        var frameLength = _source.ReadFrame(_nextFrame, _compressedFrame);
+        var framePayload = _compressedFrame.AsSpan(0, frameLength);
+        var frame = SmackerMovieDecoder.DecodeFramePayload(_movie, _nextFrame, framePayload, _palette);
         _palette = frame.Palette;
-        _videoDecoder.DecodeFrame(_source.AsSpan(frame.Video.Offset, frame.Video.Length), _indices,
+        _videoDecoder.DecodeFrame(framePayload.Slice(frame.Video.Offset, frame.Video.Length), _indices,
             descriptor.IsKeyFrame);
         for (var index = 0; index < _indices.Length; index++)
         {
@@ -81,7 +85,7 @@ public sealed class SmackerMoviePlayer : IDisposable
             foreach (var packet in frame.AudioPackets.Where(packet => packet.TrackIndex == audioTrack.Index))
             {
                 var decoded = SmackerAudioDecoder.Decode(
-                    _source.AsSpan(packet.Data.Offset, packet.Data.Length), audioTrack);
+                    framePayload.Slice(packet.Data.Offset, packet.Data.Length), audioTrack);
                 _audio.SubmitBuffer(decoded.ToPcm16LittleEndian());
             }
             if (_audio.PendingBufferCount > 0 && _audio.State != SoundState.Playing) _audio.Play();
@@ -95,5 +99,6 @@ public sealed class SmackerMoviePlayer : IDisposable
         _disposed = true;
         _audio?.Dispose();
         Texture.Dispose();
+        _source.Dispose();
     }
 }
