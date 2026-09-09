@@ -4,7 +4,8 @@ using Conqueror.Resources;
 namespace Conqueror.Game;
 
 public sealed record ImportedSiegeScene(
-    string ArchiveId, DynamixScene Scene, SiegeLayout Layout, int SourceOriginX, int SourceOriginY);
+    string ArchiveId, DynamixScene Scene, DynamixSceneBackdrop? Backdrop,
+    SiegeLayout Layout, int SourceOriginX, int SourceOriginY);
 
 public static class ImportedSiegeLayouts
 {
@@ -82,7 +83,8 @@ public static class ImportedSiegeLayouts
         var scene = catalog?.DecodeScene(archiveId);
         if (scene is null) return null;
         var converted = ConvertWithOrigin(scene);
-        return new ImportedSiegeScene(archiveId, scene, converted.Layout, converted.OriginX, converted.OriginY);
+        return new ImportedSiegeScene(archiveId, scene, catalog!.DecodeSceneBackdrop(archiveId),
+            converted.Layout, converted.OriginX, converted.OriginY);
     }
 
     private static SiegeTile TileFor(string name)

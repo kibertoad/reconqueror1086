@@ -32,7 +32,7 @@ The repository currently provides:
 - An end-user importer that installs byte-stored, kind-1, and kind-2 owned resources plus lossless CDDA WAV files under ignored local storage.
 - A runtime imported-content catalog, CD music playback, and definition-driven original art for the title, options hub, character options, pre-generated characters, campaign briefing, animated youth dilemmas, estate/travel shell, England map, load screen, Home/farm/blacksmith flows, and a tournament portrait.
 - An executable-confirmed `TITLE.HAT`/`FFTITLE.PCX` title load followed by a corroborated character-options flow whose exact geometry comes from installed `CGOPTS.HAT` and `PREGEN.HAT`.
-- Seventy-three xUnit test cases and 143 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
+- Seventy-four xUnit test cases and 143 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
 
 ## Dependency map
 
@@ -371,7 +371,7 @@ Deliverables:
 - Track conquest spoils separately in the economics overview.
 - Apply correct estate transfer, fame, experience, strength, and victory effects.
 
-Current progress: the owned scene archives' bounded `Viewer`, `Scenario`, `Map`, and `Blocks` records now drive collision maps, initial position/facing, named doors and secret passages, food/treasure roles, and defender/champion placements in practice and campaign siege sessions. Import floods from the Viewer and crops the 128x128 source map to its reachable play area plus enclosing wall, excluding the disconnected resource-authoring gallery. A map-aware raycast viewport renders original indexed wall/door planes and the initial knight/champion sprite planes selected by bounded block references, with per-column occlusion; missing media uses shaded structures and generated combatants, and the generated 12x12 keep remains the no-media fallback. Exact per-location archive selection, four-side texture ordering, block state transitions, palette confirmation, directional sprite animation, AI, timing, balance, retainers, and loot/consequence tables remain open.
+Current progress: the owned scene archives' bounded `Viewer`, `Scenario`, `Map`, `Blocks`, `Backdrop`, and `BackImage` records now drive collision maps, initial position/facing, panorama, named doors and secret passages, food/treasure roles, and defender/champion placements in practice and campaign siege sessions. Import floods from the Viewer and crops the 128x128 source map to its reachable play area plus enclosing wall; this excludes disconnected authoring galleries where they are separate from that component, while the defense scene currently retains its connected exterior. A map-aware raycast viewport renders the facing-wrapped original panorama, indexed wall/door planes, and initial knight/champion sprite planes selected by bounded block references, with per-column occlusion; missing media uses shaded structures and generated combatants, and the generated 12x12 keep remains the no-media fallback. Exact per-location archive selection, four-side texture ordering, block state transitions, palette confirmation, directional sprite animation, AI, timing, balance, retainers, and loot/consequence tables remain open.
 
 Acceptance criteria:
 
@@ -567,7 +567,7 @@ Local static-analysis tool: Ghidra 12.1.3 is installed user-wide at `C:\Users\ki
 - [x] Confirm unsigned 8-bit mono PCM from waveform centering, identify the identical shared UI sample across 17 screen banks, and activate it through a startup cache that decodes each referenced bank and converts each registered sample only once.
 - [x] Decode and classify all six `FFMOUSE.CSF` cursor frames, activate contextual travel/talk/target/pressed-hand selection, and use the decoded `OPTION.CSF` held states with same-region press/release activation.
 - [x] Activate the original `PRACTICE.PCX`/`PRACTICE.HAT` menu, preserve its executable-ordered War/Joust/Melee/Exit/Castle Skirmish labels, bind the directly decoded `JOUSPRAC.SMK`, and route War versus Melee/Castle Skirmish into isolated non-campaign tactical versus first-person practice sessions. Exact legacy combat presentation and parameters remain provisional.
-- [x] Decode the first-person `Viewer`, `Scenario`, 128x128 column-major `Map`, and fixed-size named `Blocks` records; use original scene geometry, viewer start/facing, interactive block roles, and defender/champion placements in melee and castle-skirmish sessions while retaining a no-media fallback.
+- [x] Decode the first-person `Viewer`, `Scenario`, 128x128 column-major `Map`, fixed-size named `Blocks`, and paired `Backdrop`/`BackImage` records; use original scene geometry, viewer start/facing, wrapping panorama, interactive block roles, and defender/champion placements in melee and castle-skirmish sessions while retaining a no-media fallback.
 - [ ] Trace the complete startup/menu state machine, input timing, cursor behavior, and region-action dispatch from `CONQUER.EXE`; keep semantics corroborated until each executable branch is confirmed.
 
 The resource-decoding sprint is first because it unlocks exact dialogue, screen mappings, opponent identities, construction data, and balance tables needed by most later phases.

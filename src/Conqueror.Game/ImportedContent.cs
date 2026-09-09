@@ -275,6 +275,25 @@ public sealed class ImportedContentCatalog
         }
     }
 
+    public DynamixSceneBackdrop? DecodeSceneBackdrop(string archiveId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(archiveId);
+        var prefix = archiveId.Replace('\\', '/') + "#";
+        var descriptorId = _assets.FirstOrDefault(asset => asset.Id.StartsWith(prefix, StringComparison.OrdinalIgnoreCase) &&
+            asset.Id.EndsWith(":Backdrop", StringComparison.OrdinalIgnoreCase))?.Id;
+        var imageId = _assets.FirstOrDefault(asset => asset.Id.StartsWith(prefix, StringComparison.OrdinalIgnoreCase) &&
+            asset.Id.EndsWith(":BackImage", StringComparison.OrdinalIgnoreCase))?.Id;
+        if (descriptorId is null || imageId is null) return null;
+        try
+        {
+            return DynamixSceneBackdropDecoder.Decode(ReadBytes(descriptorId), ReadBytes(imageId));
+        }
+        catch (InvalidDataException)
+        {
+            return null;
+        }
+    }
+
     public DynamixConversationDatabase? DecodeConversations(string bodyId, string indexId)
     {
         using var body = Open(bodyId);

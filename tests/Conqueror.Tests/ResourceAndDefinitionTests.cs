@@ -50,6 +50,25 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void SceneBackdropDecoderBindsDescriptorGeometryToExactImage()
+    {
+        var descriptor = new byte[DynamixSceneBackdropDecoder.DescriptorSize];
+        WriteInt(descriptor, 0, 1);
+        WriteInt(descriptor, 8, 4);
+        WriteInt(descriptor, 12, 2);
+        WriteInt(descriptor, 16, 1);
+        WriteInt(descriptor, 20, 3);
+
+        var backdrop = DynamixSceneBackdropDecoder.Decode(descriptor, new byte[8]);
+
+        Assert.Equal((4, 2, 1, 3, 8),
+            (backdrop.Width, backdrop.Height, backdrop.Horizon, backdrop.Mode, backdrop.Indices.Length));
+        Assert.Throws<InvalidDataException>(() => DynamixSceneBackdropDecoder.Decode(descriptor, new byte[7]));
+        WriteInt(descriptor, 16, 2);
+        Assert.Throws<InvalidDataException>(() => DynamixSceneBackdropDecoder.Decode(descriptor, new byte[8]));
+    }
+
+    [Fact]
     public void SceneDecoderReadsColumnMajorMapViewerAndNamedBlocks()
     {
         var source = SyntheticScene();

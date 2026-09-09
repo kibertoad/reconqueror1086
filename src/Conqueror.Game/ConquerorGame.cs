@@ -13,15 +13,17 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private sealed record OriginalAnimation(IReadOnlyList<Texture2D> Frames);
     private sealed class SiegeVisuals(
         DynamixScene scene, int sourceOriginX, int sourceOriginY,
-        IReadOnlyDictionary<int, Texture2D> textures) : IDisposable
+        IReadOnlyDictionary<int, Texture2D> textures, Texture2D? backdrop) : IDisposable
     {
         public DynamixScene Scene { get; } = scene;
         public int SourceOriginX { get; } = sourceOriginX;
         public int SourceOriginY { get; } = sourceOriginY;
         public IReadOnlyDictionary<int, Texture2D> Textures { get; } = textures;
+        public Texture2D? Backdrop { get; } = backdrop;
         public void Dispose()
         {
             foreach (var texture in Textures.Values) texture.Dispose();
+            Backdrop?.Dispose();
         }
     }
     private const string OriginalCursorAnimationRole = "Interface.Cursor";
@@ -2296,8 +2298,15 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             texture.SetData(IndexedRgba(decoded.Indices, palette.Rgb));
             textures.Add(decoded.Index, texture);
         }
+        Texture2D? backdrop = null;
+        if (imported.Backdrop is { } decodedBackdrop)
+        {
+            backdrop = new Texture2D(GraphicsDevice, decodedBackdrop.Width, decodedBackdrop.Height,
+                false, SurfaceFormat.Color);
+            backdrop.SetData(IndexedRgba(decodedBackdrop.Indices, palette.Rgb, transparentZero: false));
+        }
         _siegeVisuals = new SiegeVisuals(
-            imported.Scene, imported.SourceOriginX, imported.SourceOriginY, textures);
+            imported.Scene, imported.SourceOriginX, imported.SourceOriginY, textures, backdrop);
     }
 
     private Texture2D? SceneWallTexture(SiegeRayHit hit)
@@ -2332,7 +2341,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _siegeVisuals = null;
     }
 
-    private static byte[] IndexedRgba(ReadOnlySpan<byte> indices, ReadOnlySpan<byte> palette)
+    private static byte[] IndexedRgba(
+        ReadOnlySpan<byte> indices, ReadOnlySpan<byte> palette, bool transparentZero = true)
     {
         if (palette.Length != IndexedPalette.ByteSize) throw new InvalidDataException("Scene palette is incomplete.");
         var rgba = new byte[checked(indices.Length * 4)];
@@ -2343,9 +2353,34 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             rgba[target] = palette[source];
             rgba[target + 1] = palette[source + 1];
             rgba[target + 2] = palette[source + 2];
-            rgba[target + 3] = indices[pixel] == 0 ? (byte)0 : (byte)255;
+            rgba[target + 3] = transparentZero && indices[pixel] == 0 ? (byte)0 : (byte)255;
         }
         return rgba;
+    }
+
+    private void DrawSiegeBackdrop(Rectangle viewport, Facing facing)
+    {
+        if (_siegeVisuals?.Backdrop is not { } backdrop)
+        {
+            Fill(new Rectangle(viewport.X, viewport.Y, viewport.Width, viewport.Height / 2), new Color(32, 31, 34));
+            Fill(new Rectangle(viewport.X, viewport.Center.Y, viewport.Width, viewport.Height / 2), new Color(42, 35, 29));
+            return;
+        }
+
+        var sourceWidth = Math.Min(640, backdrop.Width);
+        var sourceX = (int)facing * backdrop.Width / 4 % backdrop.Width;
+        var firstWidth = Math.Min(sourceWidth, backdrop.Width - sourceX);
+        var firstDestinationWidth = firstWidth * viewport.Width / sourceWidth;
+        _batch.Draw(backdrop, new Rectangle(viewport.X, viewport.Y, firstDestinationWidth, viewport.Height),
+            new Rectangle(sourceX, 0, firstWidth, backdrop.Height), Color.White);
+        if (firstWidth < sourceWidth)
+        {
+            var remaining = sourceWidth - firstWidth;
+            _batch.Draw(backdrop,
+                new Rectangle(viewport.X + firstDestinationWidth, viewport.Y,
+                    viewport.Width - firstDestinationWidth, viewport.Height),
+                new Rectangle(0, 0, remaining, backdrop.Height), Color.White);
+        }
     }
 
     private void DrawSiege()
@@ -2353,8 +2388,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (_siege is null) return;
         var viewport = new Rectangle(0, 85, 1024, 520);
         Fill(new Rectangle(0, 0, 1024, 768), new Color(22, 19, 18));
-        Fill(new Rectangle(viewport.X, viewport.Y, viewport.Width, viewport.Height / 2), new Color(32, 31, 34));
-        Fill(new Rectangle(viewport.X, viewport.Center.Y, viewport.Width, viewport.Height / 2), new Color(42, 35, 29));
+        DrawSiegeBackdrop(viewport, _siege.Facing);
         var depths = new double[viewport.Width];
         for (var column = 0; column < viewport.Width; column++)
         {
