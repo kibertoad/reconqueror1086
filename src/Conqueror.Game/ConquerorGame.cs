@@ -14,7 +14,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private const string OriginalCursorRole = "Interface.Cursor";
     private const int OriginalDefaultCursorFrame = 0;
 
-    private enum Screen { Title, OptionsHub, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Map, Home, WarPlanning, Farm, Village, Blacksmith, BlacksmithDialogue, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
+    private enum Screen { Title, Movie, OptionsHub, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Map, Home, WarPlanning, Farm, Village, Blacksmith, BlacksmithDialogue, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _batch = null!;
     private Texture2D _pixel = null!;
@@ -70,6 +70,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private SoundEffect? _importedMusic;
     private SoundEffectInstance? _musicInstance;
     private SmackerMoviePlayer? _titleMovie;
+    private SmackerMoviePlayer? _eventMovie;
+    private Screen _movieReturnScreen = Screen.OptionsHub;
     private readonly Dictionary<string, SoundEffect> _originalSounds = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, Texture2D> _originalArt = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, byte[]> _originalPalettes = new(StringComparer.OrdinalIgnoreCase);
@@ -182,6 +184,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     protected override void UnloadContent()
     {
         _titleMovie?.Dispose();
+        _eventMovie?.Dispose();
         _musicInstance?.Dispose();
         _importedMusic?.Dispose();
         foreach (var texture in _originalArt.Values) texture.Dispose();
@@ -218,6 +221,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (Press(Keys.Escape))
         {
             if (_screen == Screen.Title) Exit();
+            else if (_screen == Screen.Movie) FinishEventMovie();
             else if (_screen == Screen.OptionsHub) _screen = Screen.Title;
             else if (_screen == Screen.LoadGame) ResumeFromLoadGame();
             else if (_screen == Screen.CharacterName) _screen = Screen.CharacterOptions;
@@ -246,6 +250,14 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                     _titleMovie?.Skip();
                     StartMusic();
                     _screen = Screen.OptionsHub;
+                }
+                break;
+            case Screen.Movie:
+                if (_eventMovie is null) FinishEventMovie();
+                else
+                {
+                    _eventMovie.Update(gameTime.ElapsedGameTime);
+                    if (pressAny || click || _eventMovie.IsComplete) FinishEventMovie();
                 }
                 break;
             case Screen.OptionsHub: UpdateOptionsHub(Press, mouse, click); break;
@@ -336,8 +348,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
                 break;
             case OptionsHubAction.ToggleMidiMusic: _notice = "MIDI MUSIC IS NOT AVAILABLE"; break;
             case OptionsHubAction.Practice: _notice = "PRACTICE MODE IS NOT IMPLEMENTED YET"; break;
-            case OptionsHubAction.Credits: _notice = "CREDITS PRESENTATION IS NOT IMPLEMENTED YET"; break;
-            case OptionsHubAction.Movie: _notice = "MOVIE PLAYBACK IS NOT IMPLEMENTED YET"; break;
+            case OptionsHubAction.Credits: PlayEventMovie("Options.Credits", Screen.OptionsHub); break;
+            case OptionsHubAction.Movie: PlayEventMovie("Title.Intro", Screen.OptionsHub); break;
             case OptionsHubAction.Exit: Exit(); break;
             default: throw new ArgumentOutOfRangeException(nameof(option));
         }
@@ -871,7 +883,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
     private void ViewShopItem(EquipmentBalance item)
     {
         var imported = ImportedStoreEntry(item);
-        _notice = imported?.HasMovie == true ? "ITEM MOVIE PLAYBACK IS NOT IMPLEMENTED YET" : "NO ITEM VIEW IS AVAILABLE";
+        if (imported?.HasMovie == true) PlayEventMovie('/' + imported.MovieFile, Screen.Shop);
+        else _notice = "NO ITEM VIEW IS AVAILABLE";
     }
 
     private void TransactShopItem(EquipmentBalance item)
@@ -937,12 +950,14 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         _batch.Begin(samplerState: SamplerState.PointClamp);
         switch (_screen)
         {
-            case Screen.Title: DrawTitle(); break; case Screen.OptionsHub: DrawOptionsHub(); break; case Screen.LoadGame: DrawLoadGame(); break; case Screen.CharacterOptions: DrawCharacterOptions(); break; case Screen.CharacterName: DrawCharacterName(); break; case Screen.Character: DrawCharacter(); break; case Screen.Dilemma: DrawDilemma(); break; case Screen.Map: DrawMap(); break;
+            case Screen.Title: DrawTitle(); break; case Screen.Movie: DrawEventMovie(); break; case Screen.OptionsHub: DrawOptionsHub(); break; case Screen.LoadGame: DrawLoadGame(); break; case Screen.CharacterOptions: DrawCharacterOptions(); break; case Screen.CharacterName: DrawCharacterName(); break; case Screen.Character: DrawCharacter(); break; case Screen.Dilemma: DrawDilemma(); break; case Screen.Map: DrawMap(); break;
             case Screen.Home: DrawHome(); break; case Screen.WarPlanning: DrawWarPlanning(); break; case Screen.Farm: DrawFarm(); break; case Screen.Village: DrawVillage(); break; case Screen.Blacksmith: DrawBlacksmith(); break; case Screen.BlacksmithDialogue: DrawBlacksmithDialogue(); break; case Screen.Shop: DrawShop(); break; case Screen.Tournament: DrawTournament(); break; case Screen.FieldBattle: DrawFieldBattle(); break;
             case Screen.Siege: DrawSiege(); break; case Screen.Overview: DrawOverview(); break; case Screen.Ending: DrawEnding(); break;
         }
-        if (_screen is not Screen.Title and not Screen.LoadGame and not Screen.Character and not Screen.Dilemma) DrawText(_notice, 24, 730, Color.Gold, 2);
-        DrawOriginalCursor();
+        if (_screen is not Screen.Title and not Screen.Movie and not Screen.LoadGame
+            and not Screen.Character and not Screen.Dilemma) DrawText(_notice, 24, 730, Color.Gold, 2);
+        if (_screen != Screen.Movie && !(_screen == Screen.Title && _titleMovie is { IsComplete: false }))
+            DrawOriginalCursor();
         _batch.End();
         base.Draw(gameTime);
     }
@@ -952,6 +967,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (disposing)
         {
             _titleMovie?.Dispose();
+            _eventMovie?.Dispose();
             _musicInstance?.Dispose();
             _importedMusic?.Dispose();
             DisposeOriginalSounds();
@@ -977,23 +993,55 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void LoadTitleMovie()
     {
-        var definition = ImportedMovies.Definitions.Single(movie => movie.Role == "Title.Intro");
-        var id = _importedContent?.FindId("movie", definition.IdSuffix);
-        if (id is null || _importedContent?.Open(id) is not { } source) return;
+        _titleMovie = CreateMovie("Title.Intro", reportFailure: false);
+    }
+
+    private SmackerMoviePlayer? CreateMovie(string roleOrSuffix, bool reportFailure = true)
+    {
+        var suffix = ImportedMovies.Definitions.FirstOrDefault(movie => movie.Role == roleOrSuffix)?.IdSuffix
+            ?? roleOrSuffix;
+        var id = _importedContent?.FindId("movie", suffix);
+        if (id is null || _importedContent?.Open(id) is not { } source)
+        {
+            if (reportFailure) _notice = "ORIGINAL MOVIE IS NOT INSTALLED";
+            return null;
+        }
         try
         {
-            _titleMovie = new SmackerMoviePlayer(GraphicsDevice, source);
+            return new SmackerMoviePlayer(GraphicsDevice, source);
         }
         catch (Exception error) when (error is InvalidDataException or NotSupportedException or IOException)
         {
             source.Dispose();
-            _notice = "ORIGINAL TITLE MOVIE COULD NOT BE PLAYED";
+            if (reportFailure) _notice = "ORIGINAL MOVIE COULD NOT BE PLAYED";
+            return null;
         }
+    }
+
+    private void PlayEventMovie(string roleOrSuffix, Screen returnScreen)
+    {
+        var movie = CreateMovie(roleOrSuffix);
+        if (movie is null) return;
+        _eventMovie?.Dispose();
+        _eventMovie = movie;
+        _movieReturnScreen = returnScreen;
+        if (_musicInstance?.State == SoundState.Playing) _musicInstance.Pause();
+        _screen = Screen.Movie;
+    }
+
+    private void FinishEventMovie()
+    {
+        _eventMovie?.Skip();
+        _eventMovie?.Dispose();
+        _eventMovie = null;
+        _screen = _movieReturnScreen;
+        StartMusic();
     }
 
     private void StartMusic()
     {
-        if (!_cdMusicEnabled || _titleMovie is { IsComplete: false } || _musicInstance is null) return;
+        if (!_cdMusicEnabled || _titleMovie is { IsComplete: false }
+            || _eventMovie is { IsComplete: false } || _musicInstance is null) return;
         if (_musicInstance.State == SoundState.Paused) _musicInstance.Resume();
         else if (_musicInstance.State == SoundState.Stopped) _musicInstance.Play();
     }
@@ -1025,6 +1073,23 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             DrawText("CONQUEROR", 250, 190, Color.Gold, 7); DrawText("A.D. 1086", 350, 265, Color.Wheat, 4);
         }
         if (!hasTitle) DrawText("PRESS ANY KEY", 405, 600, Color.White, 2);
+    }
+
+    private void DrawEventMovie()
+    {
+        if (_eventMovie is null)
+        {
+            Fill(new Rectangle(0, 0, 1024, 768), Color.Black);
+            return;
+        }
+        if (_movieReturnScreen == Screen.Shop)
+        {
+            DrawShop();
+            _batch.Draw(_eventMovie.Texture, ScaleBounds(ShopPresentationDefinitions.ItemBounds(
+                _eventMovie.Texture.Width, _eventMovie.Texture.Height)), Color.White);
+            return;
+        }
+        _batch.Draw(_eventMovie.Texture, new Rectangle(0, 0, 1024, 768), Color.White);
     }
 
     private void DrawOptionsHub()

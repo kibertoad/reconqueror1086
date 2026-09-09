@@ -31,7 +31,8 @@ Check(Balance.Strategy == new StrategicDefinition(80, 98, 9), "strategic warfare
 Check(Balance.TournamentOpponents.Length == 5 && Balance.TournamentOpponents.All(x => x.Wager is >= 20 and <= 80 && x.Swordsmen + x.Halberdiers + x.Knights == 8), "tournament opponent definitions valid");
 Check(ImportedArt.Definitions.Select(x => x.Role).Distinct(StringComparer.OrdinalIgnoreCase).Count() == ImportedArt.Definitions.Count, "imported art roles are unique definitions");
 Check(ImportedAnimations.Definitions.Any(x => x is { Role: "Interface.Cursor", IdSuffix: ":ffmouse.csf" }), "original cursor role is definition driven");
-Check(ImportedMovies.Definitions.Any(x => x is { Role: "Title.Intro", IdSuffix: ":title.smk" }), "original title movie role is definition driven");
+Check(ImportedMovies.Definitions.Any(x => x is { Role: "Title.Intro", IdSuffix: "/title.smk" }), "original title movie role uses the disc-file identifier shape");
+Check(ImportedMovies.Definitions.Any(x => x is { Role: "Options.Credits", IdSuffix: "/creditzz.smk" }), "original credits movie role is definition driven");
 Check(EstatePresentationDefinitions.From(null).Controls.Select(x => x.Action).Distinct().Count() == Enum.GetValues<EstateControlAction>().Length, "estate controls are unique definitions");
 Check(EstatePresentationDefinitions.TileAtlases.Count == 3 && EstatePresentationDefinitions.TileFrames.Count == Enum.GetValues<EstateTerrainKind>().Length, "seasonal estate tile atlases are definition driven");
 Check(FarmPresentationDefinitions.Commands.Select(x => x.Key).Distinct().Count() == FarmPresentationDefinitions.Commands.Count, "farm commands are unique definitions");
@@ -318,6 +319,7 @@ try
     File.WriteAllBytes(Path.Combine(contentRoot, "animation.csf"), CreateSyntheticCsf(CreateSyntheticCsfFrame()));
     File.WriteAllBytes(Path.Combine(contentRoot, "screen.pal"), new byte[IndexedPalette.ByteSize]);
     File.WriteAllBytes(Path.Combine(contentRoot, "interface.666"), soundBankFixture);
+    File.WriteAllBytes(Path.Combine(contentRoot, "title.smk"), [1]);
     File.WriteAllText(Path.Combine(contentRoot, "dilem7.dat"), CreateSyntheticDilemma());
     var manifest = new
     {
@@ -330,6 +332,7 @@ try
             new { Id = "ANIMATION", Path = "animation.csf", Kind = "indexed-animation", Size = 0, Sha256 = "test" },
             new { Id = "PALETTE", Path = "screen.pal", Kind = "palette", Size = IndexedPalette.ByteSize, Sha256 = "test" },
             new { Id = "SOUND", Path = "interface.666", Kind = "sound-bank", Size = soundBankFixture.Length, Sha256 = "test" },
+            new { Id = "CONQUER/TITLE.SMK", Path = "title.smk", Kind = "movie", Size = 1, Sha256 = "test" },
             new { Id = "C1086.GOB#177:dilem7.dat", Path = "dilem7.dat", Kind = "resource", Size = 0, Sha256 = "test" },
             new { Id = "UNSAFE", Path = "../outside.bin", Kind = "resource", Size = 0, Sha256 = "test" }
         }
@@ -338,8 +341,9 @@ try
     Environment.SetEnvironmentVariable("CONQUEROR_USER_CONTENT", contentRoot);
     var catalog = ImportedContentCatalog.Discover();
     using var importedTrack = catalog?.Open("CDDA/TRACK02");
-    Check(catalog?.Count == 7 && importedTrack?.Length == 4 && catalog.Ids("audio").SequenceEqual(["CDDA/TRACK02"]), "imported content manifest is discoverable");
+    Check(catalog?.Count == 8 && importedTrack?.Length == 4 && catalog.Ids("audio").SequenceEqual(["CDDA/TRACK02"]), "imported content manifest is discoverable");
     Check(catalog?.FindId("image", "aGe") == "IMAGE" && catalog.FindId("audio", "aGe") is null, "imported content finds role candidates by kind and suffix");
+    Check(catalog?.FindId("movie", "/title.smk") == "CONQUER/TITLE.SMK", "runtime catalog matches disc-level movie suffixes");
     Check(catalog?.DecodePcx("IMAGE") is { Width: 3, Height: 1 }, "runtime catalog decodes imported PCX-compatible images");
     var importedSequence = catalog?.DecodeCsf("ANIMATION");
     Check(importedSequence?.DecodeFrame(importedSequence.Chunks[0]) is { Width: 5, Height: 2 }, "runtime catalog decodes imported CSF frame sequences");

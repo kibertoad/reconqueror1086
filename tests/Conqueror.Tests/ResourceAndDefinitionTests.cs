@@ -231,7 +231,9 @@ public sealed class ResourceAndDefinitionTests
         Assert.Equal(ImportedAnimations.Definitions.Count,
             ImportedAnimations.Definitions.Select(x => x.Role).Distinct(StringComparer.OrdinalIgnoreCase).Count());
         Assert.Contains(ImportedMovies.Definitions,
-            definition => definition is { Role: "Title.Intro", IdSuffix: ":title.smk" });
+            definition => definition is { Role: "Title.Intro", IdSuffix: "/title.smk" });
+        Assert.Contains(ImportedMovies.Definitions,
+            definition => definition is { Role: "Options.Credits", IdSuffix: "/creditzz.smk" });
         Assert.Equal(ImportedMovies.Definitions.Count,
             ImportedMovies.Definitions.Select(x => x.Role).Distinct(StringComparer.OrdinalIgnoreCase).Count());
         Assert.Equal(ImportedSounds.Definitions.Count,

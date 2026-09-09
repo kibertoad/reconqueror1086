@@ -32,7 +32,7 @@ The repository currently provides:
 - An end-user importer that installs byte-stored, kind-1, and kind-2 owned resources plus lossless CDDA WAV files under ignored local storage.
 - A runtime imported-content catalog, CD music playback, and definition-driven original art for the title, options hub, character options, pre-generated characters, animated youth dilemmas, estate/travel shell, England map, load screen, Home/farm/blacksmith flows, and a tournament portrait.
 - An executable-confirmed `TITLE.HAT`/`FFTITLE.PCX` title load followed by a corroborated character-options flow whose exact geometry comes from installed `CGOPTS.HAT` and `PREGEN.HAT`.
-- Forty-eight xUnit test cases and 135 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
+- Forty-eight xUnit test cases and 137 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
 
 ## Dependency map
 
@@ -512,7 +512,7 @@ Status is conservative: “prototype” means the route is playable but substant
 | M3: Knightly competition | 5 | Playable prototype. | Exact opponent tables plus faithful first-person jousting and tactical tournament melee. |
 | M4: Conquest | 6-7 | Playable prototype: the manual-confirmed five-division War Planning roster, company editing, membership, field state, persistent spies, joined-division combat, and persisted captain-commanded movement are active. | Exact route interaction and captain battle rules, remaining original strategic rules, battlefield systems, castle layouts, combat balance, retainers, and loot. |
 | M5: Two endings | 8 | Both routes playable as prototypes. | Complete Drogo/dragon quest chain, dragon encounter, crown politics, and original endings. |
-| M6: Original presentation | 9 | In progress: file-backed direct original title-movie playback, title fallback, options hub with original state widgets, character screens, estate/map panels, all ten executable-ordered Home hotspots, Overview/War Planning backgrounds and controls, four descriptor-driven fief-management variants, blacksmith flow, one portrait, CD audio, and presentation descriptors are active. | Exact army-path/JUMP behavior, exact estate tiles, remaining CSF/SMK event bindings and seeking, fonts, cursors, dialogue, effects, speech, and accessibility/settings. |
+| M6: Original presentation | 9 | In progress: file-backed direct title/credits/item-movie playback, title fallback, options hub with original state widgets, character screens, estate/map panels, all ten executable-ordered Home hotspots, Overview/War Planning backgrounds and controls, four descriptor-driven fief-management variants, blacksmith flow, one portrait, CD audio, and presentation descriptors are active. | Exact army-path/JUMP behavior, exact estate tiles, remaining CSF/SMK event bindings and seeking, fonts, cursors, dialogue, effects, speech, and accessibility/settings. |
 | M7: Release | 10 | In progress: launch/test/import batch utilities, five save slots, a data-driven legal-boundary check, and Windows CI are implemented. | Save migrations and recovery, importer repair workflow, packaging, and clean-machine verification. |
 
 ## Current resource and startup sprint

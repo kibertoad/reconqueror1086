@@ -81,7 +81,8 @@ public static class ImportedMovies
 {
     public static IReadOnlyList<ImportedMovieDefinition> Definitions { get; } =
     [
-        new("Title.Intro", ":title.smk")
+        new("Title.Intro", "/title.smk"),
+        new("Options.Credits", "/creditzz.smk")
     ];
 }
 

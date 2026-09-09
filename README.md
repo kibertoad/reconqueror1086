@@ -55,6 +55,6 @@ The read-only `tools/Conqueror.Inspect` utility inventories the mixed-mode GOG C
 
 ## Original media
 
-The project is playable without copyrighted media. The GOG installation remains the reference for future audiovisual adapters. `C1086.GOB`, the raw CD tracks, Smacker movies, and CD audio are intentionally not copied into this repository. See `docs/fidelity.md` for the fidelity ledger and remaining audiovisual work.
+The project is playable without copyrighted media. When locally imported from an owned GOG installation, original screens, CD audio, and directly decoded Smacker title/credits/item movies are activated from ignored user content. `C1086.GOB`, the raw CD tracks, Smacker movies, and CD audio are intentionally not copied into this repository. See `docs/fidelity.md` for the fidelity ledger and remaining audiovisual work.
 
 The complete phased backlog and acceptance criteria are tracked in [`docs/implementation-plan.md`](docs/implementation-plan.md).
