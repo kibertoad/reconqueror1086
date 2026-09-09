@@ -507,7 +507,7 @@ Status is conservative: “prototype” means the route is playable but substant
 
 | Milestone | Phases | Status (2026-09-09) | Remaining completion gate |
 | --- | --- | --- | --- |
-| M1: Decoded content | 1-2 | In progress: archive kinds 1 and 2, all `.RES`/`.LOW` scene archives, raw `TEX` dimensions, PCX/PCC, CSF, palettes, HAT layouts, dilemma text, `.666` sound-bank framing, complete owned-release SMK codecs, collision-free installer, and evidence reports work. | Decode remaining scene/dialogue/text structures, texture palettes/surface mappings, and audio event bindings; complete executable table recovery and controlled observations. |
+| M1: Decoded content | 1-2 | In progress: archive kinds 1 and 2, all `.RES`/`.LOW` scene archives, raw `TEX` dimensions, PCX/PCC, CSF, palettes, HAT layouts, dilemma text, the 1,311-node `ALL.CIF`/`ALL.CBF` conversation graph, `.666` sound-bank framing, complete owned-release SMK codecs, collision-free installer, and evidence reports work. | Decode remaining conversation conditions/mutations and scene/text structures, texture palettes/surface mappings, and audio event bindings; complete executable table recovery and controlled observations. |
 | M2: Feudal simulation | 3-4 | Playable prototype: the original estate shell and typed panel/navigation layout are active, and farm commands/help share one definition registry. | Exact terrain sprites and map/economy data, tile-based fief construction, multiple managed estates, full dialogue/quests, and political orders. |
 | M3: Knightly competition | 5 | Playable prototype. | Exact opponent tables plus faithful first-person jousting and tactical tournament melee. |
 | M4: Conquest | 6-7 | Playable prototype: the manual-confirmed five-division War Planning roster, company editing, membership, field state, persistent spies, joined-division combat, and persisted captain-commanded movement are active. | Exact route interaction and captain battle rules, remaining original strategic rules, battlefield systems, castle layouts, combat balance, retainers, and loot. |
@@ -527,6 +527,7 @@ Local static-analysis tool: Ghidra 12.1.3 is installed user-wide at `C:\Users\ki
 - [x] Reverse-engineer and bounds-check the top-level `C1086.GOB`/scene-RES directory structure.
 - [x] Inventory stored versus compressed entries without bulk decompression.
 - [x] Identify and decode the marker-delimited `DILEM*.DAT` text resources end to end; all 30 validate through a bounded ASCII parser and are exposed by stable number through the runtime dialogue repository.
+- [x] Decode `ALL.CIF`/`ALL.CBF` conversation framing end to end; all 1,311 indexed nodes, 2,062 prompt variants, and 2,696 terminal/linked responses validate through a bounded graph parser and runtime catalog adapter.
 - [x] Decode one byte-stored image/palette resource into runtime RGBA pixels end to end.
 - [x] Decode all five byte-stored CSF indexed-animation sequences into bounded palette indices and alpha masks.
 - [x] Validate and classify the five stored 256-color RGB palette resources.

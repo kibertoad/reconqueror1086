@@ -210,6 +210,27 @@ if (File.Exists(gobPath))
     }
     File.WriteAllText(Path.Combine(output, "weapon-store-report.txt"), weaponStoreReport.ToString());
 
+    var conversationReport = new StringBuilder("# Nodes  Empty  PromptVariants  Responses  TerminalResponses  LinkedResponses  Body  Index\n");
+    var conversationBody = gob.Entries.FirstOrDefault(x => x.Name.Equals("all.cbf", StringComparison.OrdinalIgnoreCase));
+    var conversationIndex = gob.Entries.FirstOrDefault(x => x.Name.Equals("all.cif", StringComparison.OrdinalIgnoreCase));
+    if (conversationBody is not null && conversationIndex is not null
+        && DynamixArchive.CanDecode(conversationBody) && DynamixArchive.CanDecode(conversationIndex))
+    {
+        try
+        {
+            var conversations = DynamixConversationDecoder.Decode(
+                gob.ReadDecoded(conversationBody), gob.ReadDecoded(conversationIndex));
+            var nodes = conversations.Nodes.Values.ToArray();
+            var responses = nodes.SelectMany(node => node.Responses).ToArray();
+            conversationReport.AppendLine($"{nodes.Length,7}  {nodes.Count(node => node.PortraitFile is null),5}  {nodes.Sum(node => node.PromptVariants.Count),14}  {responses.Length,9}  {responses.Count(response => response.TargetNodeId == 0),17}  {responses.Count(response => response.TargetNodeId != 0),15}  {conversationBody.Name}  {conversationIndex.Name}");
+        }
+        catch (InvalidDataException error)
+        {
+            conversationReport.AppendLine($"rejected  {error.Message.Replace('\r', ' ').Replace('\n', ' ')}");
+        }
+    }
+    File.WriteAllText(Path.Combine(output, "conversation-report.txt"), conversationReport.ToString());
+
     var dilemmaReport = new StringBuilder("# Number  Age  Scene  Choices  Outcomes  Changes  PromptChars  OutcomeChars  Name\n");
     var dilemmaRules = new StringBuilder("# Number  Choice:scoring[low,high] outcome(changes); original prose omitted\n");
     foreach (var entry in gob.Entries.Where(x => (x.IsStored || x.Flags == 1)

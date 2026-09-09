@@ -50,6 +50,47 @@ public sealed class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void ConversationDatabaseDecodesIndexedPromptsResponsesAndLinks()
+    {
+        var first = ConversationNode(["GERARD.PCC", "Earl Gerard", "Greetings.", "Ask about the dragon.", "Farewell."], [1102, 0]);
+        var second = ConversationNode(["BARKEEP.PCC", "Bartender", "Good day."], []);
+        var body = first.Concat(second).ToArray();
+        var index = new byte[16];
+        WriteInt(index, 0, 1102); WriteInt(index, 4, first.Length);
+        WriteInt(index, 8, 1101); WriteInt(index, 12, 0);
+
+        var database = DynamixConversationDecoder.Decode(body, index);
+
+        Assert.Equal(2, database.Nodes.Count);
+        var gerard = Assert.IsType<DynamixConversationNode>(database.Find(1101));
+        Assert.Equal(("GERARD.PCC", "Earl Gerard"), (gerard.PortraitFile, gerard.Speaker));
+        Assert.Equal(["Greetings."], gerard.PromptVariants);
+        Assert.Equal([new DynamixConversationResponse("Ask about the dragon.", 1102), new DynamixConversationResponse("Farewell.", 0)], gerard.Responses);
+        Assert.Equal("Bartender", database.Find(1102)?.Speaker);
+    }
+
+    [Fact]
+    public void ConversationDatabaseRejectsMalformedIndicesMarkersTextAndLinks()
+    {
+        var valid = ConversationNode(["GERARD.PCC", "Earl Gerard", "Greetings.", "Continue."], [0]);
+        Assert.Throws<InvalidDataException>(() => DynamixConversationDecoder.Decode(valid, new byte[7]));
+
+        var duplicateIndex = new byte[16];
+        WriteInt(duplicateIndex, 0, 1); WriteInt(duplicateIndex, 4, 0);
+        WriteInt(duplicateIndex, 8, 1); WriteInt(duplicateIndex, 12, 0);
+        Assert.Throws<InvalidDataException>(() => DynamixConversationDecoder.Decode(valid, duplicateIndex));
+
+        var oneIndex = new byte[8];
+        WriteInt(oneIndex, 0, 1); WriteInt(oneIndex, 4, 0);
+        var badMarker = valid.ToArray(); badMarker[0x49] = 0;
+        Assert.Throws<InvalidDataException>(() => DynamixConversationDecoder.Decode(badMarker, oneIndex));
+        var badText = valid.ToArray(); badText[^1] = (byte)'X';
+        Assert.Throws<InvalidDataException>(() => DynamixConversationDecoder.Decode(badText, oneIndex));
+        var badLink = ConversationNode(["GERARD.PCC", "Earl Gerard", "Greetings.", "Continue."], [99]);
+        Assert.Throws<InvalidDataException>(() => DynamixConversationDecoder.Decode(badLink, oneIndex));
+    }
+
+    [Fact]
     public void SmackerMovieHeaderAndFrameIndexAreBounded()
     {
         var movie = SmackerMovieDecoder.Decode(SyntheticSmacker());
@@ -940,6 +981,22 @@ public sealed class ResourceAndDefinitionTests
             }
         }
         return text.Append('\u001a').ToString();
+    }
+
+    private static byte[] ConversationNode(IReadOnlyList<string> strings, IReadOnlyList<int> targets)
+    {
+        var encoded = strings.Select(System.Text.Encoding.ASCII.GetBytes).ToArray();
+        var result = new byte[0x348 + encoded.Sum(bytes => bytes.Length + 1)];
+        result[0x48] = checked((byte)targets.Count);
+        result[0x49] = 0x65; result[0x4a] = 0x3a; result[0x4b] = 0x5c;
+        for (var index = 0; index < targets.Count; index++) WriteInt(result, 0x4c + index * 4, targets[index]);
+        var position = 0x348;
+        foreach (var bytes in encoded)
+        {
+            bytes.CopyTo(result, position);
+            position += bytes.Length + 1;
+        }
+        return result;
     }
 
     private static void WriteInt(byte[] target, int offset, int value) => BinaryPrimitives.WriteInt32LittleEndian(target.AsSpan(offset, 4), value);

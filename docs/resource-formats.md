@@ -266,6 +266,14 @@ Image frames and item identifiers normally advance together from 0 through 36. T
 
 `BUYSELL.CSF` is a four-frame indexed overlay sequence associated with the `SWDTEMP.PCX` palette. Frames 0 and 1 are 81x71 versions of the View stone without and with its label; frames 2 and 3 are 100x32 stones labelled Sell and Purchase. Those dimensions, pixels, labels, order, and palette association are **Confirmed** by bounded decoding and palette-assisted rendering. Selecting the View variant from the store record's movie marker and selecting Sell/Purchase from current ownership are **Corroborated** by the table population and visible store behavior; exact input timing remains untraced.
 
+## Conversation database
+
+`ALL.CIF` is an index of 1,311 eight-byte records, each containing a unique non-negative node identifier and a unique 32-bit little-endian byte offset into `ALL.CBF`. Sorting those offsets partitions the 1,514,658-byte body into complete node records; the first begins at offset zero. Every node has a fixed `0x348`-byte binary header followed by zero or more null-terminated printable-ASCII strings. Header byte `0x48` is a response count from zero through five, bytes `0x49`-`0x4B` are the invariant marker `65 3A 5C`, and the corresponding response target node identifiers begin at `0x4C`. Target zero terminates a branch; every nonzero target resolves to another CIF node.
+
+For nonempty nodes, the first string is a PCC filename, the second is the displayed speaker, the final N strings are the N response labels, and the intervening strings are one or more prompt variants. Across the complete owned database, 29 nodes are empty sentinels, the remaining nodes contain 2,062 prompt variants, and 2,696 responses divide into 1,119 terminal and 1,577 linked branches. These framing, string-role, count, and link invariants are **Confirmed** for the hashed release. The meanings of the rest of the fixed header, conditions, mutations, prompt-selection rules, and character-to-root-node table remain under analysis.
+
+`DynamixConversationDecoder` bounds the node population and every record extent, validates IDs, offsets, markers, ASCII strings, response counts, and graph targets, and exposes typed prompt variants and responses without copying original prose into the repository. `conversation-report.txt` contains only aggregate structural counts.
+
 ## HAT screen layouts
 
 The decoded `.HAT` population uses a compact fixed-header layout. Integer fields are signed 32-bit little-endian values. The following structure is **Confirmed for the hashed release**:
@@ -313,6 +321,7 @@ The raw-sector bounds, ISO directory traversal, cue timestamps, and WAV sample p
 - `dilemma-text-report.txt`: stable dilemma/scene identifiers plus choice, outcome, modifier, and text-length counts without original prose.
 - `dilemma-rules-report.txt`: choice scoring attributes, low/high breakpoints, and outcome modifiers without original prose.
 - `weapon-store-report.txt`: store record indices, movie presence, unknown numeric values, image/item indices, prices, and description lengths without original prose.
+- `conversation-report.txt`: aggregate node, empty-sentinel, prompt-variant, terminal-response, and linked-response counts without original prose.
 - `sound-bank-report.txt`: bank provenance, sample counts, distinct rates, and aggregate payload sizes without exporting audio.
 - `artifact-hashes.txt`, `string-hits.txt`, and `executable-disassembly-report.txt`: provenance and targeted executable evidence.
 
