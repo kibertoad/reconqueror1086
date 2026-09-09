@@ -53,6 +53,7 @@ public static class ImportedAnimations
         new("Options.Widgets", ":option.csf", "Options.Background"),
         new("Shop.Items", ":swords.csf", "Shop.Inventory"),
         new("Shop.Controls", ":buysell.csf", "Shop.Inventory"),
+        new("Interface.Cursor", ":ffmouse.csf", "Estate.Shell"),
         .. EstatePresentationDefinitions.TileAtlases.Select(atlas =>
             new ImportedAnimationDefinition(atlas.Role, atlas.IdSuffix, "Estate.Shell"))
     ];

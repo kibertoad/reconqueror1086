@@ -11,6 +11,8 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
 {
     private sealed record DilemmaAnimation(IReadOnlyList<Texture2D> Frames, int FramesPerChoice);
     private sealed record OriginalAnimation(IReadOnlyList<Texture2D> Frames);
+    private const string OriginalCursorRole = "Interface.Cursor";
+    private const int OriginalDefaultCursorFrame = 0;
 
     private enum Screen { Title, OptionsHub, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Map, Home, Farm, Village, Blacksmith, BlacksmithDialogue, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
     private readonly GraphicsDeviceManager _graphics;
@@ -131,6 +133,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             }).ToArray();
             _originalAnimations.Add(definition.Role, new OriginalAnimation(frames));
         }
+        IsMouseVisible = !_originalAnimations.ContainsKey(OriginalCursorRole);
         if (_importedContent?.Open("CDDA/TRACK02") is { } music)
         {
             using (music)
@@ -740,6 +743,7 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.Siege: DrawSiege(); break; case Screen.Overview: DrawOverview(); break; case Screen.Ending: DrawEnding(); break;
         }
         if (_screen is not Screen.Title and not Screen.LoadGame and not Screen.Character and not Screen.Dilemma) DrawText(_notice, 24, 730, Color.Gold, 2);
+        DrawOriginalCursor();
         _batch.End();
         base.Draw(gameTime);
     }
@@ -1359,6 +1363,15 @@ public sealed class ConquerorGame : Microsoft.Xna.Framework.Game
         if (!_originalArt.TryGetValue(role, out var texture)) return false;
         _batch.Draw(texture, destination, Color.White);
         return true;
+    }
+    private void DrawOriginalCursor()
+    {
+        if (!_originalAnimations.TryGetValue(OriginalCursorRole, out var cursor)
+            || cursor.Frames.Count <= OriginalDefaultCursorFrame) return;
+        var frame = cursor.Frames[OriginalDefaultCursorFrame];
+        var mouse = Mouse.GetState();
+        _batch.Draw(frame, new Rectangle(mouse.X, mouse.Y,
+            frame.Width * 1024 / 640, frame.Height * 768 / 480), Color.White);
     }
     private void DrawText(string text, int x, int y, Color color, int scale = 3, int wrap = 0) => PixelFont.Draw(_batch, _pixel, text, new Vector2(x, y), color, scale, wrap);
 }

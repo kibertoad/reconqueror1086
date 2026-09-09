@@ -77,6 +77,8 @@ public sealed class ResourceAndDefinitionTests
         Assert.Equal(ImportedArt.Definitions.Count, ImportedArt.Definitions.Select(x => x.Role).Distinct(StringComparer.OrdinalIgnoreCase).Count());
         Assert.Equal(ImportedAnimations.Definitions.Count,
             ImportedAnimations.Definitions.Select(x => x.Role).Distinct(StringComparer.OrdinalIgnoreCase).Count());
+        Assert.Contains(ImportedAnimations.Definitions,
+            definition => definition is { Role: "Interface.Cursor", IdSuffix: ":ffmouse.csf", PaletteArtRole: "Estate.Shell" });
     }
 
     [Fact]

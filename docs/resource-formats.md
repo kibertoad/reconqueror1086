@@ -182,6 +182,8 @@ Every one of the 1,766 stored chunks begins with two positive `UINT16LE` values 
 
 The values, population counts, and width/height interpretation are **Confirmed** by exact scanline decoding across every chunk.
 
+The kind-1 `FFMOUSE.CSF` sequence uses the same container and scanline grammar: six frames, all 20x20. Rendering it with the `ICONTEMP.PCX` palette produces coherent sword, hourglass/wait, alternate weapon, scroll, targeting, and pointing-hand cursors. The dimensions, frame count, and default sword appearance are **Confirmed**; palette association is **Corroborated**, while the exact runtime conditions selecting frames 1-5 remain **Provisional**.
+
 Decoded-image comparison confirms that `ica.CSF`, `ics.CSF`, and `icw.CSF` are matching 337-frame isometric estate atlases for autumn, spring/summer, and winter respectively. Each frame index preserves the same broad visual role across the three files, and all three render coherently with the palette embedded in `ICONTEMP.PCX`. The runtime therefore selects the atlas by campaign month and uses that palette. The seasonal filename interpretation and palette association are **Corroborated** by the rendered populations and screen context; the precise month boundaries and individual frame-to-estate-data mapping remain **Provisional** pending executable table recovery.
 
 ### CSF frame payload
