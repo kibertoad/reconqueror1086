@@ -527,8 +527,8 @@ public sealed partial class ConquerorGame
 
     private void StartSiegeWeapon(SiegeFrameRun run)
     {
-        _siegeWeaponFrame = _animationEnabled ? run.Start : run.EndExclusive - 1;
-        _siegeWeaponEnd = run.EndExclusive;
+        _siegeWeaponRun = run;
+        _siegeWeaponFrame = _animationEnabled ? run.First : run.Last;
         _siegeWeaponElapsed = 0;
     }
 
@@ -537,8 +537,8 @@ public sealed partial class ConquerorGame
         var after = LivingSiegeEnemyState();
         if (after.Health >= before.Health) return;
         var run = SiegeCombatPresentation.BloodFramesFor(after.Count < before.Count);
-        _siegeHitFrame = _animationEnabled ? run.Start : run.EndExclusive - 1;
-        _siegeHitEnd = run.EndExclusive;
+        _siegeHitRun = run;
+        _siegeHitFrame = _animationEnabled ? run.First : run.Last;
         _siegeHitElapsed = 0;
     }
 
@@ -550,11 +550,11 @@ public sealed partial class ConquerorGame
 
     private void AdvanceSiegeForeground(double elapsedSeconds)
     {
-        AdvanceSiegeRun(ref _siegeWeaponFrame, _siegeWeaponEnd, ref _siegeWeaponElapsed, elapsedSeconds);
-        AdvanceSiegeRun(ref _siegeHitFrame, _siegeHitEnd, ref _siegeHitElapsed, elapsedSeconds);
+        AdvanceSiegeRun(ref _siegeWeaponFrame, _siegeWeaponRun, ref _siegeWeaponElapsed, elapsedSeconds);
+        AdvanceSiegeRun(ref _siegeHitFrame, _siegeHitRun, ref _siegeHitElapsed, elapsedSeconds);
     }
 
-    private void AdvanceSiegeRun(ref int frame, int endExclusive, ref double elapsed, double elapsedSeconds)
+    private void AdvanceSiegeRun(ref int frame, SiegeFrameRun run, ref double elapsed, double elapsedSeconds)
     {
         if (frame < 0) return;
         if (!_animationEnabled)
@@ -567,7 +567,7 @@ public sealed partial class ConquerorGame
         while (elapsed >= SiegeCombatPresentation.FrameSeconds && frame >= 0)
         {
             elapsed -= SiegeCombatPresentation.FrameSeconds;
-            if (++frame >= endExclusive) frame = -1;
+            frame = run.Next(frame);
         }
     }
 

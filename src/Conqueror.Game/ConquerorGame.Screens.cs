@@ -331,10 +331,10 @@ public sealed partial class ConquerorGame
         _siegeVisuals?.Dispose();
         _siegeVisuals = null;
         _siegeWeaponFrame = -1;
-        _siegeWeaponEnd = 0;
+        _siegeWeaponRun = default;
         _siegeWeaponElapsed = 0;
         _siegeHitFrame = -1;
-        _siegeHitEnd = 0;
+        _siegeHitRun = default;
         _siegeHitElapsed = 0;
     }
 

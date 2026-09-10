@@ -2,9 +2,18 @@ using Conqueror.Core;
 
 namespace Conqueror.Game;
 
-public readonly record struct SiegeFrameRun(int Start, int Count)
+public readonly record struct SiegeFrameRun(int Start, int Count, bool Descending = false)
 {
     public int EndExclusive => checked(Start + Count);
+    public int First => Descending ? EndExclusive - 1 : Start;
+    public int Last => Descending ? Start : EndExclusive - 1;
+
+    public int Next(int frame)
+    {
+        if (frame < Start || frame >= EndExclusive) return -1;
+        if (frame == Last) return -1;
+        return frame + (Descending ? -1 : 1);
+    }
 }
 
 public static class SiegeCombatPresentation
@@ -23,11 +32,13 @@ public static class SiegeCombatPresentation
     public static readonly UiBounds Message = new(5, 145, 205, 26);
     public static readonly UiBounds PrimaryStatus = new(225, 22, 90, 25);
     public static readonly UiBounds SecondaryStatus = new(225, 54, 90, 35);
-    public static readonly SiegeFrameRun AxeAttack = new(27, 3);
-    public static readonly SiegeFrameRun CrossbowAttack = new(30, 3);
-    public static readonly SiegeFrameRun HammerAttack = new(33, 3);
-    public static readonly SiegeFrameRun MaceAttack = new(36, 3);
-    public static readonly SiegeFrameRun SwordAttack = new(39, 3);
+    // CONQUER.EXE 0x5529B-0x55448 selects offset 2 on approach, offset 1
+    // near contact, and offset 0 on return. Rows 23+ retain offset 2.
+    public static readonly SiegeFrameRun AxeAttack = new(27, 3, true);
+    public static readonly SiegeFrameRun CrossbowAttack = new(32, 1);
+    public static readonly SiegeFrameRun HammerAttack = new(33, 3, true);
+    public static readonly SiegeFrameRun MaceAttack = new(36, 3, true);
+    public static readonly SiegeFrameRun SwordAttack = new(39, 3, true);
     public static readonly SiegeFrameRun DaggerAttack = new(42, 1);
     // CONQUER.EXE 0x55171-0x55189 chooses base 43 for a fatal strike and
     // base 48 otherwise; 0x552FB-0x55395 renders offsets 0 through 3.

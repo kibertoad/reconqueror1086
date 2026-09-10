@@ -102,7 +102,7 @@ public sealed partial class ResourceAndDefinitionTests
 
     [Theory]
     [InlineData("Basic Axe", 27, 3)]
-    [InlineData("Heavy Crossbow", 30, 3)]
+    [InlineData("Heavy Crossbow", 32, 1)]
     [InlineData("War Hammer", 33, 3)]
     [InlineData("Spiked Mace", 36, 3)]
     [InlineData("Battle Sword", 39, 3)]

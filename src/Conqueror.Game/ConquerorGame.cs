@@ -101,10 +101,10 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private SiegeSession? _siege;
     private SiegeVisuals? _siegeVisuals;
     private int _siegeWeaponFrame = -1;
-    private int _siegeWeaponEnd;
+    private SiegeFrameRun _siegeWeaponRun;
     private double _siegeWeaponElapsed;
     private int _siegeHitFrame = -1;
-    private int _siegeHitEnd;
+    private SiegeFrameRun _siegeHitRun;
     private double _siegeHitElapsed;
     private bool _showRadar = true;
     private FieldBattleSession? _fieldBattle;

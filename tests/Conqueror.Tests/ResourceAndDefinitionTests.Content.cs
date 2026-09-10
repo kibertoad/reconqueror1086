@@ -18,6 +18,21 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void FirstPersonWeaponPosesFollowTheExecutableApproachAndReturnOrder()
+    {
+        var sword = SiegeCombatPresentation.SwordAttack;
+        Assert.Equal((41, 39), (sword.First, sword.Last));
+        Assert.Equal(40, sword.Next(41));
+        Assert.Equal(39, sword.Next(40));
+        Assert.Equal(-1, sword.Next(39));
+
+        var crossbow = SiegeCombatPresentation.CrossbowAttack;
+        Assert.Equal((32, 32, -1), (crossbow.First, crossbow.Last, crossbow.Next(32)));
+        Assert.Equal((43, 46), (SiegeCombatPresentation.FatalHitBlood.First,
+            SiegeCombatPresentation.FatalHitBlood.Last));
+    }
+
+    [Fact]
     public void OriginalWeaponIdentifiersUseTheExecutableCombatRowPermutation()
     {
         int[] expectedRows =
@@ -37,7 +52,7 @@ public sealed partial class ResourceAndDefinitionTests
             item =>
             {
                 var foregroundBase = SiegeCombatPresentation.OriginalForegroundBaseFor(item.OriginalWeaponItemId!.Value);
-                var expectedAttackStart = foregroundBase == 41 ? 42 : foregroundBase;
+                var expectedAttackStart = foregroundBase switch { 30 => 32, 41 => 42, _ => foregroundBase };
                 Assert.Equal(expectedAttackStart, SiegeCombatPresentation.AttackFramesFor(item.Name).Start);
             });
         Assert.Equal(
