@@ -134,6 +134,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private SmackerMoviePlayer? _eventMovie;
     private readonly Queue<string> _eventMovieQueue = new();
     private Screen _movieReturnScreen = Screen.OptionsHub;
+    private CampaignEndReason _presentedEndReason;
     private readonly Dictionary<string, SoundEffect> _originalSounds = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, Texture2D> _originalArt = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, Texture2D> _conversationPortraits = new(StringComparer.OrdinalIgnoreCase);
@@ -443,7 +444,16 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.Ending: if (Press(Keys.Enter)) _screen = Screen.Title; break;
         }
         if (_campaign.State.Victory != VictoryKind.None
-            && _screen is not Screen.Title and not Screen.LoadGame and not Screen.Movie) _screen = Screen.Ending;
+            && _screen is not Screen.Title and not Screen.LoadGame and not Screen.Movie)
+        {
+            _screen = Screen.Ending;
+            if (_campaign.State.EndReason == CampaignEndReason.AgeLimit
+                && _presentedEndReason != CampaignEndReason.AgeLimit)
+            {
+                _presentedEndReason = CampaignEndReason.AgeLimit;
+                PlayEventMovie("Ending.AgeLimit", Screen.Ending);
+            }
+        }
         _last = keys;
         _lastGamePad = gamePad;
         _lastMouse = mouse;
@@ -748,6 +758,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private void ApplyLoadedCampaign(Campaign campaign)
     {
         _campaign = campaign;
+        _presentedEndReason = CampaignEndReason.None;
         ResetConversationSession();
         _fiefCheckpoint = null;
         _hasActiveCampaign = true;
@@ -801,6 +812,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
             case CharacterCreationAction.GenerateNew:
                 var seed = Environment.TickCount;
                 _campaign = new Campaign(Campaign.NewCustom(NormalizedCharacterName(), seed, _heraldicColors[_heraldicColor].Name), seed);
+                _presentedEndReason = CampaignEndReason.None;
                 ResetConversationSession();
                 _hasActiveCampaign = true;
                 _youthDilemmaResult = null;
@@ -837,6 +849,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private void StartPregeneratedCharacter(int index)
     {
         _campaign = new Campaign(Campaign.NewFromTemplate(index));
+        _presentedEndReason = CampaignEndReason.None;
         ResetConversationSession();
         _hasActiveCampaign = true;
         _selectedLocation = 0;

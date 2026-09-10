@@ -4,6 +4,7 @@ public enum UnitType { Swordsmen, Halberdiers, Knights }
 public enum CropType { Grain, Beans, Vegetables, Fruit }
 public enum ForestIndustry { Timber, IronMine, CoalMine, GoldMine, SilverMine }
 public enum VictoryKind { None, Crown, Dragon, Defeat }
+public enum CampaignEndReason { None, AgeLimit, Dragon, Drogo }
 public enum LocationKind { Home, Village, Castle, City, Tournament, London, DragonLair }
 public enum EquipmentSlot { Weapon, Body, Shield, Helm, Keepsake }
 public enum BuildingKind { House, Church, Monastery, Steward, Beadle, Priest, ServantRoom, Woodward }
@@ -222,6 +223,7 @@ public sealed class CampaignState
     public Player Player { get; init; } = new();
     public DateTime Date { get; set; } = new(1086, 3, 1);
     public VictoryKind Victory { get; set; }
+    public CampaignEndReason EndReason { get; set; }
     public int DaySpeed { get; set; } = 1;
     public int CastlesConquered { get; set; }
     public int DragonProgress { get; set; }

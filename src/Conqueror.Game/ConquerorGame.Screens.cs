@@ -586,9 +586,19 @@ public sealed partial class ConquerorGame
 
     private void DrawEnding()
     {
-        var victory = _campaign.State.Victory;
+        var state = _campaign.State;
+        var victory = state.Victory;
         Fill(new Rectangle(0, 0, 1024, 768), victory == VictoryKind.Defeat ? Color.Black : new Color(50, 30, 15));
-        DrawText(victory == VictoryKind.Crown ? "KING OF ENGLAND" : victory == VictoryKind.Dragon ? "SLAYER OF THE DRAGON" : "YOUR TIME HAS PASSED", 150, 260, victory == VictoryKind.Defeat ? Color.Gray : Color.Gold, 4, 760);
+        var title = victory switch
+        {
+            VictoryKind.Crown => "KING OF ENGLAND",
+            VictoryKind.Dragon => "SLAYER OF THE DRAGON",
+            _ when state.EndReason == CampaignEndReason.Dragon => "THE DRAGON CLAIMS ANOTHER VICTIM",
+            _ when state.EndReason == CampaignEndReason.Drogo => "DROGO HAS KILLED YOU",
+            _ when state.EndReason == CampaignEndReason.AgeLimit => "YOUR TIME HAS PASSED",
+            _ => "YOUR QUEST HAS ENDED"
+        };
+        DrawText(title, 150, 260, victory == VictoryKind.Defeat ? Color.Gray : Color.Gold, 4, 760);
         DrawText("PRESS ENTER", 410, 520, Color.White, 2);
     }
 

@@ -111,7 +111,8 @@ public static class ImportedMovies
         new("Ending.DragonInvestiture", "/champl30.smk"),
         new("Ending.DragonDefeat", "/drjstlse.smk"),
         new("Dragon.Retreat", "/drjstrun.smk"),
-        new("Ending.CrownVictory", "/crownl30.smk")
+        new("Ending.CrownVictory", "/crownl30.smk"),
+        new("Ending.AgeLimit", "/avg_end.smk")
     ];
 }
 

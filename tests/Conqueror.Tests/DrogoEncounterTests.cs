@@ -47,4 +47,24 @@ public sealed class DrogoEncounterTests
         Assert.Equal(0, campaign.State.Player.Debt);
         Assert.False(campaign.Borrow(1));
     }
+
+    [Fact]
+    public void LosingToDrogoRecordsADistinctFatalEnding()
+    {
+        var campaign = new Campaign(Campaign.NewFromTemplate(2));
+        campaign.State.Player.Debt = 300;
+        campaign.State.PendingDrogoEncounter = true;
+        var battle = campaign.CreateDrogoBattle();
+
+        for (var turn = 0; turn < 100 && !battle.Defeated; turn++)
+        {
+            battle.Move(true);
+            battle.AdvanceEnemyAnimations(1);
+        }
+
+        Assert.True(battle.Defeated);
+        Assert.False(campaign.FinishDrogoBattle(battle));
+        Assert.Equal(VictoryKind.Defeat, campaign.State.Victory);
+        Assert.Equal(CampaignEndReason.Drogo, campaign.State.EndReason);
+    }
 }

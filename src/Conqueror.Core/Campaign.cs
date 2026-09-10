@@ -335,7 +335,12 @@ public sealed class Campaign
             if (State.Date.Year != previousYear)
             {
                 State.Player.Age++;
-                if (State.Player.Age >= Balance.FinalAge) { State.Victory = VictoryKind.Defeat; Log("Your thirtieth birthday arrives before your destiny is fulfilled."); }
+                if (State.Player.Age >= Balance.FinalAge)
+                {
+                    State.Victory = VictoryKind.Defeat;
+                    State.EndReason = CampaignEndReason.AgeLimit;
+                    Log("Your thirtieth birthday arrives before your destiny is fulfilled.");
+                }
             }
         }
     }
@@ -404,6 +409,7 @@ public sealed class Campaign
         }
         if (!battle.Defeated) return false;
         State.Victory = VictoryKind.Defeat;
+        State.EndReason = CampaignEndReason.Drogo;
         State.PendingDrogoEncounter = false;
         Log("Drogo killed you while collecting the moneylender's debt.");
         return false;
@@ -673,6 +679,7 @@ public sealed class Campaign
                 return AttemptVictory(VictoryKind.Dragon);
             case DragonBattleOutcome.Defeat:
                 State.Victory = VictoryKind.Defeat;
+                State.EndReason = CampaignEndReason.Dragon;
                 Log("The dragon ends your quest for England's championship.");
                 return false;
             case DragonBattleOutcome.Withdrawn:

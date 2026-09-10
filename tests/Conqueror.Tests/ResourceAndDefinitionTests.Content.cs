@@ -67,6 +67,8 @@ public sealed partial class ResourceAndDefinitionTests
             ImportedMovies.Definitions);
         Assert.Contains(new ImportedMovieDefinition("Ending.CrownVictory", "/crownl30.smk"),
             ImportedMovies.Definitions);
+        Assert.Contains(new ImportedMovieDefinition("Ending.AgeLimit", "/avg_end.smk"),
+            ImportedMovies.Definitions);
         Assert.Equal(ImportedMovies.Definitions.Count,
             ImportedMovies.Definitions.Select(movie => movie.Role).Distinct(StringComparer.Ordinal).Count());
     }

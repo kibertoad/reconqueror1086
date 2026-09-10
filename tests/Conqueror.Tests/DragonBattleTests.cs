@@ -87,6 +87,7 @@ public sealed class DragonBattleTests
         Assert.False(defeatedBattle.Strike());
         Assert.False(defeatedCampaign.FinishDragonBattle(defeatedBattle));
         Assert.Equal(VictoryKind.Defeat, defeatedCampaign.State.Victory);
+        Assert.Equal(CampaignEndReason.Dragon, defeatedCampaign.State.EndReason);
 
         var withdrawnCampaign = ReadyCampaign();
         var withdrawnBattle = withdrawnCampaign.BeginDragonBattle()!;
@@ -104,6 +105,19 @@ public sealed class DragonBattleTests
         battle.Tick(DragonBattleSession.Rules.DurationSeconds);
 
         Assert.Equal(DragonBattleOutcome.Defeat, battle.Outcome);
+    }
+
+    [Fact]
+    public void ThirtiethBirthdayRecordsTheAgeLimitEnding()
+    {
+        var campaign = new Campaign(Campaign.NewFromTemplate(2));
+        campaign.State.Player.Age = Balance.FinalAge - 1;
+        campaign.State.Date = new DateTime(1086, 12, 31);
+
+        campaign.AdvanceDays(1);
+
+        Assert.Equal(VictoryKind.Defeat, campaign.State.Victory);
+        Assert.Equal(CampaignEndReason.AgeLimit, campaign.State.EndReason);
     }
 
     private static Campaign ReadyCampaign()
