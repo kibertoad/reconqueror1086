@@ -608,7 +608,41 @@ public sealed class Campaign
         return AttemptVictory(VictoryKind.Dragon);
     }
 
+    public DragonBattleSession? BeginDragonBattle()
+    {
+        return MeetsVictoryRequirements(VictoryKind.Dragon, logFailure: true)
+            ? new DragonBattleSession(State.Player.Stats.Strength)
+            : null;
+    }
+
+    public bool FinishDragonBattle(DragonBattleSession battle)
+    {
+        ArgumentNullException.ThrowIfNull(battle);
+        switch (battle.Outcome)
+        {
+            case DragonBattleOutcome.Victory:
+                return AttemptVictory(VictoryKind.Dragon);
+            case DragonBattleOutcome.Defeat:
+                State.Victory = VictoryKind.Defeat;
+                Log("The dragon ends your quest for England's championship.");
+                return false;
+            case DragonBattleOutcome.Withdrawn:
+                Log("You escape the dragon and may prepare for another challenge.");
+                return false;
+            default:
+                throw new InvalidOperationException("The dragon battle is still in progress.");
+        }
+    }
+
     public bool AttemptVictory(VictoryKind kind)
+    {
+        if (!MeetsVictoryRequirements(kind, logFailure: true)) return false;
+        State.Victory = kind;
+        Log(kind == VictoryKind.Crown ? "William is overthrown. You take the crown of England." : "The dragon falls. England hails its champion.");
+        return true;
+    }
+
+    private bool MeetsVictoryRequirements(VictoryKind kind, bool logFailure)
     {
         if (!Balance.Victories.TryGetValue(kind, out var definition)) return false;
         var p = State.Player;
@@ -616,11 +650,10 @@ public sealed class Campaign
         if (State.CurrentLocation != definition.LocationIndex || p.Fiefs < definition.RequiredFiefs || p.Army.Total < definition.RequiredArmy
             || p.Stats.Strength < definition.RequiredStrength || missingItems.Length > 0)
         {
-            Log($"Requirements not met for {kind}: travel to {World.Locations[definition.LocationIndex].Name}, fiefs {definition.RequiredFiefs}, army {definition.RequiredArmy}, strength {definition.RequiredStrength}, items {string.Join(", ", definition.RequiredItems)}.");
+            if (logFailure)
+                Log($"Requirements not met for {kind}: travel to {World.Locations[definition.LocationIndex].Name}, fiefs {definition.RequiredFiefs}, army {definition.RequiredArmy}, strength {definition.RequiredStrength}, items {string.Join(", ", definition.RequiredItems)}.");
             return false;
         }
-        State.Victory = kind;
-        Log(kind == VictoryKind.Crown ? "William is overthrown. You take the crown of England." : "The dragon falls. England hails its champion.");
         return true;
     }
 
