@@ -39,7 +39,8 @@ public static class ControllerInputBindings
         new Dictionary<ControllerInputContext, IReadOnlyDictionary<Keys, Buttons[]>>
         {
             [ControllerInputContext.Home] = Bind((Keys.F, Buttons.X), (Keys.V, Buttons.Y)),
-            [ControllerInputContext.Village] = Bind((Keys.K, Buttons.X), (Keys.I, Buttons.Y)),
+            [ControllerInputContext.Village] = Bind((Keys.K, Buttons.X), (Keys.I, Buttons.Y),
+                (Keys.P, Buttons.RightShoulder)),
             [ControllerInputContext.Shop] = Bind((Keys.B, Buttons.X), (Keys.S, Buttons.Y)),
             [ControllerInputContext.Tournament] = Bind((Keys.C, Buttons.LeftShoulder), (Keys.K, Buttons.Y),
                 (Keys.I, Buttons.RightShoulder)),

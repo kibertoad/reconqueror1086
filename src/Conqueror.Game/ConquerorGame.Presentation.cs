@@ -728,8 +728,8 @@ public sealed partial class ConquerorGame
         DrawPanel("THE VILLAGE", "VISIT THE MONEYLENDER, CHURCH, BLACKSMITH, AND INN");
         DrawText("B  BORROW 200S (300S DUE AT HARVEST)", 100, 220, Color.White); DrawText("D  DONATE 15S (+1 PIETY)", 100, 280, Color.White);
         DrawText("C  BUILD CHURCH 100S (+15% PRODUCTIVITY)", 100, 340, Color.White); DrawText("K  ENTER BLACKSMITH (ALL WEAPONS AND ARMOR)", 100, 400, Color.LightGreen, 2);
-        DrawText("I  ENTER INN", 100, 435, Color.LightGreen, 2);
-        DrawText($"PLUS MINUS TAX RATE  {_campaign.State.Player.Home.TaxRate}%", 100, 455, Color.Wheat, 2);
-        DrawText("ENTER RETURN TO MAP", 100, 520, Color.LightGreen);
+        DrawText("I  ENTER INN   P  VISIT PARISH", 100, 435, Color.LightGreen, 2);
+        DrawText($"PLUS MINUS TAX RATE  {_campaign.State.Player.Home.TaxRate}%", 100, 475, Color.Wheat, 2);
+        DrawText("ENTER RETURN TO MAP", 100, 535, Color.LightGreen);
     }
 }

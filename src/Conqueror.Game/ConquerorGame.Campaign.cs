@@ -148,6 +148,7 @@ public sealed partial class ConquerorGame
         if (press(Keys.W)) _notice = _campaign.BuyEquipment("War Helm") ? "BOUGHT AND EQUIPPED WAR HELM" : "PURCHASE REFUSED";
         if (press(Keys.K)) _screen = Screen.Blacksmith;
         if (press(Keys.I)) { _notice = ""; _screen = Screen.Inn; }
+        if (press(Keys.P) && !StartChurchConversation()) _notice = "ORIGINAL PARISH CONVERSATION DATA IS NOT INSTALLED";
         if (press(Keys.OemPlus) || press(Keys.Add)) _campaign.State.Player.Home.TaxRate = Math.Min(100, _campaign.State.Player.Home.TaxRate + 5);
         if (press(Keys.OemMinus) || press(Keys.Subtract)) _campaign.State.Player.Home.TaxRate = Math.Max(0, _campaign.State.Player.Home.TaxRate - 5);
         if (press(Keys.Enter) || press(Keys.V)) _screen = Screen.Map;
@@ -272,6 +273,14 @@ public sealed partial class ConquerorGame
             "Blacksmith.Portrait", ":blacksmi.pcc",
             BlacksmithDialoguePresentationDefinitions.OriginalConversationRootNodeId, new UiBounds(0, 0, 0, 0));
         return StartConversation(speaker, Screen.Blacksmith);
+    }
+
+    private bool StartChurchConversation()
+    {
+        var speaker = new InnPatronHotspot(-1, ChurchConversationPresentationDefinitions.Speaker,
+            "", ChurchConversationPresentationDefinitions.PortraitSuffix,
+            ChurchConversationPresentationDefinitions.GenericRootNodeId, new UiBounds(0, 0, 0, 0));
+        return StartConversation(speaker, Screen.Village);
     }
 
     private SceneHotspot? HitSceneHotspot(IReadOnlyList<SceneHotspot> hotspots, MouseState mouse)

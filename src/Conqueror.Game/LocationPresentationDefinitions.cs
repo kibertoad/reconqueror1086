@@ -212,6 +212,13 @@ public static class BlacksmithDialoguePresentationDefinitions
     ];
 }
 
+public static class ChurchConversationPresentationDefinitions
+{
+    public const int GenericRootNodeId = 3100;
+    public const string Speaker = "PRIEST";
+    public const string PortraitSuffix = ":priest.pcc";
+}
+
 public static class FarmPresentationDefinitions
 {
     public enum Section { Castle, Village, Farm, Forest }

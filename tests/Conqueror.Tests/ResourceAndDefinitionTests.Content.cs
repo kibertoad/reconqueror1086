@@ -34,6 +34,8 @@ public sealed partial class ResourceAndDefinitionTests
             ControllerInputBindings.ButtonsFor(Keys.Space, ControllerInputContext.DragonBattle));
         Assert.Contains(Buttons.RightShoulder,
             ControllerInputBindings.ButtonsFor(Keys.I, ControllerInputContext.Tournament));
+        Assert.Contains(Buttons.RightShoulder,
+            ControllerInputBindings.ButtonsFor(Keys.P, ControllerInputContext.Village));
 
         var moved = ControllerInputBindings.MovePointer(new Vector2(638, 2), new Vector2(1, 1), 1);
         Assert.Equal(new Vector2(639, 0), moved);
@@ -74,6 +76,7 @@ public sealed partial class ResourceAndDefinitionTests
             TournamentConversationDefinitions.Ladies.Select(lady => lady.RootNodeId));
         Assert.Equal("Anna Lisa", OriginalConversationBindings.LadyColors[3]);
         Assert.Equal(3201, BlacksmithDialoguePresentationDefinitions.OriginalConversationRootNodeId);
+        Assert.Equal(3100, ChurchConversationPresentationDefinitions.GenericRootNodeId);
 
         var campaign = Campaign.NewFromTemplate(2);
         campaign.ConversationVariables.AddRange(Enumerable.Repeat(0, 43));
