@@ -12,16 +12,24 @@ public static class ImportedSiegeLayouts
     public static string? SceneNameForCampaignLocation(int location)
     {
         if (location < 0 || location >= World.Locations.Length) return null;
-        if (World.Locations[location].Kind == LocationKind.London) return "MELEE1.RES";
-        if (World.Locations[location].Kind != LocationKind.Castle) return null;
-        var castle = World.Locations.Take(location).Count(candidate => candidate.Kind == LocationKind.Castle);
-        return $"MELEE{castle / 5}{castle % 5}.RES";
+        return World.Locations[location].Kind is LocationKind.Castle or LocationKind.London
+            ? "MELEE0.RES"
+            : null;
     }
 
     public static ImportedSiegeScene? ForCampaignLocation(ImportedContentCatalog? catalog, int location) =>
         SceneNameForCampaignLocation(location) is { } name ? Load(catalog, name) : null;
 
-    public static ImportedSiegeScene? ForPracticeMelee(ImportedContentCatalog? catalog) => Load(catalog, "MELEE0.RES");
+    public static string SceneNameForPracticeMelee(int variant) => variant switch
+    {
+        0 => "MELEE0.RES",
+        1 => "MELEE1.RES",
+        2 => "MELEE2.RES",
+        _ => throw new ArgumentOutOfRangeException(nameof(variant))
+    };
+
+    public static ImportedSiegeScene? ForPracticeMelee(ImportedContentCatalog? catalog, int variant) =>
+        Load(catalog, SceneNameForPracticeMelee(variant));
     public static ImportedSiegeScene? ForPracticeCastleSkirmish(ImportedContentCatalog? catalog) => Load(catalog, "DEFEND0.RES");
 
     public static SiegeLayout Convert(DynamixScene scene) => ConvertWithOrigin(scene).Layout;

@@ -247,19 +247,19 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
-    public void FifteenCastlesSelectTheirOrderedThreeByFiveMeleeScenes()
+    public void CampaignAndPracticeSelectTheirExecutableMeleeSceneFamilies()
     {
-        Assert.Equal("MELEE1.RES", ImportedSiegeLayouts.SceneNameForCampaignLocation(1));
-        Assert.Equal("MELEE00.RES", ImportedSiegeLayouts.SceneNameForCampaignLocation(2));
-        Assert.Equal("MELEE04.RES", ImportedSiegeLayouts.SceneNameForCampaignLocation(6));
-        Assert.Equal("MELEE10.RES", ImportedSiegeLayouts.SceneNameForCampaignLocation(7));
-        Assert.Equal("MELEE14.RES", ImportedSiegeLayouts.SceneNameForCampaignLocation(11));
-        Assert.Equal("MELEE20.RES", ImportedSiegeLayouts.SceneNameForCampaignLocation(12));
-        Assert.Equal("MELEE24.RES", ImportedSiegeLayouts.SceneNameForCampaignLocation(16));
+        Assert.Equal("MELEE0.RES", ImportedSiegeLayouts.SceneNameForCampaignLocation(1));
+        Assert.All(Enumerable.Range(2, 15), location =>
+            Assert.Equal("MELEE0.RES", ImportedSiegeLayouts.SceneNameForCampaignLocation(location)));
         Assert.Null(ImportedSiegeLayouts.SceneNameForCampaignLocation(0));
         Assert.Null(ImportedSiegeLayouts.SceneNameForCampaignLocation(17));
         Assert.Null(ImportedSiegeLayouts.SceneNameForCampaignLocation(-1));
         Assert.Null(ImportedSiegeLayouts.SceneNameForCampaignLocation(World.Locations.Length));
+        Assert.Equal(["MELEE0.RES", "MELEE1.RES", "MELEE2.RES"],
+            Enumerable.Range(0, 3).Select(ImportedSiegeLayouts.SceneNameForPracticeMelee));
+        Assert.Throws<ArgumentOutOfRangeException>(() => ImportedSiegeLayouts.SceneNameForPracticeMelee(-1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => ImportedSiegeLayouts.SceneNameForPracticeMelee(3));
     }
 
     [Fact]
