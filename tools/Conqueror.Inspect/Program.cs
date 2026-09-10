@@ -440,8 +440,14 @@ if (File.Exists(gobPath))
 
 var sceneReport = new StringBuilder("# Result  Entries  Stored  Kind1  Kind2  CompressedBlocks  StoredBlocks  ISO path\n");
 var sceneTextureReport = new StringBuilder("# Textures  Dimensions  ISO path\n");
-var sceneScenarioReport = new StringBuilder("# Enabled  MapCount  DistanceShift  BlendTarget  BlockOffsets  ISO path\n");
+var sceneScenarioReport = new StringBuilder("# Enabled  MapCount  DistanceShift  BlendTarget  Generated  BlockOffsets  ISO path\n");
 var paletteReport = new StringBuilder("# Minimum  Maximum  SHA-256  Resource  ISO path\n");
+var skirmishFile = files.Single(file =>
+    Path.GetFileName(file.Path).Equals("SKIRMISH.RES", StringComparison.OrdinalIgnoreCase));
+var skirmishArchive = new DynamixArchive(iso.ReadFile(skirmishFile), skirmishFile.Path);
+var skirmishPaletteEntry = skirmishArchive.Entries.Single(entry =>
+    entry.Name.Equals("SKIRMISH.PAL", StringComparison.OrdinalIgnoreCase));
+var skirmishPalette = IndexedPaletteDecoder.Decode(skirmishArchive.ReadDecoded(skirmishPaletteEntry)).Rgb;
 var sceneContainers = 0;
 var sceneEntries = 0;
 var sceneStoredEntries = 0;
@@ -490,10 +496,22 @@ foreach (var file in files.Where(x => DynamixArchive.HasContainerExtension(x.Pat
             var blocksEntry = archive.Entries.Single(entry => entry.Name.Equals("Blocks", StringComparison.OrdinalIgnoreCase));
             var scene = DynamixSceneDecoder.Decode(archive.ReadDecoded(viewerEntry), scenario,
                 archive.ReadDecoded(mapEntry), archive.ReadDecoded(blocksEntry));
+            var colorMaps = new DynamixSceneColorMaps(Enumerable.Range(0, DynamixSceneColorMaps.Count).Select(index =>
+            {
+                var entry = archive.Entries.Single(candidate =>
+                    candidate.Name.Equals($"Pal{index}", StringComparison.Ordinal));
+                return DynamixSceneColorMapDecoder.Decode(entry.Name, archive.ReadDecoded(entry));
+            }));
+            var generated = DynamixSceneColorMapGenerator.RegenerateFirstFamily(
+                colorMaps, skirmishPalette, scene.ColorMapping);
+            var generatedExact = Enumerable.Range(0, scene.ColorMapping.MapCount)
+                .All(index => colorMaps[index].Span.SequenceEqual(generated[index].Span));
+            if (!generatedExact)
+                throw new InvalidDataException("Stored first-family color maps do not match executable generation.");
             var offsets = string.Join(',', scene.Blocks.Select(block => block.ColorMapOffset).Distinct().Order());
             sceneScenarioReport.AppendLine($"{Convert.ToInt32(scene.ColorMapping.Enabled),7}  "
                 + $"{scene.ColorMapping.MapCount,8}  {scene.ColorMapping.DistanceShift,13}  "
-                + $"{scene.ColorMapping.BlendTarget,11}  {offsets,-12}  {file.Path}");
+                + $"{scene.ColorMapping.BlendTarget,11}  {generatedExact,9}  {offsets,-12}  {file.Path}");
         }
         foreach (var entry in archive.Entries.Where(x => DynamixArchive.CanDecode(x)
             && Path.GetExtension(x.Name).Equals(".666", StringComparison.OrdinalIgnoreCase)))

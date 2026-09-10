@@ -11,6 +11,27 @@ namespace Conqueror.Tests;
 public sealed partial class ResourceAndDefinitionTests
 {
     [Fact]
+    public void SceneColorMapGenerationMatchesTheExecutableBlendAndNearestPaletteRules()
+    {
+        var palette = new byte[IndexedPalette.ByteSize];
+        for (var index = 0; index < IndexedPalette.ColorCount; index++)
+            palette.AsSpan(index * 3, 3).Fill((byte)index);
+        var stored = new DynamixSceneColorMaps(Enumerable.Range(0, DynamixSceneColorMaps.Count)
+            .Select(index => new DynamixSceneColorMap(index,
+                Enumerable.Range(0, DynamixSceneColorMaps.EntryCount).Select(value => (byte)value).ToArray())));
+
+        var generated = DynamixSceneColorMapGenerator.RegenerateFirstFamily(
+            stored, palette, new DynamixSceneColorMapping(true, 4, 10, 0));
+
+        Assert.Equal(100, generated[0].Span[100]);
+        Assert.Equal(2, generated[1].Span[2]);
+        Assert.Equal(75, generated[1].Span[100]);
+        Assert.Equal(50, generated[2].Span[100]);
+        Assert.Equal(25, generated[3].Span[100]);
+        Assert.Equal(100, generated[4].Span[100]);
+    }
+
+    [Fact]
     public void ControllerBindingsProvideEdgeTriggeredNavigationAndContextActions()
     {
         var released = default(GamePadState);

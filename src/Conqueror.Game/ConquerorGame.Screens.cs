@@ -188,6 +188,9 @@ public sealed partial class ConquerorGame
         var paletteId = _importedContent.FindId("resource", ":skirmish.pal");
         var palette = paletteId is null ? null : _importedContent.DecodePalette(paletteId);
         if (palette is null) return;
+        var colorMaps = imported.ColorMaps is null ? null :
+            DynamixSceneColorMapGenerator.RegenerateFirstFamily(
+                imported.ColorMaps, palette.Rgb, imported.Scene.ColorMapping);
 
         var required = new HashSet<int>();
         void Require(DynamixSceneBlock block)
@@ -252,7 +255,7 @@ public sealed partial class ConquerorGame
         }
         _siegeVisuals = new SiegeVisuals(
             imported.Scene, imported.SourceOriginX, imported.SourceOriginY,
-            textures, sources, palette.Rgb, imported.ColorMaps, backdrop);
+            textures, sources, palette.Rgb, colorMaps, backdrop);
     }
 
     private Texture2D? SceneWallTexture(SiegeRayHit hit)
