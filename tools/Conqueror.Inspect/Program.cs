@@ -58,6 +58,7 @@ var conversationTextIds = OptionValue(inspectionOptions, "--conversation-text=")
 var integerResourceName = OptionValue(inspectionOptions, "--resource-integers=");
 var actionGroupIds = OptionValue(inspectionOptions, "--action-groups=");
 var weaponTextIds = OptionValue(inspectionOptions, "--weapon-text=");
+var reportSceneBlocks = inspectionOptions.Contains("--scene-blocks", StringComparer.OrdinalIgnoreCase);
 if (disassembleAddresses is not null)
 {
     var executable = Directory.EnumerateFiles(artifactRoot, "CONQUER.EXE", SearchOption.AllDirectories).Single();
@@ -459,6 +460,7 @@ if (File.Exists(gobPath))
 var sceneReport = new StringBuilder("# Result  Entries  Stored  Kind1  Kind2  CompressedBlocks  StoredBlocks  ISO path\n");
 var sceneTextureReport = new StringBuilder("# Textures  Dimensions  ISO path\n");
 var sceneScenarioReport = new StringBuilder("# Enabled  MapCount  DistanceShift  BlendTarget  Generated  BlockOffsets  ISO path\n");
+var sceneBlockReport = new StringBuilder("# Archive  Index  Placed  Kind  Behavior  Flags  ColorMap  Size  Surfaces  Name\n");
 var paletteReport = new StringBuilder("# Minimum  Maximum  SHA-256  Resource  ISO path\n");
 var skirmishFile = files.Single(file =>
     Path.GetFileName(file.Path).Equals("SKIRMISH.RES", StringComparison.OrdinalIgnoreCase));
@@ -514,6 +516,20 @@ foreach (var file in files.Where(x => DynamixArchive.HasContainerExtension(x.Pat
             var blocksEntry = archive.Entries.Single(entry => entry.Name.Equals("Blocks", StringComparison.OrdinalIgnoreCase));
             var scene = DynamixSceneDecoder.Decode(archive.ReadDecoded(viewerEntry), scenario,
                 archive.ReadDecoded(mapEntry), archive.ReadDecoded(blocksEntry));
+            var sceneName = Path.GetFileNameWithoutExtension(file.Path);
+            if (reportSceneBlocks && (sceneName.StartsWith("MELEE", StringComparison.OrdinalIgnoreCase)
+                || sceneName.StartsWith("DEFEND", StringComparison.OrdinalIgnoreCase)))
+            {
+                var placements = new int[scene.Blocks.Count];
+                for (var x = 0; x < DynamixScene.MapWidth; x++)
+                for (var y = 0; y < DynamixScene.MapHeight; y++)
+                    placements[scene.BlockIndexAt(x, y)]++;
+                foreach (var block in scene.Blocks)
+                    sceneBlockReport.AppendLine($"{file.Path}  {block.Index,5}  {placements[block.Index],6}  "
+                        + $"{block.Kind,4}  {block.Behavior,8}  0x{block.Flags:X8}  {block.ColorMapOffset,8}  "
+                        + $"{block.Width}x{block.Height}  {block.Surface0},{block.Surface1},{block.Surface2},{block.Surface3}  "
+                        + block.Name.Replace('\r', ' ').Replace('\n', ' '));
+            }
             var colorMaps = new DynamixSceneColorMaps(Enumerable.Range(0, DynamixSceneColorMaps.Count).Select(index =>
             {
                 var entry = archive.Entries.Single(candidate =>
@@ -556,6 +572,12 @@ File.WriteAllText(Path.Combine(output, "scene-res-report.txt"), sceneReport.ToSt
 sceneTextureReport.AppendLine($"# total textures: {sceneTextures}");
 File.WriteAllText(Path.Combine(output, "scene-texture-report.txt"), sceneTextureReport.ToString());
 File.WriteAllText(Path.Combine(output, "scene-scenario-report.txt"), sceneScenarioReport.ToString());
+if (reportSceneBlocks)
+{
+    File.WriteAllText(Path.Combine(output, "scene-block-report.txt"), sceneBlockReport.ToString());
+    Console.WriteLine($"Inspected scene block metadata and placements to {output}.");
+    return 0;
+}
 File.WriteAllText(Path.Combine(output, "stored-palette-report.txt"), paletteReport.ToString());
 File.WriteAllText(Path.Combine(output, "sound-bank-report.txt"), soundBankReport.ToString());
 var smackerReport = new StringBuilder("# Version  Dimensions  Frames  Frame ms  Palette changes  Audio packets  Decoded audio  Final frame SHA-256  Audio tracks  Bytes  ISO path\n");

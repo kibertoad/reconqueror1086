@@ -40,7 +40,7 @@ public static class ImportedSiegeLayouts
         var sourceTiles = new SiegeTile[DynamixScene.MapWidth, DynamixScene.MapHeight];
         for (var x = 0; x < DynamixScene.MapWidth; x++)
         for (var y = 0; y < DynamixScene.MapHeight; y++)
-            sourceTiles[x, y] = TileFor(scene.BlockAt(x, y).Name);
+            sourceTiles[x, y] = TileFor(scene.BlockAt(x, y));
         sourceTiles[scene.Viewer.CellX, scene.Viewer.CellY] = SiegeTile.Floor;
 
         var reachable = ReachableFromViewer(sourceTiles, scene.Viewer.CellX, scene.Viewer.CellY);
@@ -58,7 +58,7 @@ public static class ImportedSiegeLayouts
             tiles[x - minX, y - minY] = reachable[x, y] ? sourceTiles[x, y] : SiegeTile.Wall;
 
         var enemies = points
-            .Where(point => IsEnemy(scene.BlockAt(point.X, point.Y).Name))
+            .Where(point => IsEnemy(scene.BlockAt(point.X, point.Y)))
             .Select(point => new SiegeSpawn(point.X - minX, point.Y - minY,
                 scene.BlockAt(point.X, point.Y).Name.Contains("champion", StringComparison.OrdinalIgnoreCase) ||
                 scene.BlockAt(point.X, point.Y).Name.Contains("lord", StringComparison.OrdinalIgnoreCase),
@@ -103,8 +103,21 @@ public static class ImportedSiegeLayouts
             converted.Layout, converted.OriginX, converted.OriginY);
     }
 
-    private static SiegeTile TileFor(string name)
+    private static SiegeTile TileFor(DynamixSceneBlock block)
     {
+        var name = block.Name;
+        // Across the owned MELEE*/DEFEND* population, behavior 83 is used only
+        // by placed exit/gate markers. They are traversable scene markers, not
+        // members of the behavior-19 locked-door family.
+        if (block.Behavior == 83) return SiegeTile.Floor;
+        if (IsEnemy(block)) return SiegeTile.Floor;
+        // Placed kind-4 behavior-19 records are the scene pickups. Their names
+        // distinguish food from equipment/currency while the metadata keeps an
+        // unfamiliar pickup name from becoming a wall.
+        if (block.Kind == 4 && block.Behavior == 19)
+            return name.Contains("meal", StringComparison.OrdinalIgnoreCase)
+                ? SiegeTile.Barrel
+                : SiegeTile.Treasure;
         if (name.Contains("secret passage", StringComparison.OrdinalIgnoreCase)) return SiegeTile.SecretDoor;
         if (name.Contains("door", StringComparison.OrdinalIgnoreCase) ||
             name.Contains("portcullis", StringComparison.OrdinalIgnoreCase) ||
@@ -117,7 +130,7 @@ public static class ImportedSiegeLayouts
             name.Contains("shield", StringComparison.OrdinalIgnoreCase) ||
             name.Contains("ax", StringComparison.OrdinalIgnoreCase) ||
             name.Contains("hauberk", StringComparison.OrdinalIgnoreCase)) return SiegeTile.Treasure;
-        if (IsEnemy(name) || name.Equals("ground", StringComparison.OrdinalIgnoreCase) ||
+        if (name.Equals("ground", StringComparison.OrdinalIgnoreCase) ||
             name.Contains("floor", StringComparison.OrdinalIgnoreCase) ||
             name.Equals("carpet", StringComparison.OrdinalIgnoreCase) ||
             name.Equals("dirt", StringComparison.OrdinalIgnoreCase) ||
@@ -128,7 +141,10 @@ public static class ImportedSiegeLayouts
         return SiegeTile.Wall;
     }
 
-    private static bool IsEnemy(string name) =>
+    private static bool IsEnemy(DynamixSceneBlock block) =>
+        block.Behavior == 135 || IsEnemyName(block.Name);
+
+    private static bool IsEnemyName(string name) =>
         name.Contains("knight", StringComparison.OrdinalIgnoreCase) ||
         name.Contains("footman", StringComparison.OrdinalIgnoreCase) ||
         name.Contains("bowman", StringComparison.OrdinalIgnoreCase) ||

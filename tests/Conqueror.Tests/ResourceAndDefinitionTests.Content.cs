@@ -11,6 +11,27 @@ namespace Conqueror.Tests;
 public sealed partial class ResourceAndDefinitionTests
 {
     [Fact]
+    public void ImportedSceneLayoutUsesOriginalBehaviorClassesBeforeNames()
+    {
+        var source = SyntheticScene();
+        SetSceneBlockName(source.Blocks, 1, "gate");
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize + 4, 83);
+        SetSceneBlockName(source.Blocks, 4, "mystery pickup");
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 4, 4);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 4 + 4, 19);
+        SetSceneBlockName(source.Blocks, 5, "mystery actor");
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 5 + 4, 135);
+
+        var layout = ImportedSiegeLayouts.Convert(DynamixSceneDecoder.Decode(
+            source.Viewer, source.Scenario, source.Map, source.Blocks));
+
+        var tiles = layout.CopyTiles();
+        Assert.Equal(SiegeTile.Floor, tiles[11, 20]);
+        Assert.Equal(SiegeTile.Treasure, tiles[9, 20]);
+        Assert.Contains(layout.Enemies, enemy => (enemy.X, enemy.Y, enemy.VisualId) == (13, 20, 5));
+    }
+
+    [Fact]
     public void FatalAndWoundingHitsUseTheirExecutableBloodRuns()
     {
         Assert.Equal(new SiegeFrameRun(43, 4), SiegeCombatPresentation.BloodFramesFor(true));
