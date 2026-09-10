@@ -7,6 +7,11 @@ public sealed partial class ConquerorGame
 {
     private void UpdateMap(Func<Keys, bool> press, MouseState mouse, bool click)
     {
+        if (_campaign.State.PendingDrogoEncounter)
+        {
+            _screen = Screen.DrogoDemand;
+            return;
+        }
         if (_campaign.HasPendingFieldBattle)
         {
             BeginFieldBattle("YOUR ARMY HAS BEEN INTERCEPTED");

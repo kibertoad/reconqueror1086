@@ -469,19 +469,52 @@ public sealed partial class ConquerorGame
         _notice = _siege.LastMessage;
         if (press(Keys.R))
         {
+            if (_drogoCombat) { _notice = "DROGO WILL NOT LET YOU ESCAPE"; return; }
             if (_activePracticeCombat is not null) { FinishPracticeCombat("PRACTICE ENDED"); return; }
             _campaign.FinishSiege(_siege); var lost = _campaign.Retreat(); _siege = null; ClearSiegeVisuals(); _screen = Screen.Map; _notice = $"RETREATED - {lost} SOLDIERS LOST"; Autosave(); return;
         }
         if (_siege.Won)
         {
-            if (_activePracticeCombat is not null) FinishPracticeCombat("PRACTICE WON");
+            if (_drogoCombat) FinishDrogoCombat();
+            else if (_activePracticeCombat is not null) FinishPracticeCombat("PRACTICE WON");
             else { _campaign.FinishSiege(_siege); _siege = null; ClearSiegeVisuals(); _screen = Screen.Map; _notice = "THE CASTLE IS YOURS"; Autosave(); }
         }
         else if (_siege.Defeated)
         {
-            if (_activePracticeCombat is not null) FinishPracticeCombat("PRACTICE LOST");
+            if (_drogoCombat) FinishDrogoCombat();
+            else if (_activePracticeCombat is not null) FinishPracticeCombat("PRACTICE LOST");
             else { _campaign.FinishSiege(_siege); _siege = null; ClearSiegeVisuals(); _screen = Screen.Map; _notice = "YOU ARE CARRIED FROM THE CASTLE"; Autosave(); }
         }
+    }
+
+    private void UpdateDrogoDemand(Func<Keys, bool> press)
+    {
+        if (!_campaign.State.PendingDrogoEncounter) { _screen = Screen.Map; return; }
+        if (press(Keys.P))
+        {
+            _notice = _campaign.PayDrogo() ? "DROGO ACCEPTS THE DEBT PAYMENT" : "YOU CANNOT PAY WHAT YOU OWE";
+            if (!_campaign.State.PendingDrogoEncounter) { _screen = Screen.Map; Autosave(); }
+        }
+        if (!press(Keys.F)) return;
+        ClearSiegeVisuals();
+        _siege = _campaign.CreateDrogoBattle();
+        _drogoCombat = true;
+        _showRadar = false;
+        _notice = "DROGO PREPARES TO FIGHT";
+        _screen = Screen.Siege;
+    }
+
+    private void FinishDrogoCombat()
+    {
+        if (_siege is null) return;
+        var won = _siege.Won;
+        _campaign.FinishDrogoBattle(_siege);
+        _siege = null;
+        _drogoCombat = false;
+        ClearSiegeVisuals();
+        _screen = won ? Screen.Map : Screen.Ending;
+        _notice = won ? "DROGO IS DEAD - THE MONEYLENDER WILL NOT RETURN" : "DROGO HAS KILLED YOU";
+        Autosave();
     }
 
     private void StartSiegeWeapon(SiegeFrameRun run)
@@ -589,7 +622,7 @@ public sealed partial class ConquerorGame
         {
             case Screen.Title: DrawTitle(); break; case Screen.Movie: DrawEventMovie(); break; case Screen.OptionsHub: DrawOptionsHub(); break; case Screen.Practice: DrawPractice(); break; case Screen.LoadGame: DrawLoadGame(); break; case Screen.CharacterOptions: DrawCharacterOptions(); break; case Screen.CharacterName: DrawCharacterName(); break; case Screen.Character: DrawCharacter(); break; case Screen.Dilemma: DrawDilemma(); break; case Screen.Briefing: DrawCampaignBriefing(); break; case Screen.Map: DrawMap(); break;
             case Screen.Home: DrawHome(); break; case Screen.WarPlanning: DrawWarPlanning(); break; case Screen.Farm: DrawFarm(); break; case Screen.Village: DrawVillage(); break; case Screen.Inn: DrawInn(); break; case Screen.InnDialogue: DrawInnDialogue(); break; case Screen.Blacksmith: DrawBlacksmith(); break; case Screen.BlacksmithDialogue: DrawBlacksmithDialogue(); break; case Screen.Shop: DrawShop(); break; case Screen.Tournament: DrawTournament(); break; case Screen.FieldBattle: DrawFieldBattle(); break;
-            case Screen.Siege: DrawSiege(); break; case Screen.Overview: DrawOverview(); break; case Screen.Ending: DrawEnding(); break;
+            case Screen.DrogoDemand: DrawDrogoDemand(); break; case Screen.Siege: DrawSiege(); break; case Screen.Overview: DrawOverview(); break; case Screen.Ending: DrawEnding(); break;
             case Screen.DragonBattle: DrawDragonBattle(); break;
         }
         if (_screen is not Screen.Title and not Screen.Movie and not Screen.LoadGame

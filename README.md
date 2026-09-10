@@ -40,7 +40,7 @@ The importer also validates stored CSF files as indexed animation sequences. The
 - Playable continuous field battles with per-formation hold, advance, flank, withdrawal, or captain-control orders
 - Named England destinations, calendar-costed travel, a moving tournament circuit, and persistent per-castle conquest
 - Persistent hostile field garrisons, 80-shilling spy reports, 98% stronghold interception, route fallback, and siege approach gating
-- 50% harvest loan, church donations, recruiting, taxation, wealth and army upkeep
+- 50% harvest loan with a persisted pay-or-fight Drogo collection encounter, church donations, recruiting, taxation, wealth and army upkeep
 - Blacksmith purchases, automatic equipment, and the original 75% resale rule
 - Three-joust/one-skirmish tournament limits, selectable ladies, individual eligibility rules, multi-stage reward ladders, marriage, and imported original lady, blacksmith, ordinary parish, and Cambridge armor-quest conversations
 - First-person castle simulation with facing and movement, doors and secret rooms, melee reach, crossbows and ammunition, enemy pursuit, champions, armor checks, commandable retainers, food, treasure, breakable weapons, radar, retreat losses, and progression

@@ -37,6 +37,7 @@ public static class ImportedArt
         new("Blacksmith.Workshop", "image", ":forgesmi.pcx"),
         new("Dialogue.Frame", "image", ":comscrn1.pcx"),
         new("Dragon.Background", "image", ":drjstwin.pcx"),
+        new("Encounter.Drogo", "image", ":drogo.pcc"),
         new("Blacksmith.Portrait", "image", ":blacksmi.pcc"),
         new("Shop.Inventory", "image", ":swdtemp.pcx"),
         new("Tournament.Richard", "image", ":richard.pcc"),

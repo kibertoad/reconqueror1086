@@ -170,6 +170,11 @@ var campaign = new Campaign(Campaign.NewFromTemplate(1));
 Check(campaign.State.Player.Wealth == 490, "Ronald starting wealth");
 Check(campaign.Borrow(200) && campaign.State.Player.Debt == 300, "50 percent loan interest");
 Check(!campaign.Borrow(1), "one outstanding loan only");
+campaign.State.Date = new DateTime(1086, 7, 1);
+campaign.SettleMonth();
+Check(campaign.State.PendingDrogoEncounter && campaign.State.Player.Debt == 300, "harvest debt summons Drogo");
+var drogoBattle = campaign.CreateDrogoBattle();
+Check(drogoBattle.AlliesStarted == 0 && drogoBattle.Enemies.Count == 1, "Drogo fight is one on one");
 
 var fief = campaign.State.Player.Home;
 campaign.Build("Steward"); campaign.Build("Beadle"); campaign.Build("Priest"); campaign.Build("Monastery"); campaign.Build("Woodward");

@@ -93,7 +93,8 @@ public sealed class SiegeSession
     {
     }
 
-    public SiegeSession(Player player, Army army, int garrison, int seed, SiegeLayout? layout)
+    public SiegeSession(Player player, Army army, int garrison, int seed, SiegeLayout? layout,
+        bool includeRetainers = true)
     {
         _player = player;
         _random = new Random(seed);
@@ -106,7 +107,7 @@ public sealed class SiegeSession
         }
         MaxHealth = 80 + player.Stats.Stamina * 5;
         Health = MaxHealth;
-        AlliesStarted = Math.Clamp(1 + army.Total / 10, 1, 5);
+        AlliesStarted = includeRetainers ? Math.Clamp(1 + army.Total / 10, 1, 5) : 0;
         AlliesAlive = AlliesStarted;
         if (layout is not null)
         {

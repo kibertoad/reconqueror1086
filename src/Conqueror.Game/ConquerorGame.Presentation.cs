@@ -732,4 +732,15 @@ public sealed partial class ConquerorGame
         DrawText($"PLUS MINUS TAX RATE  {_campaign.State.Player.Home.TaxRate}%", 100, 475, Color.Wheat, 2);
         DrawText("ENTER RETURN TO MAP", 100, 535, Color.LightGreen);
     }
+
+    private void DrawDrogoDemand()
+    {
+        var player = _campaign.State.Player;
+        DrawPanel("DROGO HAS COME TO COLLECT", $"THE MONEYLENDER DEMANDS THE {player.Debt} SHILLINGS YOU OWE");
+        DrawOriginal("Encounter.Drogo", new Rectangle(660, 185, 293, 305));
+        DrawText($"WEALTH {player.Wealth}S", 100, 245, Color.Wheat, 2);
+        DrawText("P  PAY THE DEBT", 100, 335, player.Wealth >= player.Debt ? Color.LightGreen : Color.Gray, 2);
+        DrawText("F  REFUSE AND FIGHT DROGO", 100, 395, Color.IndianRed, 2);
+        DrawText("THIS FIGHT IS TO THE DEATH", 100, 475, Color.Gold, 2);
+    }
 }

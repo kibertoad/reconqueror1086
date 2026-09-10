@@ -233,7 +233,8 @@ public sealed class Campaign
 
     public bool Borrow(int amount)
     {
-        if (amount <= 0 || amount > Balance.MaxLoan || State.Player.Debt != 0) return false;
+        if (amount <= 0 || amount > Balance.MaxLoan || State.Player.Debt != 0
+            || State.DrogoDefeated || State.PendingDrogoEncounter) return false;
         State.Player.Wealth += amount;
         State.Player.Debt = amount + (int)(amount * Balance.LoanInterest);
         Log($"Borrowed {amount}s; {State.Player.Debt}s due at harvest.");
@@ -363,12 +364,49 @@ public sealed class Campaign
 
         if (july && p.Debt > 0)
         {
-            if (p.Wealth >= p.Debt) { p.Wealth -= p.Debt; Log($"Repaid {p.Debt}s to the moneylender."); }
-            else { Log("The moneylender sends Drogo to collect the harvest debt."); }
-            p.Debt = 0;
+            State.PendingDrogoEncounter = true;
+            Log($"Drogo, the moneylender's thug, comes to collect the {p.Debt}s debt.");
         }
         ResolveSpyReports();
         Log($"Month settled: +{revenue}s revenue, -{upkeep}s upkeep, {productivity}% productivity.");
+    }
+
+    public bool PayDrogo()
+    {
+        var player = State.Player;
+        if (!State.PendingDrogoEncounter || player.Debt <= 0 || player.Wealth < player.Debt) return false;
+        var payment = player.Debt;
+        player.Wealth -= payment;
+        player.Debt = 0;
+        State.PendingDrogoEncounter = false;
+        Log($"Paid Drogo the {payment}s owed to the moneylender.");
+        return true;
+    }
+
+    public SiegeSession CreateDrogoBattle()
+    {
+        if (!State.PendingDrogoEncounter || State.Player.Debt <= 0)
+            throw new InvalidOperationException("Drogo is not waiting to collect a debt.");
+        return DrogoEncounterDefinitions.Create(State.Player, State.Date.DayOfYear + State.Date.Year);
+    }
+
+    public bool FinishDrogoBattle(SiegeSession battle)
+    {
+        ArgumentNullException.ThrowIfNull(battle);
+        if (!State.PendingDrogoEncounter) return false;
+        if (battle.Won)
+        {
+            State.DrogoDefeated = true;
+            State.PendingDrogoEncounter = false;
+            State.Player.Debt = 0;
+            Log("You killed Drogo. The moneylender will not bother you again.");
+            return true;
+        }
+        if (!battle.Defeated) return false;
+        State.Victory = VictoryKind.Defeat;
+        State.PendingDrogoEncounter = false;
+        Log("Drogo killed you while collecting the moneylender's debt.");
+        return false;
     }
 
     public BattleResult FightFieldBattle(Army enemy)

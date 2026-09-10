@@ -49,7 +49,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     }
     private const string OriginalCursorAnimationRole = "Interface.Cursor";
 
-    private enum Screen { Title, Movie, OptionsHub, Practice, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Briefing, Map, Home, WarPlanning, Farm, Village, Inn, InnDialogue, Blacksmith, BlacksmithDialogue, Shop, Tournament, FieldBattle, Siege, DragonBattle, Overview, Ending }
+    private enum Screen { Title, Movie, OptionsHub, Practice, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Briefing, Map, Home, WarPlanning, Farm, Village, Inn, InnDialogue, Blacksmith, BlacksmithDialogue, Shop, Tournament, DrogoDemand, FieldBattle, Siege, DragonBattle, Overview, Ending }
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _batch = null!;
     private Texture2D _pixel = null!;
@@ -111,6 +111,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private FieldBattleSession? _fieldBattle;
     private DragonBattleSession? _dragonBattle;
     private PracticeCombatKind? _activePracticeCombat;
+    private bool _drogoCombat;
     private UnitType _selectedUnit = UnitType.Swordsmen;
     private double _battleTick;
     private string _notice = "";
@@ -375,6 +376,8 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
             else if (_screen == Screen.Shop) _screen = Screen.Blacksmith;
             else if (_screen == Screen.FieldBattle && _activePracticeCombat is not null) FinishPracticeCombat("PRACTICE ENDED");
             else if (_screen == Screen.Siege && _activePracticeCombat is not null) FinishPracticeCombat("PRACTICE ENDED");
+            else if (_screen == Screen.Siege && _drogoCombat) _notice = "DROGO WILL NOT LET YOU ESCAPE";
+            else if (_screen == Screen.DrogoDemand) _notice = "PAY DROGO OR FIGHT HIM";
             else if (_screen == Screen.FieldBattle && _fieldBattle is not null) { _fieldBattle.IssueAll(UnitOrder.Withdraw); _notice = "WITHDRAWAL ORDERED"; }
             else if (_screen == Screen.DragonBattle && _dragonBattle is not null)
             {
@@ -431,6 +434,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.BlacksmithDialogue: UpdateBlacksmithDialogue(Press); break;
             case Screen.Shop: UpdateShop(Press, mouse, click); break;
             case Screen.Tournament: UpdateTournament(Press); break;
+            case Screen.DrogoDemand: UpdateDrogoDemand(Press); break;
             case Screen.FieldBattle: UpdateFieldBattle(Press, gameTime); break;
             case Screen.Siege: UpdateSiege(Press, gameTime); break;
             case Screen.DragonBattle: UpdateDragonBattle(Press, keys, gamePad, mouse, click, gameTime); break;
