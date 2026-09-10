@@ -150,6 +150,8 @@ public static class ImportedSiegeLayouts
 
     private static SiegeSpawn EnemyFor(DynamixSceneBlock block, int x, int y)
     {
+        if (block.ActorCombatRow is < 0 or >= OriginalWeaponCombat.CombatRowCount)
+            throw new InvalidDataException($"Scene actor {block.Index} references an unknown combat row.");
         OriginalCombatantTemplate template;
         try { template = OriginalCombatantTemplates.For(block.ActorTemplate); }
         catch (ArgumentOutOfRangeException exception)
@@ -158,7 +160,7 @@ public static class ImportedSiegeLayouts
         }
         var champion = block.Name.Contains("champion", StringComparison.OrdinalIgnoreCase) ||
             block.Name.Contains("lord", StringComparison.OrdinalIgnoreCase);
-        return new SiegeSpawn(x, y, champion, block.Index, template.Armor, template.Health);
+        return new SiegeSpawn(x, y, champion, block.Index, template.Armor, template.Health, block.ActorCombatRow);
     }
 
     private static bool IsDestructible(DynamixSceneBlock block) =>

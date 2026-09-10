@@ -11,6 +11,7 @@ public sealed class SiegeEnemy
     public int Y { get; set; }
     public int Health { get; set; }
     public int? OriginalArmor { get; init; }
+    public int? OriginalCombatRow { get; init; }
     public bool Champion { get; init; }
     public int VisualId { get; init; } = -1;
     public Facing Facing { get; set; }
@@ -22,7 +23,7 @@ public sealed class SiegeEnemy
 
 public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int GarrisonPerEnemy, int BaseChampionHealth, int FoodHealing, int WeaponBreakPercent);
 public sealed record SiegeSpawn(int X, int Y, bool Champion, int VisualId = -1,
-    int? OriginalArmor = null, int? OriginalHealth = null);
+    int? OriginalArmor = null, int? OriginalHealth = null, int? OriginalCombatRow = null);
 public sealed record SiegeObjectStage(int VisualId, SiegeTile Tile);
 public sealed record SiegeObjectSpawn(int X, int Y, IReadOnlyList<SiegeObjectStage> Stages);
 
@@ -156,6 +157,7 @@ public sealed class SiegeSession
                     Y = spawn.Y,
                     Health = spawn.OriginalHealth ?? (spawn.Champion ? Rules.BaseChampionHealth : 1),
                     OriginalArmor = spawn.OriginalArmor,
+                    OriginalCombatRow = spawn.OriginalCombatRow,
                     Champion = spawn.Champion,
                     VisualId = spawn.VisualId
                 };
@@ -404,8 +406,11 @@ public sealed class SiegeSession
                 if (enemy.VisualState != SiegeEnemyVisualState.Hit)
                     StartVisual(enemy, SiegeEnemyVisualState.Attack);
                 if (AlliesAlive > 0 && _random.Next(100) < 18) { AlliesAlive--; LastMessage = "A retainer falls defending you."; continue; }
-                var hitChance = Math.Clamp(70 - ArmorRating(), 5, 70);
-                if (_random.Next(100) < hitChance) Health -= Math.Max(2, 12 - _player.Stats.Stamina / 3);
+                var hitChance = enemy.OriginalCombatRow is null ? Math.Clamp(70 - ArmorRating(), 5, 70) : 70;
+                if (_random.Next(100) < hitChance)
+                    Health -= enemy.OriginalCombatRow is { } combatRow
+                        ? OriginalWeaponCombat.DamageForCombatRow(combatRow, ArmorRating(), _random)
+                        : Math.Max(2, 12 - _player.Stats.Stamina / 3);
                 continue;
             }
             if (distance > 6 || _random.Next(100) >= 55) continue;

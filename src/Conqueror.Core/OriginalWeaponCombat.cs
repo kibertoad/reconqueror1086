@@ -2,6 +2,7 @@ namespace Conqueror.Core;
 
 public static class OriginalWeaponCombat
 {
+    public const int CombatRowCount = 25;
     private static readonly int[] CombatRowsByItemId =
     [
         4, 5, 12, 14, 6, 13, 11, 7, 9, 8, 10, 16,
@@ -64,14 +65,17 @@ public static class OriginalWeaponCombat
     public static int GridReachFor(int itemId) => Math.Max(1, ContactDistanceFor(itemId) >> 8);
 
     public static int DamageFor(int itemId, int targetArmor, Random random)
+        => DamageForCombatRow(CombatRowFor(itemId), targetArmor, random);
+
+    public static int DamageForCombatRow(int combatRow, int targetArmor, Random random)
     {
         ArgumentNullException.ThrowIfNull(random);
+        if ((uint)combatRow >= (uint)CombatRowCount) throw new ArgumentOutOfRangeException(nameof(combatRow));
         if (targetArmor < 0) throw new ArgumentOutOfRangeException(nameof(targetArmor));
-        var row = CombatRowFor(itemId);
         var rolled = 0;
-        for (var die = 0; die < DiceCountsByCombatRow[row]; die++)
-            rolled += random.Next(DieSidesByCombatRow[row]) + 1;
-        var mitigation = Math.Max(targetArmor - ArmorPenetrationByCombatRow[row], 0);
+        for (var die = 0; die < DiceCountsByCombatRow[combatRow]; die++)
+            rolled += random.Next(DieSidesByCombatRow[combatRow]) + 1;
+        var mitigation = Math.Max(targetArmor - ArmorPenetrationByCombatRow[combatRow], 0);
         return Math.Max(rolled - mitigation, 0);
     }
 }

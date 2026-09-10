@@ -132,6 +132,17 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void ImportedSceneRejectsAnUnknownActorCombatRow()
+    {
+        var source = SyntheticScene();
+        BinaryPrimitives.WriteInt16LittleEndian(
+            source.Blocks.AsSpan(5 * DynamixSceneDecoder.BlockSize + 0x4c, sizeof(short)), 25);
+
+        var scene = DynamixSceneDecoder.Decode(source.Viewer, source.Scenario, source.Map, source.Blocks);
+        Assert.Throws<InvalidDataException>(() => ImportedSiegeLayouts.Convert(scene));
+    }
+
+    [Fact]
     public void ImportedPickupRetainsItsExplicitDebrisBillboard()
     {
         var source = SyntheticScene();
@@ -271,8 +282,11 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(0, OriginalWeaponCombat.DamageFor(9, 20, new MaximumRandom()));
         Assert.Equal(17, OriginalWeaponCombat.DamageFor(0, 7, new MaximumRandom()));
         Assert.Equal(10, OriginalWeaponCombat.DamageFor(44, 10, new MaximumRandom()));
+        Assert.Equal(11, OriginalWeaponCombat.DamageForCombatRow(5, 10, new MaximumRandom()));
         Assert.Throws<ArgumentOutOfRangeException>(() =>
             OriginalWeaponCombat.DamageFor(0, -1, new Random(1)));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            OriginalWeaponCombat.DamageForCombatRow(25, 0, new Random(1)));
     }
 
     [Fact]
