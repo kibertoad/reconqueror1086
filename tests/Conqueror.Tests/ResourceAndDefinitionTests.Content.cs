@@ -43,6 +43,17 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void DragonTravelAndVictoryMoviesUseTheirOwnedDiscSequences()
+    {
+        Assert.Contains(new ImportedMovieDefinition("Travel.DragonLair", "/trandrag.smk"),
+            ImportedMovies.Definitions);
+        Assert.Contains(new ImportedMovieDefinition("Ending.DragonVictory", "/drjstwin.smk"),
+            ImportedMovies.Definitions);
+        Assert.Equal(ImportedMovies.Definitions.Count,
+            ImportedMovies.Definitions.Select(movie => movie.Role).Distinct(StringComparer.Ordinal).Count());
+    }
+
+    [Fact]
     public void ImportedContentVerificationDetectsDamageAndUnsafeManifestRecords()
     {
         var root = Path.Combine(Path.GetTempPath(), $"conqueror-verify-{Guid.NewGuid():N}");

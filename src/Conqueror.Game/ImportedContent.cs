@@ -102,7 +102,9 @@ public static class ImportedMovies
     [
         new("Title.Intro", "/title.smk"),
         new("Options.Credits", "/creditzz.smk"),
-        new("Practice.Joust", "/jousprac.smk")
+        new("Practice.Joust", "/jousprac.smk"),
+        new("Travel.DragonLair", "/trandrag.smk"),
+        new("Ending.DragonVictory", "/drjstwin.smk")
     ];
 }
 

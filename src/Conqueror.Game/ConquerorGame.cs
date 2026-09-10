@@ -426,7 +426,8 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.Overview: if (Press(Keys.Enter) || Press(Keys.O)) _screen = _overviewReturnScreen; break;
             case Screen.Ending: if (Press(Keys.Enter)) _screen = Screen.Title; break;
         }
-        if (_campaign.State.Victory != VictoryKind.None && _screen is not Screen.Title and not Screen.LoadGame) _screen = Screen.Ending;
+        if (_campaign.State.Victory != VictoryKind.None
+            && _screen is not Screen.Title and not Screen.LoadGame and not Screen.Movie) _screen = Screen.Ending;
         _last = keys;
         _lastGamePad = gamePad;
         _lastMouse = mouse;
@@ -849,6 +850,11 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
             _notice = days == 0 ? $"ALREADY AT {World.Locations[_selectedLocation].Name}" : $"TRAVELLED {days} DAYS TO {World.Locations[_selectedLocation].Name}";
             if (days > 0) Autosave();
             if (_campaign.HasPendingFieldBattle) { BeginFieldBattle("YOUR ARMY HAS BEEN INTERCEPTED"); return; }
+            if (days > 0 && World.Locations[_selectedLocation].Kind == LocationKind.DragonLair)
+            {
+                PlayEventMovie("Travel.DragonLair", Screen.Map);
+                if (_screen == Screen.Movie) return;
+            }
         }
         if (press(Keys.H) && _campaign.State.CurrentLocation == 0) _screen = Screen.Home;
         if (press(Keys.V)) _screen = Screen.Village;
@@ -879,7 +885,8 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
             ? $"SPY REPORTS {_campaign.GarrisonAt(_selectedLocation)} SOLDIERS AT {World.Locations[_selectedLocation].Name}"
             : "SPY NOT SENT (NEED HOSTILE CASTLE AND 80S)";
         if (press(Keys.C)) _notice = "TO CLAIM THE CROWN, TRAVEL TO LONDON AND PRESS S TO BESIEGE IT";
-        if (press(Keys.D)) _campaign.AttemptDragon();
+        if (press(Keys.D) && _campaign.AttemptDragon())
+            PlayEventMovie("Ending.DragonVictory", Screen.Ending);
         if (press(Keys.E)) { _campaign.AdvanceDays(_campaign.State.DaySpeed); Autosave(); }
         if (press(Keys.OemPlus) || press(Keys.Add)) _campaign.State.DaySpeed = Math.Min(15, _campaign.State.DaySpeed + 1);
         if (press(Keys.OemMinus) || press(Keys.Subtract)) _campaign.State.DaySpeed = Math.Max(1, _campaign.State.DaySpeed - 1);
