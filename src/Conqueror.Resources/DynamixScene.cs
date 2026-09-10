@@ -13,10 +13,12 @@ public sealed record DynamixSceneColorMapping(bool Enabled, int MapCount, int Di
 
 public enum DynamixSceneFace
 {
-    North,
-    East,
-    South,
-    West
+    // CONQUER.EXE 0x44CC0-0x44F61 emits these hit masks; the selector at
+    // 0x46739-0x467F7 maps them to block offsets 44, 48, 52, and 56.
+    North = 0x100,
+    East = 0x200,
+    South = 0x400,
+    West = 0x800
 }
 
 public sealed record DynamixSceneBlock(

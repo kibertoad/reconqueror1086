@@ -11,6 +11,13 @@ namespace Conqueror.Tests;
 public sealed partial class ResourceAndDefinitionTests
 {
     [Fact]
+    public void SceneCardinalFacesRetainTheirExecutableHitMasks()
+    {
+        Assert.Equal([0x100, 0x200, 0x400, 0x800],
+            Enum.GetValues<DynamixSceneFace>().Select(face => (int)face));
+    }
+
+    [Fact]
     public void SceneColorMapGenerationMatchesTheExecutableBlendAndNearestPaletteRules()
     {
         var palette = new byte[IndexedPalette.ByteSize];
