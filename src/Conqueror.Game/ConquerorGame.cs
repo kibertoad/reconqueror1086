@@ -57,6 +57,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private Campaign _campaign = new();
     private Screen _screen = Screen.Title;
     private KeyboardState _last;
+    private GamePadState _lastGamePad;
     private MouseState _lastMouse;
     private int _characterOption;
     private int _optionsHubOption;
@@ -310,8 +311,11 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     {
         _presentationSeconds += gameTime.ElapsedGameTime.TotalSeconds;
         var keys = Keyboard.GetState();
+        var gamePad = GamePad.GetState(PlayerIndex.One);
         var mouse = Mouse.GetState();
-        bool Press(Keys key) => keys.IsKeyDown(key) && !_last.IsKeyDown(key);
+        var controllerContext = ControllerContextFor(_screen);
+        bool Press(Keys key) => keys.IsKeyDown(key) && !_last.IsKeyDown(key)
+            || ControllerInputBindings.IsPressed(key, controllerContext, gamePad, _lastGamePad);
         var click = mouse.LeftButton == ButtonState.Pressed && _lastMouse.LeftButton == ButtonState.Released;
         var release = mouse.LeftButton == ButtonState.Released && _lastMouse.LeftButton == ButtonState.Pressed;
         var rightClick = mouse.RightButton == ButtonState.Pressed && _lastMouse.RightButton == ButtonState.Released;
@@ -321,13 +325,15 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         if (_paused)
         {
             _last = keys;
+            _lastGamePad = gamePad;
             _lastMouse = mouse;
             base.Update(gameTime);
             return;
         }
         if (click && _soundEffectsEnabled) PlayOriginalSound("Interface.Activate");
         var pressAny = keys.GetPressedKeys().Any(key => key is not Keys.Escape and not Keys.F10
-            and not Keys.F11 and not Keys.Pause && !_last.IsKeyDown(key));
+            and not Keys.F11 and not Keys.Pause && !_last.IsKeyDown(key))
+            || ControllerInputBindings.AnyPressed(gamePad, _lastGamePad);
         if (Press(Keys.F5) && _screen is Screen.Farm or Screen.WarPlanning)
         {
             _notice = "CONFIRM OR CANCEL PENDING MANAGEMENT CHANGES BEFORE SAVING";
@@ -414,9 +420,23 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         }
         if (_campaign.State.Victory != VictoryKind.None && _screen is not Screen.Title and not Screen.LoadGame) _screen = Screen.Ending;
         _last = keys;
+        _lastGamePad = gamePad;
         _lastMouse = mouse;
         base.Update(gameTime);
     }
+
+    private static ControllerInputContext ControllerContextFor(Screen screen) => screen switch
+    {
+        Screen.Home => ControllerInputContext.Home,
+        Screen.Village => ControllerInputContext.Village,
+        Screen.Shop => ControllerInputContext.Shop,
+        Screen.Tournament => ControllerInputContext.Tournament,
+        Screen.Map => ControllerInputContext.Map,
+        Screen.InnDialogue or Screen.BlacksmithDialogue => ControllerInputContext.Dialogue,
+        Screen.FieldBattle => ControllerInputContext.FieldBattle,
+        Screen.Siege => ControllerInputContext.Siege,
+        _ => ControllerInputContext.General
+    };
 
     private void OpenLoadGame()
     {

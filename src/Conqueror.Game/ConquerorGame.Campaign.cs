@@ -489,6 +489,9 @@ public sealed partial class ConquerorGame
             _activePracticeCombat = null;
             return;
         }
+        var unitTypes = Enum.GetValues<UnitType>();
+        if (press(Keys.Left)) _selectedUnit = unitTypes[((int)_selectedUnit + unitTypes.Length - 1) % unitTypes.Length];
+        if (press(Keys.Right)) _selectedUnit = unitTypes[((int)_selectedUnit + 1) % unitTypes.Length];
         if (press(Keys.D1)) _selectedUnit = UnitType.Swordsmen; if (press(Keys.D2)) _selectedUnit = UnitType.Halberdiers; if (press(Keys.D3)) _selectedUnit = UnitType.Knights;
         if (press(Keys.H)) _fieldBattle.Issue(_selectedUnit, UnitOrder.Hold);
         if (press(Keys.A)) _fieldBattle.Issue(_selectedUnit, UnitOrder.Advance);

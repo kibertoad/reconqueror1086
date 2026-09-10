@@ -1,6 +1,8 @@
 using Conqueror.Core;
 using Conqueror.Game;
 using Conqueror.Resources;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using System.Buffers.Binary;
 using Xunit;
 
@@ -8,6 +10,28 @@ namespace Conqueror.Tests;
 
 public sealed partial class ResourceAndDefinitionTests
 {
+    [Fact]
+    public void ControllerBindingsProvideEdgeTriggeredNavigationAndContextActions()
+    {
+        var released = default(GamePadState);
+        var accept = new GamePadState(Vector2.Zero, Vector2.Zero, 0, 0, Buttons.A);
+        Assert.True(ControllerInputBindings.IsPressed(Keys.Enter, ControllerInputContext.General, accept, released));
+        Assert.False(ControllerInputBindings.IsPressed(Keys.Enter, ControllerInputContext.General, accept, accept));
+
+        Assert.Equal([Buttons.DPadUp, Buttons.LeftThumbstickUp],
+            ControllerInputBindings.ButtonsFor(Keys.Up, ControllerInputContext.General));
+        Assert.Contains(Buttons.X, ControllerInputBindings.ButtonsFor(Keys.F, ControllerInputContext.Home));
+        Assert.Empty(ControllerInputBindings.ButtonsFor(Keys.F, ControllerInputContext.General));
+        Assert.Contains(Buttons.RightShoulder,
+            ControllerInputBindings.ButtonsFor(Keys.P, ControllerInputContext.Map));
+        Assert.Contains(Buttons.RightShoulder,
+            ControllerInputBindings.ButtonsFor(Keys.D5, ControllerInputContext.Dialogue));
+        Assert.Contains(Buttons.LeftThumbstickUp,
+            ControllerInputBindings.ButtonsFor(Keys.W, ControllerInputContext.Siege));
+        Assert.Contains(Buttons.A,
+            ControllerInputBindings.ButtonsFor(Keys.A, ControllerInputContext.FieldBattle));
+    }
+
     [Fact]
     public void ImportedContentVerificationDetectsDamageAndUnsafeManifestRecords()
     {
