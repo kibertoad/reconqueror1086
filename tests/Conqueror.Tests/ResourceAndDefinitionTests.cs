@@ -243,8 +243,10 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Contains(siege.Enemies, enemy => (enemy.X, enemy.Y, enemy.Champion) == (14, 20, true));
         Assert.Equal(5, Assert.Single(siege.Enemies, enemy => !enemy.Champion).VisualId);
         Assert.Equal(6, Assert.Single(siege.Enemies, enemy => enemy.Champion).VisualId);
-        Assert.Equal(SiegeSession.Rules.BaseChampionHealth,
-            Assert.Single(siege.Enemies, enemy => enemy.Champion).Health);
+        Assert.Equal((7, 12), (Assert.Single(siege.Enemies, enemy => !enemy.Champion).OriginalArmor,
+            Assert.Single(siege.Enemies, enemy => !enemy.Champion).Health));
+        Assert.Equal((10, 20), (Assert.Single(siege.Enemies, enemy => enemy.Champion).OriginalArmor,
+            Assert.Single(siege.Enemies, enemy => enemy.Champion).Health));
     }
 
     [Fact]

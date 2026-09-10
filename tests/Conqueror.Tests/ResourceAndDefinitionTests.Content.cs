@@ -121,6 +121,17 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void ImportedSceneRejectsAnUnknownActorTemplate()
+    {
+        var source = SyntheticScene();
+        BinaryPrimitives.WriteInt16LittleEndian(
+            source.Blocks.AsSpan(5 * DynamixSceneDecoder.BlockSize + 0x4a, sizeof(short)), 10);
+
+        var scene = DynamixSceneDecoder.Decode(source.Viewer, source.Scenario, source.Map, source.Blocks);
+        Assert.Throws<InvalidDataException>(() => ImportedSiegeLayouts.Convert(scene));
+    }
+
+    [Fact]
     public void ImportedPickupRetainsItsExplicitDebrisBillboard()
     {
         var source = SyntheticScene();
@@ -252,6 +263,25 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(43, Balance.Equipment.Single(item => item.Name == "Light Crossbow").OriginalWeaponItemId);
         Assert.Equal(44, Balance.Equipment.Single(item => item.Name == "Heavy Crossbow").OriginalWeaponItemId);
         Assert.Throws<ArgumentOutOfRangeException>(() => OriginalWeaponCombat.CombatRowFor(23));
+    }
+
+    [Fact]
+    public void OriginalWeaponDamageRollsDiceThenAppliesArmorPenetration()
+    {
+        Assert.Equal(0, OriginalWeaponCombat.DamageFor(9, 20, new MaximumRandom()));
+        Assert.Equal(17, OriginalWeaponCombat.DamageFor(0, 7, new MaximumRandom()));
+        Assert.Equal(10, OriginalWeaponCombat.DamageFor(44, 10, new MaximumRandom()));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            OriginalWeaponCombat.DamageFor(0, -1, new Random(1)));
+    }
+
+    [Fact]
+    public void OriginalCombatantTemplatesRetainExecutableArmorAndHealth()
+    {
+        Assert.Equal(new OriginalCombatantTemplate(7, 12), OriginalCombatantTemplates.For(0));
+        Assert.Equal(new OriginalCombatantTemplate(8, 15), OriginalCombatantTemplates.For(1));
+        Assert.Equal(new OriginalCombatantTemplate(10, 20), OriginalCombatantTemplates.For(9));
+        Assert.Throws<ArgumentOutOfRangeException>(() => OriginalCombatantTemplates.For(10));
     }
 
     [Fact]
@@ -714,6 +744,8 @@ public sealed partial class ResourceAndDefinitionTests
             blocks[offset + 94] = 0xcc;
             blocks[offset + 95] = 0xcc;
         }
+        BinaryPrimitives.WriteInt16LittleEndian(
+            blocks.AsSpan(6 * DynamixSceneDecoder.BlockSize + 0x4a, sizeof(short)), 9);
 
         var map = new byte[DynamixSceneDecoder.MapSize];
         SetSceneCell(map, 11, 20, 1);
@@ -755,6 +787,11 @@ public sealed partial class ResourceAndDefinitionTests
         public bool TryAddItem(int index) { _items[index] = _items.GetValueOrDefault(index) + 1; return true; }
         public bool TryClearItem(int index) => _items.Remove(index);
         public bool HasItem(int index) => _items.GetValueOrDefault(index) != 0;
+    }
+
+    private sealed class MaximumRandom : Random
+    {
+        public override int Next(int maxValue) => maxValue - 1;
     }
 
     private static byte[] SyntheticSmacker()

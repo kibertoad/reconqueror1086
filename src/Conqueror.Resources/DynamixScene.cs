@@ -34,6 +34,7 @@ public sealed record DynamixSceneBlock(
     int Surface2,
     int Surface3,
     int StateTarget,
+    int ActorTemplate,
     string Name)
 {
     public int TextureForFace(DynamixSceneFace face) => face switch
@@ -157,6 +158,7 @@ public static class DynamixSceneDecoder
                 ReadInt32(record, 52),
                 ReadInt32(record, 56),
                 ReadInt32(record, 64),
+                BinaryPrimitives.ReadInt16LittleEndian(record.Slice(0x4a, sizeof(short))),
                 DecodeName(record.Slice(BlockNameOffset, BlockNameSize), index));
             if (decoded.TextureReferences()
                 .Any(surface => surface < -1 || surface >= textureCount))

@@ -14,6 +14,25 @@ public static class OriginalWeaponCombat
         1, 0, 1, 3, 2, 1, 1, 3, 1, 3, 3, 6, 6
     ];
 
+    // CONQUER.EXE object 2 offset 0xCE14, columns 0-2 of each 28-byte row.
+    private static readonly int[] DiceCountsByCombatRow =
+    [
+        1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+        2, 2, 2, 2, 2, 1, 3, 3, 1, 1, 2, 2
+    ];
+
+    private static readonly int[] DieSidesByCombatRow =
+    [
+        6, 5, 5, 4, 9, 8, 9, 8, 5, 7, 9, 8, 8,
+        8, 7, 7, 6, 6, 12, 4, 4, 16, 12, 6, 7
+    ];
+
+    private static readonly int[] ArmorPenetrationByCombatRow =
+    [
+        4, 5, 6, 3, 6, 5, 3, 4, 2, 6, 0, 2, 1,
+        0, 1, 3, 2, 1, 1, 3, 1, 3, 3, 6, 6
+    ];
+
     // CONQUER.EXE object 2 offset 0xCE24 + 28 * row, column 4 of each combat row.
     // Contact processing at 0x558D4/0x559CA adds 0x40 before comparing range.
     private static readonly int[] ContactDistancesByCombatRow =
@@ -43,4 +62,16 @@ public static class OriginalWeaponCombat
         checked(ContactDistancesByCombatRow[CombatRowFor(itemId)] + 0x40);
 
     public static int GridReachFor(int itemId) => Math.Max(1, ContactDistanceFor(itemId) >> 8);
+
+    public static int DamageFor(int itemId, int targetArmor, Random random)
+    {
+        ArgumentNullException.ThrowIfNull(random);
+        if (targetArmor < 0) throw new ArgumentOutOfRangeException(nameof(targetArmor));
+        var row = CombatRowFor(itemId);
+        var rolled = 0;
+        for (var die = 0; die < DiceCountsByCombatRow[row]; die++)
+            rolled += random.Next(DieSidesByCombatRow[row]) + 1;
+        var mitigation = Math.Max(targetArmor - ArmorPenetrationByCombatRow[row], 0);
+        return Math.Max(rolled - mitigation, 0);
+    }
 }

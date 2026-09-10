@@ -10,6 +10,7 @@ public sealed class SiegeEnemy
     public int X { get; set; }
     public int Y { get; set; }
     public int Health { get; set; }
+    public int? OriginalArmor { get; init; }
     public bool Champion { get; init; }
     public int VisualId { get; init; } = -1;
     public Facing Facing { get; set; }
@@ -20,7 +21,8 @@ public sealed class SiegeEnemy
 }
 
 public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int GarrisonPerEnemy, int BaseChampionHealth, int FoodHealing, int WeaponBreakPercent);
-public sealed record SiegeSpawn(int X, int Y, bool Champion, int VisualId = -1);
+public sealed record SiegeSpawn(int X, int Y, bool Champion, int VisualId = -1,
+    int? OriginalArmor = null, int? OriginalHealth = null);
 public sealed record SiegeObjectStage(int VisualId, SiegeTile Tile);
 public sealed record SiegeObjectSpawn(int X, int Y, IReadOnlyList<SiegeObjectStage> Stages);
 
@@ -152,7 +154,8 @@ public sealed class SiegeSession
                 {
                     X = spawn.X,
                     Y = spawn.Y,
-                    Health = spawn.Champion ? Rules.BaseChampionHealth : 1,
+                    Health = spawn.OriginalHealth ?? (spawn.Champion ? Rules.BaseChampionHealth : 1),
+                    OriginalArmor = spawn.OriginalArmor,
                     Champion = spawn.Champion,
                     VisualId = spawn.VisualId
                 };
@@ -289,7 +292,9 @@ public sealed class SiegeSession
         var hit = _random.Next(220) < chance;
         if (hit)
         {
-            target.Health -= 1 + _player.Stats.Strength / 16;
+            target.Health -= weapon?.OriginalWeaponItemId is { } damageItemId && target.OriginalArmor is { } armor
+                ? OriginalWeaponCombat.DamageFor(damageItemId, armor, _random)
+                : 1 + _player.Stats.Strength / 16;
             if (target.Health > 0) StartVisual(target, SiegeEnemyVisualState.Hit);
             LastMessage = target.Champion ? "You strike the castle champion." : "Your weapon finds its mark.";
             RemoveDead();
@@ -326,7 +331,9 @@ public sealed class SiegeSession
         var target = FirstEnemyAhead(range);
         if (target is not null)
         {
-            target.Health -= 2;
+            target.Health -= weapon?.OriginalWeaponItemId is { } damageItemId && target.OriginalArmor is { } armor
+                ? OriginalWeaponCombat.DamageFor(damageItemId, armor, _random)
+                : 2;
             if (target.Health > 0) StartVisual(target, SiegeEnemyVisualState.Hit);
             RemoveDead(); LastMessage = "The bolt strikes true.";
         }

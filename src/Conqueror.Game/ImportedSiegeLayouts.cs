@@ -59,10 +59,7 @@ public static class ImportedSiegeLayouts
 
         var enemies = points
             .Where(point => IsEnemy(scene.BlockAt(point.X, point.Y)))
-            .Select(point => new SiegeSpawn(point.X - minX, point.Y - minY,
-                scene.BlockAt(point.X, point.Y).Name.Contains("champion", StringComparison.OrdinalIgnoreCase) ||
-                scene.BlockAt(point.X, point.Y).Name.Contains("lord", StringComparison.OrdinalIgnoreCase),
-                scene.BlockIndexAt(point.X, point.Y)))
+            .Select(point => EnemyFor(scene.BlockAt(point.X, point.Y), point.X - minX, point.Y - minY))
             .ToArray();
         var objects = points
             .Where(point => IsSceneObject(scene.BlockAt(point.X, point.Y)))
@@ -150,6 +147,19 @@ public static class ImportedSiegeLayouts
 
     private static bool IsEnemy(DynamixSceneBlock block) =>
         block.Behavior == 135 || IsEnemyName(block.Name);
+
+    private static SiegeSpawn EnemyFor(DynamixSceneBlock block, int x, int y)
+    {
+        OriginalCombatantTemplate template;
+        try { template = OriginalCombatantTemplates.For(block.ActorTemplate); }
+        catch (ArgumentOutOfRangeException exception)
+        {
+            throw new InvalidDataException($"Scene actor {block.Index} references an unknown combatant template.", exception);
+        }
+        var champion = block.Name.Contains("champion", StringComparison.OrdinalIgnoreCase) ||
+            block.Name.Contains("lord", StringComparison.OrdinalIgnoreCase);
+        return new SiegeSpawn(x, y, champion, block.Index, template.Armor, template.Health);
+    }
 
     private static bool IsDestructible(DynamixSceneBlock block) =>
         block.Kind == 4 && (block.Behavior & 0x20) != 0;
