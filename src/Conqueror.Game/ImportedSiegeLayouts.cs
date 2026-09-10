@@ -64,9 +64,13 @@ public static class ImportedSiegeLayouts
                 scene.BlockAt(point.X, point.Y).Name.Contains("lord", StringComparison.OrdinalIgnoreCase),
                 scene.BlockIndexAt(point.X, point.Y)))
             .ToArray();
+        var objects = points
+            .Where(point => IsDestructible(scene.BlockAt(point.X, point.Y)))
+            .Select(point => ObjectFor(scene, point.X, point.Y, minX, minY))
+            .ToArray();
         var heading = (scene.Viewer.Heading + 8192) / 16384 & 3;
         var layout = new SiegeLayout(tiles, scene.Viewer.CellX - minX, scene.Viewer.CellY - minY,
-            (Facing)heading, enemies);
+            (Facing)heading, enemies, objects);
         return (layout, minX, minY);
     }
 
@@ -79,7 +83,7 @@ public static class ImportedSiegeLayouts
         while (pending.Count > 0)
         {
             var point = pending.Dequeue();
-            if (tiles[point.X, point.Y] == SiegeTile.Exit) continue;
+            if (tiles[point.X, point.Y] is SiegeTile.Exit or SiegeTile.Destructible) continue;
             foreach (var (dx, dy) in new[] { (1, 0), (-1, 0), (0, 1), (0, -1) })
             {
                 var x = point.X + dx;
@@ -112,6 +116,7 @@ public static class ImportedSiegeLayouts
         // members of the behavior-19 locked-door family.
         if (block.Behavior == 83) return SiegeTile.Exit;
         if (IsEnemy(block)) return SiegeTile.Floor;
+        if (IsDestructible(block)) return SiegeTile.Destructible;
         // Placed kind-4 behavior-19 records are the scene pickups. Their names
         // distinguish food from equipment/currency while the metadata keeps an
         // unfamiliar pickup name from becoming a wall.
@@ -144,6 +149,43 @@ public static class ImportedSiegeLayouts
 
     private static bool IsEnemy(DynamixSceneBlock block) =>
         block.Behavior == 135 || IsEnemyName(block.Name);
+
+    private static bool IsDestructible(DynamixSceneBlock block) =>
+        block.Kind == 4 && block.Behavior == 35;
+
+    private static SiegeObjectSpawn ObjectFor(DynamixScene scene, int x, int y, int minX, int minY)
+    {
+        var initial = scene.BlockAt(x, y);
+        var stages = new List<SiegeObjectStage> { new(initial.Index, SiegeTile.Destructible) };
+        for (var offset = 1; offset <= 2 && initial.Index + offset < scene.Blocks.Count; offset++)
+        {
+            var candidate = scene.Blocks[initial.Index + offset];
+            if (!IsObjectState(initial.Name, candidate.Name, offset)) break;
+            var tile = candidate.Kind == 4 && candidate.Behavior == 35
+                ? SiegeTile.Destructible
+                : candidate.Kind == 4 && candidate.Behavior == 19 &&
+                  candidate.Name.Contains("meal", StringComparison.OrdinalIgnoreCase)
+                    ? SiegeTile.Barrel
+                    : SiegeTile.Floor;
+            stages.Add(new(candidate.Index, tile));
+        }
+        return new SiegeObjectSpawn(x - minX, y - minY, stages);
+    }
+
+    private static bool IsObjectState(string initialName, string candidateName, int offset)
+    {
+        if (initialName.Equals("barrel", StringComparison.OrdinalIgnoreCase))
+            return offset == 1
+                ? candidateName.Contains("meal", StringComparison.OrdinalIgnoreCase)
+                : candidateName.Contains("barrel", StringComparison.OrdinalIgnoreCase);
+        return ObjectRoot(initialName).Equals(ObjectRoot(candidateName), StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string ObjectRoot(string name) => name
+        .Replace("destroyed ", "", StringComparison.OrdinalIgnoreCase)
+        .Replace("broken ", "", StringComparison.OrdinalIgnoreCase)
+        .Replace(" chopped", "", StringComparison.OrdinalIgnoreCase)
+        .Trim();
 
     private static bool IsEnemyName(string name) =>
         name.Contains("knight", StringComparison.OrdinalIgnoreCase) ||

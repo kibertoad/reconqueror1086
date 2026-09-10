@@ -8,6 +8,7 @@ public readonly record struct SiegeRayHit(
     double Distance, SiegeTile Tile, bool HitVerticalSide, SiegeWallFace Face,
     int MapX, int MapY, double TextureOffset);
 public readonly record struct SiegeEnemyProjection(double ScreenPosition, double ForwardDistance, SiegeEnemy Enemy);
+public readonly record struct SiegeObjectProjection(double ScreenPosition, double ForwardDistance, SiegeObject Object);
 public readonly record struct SiegeEnemyFrame(int DirectionOffset, bool FlipHorizontally);
 
 public static class SiegeViewProjection
@@ -84,6 +85,27 @@ public static class SiegeViewProjection
             var screen = 0.5 + lateral / (forward * 2.0 * Math.Tan(FieldOfView / 2.0));
             if (screen is < -0.25 or > 1.25) continue;
             result.Add(new SiegeEnemyProjection(screen, forward, enemy));
+        }
+        return result.OrderByDescending(item => item.ForwardDistance).ToArray();
+    }
+
+    public static IReadOnlyList<SiegeObjectProjection> ProjectObjects(SiegeSession siege)
+    {
+        ArgumentNullException.ThrowIfNull(siege);
+        var (forwardX, forwardY) = Direction(siege.Facing);
+        var rightX = -forwardY;
+        var rightY = forwardX;
+        var result = new List<SiegeObjectProjection>();
+        foreach (var item in siege.Objects)
+        {
+            var dx = item.X - siege.PlayerX;
+            var dy = item.Y - siege.PlayerY;
+            var forward = dx * forwardX + dy * forwardY;
+            if (forward <= 0.05 || forward > MaximumDistance) continue;
+            var lateral = dx * rightX + dy * rightY;
+            var screen = 0.5 + lateral / (forward * 2.0 * Math.Tan(FieldOfView / 2.0));
+            if (screen is < -0.25 or > 1.25) continue;
+            result.Add(new SiegeObjectProjection(screen, forward, item));
         }
         return result.OrderByDescending(item => item.ForwardDistance).ToArray();
     }

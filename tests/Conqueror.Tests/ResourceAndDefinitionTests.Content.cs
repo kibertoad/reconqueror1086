@@ -49,6 +49,84 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void DestructibleSceneObjectsAdvanceThroughTheirResourceStates()
+    {
+        var tiles = new SiegeTile[5, 3];
+        for (var x = 0; x < 5; x++)
+        for (var y = 0; y < 3; y++)
+            tiles[x, y] = x == 0 || y == 0 || x == 4 || y == 2 ? SiegeTile.Wall : SiegeTile.Floor;
+        tiles[2, 1] = SiegeTile.Destructible;
+        var stages = new[]
+        {
+            new SiegeObjectStage(10, SiegeTile.Destructible),
+            new SiegeObjectStage(11, SiegeTile.Destructible),
+            new SiegeObjectStage(12, SiegeTile.Floor)
+        };
+        var siege = new SiegeSession(new Player(), new Army(), 0, 1,
+            new SiegeLayout(tiles, 1, 1, Facing.East, [], [new SiegeObjectSpawn(2, 1, stages)]));
+
+        Assert.Equal(SiegeAction.Blocked, siege.Move(true));
+        Assert.Equal(10, Assert.Single(SiegeViewProjection.ProjectObjects(siege)).Object.VisualId);
+        Assert.Equal(SiegeAction.Hit, siege.Attack());
+        Assert.Equal((1, 11, SiegeTile.Destructible),
+            (Assert.Single(siege.Objects).State, Assert.Single(siege.Objects).VisualId, siege.TileAt(2, 1)));
+        Assert.Equal(SiegeAction.Hit, siege.Attack());
+        Assert.Equal((2, 12, SiegeTile.Floor),
+            (Assert.Single(siege.Objects).State, Assert.Single(siege.Objects).VisualId, siege.TileAt(2, 1)));
+        Assert.Equal(SiegeAction.Moved, siege.Move(true));
+    }
+
+    [Fact]
+    public void ImportedDestructibleUsesAdjacentNamedResourceStates()
+    {
+        var source = SyntheticScene();
+        SetSceneBlockName(source.Blocks, 4, "tree");
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 4, 4);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 4 + 4, 35);
+        SetSceneBlockName(source.Blocks, 5, "tree chopped");
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 5, 4);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 5 + 4, 35);
+        SetSceneBlockName(source.Blocks, 6, "destroyed tree");
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 6, 4);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 6 + 4, 1);
+        SetSceneCell(source.Map, 13, 20, 0);
+        SetSceneCell(source.Map, 14, 20, 0);
+
+        var layout = ImportedSiegeLayouts.Convert(DynamixSceneDecoder.Decode(
+            source.Viewer, source.Scenario, source.Map, source.Blocks));
+
+        var item = Assert.Single(layout.Objects);
+        Assert.Equal((9, 20), (item.X, item.Y));
+        Assert.Equal([(4, SiegeTile.Destructible), (5, SiegeTile.Destructible), (6, SiegeTile.Floor)],
+            item.Stages.Select(stage => (stage.VisualId, stage.Tile)));
+    }
+
+    [Fact]
+    public void DestructibleBarrelRevealsFoodBeforeBecomingDebris()
+    {
+        var tiles = new SiegeTile[5, 3];
+        for (var x = 0; x < 5; x++)
+        for (var y = 0; y < 3; y++)
+            tiles[x, y] = x == 0 || y == 0 || x == 4 || y == 2 ? SiegeTile.Wall : SiegeTile.Floor;
+        tiles[2, 1] = SiegeTile.Destructible;
+        var stages = new[]
+        {
+            new SiegeObjectStage(20, SiegeTile.Destructible),
+            new SiegeObjectStage(21, SiegeTile.Barrel),
+            new SiegeObjectStage(22, SiegeTile.Floor)
+        };
+        var siege = new SiegeSession(new Player(), new Army(), 0, 1,
+            new SiegeLayout(tiles, 1, 1, Facing.East, [], [new SiegeObjectSpawn(2, 1, stages)]));
+
+        Assert.Equal(SiegeAction.Hit, siege.Attack());
+        Assert.Equal((1, 21, SiegeTile.Barrel),
+            (Assert.Single(siege.Objects).State, Assert.Single(siege.Objects).VisualId, siege.TileAt(2, 1)));
+        Assert.Equal(SiegeAction.Healed, siege.Move(true));
+        Assert.Equal((2, 22, SiegeTile.Floor),
+            (Assert.Single(siege.Objects).State, Assert.Single(siege.Objects).VisualId, siege.TileAt(2, 1)));
+    }
+
+    [Fact]
     public void FatalAndWoundingHitsUseTheirExecutableBloodRuns()
     {
         Assert.Equal(new SiegeFrameRun(43, 4), SiegeCombatPresentation.BloodFramesFor(true));

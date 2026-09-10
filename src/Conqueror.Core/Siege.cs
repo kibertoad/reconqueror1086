@@ -1,7 +1,7 @@
 namespace Conqueror.Core;
 
 public enum Facing { North, East, South, West }
-public enum SiegeTile { Floor, Wall, Door, SecretDoor, OpeningDoor, Barrel, Treasure, Exit }
+public enum SiegeTile { Floor, Wall, Door, SecretDoor, OpeningDoor, Barrel, Treasure, Exit, Destructible }
 public enum SiegeAction { None, Moved, Blocked, DoorOpened, Healed, Looted, Hit, Missed, WeaponBroke, Shot, NoAmmunition, Exited }
 public enum SiegeEnemyVisualState { Walk, Attack, Hit, Dying }
 
@@ -21,12 +21,39 @@ public sealed class SiegeEnemy
 
 public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int GarrisonPerEnemy, int BaseChampionHealth, int FoodHealing, int WeaponBreakPercent);
 public sealed record SiegeSpawn(int X, int Y, bool Champion, int VisualId = -1);
+public sealed record SiegeObjectStage(int VisualId, SiegeTile Tile);
+public sealed record SiegeObjectSpawn(int X, int Y, IReadOnlyList<SiegeObjectStage> Stages);
+
+public sealed class SiegeObject
+{
+    private readonly SiegeObjectStage[] _stages;
+
+    internal SiegeObject(SiegeObjectSpawn spawn)
+    {
+        X = spawn.X;
+        Y = spawn.Y;
+        _stages = spawn.Stages.ToArray();
+    }
+
+    public int X { get; }
+    public int Y { get; }
+    public int State { get; private set; }
+    public int VisualId => _stages[State].VisualId;
+    public SiegeTile Tile => _stages[State].Tile;
+    internal bool Advance()
+    {
+        if (State + 1 >= _stages.Length) return false;
+        State++;
+        return true;
+    }
+}
 
 public sealed class SiegeLayout
 {
     private readonly SiegeTile[,] _tiles;
 
-    public SiegeLayout(SiegeTile[,] tiles, int playerX, int playerY, Facing facing, IReadOnlyList<SiegeSpawn> enemies)
+    public SiegeLayout(SiegeTile[,] tiles, int playerX, int playerY, Facing facing, IReadOnlyList<SiegeSpawn> enemies,
+        IReadOnlyList<SiegeObjectSpawn>? objects = null)
     {
         ArgumentNullException.ThrowIfNull(tiles);
         ArgumentNullException.ThrowIfNull(enemies);
@@ -38,18 +65,24 @@ public sealed class SiegeLayout
             throw new ArgumentException("Siege enemy starts outside the layout.", nameof(enemies));
         if (enemies.GroupBy(enemy => (enemy.X, enemy.Y)).Any(group => group.Count() > 1))
             throw new ArgumentException("Siege enemies cannot share a map cell.", nameof(enemies));
+        objects ??= [];
+        if (objects.Any(item => item.X < 0 || item.Y < 0 || item.X >= tiles.GetLength(0) || item.Y >= tiles.GetLength(1)
+                || item.Stages.Count == 0))
+            throw new ArgumentException("Siege objects require a map cell and at least one state.", nameof(objects));
 
         _tiles = (SiegeTile[,])tiles.Clone();
         PlayerX = playerX;
         PlayerY = playerY;
         Facing = facing;
         Enemies = enemies.ToArray();
+        Objects = objects.ToArray();
     }
 
     public int PlayerX { get; }
     public int PlayerY { get; }
     public Facing Facing { get; }
     public IReadOnlyList<SiegeSpawn> Enemies { get; }
+    public IReadOnlyList<SiegeObjectSpawn> Objects { get; }
     public SiegeTile[,] CopyTiles() => (SiegeTile[,])_tiles.Clone();
 }
 
@@ -66,6 +99,8 @@ public sealed class SiegeSession
     private readonly Dictionary<(int X, int Y), double> _openingDoors = [];
     public IReadOnlyList<SiegeEnemy> Enemies => _enemies;
     private readonly List<SiegeEnemy> _enemies = [];
+    public IReadOnlyList<SiegeObject> Objects => _objects;
+    private readonly List<SiegeObject> _objects = [];
 
     public int PlayerX { get; private set; } = 1;
     public int PlayerY { get; private set; } = 1;
@@ -124,6 +159,7 @@ public sealed class SiegeSession
                 enemy.Facing = DirectionToward(enemy.X, enemy.Y, PlayerX, PlayerY, Facing.South);
                 _enemies.Add(enemy);
             }
+            _objects.AddRange(layout.Objects.Select(spawn => new SiegeObject(spawn)));
         }
         else
         {
@@ -145,6 +181,7 @@ public sealed class SiegeSession
 
     public SiegeTile TileAt(int x, int y) => x < 0 || y < 0 || x >= Width || y >= Height ? SiegeTile.Wall : _map[x, y];
     public SiegeEnemy? EnemyAt(int x, int y) => _enemies.FirstOrDefault(e => e.Health > 0 && e.X == x && e.Y == y);
+    public SiegeObject? ObjectAt(int x, int y) => _objects.FirstOrDefault(item => item.X == x && item.Y == y);
 
     public double? DoorOpeningProgress(int x, int y) => _openingDoors.TryGetValue((x, y), out var elapsed)
         ? Math.Clamp(elapsed / DoorOpeningSeconds, 0, 1)
@@ -208,7 +245,7 @@ public sealed class SiegeSession
             LastMessage = "You leave the battle.";
             return SiegeAction.Exited;
         }
-        if (tile is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor || EnemyAt(nx, ny) is not null)
+        if (tile is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor or SiegeTile.Destructible || EnemyAt(nx, ny) is not null)
         {
             LastMessage = "The way is blocked."; TickEnemies(); return SiegeAction.Blocked;
         }
@@ -235,7 +272,17 @@ public sealed class SiegeSession
         var weapon = Balance.Equipment.FirstOrDefault(x => x.Name.Equals(_player.Inventory.Weapon, StringComparison.OrdinalIgnoreCase));
         var reach = weapon is null ? 1 : Math.Clamp(weapon.Power / 70, 1, 2);
         var target = FirstEnemyAhead(reach);
-        if (target is null) { LastMessage = "Your blow meets empty air."; TickEnemies(); return SiegeAction.Missed; }
+        if (target is null)
+        {
+            if (FirstDestructibleAhead(reach) is { } obstacle)
+            {
+                AdvanceObject(obstacle);
+                LastMessage = "You smash through the obstacle.";
+                TickEnemies();
+                return SiegeAction.Hit;
+            }
+            LastMessage = "Your blow meets empty air."; TickEnemies(); return SiegeAction.Missed;
+        }
         var chance = Math.Clamp((weapon?.Power ?? 35) + _player.Stats.Dexterity * 3 - (target.Champion ? 35 : 0), 15, 210);
         var hit = _random.Next(220) < chance;
         if (hit)
@@ -286,7 +333,7 @@ public sealed class SiegeSession
         for (var distance = 1; distance <= 8; distance++)
         {
             var x = PlayerX + dx * distance; var y = PlayerY + dy * distance;
-            if (TileAt(x, y) is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor or SiegeTile.Exit) return 0;
+            if (TileAt(x, y) is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor or SiegeTile.Exit or SiegeTile.Destructible) return 0;
             if (EnemyAt(x, y) is not null) return distance;
         }
         return 0;
@@ -305,7 +352,9 @@ public sealed class SiegeSession
         var tile = TileAt(PlayerX, PlayerY);
         if (tile == SiegeTile.Barrel)
         {
-            Health = Math.Min(MaxHealth, Health + Rules.FoodHealing); _map[PlayerX, PlayerY] = SiegeTile.Floor;
+            Health = Math.Min(MaxHealth, Health + Rules.FoodHealing);
+            if (ObjectAt(PlayerX, PlayerY) is { } item && item.Advance()) _map[PlayerX, PlayerY] = item.Tile;
+            else _map[PlayerX, PlayerY] = SiegeTile.Floor;
             LastMessage = $"Food restores {Rules.FoodHealing} health."; return SiegeAction.Healed;
         }
         if (tile == SiegeTile.Treasure)
@@ -365,10 +414,29 @@ public sealed class SiegeSession
         for (var i = 1; i <= range; i++)
         {
             var x = PlayerX + dx * i; var y = PlayerY + dy * i;
-            if (TileAt(x, y) is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor or SiegeTile.Exit) return null;
+            if (TileAt(x, y) is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor or SiegeTile.Exit or SiegeTile.Destructible) return null;
             if (EnemyAt(x, y) is { } enemy) return enemy;
         }
         return null;
+    }
+
+    private SiegeObject? FirstDestructibleAhead(int range)
+    {
+        var (dx, dy) = Direction(Facing);
+        for (var i = 1; i <= range; i++)
+        {
+            var x = PlayerX + dx * i; var y = PlayerY + dy * i;
+            if (TileAt(x, y) == SiegeTile.Destructible) return ObjectAt(x, y);
+            if (TileAt(x, y) is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor or SiegeTile.Exit)
+                return null;
+            if (EnemyAt(x, y) is not null) return null;
+        }
+        return null;
+    }
+
+    private void AdvanceObject(SiegeObject item)
+    {
+        _map[item.X, item.Y] = item.Advance() ? item.Tile : SiegeTile.Floor;
     }
 
     private void RemoveDead()
