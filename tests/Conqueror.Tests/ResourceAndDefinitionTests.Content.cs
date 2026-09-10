@@ -31,7 +31,7 @@ public sealed partial class ResourceAndDefinitionTests
             27, 27, 27, 41, 41, 41, 41, 33, 33, 36, 36
         ];
 
-        Assert.Equal(expectedRows, Enumerable.Range(0, 23).Select(SiegeCombatPresentation.OriginalCombatRowFor));
+        Assert.Equal(expectedRows, Enumerable.Range(0, 23).Select(OriginalWeaponCombat.CombatRowFor));
         Assert.Equal(expectedBases, Enumerable.Range(0, 23).Select(SiegeCombatPresentation.OriginalForegroundBaseFor));
         Assert.All(Balance.Equipment.Where(item => item.Slot == EquipmentSlot.Weapon && item.OriginalStoreRecord is not null),
             item =>
@@ -40,7 +40,10 @@ public sealed partial class ResourceAndDefinitionTests
                 var expectedAttackStart = foregroundBase == 41 ? 42 : foregroundBase;
                 Assert.Equal(expectedAttackStart, SiegeCombatPresentation.AttackFramesFor(item.Name).Start);
             });
-        Assert.Throws<ArgumentOutOfRangeException>(() => SiegeCombatPresentation.OriginalCombatRowFor(23));
+        Assert.Equal(
+            [500, 450, 250, 250, 350, 200, 300, 400, 500, 300, 200, 300, 250, 250, 350, 350, null, 450, 500, 350, 250, 350, 350],
+            Enumerable.Range(0, 23).Select(OriginalWeaponCombat.BreakRollRangeFor));
+        Assert.Throws<ArgumentOutOfRangeException>(() => OriginalWeaponCombat.CombatRowFor(23));
     }
 
     [Fact]

@@ -232,7 +232,8 @@ public sealed class SiegeSession
         var target = FirstEnemyAhead(reach);
         if (target is null) { LastMessage = "Your blow meets empty air."; TickEnemies(); return SiegeAction.Missed; }
         var chance = Math.Clamp((weapon?.Power ?? 35) + _player.Stats.Dexterity * 3 - (target.Champion ? 35 : 0), 15, 210);
-        if (_random.Next(220) < chance)
+        var hit = _random.Next(220) < chance;
+        if (hit)
         {
             target.Health -= 1 + _player.Stats.Strength / 16;
             if (target.Health > 0) StartVisual(target, SiegeEnemyVisualState.Hit);
@@ -240,7 +241,14 @@ public sealed class SiegeSession
             RemoveDead();
         }
         else LastMessage = "The enemy turns your blow.";
-        var broke = weapon is not null && weapon.BuyPrice > 0 && _random.Next(100) < Rules.WeaponBreakPercent;
+        var originalItemId = weapon?.OriginalStoreRecord;
+        var usesOriginalBreakRule = originalItemId is >= 0 and <= 22;
+        var originalBreakRange = usesOriginalBreakRule
+            ? OriginalWeaponCombat.BreakRollRangeFor(originalItemId!.Value)
+            : null;
+        var broke = !hit && weapon is not null && weapon.BuyPrice > 0 && (usesOriginalBreakRule
+            ? originalBreakRange is { } range && _random.Next(range) == 0
+            : _random.Next(100) < Rules.WeaponBreakPercent);
         if (broke)
         {
             _player.Inventory.Items.Remove(weapon!.Name);
