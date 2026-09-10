@@ -36,6 +36,7 @@ public static class ImportedArt
         new("Village.Inn", "image", ":innpeopl.pcx"),
         new("Blacksmith.Workshop", "image", ":forgesmi.pcx"),
         new("Dialogue.Frame", "image", ":comscrn1.pcx"),
+        new("Dragon.Background", "image", ":drjstwin.pcx"),
         new("Blacksmith.Portrait", "image", ":blacksmi.pcc"),
         new("Shop.Inventory", "image", ":swdtemp.pcx"),
         new("Tournament.Richard", "image", ":richard.pcc"),
@@ -83,6 +84,7 @@ public static class ImportedAnimations
         new("Shop.Controls", ":buysell.csf", "Shop.Inventory"),
         new("Interface.Cursor", ":ffmouse.csf", "Estate.Shell"),
         new("Combat.FirstPerson", ":skirmish.csf", "", ":SKIRMISH.PAL"),
+        new("Dragon.Lance", ":lance1.csf", "Dragon.Background"),
         .. EstatePresentationDefinitions.TileAtlases.Select(atlas =>
             new ImportedAnimationDefinition(atlas.Role, atlas.IdSuffix, "Estate.Shell"))
     ];
@@ -104,7 +106,9 @@ public static class ImportedMovies
         new("Options.Credits", "/creditzz.smk"),
         new("Practice.Joust", "/jousprac.smk"),
         new("Travel.DragonLair", "/trandrag.smk"),
-        new("Ending.DragonVictory", "/drjstwin.smk")
+        new("Ending.DragonVictory", "/drjstwin.smk"),
+        new("Ending.DragonDefeat", "/drjstlse.smk"),
+        new("Dragon.Retreat", "/drjstrun.smk")
     ];
 }
 

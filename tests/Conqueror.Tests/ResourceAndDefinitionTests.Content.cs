@@ -30,6 +30,8 @@ public sealed partial class ResourceAndDefinitionTests
             ControllerInputBindings.ButtonsFor(Keys.W, ControllerInputContext.Siege));
         Assert.Contains(Buttons.A,
             ControllerInputBindings.ButtonsFor(Keys.A, ControllerInputContext.FieldBattle));
+        Assert.Contains(Buttons.A,
+            ControllerInputBindings.ButtonsFor(Keys.Space, ControllerInputContext.DragonBattle));
 
         var moved = ControllerInputBindings.MovePointer(new Vector2(638, 2), new Vector2(1, 1), 1);
         Assert.Equal(new Vector2(639, 0), moved);
@@ -43,11 +45,19 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
-    public void DragonTravelAndVictoryMoviesUseTheirOwnedDiscSequences()
+    public void DragonEncounterUsesItsOwnedArtAnimationAndOutcomeMovies()
     {
+        Assert.Contains(new ImportedArtDefinition("Dragon.Background", "image", ":drjstwin.pcx"),
+            ImportedArt.Definitions);
+        Assert.Contains(new ImportedAnimationDefinition("Dragon.Lance", ":lance1.csf", "Dragon.Background"),
+            ImportedAnimations.Definitions);
         Assert.Contains(new ImportedMovieDefinition("Travel.DragonLair", "/trandrag.smk"),
             ImportedMovies.Definitions);
         Assert.Contains(new ImportedMovieDefinition("Ending.DragonVictory", "/drjstwin.smk"),
+            ImportedMovies.Definitions);
+        Assert.Contains(new ImportedMovieDefinition("Ending.DragonDefeat", "/drjstlse.smk"),
+            ImportedMovies.Definitions);
+        Assert.Contains(new ImportedMovieDefinition("Dragon.Retreat", "/drjstrun.smk"),
             ImportedMovies.Definitions);
         Assert.Equal(ImportedMovies.Definitions.Count,
             ImportedMovies.Definitions.Select(movie => movie.Role).Distinct(StringComparer.Ordinal).Count());

@@ -39,6 +39,13 @@ public sealed class DragonBattleSession
         AimY = Math.Clamp(AimY + vertical * Rules.AimSpeed * elapsedSeconds, 0, 1);
     }
 
+    public void SetAim(double x, double y)
+    {
+        if (Outcome != DragonBattleOutcome.InProgress) return;
+        AimX = Math.Clamp(x, 0, 1);
+        AimY = Math.Clamp(y, 0, 1);
+    }
+
     public void Tick(double elapsedSeconds)
     {
         if (Outcome != DragonBattleOutcome.InProgress || elapsedSeconds <= 0) return;

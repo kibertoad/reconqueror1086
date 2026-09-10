@@ -45,7 +45,7 @@ The importer also validates stored CSF files as indexed animation sequences. The
 - Three-joust/one-skirmish tournament limits, selectable ladies, individual eligibility rules, multi-stage reward ladders, and marriage
 - First-person castle simulation with facing and movement, doors and secret rooms, melee reach, crossbows and ammunition, enemy pursuit, champions, armor checks, commandable retainers, food, treasure, breakable weapons, radar, retreat losses, and progression
 - Equipment catalog with the original shop prices and armor-bar values
-- Crown victory by conquering London's real garrison, dragon victory route, campaign defeat, journal, save/load
+- Crown victory by conquering London's real garrison; timed dragon-eye encounter with keyboard, mouse, and controller aim; campaign defeat, journal, save/load
 
 ## Verification
 
@@ -65,6 +65,6 @@ The read-only `tools/Conqueror.Inspect` utility inventories the mixed-mode GOG C
 
 ## Original media
 
-The project is playable without copyrighted media. When locally imported from an owned GOG installation, original screens, CD audio, and directly decoded Smacker title, credits, item, dragon-lair travel, and dragon-victory movies are activated from ignored user content. `C1086.GOB`, the raw CD tracks, Smacker movies, and CD audio are intentionally not copied into this repository. See `docs/fidelity.md` for the fidelity ledger and remaining audiovisual work.
+The project is playable without copyrighted media. When locally imported from an owned GOG installation, original screens, CD audio, the dragon screen and lance animation, and directly decoded Smacker title, credits, item, dragon-lair travel, and dragon-outcome movies are activated from ignored user content. `C1086.GOB`, the raw CD tracks, Smacker movies, and CD audio are intentionally not copied into this repository. See `docs/fidelity.md` for the fidelity ledger and remaining audiovisual work.
 
 The complete phased backlog and acceptance criteria are tracked in [`docs/implementation-plan.md`](docs/implementation-plan.md).

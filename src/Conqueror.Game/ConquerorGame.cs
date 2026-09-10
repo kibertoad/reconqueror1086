@@ -49,7 +49,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     }
     private const string OriginalCursorAnimationRole = "Interface.Cursor";
 
-    private enum Screen { Title, Movie, OptionsHub, Practice, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Briefing, Map, Home, WarPlanning, Farm, Village, Inn, InnDialogue, Blacksmith, BlacksmithDialogue, Shop, Tournament, FieldBattle, Siege, Overview, Ending }
+    private enum Screen { Title, Movie, OptionsHub, Practice, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Briefing, Map, Home, WarPlanning, Farm, Village, Inn, InnDialogue, Blacksmith, BlacksmithDialogue, Shop, Tournament, FieldBattle, Siege, DragonBattle, Overview, Ending }
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _batch = null!;
     private Texture2D _pixel = null!;
@@ -108,6 +108,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private double _siegeImpactElapsed;
     private bool _showRadar = true;
     private FieldBattleSession? _fieldBattle;
+    private DragonBattleSession? _dragonBattle;
     private PracticeCombatKind? _activePracticeCombat;
     private UnitType _selectedUnit = UnitType.Swordsmen;
     private double _battleTick;
@@ -374,6 +375,14 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
             else if (_screen == Screen.FieldBattle && _activePracticeCombat is not null) FinishPracticeCombat("PRACTICE ENDED");
             else if (_screen == Screen.Siege && _activePracticeCombat is not null) FinishPracticeCombat("PRACTICE ENDED");
             else if (_screen == Screen.FieldBattle && _fieldBattle is not null) { _fieldBattle.IssueAll(UnitOrder.Withdraw); _notice = "WITHDRAWAL ORDERED"; }
+            else if (_screen == Screen.DragonBattle && _dragonBattle is not null)
+            {
+                _dragonBattle.Withdraw();
+                ResolveDragonBattle();
+                _last = keys; _lastGamePad = gamePad; _lastMouse = mouse;
+                base.Update(gameTime);
+                return;
+            }
             else { if (_screen == Screen.Siege && _siege is not null) _campaign.FinishSiege(_siege); _screen = Screen.Map; }
         }
 
@@ -423,6 +432,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.Tournament: UpdateTournament(Press); break;
             case Screen.FieldBattle: UpdateFieldBattle(Press, gameTime); break;
             case Screen.Siege: UpdateSiege(Press, gameTime); break;
+            case Screen.DragonBattle: UpdateDragonBattle(Press, keys, gamePad, mouse, click, gameTime); break;
             case Screen.Overview: if (Press(Keys.Enter) || Press(Keys.O)) _screen = _overviewReturnScreen; break;
             case Screen.Ending: if (Press(Keys.Enter)) _screen = Screen.Title; break;
         }
@@ -736,6 +746,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         _fiefCheckpoint = null;
         _hasActiveCampaign = true;
         _fieldBattle = null;
+        _dragonBattle = null;
         _siege = null;
         ClearSiegeVisuals();
         _youthDilemmaResult = null;
@@ -885,8 +896,12 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
             ? $"SPY REPORTS {_campaign.GarrisonAt(_selectedLocation)} SOLDIERS AT {World.Locations[_selectedLocation].Name}"
             : "SPY NOT SENT (NEED HOSTILE CASTLE AND 80S)";
         if (press(Keys.C)) _notice = "TO CLAIM THE CROWN, TRAVEL TO LONDON AND PRESS S TO BESIEGE IT";
-        if (press(Keys.D) && _campaign.AttemptDragon())
-            PlayEventMovie("Ending.DragonVictory", Screen.Ending);
+        if (press(Keys.D))
+        {
+            _dragonBattle = _campaign.BeginDragonBattle();
+            if (_dragonBattle is not null) { _screen = Screen.DragonBattle; _notice = _dragonBattle.LastMessage.ToUpperInvariant(); }
+            else _notice = "DRAGON CHALLENGE REQUIRES THE MOOR, MIGHTY STRENGTH, ARMOR, SHIELD, AND LANCE";
+        }
         if (press(Keys.E)) { _campaign.AdvanceDays(_campaign.State.DaySpeed); Autosave(); }
         if (press(Keys.OemPlus) || press(Keys.Add)) _campaign.State.DaySpeed = Math.Min(15, _campaign.State.DaySpeed + 1);
         if (press(Keys.OemMinus) || press(Keys.Subtract)) _campaign.State.DaySpeed = Math.Max(1, _campaign.State.DaySpeed - 1);

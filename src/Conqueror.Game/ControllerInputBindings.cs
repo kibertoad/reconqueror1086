@@ -13,7 +13,8 @@ public enum ControllerInputContext
     Map,
     Dialogue,
     FieldBattle,
-    Siege
+    Siege,
+    DragonBattle
 }
 
 public static class ControllerInputBindings
@@ -51,7 +52,8 @@ public static class ControllerInputBindings
                 (Keys.S, [Buttons.DPadDown, Buttons.LeftThumbstickDown]),
                 (Keys.A, [Buttons.DPadLeft, Buttons.LeftThumbstickLeft]),
                 (Keys.D, [Buttons.DPadRight, Buttons.LeftThumbstickRight]),
-                (Keys.X, [Buttons.RightShoulder]), (Keys.R, [Buttons.LeftShoulder]), (Keys.M, [Buttons.RightStick]))
+                (Keys.X, [Buttons.RightShoulder]), (Keys.R, [Buttons.LeftShoulder]), (Keys.M, [Buttons.RightStick])),
+            [ControllerInputContext.DragonBattle] = Bind((Keys.Space, Buttons.A))
         };
 
     public static bool IsPressed(Keys key, ControllerInputContext context, GamePadState current, GamePadState previous) =>

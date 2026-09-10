@@ -34,6 +34,7 @@ public sealed partial class ConquerorGame
         Screen.InnDialogue or Screen.BlacksmithDialogue => ControllerInputContext.Dialogue,
         Screen.FieldBattle => ControllerInputContext.FieldBattle,
         Screen.Siege => ControllerInputContext.Siege,
+        Screen.DragonBattle => ControllerInputContext.DragonBattle,
         _ => ControllerInputContext.General
     };
 }
