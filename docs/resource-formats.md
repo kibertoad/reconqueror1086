@@ -141,6 +141,8 @@ The foreground renderer at `0x5529B`-`0x55448` selects stored offset 2 on a mele
 
 The first three signed dwords of each 28-byte combat row are dice count, die sides, and armor penetration. The executable rolls `random(sides) + 1` for every die, then subtracts the nonnegative remainder of target armor after penetration and clamps the result to zero. Runtime player attacks with original item and actor metadata and successful imported-actor attacks use this exact calculation; fallback-generated opponents retain the prototype rule until their source model is recovered.
 
+Combat-row column 4 is also used symmetrically for actor contact: the executable selects the attacker's row, adds `0x40`, and compares it with fixed-point Manhattan separation. Imported enemies therefore use their scene-selected combat row for attack reach, allowing crossbow rows 23 and 24 to engage along clear lanes. The runtime's fixed-point-to-grid conversion, path obstruction approximation, and attack cadence remain **Provisional**.
+
 ## Smacker movie container
 
 The CD contains 2,131 Smacker movies occupying 288,867,980 bytes and indexing 182,360 frames. Every movie uses the `SMK2` version. The bounded container parser validates the fixed header, optional ring-frame adjustment, frame-size table, frame-flags table, tree extent, and every aligned frame extent through exact end of file. It supports `SMK4` framing synthetically so the playback boundary is explicit, but no `SMK4` file occurs in this release.

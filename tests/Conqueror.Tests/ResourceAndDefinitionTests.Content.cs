@@ -290,6 +290,34 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void ImportedRangedActorsUseTheirCombatRowContactDistance()
+    {
+        var clear = Corridor(6);
+        var ranged = new SiegeSession(new Player(), new Army(), 0, 1,
+            new SiegeLayout(clear, 1, 1, Facing.East,
+                [new SiegeSpawn(4, 1, false, OriginalCombatRow: 23)]), includeRetainers: false);
+
+        Assert.Equal(SiegeAction.Missed, ranged.Attack());
+        Assert.Equal(SiegeEnemyVisualState.Attack, Assert.Single(ranged.Enemies).VisualState);
+
+        clear[2, 1] = SiegeTile.Wall;
+        var occluded = new SiegeSession(new Player(), new Army(), 0, 1,
+            new SiegeLayout(clear, 1, 1, Facing.East,
+                [new SiegeSpawn(4, 1, false, OriginalCombatRow: 23)]), includeRetainers: false);
+        Assert.Equal(SiegeAction.Missed, occluded.Attack());
+        Assert.Equal(SiegeEnemyVisualState.Walk, Assert.Single(occluded.Enemies).VisualState);
+
+        static SiegeTile[,] Corridor(int width)
+        {
+            var tiles = new SiegeTile[width, 3];
+            for (var x = 0; x < width; x++)
+            for (var y = 0; y < 3; y++)
+                tiles[x, y] = x == 0 || x == width - 1 || y is 0 or 2 ? SiegeTile.Wall : SiegeTile.Floor;
+            return tiles;
+        }
+    }
+
+    [Fact]
     public void OriginalCombatantTemplatesRetainExecutableArmorAndHealth()
     {
         Assert.Equal(new OriginalCombatantTemplate(7, 12), OriginalCombatantTemplates.For(0));

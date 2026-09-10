@@ -399,7 +399,7 @@ public sealed class SiegeSession
         foreach (var enemy in _enemies.Where(enemy => enemy.Health > 0).ToArray())
         {
             var distance = Math.Abs(enemy.X - PlayerX) + Math.Abs(enemy.Y - PlayerY);
-            if (distance == 1)
+            if (CanEnemyAttack(enemy, distance))
             {
                 enemy.Facing = DirectionToward(enemy.X, enemy.Y, PlayerX, PlayerY, enemy.Facing);
                 enemy.WalkFrame = 0;
@@ -442,6 +442,24 @@ public sealed class SiegeSession
             if (EnemyAt(x, y) is { } enemy) return enemy;
         }
         return null;
+    }
+
+    private bool CanEnemyAttack(SiegeEnemy enemy, int distance)
+    {
+        var range = enemy.OriginalCombatRow is { } combatRow
+            ? OriginalWeaponCombat.GridReachForCombatRow(combatRow)
+            : 1;
+        if (distance > range || enemy.X != PlayerX && enemy.Y != PlayerY) return false;
+        var dx = Math.Sign(PlayerX - enemy.X);
+        var dy = Math.Sign(PlayerY - enemy.Y);
+        for (var step = 1; step < distance; step++)
+        {
+            var x = enemy.X + dx * step;
+            var y = enemy.Y + dy * step;
+            if (TileAt(x, y) is not (SiegeTile.Floor or SiegeTile.Barrel or SiegeTile.Treasure) ||
+                EnemyAt(x, y) is not null) return false;
+        }
+        return true;
     }
 
     private SiegeObject? FirstDestructibleAhead(int range)

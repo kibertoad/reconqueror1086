@@ -59,10 +59,18 @@ public static class OriginalWeaponCombat
         return row == 0 ? null : checked(200 + BreakRatingsByCombatRow[row] * 50);
     }
 
-    public static int ContactDistanceFor(int itemId) =>
-        checked(ContactDistancesByCombatRow[CombatRowFor(itemId)] + 0x40);
+    public static int ContactDistanceFor(int itemId) => ContactDistanceForCombatRow(CombatRowFor(itemId));
 
     public static int GridReachFor(int itemId) => Math.Max(1, ContactDistanceFor(itemId) >> 8);
+
+    public static int ContactDistanceForCombatRow(int combatRow)
+    {
+        if ((uint)combatRow >= (uint)CombatRowCount) throw new ArgumentOutOfRangeException(nameof(combatRow));
+        return checked(ContactDistancesByCombatRow[combatRow] + 0x40);
+    }
+
+    public static int GridReachForCombatRow(int combatRow) =>
+        Math.Max(1, ContactDistanceForCombatRow(combatRow) >> 8);
 
     public static int DamageFor(int itemId, int targetArmor, Random random)
         => DamageForCombatRow(CombatRowFor(itemId), targetArmor, random);
