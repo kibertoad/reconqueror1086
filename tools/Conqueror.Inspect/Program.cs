@@ -52,6 +52,7 @@ var renderSmkName = OptionValue(inspectionOptions, "--render-smk=");
 var palettePcxName = OptionValue(inspectionOptions, "--palette-pcx=");
 var disassembleAddresses = OptionValue(inspectionOptions, "--disassemble=");
 var xrefDataOffsets = OptionValue(inspectionOptions, "--xref-data=");
+var xrefCodeAddresses = OptionValue(inspectionOptions, "--xref-code=");
 var fixupSourceAddresses = OptionValue(inspectionOptions, "--fixup-source=");
 var conversationNodeIds = OptionValue(inspectionOptions, "--conversation-nodes=");
 var conversationTextIds = OptionValue(inspectionOptions, "--conversation-text=");
@@ -72,6 +73,13 @@ if (xrefDataOffsets is not null)
     var offsets = xrefDataOffsets.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
         .Select(ParseAddress).ToArray();
     File.WriteAllText(Path.Combine(output, "executable-data-xrefs.txt"), FindLinearExecutableDataReferences(executable, offsets));
+}
+if (xrefCodeAddresses is not null)
+{
+    var executable = Directory.EnumerateFiles(artifactRoot, "CONQUER.EXE", SearchOption.AllDirectories).Single();
+    var addresses = xrefCodeAddresses.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .Select(ParseAddress).ToArray();
+    File.WriteAllText(Path.Combine(output, "executable-code-xrefs.txt"), LinearExecutableCodeReferences.Find(executable, addresses));
 }
 if (fixupSourceAddresses is not null)
 {
