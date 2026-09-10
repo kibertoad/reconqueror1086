@@ -261,6 +261,8 @@ public sealed partial class ConquerorGame
         }
 
         if (!original) DrawText("ESC OR R  RESUME", 150, 640, Color.LightGreen, 2);
+        if (_loadSlot < _saveSlotInfo.Count && !string.IsNullOrEmpty(_saveSlotInfo[_loadSlot].Error))
+            DrawText(_saveSlotInfo[_loadSlot].Error!, 120, 675, Color.Orange, 2, 780);
         DrawText("ARROWS/1-5 LOAD   F8 AUTOSAVE   ESC RESUME", 190, 710, Color.Wheat, 2);
         if (!string.IsNullOrEmpty(_notice)) DrawText(_notice, 250, 740, Color.Gold, 2);
     }

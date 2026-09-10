@@ -684,6 +684,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void LoadSlot(int number)
     {
+        var inspected = _saveSlots.Inspect(number);
         if (!_saveSlots.TryLoad(number, out var campaign, out var error))
         {
             _notice = error ?? "CAMPAIGN COULD NOT BE LOADED";
@@ -693,18 +694,23 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
 
         ApplyLoadedCampaign(campaign!);
         _activeSaveSlot = number;
-        _notice = $"CAMPAIGN LOADED FROM SLOT {number}";
+        _notice = inspected.RecoveredFromBackup
+            ? $"PRIMARY SAVE COULD NOT BE USED; SLOT {number} RECOVERED FROM BACKUP"
+            : $"CAMPAIGN LOADED FROM SLOT {number}";
     }
 
     private void LoadAutosave()
     {
+        var inspected = _saveSlots.InspectAutosave();
         if (!_saveSlots.TryLoadAutosave(out var campaign, out var error))
         {
             _notice = error ?? "AUTOSAVE COULD NOT BE LOADED";
             return;
         }
         ApplyLoadedCampaign(campaign!);
-        _notice = "AUTOSAVE LOADED";
+        _notice = inspected.RecoveredFromBackup
+            ? "PRIMARY AUTOSAVE COULD NOT BE USED; RECOVERED FROM BACKUP"
+            : "AUTOSAVE LOADED";
     }
 
     private void ApplyLoadedCampaign(Campaign campaign)

@@ -3,7 +3,8 @@ setlocal
 cd /d "%~dp0"
 
 set "DOTNET_EXE="
-for %%D in (dotnet.exe) do set "DOTNET_EXE=%%~$PATH:D"
+if exist "%USERPROFILE%\.dotnet\dotnet.exe" set "DOTNET_EXE=%USERPROFILE%\.dotnet\dotnet.exe"
+if not defined DOTNET_EXE for %%D in (dotnet.exe) do set "DOTNET_EXE=%%~$PATH:D"
 if not defined DOTNET_EXE (
   echo The .NET SDK is required. Install it from https://dotnet.microsoft.com/download
   pause
@@ -23,12 +24,20 @@ if errorlevel 1 goto failed
 
 "%DOTNET_EXE%" build tests\Conqueror.Tests\Conqueror.Tests.csproj --artifacts-path "%TEST_ARTIFACTS%" -m:1 -p:UseSharedCompilation=false -v:minimal
 if errorlevel 1 goto failed
+if not exist "%TEST_ARTIFACTS%\bin\Conqueror.Tests\debug\Conqueror.Tests.dll" (
+  echo Test build did not produce Conqueror.Tests.dll.
+  goto failed
+)
 
 "%DOTNET_EXE%" "%TEST_ARTIFACTS%\bin\Conqueror.Tests\debug\Conqueror.Tests.dll" -reporter verbose -noColor
 if errorlevel 1 goto failed
 
 "%DOTNET_EXE%" build tests\Conqueror.Specs\Conqueror.Specs.csproj --artifacts-path "%TEST_ARTIFACTS%" -m:1 -p:UseSharedCompilation=false -v:minimal
 if errorlevel 1 goto failed
+if not exist "%TEST_ARTIFACTS%\bin\Conqueror.Specs\debug\Conqueror.Specs.dll" (
+  echo Specification build did not produce Conqueror.Specs.dll.
+  goto failed
+)
 
 "%DOTNET_EXE%" "%TEST_ARTIFACTS%\bin\Conqueror.Specs\debug\Conqueror.Specs.dll"
 if errorlevel 1 goto failed

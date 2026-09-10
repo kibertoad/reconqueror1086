@@ -494,7 +494,7 @@ public sealed partial class ResourceAndDefinitionTests
             Assert.False(slots.Inspect(2).IsValid);
             Assert.False(slots.TryLoad(2, out var campaign, out var error));
             Assert.Null(campaign);
-            Assert.NotNull(error);
+            Assert.Equal("PRIMARY SAVE IS MALFORMED; NO VALID BACKUP IS AVAILABLE", error);
         }
         finally
         {
@@ -522,10 +522,46 @@ public sealed partial class ResourceAndDefinitionTests
             var info = slots.Inspect(4);
             Assert.True(info.IsValid);
             Assert.True(info.RecoveredFromBackup);
+            Assert.Equal("PRIMARY SAVE IS MALFORMED; RECOVERY BACKUP IS AVAILABLE", info.Error);
             Assert.True(slots.TryLoad(4, out var recovered, out var error));
             Assert.Null(error);
             Assert.Equal(111, recovered!.State.Player.Wealth);
             Assert.Empty(Directory.EnumerateFiles(root, "*.tmp"));
+        }
+        finally
+        {
+            if (Directory.Exists(root)) Directory.Delete(root, true);
+        }
+    }
+
+    [Fact]
+    public void SaveSlotsExplainMissingAndUnreadableRecoveryGenerations()
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"conqueror-diagnostics-{Guid.NewGuid():N}");
+        try
+        {
+            Directory.CreateDirectory(root);
+            var slots = new CampaignSaveSlots(root);
+            var campaign = new Campaign(Campaign.NewFromTemplate(0));
+            campaign.Save(slots.BackupPath(1));
+
+            var backupOnly = slots.Inspect(1);
+            Assert.True(backupOnly.IsValid);
+            Assert.True(backupOnly.RecoveredFromBackup);
+            Assert.Equal("PRIMARY SAVE IS MISSING; RECOVERY BACKUP IS AVAILABLE", backupOnly.Error);
+            Assert.True(slots.TryLoad(1, out _, out var recoveryNotice));
+            Assert.Null(recoveryNotice);
+
+            File.WriteAllText(slots.SlotPath(2), "broken primary");
+            File.WriteAllText(slots.BackupPath(2), "broken backup");
+            Assert.False(slots.TryLoad(2, out _, out var bothBroken));
+            Assert.Equal("PRIMARY SAVE IS MALFORMED; BACKUP IS MALFORMED", bothBroken);
+
+            var future = Campaign.NewFromTemplate(0);
+            future.SchemaVersion = Campaign.CurrentSaveSchemaVersion + 1;
+            File.WriteAllText(slots.SlotPath(3), System.Text.Json.JsonSerializer.Serialize(future));
+            Assert.Equal("PRIMARY SAVE USES AN UNSUPPORTED FORMAT; NO VALID BACKUP IS AVAILABLE",
+                slots.Inspect(3).Error);
         }
         finally
         {

@@ -36,18 +36,21 @@ public sealed class CampaignSaveSlots
     {
         if (paths.Count == 0) return new(number, false, false, "EMPTY", null, null);
 
-        Exception? firstError = null;
+        var failures = new List<(bool IsBackup, Exception Error)>();
         foreach (var candidate in paths)
             try
             {
                 var campaign = Campaign.Load(candidate.Path);
-                return new(number, true, true, campaign.State.Player.Name, campaign.State.Date, null, candidate.IsBackup);
+                var warning = candidate.IsBackup
+                    ? RecoveryMessage(failures, "RECOVERY BACKUP IS AVAILABLE")
+                    : null;
+                return new(number, true, true, campaign.State.Player.Name, campaign.State.Date, warning, candidate.IsBackup);
             }
             catch (Exception error) when (IsUnreadableSave(error))
             {
-                firstError ??= error;
+                failures.Add((candidate.IsBackup, error));
             }
-        return new(number, true, false, "UNREADABLE", null, firstError?.Message);
+        return new(number, true, false, "UNREADABLE", null, DescribeFailures(failures));
     }
 
     public void Save(Campaign campaign, int number)
@@ -78,6 +81,7 @@ public sealed class CampaignSaveSlots
             return false;
         }
 
+        var failures = new List<(bool IsBackup, Exception Error)>();
         foreach (var candidate in paths)
         {
             try
@@ -86,10 +90,13 @@ public sealed class CampaignSaveSlots
                 error = null;
                 return true;
             }
-            catch (Exception loadError) when (IsUnreadableSave(loadError)) { }
+            catch (Exception loadError) when (IsUnreadableSave(loadError))
+            {
+                failures.Add((candidate.IsBackup, loadError));
+            }
         }
         campaign = null;
-        error = "THAT SAVE SLOT CANNOT BE READ";
+        error = DescribeFailures(failures);
         return false;
     }
 
@@ -165,4 +172,34 @@ public sealed class CampaignSaveSlots
     private static bool IsUnreadableSave(Exception error) => error is
         IOException or UnauthorizedAccessException or InvalidDataException or System.Text.Json.JsonException
         or NotSupportedException or ArgumentException or NullReferenceException or KeyNotFoundException or OverflowException;
+
+    private static string DescribeFailures(IReadOnlyList<(bool IsBackup, Exception Error)> failures)
+    {
+        if (failures.Count == 0) return "THAT SAVE SLOT CANNOT BE READ";
+        var primary = failures.FirstOrDefault(candidate => !candidate.IsBackup).Error;
+        var backup = failures.FirstOrDefault(candidate => candidate.IsBackup).Error;
+        if (primary is not null && backup is not null)
+            return $"PRIMARY SAVE {DescribeFailure(primary)}; BACKUP {DescribeFailure(backup)}";
+        var failure = primary ?? backup!;
+        var source = primary is not null ? "PRIMARY SAVE" : "BACKUP SAVE";
+        return $"{source} {DescribeFailure(failure)}; NO VALID BACKUP IS AVAILABLE";
+    }
+
+    private static string RecoveryMessage(IReadOnlyList<(bool IsBackup, Exception Error)> failures, string outcome)
+    {
+        var primary = failures.FirstOrDefault(candidate => !candidate.IsBackup).Error;
+        return primary is null
+            ? $"PRIMARY SAVE IS MISSING; {outcome}"
+            : $"PRIMARY SAVE {DescribeFailure(primary)}; {outcome}";
+    }
+
+    private static string DescribeFailure(Exception error) => error switch
+    {
+        UnauthorizedAccessException => "ACCESS WAS DENIED",
+        IOException => "COULD NOT BE OPENED",
+        System.Text.Json.JsonException => "IS MALFORMED",
+        InvalidDataException invalid when invalid.Message.StartsWith("Unsupported campaign save schema ", StringComparison.Ordinal) =>
+            "USES AN UNSUPPORTED FORMAT",
+        _ => "CONTAINS INVALID DATA"
+    };
 }
