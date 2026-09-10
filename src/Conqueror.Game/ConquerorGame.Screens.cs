@@ -333,10 +333,9 @@ public sealed partial class ConquerorGame
         _siegeWeaponFrame = -1;
         _siegeWeaponEnd = 0;
         _siegeWeaponElapsed = 0;
-        _siegeBloodFrame = -1;
-        _siegeBloodElapsed = 0;
-        _siegeImpactFrame = -1;
-        _siegeImpactElapsed = 0;
+        _siegeHitFrame = -1;
+        _siegeHitEnd = 0;
+        _siegeHitElapsed = 0;
     }
 
     private void DrawSiegeBackdrop(Rectangle viewport, Facing facing)
@@ -482,14 +481,9 @@ public sealed partial class ConquerorGame
             DrawClipped(texture,
                 new Rectangle(viewport.Center.X - width / 2, viewport.Bottom - height, width, height), viewport);
         }
-        if (_siegeBloodFrame >= 0 && _siegeBloodFrame < animation.Frames.Count)
+        if (_siegeHitFrame >= 0 && _siegeHitFrame < animation.Frames.Count)
         {
-            var texture = animation.Frames[_siegeBloodFrame];
-            DrawSiegeEffect(texture, viewport, originalScale);
-        }
-        if (_siegeImpactFrame >= 0 && _siegeImpactFrame < animation.Frames.Count)
-        {
-            var texture = animation.Frames[_siegeImpactFrame];
+            var texture = animation.Frames[_siegeHitFrame];
             DrawSiegeEffect(texture, viewport, originalScale);
         }
     }

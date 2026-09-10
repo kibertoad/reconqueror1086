@@ -22,8 +22,10 @@ public static class SiegeCombatPresentation
     public static readonly SiegeFrameRun MaceAttack = new(36, 3);
     public static readonly SiegeFrameRun SwordAttack = new(39, 3);
     public static readonly SiegeFrameRun DaggerAttack = new(42, 1);
-    public static readonly SiegeFrameRun PlayerBlood = new(43, 5);
-    public static readonly SiegeFrameRun EnemyBlood = new(48, 5);
+    // CONQUER.EXE 0x55171-0x55189 chooses base 43 for a fatal strike and
+    // base 48 otherwise; 0x552FB-0x55395 renders offsets 0 through 3.
+    public static readonly SiegeFrameRun FatalHitBlood = new(43, 4);
+    public static readonly SiegeFrameRun WoundingHitBlood = new(48, 4);
 
     public static SiegeFrameRun AttackFramesFor(string? weapon)
     {
@@ -34,4 +36,6 @@ public static class SiegeCombatPresentation
         if (weapon?.Contains("Mace", StringComparison.OrdinalIgnoreCase) == true) return MaceAttack;
         return SwordAttack;
     }
+
+    public static SiegeFrameRun BloodFramesFor(bool fatal) => fatal ? FatalHitBlood : WoundingHitBlood;
 }

@@ -112,10 +112,7 @@ public sealed partial class ResourceAndDefinitionTests
     {
         var run = SiegeCombatPresentation.AttackFramesFor(weapon);
         Assert.Equal((start, count, start + count), (run.Start, run.Count, run.EndExclusive));
-        Assert.True(run.EndExclusive <= SiegeCombatPresentation.PlayerBlood.Start);
-        Assert.Equal(new SiegeFrameRun(43, 5), SiegeCombatPresentation.PlayerBlood);
-        Assert.Equal(new SiegeFrameRun(48, 5), SiegeCombatPresentation.EnemyBlood);
-        Assert.Equal(SiegeCombatPresentation.EnemyBlood.Start, SiegeCombatPresentation.PlayerBlood.EndExclusive);
+        Assert.True(run.EndExclusive <= SiegeCombatPresentation.FatalHitBlood.Start);
         Assert.Equal((320, 200), (SiegeCombatPresentation.OriginalWidth, SiegeCombatPresentation.OriginalHeight));
         Assert.True(SiegeCombatPresentation.Viewport.X + SiegeCombatPresentation.Viewport.Width <=
                     SiegeCombatPresentation.OriginalWidth);

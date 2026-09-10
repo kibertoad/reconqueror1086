@@ -441,7 +441,6 @@ public sealed partial class ConquerorGame
             return;
         }
         AdvanceSiegeForeground(gameTime.ElapsedGameTime.TotalSeconds);
-        var healthBeforeInput = _siege.Health;
         _siege.AdvanceDoorAnimations(_animationEnabled ? gameTime.ElapsedGameTime.TotalSeconds : SiegeSession.DoorOpeningSeconds);
         _siege.AdvanceEnemyAnimations(_animationEnabled ? gameTime.ElapsedGameTime.TotalSeconds : 1);
         if (press(Keys.W)) _siege.Move(true); if (press(Keys.S)) _siege.Move(false);
@@ -449,22 +448,21 @@ public sealed partial class ConquerorGame
         if (press(Keys.E)) _siege.Interact();
         if (press(Keys.Space))
         {
-            var enemyHealthBeforeAttack = LivingSiegeEnemyHealth();
+            var enemiesBeforeAttack = LivingSiegeEnemyState();
             var attackFrames = SiegeCombatPresentation.AttackFramesFor(_campaign.State.Player.Inventory.Weapon);
             _siege.Attack();
             StartSiegeWeapon(attackFrames);
-            if (LivingSiegeEnemyHealth() < enemyHealthBeforeAttack) StartSiegeImpact();
+            StartSiegeHitEffect(enemiesBeforeAttack);
         }
         if (press(Keys.X))
         {
-            var enemyHealthBeforeShot = LivingSiegeEnemyHealth();
+            var enemiesBeforeShot = LivingSiegeEnemyState();
             if (_siege.Shoot() == SiegeAction.Shot)
             {
                 StartSiegeWeapon(SiegeCombatPresentation.CrossbowAttack);
-                if (LivingSiegeEnemyHealth() < enemyHealthBeforeShot) StartSiegeImpact();
+                StartSiegeHitEffect(enemiesBeforeShot);
             }
         }
-        if (_siege.Health < healthBeforeInput) StartSiegeBlood();
         if (press(Keys.M)) _showRadar = !_showRadar;
         _notice = _siege.LastMessage;
         if (press(Keys.R))
@@ -534,32 +532,26 @@ public sealed partial class ConquerorGame
         _siegeWeaponElapsed = 0;
     }
 
-    private void StartSiegeBlood()
+    private void StartSiegeHitEffect((int Health, int Count) before)
     {
-        _siegeBloodFrame = _animationEnabled
-            ? SiegeCombatPresentation.PlayerBlood.Start
-            : SiegeCombatPresentation.PlayerBlood.EndExclusive - 1;
-        _siegeBloodElapsed = 0;
+        var after = LivingSiegeEnemyState();
+        if (after.Health >= before.Health) return;
+        var run = SiegeCombatPresentation.BloodFramesFor(after.Count < before.Count);
+        _siegeHitFrame = _animationEnabled ? run.Start : run.EndExclusive - 1;
+        _siegeHitEnd = run.EndExclusive;
+        _siegeHitElapsed = 0;
     }
 
-    private void StartSiegeImpact()
+    private (int Health, int Count) LivingSiegeEnemyState()
     {
-        _siegeImpactFrame = _animationEnabled
-            ? SiegeCombatPresentation.EnemyBlood.Start
-            : SiegeCombatPresentation.EnemyBlood.EndExclusive - 1;
-        _siegeImpactElapsed = 0;
+        var living = _siege?.Enemies.Where(enemy => enemy.Health > 0).ToArray() ?? [];
+        return (living.Sum(enemy => enemy.Health), living.Length);
     }
-
-    private int LivingSiegeEnemyHealth() =>
-        _siege?.Enemies.Where(enemy => enemy.Health > 0).Sum(enemy => enemy.Health) ?? 0;
 
     private void AdvanceSiegeForeground(double elapsedSeconds)
     {
         AdvanceSiegeRun(ref _siegeWeaponFrame, _siegeWeaponEnd, ref _siegeWeaponElapsed, elapsedSeconds);
-        AdvanceSiegeRun(ref _siegeBloodFrame, SiegeCombatPresentation.PlayerBlood.EndExclusive,
-            ref _siegeBloodElapsed, elapsedSeconds);
-        AdvanceSiegeRun(ref _siegeImpactFrame, SiegeCombatPresentation.EnemyBlood.EndExclusive,
-            ref _siegeImpactElapsed, elapsedSeconds);
+        AdvanceSiegeRun(ref _siegeHitFrame, _siegeHitEnd, ref _siegeHitElapsed, elapsedSeconds);
     }
 
     private void AdvanceSiegeRun(ref int frame, int endExclusive, ref double elapsed, double elapsedSeconds)

@@ -11,6 +11,13 @@ namespace Conqueror.Tests;
 public sealed partial class ResourceAndDefinitionTests
 {
     [Fact]
+    public void FatalAndWoundingHitsUseTheirExecutableBloodRuns()
+    {
+        Assert.Equal(new SiegeFrameRun(43, 4), SiegeCombatPresentation.BloodFramesFor(true));
+        Assert.Equal(new SiegeFrameRun(48, 4), SiegeCombatPresentation.BloodFramesFor(false));
+    }
+
+    [Fact]
     public void SceneCardinalFacesRetainTheirExecutableHitMasks()
     {
         Assert.Equal([0x100, 0x200, 0x400, 0x800],
