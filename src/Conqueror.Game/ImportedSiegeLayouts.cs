@@ -164,6 +164,8 @@ public static class ImportedSiegeLayouts
         var stages = new List<SiegeObjectStage> { new(initial.Index, initialTile) };
         if (initialTile is SiegeTile.Destructible or SiegeTile.Barrel or SiegeTile.Treasure)
         {
+            if ((uint)initial.StateTarget >= (uint)scene.Blocks.Count)
+                throw new InvalidDataException($"Scene object {initial.Index} references a state outside the block table.");
             var target = scene.Blocks[initial.StateTarget];
             stages.Add(new(target.Kind == 4 ? target.Index : -1, TileFor(target)));
         }

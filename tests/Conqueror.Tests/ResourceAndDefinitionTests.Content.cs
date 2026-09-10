@@ -109,13 +109,15 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
-    public void SceneDecoderRejectsAnUnboundedStateTarget()
+    public void ImportedSceneRejectsAnUnboundedActionableStateTarget()
     {
         var source = SyntheticScene();
-        WriteInt(source.Blocks, 64, 7);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 4, 4);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 4 + 4, 35);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 4 + 64, 7);
 
-        Assert.Throws<InvalidDataException>(() => DynamixSceneDecoder.Decode(
-            source.Viewer, source.Scenario, source.Map, source.Blocks));
+        var scene = DynamixSceneDecoder.Decode(source.Viewer, source.Scenario, source.Map, source.Blocks);
+        Assert.Throws<InvalidDataException>(() => ImportedSiegeLayouts.Convert(scene));
     }
 
     [Fact]

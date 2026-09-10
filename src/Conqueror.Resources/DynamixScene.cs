@@ -161,8 +161,6 @@ public static class DynamixSceneDecoder
             if (decoded.TextureReferences()
                 .Any(surface => surface < -1 || surface >= textureCount))
                 throw new InvalidDataException($"Scene block {index} references a texture outside the Scenario table.");
-            if (decoded.StateTarget < 0 || decoded.StateTarget >= blockCount)
-                throw new InvalidDataException($"Scene block {index} references a state outside the block table.");
             decodedBlocks[index] = decoded;
         }
 
