@@ -32,6 +32,8 @@ public sealed partial class ResourceAndDefinitionTests
             ControllerInputBindings.ButtonsFor(Keys.A, ControllerInputContext.FieldBattle));
         Assert.Contains(Buttons.A,
             ControllerInputBindings.ButtonsFor(Keys.Space, ControllerInputContext.DragonBattle));
+        Assert.Contains(Buttons.RightShoulder,
+            ControllerInputBindings.ButtonsFor(Keys.I, ControllerInputContext.Tournament));
 
         var moved = ControllerInputBindings.MovePointer(new Vector2(638, 2), new Vector2(1, 1), 1);
         Assert.Equal(new Vector2(639, 0), moved);
@@ -61,6 +63,25 @@ public sealed partial class ResourceAndDefinitionTests
             ImportedMovies.Definitions);
         Assert.Equal(ImportedMovies.Definitions.Count,
             ImportedMovies.Definitions.Select(movie => movie.Role).Distinct(StringComparer.Ordinal).Count());
+    }
+
+    [Fact]
+    public void TournamentConversationRootsAndOriginalStateBridgesAreDefinitionDriven()
+    {
+        Assert.Equal(Balance.Courtships.Select(lady => lady.Name),
+            TournamentConversationDefinitions.Ladies.Select(lady => lady.Lady));
+        Assert.Equal([2200, 2900, 2400, 2100, 2000, 2500],
+            TournamentConversationDefinitions.Ladies.Select(lady => lady.RootNodeId));
+        Assert.Equal("Anna Lisa", OriginalConversationBindings.LadyColors[3]);
+
+        var campaign = Campaign.NewFromTemplate(2);
+        campaign.ConversationVariables.AddRange(Enumerable.Repeat(0, 43));
+        OriginalConversationBindings.RecordJoustResult(campaign, "Anna Lisa", won: true);
+        OriginalConversationBindings.SynchronizeTournamentState(campaign);
+
+        Assert.Equal(3, campaign.ConversationVariables[OriginalConversationBindings.LadyColorsVariable]);
+        Assert.Equal(2, campaign.ConversationVariables[OriginalConversationBindings.JoustOutcomeVariable]);
+        Assert.Equal("Anna Lisa", campaign.Player.LadyColors);
     }
 
     [Fact]

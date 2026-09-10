@@ -472,6 +472,7 @@ public sealed partial class ConquerorGame
     {
         for (var index = 0; index < World.Locations.Length; index++)
         {
+            if (!_campaign.CanRevealLocation(index)) continue;
             var point = EstatePresentationDefinitions.InsetPoint(_estateLayout.InsetMap, World.Locations[index]);
             var marker = ScaleBounds(new UiBounds(point.X - 2, point.Y - 2, index == _selectedLocation ? 6 : 4, index == _selectedLocation ? 6 : 4));
             var owned = index == 0 || _campaign.State.ConqueredLocations.Contains(index);
@@ -522,6 +523,7 @@ public sealed partial class ConquerorGame
             Fill(new Rectangle(0, 0, 760, 768), new Color(71, 92, 58));
         for (var i = 0; i < World.Locations.Length; i++)
         {
+            if (!_campaign.CanRevealLocation(i)) continue;
             var place = World.Locations[i];
             var owned = i == 0 || _campaign.State.ConqueredLocations.Contains(i);
             var color = i == _selectedLocation ? Color.Gold : owned ? Color.LightGreen : place.Kind == LocationKind.DragonLair ? Color.DarkRed : Color.White;

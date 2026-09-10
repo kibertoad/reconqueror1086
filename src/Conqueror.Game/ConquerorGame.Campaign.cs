@@ -166,9 +166,7 @@ public sealed partial class ConquerorGame
         if (_innPatron is not null)
         {
             _notice = "";
-            if (_conversationSession?.Start(_innPatron.ConversationRootNodeId, Random.Shared.Next) == true)
-                ScheduleAutomaticConversationAdvance();
-            _screen = Screen.InnDialogue;
+            StartConversation(_innPatron, Screen.Inn);
         }
         else if (_innLayout.ExitBounds.Contains(x, y))
             _screen = Screen.Village;
@@ -178,13 +176,13 @@ public sealed partial class ConquerorGame
     {
         if (press(Keys.I) || press(Keys.V))
         {
-            _screen = Screen.Inn;
+            _screen = _conversationReturnScreen;
             return;
         }
         var node = _conversationSession?.CurrentNode;
         if (node is null)
         {
-            if (press(Keys.Enter)) _screen = Screen.Inn;
+            if (press(Keys.Enter)) _screen = _conversationReturnScreen;
             return;
         }
         if (node.Responses.Count == 0)
@@ -207,9 +205,10 @@ public sealed partial class ConquerorGame
     {
         if (_conversationSession?.ChooseResponse(index, Random.Shared.Next) != true)
         {
-            _screen = Screen.Inn;
+            _screen = _conversationReturnScreen;
             return;
         }
+        OriginalConversationBindings.SynchronizeTournamentState(_campaign.State);
         ScheduleAutomaticConversationAdvance();
     }
 
@@ -217,10 +216,22 @@ public sealed partial class ConquerorGame
     {
         if (_conversationSession?.Continue(Random.Shared.Next) != true)
         {
-            _screen = Screen.Inn;
+            _screen = _conversationReturnScreen;
             return;
         }
+        OriginalConversationBindings.SynchronizeTournamentState(_campaign.State);
         ScheduleAutomaticConversationAdvance();
+    }
+
+    private bool StartConversation(InnPatronHotspot speaker, Screen returnScreen)
+    {
+        if (_conversationSession?.Start(speaker.ConversationRootNodeId, Random.Shared.Next) != true) return false;
+        _innPatron = speaker;
+        _conversationReturnScreen = returnScreen;
+        OriginalConversationBindings.SynchronizeTournamentState(_campaign.State);
+        ScheduleAutomaticConversationAdvance();
+        _screen = Screen.InnDialogue;
+        return true;
     }
 
     private void ScheduleAutomaticConversationAdvance() => _conversationAdvanceAt =
@@ -371,10 +382,34 @@ public sealed partial class ConquerorGame
         if (press(Keys.Down)) _ladyIndex = (_ladyIndex + 1) % Balance.Courtships.Length;
         if (press(Keys.Left)) _tournamentOpponent = (_tournamentOpponent + Balance.TournamentOpponents.Length - 1) % Balance.TournamentOpponents.Length;
         if (press(Keys.Right)) _tournamentOpponent = (_tournamentOpponent + 1) % Balance.TournamentOpponents.Length;
-        if (press(Keys.C)) _notice = _campaign.RequestColors(Balance.Courtships[_ladyIndex].Name) ? $"WEARING {Balance.Courtships[_ladyIndex].Name}'S COLORS" : "YOUR REQUEST IS REFUSED";
-        if (press(Keys.Space)) _notice = _campaign.Joust(Math.Abs(100 - _joustCursor), _tournamentOpponent) ? "A CLEAN STRIKE - YOU WIN THE WAGER" : "YOU MISS, CANNOT PAY, OR THE LISTS ARE CLOSED";
+        if (press(Keys.C))
+        {
+            var lady = Balance.Courtships[_ladyIndex].Name;
+            var accepted = _campaign.RequestColors(lady);
+            if (accepted) OriginalConversationBindings.RecordLadyColors(_campaign.State, lady);
+            _notice = accepted ? $"WEARING {lady}'S COLORS" : "YOUR REQUEST IS REFUSED";
+        }
+        if (press(Keys.I)) StartTournamentConversation();
+        if (press(Keys.Space))
+        {
+            var lady = _campaign.State.Player.LadyColors;
+            var before = _campaign.State.JoustsThisTournament;
+            var won = _campaign.Joust(Math.Abs(100 - _joustCursor), _tournamentOpponent);
+            if (_campaign.State.JoustsThisTournament > before)
+                OriginalConversationBindings.RecordJoustResult(_campaign.State, lady, won);
+            _notice = won ? "A CLEAN STRIKE - YOU WIN THE WAGER" : "YOU MISS, CANNOT PAY, OR THE LISTS ARE CLOSED";
+        }
         if (press(Keys.K)) _notice = _campaign.TournamentSkirmish(_tournamentOpponent) is { } result ? result.Summary : "THE SKIRMISH IS UNAVAILABLE";
         if (press(Keys.Enter) || press(Keys.T)) _screen = Screen.Map;
+    }
+
+    private void StartTournamentConversation()
+    {
+        var definition = TournamentConversationDefinitions.For(Balance.Courtships[_ladyIndex].Name);
+        var speaker = new InnPatronHotspot(-1, definition.Lady, "", definition.PortraitSuffix,
+            definition.RootNodeId, new UiBounds(0, 0, 0, 0));
+        if (!StartConversation(speaker, Screen.Tournament))
+            _notice = "ORIGINAL TOURNAMENT CONVERSATION DATA IS NOT INSTALLED";
     }
 
     private void UpdateSiege(Func<Keys, bool> press, GameTime gameTime)

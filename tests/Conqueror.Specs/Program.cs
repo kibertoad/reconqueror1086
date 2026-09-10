@@ -277,6 +277,7 @@ var dragonCampaign = new Campaign(Campaign.NewFromTemplate(2));
 dragonCampaign.State.Player.Inventory.Items.Add("Dragon Slaying Lance");
 dragonCampaign.State.Player.Inventory.Items.Add("Dragon Slaying Armor");
 dragonCampaign.State.Player.Inventory.Items.Add("Shield of St. George");
+dragonCampaign.State.DragonProgress = 1;
 Check(!dragonCampaign.AttemptDragon(), "dragon challenge requires the moor");
 dragonCampaign.State.CurrentLocation = World.Locations.Length - 1;
 Check(dragonCampaign.AttemptDragon() && dragonCampaign.State.Victory == VictoryKind.Dragon, "dragon victory route");

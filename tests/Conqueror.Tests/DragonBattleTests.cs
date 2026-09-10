@@ -6,6 +6,51 @@ namespace Conqueror.Tests;
 public sealed class DragonBattleTests
 {
     [Fact]
+    public void DragonMoorIsHiddenUntilItsOriginalConversationFlagIsSet()
+    {
+        var campaign = new Campaign(Campaign.NewFromTemplate(2));
+        var moor = World.Locations.Length - 1;
+
+        Assert.False(campaign.DragonLairDiscovered);
+        Assert.False(campaign.CanRevealLocation(moor));
+        Assert.False(campaign.CanTravelTo(moor));
+        Assert.Equal(0, campaign.TravelTo(moor));
+        Assert.Equal(0, campaign.State.CurrentLocation);
+
+        campaign.State.ConversationVariables.AddRange([0, 0, 1]);
+        Assert.True(campaign.DragonLairDiscovered);
+        Assert.True(campaign.CanRevealLocation(moor));
+    }
+
+    [Fact]
+    public void AnnaLisaProvidesTheCleanRoomDiscoveryRouteAfterTwoWins()
+    {
+        var campaign = new Campaign(Campaign.NewFromTemplate(2));
+        for (var win = 0; win < 2; win++)
+        {
+            campaign.State.Date = new DateTime(1086, 3, 1).AddMonths(win);
+            campaign.State.CurrentLocation = World.TournamentIndex(campaign.State.Date);
+            Assert.True(campaign.RequestColors("Anna Lisa"));
+            Assert.True(campaign.Joust(0, 0));
+        }
+
+        Assert.True(campaign.DragonLairDiscovered);
+        Assert.Contains("northwestern Wales", campaign.State.Journal[^2], StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void PrototypeSaveAlreadyAtTheMoorMigratesToDiscovered()
+    {
+        var state = Campaign.NewFromTemplate(2);
+        state.CurrentLocation = World.Locations.Length - 1;
+
+        var campaign = new Campaign(state);
+
+        Assert.Equal(1, campaign.State.DragonProgress);
+        Assert.True(campaign.DragonLairDiscovered);
+    }
+
+    [Fact]
     public void ChallengeRequiresTheDragonVictoryEquipmentAndLocation()
     {
         var campaign = ReadyCampaign();
@@ -14,6 +59,7 @@ public sealed class DragonBattleTests
         Assert.Null(campaign.BeginDragonBattle());
 
         campaign.State.CurrentLocation = World.Locations.Length - 1;
+        campaign.State.DragonProgress = 1;
         Assert.NotNull(campaign.BeginDragonBattle());
         Assert.Equal(VictoryKind.None, campaign.State.Victory);
     }
@@ -64,6 +110,7 @@ public sealed class DragonBattleTests
     {
         var campaign = new Campaign(Campaign.NewFromTemplate(2));
         campaign.State.Player.Inventory.Items.UnionWith(Balance.Victories[VictoryKind.Dragon].RequiredItems);
+        campaign.State.DragonProgress = 1;
         campaign.State.CurrentLocation = World.Locations.Length - 1;
         return campaign;
     }

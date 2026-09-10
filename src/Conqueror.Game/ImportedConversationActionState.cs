@@ -5,6 +5,19 @@ namespace Conqueror.Game;
 
 public static class OriginalConversationBindings
 {
+    public const int DragonLairDiscoveryVariable = OriginalCampaignVariables.DragonLairDiscovery;
+    public const int JoustOutcomeVariable = OriginalCampaignVariables.JoustOutcome;
+    public const int LadyColorsVariable = OriginalCampaignVariables.LadyColors;
+
+    public static readonly IReadOnlyDictionary<int, string> LadyColors = new Dictionary<int, string>
+    {
+        [1] = "Wendessa",
+        [2] = "Victoria",
+        [3] = "Anna Lisa",
+        [4] = "Valetta",
+        [5] = "Jane"
+    };
+
     public static readonly IReadOnlyDictionary<int, CharacterAttribute> Attributes =
         new Dictionary<int, CharacterAttribute>
         {
@@ -44,6 +57,28 @@ public static class OriginalConversationBindings
         [22] = "Title To Armor",
         [23] = "Note From Gilbert"
     };
+
+    public static void SynchronizeTournamentState(CampaignState campaign)
+    {
+        if (campaign.ConversationVariables.Count <= LadyColorsVariable) return;
+        campaign.Player.LadyColors = LadyColors.GetValueOrDefault(
+            campaign.ConversationVariables[LadyColorsVariable]);
+    }
+
+    public static void RecordJoustResult(CampaignState campaign, string? lady, bool won)
+    {
+        if (!RecordLadyColors(campaign, lady)) return;
+        campaign.ConversationVariables[JoustOutcomeVariable] = won ? 2 : 1;
+    }
+
+    public static bool RecordLadyColors(CampaignState campaign, string? lady)
+    {
+        if (lady is null || campaign.ConversationVariables.Count <= LadyColorsVariable) return false;
+        var color = LadyColors.FirstOrDefault(entry => entry.Value.Equals(lady, StringComparison.OrdinalIgnoreCase)).Key;
+        if (color == 0) return false;
+        campaign.ConversationVariables[LadyColorsVariable] = color;
+        return true;
+    }
 }
 
 public sealed class ImportedConversationActionState(CampaignState campaign) : IDynamixActionState

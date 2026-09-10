@@ -61,13 +61,13 @@ public sealed partial class ConquerorGame
                 }
             }
             else
-                DrawText("ENTER  RETURN TO THE INN", 75, 500, Color.Cyan, 2, 850);
+                DrawText($"ENTER  RETURN TO THE {_conversationReturnScreen.ToString().ToUpperInvariant()}", 75, 500, Color.Cyan, 2, 850);
             return;
         }
 
         DrawPanel((node?.Speaker ?? patron.Name).ToUpperInvariant(), (prompt ?? "CONVERSATION DATA IS NOT INSTALLED").ToUpperInvariant());
         if (node is null)
-            DrawText("ENTER  RETURN TO THE INN", 100, 300, Color.LightGreen, 2);
+            DrawText($"ENTER  RETURN TO THE {_conversationReturnScreen.ToString().ToUpperInvariant()}", 100, 300, Color.LightGreen, 2);
         else
             for (var index = 0; index < node.Responses.Count; index++)
                 DrawText($"{index + 1}  {node.Responses[index].Text}", 100, 300 + index * 55, Color.LightGreen, 2, 820);
@@ -178,7 +178,7 @@ public sealed partial class ConquerorGame
         var wins = _campaign.State.Player.CourtshipWins.GetValueOrDefault(lady.Name);
         DrawText($"UP DOWN LADY: {lady.Name}   WINS {wins}   C REQUEST COLORS", 150, 515, lady.CourtAble ? Color.Wheat : Color.Gray, 2);
         DrawText($"COLORS: {_campaign.State.Player.LadyColors ?? "NONE"}", 150, 555, Color.Gold, 2);
-        DrawText("SPACE JOUST   K SKIRMISH   ENTER LEAVE", 250, 610, Color.LightGreen, 2);
+        DrawText("SPACE JOUST   I SPEAK   K SKIRMISH   ENTER LEAVE", 190, 610, Color.LightGreen, 2);
     }
 
     private void ActivateSiegeVisuals(ImportedSiegeScene? imported)

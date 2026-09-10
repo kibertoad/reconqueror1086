@@ -82,7 +82,7 @@ public sealed class Campaign
 
     public int TravelTo(int location)
     {
-        if (location < 0 || location >= World.Locations.Length || State.PendingEnemyArmy is not null) return 0;
+        if (!CanTravelTo(location)) return 0;
         var origin = State.CurrentLocation;
         var accompanyingArmyIndex = JoinedArmyIndexAt(origin);
         var days = World.TravelDays(State.CurrentLocation, location);
@@ -102,6 +102,15 @@ public sealed class Campaign
         }
         return days;
     }
+
+    public bool DragonLairDiscovered => State.DragonProgress > 0
+        || State.ConversationVariables.Count > OriginalCampaignVariables.DragonLairDiscovery
+        && State.ConversationVariables[OriginalCampaignVariables.DragonLairDiscovery] != 0;
+
+    public bool CanRevealLocation(int location) => location >= 0 && location < World.Locations.Length
+        && (World.Locations[location].Kind != LocationKind.DragonLair || DragonLairDiscovered);
+
+    public bool CanTravelTo(int location) => CanRevealLocation(location) && State.PendingEnemyArmy is null;
 
     public bool HasPendingFieldBattle => State.PendingEnemyArmy is not null;
 
@@ -178,8 +187,7 @@ public sealed class Campaign
 
     public bool DispatchArmy(int armyIndex, int destination)
     {
-        if (armyIndex is < 0 or >= Player.ArmyDivisionLimit || destination < 0
-            || destination >= World.Locations.Length) return false;
+        if (armyIndex is < 0 or >= Player.ArmyDivisionLimit || !CanRevealLocation(destination)) return false;
         var player = State.Player;
         player.EnsureArmyRoster();
         var origin = player.ArmyLocationAt(armyIndex);
@@ -454,6 +462,9 @@ public sealed class Campaign
     private void EnsureStrategicState()
     {
         State.Player.EnsureArmyRoster();
+        if (State.CurrentLocation >= 0 && State.CurrentLocation < World.Locations.Length
+            && World.Locations[State.CurrentLocation].Kind == LocationKind.DragonLair)
+            State.DragonProgress = Math.Max(1, State.DragonProgress);
         foreach (var (location, index) in World.Locations.Select((location, index) => (location, index)))
             if (location.Kind is LocationKind.Castle or LocationKind.London)
                 State.GarrisonStrength.TryAdd(index, State.ConqueredLocations.Contains(index) ? 0 : location.Garrison);
@@ -647,11 +658,12 @@ public sealed class Campaign
         if (!Balance.Victories.TryGetValue(kind, out var definition)) return false;
         var p = State.Player;
         var missingItems = definition.RequiredItems.Where(x => !p.Inventory.Items.Contains(x)).ToArray();
-        if (State.CurrentLocation != definition.LocationIndex || p.Fiefs < definition.RequiredFiefs || p.Army.Total < definition.RequiredArmy
+        var missingDiscovery = kind == VictoryKind.Dragon && !DragonLairDiscovered;
+        if (missingDiscovery || State.CurrentLocation != definition.LocationIndex || p.Fiefs < definition.RequiredFiefs || p.Army.Total < definition.RequiredArmy
             || p.Stats.Strength < definition.RequiredStrength || missingItems.Length > 0)
         {
             if (logFailure)
-                Log($"Requirements not met for {kind}: travel to {World.Locations[definition.LocationIndex].Name}, fiefs {definition.RequiredFiefs}, army {definition.RequiredArmy}, strength {definition.RequiredStrength}, items {string.Join(", ", definition.RequiredItems)}.");
+                Log($"Requirements not met for {kind}: discover its location, travel to {World.Locations[definition.LocationIndex].Name}, fiefs {definition.RequiredFiefs}, army {definition.RequiredArmy}, strength {definition.RequiredStrength}, items {string.Join(", ", definition.RequiredItems)}.");
             return false;
         }
         return true;
@@ -680,6 +692,11 @@ public sealed class Campaign
         var reward = definition.Rewards.FirstOrDefault(x => x.Win == wins);
         if (reward is not null && reward.Wealth > 0) { p.Wealth += reward.Wealth; Log($"{lady} rewards you with {reward.Wealth}s."); }
         if (reward?.Item is not null) { p.Inventory.Items.Add(reward.Item); Log($"{lady} rewards you with {reward.Item}."); }
+        if (definition.Name == "Anna Lisa" && wins >= 2 && !DragonLairDiscovered)
+        {
+            State.DragonProgress = 1;
+            Log("Anna Lisa confides that the dragon's lair lies in the mountains of northwestern Wales.");
+        }
         if (definition.MarriageWins > 0 && wins >= definition.MarriageWins) p.Wife = definition.Name;
     }
 

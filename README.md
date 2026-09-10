@@ -42,10 +42,10 @@ The importer also validates stored CSF files as indexed animation sequences. The
 - Persistent hostile field garrisons, 80-shilling spy reports, 98% stronghold interception, route fallback, and siege approach gating
 - 50% harvest loan, church donations, recruiting, taxation, wealth and army upkeep
 - Blacksmith purchases, automatic equipment, and the original 75% resale rule
-- Three-joust/one-skirmish tournament limits, selectable ladies, individual eligibility rules, multi-stage reward ladders, and marriage
+- Three-joust/one-skirmish tournament limits, selectable ladies, individual eligibility rules, multi-stage reward ladders, marriage, and imported original lady conversations
 - First-person castle simulation with facing and movement, doors and secret rooms, melee reach, crossbows and ammunition, enemy pursuit, champions, armor checks, commandable retainers, food, treasure, breakable weapons, radar, retreat losses, and progression
 - Equipment catalog with the original shop prices and armor-bar values
-- Crown victory by conquering London's real garrison; timed dragon-eye encounter with keyboard, mouse, and controller aim; campaign defeat, journal, save/load
+- Crown victory by conquering London's real garrison; quest-gated dragon-lair discovery and timed dragon-eye encounter with keyboard, mouse, and controller aim; campaign defeat, journal, save/load
 
 ## Verification
 
