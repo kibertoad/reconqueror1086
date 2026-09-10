@@ -215,8 +215,16 @@ public static class BlacksmithDialoguePresentationDefinitions
 public static class ChurchConversationPresentationDefinitions
 {
     public const int GenericRootNodeId = 3100;
+    public const int ArmorQuestRootNodeId = 3149;
+    public const string ArmorQuestLocation = "Cambridge";
     public const string Speaker = "PRIEST";
     public const string PortraitSuffix = ":priest.pcc";
+
+    public static int RootNodeIdFor(int locationIndex) => locationIndex >= 0
+        && locationIndex < World.Locations.Length
+        && World.Locations[locationIndex].Name.Equals(ArmorQuestLocation, StringComparison.OrdinalIgnoreCase)
+            ? ArmorQuestRootNodeId
+            : GenericRootNodeId;
 }
 
 public static class FarmPresentationDefinitions

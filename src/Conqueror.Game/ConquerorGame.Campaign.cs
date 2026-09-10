@@ -279,7 +279,8 @@ public sealed partial class ConquerorGame
     {
         var speaker = new InnPatronHotspot(-1, ChurchConversationPresentationDefinitions.Speaker,
             "", ChurchConversationPresentationDefinitions.PortraitSuffix,
-            ChurchConversationPresentationDefinitions.GenericRootNodeId, new UiBounds(0, 0, 0, 0));
+            ChurchConversationPresentationDefinitions.RootNodeIdFor(_campaign.State.CurrentLocation),
+            new UiBounds(0, 0, 0, 0));
         return StartConversation(speaker, Screen.Village);
     }
 

@@ -77,6 +77,11 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal("Anna Lisa", OriginalConversationBindings.LadyColors[3]);
         Assert.Equal(3201, BlacksmithDialoguePresentationDefinitions.OriginalConversationRootNodeId);
         Assert.Equal(3100, ChurchConversationPresentationDefinitions.GenericRootNodeId);
+        var cambridge = Array.FindIndex(World.Locations,
+            location => location.Name == ChurchConversationPresentationDefinitions.ArmorQuestLocation);
+        Assert.True(cambridge >= 0);
+        Assert.Equal(3149, ChurchConversationPresentationDefinitions.RootNodeIdFor(cambridge));
+        Assert.Equal(3100, ChurchConversationPresentationDefinitions.RootNodeIdFor(0));
 
         var campaign = Campaign.NewFromTemplate(2);
         campaign.ConversationVariables.AddRange(Enumerable.Repeat(0, 43));

@@ -574,13 +574,13 @@ public sealed partial class ResourceAndDefinitionTests
             [23] = new(23, DynamixActionKind.Evaluate, 17, [])
         };
         var database = new DynamixActionTreeDatabase(100,
-            new Dictionary<int, DynamixActionGroup> { [99] = new(99, 0, [20, 21]) }, actions, expressions, values);
+            new Dictionary<int, DynamixActionGroup> { [99] = new(99, 0, [20, 21, 20]) }, actions, expressions, values);
         var state = new TestActionState([3, 0]);
 
         var result = new DynamixActionInterpreter(database, state).Execute([99]);
 
         Assert.True(result.Success);
-        Assert.Equal(1, state.Variables[1]);
+        Assert.Equal(2, state.Variables[1]);
         Assert.Equal(1, result.RedirectNodeId);
         Assert.False(new DynamixActionInterpreter(database, state).Execute([5011]).Success);
 
