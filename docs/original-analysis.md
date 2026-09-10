@@ -61,6 +61,8 @@ The owned `CONQUER.EXE` is a Linear Executable embedded behind its DOS stub; thi
 
 The inspector's `--disassemble=0xADDRESS,...` option maps LE objects/pages and uses the Iced 32-bit x86 decoder to emit a metadata-only local report. It exposed the kind-2 decoder at virtual address `0x45C6E`: MSB-first bit reading, clear/end codes `0x100`/`0x101`, first dictionary code `0x102`, and adaptive widths from 9 through 14 bits. Exact-size decoding of all five entries and strict PCX validation of the four images independently confirm the recovered behavior.
 
+Use `--xref-block-flags=0x20` to inventory comparisons and bit operations against selected byte flags in the scene block field at offset 4. The ignored `executable-block-flag-xrefs.txt` report covers the complete mapped code object and is intended to locate state-specific interaction paths before focused disassembly.
+
 Use `--xref-code=0xADDRESS,...` to find direct branch/call references and internal LE relocations to code addresses. The latter expose callback registrations whose targets never appear in a direct call instruction. Its ignored output is `executable-code-xrefs.txt`.
 
 That workflow found a reference to data offset `0x8020` (`TITLE.HAT`) in code at virtual address `0x4FF4F`. The surrounding routine copies the name and calls the common resource loader. The 64-byte `TITLE.HAT` record identifies `FFTITLE.PCX` and a 640x480 presentation. Resource inspection then distinguishes the static title from the first interactive `CHAR_OPS.PCX` screen. `CGOPTS.HAT` and `PREGEN.HAT` now confirm the clickable geometry; exact navigation timing and region-action dispatch still require further executable tracing.

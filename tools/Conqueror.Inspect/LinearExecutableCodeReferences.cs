@@ -48,6 +48,48 @@ internal static class LinearExecutableCodeReferences
         return report.ToString();
     }
 
+    public static string FindBlockFlags(string path, IReadOnlyList<uint> flags)
+    {
+        if (flags.Count == 0 || flags.Any(flag => flag is 0 or > byte.MaxValue))
+            throw new ArgumentOutOfRangeException(nameof(flags), "Block flags must be bytes from 1 through 255.");
+        var bytes = File.ReadAllBytes(path);
+        var header = FindHeader(bytes);
+        var module = FindModuleStart(bytes, header);
+        var pageSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x28, 4));
+        var objectTable = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x40, 4));
+        var dataPages = checked((uint)module + BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x80, 4)));
+        var descriptor = checked(header + (int)objectTable);
+        var virtualSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor, 4));
+        var baseAddress = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor + 4, 4));
+        var pageIndex = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor + 12, 4));
+        var fileOffset = checked(dataPages + (pageIndex - 1) * pageSize);
+        var available = Math.Min(checked((int)virtualSize), bytes.Length - checked((int)fileOffset));
+        var decoder = Iced.Intel.Decoder.Create(32,
+            new ByteArrayCodeReader(bytes.AsSpan(checked((int)fileOffset), available).ToArray()));
+        decoder.IP = baseAddress;
+        var formatter = new IntelFormatter();
+        var report = new StringBuilder("# References to byte flags in the scene block field at offset 4 (derived metadata)\n");
+        report.AppendLine($"# requested: {string.Join(',', flags.Select(flag => $"0x{flag:X2}"))}");
+        while (decoder.IP < baseAddress + (uint)available)
+        {
+            decoder.Decode(out var instruction);
+            if (instruction.IsInvalid || instruction.MemoryDisplacement64 != 4 ||
+                instruction.Mnemonic is not (Mnemonic.Test or Mnemonic.And or Mnemonic.Or or Mnemonic.Xor or Mnemonic.Cmp))
+                continue;
+            for (var operand = 0; operand < instruction.OpCount; operand++)
+            {
+                if (instruction.GetOpKind(operand) is not (OpKind.Immediate8 or OpKind.Immediate8_2nd)) continue;
+                var immediate = (uint)instruction.GetImmediate(operand);
+                if (!flags.Contains(immediate)) continue;
+                var formatted = new StringOutput();
+                formatter.Format(instruction, formatted);
+                report.AppendLine($"0x{instruction.IP:X8}  block+4 flag 0x{immediate:X2}  {formatted}");
+                break;
+            }
+        }
+        return report.ToString();
+    }
+
     private static int FindHeader(ReadOnlySpan<byte> source)
     {
         for (var index = 0; index <= source.Length - 0x84; index++)

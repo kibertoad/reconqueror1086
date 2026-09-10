@@ -53,6 +53,7 @@ var palettePcxName = OptionValue(inspectionOptions, "--palette-pcx=");
 var disassembleAddresses = OptionValue(inspectionOptions, "--disassemble=");
 var xrefDataOffsets = OptionValue(inspectionOptions, "--xref-data=");
 var xrefCodeAddresses = OptionValue(inspectionOptions, "--xref-code=");
+var xrefBlockFlags = OptionValue(inspectionOptions, "--xref-block-flags=");
 var fixupSourceAddresses = OptionValue(inspectionOptions, "--fixup-source=");
 var conversationNodeIds = OptionValue(inspectionOptions, "--conversation-nodes=");
 var conversationTextIds = OptionValue(inspectionOptions, "--conversation-text=");
@@ -80,6 +81,14 @@ if (xrefCodeAddresses is not null)
     var addresses = xrefCodeAddresses.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
         .Select(ParseAddress).ToArray();
     File.WriteAllText(Path.Combine(output, "executable-code-xrefs.txt"), LinearExecutableCodeReferences.Find(executable, addresses));
+}
+if (xrefBlockFlags is not null)
+{
+    var executable = Directory.EnumerateFiles(artifactRoot, "CONQUER.EXE", SearchOption.AllDirectories).Single();
+    var flags = xrefBlockFlags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .Select(ParseAddress).ToArray();
+    File.WriteAllText(Path.Combine(output, "executable-block-flag-xrefs.txt"),
+        LinearExecutableCodeReferences.FindBlockFlags(executable, flags));
 }
 if (fixupSourceAddresses is not null)
 {
@@ -468,7 +477,7 @@ if (File.Exists(gobPath))
 var sceneReport = new StringBuilder("# Result  Entries  Stored  Kind1  Kind2  CompressedBlocks  StoredBlocks  ISO path\n");
 var sceneTextureReport = new StringBuilder("# Textures  Dimensions  ISO path\n");
 var sceneScenarioReport = new StringBuilder("# Enabled  MapCount  DistanceShift  BlendTarget  Generated  BlockOffsets  ISO path\n");
-var sceneBlockReport = new StringBuilder("# Archive  Index  Placed  Kind  Behavior  Flags  ColorMap  Size  Surfaces  Name\n");
+var sceneBlockReport = new StringBuilder("# Archive  Index  Placed  Kind  Behavior  Flags  ColorMap  Field48  Field4A  Size  Surfaces  Name\n");
 var paletteReport = new StringBuilder("# Minimum  Maximum  SHA-256  Resource  ISO path\n");
 var skirmishFile = files.Single(file =>
     Path.GetFileName(file.Path).Equals("SKIRMISH.RES", StringComparison.OrdinalIgnoreCase));
@@ -522,8 +531,9 @@ foreach (var file in files.Where(x => DynamixArchive.HasContainerExtension(x.Pat
             var viewerEntry = archive.Entries.Single(entry => entry.Name.Equals("Viewer", StringComparison.OrdinalIgnoreCase));
             var mapEntry = archive.Entries.Single(entry => entry.Name.Equals("Map", StringComparison.OrdinalIgnoreCase));
             var blocksEntry = archive.Entries.Single(entry => entry.Name.Equals("Blocks", StringComparison.OrdinalIgnoreCase));
+            var blockBytes = archive.ReadDecoded(blocksEntry);
             var scene = DynamixSceneDecoder.Decode(archive.ReadDecoded(viewerEntry), scenario,
-                archive.ReadDecoded(mapEntry), archive.ReadDecoded(blocksEntry));
+                archive.ReadDecoded(mapEntry), blockBytes);
             var sceneName = Path.GetFileNameWithoutExtension(file.Path);
             if (reportSceneBlocks && (sceneName.StartsWith("MELEE", StringComparison.OrdinalIgnoreCase)
                 || sceneName.StartsWith("DEFEND", StringComparison.OrdinalIgnoreCase)))
@@ -533,10 +543,16 @@ foreach (var file in files.Where(x => DynamixArchive.HasContainerExtension(x.Pat
                 for (var y = 0; y < DynamixScene.MapHeight; y++)
                     placements[scene.BlockIndexAt(x, y)]++;
                 foreach (var block in scene.Blocks)
+                {
+                    var record = blockBytes.AsSpan(block.Index * DynamixSceneDecoder.BlockSize,
+                        DynamixSceneDecoder.BlockSize);
                     sceneBlockReport.AppendLine($"{file.Path}  {block.Index,5}  {placements[block.Index],6}  "
                         + $"{block.Kind,4}  {block.Behavior,8}  0x{block.Flags:X8}  {block.ColorMapOffset,8}  "
+                        + $"{BinaryPrimitives.ReadInt16LittleEndian(record.Slice(0x48, 2)),7}  "
+                        + $"{BinaryPrimitives.ReadInt16LittleEndian(record.Slice(0x4A, 2)),7}  "
                         + $"{block.Width}x{block.Height}  {block.Surface0},{block.Surface1},{block.Surface2},{block.Surface3}  "
                         + block.Name.Replace('\r', ' ').Replace('\n', ' '));
+                }
             }
             var colorMaps = new DynamixSceneColorMaps(Enumerable.Range(0, DynamixSceneColorMaps.Count).Select(index =>
             {
