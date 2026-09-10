@@ -59,6 +59,9 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private KeyboardState _last;
     private GamePadState _lastGamePad;
     private MouseState _lastMouse;
+    private Vector2 _controllerPointer = new(320, 240);
+    private bool _controllerPointerActive;
+    private bool _controllerPointerPressed;
     private int _characterOption;
     private int _optionsHubOption;
     private int _pressedOptionsHubOption = -1;
@@ -313,12 +316,17 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         var keys = Keyboard.GetState();
         var gamePad = GamePad.GetState(PlayerIndex.One);
         var mouse = Mouse.GetState();
+        var (controllerClick, controllerRelease, controllerRightClick) =
+            UpdateControllerPointer(gamePad, mouse, gameTime.ElapsedGameTime.TotalSeconds);
         var controllerContext = ControllerContextFor(_screen);
         bool Press(Keys key) => keys.IsKeyDown(key) && !_last.IsKeyDown(key)
             || ControllerInputBindings.IsPressed(key, controllerContext, gamePad, _lastGamePad);
-        var click = mouse.LeftButton == ButtonState.Pressed && _lastMouse.LeftButton == ButtonState.Released;
-        var release = mouse.LeftButton == ButtonState.Released && _lastMouse.LeftButton == ButtonState.Pressed;
-        var rightClick = mouse.RightButton == ButtonState.Pressed && _lastMouse.RightButton == ButtonState.Released;
+        var click = mouse.LeftButton == ButtonState.Pressed && _lastMouse.LeftButton == ButtonState.Released
+            || controllerClick;
+        var release = mouse.LeftButton == ButtonState.Released && _lastMouse.LeftButton == ButtonState.Pressed
+            || controllerRelease;
+        var rightClick = mouse.RightButton == ButtonState.Pressed && _lastMouse.RightButton == ButtonState.Released
+            || controllerRightClick;
         if (Press(Keys.F11)) ToggleFullscreen();
         if (Press(Keys.F10)) ToggleIntegerScaling();
         if (Press(Keys.Pause)) TogglePause();
@@ -424,19 +432,6 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         _lastMouse = mouse;
         base.Update(gameTime);
     }
-
-    private static ControllerInputContext ControllerContextFor(Screen screen) => screen switch
-    {
-        Screen.Home => ControllerInputContext.Home,
-        Screen.Village => ControllerInputContext.Village,
-        Screen.Shop => ControllerInputContext.Shop,
-        Screen.Tournament => ControllerInputContext.Tournament,
-        Screen.Map => ControllerInputContext.Map,
-        Screen.InnDialogue or Screen.BlacksmithDialogue => ControllerInputContext.Dialogue,
-        Screen.FieldBattle => ControllerInputContext.FieldBattle,
-        Screen.Siege => ControllerInputContext.Siege,
-        _ => ControllerInputContext.General
-    };
 
     private void OpenLoadGame()
     {
@@ -833,6 +828,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private string NormalizedCharacterName() => _characterName.Trim() is { Length: > 4 } name ? name : "Sir Custom";
     private (int X, int Y) OriginalPoint(MouseState mouse)
     {
+        if (_controllerPointerActive) return ((int)_controllerPointer.X, (int)_controllerPointer.Y);
         return PresentationScaling.ToLogical(mouse.X, mouse.Y, CanvasBounds(), 640, 480);
     }
 

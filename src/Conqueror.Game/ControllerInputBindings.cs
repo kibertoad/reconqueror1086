@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework;
 
 namespace Conqueror.Game;
 
@@ -17,6 +18,8 @@ public enum ControllerInputContext
 
 public static class ControllerInputBindings
 {
+    public const float PointerSpeed = 360;
+    public const float PointerTriggerThreshold = .5f;
     private static readonly IReadOnlyDictionary<Keys, Buttons[]> Common = new Dictionary<Keys, Buttons[]>
     {
         [Keys.Enter] = [Buttons.A],
@@ -57,6 +60,24 @@ public static class ControllerInputBindings
     public static bool AnyPressed(GamePadState current, GamePadState previous) =>
         Common.Values.SelectMany(buttons => buttons).Distinct()
             .Any(button => current.IsButtonDown(button) && previous.IsButtonUp(button));
+
+    public static Vector2 MovePointer(Vector2 current, Vector2 stick, double elapsedSeconds)
+    {
+        if (elapsedSeconds < 0) throw new ArgumentOutOfRangeException(nameof(elapsedSeconds));
+        var seconds = (float)Math.Min(elapsedSeconds, .1);
+        return new Vector2(
+            Math.Clamp(current.X + stick.X * PointerSpeed * seconds, 0, 639),
+            Math.Clamp(current.Y - stick.Y * PointerSpeed * seconds, 0, 479));
+    }
+
+    public static bool PrimaryPointerPressed(GamePadState current, GamePadState previous) =>
+        current.Triggers.Right > PointerTriggerThreshold && previous.Triggers.Right <= PointerTriggerThreshold;
+
+    public static bool PrimaryPointerReleased(GamePadState current, GamePadState previous) =>
+        current.Triggers.Right <= PointerTriggerThreshold && previous.Triggers.Right > PointerTriggerThreshold;
+
+    public static bool SecondaryPointerPressed(GamePadState current, GamePadState previous) =>
+        current.Triggers.Left > PointerTriggerThreshold && previous.Triggers.Left <= PointerTriggerThreshold;
 
     public static IReadOnlyList<Buttons> ButtonsFor(Keys key, ControllerInputContext context)
     {

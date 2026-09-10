@@ -14,7 +14,7 @@ The game opens at 1024x768. Press any key or click through the title to reach th
 
 On the options hub, select CD Music, Sound Effects, or Digitized Speech and use Left/Right to adjust that channel in 10% steps; `R` toggles reduced motion. The Pause key freezes simulation and Smacker playback, including its audio, from any screen and displays an explicit pause overlay.
 
-The first connected controller can navigate with the D-pad or left stick, select with A, go back with B, pause with Start, and open Load Game with Back/View. Context mappings expose dialogue choices on A/X/Y/LB/RB, map siege/spy/overview actions to X/RB/LB, shop transactions to X/Y, and first-person movement and field-battle orders to the sticks, face buttons, and shoulders. Keyboard and mouse remain available concurrently; custom binding remapping is still planned.
+The first connected controller can navigate with the D-pad or left stick, select with A, go back with B, pause with Start, and open Load Game with Back/View. The right stick controls a visible virtual pointer; right trigger clicks and left trigger performs a secondary click, exposing every original hotspot and management control. Context mappings expose dialogue choices on A/X/Y/LB/RB, map siege/spy/overview actions to X/RB/LB, shop transactions to X/Y, and first-person movement and field-battle orders to the sticks, face buttons, and shoulders. Keyboard and mouse remain available concurrently; moving the mouse immediately retakes pointer control. Custom binding remapping is still planned.
 
 On Windows, double-click `Start Conqueror 1086.bat` in the repository root. It checks for the .NET SDK and builds/starts the game locally.
 

@@ -205,7 +205,7 @@ public sealed partial class ConquerorGame
         {
             var option = indexed.option;
             var pressed = indexed.index == _pressedOptionsHubOption
-                && Mouse.GetState().LeftButton == ButtonState.Pressed;
+                && (Mouse.GetState().LeftButton == ButtonState.Pressed || _controllerPointerPressed);
             var frameIndex = OptionsHubDefinitions.StatusFrame(SettingEnabled(option.Setting!.Value), pressed);
             var frame = animation.Frames[frameIndex];
             var bounds = OptionsHubDefinitions.StatusBounds(option, frame.Width, frame.Height);

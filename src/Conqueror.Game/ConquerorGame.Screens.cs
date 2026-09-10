@@ -620,12 +620,23 @@ public sealed partial class ConquerorGame
     }
     private void DrawOriginalCursor()
     {
-        if (!_originalAnimations.TryGetValue(OriginalCursorAnimationRole, out var cursor)) return;
         var mouse = Mouse.GetState();
+        var point = _controllerPointerActive
+            ? new Point((int)(_controllerPointer.X * 1024 / 640), (int)(_controllerPointer.Y * 768 / 480))
+            : new Point(PresentationScaling.ToVirtual(mouse.X, mouse.Y, CanvasBounds()).X,
+                PresentationScaling.ToVirtual(mouse.X, mouse.Y, CanvasBounds()).Y);
+        if (!_originalAnimations.TryGetValue(OriginalCursorAnimationRole, out var cursor))
+        {
+            if (_controllerPointerActive)
+            {
+                Fill(new Rectangle(point.X - 8, point.Y - 1, 17, 3), Color.Gold);
+                Fill(new Rectangle(point.X - 1, point.Y - 8, 3, 17), Color.Gold);
+            }
+            return;
+        }
         var frameIndex = OriginalCursorDefinitions.Frame(CurrentCursorKind(mouse));
         if (cursor.Frames.Count <= frameIndex) return;
         var frame = cursor.Frames[frameIndex];
-        var point = PresentationScaling.ToVirtual(mouse.X, mouse.Y, CanvasBounds());
         _batch.Draw(frame, new Rectangle(point.X, point.Y,
             frame.Width * 1024 / 640, frame.Height * 768 / 480), Color.White);
     }
@@ -642,7 +653,8 @@ public sealed partial class ConquerorGame
 
     private OriginalCursorKind CurrentCursorKind(MouseState mouse)
     {
-        if (mouse.LeftButton == ButtonState.Pressed || mouse.RightButton == ButtonState.Pressed)
+        if (mouse.LeftButton == ButtonState.Pressed || mouse.RightButton == ButtonState.Pressed
+            || _controllerPointerPressed)
             return OriginalCursorKind.Hand;
         var (x, y) = OriginalPoint(mouse);
         return _screen switch

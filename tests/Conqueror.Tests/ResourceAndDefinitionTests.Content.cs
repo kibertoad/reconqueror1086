@@ -30,6 +30,16 @@ public sealed partial class ResourceAndDefinitionTests
             ControllerInputBindings.ButtonsFor(Keys.W, ControllerInputContext.Siege));
         Assert.Contains(Buttons.A,
             ControllerInputBindings.ButtonsFor(Keys.A, ControllerInputContext.FieldBattle));
+
+        var moved = ControllerInputBindings.MovePointer(new Vector2(638, 2), new Vector2(1, 1), 1);
+        Assert.Equal(new Vector2(639, 0), moved);
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            ControllerInputBindings.MovePointer(Vector2.Zero, Vector2.Zero, -.01));
+        var trigger = new GamePadState(Vector2.Zero, Vector2.Zero, 0, 1, Buttons.None);
+        Assert.True(ControllerInputBindings.PrimaryPointerPressed(trigger, released));
+        Assert.True(ControllerInputBindings.PrimaryPointerReleased(released, trigger));
+        var secondaryTrigger = new GamePadState(Vector2.Zero, Vector2.Zero, 1, 0, Buttons.None);
+        Assert.True(ControllerInputBindings.SecondaryPointerPressed(secondaryTrigger, released));
     }
 
     [Fact]
