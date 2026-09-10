@@ -90,6 +90,38 @@ internal static class LinearExecutableCodeReferences
         return report.ToString();
     }
 
+    public static string ReadDataTable(string path, uint offset, int rows, int columns)
+    {
+        if (rows <= 0) throw new ArgumentOutOfRangeException(nameof(rows));
+        if (columns <= 0) throw new ArgumentOutOfRangeException(nameof(columns));
+        var bytes = File.ReadAllBytes(path);
+        var header = FindHeader(bytes);
+        var module = FindModuleStart(bytes, header);
+        var pageSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x28, 4));
+        var objectTable = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x40, 4));
+        var objectCount = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x44, 4));
+        if (objectCount < 2) throw new InvalidDataException("Linear Executable has no data object.");
+        var dataPages = checked((uint)module + BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x80, 4)));
+        var descriptor = checked(header + (int)objectTable + 24);
+        var virtualSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor, 4));
+        var pageIndex = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor + 12, 4));
+        var length = checked(rows * columns * sizeof(int));
+        if (offset > virtualSize || length > virtualSize - offset)
+            throw new InvalidDataException("Requested table is outside the data object.");
+        var fileOffset = checked(dataPages + (pageIndex - 1) * pageSize + offset);
+        if (fileOffset > bytes.Length || length > bytes.Length - fileOffset)
+            throw new InvalidDataException("Requested table is outside the executable file.");
+        var report = new StringBuilder("# 32-bit LE data table (derived numeric metadata; original bytes omitted)\n");
+        report.AppendLine($"# object2+0x{offset:X}; {rows} rows; {columns} signed dwords per row");
+        for (var row = 0; row < rows; row++)
+        {
+            var values = Enumerable.Range(0, columns).Select(column => BinaryPrimitives.ReadInt32LittleEndian(
+                bytes.AsSpan(checked((int)fileOffset + (row * columns + column) * sizeof(int)), sizeof(int))));
+            report.AppendLine($"{row,2}  {string.Join(' ', values)}");
+        }
+        return report.ToString();
+    }
+
     private static int FindHeader(ReadOnlySpan<byte> source)
     {
         for (var index = 0; index <= source.Length - 0x84; index++)

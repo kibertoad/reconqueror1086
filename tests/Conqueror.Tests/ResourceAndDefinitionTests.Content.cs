@@ -127,6 +127,26 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void SiegeContactUsesTheOriginalWeaponRowDistance()
+    {
+        var tiles = new SiegeTile[6, 3];
+        for (var x = 0; x < 6; x++)
+        for (var y = 0; y < 3; y++)
+            tiles[x, y] = x == 0 || y == 0 || x == 5 || y == 2 ? SiegeTile.Wall : SiegeTile.Floor;
+        tiles[3, 1] = SiegeTile.Destructible;
+        var player = new Player();
+        var siege = new SiegeSession(player, new Army(), 0, 1,
+            new SiegeLayout(tiles, 1, 1, Facing.East, [],
+                [new SiegeObjectSpawn(3, 1, [new(30, SiegeTile.Destructible), new(31, SiegeTile.Floor)])]));
+
+        Assert.Equal(SiegeAction.Missed, siege.Attack());
+        Assert.Equal(0, Assert.Single(siege.Objects).State);
+        player.Inventory.Weapon = "Kingslayer Sword";
+        Assert.Equal(SiegeAction.Hit, siege.Attack());
+        Assert.Equal(1, Assert.Single(siege.Objects).State);
+    }
+
+    [Fact]
     public void FatalAndWoundingHitsUseTheirExecutableBloodRuns()
     {
         Assert.Equal(new SiegeFrameRun(43, 4), SiegeCombatPresentation.BloodFramesFor(true));
@@ -178,6 +198,10 @@ public sealed partial class ResourceAndDefinitionTests
             SiegeCombatPresentation.OriginalForegroundBaseFor(43), OriginalWeaponCombat.BreakRollRangeFor(43)));
         Assert.Equal((24, 30, 500), (OriginalWeaponCombat.CombatRowFor(44),
             SiegeCombatPresentation.OriginalForegroundBaseFor(44), OriginalWeaponCombat.BreakRollRangeFor(44)));
+        Assert.Equal((514, 2), (OriginalWeaponCombat.ContactDistanceFor(0), OriginalWeaponCombat.GridReachFor(0)));
+        Assert.Equal((484, 1), (OriginalWeaponCombat.ContactDistanceFor(2), OriginalWeaponCombat.GridReachFor(2)));
+        Assert.Equal((7064, 27), (OriginalWeaponCombat.ContactDistanceFor(43), OriginalWeaponCombat.GridReachFor(43)));
+        Assert.Equal((8256, 32), (OriginalWeaponCombat.ContactDistanceFor(44), OriginalWeaponCombat.GridReachFor(44)));
         Assert.Equal(43, Balance.Equipment.Single(item => item.Name == "Light Crossbow").OriginalWeaponItemId);
         Assert.Equal(44, Balance.Equipment.Single(item => item.Name == "Heavy Crossbow").OriginalWeaponItemId);
         Assert.Throws<ArgumentOutOfRangeException>(() => OriginalWeaponCombat.CombatRowFor(23));

@@ -40,7 +40,6 @@ foreach (var file in files.Where(x => interesting.Contains(Path.GetExtension(x.P
     File.WriteAllBytes(target, iso.ReadFile(file));
     extracted++;
 }
-
 var report = new StringBuilder();
 report.AppendLine("# Extracted artifact hashes");
 foreach (var path in Directory.EnumerateFiles(artifactRoot, "*", SearchOption.AllDirectories).Order())
@@ -54,6 +53,7 @@ var disassembleAddresses = OptionValue(inspectionOptions, "--disassemble=");
 var xrefDataOffsets = OptionValue(inspectionOptions, "--xref-data=");
 var xrefCodeAddresses = OptionValue(inspectionOptions, "--xref-code=");
 var xrefBlockFlags = OptionValue(inspectionOptions, "--xref-block-flags=");
+var reportWeaponCombatTable = inspectionOptions.Contains("--weapon-combat-table", StringComparer.OrdinalIgnoreCase);
 var fixupSourceAddresses = OptionValue(inspectionOptions, "--fixup-source=");
 var conversationNodeIds = OptionValue(inspectionOptions, "--conversation-nodes=");
 var conversationTextIds = OptionValue(inspectionOptions, "--conversation-text=");
@@ -89,6 +89,11 @@ if (xrefBlockFlags is not null)
         .Select(ParseAddress).ToArray();
     File.WriteAllText(Path.Combine(output, "executable-block-flag-xrefs.txt"),
         LinearExecutableCodeReferences.FindBlockFlags(executable, flags));
+}
+if (reportWeaponCombatTable)
+{
+    var executable = Directory.EnumerateFiles(artifactRoot, "CONQUER.EXE", SearchOption.AllDirectories).Single();
+    File.WriteAllText(Path.Combine(output, "weapon-combat-table-report.txt"), LinearExecutableCodeReferences.ReadDataTable(executable, 0xCE14, 25, 7));
 }
 if (fixupSourceAddresses is not null)
 {

@@ -270,7 +270,9 @@ public sealed class SiegeSession
     public SiegeAction Attack()
     {
         var weapon = Balance.Equipment.FirstOrDefault(x => x.Name.Equals(_player.Inventory.Weapon, StringComparison.OrdinalIgnoreCase));
-        var reach = weapon is null ? 1 : Math.Clamp(weapon.Power / 70, 1, 2);
+        var reach = weapon?.OriginalWeaponItemId is { } reachItemId
+            ? OriginalWeaponCombat.GridReachFor(reachItemId)
+            : weapon is null ? 1 : Math.Clamp(weapon.Power / 70, 1, 2);
         var target = FirstEnemyAhead(reach);
         if (target is null)
         {
@@ -315,8 +317,13 @@ public sealed class SiegeSession
     {
         if (_player.Inventory.CrossbowBolts <= 0) { LastMessage = "You have no crossbow bolts."; return SiegeAction.NoAmmunition; }
         if (!_player.Inventory.Weapon.Contains("Crossbow", StringComparison.OrdinalIgnoreCase)) { LastMessage = "Equip a crossbow first."; return SiegeAction.NoAmmunition; }
+        var weapon = Balance.Equipment.FirstOrDefault(item =>
+            item.Name.Equals(_player.Inventory.Weapon, StringComparison.OrdinalIgnoreCase));
+        var range = weapon?.OriginalWeaponItemId is { } originalItemId
+            ? OriginalWeaponCombat.GridReachFor(originalItemId)
+            : 8;
         _player.Inventory.CrossbowBolts--;
-        var target = FirstEnemyAhead(8);
+        var target = FirstEnemyAhead(range);
         if (target is not null)
         {
             target.Health -= 2;

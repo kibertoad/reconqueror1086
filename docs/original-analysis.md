@@ -63,6 +63,8 @@ The inspector's `--disassemble=0xADDRESS,...` option maps LE objects/pages and u
 
 Use `--xref-block-flags=0x20` to inventory comparisons and bit operations against selected byte flags in the scene block field at offset 4. The ignored `executable-block-flag-xrefs.txt` report covers the complete mapped code object and is intended to locate state-specific interaction paths before focused disassembly.
 
+Use `--weapon-combat-table` to emit the 25 seven-dword combat rows at data-object offset `0xCE14` into ignored `weapon-combat-table-report.txt`. Column 4 begins at `0xCE24` and supplies contact distance. This preserves the original numeric row values as reproducible local evidence without exporting executable bytes.
+
 Use `--xref-code=0xADDRESS,...` to find direct branch/call references and internal LE relocations to code addresses. The latter expose callback registrations whose targets never appear in a direct call instruction. Its ignored output is `executable-code-xrefs.txt`.
 
 That workflow found a reference to data offset `0x8020` (`TITLE.HAT`) in code at virtual address `0x4FF4F`. The surrounding routine copies the name and calls the common resource loader. The 64-byte `TITLE.HAT` record identifies `FFTITLE.PCX` and a 640x480 presentation. Resource inspection then distinguishes the static title from the first interactive `CHAR_OPS.PCX` screen. `CGOPTS.HAT` and `PREGEN.HAT` now confirm the clickable geometry; exact navigation timing and region-action dispatch still require further executable tracing.

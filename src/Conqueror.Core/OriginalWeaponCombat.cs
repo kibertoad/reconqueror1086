@@ -14,6 +14,14 @@ public static class OriginalWeaponCombat
         1, 0, 1, 3, 2, 1, 1, 3, 1, 3, 3, 6, 6
     ];
 
+    // CONQUER.EXE object 2 offset 0xCE24 + 28 * row, column 4 of each combat row.
+    // Contact processing at 0x558D4/0x559CA adds 0x40 before comparing range.
+    private static readonly int[] ContactDistancesByCombatRow =
+    [
+        350, 350, 350, 350, 450, 440, 430, 420, 420, 420, 420, 420, 420,
+        420, 420, 400, 400, 400, 400, 380, 380, 360, 360, 7000, 8192
+    ];
+
     public static int CombatRowFor(int itemId)
     {
         if ((uint)itemId < (uint)CombatRowsByItemId.Length) return CombatRowsByItemId[itemId];
@@ -30,4 +38,9 @@ public static class OriginalWeaponCombat
         var row = CombatRowFor(itemId);
         return row == 0 ? null : checked(200 + BreakRatingsByCombatRow[row] * 50);
     }
+
+    public static int ContactDistanceFor(int itemId) =>
+        checked(ContactDistancesByCombatRow[CombatRowFor(itemId)] + 0x40);
+
+    public static int GridReachFor(int itemId) => Math.Max(1, ContactDistanceFor(itemId) >> 8);
 }
