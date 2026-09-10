@@ -41,7 +41,7 @@ The owned release contains a 35,361,714-byte `.RES`-signature `C1086.GOB` archiv
 
 ## Controls represented
 
-The dragon moor is omitted from selection, drawing, travel, and captain dispatch until the decoded original discovery flag is set. Imported tournament dialogue can enter all six lady selector roots and bridges their current-colors and last-joust variables back to the playable joust. Anna Lisa's original secret sets the discovery flag; her second fallback courtship win supplies an equivalent clean-room route, and prototype saves already at the moor migrate safely.
+The dragon moor is omitted from selection, drawing, travel, and captain dispatch until the decoded original discovery flag is set. Imported tournament dialogue can enter all six lady selector roots and bridges their current-colors and last-joust variables back to the playable joust. The blacksmith portrait and keyboard route now enter original node `3201`, retaining the generated shop/return prompt only without conversation data. Anna Lisa's original secret sets the discovery flag; her second fallback courtship win supplies an equivalent clean-room route, and prototype saves already at the moor migrate safely.
 
 Reimplementation saves are explicitly schema-versioned and written by same-directory replacement. Each of the five slots retains its previous valid generation and transparently exposes that backup if the primary JSON is damaged; unversioned prototype saves and the former single slot-1 filename are migrated on load. A separate transition-triggered autosave uses the same recovery policy, while the load screen distinguishes missing, malformed, inaccessible, invalid, and unsupported-format generations and reports actual backup recovery.
 

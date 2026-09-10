@@ -27,6 +27,8 @@ End users should use `Install Original Resources.bat` instead. It runs `tools/Co
 
 The importer and runtime catalog are format-neutral: assets are addressed by original path and kind, and the game rejects manifest paths that escape `UserContent`. The current runtime plays imported CD audio and direct file-backed Smacker movies, renders validated PCX/PCC/CSF presentation art, and binds all 30 marker-delimited dilemma definitions to the executable-confirmed six-age selection and outcome interpreter. The complete `ALL.CIF`/`ALL.CBF` conversation graph and its referenced portraits are decoded once at startup; the populated inn now enters its ten confirmed selector roots, displays original prompts and responses, follows response/continuation edges, and returns on terminal target zero. Original prose remains in ignored local content; the presence of an imported asset must not be reported as equivalent to displaying or playing it. On the hashed GOG build, an end-to-end import produces 29,226 catalog entries with zero duplicate output paths. The installer decodes every supported byte-stored, kind-1, and kind-2 entry from the GOB and all 99 `.RES`/`.LOW` scene containers; source extensions remain in decoded directory names so paired scene tiers stay distinct.
 
+Runtime conversation entry also covers all six named tournament-lady selector roots and blacksmith node `3201`; the latter must not be confused with inn bartender selector `3200`.
+
 ## What it does
 
 1. Parses `game.ins` to find the end of CD data track 1.

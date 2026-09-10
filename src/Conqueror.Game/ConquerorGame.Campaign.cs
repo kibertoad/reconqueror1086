@@ -241,7 +241,7 @@ public sealed partial class ConquerorGame
     {
         if (press(Keys.Enter))
         {
-            _screen = Screen.BlacksmithDialogue;
+            if (!StartBlacksmithConversation()) _screen = Screen.BlacksmithDialogue;
             return;
         }
         if (press(Keys.B))
@@ -266,6 +266,14 @@ public sealed partial class ConquerorGame
         }
     }
 
+    private bool StartBlacksmithConversation()
+    {
+        var speaker = new InnPatronHotspot(-1, BlacksmithDialoguePresentationDefinitions.Speaker,
+            "Blacksmith.Portrait", ":blacksmi.pcc",
+            BlacksmithDialoguePresentationDefinitions.OriginalConversationRootNodeId, new UiBounds(0, 0, 0, 0));
+        return StartConversation(speaker, Screen.Blacksmith);
+    }
+
     private SceneHotspot? HitSceneHotspot(IReadOnlyList<SceneHotspot> hotspots, MouseState mouse)
     {
         var (x, y) = OriginalPoint(mouse);
@@ -287,7 +295,9 @@ public sealed partial class ConquerorGame
             case SceneNavigationAction.Jump: _notice = "JUMP ACTION REQUIRES EXECUTABLE CONFIRMATION"; break;
             case SceneNavigationAction.Map: _estatePanel = EstatePanel.Map; _screen = Screen.Map; break;
             case SceneNavigationAction.Orders: _estatePanel = EstatePanel.Orders; _screen = Screen.Map; break;
-            case SceneNavigationAction.BlacksmithDialogue: _screen = Screen.BlacksmithDialogue; break;
+            case SceneNavigationAction.BlacksmithDialogue:
+                if (!StartBlacksmithConversation()) _screen = Screen.BlacksmithDialogue;
+                break;
             case SceneNavigationAction.Shop: _shopIndex = 0; _screen = Screen.Shop; break;
             default: throw new ArgumentOutOfRangeException(nameof(hotspot));
         }

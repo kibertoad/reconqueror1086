@@ -73,6 +73,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal([2200, 2900, 2400, 2100, 2000, 2500],
             TournamentConversationDefinitions.Ladies.Select(lady => lady.RootNodeId));
         Assert.Equal("Anna Lisa", OriginalConversationBindings.LadyColors[3]);
+        Assert.Equal(3201, BlacksmithDialoguePresentationDefinitions.OriginalConversationRootNodeId);
 
         var campaign = Campaign.NewFromTemplate(2);
         campaign.ConversationVariables.AddRange(Enumerable.Repeat(0, 43));

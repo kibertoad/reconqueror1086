@@ -201,6 +201,7 @@ public sealed record BlacksmithDialogueCommand(
 
 public static class BlacksmithDialoguePresentationDefinitions
 {
+    public const int OriginalConversationRootNodeId = 3201;
     public const string Speaker = "BLACKSMITH";
     public const string FallbackPrompt = "The smith waits for your question.";
     public static UiBounds Portrait { get; } = new(39, 31, 195, 203);
