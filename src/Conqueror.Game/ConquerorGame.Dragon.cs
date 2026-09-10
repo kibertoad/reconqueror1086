@@ -43,7 +43,8 @@ public sealed partial class ConquerorGame
         _notice = battle.LastMessage.ToUpperInvariant();
         _screen = outcome == DragonBattleOutcome.Withdrawn ? Screen.Map : Screen.Ending;
         Autosave();
-        if (outcome == DragonBattleOutcome.Victory) PlayEventMovie("Ending.DragonVictory", Screen.Ending);
+        if (outcome == DragonBattleOutcome.Victory)
+            PlayEventMovieSequence(["Ending.DragonVictory", "Ending.DragonInvestiture"], Screen.Ending);
         else if (outcome == DragonBattleOutcome.Defeat) PlayEventMovie("Ending.DragonDefeat", Screen.Ending);
         else PlayEventMovie("Dragon.Retreat", Screen.Map);
     }

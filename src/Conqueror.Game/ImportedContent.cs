@@ -108,8 +108,10 @@ public static class ImportedMovies
         new("Practice.Joust", "/jousprac.smk"),
         new("Travel.DragonLair", "/trandrag.smk"),
         new("Ending.DragonVictory", "/drjstwin.smk"),
+        new("Ending.DragonInvestiture", "/champl30.smk"),
         new("Ending.DragonDefeat", "/drjstlse.smk"),
-        new("Dragon.Retreat", "/drjstrun.smk")
+        new("Dragon.Retreat", "/drjstrun.smk"),
+        new("Ending.CrownVictory", "/crownl30.smk")
     ];
 }
 

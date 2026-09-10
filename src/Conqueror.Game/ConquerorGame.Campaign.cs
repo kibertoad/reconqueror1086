@@ -477,7 +477,17 @@ public sealed partial class ConquerorGame
         {
             if (_drogoCombat) FinishDrogoCombat();
             else if (_activePracticeCombat is not null) FinishPracticeCombat("PRACTICE WON");
-            else { _campaign.FinishSiege(_siege); _siege = null; ClearSiegeVisuals(); _screen = Screen.Map; _notice = "THE CASTLE IS YOURS"; Autosave(); }
+            else
+            {
+                _campaign.FinishSiege(_siege);
+                var crowned = _campaign.State.Victory == VictoryKind.Crown;
+                _siege = null;
+                ClearSiegeVisuals();
+                _screen = crowned ? Screen.Ending : Screen.Map;
+                _notice = crowned ? "YOU HAVE DEFEATED WILLIAM AND USURPED THE THRONE" : "THE CASTLE IS YOURS";
+                Autosave();
+                if (crowned) PlayEventMovie("Ending.CrownVictory", Screen.Ending);
+            }
         }
         else if (_siege.Defeated)
         {

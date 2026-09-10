@@ -98,13 +98,33 @@ public sealed partial class ConquerorGame
 
     private void PlayEventMovie(string roleOrSuffix, Screen returnScreen)
     {
-        var movie = CreateMovie(roleOrSuffix);
-        if (movie is null) return;
-        _eventMovie?.Dispose();
-        _eventMovie = movie;
+        PlayEventMovieSequence([roleOrSuffix], returnScreen);
+    }
+
+    private void PlayEventMovieSequence(IEnumerable<string> rolesOrSuffixes, Screen returnScreen)
+    {
+        _eventMovieQueue.Clear();
+        foreach (var roleOrSuffix in rolesOrSuffixes) _eventMovieQueue.Enqueue(roleOrSuffix);
         _movieReturnScreen = returnScreen;
-        if (_musicInstance?.State == SoundState.Playing) _musicInstance.Pause();
-        _screen = Screen.Movie;
+        PlayNextEventMovie();
+    }
+
+    private void PlayNextEventMovie()
+    {
+        _eventMovie?.Dispose();
+        _eventMovie = null;
+        while (_eventMovieQueue.TryDequeue(out var roleOrSuffix))
+        {
+            var movie = CreateMovie(roleOrSuffix);
+            if (movie is null) continue;
+            _eventMovie = movie;
+            if (_musicInstance?.State == SoundState.Playing) _musicInstance.Pause();
+            _screen = Screen.Movie;
+            return;
+        }
+
+        _screen = _movieReturnScreen;
+        StartMusic();
     }
 
     private void FinishEventMovie()
@@ -112,8 +132,7 @@ public sealed partial class ConquerorGame
         _eventMovie?.Skip();
         _eventMovie?.Dispose();
         _eventMovie = null;
-        _screen = _movieReturnScreen;
-        StartMusic();
+        PlayNextEventMovie();
     }
 
     private void StartMusic()

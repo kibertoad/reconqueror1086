@@ -525,12 +525,26 @@ foreach (var file in files.Where(x => Path.GetExtension(x.Path).Equals(".SMK", S
         var paletteChanges = 0;
         var audioPackets = 0;
         long decodedAudioBytes = 0;
+        var renderSmk = renderSmkName is not null
+            && Path.GetFileName(file.Path).Equals(renderSmkName, StringComparison.OrdinalIgnoreCase);
+        var renderFrames = renderSmk
+            ? new HashSet<int>([0, movie.Frames.Count / 4, movie.Frames.Count / 2,
+                movie.Frames.Count * 3 / 4, movie.Frames.Count - 1])
+            : [];
         for (var index = 0; index < movie.Frames.Count; index++)
         {
             var frame = SmackerMovieDecoder.DecodeFrameLayout(movie, index, source, palette);
             palette = frame.Palette;
             videoDecoder.DecodeFrame(source.AsSpan(frame.Video.Offset, frame.Video.Length), indices,
                 movie.Frames[index].IsKeyFrame);
+            if (renderFrames.Contains(index))
+            {
+                var renderRoot = Path.Combine(artifactRoot, "smacker");
+                Directory.CreateDirectory(renderRoot);
+                WriteIndexedPpm(Path.Combine(renderRoot,
+                        $"{SafeName(Path.GetFileNameWithoutExtension(file.Path))}-{index:D5}.ppm"),
+                    movie.Width, movie.Height, indices, palette);
+            }
             if (frame.PaletteChanged) paletteChanges++;
             audioPackets += frame.AudioPackets.Count;
             foreach (var packet in frame.AudioPackets)
@@ -543,13 +557,6 @@ foreach (var file in files.Where(x => Path.GetExtension(x.Path).Equals(".SMK", S
         var audio = string.Join(',', movie.AudioTracks.Select(track =>
             $"{track.Index}:{track.SampleRate}/{(track.IsCompressed ? "packed" : "pcm")}/{(track.Is16Bit ? 16 : 8)}/{(track.IsStereo ? 2 : 1)}"));
         var frameHash = Convert.ToHexString(SHA256.HashData(indices)).ToLowerInvariant();
-        if (renderSmkName is not null && Path.GetFileName(file.Path).Equals(renderSmkName, StringComparison.OrdinalIgnoreCase))
-        {
-            var renderRoot = Path.Combine(artifactRoot, "smacker");
-            Directory.CreateDirectory(renderRoot);
-            WriteIndexedPpm(Path.Combine(renderRoot, $"{SafeName(Path.GetFileNameWithoutExtension(file.Path))}-last.ppm"),
-                movie.Width, movie.Height, indices, palette);
-        }
         smackerReport.AppendLine(FormattableString.Invariant(
             $"SMK{movie.Version,-4}  {movie.Width}x{movie.Height,-10}  {movie.Frames.Count,6}  {movie.FrameDuration.TotalMilliseconds,8:0.###}  {paletteChanges,15}  {audioPackets,13}  {decodedAudioBytes,13}  {frameHash}  {audio,-28}  {file.Size,9}  {file.Path}"));
         smackerMovies++;

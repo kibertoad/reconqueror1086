@@ -132,6 +132,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private SoundEffectInstance? _musicInstance;
     private SmackerMoviePlayer? _titleMovie;
     private SmackerMoviePlayer? _eventMovie;
+    private readonly Queue<string> _eventMovieQueue = new();
     private Screen _movieReturnScreen = Screen.OptionsHub;
     private readonly Dictionary<string, SoundEffect> _originalSounds = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, Texture2D> _originalArt = new(StringComparer.OrdinalIgnoreCase);
