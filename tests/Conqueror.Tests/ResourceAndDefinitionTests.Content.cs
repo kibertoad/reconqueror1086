@@ -18,6 +18,32 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StoreWeaponIdentifiersUseTheExecutableCombatRowPermutation()
+    {
+        int[] expectedRows =
+        [
+            4, 5, 12, 14, 6, 13, 11, 7, 9, 8, 10, 16,
+            17, 18, 15, 3, 0, 1, 2, 19, 20, 21, 22
+        ];
+        int[] expectedBases =
+        [
+            39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 27,
+            27, 27, 27, 41, 41, 41, 41, 33, 33, 36, 36
+        ];
+
+        Assert.Equal(expectedRows, Enumerable.Range(0, 23).Select(SiegeCombatPresentation.OriginalCombatRowFor));
+        Assert.Equal(expectedBases, Enumerable.Range(0, 23).Select(SiegeCombatPresentation.OriginalForegroundBaseFor));
+        Assert.All(Balance.Equipment.Where(item => item.Slot == EquipmentSlot.Weapon && item.OriginalStoreRecord is not null),
+            item =>
+            {
+                var foregroundBase = SiegeCombatPresentation.OriginalForegroundBaseFor(item.OriginalStoreRecord!.Value);
+                var expectedAttackStart = foregroundBase == 41 ? 42 : foregroundBase;
+                Assert.Equal(expectedAttackStart, SiegeCombatPresentation.AttackFramesFor(item.Name).Start);
+            });
+        Assert.Throws<ArgumentOutOfRangeException>(() => SiegeCombatPresentation.OriginalCombatRowFor(23));
+    }
+
+    [Fact]
     public void SceneCardinalFacesRetainTheirExecutableHitMasks()
     {
         Assert.Equal([0x100, 0x200, 0x400, 0x800],

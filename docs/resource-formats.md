@@ -290,6 +290,8 @@ Image frames and item identifiers normally advance together from 0 through 36. T
 
 `WeaponStoreDecoder` rejects oversized input, non-printable/non-ASCII bytes, bare line endings, incomplete records, excessive record counts or text fields, and negative/non-decimal numeric fields. Runtime equipment definitions store the original record number explicitly; the UI uses the parsed record's frame, price, and locally held description without copying original prose into tracked files or matching on display names. `weapon-store-report.txt` emits only numeric fields, movie presence, and description lengths.
 
+For owner-local catalog reconciliation, the inspector accepts `--weapon-text=0,1,...` (or `all`) and writes the explicitly selected descriptions to the ignored `weapon-store-text.txt`. That report may be inspected locally but must not be committed or redistributed.
+
 `BUYSELL.CSF` is a four-frame indexed overlay sequence associated with the `SWDTEMP.PCX` palette. Frames 0 and 1 are 81x71 versions of the View stone without and with its label; frames 2 and 3 are 100x32 stones labelled Sell and Purchase. Those dimensions, pixels, labels, order, and palette association are **Confirmed** by bounded decoding and palette-assisted rendering. Selecting the View variant from the store record's movie marker and selecting Sell/Purchase from current ownership are **Corroborated** by the table population and visible store behavior; exact input timing remains untraced.
 
 ## Conversation database

@@ -57,6 +57,7 @@ var conversationNodeIds = OptionValue(inspectionOptions, "--conversation-nodes="
 var conversationTextIds = OptionValue(inspectionOptions, "--conversation-text=");
 var integerResourceName = OptionValue(inspectionOptions, "--resource-integers=");
 var actionGroupIds = OptionValue(inspectionOptions, "--action-groups=");
+var weaponTextIds = OptionValue(inspectionOptions, "--weapon-text=");
 if (disassembleAddresses is not null)
 {
     var executable = Directory.EnumerateFiles(artifactRoot, "CONQUER.EXE", SearchOption.AllDirectories).Single();
@@ -235,6 +236,23 @@ if (File.Exists(gobPath))
             var weaponStore = WeaponStoreDecoder.Decode(gob.ReadDecoded(weaponStoreEntry));
             foreach (var item in weaponStore.Entries)
                 weaponStoreReport.AppendLine($"{item.RecordIndex,8}  {(item.MovieFile == "#" ? "none" : "yes"),5}  {item.UnknownValue,7}  {item.ImageFrame,10}  {item.ItemId,6}  {item.Price,5}  {item.Description.Length,16}");
+            if (weaponTextIds is not null)
+            {
+                var selected = weaponTextIds.Equals("all", StringComparison.OrdinalIgnoreCase)
+                    ? weaponStore.Entries.Select(item => item.RecordIndex).ToArray()
+                    : weaponTextIds.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                        .Select(ParseWeaponRecordId).Distinct().ToArray();
+                var textReport = new StringBuilder("# Selected owner-local weapon-store text (do not redistribute)\n");
+                foreach (var index in selected)
+                {
+                    if ((uint)index >= (uint)weaponStore.Entries.Count)
+                        throw new ArgumentOutOfRangeException(nameof(weaponTextIds), $"Weapon-store record {index} does not exist.");
+                    var item = weaponStore.Entries[index];
+                    textReport.AppendLine($"# Record {item.RecordIndex}; item {item.ItemId}; frame {item.ImageFrame}; price {item.Price}");
+                    textReport.AppendLine(item.Description);
+                }
+                File.WriteAllText(Path.Combine(output, "weapon-store-text.txt"), textReport.ToString());
+            }
         }
         catch (InvalidDataException error)
         {
@@ -648,6 +666,17 @@ static int ParseNodeId(string value)
             : System.Globalization.NumberStyles.None, null, out var id) && id >= 0
         ? id
         : throw new ArgumentException($"Invalid conversation node identifier '{value}'.");
+}
+
+static int ParseWeaponRecordId(string value)
+{
+    var hexadecimal = value.StartsWith("0x", StringComparison.OrdinalIgnoreCase);
+    var digits = hexadecimal ? value[2..] : value;
+    return int.TryParse(digits, hexadecimal
+            ? System.Globalization.NumberStyles.HexNumber
+            : System.Globalization.NumberStyles.None, null, out var id) && id >= 0
+        ? id
+        : throw new ArgumentException($"Invalid weapon-store record identifier '{value}'.");
 }
 
 static string ReportText(string value) => value.Replace('\r', ' ').Replace('\n', ' ');
