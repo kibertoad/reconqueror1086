@@ -12,7 +12,7 @@ public static class SiegeCombatPresentation
     private static readonly int[] ForegroundBasesByCombatRow =
     [
         41, 41, 41, 41, 39, 39, 39, 39, 39, 39, 39, 39,
-        39, 39, 39, 27, 27, 27, 27, 33, 33, 36, 36, 30
+        39, 39, 39, 27, 27, 27, 27, 33, 33, 36, 36, 30, 30
     ];
     public const int OriginalWidth = 320;
     public const int OriginalHeight = 200;
@@ -36,19 +36,20 @@ public static class SiegeCombatPresentation
 
     public static SiegeFrameRun AttackFramesFor(string? weapon)
     {
-        if (weapon?.Contains("Crossbow", StringComparison.OrdinalIgnoreCase) == true) return CrossbowAttack;
         var definition = Balance.Equipment.FirstOrDefault(item =>
             item.Slot == EquipmentSlot.Weapon && string.Equals(item.Name, weapon, StringComparison.Ordinal));
-        if (definition?.OriginalStoreRecord is { } itemId)
+        if (definition?.OriginalWeaponItemId is { } itemId)
             return OriginalForegroundBaseFor(itemId) switch
             {
                 27 => AxeAttack,
+                30 => CrossbowAttack,
                 33 => HammerAttack,
                 36 => MaceAttack,
                 39 => SwordAttack,
                 41 => DaggerAttack,
                 _ => SwordAttack
             };
+        if (weapon?.Contains("Crossbow", StringComparison.OrdinalIgnoreCase) == true) return CrossbowAttack;
         if (weapon?.Contains("Dagger", StringComparison.OrdinalIgnoreCase) == true) return DaggerAttack;
         if (weapon?.Contains("Axe", StringComparison.OrdinalIgnoreCase) == true) return AxeAttack;
         if (weapon?.Contains("Hammer", StringComparison.OrdinalIgnoreCase) == true) return HammerAttack;

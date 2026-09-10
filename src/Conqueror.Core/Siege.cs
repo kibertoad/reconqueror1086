@@ -241,14 +241,14 @@ public sealed class SiegeSession
             RemoveDead();
         }
         else LastMessage = "The enemy turns your blow.";
-        var originalItemId = weapon?.OriginalStoreRecord;
-        var usesOriginalBreakRule = originalItemId is >= 0 and <= 22;
+        var originalItemId = weapon?.OriginalWeaponItemId;
+        var usesOriginalBreakRule = originalItemId is not null;
         var originalBreakRange = usesOriginalBreakRule
             ? OriginalWeaponCombat.BreakRollRangeFor(originalItemId!.Value)
             : null;
-        var broke = !hit && weapon is not null && weapon.BuyPrice > 0 && (usesOriginalBreakRule
+        var broke = !hit && weapon is not null && (usesOriginalBreakRule
             ? originalBreakRange is { } range && _random.Next(range) == 0
-            : _random.Next(100) < Rules.WeaponBreakPercent);
+            : weapon.BuyPrice > 0 && _random.Next(100) < Rules.WeaponBreakPercent);
         if (broke)
         {
             _player.Inventory.Items.Remove(weapon!.Name);

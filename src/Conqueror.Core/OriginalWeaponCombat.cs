@@ -11,14 +11,18 @@ public static class OriginalWeaponCombat
     private static readonly int[] BreakRatingsByCombatRow =
     [
         4, 5, 6, 3, 6, 5, 3, 4, 2, 6, 0, 2,
-        1, 0, 1, 3, 2, 1, 1, 3, 1, 3, 3
+        1, 0, 1, 3, 2, 1, 1, 3, 1, 3, 3, 6, 6
     ];
 
     public static int CombatRowFor(int itemId)
     {
-        if ((uint)itemId >= (uint)CombatRowsByItemId.Length)
-            throw new ArgumentOutOfRangeException(nameof(itemId));
-        return CombatRowsByItemId[itemId];
+        if ((uint)itemId < (uint)CombatRowsByItemId.Length) return CombatRowsByItemId[itemId];
+        return itemId switch
+        {
+            43 => 23,
+            44 => 24,
+            _ => throw new ArgumentOutOfRangeException(nameof(itemId))
+        };
     }
 
     public static int? BreakRollRangeFor(int itemId)

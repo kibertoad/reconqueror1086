@@ -4,7 +4,10 @@ public sealed record CropBalance(int Cost, int NormalRevenueAt50, int HarvestRev
 public sealed record ForestBalance(int Cost, int RevenueAt50, int Serfs);
 public sealed record UnitBalance(int PriceAt50, int PriceAt100, int UpkeepAt50, int UpkeepAt100);
 public sealed record EquipmentBalance(string Name, int BuyPrice, int Armor, int Power, bool Shop = true,
-    EquipmentSlot Slot = EquipmentSlot.Weapon, int? OriginalStoreRecord = null);
+    EquipmentSlot Slot = EquipmentSlot.Weapon, int? OriginalStoreRecord = null, int? OriginalItemId = null)
+{
+    public int? OriginalWeaponItemId => Slot == EquipmentSlot.Weapon ? OriginalItemId ?? OriginalStoreRecord : null;
+}
 public sealed record BuildingDefinition(BuildingKind Kind, string Name, int Cost, int ProductivityBonus, bool Repeatable = false);
 public sealed record CourtshipReward(int Win, int Wealth = 0, string? Item = null);
 public sealed record CourtshipDefinition(string Name, bool CourtAble, int MinHonor, int? MaxPiety, bool FameWaivesPiety, int MarriageWins, CourtshipReward[] Rewards);
@@ -94,8 +97,8 @@ public static class Balance
         new("Armor-Ripping Sword", 850, 0, 144, OriginalStoreRecord: 8), new("Defender's Sword", 900, 0, 130, OriginalStoreRecord: 6),
         new("Knight's Sword", 700, 0, 129, OriginalStoreRecord: 9), new("Irish Sword", 500, 0, 131, OriginalStoreRecord: 10),
         new("Battle Sword", 500, 0, 122, OriginalStoreRecord: 2), new("Danish Sword", 450, 0, 113, OriginalStoreRecord: 3),
-        new("General Sword", 300, 0, 99, OriginalStoreRecord: 5), new("Heavy Crossbow", 0, 0, 143, false),
-        new("Light Crossbow", 0, 0, 130, false), new("Spiked Mace", 90, 0, 138, OriginalStoreRecord: 21),
+        new("General Sword", 300, 0, 99, OriginalStoreRecord: 5), new("Heavy Crossbow", 0, 0, 143, false, OriginalItemId: 44),
+        new("Light Crossbow", 0, 0, 130, false, OriginalItemId: 43), new("Spiked Mace", 90, 0, 138, OriginalStoreRecord: 21),
         new("Flanged Mace", 100, 0, 103, OriginalStoreRecord: 22), new("Battle Axe", 300, 0, 122, OriginalStoreRecord: 14),
         new("Horseman's Axe", 210, 0, 97, OriginalStoreRecord: 11), new("Saxon Axe", 120, 0, 82, OriginalStoreRecord: 12),
         new("Basic Axe", 122, 0, 81, OriginalStoreRecord: 13), new("War Hammer", 100, 0, 101, OriginalStoreRecord: 20),

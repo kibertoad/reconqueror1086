@@ -18,7 +18,7 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
-    public void StoreWeaponIdentifiersUseTheExecutableCombatRowPermutation()
+    public void OriginalWeaponIdentifiersUseTheExecutableCombatRowPermutation()
     {
         int[] expectedRows =
         [
@@ -33,16 +33,22 @@ public sealed partial class ResourceAndDefinitionTests
 
         Assert.Equal(expectedRows, Enumerable.Range(0, 23).Select(OriginalWeaponCombat.CombatRowFor));
         Assert.Equal(expectedBases, Enumerable.Range(0, 23).Select(SiegeCombatPresentation.OriginalForegroundBaseFor));
-        Assert.All(Balance.Equipment.Where(item => item.Slot == EquipmentSlot.Weapon && item.OriginalStoreRecord is not null),
+        Assert.All(Balance.Equipment.Where(item => item.OriginalWeaponItemId is not null),
             item =>
             {
-                var foregroundBase = SiegeCombatPresentation.OriginalForegroundBaseFor(item.OriginalStoreRecord!.Value);
+                var foregroundBase = SiegeCombatPresentation.OriginalForegroundBaseFor(item.OriginalWeaponItemId!.Value);
                 var expectedAttackStart = foregroundBase == 41 ? 42 : foregroundBase;
                 Assert.Equal(expectedAttackStart, SiegeCombatPresentation.AttackFramesFor(item.Name).Start);
             });
         Assert.Equal(
             [500, 450, 250, 250, 350, 200, 300, 400, 500, 300, 200, 300, 250, 250, 350, 350, null, 450, 500, 350, 250, 350, 350],
             Enumerable.Range(0, 23).Select(OriginalWeaponCombat.BreakRollRangeFor));
+        Assert.Equal((23, 30, 500), (OriginalWeaponCombat.CombatRowFor(43),
+            SiegeCombatPresentation.OriginalForegroundBaseFor(43), OriginalWeaponCombat.BreakRollRangeFor(43)));
+        Assert.Equal((24, 30, 500), (OriginalWeaponCombat.CombatRowFor(44),
+            SiegeCombatPresentation.OriginalForegroundBaseFor(44), OriginalWeaponCombat.BreakRollRangeFor(44)));
+        Assert.Equal(43, Balance.Equipment.Single(item => item.Name == "Light Crossbow").OriginalWeaponItemId);
+        Assert.Equal(44, Balance.Equipment.Single(item => item.Name == "Heavy Crossbow").OriginalWeaponItemId);
         Assert.Throws<ArgumentOutOfRangeException>(() => OriginalWeaponCombat.CombatRowFor(23));
     }
 
