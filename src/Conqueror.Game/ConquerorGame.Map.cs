@@ -88,7 +88,19 @@ public sealed partial class ConquerorGame
         if (days > 0) Autosave();
         if (_campaign.HasPendingFieldBattle) { BeginFieldBattle("YOUR ARMY HAS BEEN INTERCEPTED"); return; }
         if (days > 0 && World.Locations[_selectedLocation].Kind == LocationKind.DragonLair)
-            PlayEventMovie("Travel.DragonLair", Screen.Map);
+        {
+            _dragonBattle = _campaign.BeginDragonBattle();
+            if (_dragonBattle is null)
+            {
+                _notice = "YOU REACH THE LAIR, BUT CANNOT CHALLENGE THE DRAGON WITHOUT MIGHTY STRENGTH, ARMOR, SHIELD, AND LANCE";
+                PlayEventMovie("Travel.DragonLair", Screen.Map);
+                return;
+            }
+
+            _notice = _dragonBattle.LastMessage.ToUpperInvariant();
+            _screen = Screen.DragonBattle;
+            PlayEventMovie("Travel.DragonLair", Screen.DragonBattle);
+        }
     }
 
     private void BeginDragonChallenge()
