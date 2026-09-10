@@ -65,7 +65,7 @@ public static class ImportedSiegeLayouts
                 scene.BlockIndexAt(point.X, point.Y)))
             .ToArray();
         var objects = points
-            .Where(point => IsDestructible(scene.BlockAt(point.X, point.Y)))
+            .Where(point => IsSceneObject(scene.BlockAt(point.X, point.Y)))
             .Select(point => ObjectFor(scene, point.X, point.Y, minX, minY))
             .ToArray();
         var heading = (scene.Viewer.Heading + 8192) / 16384 & 3;
@@ -136,6 +136,7 @@ public static class ImportedSiegeLayouts
             name.Contains("shield", StringComparison.OrdinalIgnoreCase) ||
             name.Contains("ax", StringComparison.OrdinalIgnoreCase) ||
             name.Contains("hauberk", StringComparison.OrdinalIgnoreCase)) return SiegeTile.Treasure;
+        if (block.Kind == 4) return SiegeTile.Floor;
         if (name.Equals("ground", StringComparison.OrdinalIgnoreCase) ||
             name.Contains("floor", StringComparison.OrdinalIgnoreCase) ||
             name.Equals("carpet", StringComparison.OrdinalIgnoreCase) ||
@@ -151,41 +152,23 @@ public static class ImportedSiegeLayouts
         block.Behavior == 135 || IsEnemyName(block.Name);
 
     private static bool IsDestructible(DynamixSceneBlock block) =>
-        block.Kind == 4 && block.Behavior == 35;
+        block.Kind == 4 && (block.Behavior & 0x20) != 0;
+
+    private static bool IsSceneObject(DynamixSceneBlock block) =>
+        block.Kind == 4 && !IsEnemy(block) && block.Behavior != 83;
 
     private static SiegeObjectSpawn ObjectFor(DynamixScene scene, int x, int y, int minX, int minY)
     {
         var initial = scene.BlockAt(x, y);
-        var stages = new List<SiegeObjectStage> { new(initial.Index, SiegeTile.Destructible) };
-        for (var offset = 1; offset <= 2 && initial.Index + offset < scene.Blocks.Count; offset++)
+        var initialTile = TileFor(initial);
+        var stages = new List<SiegeObjectStage> { new(initial.Index, initialTile) };
+        if (initialTile is SiegeTile.Destructible or SiegeTile.Barrel or SiegeTile.Treasure)
         {
-            var candidate = scene.Blocks[initial.Index + offset];
-            if (!IsObjectState(initial.Name, candidate.Name, offset)) break;
-            var tile = candidate.Kind == 4 && candidate.Behavior == 35
-                ? SiegeTile.Destructible
-                : candidate.Kind == 4 && candidate.Behavior == 19 &&
-                  candidate.Name.Contains("meal", StringComparison.OrdinalIgnoreCase)
-                    ? SiegeTile.Barrel
-                    : SiegeTile.Floor;
-            stages.Add(new(candidate.Index, tile));
+            var target = scene.Blocks[initial.StateTarget];
+            stages.Add(new(target.Kind == 4 ? target.Index : -1, TileFor(target)));
         }
         return new SiegeObjectSpawn(x - minX, y - minY, stages);
     }
-
-    private static bool IsObjectState(string initialName, string candidateName, int offset)
-    {
-        if (initialName.Equals("barrel", StringComparison.OrdinalIgnoreCase))
-            return offset == 1
-                ? candidateName.Contains("meal", StringComparison.OrdinalIgnoreCase)
-                : candidateName.Contains("barrel", StringComparison.OrdinalIgnoreCase);
-        return ObjectRoot(initialName).Equals(ObjectRoot(candidateName), StringComparison.OrdinalIgnoreCase);
-    }
-
-    private static string ObjectRoot(string name) => name
-        .Replace("destroyed ", "", StringComparison.OrdinalIgnoreCase)
-        .Replace("broken ", "", StringComparison.OrdinalIgnoreCase)
-        .Replace(" chopped", "", StringComparison.OrdinalIgnoreCase)
-        .Trim();
 
     private static bool IsEnemyName(string name) =>
         name.Contains("knight", StringComparison.OrdinalIgnoreCase) ||

@@ -174,6 +174,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal((ushort)0, scene.BlockIndexAt(20, 11));
         Assert.Equal((12, 13, 14, 15), (scene.Blocks[0].Surface0, scene.Blocks[0].Surface1,
             scene.Blocks[0].Surface2, scene.Blocks[0].Surface3));
+        Assert.Equal(0, scene.Blocks[0].StateTarget);
         Assert.Equal([12, 13, 14, 15], Enum.GetValues<DynamixSceneFace>()
             .Select(scene.Blocks[0].TextureForFace));
     }

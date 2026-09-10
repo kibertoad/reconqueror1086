@@ -98,6 +98,7 @@ public static class SiegeViewProjection
         var result = new List<SiegeObjectProjection>();
         foreach (var item in siege.Objects)
         {
+            if (item.VisualId < 0) continue;
             var dx = item.X - siege.PlayerX;
             var dy = item.Y - siege.PlayerY;
             var forward = dx * forwardX + dy * forwardY;

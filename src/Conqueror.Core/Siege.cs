@@ -360,13 +360,12 @@ public sealed class SiegeSession
         if (tile == SiegeTile.Barrel)
         {
             Health = Math.Min(MaxHealth, Health + Rules.FoodHealing);
-            if (ObjectAt(PlayerX, PlayerY) is { } item && item.Advance()) _map[PlayerX, PlayerY] = item.Tile;
-            else _map[PlayerX, PlayerY] = SiegeTile.Floor;
+            ConsumeObjectAtPlayer();
             LastMessage = $"Food restores {Rules.FoodHealing} health."; return SiegeAction.Healed;
         }
         if (tile == SiegeTile.Treasure)
         {
-            _map[PlayerX, PlayerY] = SiegeTile.Floor;
+            ConsumeObjectAtPlayer();
             var gold = _random.Next(20, 81); GoldFound += gold; _player.Wealth += gold;
             if (_random.Next(2) == 0)
             {
@@ -377,6 +376,12 @@ public sealed class SiegeSession
             LastMessage = $"Found {gold}s and {bolts} crossbow bolts."; return SiegeAction.Looted;
         }
         return SiegeAction.None;
+    }
+
+    private void ConsumeObjectAtPlayer()
+    {
+        if (ObjectAt(PlayerX, PlayerY) is { } item && item.Advance()) _map[PlayerX, PlayerY] = item.Tile;
+        else _map[PlayerX, PlayerY] = SiegeTile.Floor;
     }
 
     private void TickEnemies()

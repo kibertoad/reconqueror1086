@@ -77,17 +77,18 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
-    public void ImportedDestructibleUsesAdjacentNamedResourceStates()
+    public void ImportedDestructibleUsesItsExplicitSceneStateTarget()
     {
         var source = SyntheticScene();
         SetSceneBlockName(source.Blocks, 4, "tree");
         WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 4, 4);
         WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 4 + 4, 35);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 4 + 64, 6);
         SetSceneBlockName(source.Blocks, 5, "tree chopped");
         WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 5, 4);
         WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 5 + 4, 35);
-        SetSceneBlockName(source.Blocks, 6, "destroyed tree");
-        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 6, 4);
+        SetSceneBlockName(source.Blocks, 6, "ground");
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 6, 0);
         WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 6 + 4, 1);
         SetSceneCell(source.Map, 13, 20, 0);
         SetSceneCell(source.Map, 14, 20, 0);
@@ -97,12 +98,55 @@ public sealed partial class ResourceAndDefinitionTests
 
         var item = Assert.Single(layout.Objects);
         Assert.Equal((9, 20), (item.X, item.Y));
-        Assert.Equal([(4, SiegeTile.Destructible), (5, SiegeTile.Destructible), (6, SiegeTile.Floor)],
+        Assert.Equal([(4, SiegeTile.Destructible), (-1, SiegeTile.Floor)],
             item.Stages.Select(stage => (stage.VisualId, stage.Tile)));
+        var siege = new SiegeSession(new Player(), new Army(), 0, 1, layout);
+        siege.TurnLeft();
+        siege.TurnLeft();
+        Assert.Equal(SiegeAction.Hit, siege.Attack());
+        Assert.Equal((1, -1, SiegeTile.Floor),
+            (Assert.Single(siege.Objects).State, Assert.Single(siege.Objects).VisualId, siege.TileAt(9, 20)));
     }
 
     [Fact]
-    public void DestructibleBarrelRevealsFoodBeforeBecomingDebris()
+    public void SceneDecoderRejectsAnUnboundedStateTarget()
+    {
+        var source = SyntheticScene();
+        WriteInt(source.Blocks, 64, 7);
+
+        Assert.Throws<InvalidDataException>(() => DynamixSceneDecoder.Decode(
+            source.Viewer, source.Scenario, source.Map, source.Blocks));
+    }
+
+    [Fact]
+    public void ImportedPickupRetainsItsExplicitDebrisBillboard()
+    {
+        var source = SyntheticScene();
+        SetSceneBlockName(source.Blocks, 4, "meal");
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 4, 4);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 4 + 4, 19);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 4 + 64, 6);
+        SetSceneBlockName(source.Blocks, 6, "broken barrel");
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 6, 4);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 6 + 4, 1);
+
+        var layout = ImportedSiegeLayouts.Convert(DynamixSceneDecoder.Decode(
+            source.Viewer, source.Scenario, source.Map, source.Blocks));
+
+        var item = Assert.Single(layout.Objects, item => (item.X, item.Y) == (9, 20));
+        Assert.Equal([(4, SiegeTile.Barrel), (6, SiegeTile.Floor)],
+            item.Stages.Select(stage => (stage.VisualId, stage.Tile)));
+        var siege = new SiegeSession(new Player(), new Army(), 0, 1, layout);
+        Assert.Equal(SiegeAction.Healed, siege.Move(false));
+        Assert.Equal((1, 6, SiegeTile.Floor),
+            (siege.ObjectAt(9, 20)!.State, siege.ObjectAt(9, 20)!.VisualId, siege.TileAt(9, 20)));
+        Assert.Equal(SiegeAction.Moved, siege.Move(false));
+        Assert.Contains(SiegeViewProjection.ProjectObjects(siege), projection =>
+            projection.Object.X == 9 && projection.Object.VisualId == 6);
+    }
+
+    [Fact]
+    public void SceneObjectCanExposePickupBeforeRetainingDebris()
     {
         var tiles = new SiegeTile[5, 3];
         for (var x = 0; x < 5; x++)
@@ -121,6 +165,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(SiegeAction.Hit, siege.Attack());
         Assert.Equal((1, 21, SiegeTile.Barrel),
             (Assert.Single(siege.Objects).State, Assert.Single(siege.Objects).VisualId, siege.TileAt(2, 1)));
+        Assert.Equal(21, Assert.Single(SiegeViewProjection.ProjectObjects(siege)).Object.VisualId);
         Assert.Equal(SiegeAction.Healed, siege.Move(true));
         Assert.Equal((2, 22, SiegeTile.Floor),
             (Assert.Single(siege.Objects).State, Assert.Single(siege.Objects).VisualId, siege.TileAt(2, 1)));

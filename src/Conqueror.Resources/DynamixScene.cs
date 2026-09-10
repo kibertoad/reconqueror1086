@@ -33,6 +33,7 @@ public sealed record DynamixSceneBlock(
     int Surface1,
     int Surface2,
     int Surface3,
+    int StateTarget,
     string Name)
 {
     public int TextureForFace(DynamixSceneFace face) => face switch
@@ -155,10 +156,13 @@ public static class DynamixSceneDecoder
                 ReadInt32(record, 48),
                 ReadInt32(record, 52),
                 ReadInt32(record, 56),
+                ReadInt32(record, 64),
                 DecodeName(record.Slice(BlockNameOffset, BlockNameSize), index));
             if (decoded.TextureReferences()
                 .Any(surface => surface < -1 || surface >= textureCount))
                 throw new InvalidDataException($"Scene block {index} references a texture outside the Scenario table.");
+            if (decoded.StateTarget < 0 || decoded.StateTarget >= blockCount)
+                throw new InvalidDataException($"Scene block {index} references a state outside the block table.");
             decodedBlocks[index] = decoded;
         }
 
