@@ -26,9 +26,26 @@ public sealed partial class ResourceAndDefinitionTests
             source.Viewer, source.Scenario, source.Map, source.Blocks));
 
         var tiles = layout.CopyTiles();
-        Assert.Equal(SiegeTile.Floor, tiles[11, 20]);
+        Assert.Equal(SiegeTile.Exit, tiles[11, 20]);
         Assert.Equal(SiegeTile.Treasure, tiles[9, 20]);
         Assert.Contains(layout.Enemies, enemy => (enemy.X, enemy.Y, enemy.VisualId) == (13, 20, 5));
+    }
+
+    [Fact]
+    public void SiegeExitIsVisibleAndLeavesWithoutCrossingItsBoundary()
+    {
+        var tiles = new SiegeTile[4, 3];
+        for (var x = 0; x < 4; x++)
+        for (var y = 0; y < 3; y++)
+            tiles[x, y] = x == 0 || y == 0 || x == 3 || y == 2 ? SiegeTile.Wall : SiegeTile.Floor;
+        tiles[2, 1] = SiegeTile.Exit;
+        var siege = new SiegeSession(new Player(), new Army(), 0, 1,
+            new SiegeLayout(tiles, 1, 1, Facing.East, []));
+
+        Assert.Equal(SiegeTile.Exit, SiegeViewProjection.Cast(siege, 0).Tile);
+        Assert.Equal(SiegeAction.Exited, siege.Move(true));
+        Assert.Equal((1, 1), (siege.PlayerX, siege.PlayerY));
+        Assert.Equal("You leave the battle.", siege.LastMessage);
     }
 
     [Fact]

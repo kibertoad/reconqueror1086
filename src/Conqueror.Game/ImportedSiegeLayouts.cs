@@ -79,6 +79,7 @@ public static class ImportedSiegeLayouts
         while (pending.Count > 0)
         {
             var point = pending.Dequeue();
+            if (tiles[point.X, point.Y] == SiegeTile.Exit) continue;
             foreach (var (dx, dy) in new[] { (1, 0), (-1, 0), (0, 1), (0, -1) })
             {
                 var x = point.X + dx;
@@ -107,9 +108,9 @@ public static class ImportedSiegeLayouts
     {
         var name = block.Name;
         // Across the owned MELEE*/DEFEND* population, behavior 83 is used only
-        // by placed exit/gate markers. They are traversable scene markers, not
+        // by placed exit/gate markers. They are scene boundaries, not
         // members of the behavior-19 locked-door family.
-        if (block.Behavior == 83) return SiegeTile.Floor;
+        if (block.Behavior == 83) return SiegeTile.Exit;
         if (IsEnemy(block)) return SiegeTile.Floor;
         // Placed kind-4 behavior-19 records are the scene pickups. Their names
         // distinguish food from equipment/currency while the metadata keeps an

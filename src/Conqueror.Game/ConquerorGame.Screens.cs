@@ -385,6 +385,7 @@ public sealed partial class ConquerorGame
                 SiegeTile.Door => new Color(126, 83, 48),
                 SiegeTile.SecretDoor => new Color(76, 73, 68),
                 SiegeTile.OpeningDoor => new Color(102, 78, 54),
+                SiegeTile.Exit => new Color(86, 74, 58),
                 _ => new Color(128, 126, 120)
             };
             var distanceShade = Math.Clamp(1.05f - (float)hit.Distance / 32f, 0.22f, 1f);
@@ -552,7 +553,7 @@ public sealed partial class ConquerorGame
         for (var x = 0; x < siege.Width; x++) for (var y = 0; y < siege.Height; y++)
         {
             var tile = siege.TileAt(x, y);
-            var color = tile switch { SiegeTile.Wall => Color.Gray, SiegeTile.Door => Color.SaddleBrown, SiegeTile.SecretDoor => Color.DarkSlateGray, SiegeTile.OpeningDoor => Color.Peru, SiegeTile.Barrel => Color.Green, SiegeTile.Treasure => Color.Gold, _ => new Color(35, 35, 35) };
+            var color = tile switch { SiegeTile.Wall => Color.Gray, SiegeTile.Door => Color.SaddleBrown, SiegeTile.SecretDoor => Color.DarkSlateGray, SiegeTile.OpeningDoor => Color.Peru, SiegeTile.Barrel => Color.Green, SiegeTile.Treasure => Color.Gold, SiegeTile.Exit => Color.DarkRed, _ => new Color(35, 35, 35) };
             Fill(new Rectangle(ox + x * scale, oy + y * scale, scale - 1, scale - 1), color);
         }
         foreach (var enemy in siege.Enemies) Fill(new Rectangle(ox + enemy.X * scale, oy + enemy.Y * scale, scale - 1, scale - 1), enemy.Champion ? Color.Magenta : Color.Red);

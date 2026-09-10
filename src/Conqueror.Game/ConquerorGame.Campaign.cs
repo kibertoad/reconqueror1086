@@ -443,7 +443,10 @@ public sealed partial class ConquerorGame
         AdvanceSiegeForeground(gameTime.ElapsedGameTime.TotalSeconds);
         _siege.AdvanceDoorAnimations(_animationEnabled ? gameTime.ElapsedGameTime.TotalSeconds : SiegeSession.DoorOpeningSeconds);
         _siege.AdvanceEnemyAnimations(_animationEnabled ? gameTime.ElapsedGameTime.TotalSeconds : 1);
-        if (press(Keys.W)) _siege.Move(true); if (press(Keys.S)) _siege.Move(false);
+        var movement = SiegeAction.None;
+        if (press(Keys.W)) movement = _siege.Move(true);
+        if (press(Keys.S)) movement = _siege.Move(false);
+        if (movement == SiegeAction.Exited) { LeaveSiege(); return; }
         if (press(Keys.A)) _siege.TurnLeft(); if (press(Keys.D)) _siege.TurnRight();
         if (press(Keys.E)) _siege.Interact();
         if (press(Keys.Space))
@@ -467,9 +470,8 @@ public sealed partial class ConquerorGame
         _notice = _siege.LastMessage;
         if (press(Keys.R))
         {
-            if (_drogoCombat) { _notice = "DROGO WILL NOT LET YOU ESCAPE"; return; }
-            if (_activePracticeCombat is not null) { FinishPracticeCombat("PRACTICE ENDED"); return; }
-            _campaign.FinishSiege(_siege); var lost = _campaign.Retreat(); _siege = null; ClearSiegeVisuals(); _screen = Screen.Map; _notice = $"RETREATED - {lost} SOLDIERS LOST"; Autosave(); return;
+            LeaveSiege();
+            return;
         }
         if (_siege.Won)
         {
@@ -493,6 +495,20 @@ public sealed partial class ConquerorGame
             else if (_activePracticeCombat is not null) FinishPracticeCombat("PRACTICE LOST");
             else { _campaign.FinishSiege(_siege); _siege = null; ClearSiegeVisuals(); _screen = Screen.Map; _notice = "YOU ARE CARRIED FROM THE CASTLE"; Autosave(); }
         }
+    }
+
+    private void LeaveSiege()
+    {
+        if (_siege is null) return;
+        if (_drogoCombat) { _notice = "DROGO WILL NOT LET YOU ESCAPE"; return; }
+        if (_activePracticeCombat is not null) { FinishPracticeCombat("PRACTICE ENDED"); return; }
+        _campaign.FinishSiege(_siege);
+        var lost = _campaign.Retreat();
+        _siege = null;
+        ClearSiegeVisuals();
+        _screen = Screen.Map;
+        _notice = $"RETREATED - {lost} SOLDIERS LOST";
+        Autosave();
     }
 
     private void UpdateDrogoDemand(Func<Keys, bool> press)

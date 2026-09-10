@@ -104,7 +104,7 @@ public static class SiegeViewProjection
     }
 
     private static bool IsSolid(SiegeTile tile) =>
-        tile is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor;
+        tile is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor or SiegeTile.Exit;
 
     private static (double X, double Y) Direction(Facing facing) => facing switch
     {

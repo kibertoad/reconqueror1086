@@ -1,8 +1,8 @@
 namespace Conqueror.Core;
 
 public enum Facing { North, East, South, West }
-public enum SiegeTile { Floor, Wall, Door, SecretDoor, OpeningDoor, Barrel, Treasure }
-public enum SiegeAction { None, Moved, Blocked, DoorOpened, Healed, Looted, Hit, Missed, WeaponBroke, Shot, NoAmmunition }
+public enum SiegeTile { Floor, Wall, Door, SecretDoor, OpeningDoor, Barrel, Treasure, Exit }
+public enum SiegeAction { None, Moved, Blocked, DoorOpened, Healed, Looted, Hit, Missed, WeaponBroke, Shot, NoAmmunition, Exited }
 public enum SiegeEnemyVisualState { Walk, Attack, Hit, Dying }
 
 public sealed class SiegeEnemy
@@ -203,6 +203,11 @@ public sealed class SiegeSession
         if (!forward) { dx = -dx; dy = -dy; }
         var nx = PlayerX + dx; var ny = PlayerY + dy;
         var tile = TileAt(nx, ny);
+        if (tile == SiegeTile.Exit)
+        {
+            LastMessage = "You leave the battle.";
+            return SiegeAction.Exited;
+        }
         if (tile is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor || EnemyAt(nx, ny) is not null)
         {
             LastMessage = "The way is blocked."; TickEnemies(); return SiegeAction.Blocked;
@@ -281,7 +286,7 @@ public sealed class SiegeSession
         for (var distance = 1; distance <= 8; distance++)
         {
             var x = PlayerX + dx * distance; var y = PlayerY + dy * distance;
-            if (TileAt(x, y) is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor) return 0;
+            if (TileAt(x, y) is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor or SiegeTile.Exit) return 0;
             if (EnemyAt(x, y) is not null) return distance;
         }
         return 0;
@@ -360,7 +365,7 @@ public sealed class SiegeSession
         for (var i = 1; i <= range; i++)
         {
             var x = PlayerX + dx * i; var y = PlayerY + dy * i;
-            if (TileAt(x, y) is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor) return null;
+            if (TileAt(x, y) is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor or SiegeTile.Exit) return null;
             if (EnemyAt(x, y) is { } enemy) return enemy;
         }
         return null;
