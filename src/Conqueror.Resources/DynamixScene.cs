@@ -9,6 +9,8 @@ public sealed record DynamixSceneViewer(int X, int Y, int Elevation, int Heading
     public int CellY => Y >> 8;
 }
 
+public sealed record DynamixSceneColorMapping(bool Enabled, int MapCount, int DistanceShift, int BlendTarget);
+
 public enum DynamixSceneFace
 {
     North,
@@ -22,6 +24,7 @@ public sealed record DynamixSceneBlock(
     int Kind,
     int Behavior,
     int Flags,
+    int ColorMapOffset,
     int Width,
     int Height,
     int Surface0,
@@ -61,12 +64,14 @@ public sealed class DynamixScene
 
     internal DynamixScene(
         DynamixSceneViewer viewer,
+        DynamixSceneColorMapping colorMapping,
         int textureCount,
         int soundEffectCount,
         DynamixSceneBlock[] blocks,
         ushort[] cells)
     {
         Viewer = viewer;
+        ColorMapping = colorMapping;
         TextureCount = textureCount;
         SoundEffectCount = soundEffectCount;
         Blocks = blocks;
@@ -74,6 +79,7 @@ public sealed class DynamixScene
     }
 
     public DynamixSceneViewer Viewer { get; }
+    public DynamixSceneColorMapping ColorMapping { get; }
     public int TextureCount { get; }
     public int SoundEffectCount { get; }
     public IReadOnlyList<DynamixSceneBlock> Blocks { get; }
@@ -111,9 +117,21 @@ public static class DynamixSceneDecoder
         var textureCount = ReadInt32(scenario, 20);
         var blockCount = ReadInt32(scenario, 24);
         var soundEffectCount = ReadInt32(scenario, 28);
+        var colorMappingEnabled = ReadInt32(scenario, 40);
+        if (colorMappingEnabled is not (0 or 1))
+            throw new InvalidDataException("Scene color-map enable flag is invalid.");
+        var colorMapping = new DynamixSceneColorMapping(
+            colorMappingEnabled != 0,
+            ReadInt32(scenario, 44),
+            ReadInt32(scenario, 48),
+            ReadInt32(scenario, 52));
         if (textureCount is < 1 or > 4096) throw new InvalidDataException("Scene texture count is outside bounded limits.");
         if (blockCount is < 1 or > 4096) throw new InvalidDataException("Scene block count is outside bounded limits.");
         if (soundEffectCount is < 0 or > 4096) throw new InvalidDataException("Scene sound-effect count is outside bounded limits.");
+        if (colorMapping.Enabled && (colorMapping.MapCount is < 1 or > DynamixSceneColorMaps.Count
+            || colorMapping.DistanceShift is < 2 or > 30
+            || colorMapping.BlendTarget is < 0 or >= DynamixSceneColorMaps.EntryCount))
+            throw new InvalidDataException("Scene color-map parameters are outside bounded limits.");
         if (blocks.Length != checked(blockCount * BlockSize))
             throw new InvalidDataException("Scene Blocks length does not match the Scenario block count.");
 
@@ -128,6 +146,7 @@ public static class DynamixSceneDecoder
                 ReadInt32(record, 0),
                 ReadInt32(record, 4),
                 ReadInt32(record, 8),
+                ReadInt32(record, 12),
                 ReadInt32(record, 24),
                 ReadInt32(record, 32),
                 ReadInt32(record, 44),
@@ -157,7 +176,7 @@ public static class DynamixSceneDecoder
         if (decodedViewer.Heading is < 0 or > ushort.MaxValue)
             throw new InvalidDataException("Scene Viewer heading is outside its 16-bit turn range.");
 
-        return new(decodedViewer, textureCount, soundEffectCount, decodedBlocks, cells);
+        return new(decodedViewer, colorMapping, textureCount, soundEffectCount, decodedBlocks, cells);
     }
 
     private static int ReadInt32(ReadOnlySpan<byte> bytes, int offset) =>

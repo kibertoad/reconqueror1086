@@ -424,6 +424,10 @@ public sealed partial class ResourceAndDefinitionTests
         WriteInt(scenario, 20, 32);
         WriteInt(scenario, 24, names.Length);
         WriteInt(scenario, 28, 1);
+        WriteInt(scenario, 40, 1);
+        WriteInt(scenario, 44, 32);
+        WriteInt(scenario, 48, 10);
+        WriteInt(scenario, 52, 20);
 
         var blocks = new byte[names.Length * DynamixSceneDecoder.BlockSize];
         for (var index = 0; index < names.Length; index++)
@@ -431,6 +435,7 @@ public sealed partial class ResourceAndDefinitionTests
             var offset = index * DynamixSceneDecoder.BlockSize;
             System.Text.Encoding.ASCII.GetBytes(names[index]).CopyTo(blocks, offset + 78);
             WriteInt(blocks, offset + 44, 12 + index);
+            WriteInt(blocks, offset + 12, 2);
             WriteInt(blocks, offset + 48, 13 + index);
             WriteInt(blocks, offset + 52, 14 + index);
             WriteInt(blocks, offset + 56, 15 + index);

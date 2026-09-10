@@ -4,17 +4,20 @@ namespace Conqueror.Game;
 
 public static class SiegeColorMapping
 {
-    // Pal32 starts the confirmed identity-to-black family. The original family
-    // selection and distance scale are still provisional and isolated here so
-    // executable or controlled-observation evidence can replace this mapping.
-    public const int DistanceFamilyStart = 32;
-    public const int DistanceFamilyLength = 32;
-
-    public static int WallDistanceMap(double distance)
+    public static int WallDistanceMap(double distance, DynamixSceneColorMapping parameters, int blockOffset)
     {
         if (!double.IsFinite(distance) || distance < 0)
             throw new ArgumentOutOfRangeException(nameof(distance));
-        var level = Math.Clamp((int)Math.Floor(distance), 0, DistanceFamilyLength - 1);
-        return Math.Min(DynamixSceneColorMaps.Count - 1, DistanceFamilyStart + level);
+        ArgumentNullException.ThrowIfNull(parameters);
+        if (!parameters.Enabled || parameters.MapCount is < 1 or > DynamixSceneColorMaps.Count
+            || parameters.DistanceShift is < 2 or > 30)
+            throw new ArgumentOutOfRangeException(nameof(parameters));
+
+        // CONQUER.EXE 0x4581F-0x45854 selects:
+        // clamp((8.8 fixed-point depth >> (Scenario.DistanceShift - 2))
+        //       - block offset, 0, Scenario.MapCount - 1).
+        var scale = Math.Pow(2, 10 - parameters.DistanceShift);
+        var level = Math.Floor(distance * scale) - blockOffset;
+        return (int)Math.Clamp(level, 0, parameters.MapCount - 1);
     }
 }

@@ -440,6 +440,7 @@ if (File.Exists(gobPath))
 
 var sceneReport = new StringBuilder("# Result  Entries  Stored  Kind1  Kind2  CompressedBlocks  StoredBlocks  ISO path\n");
 var sceneTextureReport = new StringBuilder("# Textures  Dimensions  ISO path\n");
+var sceneScenarioReport = new StringBuilder("# Enabled  MapCount  DistanceShift  BlendTarget  BlockOffsets  ISO path\n");
 var paletteReport = new StringBuilder("# Minimum  Maximum  SHA-256  Resource  ISO path\n");
 var sceneContainers = 0;
 var sceneEntries = 0;
@@ -480,6 +481,20 @@ foreach (var file in files.Where(x => DynamixArchive.HasContainerExtension(x.Pat
         var dimensions = string.Join(',', textures.Select(texture => $"{texture.Width}x{texture.Height}")
             .Distinct().Order(StringComparer.Ordinal));
         sceneTextureReport.AppendLine($"{textures.Length,8}  {dimensions,-40}  {file.Path}");
+        var scenarioEntry = archive.Entries.FirstOrDefault(entry => entry.Name.Equals("Scenario", StringComparison.OrdinalIgnoreCase));
+        if (scenarioEntry is not null)
+        {
+            var scenario = archive.ReadDecoded(scenarioEntry);
+            var viewerEntry = archive.Entries.Single(entry => entry.Name.Equals("Viewer", StringComparison.OrdinalIgnoreCase));
+            var mapEntry = archive.Entries.Single(entry => entry.Name.Equals("Map", StringComparison.OrdinalIgnoreCase));
+            var blocksEntry = archive.Entries.Single(entry => entry.Name.Equals("Blocks", StringComparison.OrdinalIgnoreCase));
+            var scene = DynamixSceneDecoder.Decode(archive.ReadDecoded(viewerEntry), scenario,
+                archive.ReadDecoded(mapEntry), archive.ReadDecoded(blocksEntry));
+            var offsets = string.Join(',', scene.Blocks.Select(block => block.ColorMapOffset).Distinct().Order());
+            sceneScenarioReport.AppendLine($"{Convert.ToInt32(scene.ColorMapping.Enabled),7}  "
+                + $"{scene.ColorMapping.MapCount,8}  {scene.ColorMapping.DistanceShift,13}  "
+                + $"{scene.ColorMapping.BlendTarget,11}  {offsets,-12}  {file.Path}");
+        }
         foreach (var entry in archive.Entries.Where(x => DynamixArchive.CanDecode(x)
             && Path.GetExtension(x.Name).Equals(".666", StringComparison.OrdinalIgnoreCase)))
             AppendSoundBankReport(soundBankReport, file.Path, entry.Name, archive.ReadDecoded(entry));
@@ -504,6 +519,7 @@ foreach (var file in files.Where(x => DynamixArchive.HasContainerExtension(x.Pat
 File.WriteAllText(Path.Combine(output, "scene-res-report.txt"), sceneReport.ToString());
 sceneTextureReport.AppendLine($"# total textures: {sceneTextures}");
 File.WriteAllText(Path.Combine(output, "scene-texture-report.txt"), sceneTextureReport.ToString());
+File.WriteAllText(Path.Combine(output, "scene-scenario-report.txt"), sceneScenarioReport.ToString());
 File.WriteAllText(Path.Combine(output, "stored-palette-report.txt"), paletteReport.ToString());
 File.WriteAllText(Path.Combine(output, "sound-bank-report.txt"), soundBankReport.ToString());
 var smackerReport = new StringBuilder("# Version  Dimensions  Frames  Frame ms  Palette changes  Audio packets  Decoded audio  Final frame SHA-256  Audio tracks  Bytes  ISO path\n");
@@ -644,9 +660,10 @@ static string DisassembleLinearExecutable(string path, IReadOnlyList<uint> addre
     var pageSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(le + 0x28, 4));
     var objectTable = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(le + 0x40, 4));
     var objectCount = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(le + 0x44, 4));
-    var dataPages = checked((uint)le + BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(le + 0x80, 4)));
+    var module = FindLinearExecutableModuleStart(bytes, le);
+    var dataPages = checked((uint)module + BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(le + 0x80, 4)));
     var report = new StringBuilder("# 32-bit LE disassembly (derived metadata; original bytes omitted)\n");
-    report.AppendLine($"# LE file offset 0x{le:X}; objects {objectCount}; page size 0x{pageSize:X}");
+    report.AppendLine($"# bound-module file offset 0x{module:X}; LE file offset 0x{le:X}; objects {objectCount}; page size 0x{pageSize:X}");
     foreach (var address in addresses)
     {
         var mapped = false;
@@ -694,7 +711,8 @@ static string FindLinearExecutableDataReferences(string path, IReadOnlyList<uint
     var pageSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(le + 0x28, 4));
     var objectTable = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(le + 0x40, 4));
     var objectCount = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(le + 0x44, 4));
-    var dataPages = checked((uint)le + BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(le + 0x80, 4)));
+    var module = FindLinearExecutableModuleStart(bytes, le);
+    var dataPages = checked((uint)module + BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(le + 0x80, 4)));
     var report = new StringBuilder("# 32-bit LE references to object-relative data offsets (derived metadata; original bytes omitted)\n");
     report.AppendLine($"# requested: {string.Join(',', offsets.Select(offset => $"0x{offset:X}"))}");
     report.AppendLine($"# decoded internal fixups: {fixups.Count}");
@@ -740,6 +758,19 @@ static string FindLinearExecutableDataReferences(string path, IReadOnlyList<uint
         }
     }
     return report.ToString();
+}
+
+static int FindLinearExecutableModuleStart(ReadOnlySpan<byte> source, int linearHeader)
+{
+    for (var offset = linearHeader; offset >= 0; offset--)
+    {
+        if (offset > source.Length - 0x40 || source[offset] != (byte)'M' || source[offset + 1] != (byte)'Z')
+            continue;
+        var relativeHeader = BinaryPrimitives.ReadUInt32LittleEndian(source.Slice(offset + 0x3c, 4));
+        if (relativeHeader <= int.MaxValue && offset + (int)relativeHeader == linearHeader)
+            return offset;
+    }
+    throw new InvalidDataException("The Linear Executable header is not owned by a bounded MZ module.");
 }
 
 static string FindLinearExecutableFixupsBySource(string path, IReadOnlyList<uint> addresses)

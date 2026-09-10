@@ -255,7 +255,7 @@ public sealed partial class ConquerorGame
             textures, sources, palette.Rgb, imported.ColorMaps, backdrop);
     }
 
-    private Texture2D? SceneWallTexture(SiegeRayHit hit, int colorMapIndex)
+    private Texture2D? SceneWallTexture(SiegeRayHit hit)
     {
         if (_siegeVisuals is null) return null;
         var sourceX = hit.MapX + _siegeVisuals.SourceOriginX;
@@ -281,6 +281,8 @@ public sealed partial class ConquerorGame
             SiegeWallFace.South => DynamixSceneFace.South,
             _ => DynamixSceneFace.West
         };
+        var colorMapIndex = SiegeColorMapping.WallDistanceMap(
+            hit.Distance, _siegeVisuals.Scene.ColorMapping, block.ColorMapOffset);
         return _siegeVisuals.TextureFor(block.TextureForFace(face), colorMapIndex);
     }
 
@@ -384,8 +386,7 @@ public sealed partial class ConquerorGame
                 _ => new Color(128, 126, 120)
             };
             var distanceShade = Math.Clamp(1.05f - (float)hit.Distance / 32f, 0.22f, 1f);
-            var colorMapIndex = SiegeColorMapping.WallDistanceMap(hit.Distance);
-            if (SceneWallTexture(hit, colorMapIndex) is { } wallTexture)
+            if (SceneWallTexture(hit) is { } wallTexture)
             {
                 var sourceX = Math.Clamp((int)(hit.TextureOffset * wallTexture.Width), 0, wallTexture.Width - 1);
                 _batch.Draw(wallTexture, new Rectangle(viewport.X + column, top, 1, wallHeight),

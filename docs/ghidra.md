@@ -62,7 +62,10 @@ Reference facts:
 - byte length: 919,107
 - SHA-256: `5D7231758766204AD061E6B82CF2F0E0CBE28899B35D095F13E4AAD75C8B79D6`
 - format: 32-bit Linear Executable embedded behind a DOS16M MZ stub
+- embedded MZ module file offset: `0x26654`
+- LE header offset within that module: `0x2AA8`
 - LE header file offset for this build: `0x290FC`
+- LE enumerated-data-page offset: module-relative `0x25C00`, hence raw file offset `0x4C254`
 
 If the artifact is absent, regenerate it without modifying the original installation:
 
@@ -99,7 +102,7 @@ dotnet run --project tools\Conqueror.Inspect --artifacts-path $artifactPath -- `
   '--disassemble=0x45C6E,0x456F4,0x4576C' '--executable-only'
 ```
 
-This writes the ignored metadata-only `analysis/original/executable-disassembly-report.txt`. Addresses are LE virtual addresses, not raw file offsets. The inspector maps them through the executable's object and page tables before decoding 32-bit x86 instructions.
+This writes the ignored metadata-only `analysis/original/executable-disassembly-report.txt`. Addresses are LE virtual addresses, not raw file offsets. The inspector locates the nested MZ module that owns the LE header, applies module-relative LE page offsets, and then maps virtual addresses through the executable's object and page tables before decoding 32-bit x86 instructions. For this build, adding the page offset to the LE header would be wrong by `0x2AA8`; the enumerated pages begin at raw file offset `0x4C254`, not `0x4ECFC`.
 
 For data references that are absent from raw instruction operands, `--xref-data=` also decodes the executable's fixup page and record tables according to the IBM LE/LX field definitions and Open Watcom's `exeflat.h` constants. Pass comma-separated target-object offsets; the ignored report includes matching internal relocations and a small source-address neighborhood without exporting original bytes:
 

@@ -26,7 +26,6 @@ public sealed partial class ResourceAndDefinitionTests
             ResourcePaths.DecodedArchiveFolder("CONQUER/BAR0.RES"));
         Assert.Throws<InvalidDataException>(() => ResourcePaths.DecodedArchiveFolder(".."));
     }
-
     [Theory]
     [InlineData("TEX000 16 16", 256, 0, 16, 16)]
     [InlineData("TEX081 128 156", 19968, 81, 128, 156)]
@@ -87,16 +86,18 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
-    public void SiegeWallDistanceUsesTheConfirmedDarkeningFamilyWithinBounds()
+    public void SiegeWallDistanceUsesTheScenarioShiftCountAndBlockOffset()
     {
-        Assert.Equal(32, SiegeColorMapping.WallDistanceMap(0));
-        Assert.Equal(32, SiegeColorMapping.WallDistanceMap(0.999));
-        Assert.Equal(33, SiegeColorMapping.WallDistanceMap(1));
-        Assert.Equal(47, SiegeColorMapping.WallDistanceMap(15.9));
-        Assert.Equal(63, SiegeColorMapping.WallDistanceMap(31));
-        Assert.Equal(63, SiegeColorMapping.WallDistanceMap(10_000));
-        Assert.Throws<ArgumentOutOfRangeException>(() => SiegeColorMapping.WallDistanceMap(-0.1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => SiegeColorMapping.WallDistanceMap(double.NaN));
+        var melee = new DynamixSceneColorMapping(true, 32, 10, 20);
+        Assert.Equal(0, SiegeColorMapping.WallDistanceMap(0, melee, 0));
+        Assert.Equal(0, SiegeColorMapping.WallDistanceMap(0.999, melee, 0));
+        Assert.Equal(1, SiegeColorMapping.WallDistanceMap(1, melee, 0));
+        Assert.Equal(13, SiegeColorMapping.WallDistanceMap(15.9, melee, 2));
+        Assert.Equal(31, SiegeColorMapping.WallDistanceMap(10_000, melee, 0));
+        var room = melee with { DistanceShift = 8 };
+        Assert.Equal(6, SiegeColorMapping.WallDistanceMap(2.1, room, 2));
+        Assert.Throws<ArgumentOutOfRangeException>(() => SiegeColorMapping.WallDistanceMap(-0.1, melee, 0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => SiegeColorMapping.WallDistanceMap(double.NaN, melee, 0));
     }
 
     [Theory]
@@ -166,6 +167,8 @@ public sealed partial class ResourceAndDefinitionTests
 
         Assert.Equal((10, 20, 16384), (scene.Viewer.CellX, scene.Viewer.CellY, scene.Viewer.Heading));
         Assert.Equal((7, 32, 1), (scene.Blocks.Count, scene.TextureCount, scene.SoundEffectCount));
+        Assert.Equal((new DynamixSceneColorMapping(true, 32, 10, 20), 2),
+            (scene.ColorMapping, scene.Blocks[0].ColorMapOffset));
         Assert.Equal("arched door", scene.BlockAt(11, 20).Name);
         Assert.Equal("Secret Passage", scene.BlockAt(10, 21).Name);
         Assert.Equal("meal", scene.BlockAt(12, 20).Name);
