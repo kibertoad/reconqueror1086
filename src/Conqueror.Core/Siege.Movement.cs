@@ -77,6 +77,9 @@ public sealed partial class SiegeSession
     private bool TryBeginRetainerMovement(SiegeRetainer retainer)
     {
         if (retainer.VisualState != SiegeEnemyVisualState.Walk) return false;
+        // Scaling belongs to one constructed mode-10 effect. The exact
+        // heading itself persists into mode 5, whose handler preserves it.
+        retainer.MovementScalesEscapeDelta = false;
         if (retainer.OrderedDestination is { } destination)
         {
             retainer.MovementWanders = false;
@@ -118,7 +121,7 @@ public sealed partial class SiegeSession
                     return false;
                 if (retainer.RetreatMode == 0)
                 {
-                    if (RetreatOrderTarget(retainer) is not null)
+                    if (AcquireRetreatOrderTarget(retainer) is not null)
                     {
                         retainer.RetreatMode = 5;
                         retainer.MovementWanders = true;
@@ -184,7 +187,7 @@ public sealed partial class SiegeSession
                 }
                 if (retainer.RetreatMode == 4)
                 {
-                    if (RetreatOrderTarget(retainer) is { } opponent)
+                    if (AcquireRetreatOrderTarget(retainer) is { } opponent)
                     {
                         retainer.RetreatMode = 8;
                         retainer.RetreatRegroupTarget = null;
@@ -217,7 +220,7 @@ public sealed partial class SiegeSession
                 }
                 if (retainer.RetreatMode == 6)
                 {
-                    if (RetreatOrderTarget(retainer) is { } reacquired)
+                    if (AcquireRetreatOrderTarget(retainer) is { } reacquired)
                     {
                         retainer.RetreatMode = 8;
                         retainer.OrderedTarget = reacquired;
@@ -227,6 +230,46 @@ public sealed partial class SiegeSession
                     }
                     retainer.MovementWanders = true;
                     return true;
+                }
+                if (retainer.RetreatMode == 13)
+                {
+                    // Predicate 0x4FD9A succeeds at health >= 6. Kind-0
+                    // transition 0x4E7A4 therefore chooses mode 2 when
+                    // healthy and mode 10 when morale has broken.
+                    if (retainer.Health >= 6)
+                    {
+                        retainer.RetreatMode = 2;
+                        retainer.MovementWanders = false;
+                        retainer.Command = SiegeRetainerCommand.Defend;
+                        return false;
+                    }
+                    var sourceX8 = FixedActorX8(retainer);
+                    var sourceY8 = FixedActorY8(retainer);
+                    var targetX8 = retainer.RetreatTargetX8 ?? sourceX8;
+                    var targetY8 = retainer.RetreatTargetY8 ?? sourceY8;
+                    retainer.RetreatMode = 10;
+                    retainer.OriginalHeading8 = OriginalActorMotion.HeadingToward(
+                        sourceX8 - targetX8, sourceY8 - targetY8);
+                    retainer.Facing = FacingForHeading(retainer.OriginalHeading8.Value);
+                    retainer.MovementWanders = false;
+                    retainer.MovementScalesEscapeDelta = true;
+                    return true;
+                }
+                if (retainer.RetreatMode == 10)
+                {
+                    // After the escape effect, the ordinary kind-0 mode-10
+                    // acquisition chooses mode 5 on success or mode 2 on
+                    // failure (transition 0x4E76B).
+                    if (AcquireRetreatOrderTarget(retainer) is not null)
+                    {
+                        retainer.RetreatMode = 5;
+                        retainer.MovementWanders = true;
+                        return true;
+                    }
+                    retainer.RetreatMode = 2;
+                    retainer.MovementWanders = false;
+                    retainer.Command = SiegeRetainerCommand.Defend;
+                    return false;
                 }
                 retainer.MovementWanders = false;
                 return false;
@@ -246,6 +289,7 @@ public sealed partial class SiegeSession
 
     private static void AimRetainerAt(SiegeRetainer retainer, int targetX, int targetY)
     {
+        retainer.OriginalHeading8 = null;
         var dx = targetX - retainer.X;
         var dy = targetY - retainer.Y;
         var absX = Math.Abs(dx);
@@ -268,8 +312,15 @@ public sealed partial class SiegeSession
 
     private bool AdvanceMovementTick(SiegeRetainer retainer, SiegeActorMovement movement, int effectFlags)
     {
-        var (deltaX, deltaY) = RotateMovement(
-            movement.FixedXDeltaPerTick, movement.FixedYDeltaPerTick, retainer.Facing);
+        var localX = retainer.MovementScalesEscapeDelta
+            ? OriginalActorMotion.ScaleEscapeDelta(movement.FixedXDeltaPerTick)
+            : movement.FixedXDeltaPerTick;
+        var localY = retainer.MovementScalesEscapeDelta
+            ? OriginalActorMotion.ScaleEscapeDelta(movement.FixedYDeltaPerTick)
+            : movement.FixedYDeltaPerTick;
+        var (deltaX, deltaY) = retainer.OriginalHeading8 is { } heading
+            ? OriginalActorMotion.Rotate(localX, localY, heading)
+            : RotateMovement(localX, localY, retainer.Facing);
         return AdvanceMovementAxis(retainer, deltaX, true, effectFlags) &&
                AdvanceMovementAxis(retainer, deltaY, false, effectFlags);
     }
@@ -291,6 +342,7 @@ public sealed partial class SiegeSession
                     if (xAxis) retainer.OffsetX8 = 0;
                     else retainer.OffsetY8 = 0;
                     retainer.Facing = (Facing)(((int)retainer.Facing + 3) & 3);
+                    retainer.OriginalHeading8 = null;
                 }
                 // Flag 0x10 zeros the live effect's coordinate deltas and tick
                 // count, so actor thinking resumes immediately after this tick.
@@ -332,6 +384,15 @@ public sealed partial class SiegeSession
     // exits early once the returned 8.8 depth is below 0x154.
     private SiegeEnemy? RetreatOrderTarget(SiegeRetainer retainer) =>
         VisibleOrderTarget(retainer, preserveExplicitTarget: false);
+
+    private SiegeEnemy? AcquireRetreatOrderTarget(SiegeRetainer retainer)
+    {
+        var target = RetreatOrderTarget(retainer);
+        if (target is null) return null;
+        retainer.RetreatTargetX8 = FixedActorX8(target);
+        retainer.RetreatTargetY8 = FixedActorY8(target);
+        return target;
+    }
 
     private SiegeEnemy? AttackOrderTarget(SiegeRetainer retainer) =>
         VisibleOrderTarget(retainer, preserveExplicitTarget: true);
@@ -383,8 +444,29 @@ public sealed partial class SiegeSession
         retainer.Facing = DirectionToward(retainer.X, retainer.Y, target.X, target.Y, retainer.Facing);
         StartVisual(retainer, SiegeEnemyVisualState.Attack);
         retainer.PendingRangedTarget = target;
+        if (retainer.Command == SiegeRetainerCommand.Retreat &&
+            retainer.OriginalActorKind == 0 && retainer.RetreatMode == 11 &&
+            target.Health > retainer.Health)
+        {
+            // 0x504F2-0x50517 selects the failure half of 0x4E77E when
+            // the (possibly ray-replaced) target is stronger. 0x4E5F0
+            // cancels the mode-11 effect while changing current mode to 13.
+            retainer.PendingRangedTarget = null;
+            retainer.VisualState = SiegeEnemyVisualState.Walk;
+            retainer.VisualElapsed = 0;
+            retainer.RetreatMode = 13;
+        }
         return true;
     }
+
+    private static int FixedActorX8(SiegeEnemy actor) =>
+        checked((actor.X << 8) + 0x80 + actor.OffsetX8);
+
+    private static int FixedActorY8(SiegeEnemy actor) =>
+        checked((actor.Y << 8) + 0x80 + actor.OffsetY8);
+
+    private static Facing FacingForHeading(int heading) =>
+        (Facing)(((heading + 0x20) & 0xff) >> 6);
 
     private SiegeActorRayHit? RayToward(SiegeEnemy source, SiegeEnemy target)
     {

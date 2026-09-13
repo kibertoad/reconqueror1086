@@ -193,17 +193,21 @@ For bounded conversation entry-point analysis, pass decimal or hexadecimal node 
 
 For numeric action-tree inspection, `--action-groups=1101,2011` writes an ignored expression/branch trace without dialogue prose, while `--resource-integers=all.vtb` emits a bounded dword view. Pass `all` to `--action-groups` or `--conversation-nodes` to emit the complete metadata-only population rather than a comma-separated selection. For evidence correlation against the owner-local dialogue, `--conversation-text=1101,1152` writes only the explicitly selected decoded text to an ignored, redistribution-prohibited report; never commit that output. `--fixup-source=0x6ABBC` reports LE relocations near a source address and is useful for resolving switch tables whose unrelocated operands are misleading.
 
-To close the mode-9/10 route question, decode slots 9 and 10 in every kind
-table, not only the friendly public-command tables. Object-1 table bases are
-`0x3E43C`, `0x3E480`, `0x3E4C4`, `0x3E500`, `0x3E53C`, `0x3E578`, and
-`0x3E5B4`; kind 7 shares kind 2. Their resolved transition routines are among
-`0x4E6C0`, `0x4E758`, `0x4E76B`, `0x4E805`, `0x4E818`, `0x4E8D8`,
-`0x4E926`, `0x4E95F`, and `0x4E9A7`. Cross-check those columns against all ten
-current/requested/previous triples written by initializer `0x542F8`, then
-against the complete official placed-template census. That combined evidence,
-not absence of a public button alone, proves `0x50020` unreachable for the
-supported population. Preserve the handler's 1.5 non-cardinal formula as a
-dormant technical mapping rather than inventing a runtime entry.
+The mode-9/10 table and initializer census establish initial state but cannot
+prove dynamic unreachability. The former dormant conclusion is Disproved by
+tracing beyond mode 11. Fixup source `0x4E464` resolves kind-0 mode 11 to
+transition `0x4E77E` (failure 13, success 11). At `0x504F2`-`0x50517`, compare
+the stored, possibly ray-replaced target's health `+0x40` with source health:
+target `<=` source retains mode 11; target `>` source selects mode 13, and
+helper `0x4E5F0` cancels the newly constructed effect because current mode
+changes. Predicate `0x4FD9A` is true at source health `>= 6`. Fixup source
+`0x4E46C` resolves mode 13 to transition `0x4E7A4` (failure 10, success 2),
+while current handler `0x5051A` is a no-op. Thus low health reaches `0x50020`.
+That handler calls `0x445C4` with `current - stored target`, multiplies
+descriptor dwords `+0x20/+0x1C` independently by object-2 double `0x7CEA =
+1.5`, converts with x87 `FISTP`, rewrites flags to `0x112`, and constructs the
+effect. Close movement with `0x446BC`, `0x4472C`, and `0x44740`; retain
+per-product `(product + 0x3FFF) >> 15` rounding.
 
 For shared-destination behavior, correlate scheduler `0x53425`-`0x53694`
 with the ignored `--scene-blocks` census. The neighbor test reads behavior bit

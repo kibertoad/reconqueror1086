@@ -26,17 +26,6 @@ public static class OriginalSiegeProjection
 {
     private const int MaximumTraversalSteps = 0x40;
     private const int MaximumCandidates = 0x1f;
-    private static readonly int[] QuarterSine15 =
-    [
-        0, 817, 1633, 2449, 3263, 4074, 4884, 5690,
-        6493, 7291, 8085, 8875, 9658, 10436, 11207, 11971,
-        12728, 13477, 14217, 14949, 15671, 16384, 17086, 17778,
-        18458, 19128, 19785, 20430, 21062, 21681, 22287, 22879,
-        23457, 24020, 24568, 25101, 25618, 26120, 26605, 27073,
-        27525, 27960, 28377, 28777, 29158, 29522, 29867, 30194,
-        30502, 30791, 31061, 31311, 31542, 31754, 31945, 32117,
-        32269, 32401, 32513, 32604, 32675, 32726, 32757, 32767
-    ];
 
     public static IReadOnlyList<SiegeSceneRayCandidate> CastColumn(
         SiegeSession siege,
@@ -81,7 +70,7 @@ public static class OriginalSiegeProjection
     }
 
     public static int HeadingToward(int deltaX8, int deltaY8) =>
-        OriginalHeading(-deltaY8, deltaX8);
+        OriginalActorMotion.HeadingToward(deltaX8, deltaY8);
 
     private static IReadOnlyList<SiegeSceneRayCandidate> CastFixed(
         DynamixScene scene,
@@ -234,7 +223,8 @@ public static class OriginalSiegeProjection
         var localMapX = localContactX8 >> 8;
         var localMapY = localContactY8 >> 8;
         var (forwardX15, forwardY15) = ForwardFor(heading);
-        var (rightX15, rightY15) = (FixedCos15(heading), FixedSin15(heading));
+        var (rightX15, rightY15) =
+            (OriginalActorMotion.Cos15(heading), OriginalActorMotion.Sin15(heading));
         var distance8 = FixedDot15(contactX, contactY, forwardX15, forwardY15);
         var textureCoordinate8 = face is SiegeWallFace.East or SiegeWallFace.West
             ? worldY8 & 0xff
@@ -403,50 +393,19 @@ public static class OriginalSiegeProjection
 
     private static (int X, int Y) RayFor(int heading, int lateral14)
     {
-        var sine = FixedSin15(heading);
-        var cosine = FixedCos15(heading);
-        var rayX = FixedProduct15(sine, 0x4000) + FixedProduct15(cosine, lateral14);
-        var rayY = -FixedProduct15(cosine, 0x4000) + FixedProduct15(sine, lateral14);
+        var sine = OriginalActorMotion.Sin15(heading);
+        var cosine = OriginalActorMotion.Cos15(heading);
+        var rayX = OriginalActorMotion.FixedProduct15(sine, 0x4000) +
+            OriginalActorMotion.FixedProduct15(cosine, lateral14);
+        var rayY = -OriginalActorMotion.FixedProduct15(cosine, 0x4000) +
+            OriginalActorMotion.FixedProduct15(sine, lateral14);
         return (rayX, rayY);
     }
 
     private static (int X, int Y) ForwardFor(int heading) =>
-        (FixedSin15(heading), -FixedCos15(heading));
+        (OriginalActorMotion.Sin15(heading), -OriginalActorMotion.Cos15(heading));
 
     private static int FixedDot15(int x, int y, int basisX, int basisY) =>
-        FixedProduct15(x, basisX) + FixedProduct15(y, basisY);
-
-    private static int FixedProduct15(int left, int right) =>
-        checked((int)(((long)left * right + 0x3fff) >> 15));
-
-    private static int FixedCos15(int heading) => FixedSin15(heading + 0x40);
-
-    private static int FixedSin15(int heading)
-    {
-        var angle = heading & 0xff;
-        return (angle >> 6) switch
-        {
-            0 => QuarterSine15[angle],
-            1 => QuarterSine15[0x7f - angle],
-            2 => -QuarterSine15[angle - 0x80],
-            _ => -QuarterSine15[0xff - angle]
-        };
-    }
-
-    private static int OriginalHeading(int deltaX, int deltaY)
-    {
-        if (deltaX == 0 && deltaY == 0) return 0;
-        var x = Math.Abs((long)deltaX);
-        var y = Math.Abs((long)deltaY);
-        if (deltaY >= 0)
-        {
-            if (deltaX >= 0)
-                return x > y ? (int)(y * 0x20 / x) : 0x40 - (int)(x * 0x20 / y);
-            return x >= y ? 0x80 - (int)(y * 0x20 / x) : 0x40 + (int)(x * 0x20 / y);
-        }
-        if (deltaX < 0)
-            return x > y ? 0x80 + (int)(y * 0x20 / x) : 0xc0 - (int)(x * 0x20 / y);
-        var result = x < y ? 0xc0 + (int)(x * 0x20 / y) : 0x100 - (int)(y * 0x20 / x);
-        return result & 0xff;
-    }
+        OriginalActorMotion.FixedProduct15(x, basisX) +
+        OriginalActorMotion.FixedProduct15(y, basisY);
 }

@@ -10,7 +10,7 @@ The authoritative gate is:
 & '.\Run Tests.bat'
 ```
 
-The latest completed implementation gate passed 259 xUnit cases and 146 executable specifications with zero build warnings. Repository policy also passed. Re-run the gate after checkout; do not infer current health from this note alone.
+The latest completed implementation gate passed 262 xUnit cases and 146 executable specifications with zero build warnings. Repository policy also passed. Re-run the gate after checkout; do not infer current health from this note alone.
 
 ## Latest completed combat recovery
 
@@ -26,11 +26,13 @@ Owned-scene evidence covers 12,784 combat-scene blocks. The 144 placed actor def
 
 ## Exact continuation point
 
-The former `0x50020` entry-route item is closed. Complete mode-9/10 kind-table
-columns plus initializer `0x542F8` prove that handler unreachable for every
-template in the supported official placement population. Do not add its
-non-cardinal path speculatively; reopen it only for a newly supported,
-executable-corroborated asset population with a real entry route.
+The former `0x50020` unreachability conclusion is Disproved. It considered
+initializer state but missed the dynamic kind-0 route. Mode-11 transition
+`0x4E77E` selects mode 13 and cancels the attack effect when target health is
+greater than source health. Predicate `0x4FD9A` then branches at source health
+6 through transition `0x4E7A4`: mode 2 at or above 6, mode 10 below it. Handler
+`0x50020` is therefore active and performs the exact non-cardinal away heading,
+independent `1.5` x/y scaling, and `0x112` movement effect.
 
 Shared mode-12 destination occupancy and deterministic compatibility ordering
 are closed. All 144 placed actor bases and their 576 adjacent state
@@ -44,7 +46,7 @@ free effect slot, and the cursor advances on each unrestricted main-loop pass.
 Runtime authored order is the documented stable compatibility tie-breaker and
 is regression-tested across update subdivisions.
 
-Continue priority 1 in `implementation-plan.md`: trace kind-0 mode-11 outcome transition `0x4E77E`, mode 13, and broader AI. The Retreat route is now closed from mode-5/7 regroup through mode-1/3/4 support, renewed mode-8 pursuit, strict raw-row ray contact, and its first delayed mode-11 strike. Mode-8 predicate `0x4F7A2` accepts any opposite-side actor actually hit strictly below `0xCE24 + 28 * sourceRow`; kind-0 transition `0x4E745` selects mode 11 or failure mode 6. Mode-11 handler `0x5010B` uses the `<= 0x154` fixed-Manhattan shortcut or a fresh ray, and scheduler `0x53365` delays `0x4F070` damage until effect completion. Exact-boundary rejection and delayed damage have regressions. The GameFAQs FAQ has no comparable internal formula. Movement retains strict 200 ms ticks, signed 8.8 offsets, collision families, and a processor-independent clock.
+Continue priority 1 in `implementation-plan.md` with broader actor AI after the now-closed kind-0 mode-11/mode-13 branch. The Retreat route includes mode-5/7 regroup, mode-1/3/4 support, renewed mode-8 pursuit, strict raw-row contact, the target/source health comparison, and the health-six mode-13 split. A stronger target cancels the pending strike; a low-health retainer enters mode 10 and moves away using the exact `1.5` non-cardinal formula. Boundary, cancellation, and integer-rotation regressions are active. The GameFAQs FAQ has no comparable internal formula. Movement retains strict 200 ms ticks, signed 8.8 offsets, collision families, and a processor-independent clock.
 
 The projected candidate helper, actor acquisition, and shared actor-movement paths are active. Switch table `0x34A0C`, the 31-usable `0x44F7C` contact arrays, block geometry fields `+0x10..+0x20`, traversal order, continuation, projection formulas, and primary dispatch precedence are closed. Acquisition `0x4F98D` adds authored-order scanning, heading `0x445C4`, centered ray `0x470A8`, exact identity through `0x4CEA0`, strict-nearest replacement from `0x7FFF`, and the `< 0x154` early exit. `OriginalSiegeProjection` and `OriginalSiegeActorAcquisition` implement these paths with heading, non-cardinal depth, alpha, identity, ordering, and tie tests. The movement slice at `0x5185F`-`0x51875` and `0x530D0`-`0x53D5F` includes direct boundary aiming, bit-2 collision, retained partial offset, early effect termination, effect-boundary arrival, and shared-destination occupancy. Earlier confirmed actor-versus-actor portions include:
 

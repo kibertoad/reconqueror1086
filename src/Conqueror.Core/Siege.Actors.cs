@@ -93,6 +93,9 @@ public sealed partial class SiegeSession
                         retainer.Command = SiegeRetainerCommand.Defend;
                         retainer.OrderedTarget = null;
                     }
+                    else if (retainer.RetreatMode == 11 &&
+                        retainer.OrderedTarget is { Health: > 0 } meleeTarget)
+                        RetainerRangedAttack(retainer, meleeTarget);
                     break;
                 }
                 var retreatTarget = RetreatOrderTarget(retainer);

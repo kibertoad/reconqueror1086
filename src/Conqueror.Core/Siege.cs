@@ -26,6 +26,7 @@ public class SiegeEnemy
     public int VisualId { get; init; } = -1;
     public int OriginalActorOrder { get; init; } = -1;
     public Facing Facing { get; set; }
+    public int? OriginalHeading8 { get; internal set; }
     public int WalkFrame { get; set; }
     public SiegeEnemyVisualState VisualState { get; internal set; }
     internal double VisualElapsed { get; set; }
@@ -41,8 +42,11 @@ public sealed class SiegeRetainer : SiegeEnemy
     internal int MovementTick { get; set; }
     internal bool MovementActive { get; set; }
     internal bool MovementWanders { get; set; }
+    internal bool MovementScalesEscapeDelta { get; set; }
     internal SiegeEnemy? PendingRangedTarget { get; set; }
     internal SiegeEnemy? RetreatRegroupTarget { get; set; }
+    internal int? RetreatTargetX8 { get; set; }
+    internal int? RetreatTargetY8 { get; set; }
     internal int RetreatMode { get; set; }
 }
 
@@ -758,9 +762,13 @@ public sealed partial class SiegeSession
         retainer.MovementTick = 0;
         retainer.MovementActive = false;
         retainer.MovementWanders = false;
+        retainer.MovementScalesEscapeDelta = false;
         retainer.PendingRangedTarget = null;
         retainer.RetreatRegroupTarget = null;
+        retainer.RetreatTargetX8 = null;
+        retainer.RetreatTargetY8 = null;
         retainer.RetreatMode = 0;
+        retainer.OriginalHeading8 = null;
     }
 
     private void EnemyAttackRetainer(SiegeEnemy enemy, SiegeRetainer retainer, int distance)

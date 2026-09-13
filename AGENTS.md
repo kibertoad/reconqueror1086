@@ -37,16 +37,18 @@ the surrounding 3x3 neighborhood, Attack seeks the nearest hostile, and Follow
 moves toward the player target. The earlier claim that the public Retreat
 command directly invokes away-vector handler `0x50020` is Disproved. Requested
 mode 10 instead transitions friendly kind 0 to preserved-heading mode 5 and
-kind 1 to mode 4 after acquisition. The complete mode-9/10 transition-column
-map closes the remaining attribution: kinds 0-6 select `9/5`, `9/4`, `6/4`,
-`9/10`, `6/4`, `9/10`, and `9/10` on acquisition success (kind 7 shares kind
-2). Only mode-9 self-loops feed mode 9. Initializer `0x542F8` gives templates
-0-9 current/requested/previous triples `4/4/4, 4/4/4, 4/4/4, 6/8/6,
-4/10/6, 4/8/1, 1/4/2, 4/10/1, 6/8/4, 4/8/4`; templates 4 and 7 are absent
-from every supported official placement. Handler `0x50020` is therefore
-unreachable for the supported population and must not be activated
-speculatively. Revisit it only if a newly supported, executable-corroborated
-asset population supplies an entry route. Acquired melee Attack mode 8 and Follow
+kind 1 to mode 4 after acquisition. The initializer census proves only that
+supported actors do not *start* in mode 9/10; its former dynamic-unreachability
+conclusion is Disproved. Kind-0 mode-11 transition `0x4E77E` records mode 13 as
+failure and mode 11 as success. At `0x504F2`-`0x50517`, target health `<=`
+source health keeps mode 11; a stronger, possibly ray-replaced target selects
+mode 13 and transition helper `0x4E5F0` cancels the new attack effect.
+Mode-13 predicate `0x4FD9A` succeeds at source health `>= 6`; kind-0 transition
+`0x4E7A4` chooses mode 2 on success or mode 10 on failure. Low-health mode 10
+therefore invokes handler `0x50020`: heading is `0x445C4(current - stored
+target)`, each descriptor delta is multiplied by object-2 double `0x7CEA =
+1.5`, and the live `0x112` effect uses non-cardinal 1.15 rotation. Preserve
+this reachable escape route. Acquired melee Attack mode 8 and Follow
 mode 16 share handler `0x4FE76`; the runtime routes both through the recovered
 `0x112` sub-cell movement effect. Melee Retreat uses mode 5's `0x142` effect
 and flag-`0x40` left-turn collision response. Kind-1 mode 4 reacquires through
@@ -215,10 +217,10 @@ stored actor at synthetic distance `0x154`; otherwise it casts a new ray and
 may accept an intervening opposite-side actor. Both branches require strict
 raw combat-row contact range. Damage is applied only at the completed mode-11
 effect gate through `0x53365`/`0x4F070`, not when contact is first detected.
-The runtime implements this route through that first delayed strike. The
-mode-11 outcome transition at `0x4E77E` and broader actor AI remain
-Provisional. GameFAQs FAQ 66730 has no internal evidence for these states,
-thresholds, or the spatial scan order.
+The runtime implements the post-contact health comparison, canceled stronger-
+target strike, mode-13 health-six boundary, and reachable mode-10 escape.
+Broader actor AI remains Provisional. GameFAQs FAQ 66730 has no internal
+evidence for these states, thresholds, or the spatial scan order.
 GameFAQs FAQ 66730 contains no state-table, ray-identity, or threshold detail
 and neither corroborates nor conflicts with this executable-derived mapping.
 

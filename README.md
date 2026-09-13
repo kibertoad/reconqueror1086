@@ -77,7 +77,7 @@ bindings remain active reverse-engineering work.
 | Area | Remaining work |
 |---|---|
 | Exact gameplay parity | Remaining economy interpolation, construction costs, character edge cases, tournament records, world tables, political simulation, quest boundaries, and native random-number consumption still require executable-backed confirmation. |
-| Combat parity | Critical-hit behavior, stair transitions, enemy food use, post-strike formation choices, broader actor AI, and some presentation sequencing remain provisional. Pointer and actor-acquisition rays now use the executable's fixed-point projection, ordered candidates, wrapped lookup, exact scene geometry, texture alpha, and live actor identity. Selected contact travel, acquired-target Attack pursuit, Follow, and Retreat retain original signed sub-cell positions and strict 200 ms movement ticks on a processor-independent clock; melee Retreat now runs through regroup, formation support, renewed pursuit, strict weapon-row contact, and its first delayed attack strike. Authored combat actors use the executable's actor predicate and side partition; retainers obey the recovered cap/loss formula and command identities. Executable analysis confirms that defeated enemies do not generate loot; authored scene pickups are the reward source. Blood keeps the original four displayed frames through a processor-independent compatibility timer because the original advanced once per unrestricted render loop. |
+| Combat parity | Critical-hit behavior, stair transitions, enemy food use, later formation choices, broader actor AI, and some presentation sequencing remain provisional. Pointer and actor-acquisition rays now use the executable's fixed-point projection, ordered candidates, wrapped lookup, exact scene geometry, texture alpha, and live actor identity. Selected contact travel, acquired-target Attack pursuit, Follow, and Retreat retain original signed sub-cell positions and strict 200 ms movement ticks on a processor-independent clock; melee Retreat now runs through regroup, renewed pursuit, the post-contact strength comparison, the health-six morale branch, and the 1.5× non-cardinal escape from a stronger defender. Authored combat actors use the executable's actor predicate and side partition; retainers obey the recovered cap/loss formula and command identities. Executable analysis confirms that defeated enemies do not generate loot; authored scene pickups are the reward source. Blood keeps the original four displayed frames through a processor-independent compatibility timer because the original advanced once per unrestricted render loop. |
 | Strategic AI | Generated routing, garrisons, tournament movement, field-battle coefficients, captain battle rules, and opponent behavior still need fixed original-game traces. |
 | Visual and audio parity | Some palettes, Sierra payloads, conversation entry points, `.666` events, Smacker triggers/seeking, font metrics, status fields, terrain composition, and exact hit regions remain unmapped. |
 | Platform polish | Installers are unsigned. Native installer QA, macOS notarization, customizable bindings, and broader accessibility work remain. |
@@ -88,6 +88,11 @@ the instant the shot begins. Rows 23/24 retain their doubled imported interval,
 damage waits for the strict completion gate, and the same bowman immediately
 starts the next eligible shot. This cadence uses the monotonic simulation clock
 and is independent of processor speed, rendering frequency, and player input.
+
+For melee retainers, a mode-11 strike is canceled when the defender has more
+health. Health 6 or above then returns the retainer to defense; health below 6
+activates the original 1.5× non-cardinal escape effect. This corrects an older
+initializer-only inference that the escape handler was dormant.
 
 ### Permanent scope boundaries
 

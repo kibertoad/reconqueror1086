@@ -328,7 +328,7 @@ public sealed partial class ConquerorGame
                 SiegeEnemyVisualState.Dying => ActorStateBlock(initial, 3),
                 _ => initial
             };
-            active = active with { Surface3 = (int)actor.Facing << 6 };
+            active = active with { Surface3 = actor.OriginalHeading8 ?? (int)actor.Facing << 6 };
             return new SiegeProjectedBlock(active, actor.OffsetX8, actor.OffsetY8, active.Index)
             {
                 Actor = actor
