@@ -119,6 +119,43 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(expectedKind, OriginalCombatantTemplates.ActorKindForSceneTemplate(template));
     }
 
+    [Theory]
+    [InlineData(0, 4, 4, 4)]
+    [InlineData(1, 4, 4, 4)]
+    [InlineData(2, 4, 4, 4)]
+    [InlineData(3, 6, 8, 6)]
+    [InlineData(4, 4, 10, 6)]
+    [InlineData(5, 4, 8, 1)]
+    [InlineData(6, 1, 4, 2)]
+    [InlineData(7, 4, 10, 1)]
+    [InlineData(8, 6, 8, 4)]
+    [InlineData(9, 4, 8, 4)]
+    public void CombatantTemplatesRetainTheirExecutableActorModeProfile(
+        int template, int current, int requested, int previous)
+    {
+        Assert.Equal(new OriginalActorModeProfile(current, requested, previous),
+            OriginalCombatantTemplates.ModeProfileForSceneTemplate(template));
+    }
+
+    [Fact]
+    public void SupportedPlacedCombatantsCannotInitializeTheDormantModeNineOrTenHandler()
+    {
+        var placedTemplates = Enumerable.Range(0, 10)
+            .Where(OriginalCombatantTemplates.IsPlacedSceneTemplate)
+            .ToArray();
+
+        Assert.Equal([0, 1, 2, 3, 5, 8, 9], placedTemplates);
+        Assert.All(placedTemplates, template =>
+        {
+            var modes = OriginalCombatantTemplates.ModeProfileForSceneTemplate(template);
+            Assert.False(modes.Current is 9 or 10);
+            Assert.False(modes.Requested is 9 or 10);
+            Assert.False(modes.Previous is 9 or 10);
+        });
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => OriginalCombatantTemplates.ModeProfileForSceneTemplate(10));
+    }
+
     [Fact]
     public void OriginalRetainerCommandModesAndShellHitRegionsRemainMapped()
     {

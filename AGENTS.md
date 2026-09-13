@@ -37,7 +37,16 @@ the surrounding 3x3 neighborhood, Attack seeks the nearest hostile, and Follow
 moves toward the player target. The earlier claim that the public Retreat
 command directly invokes away-vector handler `0x50020` is Disproved. Requested
 mode 10 instead transitions friendly kind 0 to preserved-heading mode 5 and
-kind 1 to mode 4 after acquisition. Acquired melee Attack mode 8 and Follow
+kind 1 to mode 4 after acquisition. The complete mode-9/10 transition-column
+map closes the remaining attribution: kinds 0-6 select `9/5`, `9/4`, `6/4`,
+`9/10`, `6/4`, `9/10`, and `9/10` on acquisition success (kind 7 shares kind
+2). Only mode-9 self-loops feed mode 9. Initializer `0x542F8` gives templates
+0-9 current/requested/previous triples `4/4/4, 4/4/4, 4/4/4, 6/8/6,
+4/10/6, 4/8/1, 1/4/2, 4/10/1, 6/8/4, 4/8/4`; templates 4 and 7 are absent
+from every supported official placement. Handler `0x50020` is therefore
+unreachable for the supported population and must not be activated
+speculatively. Revisit it only if a newly supported, executable-corroborated
+asset population supplies an entry route. Acquired melee Attack mode 8 and Follow
 mode 16 share handler `0x4FE76`; the runtime routes both through the recovered
 `0x112` sub-cell movement effect. Melee Retreat uses mode 5's `0x142` effect
 and flag-`0x40` left-turn collision response. Kind-1 mode 4 reacquires through

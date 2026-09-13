@@ -444,6 +444,20 @@ Mode-11 damage cadence is also **Confirmed**. Constructor `0x4C7F4` stores the c
 
 No-visible-target Attack now closes the former mode-6 gap. Acquisition-table entry `0x4F98D` searches for the nearest visible opposite-side actor; kind-0 transition `0x4E71F` and kind-1 transition `0x4E745` retain mode 6 on failure and select modes 8/11 on success. The current-mode table maps mode 6 to `0x4FDCD`, which preserves heading, clears actor target fields, reads movement selector `+0x46`, and rewrites low descriptor flags as `(flags & 0xA7) | 0x40`. Official descriptor `0x142` is therefore unchanged. The scheduler's flag-`0x40` branch at `0x53C13`-`0x53C6C` clears a blocked local axis and applies `(((heading + 0x20) & 0xC0) - 0x40) & 0xFF` while the effect continues. `SiegeRetainer.MovementWanders` records the selected live-effect family; `SiegeSession.AttackOrderTarget` uses the bounded visibility bridge, and focused tests cover unobstructed and blocked mode-6 motion. The route, rewrite, and turn formula are **Confirmed**; exact cell-trace equivalence to `0x470A8` remains **Corroborated**. The GameFAQs guide contains no corresponding internal detail.
 
+The remaining mode-9/10 table columns are now **Confirmed**. For actor kinds
+0-6, acquisition success selects `9/5`, `9/4`, `6/4`, `9/10`, `6/4`, `9/10`,
+and `9/10`, while failure/previous selects `6/2`, `6/2`, `1/3`, `1/5`, `1/3`,
+`1/2`, and `1/1`; kind 7 shares kind 2. The only transition into mode 9 is
+therefore its own self-loop. Initializer `0x542F8` writes template
+current/requested/previous fields `+0x18/+0x1C/+0x20` as
+`4/4/4,4/4/4,4/4/4,6/8/6,4/10/6,4/8/1,1/4/2,4/10/1,6/8/4,4/8/4`.
+The official placement census contains only templates 0,1,2,3,5,8,9, so no
+supported actor initializes mode 9/10. This executable table plus decoded
+resource census proves handler `0x50020` dormant in supported gameplay;
+`OriginalCombatantTemplates.ModeProfileForSceneTemplate` is the runtime-side
+technical record. Its independently decoded `1.5` delta multiplier remains a
+design mapping, not a feature to expose without a corroborated entry route.
+
 ## Open questions
 
 1. Recover the semantic meaning of directory field `0x24` and test whether data extents may alias or overlap.
