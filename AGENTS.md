@@ -20,6 +20,13 @@ independently authored technical descriptions, compact facts, hashes, and legal
 fixtures. A gameplay batch is not complete until its new technical mappings and
 evidence have been documented alongside the implementation.
 
+The current combat map establishes that loader `0x51560` recognizes actors by
+behavior bit `0x80` plus selector 1, scans map cells x-major, and promotes the
+first friendly to player `D4D0`. Across all 1,002 placements in the supported
+official `MELEE*`/`DEFEND*` population, templates 0-2 are friendly and
+3/5/8/9 hostile. Preserve this authored partition and cap retainers to the
+available authored positions; do not infer sides from actor names.
+
 ## Git push destination
 
 The authorized canonical repository is

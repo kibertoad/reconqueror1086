@@ -64,7 +64,7 @@ public sealed class SiegeLayout
     private readonly SiegeTile[,] _tiles;
 
     public SiegeLayout(SiegeTile[,] tiles, int playerX, int playerY, Facing facing, IReadOnlyList<SiegeSpawn> enemies,
-        IReadOnlyList<SiegeObjectSpawn>? objects = null)
+        IReadOnlyList<SiegeObjectSpawn>? objects = null, IReadOnlyList<SiegeSpawn>? retainers = null)
     {
         ArgumentNullException.ThrowIfNull(tiles);
         ArgumentNullException.ThrowIfNull(enemies);
@@ -76,6 +76,14 @@ public sealed class SiegeLayout
             throw new ArgumentException("Siege enemy starts outside the layout.", nameof(enemies));
         if (enemies.GroupBy(enemy => (enemy.X, enemy.Y)).Any(group => group.Count() > 1))
             throw new ArgumentException("Siege enemies cannot share a map cell.", nameof(enemies));
+        retainers ??= [];
+        if (retainers.Any(retainer => retainer.X < 0 || retainer.Y < 0 ||
+                retainer.X >= tiles.GetLength(0) || retainer.Y >= tiles.GetLength(1)))
+            throw new ArgumentException("Siege retainers start outside the layout.", nameof(retainers));
+        if (retainers.GroupBy(retainer => (retainer.X, retainer.Y)).Any(group => group.Count() > 1) ||
+            retainers.Any(retainer => enemies.Any(enemy => enemy.X == retainer.X && enemy.Y == retainer.Y)) ||
+            retainers.Any(retainer => retainer.X == playerX && retainer.Y == playerY))
+            throw new ArgumentException("Siege actors cannot share a map cell.", nameof(retainers));
         objects ??= [];
         if (objects.Any(item => item.X < 0 || item.Y < 0 || item.X >= tiles.GetLength(0) || item.Y >= tiles.GetLength(1)
                 || item.Stages.Count == 0))
@@ -86,6 +94,7 @@ public sealed class SiegeLayout
         PlayerY = playerY;
         Facing = facing;
         Enemies = enemies.ToArray();
+        Retainers = retainers.ToArray();
         Objects = objects.ToArray();
     }
 
@@ -93,6 +102,7 @@ public sealed class SiegeLayout
     public int PlayerY { get; }
     public Facing Facing { get; }
     public IReadOnlyList<SiegeSpawn> Enemies { get; }
+    public IReadOnlyList<SiegeSpawn> Retainers { get; }
     public IReadOnlyList<SiegeObjectSpawn> Objects { get; }
     public SiegeTile[,] CopyTiles() => (SiegeTile[,])_tiles.Clone();
 }
@@ -151,7 +161,8 @@ public sealed class SiegeSession
         }
         MaxHealth = OriginalWeaponCombat.PlayerHealth(player);
         Health = MaxHealth;
-        AlliesStarted = includeRetainers ? OriginalRetainerCombat.CampaignRetainerCapFor(army) : 0;
+        var retainerCap = includeRetainers ? OriginalRetainerCombat.CampaignRetainerCapFor(army) : 0;
+        AlliesStarted = layout is null ? retainerCap : Math.Min(retainerCap, layout.Retainers.Count);
         AlliesAlive = AlliesStarted;
         if (layout is not null)
         {

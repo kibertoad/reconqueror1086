@@ -863,8 +863,10 @@ public sealed partial class ResourceAndDefinitionTests
             blocks[offset + 94] = 0xcc;
             blocks[offset + 95] = 0xcc;
         }
-        BinaryPrimitives.WriteInt16LittleEndian(
-            blocks.AsSpan(6 * DynamixSceneDecoder.BlockSize + 0x4a, sizeof(short)), 9);
+        WriteInt(blocks, 5 * DynamixSceneDecoder.BlockSize + 4, 135);
+        WriteInteraction(blocks, 5, 1, 3, 0);
+        WriteInt(blocks, 6 * DynamixSceneDecoder.BlockSize + 4, 135);
+        WriteInteraction(blocks, 6, 1, 9, 0);
 
         var map = new byte[DynamixSceneDecoder.MapSize];
         SetSceneCell(map, 11, 20, 1);

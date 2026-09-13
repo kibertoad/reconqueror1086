@@ -19,4 +19,8 @@ public static class OriginalCombatantTemplates
             throw new ArgumentOutOfRangeException(nameof(template));
         return Templates[template];
     }
+
+    // The complete owned MELEE*/DEFEND* actor-base population uses templates
+    // 0-2 for the player side and 3, 5, 8, and 9 for the opposing side.
+    public static bool IsFriendlySceneTemplate(int template) => template is 0 or 1 or 2;
 }

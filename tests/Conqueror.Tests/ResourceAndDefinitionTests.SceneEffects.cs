@@ -47,6 +47,7 @@ public sealed partial class ResourceAndDefinitionTests
             blocks[offset + 94] = 0xcc;
             blocks[offset + 95] = 0xcc;
         }
+        WriteInteraction(blocks, 5, 1, 3, 0);
         var effects = new byte[DynamixSceneEffectDecoder.RecordSize];
         WriteEffectField(effects, 0x0c, 2);
         WriteEffectField(effects, 0x14, 192);

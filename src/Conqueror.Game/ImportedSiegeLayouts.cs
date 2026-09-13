@@ -47,8 +47,10 @@ public static class ImportedSiegeLayouts
         sourceTiles[scene.Viewer.CellX, scene.Viewer.CellY] = SiegeTile.Floor;
 
         var reachable = ReachableFromViewer(sourceTiles, scene.Viewer.CellX, scene.Viewer.CellY);
-        var points = Enumerable.Range(0, DynamixScene.MapWidth)
+        var mapPoints = Enumerable.Range(0, DynamixScene.MapWidth)
             .SelectMany(x => Enumerable.Range(0, DynamixScene.MapHeight).Select(y => (X: x, Y: y)))
+            .ToArray();
+        var points = mapPoints
             .Where(point => reachable[point.X, point.Y])
             .ToArray();
         var minX = Math.Max(0, points.Min(point => point.X) - 1);
@@ -61,8 +63,19 @@ public static class ImportedSiegeLayouts
             tiles[x - minX, y - minY] = reachable[x, y] ? sourceTiles[x, y] : SiegeTile.Wall;
 
         var enemies = points
-            .Where(point => IsEnemy(scene.BlockAt(point.X, point.Y)))
-            .Select(point => EnemyFor(scene, scene.BlockAt(point.X, point.Y), point.X - minX, point.Y - minY))
+            .Where(point => IsEnemyActor(scene.BlockAt(point.X, point.Y)))
+            .Select(point => SpawnFor(scene, scene.BlockAt(point.X, point.Y), point.X - minX, point.Y - minY))
+            .ToArray();
+        // Loader 0x51560 scans x-major and promotes its first friendly actor to
+        // player D4D0. Counter 0x4D870 excludes that record from retainers.
+        var playerActor = mapPoints
+            .Where(point => IsFriendlyActor(scene.BlockAt(point.X, point.Y)))
+            .Select(point => ((int X, int Y)?)point)
+            .FirstOrDefault();
+        var retainers = points
+            .Where(point => IsFriendlyActor(scene.BlockAt(point.X, point.Y)) &&
+                (playerActor is null || point != playerActor.Value))
+            .Select(point => SpawnFor(scene, scene.BlockAt(point.X, point.Y), point.X - minX, point.Y - minY))
             .ToArray();
         var objects = points
             .Where(point => IsSceneObject(scene.BlockAt(point.X, point.Y)))
@@ -70,7 +83,7 @@ public static class ImportedSiegeLayouts
             .ToArray();
         var heading = (scene.Viewer.Heading + 8192) / 16384 & 3;
         var layout = new SiegeLayout(tiles, scene.Viewer.CellX - minX, scene.Viewer.CellY - minY,
-            (Facing)heading, enemies, objects);
+            (Facing)heading, enemies, objects, retainers);
         return (layout, minX, minY);
     }
 
@@ -118,7 +131,7 @@ public static class ImportedSiegeLayouts
         // by placed exit/gate markers. They are scene boundaries, not
         // members of the mask-19 actionable-door family.
         if (block.Behavior == 83) return SiegeTile.Exit;
-        if (IsEnemy(block)) return SiegeTile.Floor;
+        if (IsActor(block)) return SiegeTile.Floor;
         if (IsDestructible(block)) return SiegeTile.Destructible;
         // Placed kind-4 mask-19 records are the scene pickups. Their names
         // distinguish food from equipment/currency while the metadata keeps an
@@ -151,10 +164,15 @@ public static class ImportedSiegeLayouts
         return SiegeTile.Wall;
     }
 
-    private static bool IsEnemy(DynamixSceneBlock block) =>
-        block.Behavior == 135 || IsEnemyName(block.Name);
+    private static bool IsActor(DynamixSceneBlock block) =>
+        (block.Behavior & 0x80) != 0 && block.InteractionSelector == 1;
 
-    private static SiegeSpawn EnemyFor(DynamixScene scene, DynamixSceneBlock block, int x, int y)
+    private static bool IsFriendlyActor(DynamixSceneBlock block) =>
+        IsActor(block) && OriginalCombatantTemplates.IsFriendlySceneTemplate(block.ActorTemplate);
+
+    private static bool IsEnemyActor(DynamixSceneBlock block) => IsActor(block) && !IsFriendlyActor(block);
+
+    private static SiegeSpawn SpawnFor(DynamixScene scene, DynamixSceneBlock block, int x, int y)
     {
         if (block.ActorCombatRow is < 0 or >= OriginalWeaponCombat.CombatRowCount)
             throw new InvalidDataException($"Scene actor {block.Index} references an unknown combat row.");
@@ -190,7 +208,7 @@ public static class ImportedSiegeLayouts
         block.Kind == 4 && (block.Behavior & 0x20) != 0;
 
     private static bool IsSceneObject(DynamixSceneBlock block) =>
-        (block.Kind == 4 && !IsEnemy(block) && block.Behavior != 83) ||
+        (block.Kind == 4 && !IsActor(block) && block.Behavior != 83) ||
         TileFor(block) is SiegeTile.Door or SiegeTile.SecretDoor;
 
     private static SiegeObjectSpawn ObjectFor(DynamixScene scene, int x, int y, int minX, int minY)
@@ -243,10 +261,4 @@ public static class ImportedSiegeLayouts
         return Balance.Equipment.FirstOrDefault(item =>
             item.Name.Equals(normalized, StringComparison.OrdinalIgnoreCase))?.Name;
     }
-
-    private static bool IsEnemyName(string name) =>
-        name.Contains("knight", StringComparison.OrdinalIgnoreCase) ||
-        name.Contains("footman", StringComparison.OrdinalIgnoreCase) ||
-        name.Contains("bowman", StringComparison.OrdinalIgnoreCase) ||
-        name.Contains("champion", StringComparison.OrdinalIgnoreCase);
 }
