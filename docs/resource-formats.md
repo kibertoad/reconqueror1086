@@ -404,6 +404,12 @@ The reports are regenerated from the user's installation and must never be commi
 
 The non-player death path at `0x4EA40`-`0x4ECD8` subtracts damage from combatant health at `+0x40`, replaces the actor's map cell from block state target `+0x40`, copies adjacent state `base + 3`, and starts that state's effect gate. After completion, `0x4F49C` removes the actor and calls `0x4D8C0`, which counts living hostile combatants by requiring side field `+0x30 != 0` and health `+0x40 > 0`. A full reference inventory shows no death-path access to wealth `0xD4A4`, ammunition `0xD4A8`, or equipment `0xD4C4`; those mutations occur in the authored pickup and crossbow paths. Defeated-enemy loot is therefore **Disproved for the hashed release**. The runtime has no actor-drop path, and `ResourceAndDefinitionTests.EnemyRewards.cs` verifies that death completion changes none of those reward channels.
 
+## Retainer cap mapping
+
+Combat loader `0x51560` reserves actor records 0-9 as templates, clones placed actors into later 68-byte records, and records the active player actor index in `D4D0`. Routine `0x4D870` then counts records after the templates whose side field `+0x30` is zero and health `+0x40` is positive, excluding `D4D0`; its result is therefore the living-retainer count, not a player-inclusive friendly count. Loader pruning at `0x51B87` compares that count with the cap in `D49C`.
+
+The campaign assault caller obtains army total through `0x2D500`, performs signed integer division by 50 at `0x399F6`-`0x39A09`, clamps the quotient to 2-10 at `0x39A0C`-`0x39A22`, and passes it as the second argument to setup routine `0x5877C`. Setup stores that argument directly in `D49C` at `0x587E9`-`0x587F4`. Thus the recovered formula is `retainers = clamp(floor(armyTotal / 50), 2, 10)` (**Confirmed** for the hashed release). `OriginalRetainerCombat.RetainerCapFor` is the reimplementation mapping and `ResourceAndDefinitionTests.Retainers.cs` covers its boundaries. This establishes count scaling only; scene selection, formation, actor AI, casualty selection, and conversion of survivors into strategic unit losses are separate paths and remain Provisional.
+
 ## Open questions
 
 1. Recover the semantic meaning of directory field `0x24` and test whether data extents may alias or overlap.

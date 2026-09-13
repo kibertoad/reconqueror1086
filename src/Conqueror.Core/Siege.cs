@@ -151,7 +151,7 @@ public sealed class SiegeSession
         }
         MaxHealth = OriginalWeaponCombat.PlayerHealth(player);
         Health = MaxHealth;
-        AlliesStarted = includeRetainers ? Math.Clamp(1 + army.Total / 10, 1, 5) : 0;
+        AlliesStarted = includeRetainers ? OriginalRetainerCombat.RetainerCapFor(army.Total) : 0;
         AlliesAlive = AlliesStarted;
         if (layout is not null)
         {
