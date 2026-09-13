@@ -266,7 +266,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(-1, sword.Next(39));
 
         var crossbow = SiegeCombatPresentation.CrossbowAttack;
-        Assert.Equal((32, 32, -1), (crossbow.First, crossbow.Last, crossbow.Next(32)));
+        Assert.Equal((30, 32, 31), (crossbow.First, crossbow.Last, crossbow.Next(30)));
         Assert.Equal((43, 46), (SiegeCombatPresentation.FatalHitBlood.First,
             SiegeCombatPresentation.FatalHitBlood.Last));
     }
@@ -291,7 +291,7 @@ public sealed partial class ResourceAndDefinitionTests
             item =>
             {
                 var foregroundBase = SiegeCombatPresentation.OriginalForegroundBaseFor(item.OriginalWeaponItemId!.Value);
-                var expectedAttackStart = foregroundBase switch { 30 => 32, 41 => 42, _ => foregroundBase };
+                var expectedAttackStart = foregroundBase == 41 ? 42 : foregroundBase;
                 Assert.Equal(expectedAttackStart, SiegeCombatPresentation.AttackFramesFor(item.Name).Start);
             });
         Assert.Equal(

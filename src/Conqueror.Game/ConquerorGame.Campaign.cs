@@ -432,7 +432,7 @@ public sealed partial class ConquerorGame
             _notice = "ORIGINAL TOURNAMENT CONVERSATION DATA IS NOT INSTALLED";
     }
 
-    private void UpdateSiege(Func<Keys, bool> press, GameTime gameTime)
+    private void UpdateSiege(Func<Keys, bool> press, MouseState mouse, bool click, GameTime gameTime)
     {
         if (_siege is null)
         {
@@ -442,30 +442,36 @@ public sealed partial class ConquerorGame
         }
         AdvanceSiegeForeground(gameTime.ElapsedGameTime.TotalSeconds);
         _siege.AdvanceEnemyAnimations(_animationEnabled ? gameTime.ElapsedGameTime.TotalSeconds : 1);
+        var pointerTarget = click ? SiegePointerTarget(mouse) : null;
+        var crossbowEquipped = _campaign.State.Player.Inventory.Weapon
+            .Contains("Crossbow", StringComparison.OrdinalIgnoreCase);
         var movement = SiegeAction.None;
         if (press(Keys.W)) movement = _siege.Move(true);
         if (press(Keys.S)) movement = _siege.Move(false);
         if (movement == SiegeAction.Exited) { LeaveSiege(); return; }
         if (press(Keys.A)) _siege.TurnLeft(); if (press(Keys.D)) _siege.TurnRight();
         if (press(Keys.E)) _siege.Interact();
-        if (press(Keys.Space))
+        if (press(Keys.Space) || pointerTarget is not null && !crossbowEquipped)
         {
             var enemiesBeforeAttack = LivingSiegeEnemyState();
             var attackFrames = SiegeCombatPresentation.AttackFramesFor(_campaign.State.Player.Inventory.Weapon);
             var action = _siege.Attack();
             StartSiegeWeapon(attackFrames,
                 SiegeCombatPresentation.OriginalCombatRowFor(_campaign.State.Player.Inventory.Weapon),
-                action == SiegeAction.Hit);
+                action == SiegeAction.Hit, pointerTarget);
             StartSiegeHitEffect(enemiesBeforeAttack);
         }
-        if (press(Keys.X))
+        if (press(Keys.X) || pointerTarget is not null && crossbowEquipped)
         {
             var enemiesBeforeShot = LivingSiegeEnemyState();
-            if (_siege.Shoot() == SiegeAction.Shot)
+            var action = _siege.Shoot();
+            if (action == SiegeAction.Shot)
             {
-                StartSiegeWeapon(SiegeCombatPresentation.CrossbowAttack, 23, contacted: false);
+                StartSiegeWeapon(SiegeCombatPresentation.CrossbowAttack, 23, contacted: false, pointerTarget);
                 StartSiegeHitEffect(enemiesBeforeShot);
             }
+            else if (crossbowEquipped && _campaign.State.Player.Inventory.CrossbowBolts <= 0)
+                ClearSiegeWeapon();
         }
         if (press(Keys.M)) _showRadar = !_showRadar;
         _notice = _siege.LastMessage;
@@ -542,18 +548,18 @@ public sealed partial class ConquerorGame
         Autosave();
     }
 
-    private void StartSiegeWeapon(SiegeFrameRun run, int combatRow, bool contacted)
+    private void StartSiegeWeapon(SiegeFrameRun run, int combatRow, bool contacted, (int X, int Y)? pointerTarget = null)
     {
         _siegeWeaponRun = run;
         _siegeWeaponTrajectory = null;
         _siegeWeaponFrame = _animationEnabled ? run.First : run.Last;
         _siegeWeaponElapsed = 0;
-        if (!_animationEnabled || combatRow >= 23 ||
+        if (!_animationEnabled ||
             !_originalAnimations.TryGetValue("Combat.FirstPerson", out var animation)) return;
         var setupFrame = SiegeCombatPresentation.SetupFrameForCombatRow(combatRow, run.Start);
         if ((uint)setupFrame >= (uint)animation.Frames.Count) return;
         var setupTexture = animation.Frames[setupFrame];
-        var target = SiegeForegroundTarget();
+        var target = pointerTarget ?? SiegeForegroundTarget();
         _siegeWeaponTrajectory = SiegeForegroundTrajectory.Create(combatRow, run.Start,
             setupTexture.Width, setupTexture.Height, target.X, target.Y,
             SiegeCombatPresentation.Viewport.Width, SiegeCombatPresentation.Viewport.Height,
@@ -573,6 +579,18 @@ public sealed partial class ConquerorGame
             ? SiegeCombatPresentation.Viewport.Width / 2
             : (int)Math.Round(projections[0].ScreenPosition * SiegeCombatPresentation.Viewport.Width);
         return (x, SiegeCombatPresentation.Viewport.Height / 2);
+    }
+
+    private (int X, int Y)? SiegePointerTarget(MouseState mouse)
+    {
+        var point = _controllerPointerActive
+            ? ((int)(_controllerPointer.X * 1024 / 640), (int)(_controllerPointer.Y * 768 / 480))
+            : PresentationScaling.ToVirtual(mouse.X, mouse.Y, CanvasBounds());
+        var viewport = _originalArt.ContainsKey("Combat.Shell")
+            ? ScaleSiegeBounds(SiegeCombatPresentation.Viewport)
+            : new Rectangle(0, 85, 1024, 520);
+        return SiegeCombatPresentation.ForegroundTarget(point.Item1, point.Item2,
+            new UiBounds(viewport.X, viewport.Y, viewport.Width, viewport.Height));
     }
 
     private void StartSiegeHitEffect((int Health, int Count) before)

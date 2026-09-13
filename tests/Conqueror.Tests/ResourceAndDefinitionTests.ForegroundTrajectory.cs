@@ -1,3 +1,4 @@
+using Conqueror.Core;
 using Conqueror.Game;
 using Xunit;
 
@@ -46,6 +47,41 @@ public sealed partial class ResourceAndDefinitionTests
             (motion.AnchorX, motion.AnchorY, motion.TargetX, motion.TargetY, motion.Mirror));
         Assert.Equal(29, motion.Frame);
         Assert.Equal(SiegeCombatPresentation.SetupFrameForCombatRow(15, 27), motion.Frame);
+    }
+
+    [Fact]
+    public void OriginalCrossbowRisesOneSpriteHeightThenRemainsAtThePointerColumn()
+    {
+        var motion = SiegeForegroundTrajectory.Create(23, 30, 96, 43, 80, 60, 167, 117,
+            contacted: true, new FixedRandom(0));
+
+        Assert.Equal((32, 117, 32, 74, 32),
+            (motion.AnchorX, motion.AnchorY, motion.TargetX, motion.TargetY, motion.Frame));
+        Assert.Equal(0, motion.VelocityX8);
+        Assert.Equal(OriginalWeaponCombat.ForegroundVelocityForCombatRow(23, -43), motion.VelocityY8);
+
+        for (var step = 0; step < 10 && motion.Phase == SiegeForegroundPhase.Approaching; step++)
+            motion.Advance(0.166);
+
+        Assert.Equal(SiegeForegroundPhase.Holding, motion.Phase);
+        Assert.Equal((32, 74, 32), (motion.AnchorX, motion.AnchorY, motion.Frame));
+        motion.Advance(10);
+        Assert.Equal((SiegeForegroundPhase.Holding, 32, 74, 32),
+            (motion.Phase, motion.AnchorX, motion.AnchorY, motion.Frame));
+    }
+
+    [Theory]
+    [InlineData(83, 92, 9, 9)]
+    [InlineData(55, 58, 0, 0)]
+    [InlineData(587, 506, 166, 116)]
+    public void SiegePointerCoordinatesMapIntoTheOriginalForegroundViewport(
+        int pointerX, int pointerY, int expectedX, int expectedY)
+    {
+        var viewport = new UiBounds(83, 92, 534, 449);
+        Assert.Equal((expectedX, expectedY),
+            SiegeCombatPresentation.ForegroundTarget(pointerX, pointerY, viewport));
+        Assert.Null(SiegeCombatPresentation.ForegroundTarget(54, 58, viewport));
+        Assert.Null(SiegeCombatPresentation.ForegroundTarget(589, 506, viewport));
     }
 
     [Fact]

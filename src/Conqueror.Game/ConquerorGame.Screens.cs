@@ -323,11 +323,16 @@ public sealed partial class ConquerorGame
     {
         _siegeVisuals?.Dispose();
         _siegeVisuals = null;
+        ClearSiegeWeapon();
+        _siegeHitEffect = null;
+    }
+
+    private void ClearSiegeWeapon()
+    {
         _siegeWeaponTrajectory = null;
         _siegeWeaponFrame = -1;
         _siegeWeaponRun = default;
         _siegeWeaponElapsed = 0;
-        _siegeHitEffect = null;
     }
 
     private void DrawSiegeBackdrop(Rectangle viewport, Facing facing)

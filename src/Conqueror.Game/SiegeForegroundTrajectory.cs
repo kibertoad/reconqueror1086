@@ -2,7 +2,7 @@ using Conqueror.Core;
 
 namespace Conqueror.Game;
 
-public enum SiegeForegroundPhase { Approaching, Returning, Complete }
+public enum SiegeForegroundPhase { Approaching, Returning, Holding, Complete }
 
 // CONQUER.EXE 0x54B68-0x55521: row-family target/outer setup, signed 8.8
 // velocity, elapsed-millisecond integration, contact reversal, and pose state.
@@ -100,10 +100,12 @@ public sealed class SiegeForegroundTrajectory
         }
         else
         {
+            // 0x54E9D-0x54F12: rows 23-24 center base frame 30 on pointer x
+            // and rise from the viewport bottom by exactly one sprite height.
             targetX -= spriteWidth / 2;
             targetY = viewportHeight - spriteHeight;
             outerX = targetX;
-            outerY = targetY;
+            outerY = viewportHeight;
         }
 
         return new SiegeForegroundTrajectory(combatRow, baseFrame, viewportWidth, contacted,
@@ -114,7 +116,7 @@ public sealed class SiegeForegroundTrajectory
     {
         if (!double.IsFinite(elapsedSeconds) || elapsedSeconds < 0)
             throw new ArgumentOutOfRangeException(nameof(elapsedSeconds));
-        if (Phase == SiegeForegroundPhase.Complete) return;
+        if (Phase is SiegeForegroundPhase.Holding or SiegeForegroundPhase.Complete) return;
         _millisecondRemainder += Math.Min(elapsedSeconds * 1000, MaximumUpdateMilliseconds);
         var milliseconds = (int)_millisecondRemainder;
         _millisecondRemainder -= milliseconds;
@@ -131,7 +133,16 @@ public sealed class SiegeForegroundTrajectory
         {
             _x8 = _targetX8;
             _y8 = _targetY8;
-            if (!_contacted || _combatRow >= 23)
+            if (_combatRow >= 23)
+            {
+                // 0x550BC/0x553F9: the ranged pose remains at its target;
+                // only later foreground setup or siege teardown replaces it.
+                _velocityX8 = 0;
+                _velocityY8 = 0;
+                Phase = SiegeForegroundPhase.Holding;
+                return;
+            }
+            if (!_contacted)
             {
                 Phase = SiegeForegroundPhase.Complete;
                 return;

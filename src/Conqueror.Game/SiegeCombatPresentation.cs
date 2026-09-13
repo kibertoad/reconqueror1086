@@ -25,6 +25,7 @@ public static class SiegeCombatPresentation
     ];
     public const int OriginalWidth = 320;
     public const int OriginalHeight = 200;
+    public const int OriginalCursorCenterOffset = 9;
     public const double ProvisionalStepSeconds = 0.07;
     public static readonly UiBounds Viewport = new(26, 24, 167, 117);
     public static readonly UiBounds Radar = new(223, 111, 94, 84);
@@ -35,7 +36,7 @@ public static class SiegeCombatPresentation
     // CONQUER.EXE 0x5529B-0x55448 selects offset 2 on approach, offset 1
     // near contact, and offset 0 on return. Rows 23+ retain offset 2.
     public static readonly SiegeFrameRun AxeAttack = new(27, 3, true);
-    public static readonly SiegeFrameRun CrossbowAttack = new(32, 1);
+    public static readonly SiegeFrameRun CrossbowAttack = new(30, 3);
     public static readonly SiegeFrameRun HammerAttack = new(33, 3, true);
     public static readonly SiegeFrameRun MaceAttack = new(36, 3, true);
     public static readonly SiegeFrameRun SwordAttack = new(39, 3, true);
@@ -93,4 +94,15 @@ public static class SiegeCombatPresentation
     };
 
     public static SiegeFrameRun BloodFramesFor(bool fatal) => fatal ? FatalHitBlood : WoundingHitBlood;
+
+    // CONQUER.EXE 0x55DB8-0x55DE5 adds nine pixels to the stored cursor
+    // top-left before raycasting; 0x5590C-0x5591D forwards that center point.
+    public static (int X, int Y)? ForegroundTarget(int pointerX, int pointerY, UiBounds viewport)
+    {
+        var x = (int)Math.Floor((pointerX - viewport.X) * Viewport.Width / (double)viewport.Width)
+            + OriginalCursorCenterOffset;
+        var y = (int)Math.Floor((pointerY - viewport.Y) * Viewport.Height / (double)viewport.Height)
+            + OriginalCursorCenterOffset;
+        return x >= 0 && x < Viewport.Width && y >= 0 && y < Viewport.Height ? (x, y) : null;
+    }
 }
