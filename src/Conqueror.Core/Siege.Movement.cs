@@ -29,8 +29,11 @@ public sealed partial class SiegeSession
                 retainer.MovementElapsed -= movement.TickSeconds;
                 if (retainer.MovementTick == 0)
                     AimRetainerAt(retainer, destination.X, destination.Y);
-                AdvanceMovementTick(retainer, movement);
-                retainer.MovementTick = (retainer.MovementTick + 1) % movement.TickCount;
+                var effectContinues = AdvanceMovementTick(retainer, movement,
+                    GroundTravelFlags(movement.Flags));
+                retainer.MovementTick = effectContinues
+                    ? (retainer.MovementTick + 1) % movement.TickCount
+                    : 0;
                 retainer.WalkFrame = (retainer.WalkFrame + 1) % movement.TickCount;
                 if (retainer.MovementTick == 0 &&
                     retainer.X == destination.X && retainer.Y == destination.Y)
@@ -45,6 +48,11 @@ public sealed partial class SiegeSession
         movement is { TickCount: > 0 and <= 4096, IntervalMilliseconds: > 0 and <= 60_000 }
             ? movement
             : null;
+
+    // Mode 12 rewrites only the descriptor's low flag byte before constructing
+    // the live effect: and 0xA7, then or 0x10 (0x142 therefore becomes 0x112).
+    private static int GroundTravelFlags(int descriptorFlags) =>
+        (descriptorFlags & ~0xFF) | ((descriptorFlags & 0xFF & 0xA7) | 0x10);
 
     private static void CompleteDestination(SiegeRetainer retainer)
     {
@@ -75,17 +83,17 @@ public sealed partial class SiegeSession
         else if (dy < 0) retainer.Facing = dx > 0 ? Facing.East : Facing.North;
     }
 
-    private void AdvanceMovementTick(SiegeRetainer retainer, SiegeActorMovement movement)
+    private bool AdvanceMovementTick(SiegeRetainer retainer, SiegeActorMovement movement, int effectFlags)
     {
         var (deltaX, deltaY) = RotateMovement(
             movement.FixedXDeltaPerTick, movement.FixedYDeltaPerTick, retainer.Facing);
-        AdvanceMovementAxis(retainer, deltaX, true, movement.Flags);
-        AdvanceMovementAxis(retainer, deltaY, false, movement.Flags);
+        return AdvanceMovementAxis(retainer, deltaX, true, effectFlags) &&
+               AdvanceMovementAxis(retainer, deltaY, false, effectFlags);
     }
 
-    private void AdvanceMovementAxis(SiegeRetainer retainer, int delta, bool xAxis, int flags)
+    private bool AdvanceMovementAxis(SiegeRetainer retainer, int delta, bool xAxis, int flags)
     {
-        if (delta == 0) return;
+        if (delta == 0) return true;
         var offset = (xAxis ? retainer.OffsetX8 : retainer.OffsetY8) + delta;
         var step = Math.Sign(delta);
         var crossesCollisionBand = step < 0 ? offset < -0x59 : offset > 0x59;
@@ -101,7 +109,9 @@ public sealed partial class SiegeSession
                     else retainer.OffsetY8 = 0;
                     retainer.Facing = (Facing)(((int)retainer.Facing + 3) & 3);
                 }
-                return;
+                // Flag 0x10 zeros the live effect's coordinate deltas and tick
+                // count, so actor thinking resumes immediately after this tick.
+                return (flags & 0x10) == 0;
             }
         }
         var crossesCell = step < 0 ? offset < -0x80 : offset > 0x80;
@@ -113,6 +123,7 @@ public sealed partial class SiegeSession
         }
         if (xAxis) retainer.OffsetX8 = offset;
         else retainer.OffsetY8 = offset;
+        return true;
     }
 
     private static (int X, int Y) RotateMovement(int x, int y, Facing facing) => facing switch

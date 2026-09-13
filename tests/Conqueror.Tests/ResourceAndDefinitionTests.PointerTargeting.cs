@@ -160,7 +160,7 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
-    public void ModeTwelveCollisionUsesBehaviorBitTwoAndTurnsLeftAtTheStrictBand()
+    public void ModeTwelveCollisionUsesBehaviorBitTwoAndStopsItsRewrittenEffectAtTheStrictBand()
     {
         var tiles = new SiegeTile[10, 10];
         var movementBlocks = new bool[10, 10];
@@ -180,13 +180,13 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal((64, 0, Facing.East),
             (friendly.OffsetX8, friendly.OffsetY8, friendly.Facing));
         battle.AdvanceRetainerMovement(0.2001);
-        Assert.Equal((2, 2, 0, 0, Facing.North),
+        Assert.Equal((2, 2, 64, 0, Facing.East),
             (friendly.X, friendly.Y, friendly.OffsetX8, friendly.OffsetY8, friendly.Facing));
         battle.AdvanceRetainerMovement(0.2001);
-        Assert.Equal((0, -64, Facing.North),
+        Assert.Equal((64, 0, Facing.East),
             (friendly.OffsetX8, friendly.OffsetY8, friendly.Facing));
         battle.AdvanceRetainerMovement(0.2001);
-        Assert.Equal((64, -64, Facing.East),
+        Assert.Equal((64, 0, Facing.East),
             (friendly.OffsetX8, friendly.OffsetY8, friendly.Facing));
     }
 
@@ -210,14 +210,15 @@ public sealed partial class ResourceAndDefinitionTests
         battle.ToggleRetainerSelection(friendly);
         Assert.True(battle.CommandSelectedRetainersTo(5, 2));
         battle.AdvanceRetainerMovement(0.4001);
-        Assert.Equal((2, 2, Facing.North), (friendly.X, friendly.Y, friendly.Facing));
+        Assert.Equal((2, 2, 64, Facing.East),
+            (friendly.X, friendly.Y, friendly.OffsetX8, friendly.Facing));
 
         Assert.Equal(SiegeAction.DoorOpened, battle.Interact(Assert.Single(battle.Objects)));
-        battle.ToggleRetainerSelection(friendly);
-        Assert.True(battle.CommandSelectedRetainersTo(5, 2));
-        battle.AdvanceRetainerMovement(0.6001);
+        battle.AdvanceRetainerMovement(0.2001);
+        Assert.Equal((2, 2, 128), (friendly.X, friendly.Y, friendly.OffsetX8));
+        battle.AdvanceRetainerMovement(0.4001);
 
-        Assert.Equal((3, 2, -64), (friendly.X, friendly.Y, friendly.OffsetX8));
+        Assert.Equal((3, 2, 0), (friendly.X, friendly.Y, friendly.OffsetX8));
     }
 
     [Fact]

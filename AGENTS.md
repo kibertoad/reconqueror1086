@@ -79,11 +79,15 @@ Heading helper `0x445C4` followed by `(heading + 0x20) & 0xC0` aims directly
 at the destination at each three-tick effect boundary; exact diagonal ties
 choose the clockwise cardinal. Scheduler `0x53425`-`0x535E5` tests the
 neighboring map block's behavior bit `0x02` only beyond the strict
-`-0x59..0x59` band. With official flags `0x142`, rejection at
-`0x53BCE`-`0x53C6C` zeros the moving-axis remainder and turns a kind-4 actor
-90 degrees left; the next tick rerotates the local delta through the new
-heading. Completion is evaluated only after the three-tick effect returns to
-the actor thinker, even if the actor entered the target cell mid-cycle. Carry
+`-0x59..0x59` band. The descriptor stores flags `0x142`, but mode 12 rewrites
+them to `(flags & 0xA7) | 0x10 = 0x112` at `0x4FFD1`-`0x4FFDA`.
+On rejection, `0x53CC9`-`0x53D5F` therefore preserves the actor's offset and
+heading, terminates that live effect, and returns immediately to actor thinking;
+the next scheduler update creates a fresh directly aimed effect and retries.
+The `0x40` left-turn branch belongs to the unmodified `0x142` effect family,
+not mode 12. Open-path completion is evaluated only after its three-tick effect
+returns to the actor thinker, even if the actor entered the target cell
+mid-cycle. Carry
 the original bit-2 blocker separately from visual tile labels and update it
 when authored object states change. Broader modes, corner interaction,
 multi-actor destination behavior, and exact ground-ray coordinates remain
