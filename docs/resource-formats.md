@@ -400,6 +400,10 @@ The raw-sector bounds, ISO directory traversal, cue timestamps, and WAV sample p
 
 The reports are regenerated from the user's installation and must never be committed. Stable conclusions belong here and confidence-scoped gameplay conclusions belong in [`original-findings.md`](original-findings.md).
 
+## Actor death and combat rewards
+
+The non-player death path at `0x4EA40`-`0x4ECD8` subtracts damage from combatant health at `+0x40`, replaces the actor's map cell from block state target `+0x40`, copies adjacent state `base + 3`, and starts that state's effect gate. After completion, `0x4F49C` removes the actor and calls `0x4D8C0`, which counts living hostile combatants by requiring side field `+0x30 != 0` and health `+0x40 > 0`. A full reference inventory shows no death-path access to wealth `0xD4A4`, ammunition `0xD4A8`, or equipment `0xD4C4`; those mutations occur in the authored pickup and crossbow paths. Defeated-enemy loot is therefore **Disproved for the hashed release**. The runtime has no actor-drop path, and `ResourceAndDefinitionTests.EnemyRewards.cs` verifies that death completion changes none of those reward channels.
+
 ## Open questions
 
 1. Recover the semantic meaning of directory field `0x24` and test whether data extents may alias or overlap.
