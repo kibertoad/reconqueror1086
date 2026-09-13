@@ -327,9 +327,7 @@ public sealed partial class ConquerorGame
         _siegeWeaponFrame = -1;
         _siegeWeaponRun = default;
         _siegeWeaponElapsed = 0;
-        _siegeHitFrame = -1;
-        _siegeHitRun = default;
-        _siegeHitElapsed = 0;
+        _siegeHitEffect = null;
     }
 
     private void DrawSiegeBackdrop(Rectangle viewport, Facing facing)
@@ -500,9 +498,10 @@ public sealed partial class ConquerorGame
                     new Rectangle(viewport.Center.X - width / 2, viewport.Bottom - height, width, height), viewport);
             }
         }
-        if (_siegeHitFrame >= 0 && _siegeHitFrame < animation.Frames.Count)
+        var hitFrame = _siegeHitEffect?.Frame ?? -1;
+        if (hitFrame >= 0 && hitFrame < animation.Frames.Count)
         {
-            var texture = animation.Frames[_siegeHitFrame];
+            var texture = animation.Frames[hitFrame];
             DrawSiegeEffect(texture, viewport, originalScale);
         }
     }

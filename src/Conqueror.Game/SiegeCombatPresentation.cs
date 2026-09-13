@@ -25,7 +25,7 @@ public static class SiegeCombatPresentation
     ];
     public const int OriginalWidth = 320;
     public const int OriginalHeight = 200;
-    public const double FrameSeconds = 0.07;
+    public const double ProvisionalStepSeconds = 0.07;
     public static readonly UiBounds Viewport = new(26, 24, 167, 117);
     public static readonly UiBounds Radar = new(223, 111, 94, 84);
     public static readonly UiBounds HealthBar = new(60, 192, 137, 5);

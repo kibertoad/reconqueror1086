@@ -580,9 +580,7 @@ public sealed partial class ConquerorGame
         var after = LivingSiegeEnemyState();
         if (after.Health >= before.Health) return;
         var run = SiegeCombatPresentation.BloodFramesFor(after.Count < before.Count);
-        _siegeHitRun = run;
-        _siegeHitFrame = _animationEnabled ? run.First : run.Last;
-        _siegeHitElapsed = 0;
+        _siegeHitEffect = _animationEnabled ? new SiegeHitEffect(run) : null;
     }
 
     private (int Health, int Count) LivingSiegeEnemyState()
@@ -601,7 +599,7 @@ public sealed partial class ConquerorGame
         }
         else
             AdvanceSiegeRun(ref _siegeWeaponFrame, _siegeWeaponRun, ref _siegeWeaponElapsed, elapsedSeconds);
-        AdvanceSiegeRun(ref _siegeHitFrame, _siegeHitRun, ref _siegeHitElapsed, elapsedSeconds);
+        _siegeHitEffect?.Advance(elapsedSeconds);
     }
 
     private void AdvanceSiegeRun(ref int frame, SiegeFrameRun run, ref double elapsed, double elapsedSeconds)
@@ -614,9 +612,9 @@ public sealed partial class ConquerorGame
             return;
         }
         elapsed += elapsedSeconds;
-        while (elapsed >= SiegeCombatPresentation.FrameSeconds && frame >= 0)
+        while (elapsed >= SiegeCombatPresentation.ProvisionalStepSeconds && frame >= 0)
         {
-            elapsed -= SiegeCombatPresentation.FrameSeconds;
+            elapsed -= SiegeCombatPresentation.ProvisionalStepSeconds;
             frame = run.Next(frame);
         }
     }
