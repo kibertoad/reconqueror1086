@@ -95,6 +95,11 @@ public sealed partial class ResourceAndDefinitionTests
             (retainer.X, retainer.Y, retainer.VisualId, retainer.OriginalCombatRow,
                 retainer.OriginalActorKind));
         Assert.Single(layout.Enemies);
+        Assert.NotNull(layout.PlayerActor);
+        var authoredActors = layout.Enemies.Concat(layout.Retainers)
+            .Append(layout.PlayerActor!).OrderBy(actor => actor.X).ThenBy(actor => actor.Y).ToArray();
+        Assert.Equal(authoredActors.Select(actor => actor.OriginalActorOrder).Order().ToArray(),
+            authoredActors.Select(actor => actor.OriginalActorOrder).ToArray());
         Assert.DoesNotContain(layout.Objects, item => item.X == 13 && item.Y is 20 or 21);
         Assert.Equal(1, battle.AlliesStarted);
         var activeRetainer = Assert.Single(battle.Retainers);
@@ -280,6 +285,57 @@ public sealed partial class ResourceAndDefinitionTests
         battle.AdvanceRetainerMovement(0.2001);
         Assert.Equal((5, 2, 64, 0, Facing.East),
             (friendly.X, friendly.Y, friendly.OffsetX8, friendly.OffsetY8, friendly.Facing));
+    }
+
+    [Fact]
+    public void ModeFiveRegroupsThroughModeSevenUsingAuthoredFriendlyOrderAndThePlayerActor()
+    {
+        var tiles = new SiegeTile[16, 5];
+        var army = new Army();
+        army.Units[SiegeRetainerCombatUnit] = 6;
+        var playerActor = new SiegeSpawn(1, 2, false, OriginalHealth: 12,
+            OriginalActorKind: 0, OriginalActorOrder: 0);
+        var ally = new SiegeSpawn(4, 2, false, OriginalHealth: 12,
+            OriginalActorKind: 0, OriginalActorOrder: 1);
+        var runner = new SiegeSpawn(8, 2, false, OriginalHealth: 12,
+            OriginalActorKind: 0, OriginalActorOrder: 2);
+        var enemy = new SiegeSpawn(12, 2, false, OriginalHealth: 10,
+            OriginalActorKind: 2, OriginalActorOrder: 3);
+        var battle = new SiegeSession(new Player(), army, 0, 1086,
+            new SiegeLayout(tiles, 1, 2, Facing.East, [enemy], retainers: [ally, runner],
+                playerActor: playerActor));
+        var activeRunner = battle.Retainers.Single(item => item.OriginalActorOrder == 2);
+        activeRunner.Facing = Facing.West;
+        var formationCalls = new List<SiegeEnemy>();
+        var reached = false;
+        battle.ConfigureActorRaycast((source, target) =>
+        {
+            if (ReferenceEquals(target, battle.Enemies[0]))
+                return new SiegeActorRayHit(target, 0x400);
+            formationCalls.Add(target);
+            if (reached && ReferenceEquals(target, battle.Retainers[0]))
+                return new SiegeActorRayHit(battle.PlayerActor, 0x1ff);
+            return new SiegeActorRayHit(target,
+                ReferenceEquals(target, battle.PlayerActor) ? 0x500 : 0x300);
+        });
+        battle.ToggleRetainerSelection(activeRunner);
+        battle.CommandRetainers(SiegeRetainerCommand.Retreat);
+
+        battle.AdvanceRetainerMovement(0);
+        battle.AdvanceRetainerMovement(0.6001);
+        Assert.Equal((7, 2, 64), (activeRunner.X, activeRunner.Y, activeRunner.OffsetX8));
+
+        battle.AdvanceRetainerMovement(0);
+        Assert.Equal([battle.PlayerActor, battle.Retainers[0]], formationCalls);
+        Assert.Equal(Facing.West, activeRunner.Facing);
+
+        reached = true;
+        battle.AdvanceRetainerMovement(0.6001);
+        battle.AdvanceRetainerMovement(0);
+        var regrouped = (activeRunner.X, activeRunner.Y, activeRunner.OffsetX8, activeRunner.OffsetY8);
+        battle.AdvanceRetainerMovement(1.0);
+        Assert.Equal(regrouped,
+            (activeRunner.X, activeRunner.Y, activeRunner.OffsetX8, activeRunner.OffsetY8));
     }
 
     [Fact]
@@ -478,7 +534,7 @@ public sealed partial class ResourceAndDefinitionTests
         battle.ConfigureActorRaycast((_, target) =>
         {
             calls.Add(target);
-            return 0x200;
+            return new SiegeActorRayHit(target, 0x200);
         });
         battle.CommandRetainers(SiegeRetainerCommand.Attack);
 
@@ -496,7 +552,8 @@ public sealed partial class ResourceAndDefinitionTests
         battle.ConfigureActorRaycast((_, target) =>
         {
             calls.Add(target);
-            return ReferenceEquals(target, battle.Enemies[0]) ? 0x153 : 0x100;
+            return new SiegeActorRayHit(target,
+                ReferenceEquals(target, battle.Enemies[0]) ? 0x153 : 0x100);
         });
         battle.CommandRetainers(SiegeRetainerCommand.Attack);
 

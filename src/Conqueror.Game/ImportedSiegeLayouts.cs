@@ -72,9 +72,14 @@ public static class ImportedSiegeLayouts
             movementBlocks[x - minX, y - minY] = !reachable[x, y] || sourceMovementBlocks[x, y];
         }
 
+        var actorOrder = mapPoints
+            .Where(point => IsActor(scene.BlockAt(point.X, point.Y)))
+            .Select((point, order) => (point, order))
+            .ToDictionary(entry => entry.point, entry => entry.order);
         var enemies = points
             .Where(point => IsEnemyActor(scene.BlockAt(point.X, point.Y)))
-            .Select(point => SpawnFor(scene, scene.BlockAt(point.X, point.Y), point.X - minX, point.Y - minY))
+            .Select(point => SpawnFor(scene, scene.BlockAt(point.X, point.Y),
+                point.X - minX, point.Y - minY, actorOrder[point]))
             .ToArray();
         // Loader 0x51560 scans x-major and promotes its first friendly actor to
         // player D4D0. Counter 0x4D870 excludes that record from retainers.
@@ -85,15 +90,20 @@ public static class ImportedSiegeLayouts
         var retainers = points
             .Where(point => IsFriendlyActor(scene.BlockAt(point.X, point.Y)) &&
                 (playerActor is null || point != playerActor.Value))
-            .Select(point => SpawnFor(scene, scene.BlockAt(point.X, point.Y), point.X - minX, point.Y - minY))
+            .Select(point => SpawnFor(scene, scene.BlockAt(point.X, point.Y),
+                point.X - minX, point.Y - minY, actorOrder[point]))
             .ToArray();
         var objects = points
             .Where(point => IsSceneObject(scene.BlockAt(point.X, point.Y)))
             .Select(point => ObjectFor(scene, point.X, point.Y, minX, minY))
             .ToArray();
         var heading = (scene.Viewer.Heading + 8192) / 16384 & 3;
+        var playerSpawn = playerActor is { } actorPoint
+            ? SpawnFor(scene, scene.BlockAt(actorPoint.X, actorPoint.Y),
+                actorPoint.X - minX, actorPoint.Y - minY, actorOrder[actorPoint])
+            : null;
         var layout = new SiegeLayout(tiles, scene.Viewer.CellX - minX, scene.Viewer.CellY - minY,
-            (Facing)heading, enemies, objects, retainers, movementBlocks);
+            (Facing)heading, enemies, objects, retainers, movementBlocks, playerSpawn);
         return (layout, minX, minY);
     }
 
@@ -189,7 +199,8 @@ public static class ImportedSiegeLayouts
 
     private static bool IsEnemyActor(DynamixSceneBlock block) => IsActor(block) && !IsFriendlyActor(block);
 
-    private static SiegeSpawn SpawnFor(DynamixScene scene, DynamixSceneBlock block, int x, int y)
+    private static SiegeSpawn SpawnFor(
+        DynamixScene scene, DynamixSceneBlock block, int x, int y, int actorOrder)
     {
         if (block.ActorCombatRow is < 0 or >= OriginalWeaponCombat.CombatRowCount)
             throw new InvalidDataException($"Scene actor {block.Index} references an unknown combat row.");
@@ -204,7 +215,7 @@ public static class ImportedSiegeLayouts
         return new SiegeSpawn(x, y, champion, block.Index, template.Armor, template.Health,
             block.ActorCombatRow, template.AttackSkill, AnimationFor(scene, block), MovementFor(scene, block),
             block.InitialXOffset8, block.InitialYOffset8,
-            OriginalCombatantTemplates.ActorKindForSceneTemplate(block.ActorTemplate));
+            OriginalCombatantTemplates.ActorKindForSceneTemplate(block.ActorTemplate), actorOrder);
     }
 
     private static SiegeActorMovement? MovementFor(DynamixScene scene, DynamixSceneBlock block)

@@ -5,7 +5,7 @@ namespace Conqueror.Game;
 
 public static class OriginalSiegeActorAcquisition
 {
-    public static int? TargetDepth(
+    public static SiegeActorRayHit? CastToward(
         SiegeSession siege,
         DynamixScene scene,
         int sourceOriginX,
@@ -49,7 +49,9 @@ public static class OriginalSiegeActorAcquisition
                 ? candidate.TextureX
                 : TextureX(candidate.TextureCoordinate8, candidate.Block, texture.Width);
             if (!OpaqueAtHorizon(candidate, texture, textureX, horizon, viewportWidth)) continue;
-            return ReferenceEquals(candidate.Actor, target) ? candidate.Hit.Distance8 : null;
+            return candidate.Actor is { } actor
+                ? new SiegeActorRayHit(actor, candidate.Hit.Distance8)
+                : null;
         }
         return null;
     }

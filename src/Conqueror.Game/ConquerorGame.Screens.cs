@@ -283,10 +283,13 @@ public sealed partial class ConquerorGame
         return _siegeVisuals.Scene.BlockAt(sourceX, sourceY);
     }
 
-    private SiegeProjectedBlock? SceneProjectionBlockAt(int localX, int localY)
+    private SiegeProjectedBlock? SceneProjectionBlockAt(int localX, int localY, bool includePlayer = false)
     {
         if (_siegeVisuals is null || _siege is null || localX < 0 || localY < 0 ||
             localX >= _siege.Width || localY >= _siege.Height) return null;
+        if (includePlayer && _siege.PlayerActor is { VisualId: >= 0 } player &&
+            player.X == localX && player.Y == localY && player.VisualId < _siegeVisuals.Scene.Blocks.Count)
+            return ProjectionActor(player);
         if (_siege.EnemyAt(localX, localY) is { VisualId: >= 0 } enemy &&
             enemy.VisualId < _siegeVisuals.Scene.Blocks.Count)
             return ProjectionActor(enemy);
@@ -337,10 +340,11 @@ public sealed partial class ConquerorGame
     {
         if (_siege is null || _siegeVisuals is null)
             throw new InvalidOperationException("Original siege assets must be active before actor acquisition is configured.");
-        _siege.ConfigureActorRaycast((source, target) => OriginalSiegeActorAcquisition.TargetDepth(
+        _siege.ConfigureActorRaycast((source, target) => OriginalSiegeActorAcquisition.CastToward(
             _siege, _siegeVisuals.Scene,
             _siegeVisuals.SourceOriginX, _siegeVisuals.SourceOriginY,
-            source, target, SceneProjectionBlockAt, _siegeVisuals.SourceFor));
+            source, target, (x, y) => SceneProjectionBlockAt(x, y, includePlayer: true),
+            _siegeVisuals.SourceFor));
     }
 
     private Rectangle SiegeWallBounds(SiegeRayHit hit, Rectangle viewport)

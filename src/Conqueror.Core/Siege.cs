@@ -6,7 +6,8 @@ public enum SiegeAction { None, Moved, Blocked, DoorOpened, Healed, Looted, Hit,
 public enum SiegeEnemyVisualState { Walk, Attack, Hit, Dying }
 public enum SiegePickupRewardKind { Wealth, Healing, Equipment, CrossbowBolts }
 public enum SiegeRetainerCommand { Defend = 2, Attack = 6, Retreat = 10, Follow = 16 }
-public delegate int? SiegeActorRaycast(SiegeEnemy source, SiegeEnemy target);
+public sealed record SiegeActorRayHit(SiegeEnemy Actor, int Distance8);
+public delegate SiegeActorRayHit? SiegeActorRaycast(SiegeEnemy source, SiegeEnemy target);
 
 public class SiegeEnemy
 {
@@ -23,6 +24,7 @@ public class SiegeEnemy
     public int OffsetY8 { get; internal set; }
     public bool Champion { get; init; }
     public int VisualId { get; init; } = -1;
+    public int OriginalActorOrder { get; init; } = -1;
     public Facing Facing { get; set; }
     public int WalkFrame { get; set; }
     public SiegeEnemyVisualState VisualState { get; internal set; }
@@ -37,8 +39,11 @@ public sealed class SiegeRetainer : SiegeEnemy
     internal (int X, int Y)? OrderedDestination { get; set; }
     internal double MovementElapsed { get; set; }
     internal int MovementTick { get; set; }
+    internal bool MovementActive { get; set; }
     internal bool MovementWanders { get; set; }
     internal SiegeEnemy? PendingRangedTarget { get; set; }
+    internal SiegeEnemy? RetreatRegroupTarget { get; set; }
+    internal int RetreatMode { get; set; }
 }
 
 public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int GarrisonPerEnemy,
@@ -47,7 +52,7 @@ public sealed record SiegeSpawn(int X, int Y, bool Champion, int VisualId = -1,
     int? OriginalArmor = null, int? OriginalHealth = null, int? OriginalCombatRow = null,
     int? OriginalAttackSkill = null, SiegeActorAnimation? OriginalAnimation = null,
     SiegeActorMovement? OriginalMovement = null, int InitialOffsetX8 = 0, int InitialOffsetY8 = 0,
-    int? OriginalActorKind = null);
+    int? OriginalActorKind = null, int OriginalActorOrder = -1);
 public sealed record SiegeActorAnimation(double AttackSeconds, double HitSeconds, double DeathSeconds);
 public sealed record SiegeActorMovement(
     int TickCount, int IntervalMilliseconds, int FixedXDeltaPerTick, int FixedYDeltaPerTick, int Flags,
@@ -98,7 +103,7 @@ public sealed class SiegeLayout
 
     public SiegeLayout(SiegeTile[,] tiles, int playerX, int playerY, Facing facing, IReadOnlyList<SiegeSpawn> enemies,
         IReadOnlyList<SiegeObjectSpawn>? objects = null, IReadOnlyList<SiegeSpawn>? retainers = null,
-        bool[,]? movementBlocks = null)
+        bool[,]? movementBlocks = null, SiegeSpawn? playerActor = null)
     {
         ArgumentNullException.ThrowIfNull(tiles);
         ArgumentNullException.ThrowIfNull(enemies);
@@ -125,7 +130,6 @@ public sealed class SiegeLayout
         if (movementBlocks is not null && (movementBlocks.GetLength(0) != tiles.GetLength(0) ||
                 movementBlocks.GetLength(1) != tiles.GetLength(1)))
             throw new ArgumentException("Movement-block map dimensions must match the siege layout.", nameof(movementBlocks));
-
         _tiles = (SiegeTile[,])tiles.Clone();
         _movementBlocks = movementBlocks is null ? MovementBlocksFor(tiles) : (bool[,])movementBlocks.Clone();
         PlayerX = playerX;
@@ -134,6 +138,7 @@ public sealed class SiegeLayout
         Enemies = enemies.ToArray();
         Retainers = retainers.ToArray();
         Objects = objects.ToArray();
+        PlayerActor = playerActor;
     }
 
     public int PlayerX { get; }
@@ -142,6 +147,7 @@ public sealed class SiegeLayout
     public IReadOnlyList<SiegeSpawn> Enemies { get; }
     public IReadOnlyList<SiegeSpawn> Retainers { get; }
     public IReadOnlyList<SiegeObjectSpawn> Objects { get; }
+    public SiegeSpawn? PlayerActor { get; }
     public SiegeTile[,] CopyTiles() => (SiegeTile[,])_tiles.Clone();
     public bool BlocksMovementAt(int x, int y) =>
         x < 0 || y < 0 || x >= _movementBlocks.GetLength(0) || y >= _movementBlocks.GetLength(1) ||
@@ -175,6 +181,7 @@ public sealed partial class SiegeSession
     public IReadOnlyList<SiegeObject> Objects => _objects;
     private readonly List<SiegeObject> _objects = [];
     private SiegeActorRaycast? _actorRaycast;
+    public SiegeEnemy PlayerActor { get; }
 
     public int PlayerX { get; private set; } = 1;
     public int PlayerY { get; private set; } = 1;
@@ -217,6 +224,7 @@ public sealed partial class SiegeSession
         }
         MaxHealth = OriginalWeaponCombat.PlayerHealth(player);
         Health = MaxHealth;
+        PlayerActor = ActorFor(layout?.PlayerActor, PlayerX, PlayerY, Health, Facing);
         var retainerCap = includeRetainers ? OriginalRetainerCombat.CampaignRetainerCapFor(army) : 0;
         AlliesStarted = layout is null ? retainerCap : Math.Min(retainerCap, layout.Retainers.Count);
         AlliesAlive = AlliesStarted;
@@ -237,6 +245,7 @@ public sealed partial class SiegeSession
                     OriginalAttackSkill = spawn.OriginalAttackSkill,
                     OriginalCombatRow = spawn.OriginalCombatRow,
                     OriginalActorKind = spawn.OriginalActorKind,
+                    OriginalActorOrder = spawn.OriginalActorOrder,
                     Champion = spawn.Champion,
                     VisualId = spawn.VisualId,
                     OriginalAnimation = spawn.OriginalAnimation,
@@ -266,23 +275,6 @@ public sealed partial class SiegeSession
             }
         }
     }
-
-    private SiegeRetainer RetainerFor(SiegeSpawn spawn) => new()
-    {
-        X = spawn.X,
-        Y = spawn.Y,
-        Health = spawn.OriginalHealth ?? 1,
-        OriginalArmor = spawn.OriginalArmor,
-        OriginalAttackSkill = spawn.OriginalAttackSkill,
-        OriginalCombatRow = spawn.OriginalCombatRow,
-        OriginalActorKind = spawn.OriginalActorKind,
-        VisualId = spawn.VisualId,
-        OriginalAnimation = spawn.OriginalAnimation,
-        OriginalMovement = spawn.OriginalMovement,
-        OffsetX8 = spawn.InitialOffsetX8,
-        OffsetY8 = spawn.InitialOffsetY8,
-        Facing = DirectionToward(spawn.X, spawn.Y, PlayerX, PlayerY, Facing.South)
-    };
 
     public SiegeTile TileAt(int x, int y) => x < 0 || y < 0 || x >= Width || y >= Height ? SiegeTile.Wall : _map[x, y];
     public SiegeEnemy? EnemyAt(int x, int y) => _enemies.FirstOrDefault(e => e.Health > 0 && e.X == x && e.Y == y);
@@ -398,8 +390,8 @@ public sealed partial class SiegeSession
         }
     }
 
-    public void TurnLeft() { Facing = (Facing)(((int)Facing + 3) % 4); LastMessage = $"Facing {Facing}."; }
-    public void TurnRight() { Facing = (Facing)(((int)Facing + 1) % 4); LastMessage = $"Facing {Facing}."; }
+    public void TurnLeft() { Facing = (Facing)(((int)Facing + 3) % 4); SyncPlayerActor(); LastMessage = $"Facing {Facing}."; }
+    public void TurnRight() { Facing = (Facing)(((int)Facing + 1) % 4); SyncPlayerActor(); LastMessage = $"Facing {Facing}."; }
 
     public SiegeAction Move(bool forward)
     {
@@ -416,7 +408,7 @@ public sealed partial class SiegeSession
         {
             LastMessage = "The way is blocked."; TickEnemies(); return SiegeAction.Blocked;
         }
-        PlayerX = nx; PlayerY = ny;
+        PlayerX = nx; PlayerY = ny; SyncPlayerActor();
         TickEnemies();
         return SiegeAction.Moved;
     }
@@ -716,6 +708,7 @@ public sealed partial class SiegeSession
         }
         AdvanceRetainerOrders();
         Health = Math.Max(0, Health);
+        SyncPlayerActor();
     }
 
     public void AdvanceRetainerOrders()
@@ -814,8 +807,11 @@ public sealed partial class SiegeSession
     {
         retainer.MovementElapsed = 0;
         retainer.MovementTick = 0;
+        retainer.MovementActive = false;
         retainer.MovementWanders = false;
         retainer.PendingRangedTarget = null;
+        retainer.RetreatRegroupTarget = null;
+        retainer.RetreatMode = 0;
     }
 
     private void EnemyAttackRetainer(SiegeEnemy enemy, SiegeRetainer retainer, int distance)

@@ -178,13 +178,14 @@ public sealed partial class ResourceAndDefinitionTests
                 scene.Blocks[1], actor.OffsetX8, actor.OffsetY8, 1) { Actor = actor };
         }
 
-        var depth = OriginalSiegeActorAcquisition.TargetDepth(
+        var hit = OriginalSiegeActorAcquisition.CastToward(
             battle, scene, 10, 20, friendly, target, ActiveBlockAt, _ => opaque);
-        var transparent = OriginalSiegeActorAcquisition.TargetDepth(
+        var transparent = OriginalSiegeActorAcquisition.CastToward(
             battle, scene, 10, 20, friendly, target, ActiveBlockAt,
             _ => opaque with { Indices = new byte[64 * 128] });
 
-        Assert.InRange(Assert.IsType<int>(depth), 0x230, 0x250);
+        Assert.Same(target, hit?.Actor);
+        Assert.InRange(hit!.Distance8, 0x230, 0x250);
         Assert.Null(transparent);
     }
 

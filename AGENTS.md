@@ -177,7 +177,25 @@ do not identify handler `0x50020` as the command's direct action. Kind-1 mode 4
 repeats acquisition and reaches ranged mode 11 through `0x4E6D3`; `0x5010B`
 uses a strict raw contact-distance gate and doubled ranged effect interval.
 Exact fixed-point ray-visible acquisition is active for imported scenes;
-later mode-5 formation transitions remain Provisional.
+kind-0 Retreat's next regroup transition is also Confirmed. The kind-0 table
+entry at runtime `0x4E43C` sends mode 5 through transition `0x4E70C`, recording
+mode 5 as the previous/failure state and mode 7 as the requested/success state.
+Acquisition `0x4FC34` scans the complete 68-byte actor array in authored order,
+skips inactive actors and self, requires the same side, casts from the live
+fixed-point centers through heading helper `0x445C4` and centered raycaster
+`0x470A8`, and resolves the returned block to exact actor identity through
+`0x4CEA0`. It replaces the candidate only at a strictly smaller depth than the
+initial `0x7FFF` and exits early only below `0x200`. Mode-7 handler `0x4FE76`
+then directly approaches the stored actor with live flags `0x112`. Its
+acquisition predicate `0x4F8B0` casts toward that stored actor but deliberately
+accepts any living same-side actor actually returned below `0x200`; transition
+`0x4E732` enters mode 1 on success and returns to mode 5 on failure. Preserve
+the promoted first-friendly actor's authored metadata/order separately from
+the live player position: the resource cell need not equal the `Viewer` cell.
+The runtime player proxy therefore uses that actor's metadata but current
+session coordinates. Mode 1 onward and broader actor AI remain Provisional.
+GameFAQs FAQ 66730 contains no state-table, ray-identity, or threshold detail
+and neither corroborates nor conflicts with this executable-derived mapping.
 
 ## Git push destination
 

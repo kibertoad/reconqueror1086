@@ -18,11 +18,12 @@ public sealed partial class SiegeSession
         // Authored list order is the stable compatibility tie-breaker.
         foreach (var retainer in _retainers.Where(retainer => retainer.Health > 0))
         {
-            if (retainer.MovementTick == 0 && !TryBeginRetainerMovement(retainer))
+            if (!retainer.MovementActive && !TryBeginRetainerMovement(retainer))
             {
                 retainer.MovementElapsed = 0;
                 continue;
             }
+            retainer.MovementActive = true;
 
             var movement = ValidMovement(retainer.OriginalMovement) ?? FallbackActorMovement;
             retainer.MovementElapsed += elapsedSeconds;
@@ -31,16 +32,18 @@ public sealed partial class SiegeSession
             {
                 catchUp++;
                 retainer.MovementElapsed -= movement.TickSeconds;
-                if (retainer.MovementTick == 0 && !TryBeginRetainerMovement(retainer))
+                if (!retainer.MovementActive && !TryBeginRetainerMovement(retainer))
                 {
                     retainer.MovementElapsed = 0;
                     break;
                 }
+                retainer.MovementActive = true;
                 var effectContinues = AdvanceMovementTick(retainer, movement,
                     MovementFlagsFor(retainer, movement.Flags));
                 retainer.MovementTick = effectContinues
                     ? (retainer.MovementTick + 1) % movement.TickCount
                     : 0;
+                retainer.MovementActive = effectContinues && retainer.MovementTick != 0;
                 retainer.WalkFrame = (retainer.WalkFrame + 1) % movement.TickCount;
                 if (retainer.MovementTick == 0 && retainer.OrderedDestination is { } destination &&
                     retainer.X == destination.X && retainer.Y == destination.Y)
@@ -111,14 +114,50 @@ public sealed partial class SiegeSession
                 // Requested mode 10 transitions to mode 5 for friendly kind 0
                 // and mode 4 for kind 1 after acquiring a visible opponent.
                 // Mode 5 preserves heading; kind 1 continues through ranged mode 11.
-                if (RetreatOrderTarget(retainer) is null)
+                if (retainer.OriginalActorKind == 1)
+                    return false;
+                if (retainer.RetreatMode == 0)
                 {
+                    if (RetreatOrderTarget(retainer) is not null)
+                    {
+                        retainer.RetreatMode = 5;
+                        retainer.MovementWanders = true;
+                        return true;
+                    }
                     retainer.MovementWanders = false;
                     retainer.Command = SiegeRetainerCommand.Defend;
                     return false;
                 }
-                retainer.MovementWanders = retainer.OriginalActorKind is null or 0;
-                return retainer.MovementWanders;
+                if (retainer.RetreatMode == 5)
+                {
+                    if (_actorRaycast is not null && RetreatFormationTarget(retainer) is { } formation)
+                    {
+                        retainer.RetreatMode = 7;
+                        retainer.RetreatRegroupTarget = formation;
+                        retainer.MovementWanders = false;
+                        AimRetainerAt(retainer, formation.X, formation.Y);
+                        return true;
+                    }
+                    retainer.MovementWanders = true;
+                    return true;
+                }
+                if (retainer.RetreatMode == 7)
+                {
+                    if (retainer.RetreatRegroupTarget is { Health: > 0 } regroup &&
+                        RetreatFormationReached(retainer, regroup))
+                    {
+                        retainer.RetreatMode = 1;
+                        retainer.RetreatRegroupTarget = null;
+                        retainer.MovementWanders = false;
+                        return false;
+                    }
+                    retainer.RetreatMode = 5;
+                    retainer.RetreatRegroupTarget = null;
+                    retainer.MovementWanders = true;
+                    return true;
+                }
+                retainer.MovementWanders = false;
+                return false;
             default:
                 retainer.MovementWanders = false;
                 return false;
@@ -130,6 +169,7 @@ public sealed partial class SiegeSession
         retainer.OrderedDestination = null;
         retainer.MovementElapsed = 0;
         retainer.MovementTick = 0;
+        retainer.MovementActive = false;
     }
 
     private static void AimRetainerAt(SiegeRetainer retainer, int targetX, int targetY)
@@ -271,8 +311,35 @@ public sealed partial class SiegeSession
         return true;
     }
 
+    private SiegeEnemy? RetreatFormationTarget(SiegeRetainer source)
+    {
+        SiegeEnemy? nearest = null;
+        var nearestDistance8 = 0x7fff;
+        foreach (var candidate in FriendlyActorsInAuthoredOrder(source))
+        {
+            if (ActorRayDistance(source, candidate) is not { } distance8 || distance8 >= nearestDistance8)
+                continue;
+            nearest = candidate;
+            nearestDistance8 = distance8;
+            if (distance8 < 0x200) break;
+        }
+        return nearest;
+    }
+
+    private bool RetreatFormationReached(SiegeRetainer source, SiegeEnemy target)
+    {
+        if (_actorRaycast?.Invoke(source, target) is not { Distance8: < 0x200 } hit) return false;
+        return !ReferenceEquals(hit.Actor, source) && hit.Actor.Health > 0 &&
+            (ReferenceEquals(hit.Actor, PlayerActor) || _retainers.Contains(hit.Actor));
+    }
+
+    private IEnumerable<SiegeEnemy> FriendlyActorsInAuthoredOrder(SiegeRetainer source) =>
+        _retainers.Cast<SiegeEnemy>().Append(PlayerActor)
+            .Where(actor => !ReferenceEquals(actor, source) && actor.Health > 0)
+            .OrderBy(actor => actor.OriginalActorOrder < 0 ? int.MaxValue : actor.OriginalActorOrder);
+
     private int? ActorRayDistance(SiegeEnemy source, SiegeEnemy target) => _actorRaycast is not null
-        ? _actorRaycast(source, target)
+        ? _actorRaycast(source, target) is { } hit && ReferenceEquals(hit.Actor, target) ? hit.Distance8 : null
         : ActorLineIsClear(source, target) ? ActorDistanceInFixedPoint(source, target) : null;
 
     private static int ActorDistanceInFixedPoint(SiegeEnemy source, SiegeEnemy target)

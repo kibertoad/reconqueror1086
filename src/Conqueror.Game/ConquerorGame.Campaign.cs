@@ -616,7 +616,7 @@ public sealed partial class ConquerorGame
             return null;
         var sceneCandidates = OriginalSiegeProjection.CastColumn(_siege, _siegeVisuals.Scene,
             _siegeVisuals.SourceOriginX, _siegeVisuals.SourceOriginY,
-            localX, viewport.Width, SceneProjectionBlockAt);
+            localX, viewport.Width, (x, y) => SceneProjectionBlockAt(x, y));
         var localViewport = new Rectangle(0, 0, viewport.Width, viewport.Height);
         foreach (var candidate in sceneCandidates)
         {
