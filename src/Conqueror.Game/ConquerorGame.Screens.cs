@@ -271,6 +271,8 @@ public sealed partial class ConquerorGame
     private DynamixSceneBlock? SceneBlockForHit(SiegeRayHit hit)
     {
         if (_siegeVisuals is null) return null;
+        if (hit.SceneBlockIndex >= 0 && hit.SceneBlockIndex < _siegeVisuals.Scene.Blocks.Count)
+            return _siegeVisuals.Scene.Blocks[hit.SceneBlockIndex];
         var sourceX = hit.MapX + _siegeVisuals.SourceOriginX;
         var sourceY = hit.MapY + _siegeVisuals.SourceOriginY;
         if (sourceX is < 0 or >= DynamixScene.MapWidth || sourceY is < 0 or >= DynamixScene.MapHeight)
@@ -279,6 +281,49 @@ public sealed partial class ConquerorGame
             state.VisualId < _siegeVisuals.Scene.Blocks.Count)
             return _siegeVisuals.Scene.Blocks[state.VisualId];
         return _siegeVisuals.Scene.BlockAt(sourceX, sourceY);
+    }
+
+    private SiegeProjectedBlock? SceneProjectionBlockAt(int localX, int localY)
+    {
+        if (_siegeVisuals is null || _siege is null || localX < 0 || localY < 0 ||
+            localX >= _siege.Width || localY >= _siege.Height) return null;
+        if (_siege.EnemyAt(localX, localY) is { VisualId: >= 0 } enemy &&
+            enemy.VisualId < _siegeVisuals.Scene.Blocks.Count)
+            return ProjectionActor(enemy);
+        if (_siege.RetainerAt(localX, localY) is { VisualId: >= 0 } retainer &&
+            retainer.VisualId < _siegeVisuals.Scene.Blocks.Count)
+            return ProjectionActor(retainer);
+        if (_siege.ObjectAt(localX, localY) is { VisualId: >= 0 } item &&
+            item.VisualId < _siegeVisuals.Scene.Blocks.Count)
+        {
+            var active = _siegeVisuals.Scene.Blocks[item.VisualId];
+            return new SiegeProjectedBlock(active, active.InitialXOffset8,
+                active.InitialYOffset8, active.Index);
+        }
+
+        var sourceX = localX + _siegeVisuals.SourceOriginX;
+        var sourceY = localY + _siegeVisuals.SourceOriginY;
+        var index = _siegeVisuals.Scene.BlockIndexAt(sourceX, sourceY);
+        var block = _siegeVisuals.Scene.Blocks[index];
+        // A moved actor leaves its state-target block behind in the original map.
+        if ((block.Behavior & 0x80) != 0 && block.InteractionSelector == 1 &&
+            (uint)block.StateTarget < (uint)_siegeVisuals.Scene.Blocks.Count)
+            block = _siegeVisuals.Scene.Blocks[block.StateTarget];
+        return new SiegeProjectedBlock(block, block.InitialXOffset8,
+            block.InitialYOffset8, block.Index);
+
+        SiegeProjectedBlock ProjectionActor(SiegeEnemy actor)
+        {
+            var initial = _siegeVisuals.Scene.Blocks[actor.VisualId];
+            var active = actor.VisualState switch
+            {
+                SiegeEnemyVisualState.Attack => ActorStateBlock(initial, 1),
+                SiegeEnemyVisualState.Hit => ActorStateBlock(initial, 2),
+                SiegeEnemyVisualState.Dying => ActorStateBlock(initial, 3),
+                _ => initial
+            };
+            return new SiegeProjectedBlock(active, actor.OffsetX8, actor.OffsetY8, active.Index);
+        }
     }
 
     private Rectangle SiegeWallBounds(SiegeRayHit hit, Rectangle viewport)

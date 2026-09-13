@@ -129,8 +129,15 @@ before rotation through `0x447C4`. `0x45158` normalizes the signed major axis to
 lookup with `& 0x7F`, and permits only `0x40` iterations. Intersection switch
 table `0x34A0C` maps kind 0 to no candidate, kinds 1/4 to an inclusive cell
 box, kinds 2/3 to horizontal/vertical center planes, and kinds 5/6 to the two
-diagonals. Helper `0x44F7C` stores at most 32 contact-x, contact-y, packed-face,
-and block-pointer entries at globals `1C220`, `1C1A0`, `1C2A0`, and `1C320`.
+diagonals. Helper `0x44F7C` stores contact-x, contact-y, packed-face, and
+block-pointer entries at globals `1C220`, `1C1A0`, `1C2A0`, and `1C320`.
+Those arrays have 32 slots, but `0x45061` stops when the post-increment count
+reaches `0x1F`, so only 31 candidates are usable. Traversal branches
+`0x4527D`-`0x4566D` probe a changed corner as `(newX, oldY)`, `(oldX, newY)`,
+then `(newX, newY)`; a single-axis change probes the entered cell followed by
+its two perpendicular neighbors. Candidate behavior bit 0 controls whether
+the walk stops or continues. Eligible kind-4/behavior-bit-3 blocks follow
+their `+0x40` state target in place while that target has nonzero kind.
 `0x470A8` selects surfaces `+0x2C..+0x38`, flips north/east texture
 coordinates, projects `top = horizon - (upper - cameraElevation) *
 viewportWidth / depth` and `bottom = horizon + (cameraElevation - lower) *
@@ -138,8 +145,11 @@ viewportWidth / depth` from block `+0x20/+0x1C`, and calls alpha sampler
 `0x444E8`; raw palette index zero is transparent. Primary flag-0 dispatch at
 `0x555AB` gives selected friendlies mode 12 at the contact cell before
 actor/object-specific actions. These mappings Disprove the former empty-floor
-plane. The runtime's first-solid DDA is Corroborated pending full
-multi-candidate order, cropped wrapping, diagonals, and simultaneous corners.
+plane. `OriginalSiegeProjection` implements the fixed step, wrapped source-map
+lookup, exact probe order, pass/stop behavior, state-target chaining, 31-entry
+sentinel, center/diagonal shapes, and insertion-ordered alpha candidates for
+pointer picking. The exact kind-4 billboard transform and its integration with
+per-pixel actor occlusion remain Corroborated rather than arithmetic identity.
 GameFAQs FAQ 66730 has no low-level ray mathematics and must not be cited as
 corroboration for this trace.
 

@@ -74,10 +74,10 @@ friendlies first receive the hit contact coordinates as requested mode 12 and
 consume the click; only otherwise does a friendly actor toggle selection, a
 hostile become an explicit mode-8/player target, or an actionable object pass
 the strict `< 0x280` distance test. Preserve this precedence and exact hit
-identity. The runtime now shares fixed horizontal rays, decoded vertical block
-bounds, depth, and texture alpha between rendering and picking. Its first-solid
-DDA remains Corroborated pending the original multi-candidate ordering,
-diagonal shapes, cropped wrapping, and corner behavior.
+identity. Runtime pointer candidates now use the original fixed horizontal ray,
+wrapped 128-cell source lookup, neighbor probe order, pass-through stop bit,
+state-target continuation, center/diagonal shapes, vertical bounds, and alpha.
+Exact kind-4 billboard transformation remains Corroborated.
 
 Requested mode 12 uses a projected surface contact, not empty ground.
 Dispatcher `0x555AB`-`0x5562E` writes the raycaster's integer coordinates to
@@ -92,7 +92,8 @@ viewport width. Raycaster `0x470A8` forms its horizontal basis as
 `0x45158` normalizes the major axis to signed `0x100` for at most `0x40` map
 steps. Switch table `0x34A0C` sends kind 0 to no candidate, kinds 1/4 to a
 cell box, kinds 2/3 to center planes, and kinds 5/6 to opposing diagonals.
-`0x44F7C` records at most 32 contacts, while `0x470A8` projects each block's
+`0x44F7C` uses 32-slot arrays but stops at count `0x1F`, leaving 31 usable
+contacts. `0x470A8` projects each block's
 `+0x1C/+0x20` lower/upper elevations and samples its texture through `0x444E8`.
 The former below-horizon floor-plane implementation is Disproved. GameFAQs FAQ
 66730 is a trusted gameplay starting point but contains no internal projection

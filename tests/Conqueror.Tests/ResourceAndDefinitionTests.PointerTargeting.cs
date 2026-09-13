@@ -1,5 +1,6 @@
 using Conqueror.Core;
 using Conqueror.Game;
+using Conqueror.Resources;
 using Xunit;
 
 namespace Conqueror.Tests;
@@ -62,6 +63,124 @@ public sealed partial class ResourceAndDefinitionTests
         var limited = new SiegeSession(new Player(), new Army(), 0, 1,
             new SiegeLayout(beyondLimit, 64, 100, Facing.North, []));
         Assert.Null(SiegeViewProjection.GroundCell(limited, 83, 58, 167, 117));
+    }
+
+    [Fact]
+    public void OriginalCandidateTraversalKeepsPassThroughBlocksBeforeTheStoppingWall()
+    {
+        var source = SyntheticScene();
+        source.Map.AsSpan().Clear();
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize, 4);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize + 4, 3);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 2, 1);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 2 + 4, 2);
+        SetSceneCell(source.Map, 11, 20, 1);
+        SetSceneCell(source.Map, 12, 20, 2);
+        var scene = DynamixSceneDecoder.Decode(source.Viewer, source.Scenario, source.Map, source.Blocks);
+        var battle = ProjectionBattle();
+
+        var candidates = OriginalSiegeProjection.CastColumn(
+            battle, scene, 10, 20, 83, 167);
+
+        Assert.Equal([1, 2], candidates.Select(candidate => candidate.Block.Index));
+        Assert.Equal([128, 384], candidates.Select(candidate => candidate.Hit.Distance8));
+    }
+
+    [Theory]
+    [InlineData(3, 256)]
+    [InlineData(5, 256)]
+    [InlineData(6, 255)]
+    public void OriginalCandidateGeometryIntersectsCenterAndDiagonalPlanes(int kind, int distance8)
+    {
+        var source = SyntheticScene();
+        source.Map.AsSpan().Clear();
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize, kind);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize + 4, 2);
+        SetSceneCell(source.Map, 11, 20, 1);
+        var scene = DynamixSceneDecoder.Decode(source.Viewer, source.Scenario, source.Map, source.Blocks);
+
+        var candidate = Assert.Single(OriginalSiegeProjection.CastColumn(
+            ProjectionBattle(), scene, 10, 20, 83, 167));
+
+        Assert.Equal(distance8, candidate.Hit.Distance8);
+        Assert.Equal((1, 0), (candidate.Hit.MapX, candidate.Hit.MapY));
+    }
+
+    [Fact]
+    public void OriginalCandidateArrayStopsAtTheExecutableThirtyOneEntrySentinel()
+    {
+        var source = SyntheticScene();
+        source.Map.AsSpan().Clear();
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize, 1);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize + 4, 3);
+        for (var x = 11; x < 60; x++) SetSceneCell(source.Map, x, 20, 1);
+        var scene = DynamixSceneDecoder.Decode(source.Viewer, source.Scenario, source.Map, source.Blocks);
+
+        var candidates = OriginalSiegeProjection.CastColumn(
+            ProjectionBattle(), scene, 10, 20, 83, 167);
+
+        Assert.Equal(31, candidates.Count);
+    }
+
+    [Fact]
+    public void OriginalCandidateTraversalFollowsEligibleStateTargetsInPlace()
+    {
+        var source = SyntheticScene();
+        source.Map.AsSpan().Clear();
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize, 4);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize + 4, 3);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize + 0x40, 3);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 3, 3);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 3 + 4, 3);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 2, 1);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 2 + 4, 2);
+        SetSceneCell(source.Map, 11, 20, 1);
+        SetSceneCell(source.Map, 12, 20, 2);
+        var scene = DynamixSceneDecoder.Decode(source.Viewer, source.Scenario, source.Map, source.Blocks);
+
+        var candidates = OriginalSiegeProjection.CastColumn(
+            ProjectionBattle(), scene, 10, 20, 83, 167);
+
+        Assert.Equal([1, 3, 2], candidates.Select(candidate => candidate.Block.Index));
+    }
+
+    [Fact]
+    public void OriginalCandidateTraversalPreservesCornerProbeOrder()
+    {
+        var source = SyntheticScene();
+        source.Map.AsSpan().Clear();
+        var scene = DynamixSceneDecoder.Decode(source.Viewer, source.Scenario, source.Map, source.Blocks);
+        var probes = new List<(int X, int Y)>();
+
+        OriginalSiegeProjection.CastColumn(
+            ProjectionBattle(), scene, 10, 20, 2, 3,
+            (x, y) =>
+            {
+                probes.Add((x, y));
+                return null;
+            });
+
+        Assert.Equal([(1, 0), (1, -1), (1, 1), (2, 0), (1, 1), (2, 1)],
+            probes.Take(6));
+    }
+
+    [Fact]
+    public void OriginalCandidateTraversalWrapsSourceLookupBeforeCropping()
+    {
+        var source = SyntheticScene();
+        source.Map.AsSpan().Clear();
+        var scene = DynamixSceneDecoder.Decode(source.Viewer, source.Scenario, source.Map, source.Blocks);
+        var probes = new List<(int X, int Y)>();
+
+        OriginalSiegeProjection.CastColumn(
+            ProjectionBattle(), scene, 127, 20, 1, 3,
+            (x, y) =>
+            {
+                probes.Add((x, y));
+                return null;
+            });
+
+        Assert.Equal((-127, 0), probes[0]);
     }
 
     [Fact]
@@ -356,6 +475,13 @@ public sealed partial class ResourceAndDefinitionTests
         battle.ToggleRetainerSelection(battle.Retainers[1]);
         Assert.True(battle.CommandSelectedRetainersTo(3, 2));
         return battle;
+    }
+
+    private static SiegeSession ProjectionBattle()
+    {
+        var tiles = new SiegeTile[70, 3];
+        return new SiegeSession(new Player(), new Army(), 0, 1,
+            new SiegeLayout(tiles, 0, 0, Facing.East, []));
     }
 
     [Fact]

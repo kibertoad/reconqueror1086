@@ -614,8 +614,15 @@ public sealed partial class ConquerorGame
         var localY = centeredPointer.Y * viewport.Height / SiegeCombatPresentation.Viewport.Height;
         if (localX < 0 || localY < 0 || localX >= viewport.Width || localY >= viewport.Height)
             return null;
-        var wallHit = SiegeViewProjection.CastColumn(_siege, localX, viewport.Width);
-        var wallDepth = wallHit.Distance;
+        var sceneCandidates = _siegeVisuals is null
+            ? Array.Empty<SiegeSceneRayCandidate>()
+            : OriginalSiegeProjection.CastColumn(_siege, _siegeVisuals.Scene,
+                _siegeVisuals.SourceOriginX, _siegeVisuals.SourceOriginY,
+                localX, viewport.Width, SceneProjectionBlockAt);
+        var fallbackWall = SiegeViewProjection.CastColumn(_siege, localX, viewport.Width);
+        var wallDepth = sceneCandidates
+            .FirstOrDefault(candidate => (candidate.Block.Behavior & 1) == 0).Hit.Distance;
+        if (wallDepth <= 0) wallDepth = fallbackWall.Distance;
         var hits = new List<SiegePointerHit>();
         foreach (var projection in SiegeViewProjection.ProjectEnemies(_siege)
                      .Concat(SiegeViewProjection.ProjectRetainers(_siege)))
@@ -646,13 +653,32 @@ public sealed partial class ConquerorGame
                 (projection.Object.X, projection.Object.Y)));
         }
         var localViewport = new Rectangle(0, 0, viewport.Width, viewport.Height);
-        var wallBounds = SiegeWallBounds(wallHit, localViewport);
-        var wallTexture = SceneWallTexture(wallHit);
-        if (wallHit.ContactedBlock && wallBounds.Contains(localX, localY) &&
-            SiegeWallPixelContains(wallTexture, wallHit, wallBounds, localY))
+        foreach (var candidate in sceneCandidates.Where(candidate => candidate.Block.Kind != 4))
+        {
+            var wallHit = candidate.Hit;
+            if (candidate.Block.TextureForFace(wallHit.Face switch
+                {
+                    SiegeWallFace.North => DynamixSceneFace.North,
+                    SiegeWallFace.East => DynamixSceneFace.East,
+                    SiegeWallFace.South => DynamixSceneFace.South,
+                    _ => DynamixSceneFace.West
+                }) < 0) continue;
+            var wallBounds = SiegeWallBounds(wallHit, localViewport);
+            var wallTexture = SceneWallTexture(wallHit);
+            if (!wallBounds.Contains(localX, localY) ||
+                !SiegeWallPixelContains(wallTexture, wallHit, wallBounds, localY)) continue;
             hits.Add(new SiegePointerHit(
                 wallHit.Distance, null, _siege.ObjectAt(wallHit.MapX, wallHit.MapY),
                 (wallHit.ContactX8 >> 8, wallHit.ContactY8 >> 8)));
+        }
+        if (_siegeVisuals is null && fallbackWall.ContactedBlock)
+        {
+            var bounds = SiegeWallBounds(fallbackWall, localViewport);
+            if (bounds.Contains(localX, localY))
+                hits.Add(new SiegePointerHit(
+                    fallbackWall.Distance, null, _siege.ObjectAt(fallbackWall.MapX, fallbackWall.MapY),
+                    (fallbackWall.ContactX8 >> 8, fallbackWall.ContactY8 >> 8)));
+        }
         if (hits.OrderBy(hit => hit.Distance).FirstOrDefault() is { Distance: > 0 } hit) return hit;
         return null;
     }

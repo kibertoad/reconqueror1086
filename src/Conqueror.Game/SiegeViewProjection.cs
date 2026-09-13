@@ -12,6 +12,7 @@ public readonly record struct SiegeRayHit(
     public int ContactX8 { get; init; }
     public int ContactY8 { get; init; }
     public bool ContactedBlock { get; init; }
+    public int SceneBlockIndex { get; init; } = -1;
 }
 public readonly record struct SiegeEnemyProjection(double ScreenPosition, double ForwardDistance, SiegeEnemy Enemy);
 public readonly record struct SiegeObjectProjection(double ScreenPosition, double ForwardDistance, SiegeObject Object);
