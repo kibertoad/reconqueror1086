@@ -708,7 +708,8 @@ public sealed partial class SiegeSession
         {
             if (enemy.OriginalModeProfile is not null)
             {
-                AdvanceHostileOrder(enemy);
+                // Imported actors are advanced once by the fixed simulation
+                // update. Player actions must not add extra thinker passes.
                 continue;
             }
             var playerDistance = Distance(enemy.X, enemy.Y, PlayerX, PlayerY);

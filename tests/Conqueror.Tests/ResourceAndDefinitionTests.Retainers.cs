@@ -480,6 +480,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.True(battle.CommandSelectedRetainersAt(enemy));
 
         battle.AdvanceHostileMovement(0);
+        battle.AdvanceHostileMovement(0.4001);
 
         Assert.Equal(SiegeEnemyVisualState.Attack, enemy.VisualState);
         Assert.Equal(SiegeEnemyVisualState.Walk, activeRunner.VisualState);

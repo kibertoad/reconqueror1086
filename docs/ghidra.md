@@ -226,6 +226,32 @@ then enters 8 on success but falls back to 2 for kinds 2/7 through `0x4E8B2`
 or 1 for kind 4 through `0x4E6F9`. Preserve the hit-effect completion before
 the next mode-13 thinker visit.
 
+To close hostile modes 1-3, resolve the complete leading entries rather than
+borrowing kind-0 formation edges. Kind-2 table sources
+`0x4E4C4/0x4E4C8/0x4E4CC/0x4E4D4/0x4E4DC` target
+`0x4E88C/0x4E6D3/0x4E89F/0x4E70C/0x4E8C5`; kind-4 sources
+`0x4E53C/0x4E540/0x4E544/0x4E54C/0x4E554` target
+`0x4E6C0/0x4E983/0x4E6E6/0x4E70C/0x4E732`. Remember that each transition
+writes failure/previous mode to actor `+0x20` and success/requested mode to
+`+0x1C`; `0x4E5F0` selects one into current `+0x18`. Predicates `0x4F648`
+and `0x4F6F7` walk the live-centered 3x3 cells in relative y/x order for
+same- and opposite-side actors. `0x4FC34` is the same-side authored-order ray
+scan used by modes 3/5, and `0x4F8B0` is the mode-7 `< 0x200` contact test.
+This yields kind-2/7 success/failure pairs `4/6`, `11/1`, `7/1`, `7/5`,
+`1/6`, versus kind-4 `4/3`, `11/4`, `7/2`, `7/5`, `1/5`.
+
+Do not collapse those no-effect decisions into one recursive call. State
+routine `0x4F49C` evaluates one current predicate, calls `0x4E5F0`, and jumps
+through handler table `0x4F458` for the newly selected mode. Handler `0x4FDAB`
+for modes 1-4 only changes the actor block state and returns. Handler
+`0x4FE76` for modes 7/8 computes the target heading, then explicitly applies
+`(heading + 0x20) & 0xC0`; non-cardinal rotation belongs to the separate
+mode-10 escape. Global thinker `0x50524` advances cursor `D5C4` per
+unrestricted main-loop pass, so wall-clock no-effect cadence cannot be made
+processor-independent by copying the original loop. Preserve one-predicate
+ordering and immediate scheduler re-entry on a fixed simulation update as the
+documented compatibility policy.
+
 For shared-destination behavior, correlate scheduler `0x53425`-`0x53694`
 with the ignored `--scene-blocks` census. The neighbor test reads behavior bit
 `0x02`; every placed actor base and each adjacent attack/hit/death state is

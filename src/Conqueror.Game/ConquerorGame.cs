@@ -174,6 +174,8 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
             IsFullScreen = _settings.Fullscreen
         };
         Content.RootDirectory = "Content";
+        IsFixedTimeStep = true;
+        TargetElapsedTime = TimeSpan.FromSeconds(1d / 60d);
         IsMouseVisible = true;
         Window.Title = "ReConqueror A.D. 1086";
     }

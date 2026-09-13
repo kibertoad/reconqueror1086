@@ -94,7 +94,24 @@ entries select mode 4 on reacquisition or mode 3 on failure through
 `1` via `0x4E6F9` for kind 4), while success is mode 8. Preserve this path
 through imported `OriginalActorTemplate`/`OriginalModeProfile`, `ActorMode`,
 `AdvanceHostileMovement`, deferred mode-11 damage, and the shared exact motion
-math. The GameFAQs guide has no internal AI-state or timing evidence.
+math. Hostile modes 1-3 are also mapped. Mode-1 predicate `0x4F648` scans the
+live-centered 3x3 neighborhood for the first same-side actor in relative y/x
+order; mode-2 predicate `0x4F6F7` scans the same cells for an opposite-side
+actor; modes 3/5 use same-side authored-order ray acquisition `0x4FC34`, and
+mode 7 verifies a same-side ray contact below `0x200` through `0x4F8B0`.
+Kind-2/7 fixup sources `0x4E4C4/0x4E4C8/0x4E4CC/0x4E4D4/0x4E4DC` map those
+states to `4-or-6`, `11-or-1`, `7-or-1`, `7-or-5`, and `1-or-6`; kind-4
+sources `0x4E53C/0x4E540/0x4E544/0x4E54C/0x4E554` map them to `4-or-3`,
+`11-or-4`, `7-or-2`, `7-or-5`, and `1-or-5`. State routine `0x4F49C`
+evaluates one current predicate, transitions through `0x4E5F0`, then runs only
+the new mode handler; do not recursively evaluate the new predicate in the
+same thinker pass. Direct mode-7/8 handler `0x4FE76` cardinalizes heading with
+`(heading + 0x20) & 0xC0`; only mode-10 escape retains non-cardinal heading.
+The original global thinker cursor advances per unrestricted main-loop pass,
+so its wall-clock frequency is processor-dependent. Keep the one-predicate
+ordering on the runtime's explicit fixed update rather than reproducing that
+unstable throughput dependency. The GameFAQs guide has no internal AI-state or
+timing evidence.
 
 First-person pointer dispatch is also mapped. Handler `0x55524` consumes the
 world hit returned by raycaster `0x470A8`. On primary flag 0, selected

@@ -5,6 +5,20 @@ public sealed partial class SiegeSession
     private void StartVisual(SiegeEnemy actor, SiegeEnemyVisualState state)
     {
         if (state == SiegeEnemyVisualState.Hit) ApplyActorHitTransition(actor);
+        if (state is SiegeEnemyVisualState.Hit or SiegeEnemyVisualState.Dying)
+        {
+            actor.HostileMovementActive = false;
+            actor.HostileMovementTick = 0;
+            actor.HostileMovementElapsed = 0;
+            actor.HostileMovementScalesEscapeDelta = false;
+            if (actor is SiegeRetainer interrupted)
+            {
+                interrupted.MovementActive = false;
+                interrupted.MovementTick = 0;
+                interrupted.MovementElapsed = 0;
+                interrupted.MovementScalesEscapeDelta = false;
+            }
+        }
         if (actor is SiegeRetainer retainer) retainer.PendingRangedTarget = null;
         else actor.PendingHostileTarget = null;
         actor.VisualState = state;
@@ -82,78 +96,115 @@ public sealed partial class SiegeSession
     {
         if (!IsOriginalHostile(enemy) || enemy.VisualState != SiegeEnemyVisualState.Walk ||
             enemy.HostileMovementActive) return;
-        // A thinker may cross several acquisition-only modes before it creates
-        // an effect. Bound the loop defensively; the mapped paths settle in at
-        // most four transitions.
-        for (var transition = 0; transition < 8; transition++)
+        // State routine 0x4F49C evaluates exactly one current-mode predicate,
+        // applies its kind-table edge through 0x4E5F0, and then invokes the
+        // new mode's handler. Modes 1-4/13 construct no live effect and are
+        // reconsidered only on a later thinker pass.
+        var nextMode = enemy.ActorMode;
+        switch (enemy.ActorMode)
         {
-            switch (enemy.ActorMode)
+            case 1:
             {
-                case 4:
-                {
-                    var target = AcquireHostileTarget(enemy);
-                    if (target is null)
-                    {
-                        enemy.ActorMode = enemy.OriginalActorKind == 4 ? 1 : 2;
-                        return;
-                    }
-                    enemy.HostileTarget = target;
-                    enemy.ActorMode = 8;
-                    continue;
-                }
-                case 6:
-                {
-                    var target = AcquireHostileTarget(enemy);
-                    if (target is null)
-                    {
-                        enemy.HostileMovementWanders = true;
-                        return;
-                    }
-                    enemy.HostileTarget = target;
-                    enemy.ActorMode = 8;
-                    continue;
-                }
-                case 8:
-                    if (enemy.HostileTarget is not { Health: > 0 } pursued ||
-                        !IsFriendlyActor(pursued))
-                    {
-                        enemy.ActorMode = 6;
-                        continue;
-                    }
-                    if (!HostileHasContact(enemy, pursued))
-                    {
-                        enemy.HostileMovementWanders = false;
-                        AimHostileAt(enemy, pursued);
-                        return;
-                    }
-                    enemy.ActorMode = 11;
-                    continue;
-                case 11:
-                    if (TryStartHostileStrike(enemy)) return;
-                    enemy.ActorMode = 6;
-                    continue;
-                case 13:
-                    if (enemy.Health >= 6)
-                    {
-                        enemy.ActorMode = 6;
-                        // The mode-13 handler creates no effect. The original
-                        // main loop therefore revisits the actor on a later
-                        // unrestricted thinker pass rather than recursively
-                        // cycling 6 -> 8 -> 11 -> 13 in one call.
-                        return;
-                    }
-                    BeginHostileEscape(enemy);
-                    return;
-                case 10:
-                {
-                    var target = AcquireHostileTarget(enemy);
-                    enemy.ActorMode = target is null ? 3 : 4;
-                    enemy.HostileTarget = target;
-                    continue;
-                }
-                default:
-                    return;
+                var ally = AdjacentHostileActor(enemy);
+                if (ally is not null) enemy.HostileTarget = ally;
+                nextMode = enemy.OriginalActorKind == 4
+                    ? ally is null ? 3 : 4
+                    : ally is null ? 6 : 4;
+                break;
             }
+            case 2:
+            {
+                var opponent = AdjacentFriendlyActor(enemy);
+                if (opponent is not null) enemy.HostileTarget = opponent;
+                nextMode = enemy.OriginalActorKind == 4
+                    ? opponent is null ? 4 : 11
+                    : opponent is null ? 1 : 11;
+                break;
+            }
+            case 3:
+            {
+                var ally = AcquireHostileFormationTarget(enemy);
+                if (ally is not null) enemy.HostileTarget = ally;
+                nextMode = enemy.OriginalActorKind == 4
+                    ? ally is null ? 2 : 7
+                    : ally is null ? 1 : 7;
+                break;
+            }
+            case 4:
+            {
+                var opponent = AcquireHostileTarget(enemy);
+                if (opponent is not null) enemy.HostileTarget = opponent;
+                nextMode = opponent is not null ? 8 : enemy.OriginalActorKind == 4 ? 1 : 2;
+                break;
+            }
+            case 5:
+            {
+                var ally = AcquireHostileFormationTarget(enemy);
+                if (ally is not null) enemy.HostileTarget = ally;
+                nextMode = ally is null ? 5 : 7;
+                break;
+            }
+            case 6:
+            {
+                var opponent = AcquireHostileTarget(enemy);
+                if (opponent is not null) enemy.HostileTarget = opponent;
+                nextMode = opponent is null ? 6 : 8;
+                break;
+            }
+            case 7:
+                nextMode = HostileFormationReached(enemy)
+                    ? 1
+                    : enemy.OriginalActorKind == 4 ? 5 : 6;
+                break;
+            case 8:
+                nextMode = enemy.HostileTarget is { Health: > 0 } pursued && IsFriendlyActor(pursued) &&
+                    HostileHasContact(enemy, pursued) ? 11 : 6;
+                break;
+            case 10:
+            {
+                var opponent = AcquireHostileTarget(enemy);
+                if (opponent is not null) enemy.HostileTarget = opponent;
+                nextMode = opponent is null ? 3 : 4;
+                break;
+            }
+            case 13:
+                nextMode = enemy.Health >= 6 ? 6 : 10;
+                break;
+        }
+        enemy.ActorMode = nextMode;
+        BeginHostileMode(enemy);
+    }
+
+    private void BeginHostileMode(SiegeEnemy enemy)
+    {
+        enemy.HostileMovementActive = false;
+        enemy.HostileMovementWanders = false;
+        switch (enemy.ActorMode)
+        {
+            case 5:
+            case 6:
+                // Shared handler 0x4FDCD clears actor/coordinate targets and
+                // constructs the descriptor's 0x40 collision family.
+                enemy.HostileTarget = null;
+                enemy.HostileTargetX8 = null;
+                enemy.HostileTargetY8 = null;
+                enemy.HostileMovementWanders = true;
+                enemy.HostileMovementActive = true;
+                break;
+            case 7:
+            case 8:
+                if (enemy.HostileTarget is { Health: > 0 } target)
+                {
+                    AimHostileAt(enemy, target);
+                    enemy.HostileMovementActive = true;
+                }
+                break;
+            case 10:
+                BeginHostileEscape(enemy);
+                break;
+            case 11:
+                TryStartHostileStrike(enemy);
+                break;
         }
     }
 
@@ -161,9 +212,62 @@ public sealed partial class SiegeSession
     {
         AdvanceHostileOrder(enemy);
         if (enemy.VisualState != SiegeEnemyVisualState.Walk) return false;
-        if (enemy.ActorMode == 10) return true;
-        if (enemy.ActorMode == 6 && enemy.HostileMovementWanders) return true;
-        return enemy.ActorMode == 8 && enemy.HostileTarget is { Health: > 0 };
+        return enemy.HostileMovementActive;
+    }
+
+    private SiegeEnemy? AdjacentHostileActor(SiegeEnemy source)
+    {
+        var centerX = FixedActorX8(source) >> 8;
+        var centerY = FixedActorY8(source) >> 8;
+        for (var dy = -1; dy <= 1; dy++)
+        for (var dx = -1; dx <= 1; dx++)
+        {
+            var actor = EnemyAt(centerX + dx, centerY + dy);
+            if (actor is not null && !ReferenceEquals(actor, source)) return actor;
+        }
+        return null;
+    }
+
+    private SiegeEnemy? AdjacentFriendlyActor(SiegeEnemy source)
+    {
+        var centerX = FixedActorX8(source) >> 8;
+        var centerY = FixedActorY8(source) >> 8;
+        for (var dy = -1; dy <= 1; dy++)
+        for (var dx = -1; dx <= 1; dx++)
+        {
+            var x = centerX + dx;
+            var y = centerY + dy;
+            var retainer = RetainerAt(x, y);
+            if (retainer is not null) return retainer;
+            if (PlayerActor.Health > 0 && PlayerActor.X == x && PlayerActor.Y == y)
+                return PlayerActor;
+        }
+        return null;
+    }
+
+    private SiegeEnemy? AcquireHostileFormationTarget(SiegeEnemy source)
+    {
+        SiegeEnemy? nearest = null;
+        var nearestDistance8 = 0x7fff;
+        foreach (var candidate in _enemies
+                     .Where(actor => !ReferenceEquals(actor, source) && actor.Health > 0)
+                     .OrderBy(actor => actor.OriginalActorOrder < 0 ? int.MaxValue : actor.OriginalActorOrder))
+        {
+            if (ActorRayDistance(source, candidate) is not { } distance8 || distance8 >= nearestDistance8)
+                continue;
+            nearest = candidate;
+            nearestDistance8 = distance8;
+            if (distance8 < 0x200) break;
+        }
+        return nearest;
+    }
+
+    private bool HostileFormationReached(SiegeEnemy source)
+    {
+        if (source.HostileTarget is not { Health: > 0 } aimed ||
+            RayToward(source, aimed) is not { Distance8: < 0x200 } hit)
+            return false;
+        return !ReferenceEquals(hit.Actor, source) && hit.Actor.Health > 0 && _enemies.Contains(hit.Actor);
     }
 
     private SiegeEnemy? AcquireHostileTarget(SiegeEnemy source)
@@ -205,8 +309,12 @@ public sealed partial class SiegeSession
     private bool TryStartHostileStrike(SiegeEnemy source)
     {
         if (source.OriginalCombatRow is not { } row ||
-            source.HostileTarget is not { Health: > 0 } intended ||
-            RayToward(source, intended) is not { } hit || !IsFriendlyActor(hit.Actor) ||
+            source.HostileTarget is not { Health: > 0 } intended)
+            return false;
+        var hit = ActorManhattanDistanceInFixedPoint(source, intended) <= 0x154
+            ? new SiegeActorRayHit(intended, 0x154)
+            : RayToward(source, intended);
+        if (hit is null || !IsFriendlyActor(hit.Actor) ||
             hit.Distance8 >= OriginalWeaponCombat.ActorContactDistanceForCombatRow(row))
             return false;
         var target = hit.Actor;
@@ -237,8 +345,9 @@ public sealed partial class SiegeSession
 
     private static void AimHostileAt(SiegeEnemy source, SiegeEnemy target)
     {
-        source.OriginalHeading8 = OriginalActorMotion.HeadingToward(
+        var heading = OriginalActorMotion.HeadingToward(
             FixedActorX8(target) - FixedActorX8(source), FixedActorY8(target) - FixedActorY8(source));
+        source.OriginalHeading8 = (heading + 0x20) & 0xC0;
         source.Facing = FacingForHeading(source.OriginalHeading8.Value);
     }
 

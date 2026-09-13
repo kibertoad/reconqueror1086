@@ -38,6 +38,20 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void HostileDirectHandlerCardinalizesANonCardinalAcquisitionHeading()
+    {
+        var battle = HostileBattle(enemyX: 5, retainerX: 3, enemyHealth: 10,
+            retainerHealth: 5, retainerY: 1);
+        var hostile = Assert.Single(battle.Enemies);
+
+        battle.AdvanceHostileMovement(0);
+
+        Assert.Equal(8, hostile.ActorMode);
+        Assert.Equal(0xC0, hostile.OriginalHeading8);
+        Assert.Equal(Facing.West, hostile.Facing);
+    }
+
+    [Fact]
     public void HostileModeElevenDefersDamageUntilStrictEffectCompletion()
     {
         var battle = HostileBattle(enemyX: 5, retainerX: 4, enemyHealth: 10,
@@ -46,6 +60,9 @@ public sealed partial class ResourceAndDefinitionTests
         var retainer = Assert.Single(battle.Retainers);
 
         battle.AdvanceHostileMovement(0);
+        Assert.Equal(8, hostile.ActorMode);
+        Assert.Equal(SiegeEnemyVisualState.Walk, hostile.VisualState);
+        battle.AdvanceHostileMovement(0.4001);
         Assert.Equal(11, hostile.ActorMode);
         Assert.Equal(SiegeEnemyVisualState.Attack, hostile.VisualState);
         Assert.Equal(5, retainer.Health);
@@ -66,7 +83,8 @@ public sealed partial class ResourceAndDefinitionTests
         var hostile = Assert.Single(battle.Enemies);
 
         battle.AdvanceHostileMovement(0);
-        Assert.Equal(SiegeEnemyVisualState.Attack, hostile.VisualState);
+        Assert.Equal(8, hostile.ActorMode);
+        Assert.Equal(SiegeEnemyVisualState.Walk, hostile.VisualState);
         battle.CommandRetainers(SiegeRetainerCommand.Attack);
         battle.AdvanceRetainerOrders();
         Assert.Equal(13, hostile.ActorMode);
@@ -106,6 +124,107 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void HostileModeFourUsesOneNoEffectDecisionPerStableUpdate()
+    {
+        var battle = HostileBattle(enemyX: 5, retainerX: 4, enemyHealth: 10,
+            retainerHealth: 5, actorTemplate: 5);
+        var hostile = Assert.Single(battle.Enemies);
+        battle.ConfigureActorRaycast((_, _) => null);
+
+        battle.AdvanceHostileMovement(0);
+        Assert.Equal(1, hostile.ActorMode);
+        Assert.Equal(SiegeEnemyVisualState.Walk, hostile.VisualState);
+
+        battle.AdvanceHostileMovement(0);
+        Assert.Equal(3, hostile.ActorMode);
+        battle.AdvanceHostileMovement(0);
+        Assert.Equal(2, hostile.ActorMode);
+
+        battle.AdvanceHostileMovement(0);
+        Assert.Equal(11, hostile.ActorMode);
+        Assert.Equal(SiegeEnemyVisualState.Attack, hostile.VisualState);
+    }
+
+    [Fact]
+    public void PlayerActionsDoNotInjectExtraImportedHostileThinkerPasses()
+    {
+        var battle = HostileBattle(enemyX: 5, retainerX: 4, enemyHealth: 10,
+            retainerHealth: 5, actorTemplate: 5);
+        var hostile = Assert.Single(battle.Enemies);
+        battle.ConfigureActorRaycast((_, _) => null);
+
+        battle.Attack();
+        Assert.Equal(4, hostile.ActorMode);
+
+        battle.AdvanceHostileMovement(0);
+        Assert.Equal(1, hostile.ActorMode);
+    }
+
+    [Fact]
+    public void KindSevenUsesKindTwoModeFourTwoOneSixFallbacks()
+    {
+        var battle = HostileBattle(enemyX: 9, retainerX: 1, enemyHealth: 10,
+            retainerHealth: 5, actorTemplate: 9);
+        var hostile = Assert.Single(battle.Enemies);
+        battle.ConfigureActorRaycast((_, _) => null);
+
+        battle.AdvanceHostileMovement(0);
+        Assert.Equal(2, hostile.ActorMode);
+        battle.AdvanceHostileMovement(0);
+        Assert.Equal(1, hostile.ActorMode);
+        battle.AdvanceHostileMovement(0);
+        Assert.Equal(6, hostile.ActorMode);
+
+        battle.AdvanceHostileMovement(0.2001);
+        Assert.NotEqual((9, 2, 0, 0),
+            (hostile.X, hostile.Y, hostile.OffsetX8, hostile.OffsetY8));
+    }
+
+    [Fact]
+    public void HostileModeThreeRegroupsThroughModeSevenThenModeOne()
+    {
+        var tiles = new SiegeTile[12, 5];
+        var army = new Army();
+        army.Units[UnitType.Halberdiers] = 1;
+        var movement = new SiegeActorMovement(3, 200, 64, 0, 0x142);
+        var leaderSpawn = new SiegeSpawn(5, 2, false, OriginalArmor: 6,
+            OriginalHealth: 10, OriginalCombatRow: 0, OriginalAttackSkill: 50,
+            OriginalAnimation: new SiegeActorAnimation(0.384, 0.384, 0.384),
+            OriginalMovement: movement, OriginalActorKind: 4,
+            OriginalActorOrder: 1, OriginalActorTemplate: 5);
+        var allySpawn = new SiegeSpawn(7, 2, false, OriginalArmor: 6,
+            OriginalHealth: 10, OriginalCombatRow: 0, OriginalAttackSkill: 50,
+            OriginalAnimation: new SiegeActorAnimation(0.384, 0.384, 0.384),
+            OriginalMovement: movement, OriginalActorKind: 2,
+            OriginalActorOrder: 2, OriginalActorTemplate: 3);
+        var retainerSpawn = new SiegeSpawn(1, 2, false, OriginalArmor: 0,
+            OriginalHealth: 5, OriginalCombatRow: 0, OriginalAttackSkill: 50,
+            OriginalActorKind: 0, OriginalActorOrder: 0);
+        var battle = new SiegeSession(new Player(), army, 0, 1086,
+            new SiegeLayout(tiles, 1, 1, Facing.East, [leaderSpawn, allySpawn],
+                retainers: [retainerSpawn]));
+        var leader = battle.Enemies.Single(actor => actor.OriginalActorKind == 4);
+        var ally = battle.Enemies.Single(actor => actor.OriginalActorKind == 2);
+        battle.ConfigureActorRaycast((source, target) =>
+            ReferenceEquals(source, leader) && ReferenceEquals(target, ally)
+                ? new SiegeActorRayHit(ally, 0x180)
+                : null);
+
+        battle.AdvanceHostileMovement(0);
+        Assert.Equal(1, leader.ActorMode);
+        battle.AdvanceHostileMovement(0);
+        Assert.Equal(3, leader.ActorMode);
+        battle.AdvanceHostileMovement(0);
+        Assert.Equal(7, leader.ActorMode);
+        Assert.Equal(Facing.East, leader.Facing);
+
+        battle.AdvanceHostileMovement(0.6001);
+        Assert.Equal(1, leader.ActorMode);
+        Assert.Equal((6, 2, -64, 0),
+            (leader.X, leader.Y, leader.OffsetX8, leader.OffsetY8));
+    }
+
+    [Fact]
     public void HostileMovementRejectsInvalidElapsedTime()
     {
         var battle = HostileBattle(enemyX: 5, retainerX: 2, enemyHealth: 10, retainerHealth: 5);
@@ -116,7 +235,8 @@ public sealed partial class ResourceAndDefinitionTests
 
     private static SiegeSession HostileBattle(int enemyX, int retainerX, int enemyHealth,
         int retainerHealth, int actorTemplate = 3, int enemyAttackSkill = 50,
-        int enemyArmor = 6, int retainerAttackSkill = 50, int retainerArmor = 0)
+        int enemyArmor = 6, int retainerAttackSkill = 50, int retainerArmor = 0,
+        int retainerY = 2)
     {
         var tiles = new SiegeTile[12, 5];
         var army = new Army();
@@ -128,7 +248,7 @@ public sealed partial class ResourceAndDefinitionTests
             OriginalMovement: new SiegeActorMovement(3, 200, 64, 0, 0x142),
             OriginalActorKind: OriginalCombatantTemplates.ActorKindForSceneTemplate(actorTemplate),
             OriginalActorOrder: 1, OriginalActorTemplate: actorTemplate);
-        var retainer = new SiegeSpawn(retainerX, 2, false, OriginalArmor: retainerArmor,
+        var retainer = new SiegeSpawn(retainerX, retainerY, false, OriginalArmor: retainerArmor,
             OriginalHealth: retainerHealth, OriginalCombatRow: 0,
             OriginalAttackSkill: retainerAttackSkill,
             OriginalActorKind: 0, OriginalActorOrder: 0);

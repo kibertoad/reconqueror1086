@@ -514,9 +514,36 @@ to select mode 4 after reacquisition or mode 3 on failure. Mode 4 selects mode
 `SiegeEnemy.OriginalModeProfile/ActorMode`, and `AdvanceHostileMovement`
 preserve this state and run pursuit, deferred effect-completion damage, hit-state
 prior-effect cancellation, and `1.5`-scaled escape on the shared strict elapsed
-clock. Exact unrestricted no-effect thinker frequency remains **Provisional**.
+clock. The following mapping closes its remaining state loop and establishes
+that a processor-stable original no-effect frequency is **Disproved**.
 GameFAQs FAQ 66730 contains no state-table, effect-timing, or movement-formula
 detail and neither corroborates nor conflicts with this executable mapping.
+
+The supported hostile formation loop is now **Confirmed and active** as well.
+Current-mode predicates 1 and 2 at `0x4F648/0x4F6F7` scan the live-centered
+3x3 map neighborhood in relative `y=-1..1`, `x=-1..1` order for same- and
+opposite-side actors respectively. Modes 3/5 use same-side authored-order ray
+scan `0x4FC34`; mode 7 uses `0x4F8B0` and accepts the returned living
+same-side actor only below `0x200`. Kind-2/7 fixup sources
+`0x4E4C4/0x4E4C8/0x4E4CC/0x4E4D4/0x4E4DC` select success/failure pairs
+`4/6`, `11/1`, `7/1`, `7/5`, and `1/6`. Kind-4 sources
+`0x4E53C/0x4E540/0x4E544/0x4E54C/0x4E554` select `4/3`, `11/4`, `7/2`,
+`7/5`, and `1/5`. Routine `0x4F49C` runs exactly one current predicate,
+passes its Boolean to `0x4E5F0`, then dispatches the selected new mode through
+handler table `0x4F458`. Modes 1-4 use no-effect handler `0x4FDAB`; direct
+modes 7/8 use `0x4FE76`, which applies `(heading + 0x20) & 0xC0` before
+constructing the `0x112` effect. The earlier hostile runtime's same-call
+predicate chaining and non-cardinal pursuit are **Disproved**.
+
+Global thinker `0x50524` advances persistent cursor `D5C4` once per
+unrestricted main-loop pass, so the original no-effect wall-clock frequency is
+not processor-stable. The runtime preserves one predicate per fixed 60 Hz
+simulation update, adds no thinker passes for player actions, and retains
+immediate post-effect re-entry as an explicit deterministic compatibility
+policy; it does not retain processor-throughput timing. Focused
+tests cover kind-2/7 and kind-4 fallbacks, mode-2 contact, non-cardinal input
+cardinalization, hit cancellation, and delayed attack completion. GameFAQs FAQ
+66730 contains no comparable state or scheduling detail.
 
 ## Open questions
 
