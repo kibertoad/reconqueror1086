@@ -46,7 +46,7 @@ dotnet run --project tools\Conqueror.Inspect --no-restore -- 'C:\GOG Games\Conqu
 
 ## Remaining high-priority gaps
 
-1. Confirm exact attack cadence and state-linked foreground timing.
+1. Finish exact attack cadence and state-linked foreground timing. The architecture is Confirmed: constructor `0x4C7F4` creates up to 64 scheduler records (`0x40` bytes each), storing current frame at `+0x08`, active/count at `+0x0C`, deadline at `+0x10`, and a caller-supplied millisecond interval at `+0x14`; `0x530D0` advances one frame after a strict elapsed-greater-than-interval test and preserves overrun by moving the deadline one interval. The siege loop calls it at `0x583AA`, then the separate untimed actor thinker `0x50524`, then world rendering. Foreground poses are selected from live state/contact at `0x5529B`-`0x55448`, and blood advances exactly four foreground-render calls at `0x55383`-`0x55395`. Trace the `0x4C7F4` interval arguments back to resource/template fields and replace the disproved universal timing model.
 2. Close the last indirect campaign-scene callback and recover behavior-19 pickup reward semantics. Its explicit-action dispatch, strict `< 0x280` range, callback-before-replacement order, and immediate offset-`0x40` state transition are now Confirmed at `0x55524`-`0x55744` and implemented by `SiegeSession.Interact`/`CollectTile(x,y)` with two-cell-range and no-movement-collection tests.
 3. Replace provisional retainer, loot, siege consequence, and broader AI rules from evidence.
 4. Continue exact route/`JUMP!!`/spy recovery, estate tile mapping, and remaining sound/event bindings as ordered in the migration plan.
