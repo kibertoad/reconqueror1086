@@ -205,14 +205,6 @@ public sealed partial class ConquerorGame
         {
             var block = imported.Scene.BlockAt(x + imported.SourceOriginX, y + imported.SourceOriginY);
             Require(block);
-            if (layoutTiles[x, y] is not (SiegeTile.Door or SiegeTile.SecretDoor)) continue;
-            for (var stateOffset = 1; stateOffset <= 2 && block.Index + stateOffset < imported.Scene.Blocks.Count;
-                 stateOffset++)
-            {
-                var state = imported.Scene.Blocks[block.Index + stateOffset];
-                if (state.Kind == block.Kind && state.Name.Equals(block.Name, StringComparison.OrdinalIgnoreCase))
-                    Require(state);
-            }
         }
         foreach (var spawn in imported.Layout.Enemies.Where(spawn => spawn.VisualId >= 0 &&
                      spawn.VisualId < imported.Scene.Blocks.Count))
@@ -269,17 +261,9 @@ public sealed partial class ConquerorGame
         if (sourceX is < 0 or >= DynamixScene.MapWidth || sourceY is < 0 or >= DynamixScene.MapHeight)
             return null;
         var block = _siegeVisuals.Scene.BlockAt(sourceX, sourceY);
-        if (hit.Tile == SiegeTile.OpeningDoor && _siege?.DoorOpeningProgress(hit.MapX, hit.MapY) is { } progress)
-        {
-            var stateOffset = progress < 0.5 ? 1 : 2;
-            var candidateIndex = block.Index + stateOffset;
-            if (candidateIndex < _siegeVisuals.Scene.Blocks.Count)
-            {
-                var candidate = _siegeVisuals.Scene.Blocks[candidateIndex];
-                if (candidate.Kind == block.Kind && candidate.Name.Equals(block.Name, StringComparison.OrdinalIgnoreCase))
-                    block = candidate;
-            }
-        }
+        if (_siege?.ObjectAt(hit.MapX, hit.MapY) is { VisualId: >= 0 } state &&
+            state.VisualId < _siegeVisuals.Scene.Blocks.Count)
+            block = _siegeVisuals.Scene.Blocks[state.VisualId];
         var face = hit.Face switch
         {
             SiegeWallFace.North => DynamixSceneFace.North,
@@ -393,7 +377,6 @@ public sealed partial class ConquerorGame
             {
                 SiegeTile.Door => new Color(126, 83, 48),
                 SiegeTile.SecretDoor => new Color(76, 73, 68),
-                SiegeTile.OpeningDoor => new Color(102, 78, 54),
                 SiegeTile.Exit => new Color(86, 74, 58),
                 _ => new Color(128, 126, 120)
             };
@@ -573,7 +556,7 @@ public sealed partial class ConquerorGame
         for (var x = 0; x < siege.Width; x++) for (var y = 0; y < siege.Height; y++)
         {
             var tile = siege.TileAt(x, y);
-            var color = tile switch { SiegeTile.Wall => Color.Gray, SiegeTile.Door => Color.SaddleBrown, SiegeTile.SecretDoor => Color.DarkSlateGray, SiegeTile.OpeningDoor => Color.Peru, SiegeTile.Barrel => Color.Green, SiegeTile.Treasure => Color.Gold, SiegeTile.Exit => Color.DarkRed, SiegeTile.Destructible => Color.SaddleBrown, _ => new Color(35, 35, 35) };
+            var color = tile switch { SiegeTile.Wall => Color.Gray, SiegeTile.Door => Color.SaddleBrown, SiegeTile.SecretDoor => Color.DarkSlateGray, SiegeTile.Barrel => Color.Green, SiegeTile.Treasure => Color.Gold, SiegeTile.Exit => Color.DarkRed, SiegeTile.Destructible => Color.SaddleBrown, _ => new Color(35, 35, 35) };
             Fill(new Rectangle(ox + x * scale, oy + y * scale, scale - 1, scale - 1), color);
         }
         foreach (var enemy in siege.Enemies) Fill(new Rectangle(ox + enemy.X * scale, oy + enemy.Y * scale, scale - 1, scale - 1), enemy.Champion ? Color.Magenta : Color.Red);

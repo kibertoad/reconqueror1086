@@ -96,7 +96,7 @@ public sealed partial class ResourceAndDefinitionTests
         var layout = ImportedSiegeLayouts.Convert(DynamixSceneDecoder.Decode(
             source.Viewer, source.Scenario, source.Map, source.Blocks));
 
-        var item = Assert.Single(layout.Objects);
+        var item = Assert.Single(layout.Objects, item => (item.X, item.Y) == (9, 20));
         Assert.Equal((9, 20), (item.X, item.Y));
         Assert.Equal([(4, SiegeTile.Destructible), (-1, SiegeTile.Floor)],
             item.Stages.Select(stage => (stage.VisualId, stage.Tile)));
@@ -105,7 +105,7 @@ public sealed partial class ResourceAndDefinitionTests
         siege.TurnLeft();
         Assert.Equal(SiegeAction.Hit, siege.Attack());
         Assert.Equal((1, -1, SiegeTile.Floor),
-            (Assert.Single(siege.Objects).State, Assert.Single(siege.Objects).VisualId, siege.TileAt(9, 20)));
+            (siege.ObjectAt(9, 20)!.State, siege.ObjectAt(9, 20)!.VisualId, siege.TileAt(9, 20)));
     }
 
     [Fact]

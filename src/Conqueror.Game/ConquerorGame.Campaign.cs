@@ -441,7 +441,6 @@ public sealed partial class ConquerorGame
             return;
         }
         AdvanceSiegeForeground(gameTime.ElapsedGameTime.TotalSeconds);
-        _siege.AdvanceDoorAnimations(_animationEnabled ? gameTime.ElapsedGameTime.TotalSeconds : SiegeSession.DoorOpeningSeconds);
         _siege.AdvanceEnemyAnimations(_animationEnabled ? gameTime.ElapsedGameTime.TotalSeconds : 1);
         var movement = SiegeAction.None;
         if (press(Keys.W)) movement = _siege.Move(true);

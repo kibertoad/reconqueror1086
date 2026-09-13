@@ -98,7 +98,7 @@ public static class SiegeViewProjection
         var result = new List<SiegeObjectProjection>();
         foreach (var item in siege.Objects)
         {
-            if (item.VisualId < 0) continue;
+            if (item.VisualId < 0 || item.Tile is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor) continue;
             var dx = item.X - siege.PlayerX;
             var dy = item.Y - siege.PlayerY;
             var forward = dx * forwardX + dy * forwardY;
@@ -127,7 +127,7 @@ public static class SiegeViewProjection
     }
 
     private static bool IsSolid(SiegeTile tile) =>
-        tile is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor or SiegeTile.Exit;
+        tile is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.Exit;
 
     private static (double X, double Y) Direction(Facing facing) => facing switch
     {

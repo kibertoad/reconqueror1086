@@ -113,11 +113,11 @@ public static class ImportedSiegeLayouts
         var name = block.Name;
         // Across the owned MELEE*/DEFEND* population, behavior 83 is used only
         // by placed exit/gate markers. They are scene boundaries, not
-        // members of the behavior-19 locked-door family.
+        // members of the mask-19 actionable-door family.
         if (block.Behavior == 83) return SiegeTile.Exit;
         if (IsEnemy(block)) return SiegeTile.Floor;
         if (IsDestructible(block)) return SiegeTile.Destructible;
-        // Placed kind-4 behavior-19 records are the scene pickups. Their names
+        // Placed kind-4 mask-19 records are the scene pickups. Their names
         // distinguish food from equipment/currency while the metadata keeps an
         // unfamiliar pickup name from becoming a wall.
         if (block.Kind == 4 && block.Behavior == 19)
@@ -187,22 +187,31 @@ public static class ImportedSiegeLayouts
         block.Kind == 4 && (block.Behavior & 0x20) != 0;
 
     private static bool IsSceneObject(DynamixSceneBlock block) =>
-        block.Kind == 4 && !IsEnemy(block) && block.Behavior != 83;
+        (block.Kind == 4 && !IsEnemy(block) && block.Behavior != 83) ||
+        TileFor(block) is SiegeTile.Door or SiegeTile.SecretDoor;
 
     private static SiegeObjectSpawn ObjectFor(DynamixScene scene, int x, int y, int minX, int minY)
     {
         var initial = scene.BlockAt(x, y);
         var initialTile = TileFor(initial);
         var stages = new List<SiegeObjectStage> { new(initial.Index, initialTile) };
-        if (initialTile is SiegeTile.Destructible or SiegeTile.Barrel or SiegeTile.Treasure)
+        if (initialTile is SiegeTile.Destructible or SiegeTile.Barrel or SiegeTile.Treasure ||
+            IsActionableDoor(initial))
         {
             if ((uint)initial.StateTarget >= (uint)scene.Blocks.Count)
                 throw new InvalidDataException($"Scene object {initial.Index} references a state outside the block table.");
             var target = scene.Blocks[initial.StateTarget];
-            stages.Add(new(target.Kind == 4 ? target.Index : -1, TileFor(target)));
+            var targetTile = TileFor(target);
+            var targetVisual = targetTile is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor || target.Kind == 4
+                ? target.Index
+                : -1;
+            stages.Add(new(targetVisual, targetTile));
         }
         return new SiegeObjectSpawn(x - minX, y - minY, stages);
     }
+
+    private static bool IsActionableDoor(DynamixSceneBlock block) =>
+        (TileFor(block) is SiegeTile.Door or SiegeTile.SecretDoor) && (block.Behavior & 0x10) != 0;
 
     private static bool IsEnemyName(string name) =>
         name.Contains("knight", StringComparison.OrdinalIgnoreCase) ||

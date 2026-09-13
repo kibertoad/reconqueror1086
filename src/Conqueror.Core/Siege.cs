@@ -1,7 +1,7 @@
 namespace Conqueror.Core;
 
 public enum Facing { North, East, South, West }
-public enum SiegeTile { Floor, Wall, Door, SecretDoor, OpeningDoor, Barrel, Treasure, Exit, Destructible }
+public enum SiegeTile { Floor, Wall, Door, SecretDoor, Barrel, Treasure, Exit, Destructible }
 public enum SiegeAction { None, Moved, Blocked, DoorOpened, Healed, Looted, Hit, Missed, WeaponBroke, Shot, NoAmmunition, Exited }
 public enum SiegeEnemyVisualState { Walk, Attack, Hit, Dying }
 
@@ -95,14 +95,12 @@ public sealed class SiegeLayout
 public sealed class SiegeSession
 {
     public static readonly SiegeDefinition Rules = new(12, 12, 5, 3, 3, 25, 2);
-    public const double DoorOpeningSeconds = 0.36;
     public const double FallbackEnemyAttackSeconds = 0.63;
     public const double EnemyHitSeconds = 0.20;
     public const double FallbackEnemyDeathSeconds = 0.72;
     private readonly Player _player;
     private readonly Random _random;
     private readonly SiegeTile[,] _map;
-    private readonly Dictionary<(int X, int Y), double> _openingDoors = [];
     public IReadOnlyList<SiegeEnemy> Enemies => _enemies;
     private readonly List<SiegeEnemy> _enemies = [];
     public IReadOnlyList<SiegeObject> Objects => _objects;
@@ -193,27 +191,6 @@ public sealed class SiegeSession
     public SiegeEnemy? EnemyAt(int x, int y) => _enemies.FirstOrDefault(e => e.Health > 0 && e.X == x && e.Y == y);
     public SiegeObject? ObjectAt(int x, int y) => _objects.FirstOrDefault(item => item.X == x && item.Y == y);
 
-    public double? DoorOpeningProgress(int x, int y) => _openingDoors.TryGetValue((x, y), out var elapsed)
-        ? Math.Clamp(elapsed / DoorOpeningSeconds, 0, 1)
-        : null;
-
-    public void AdvanceDoorAnimations(double elapsedSeconds)
-    {
-        if (!double.IsFinite(elapsedSeconds) || elapsedSeconds < 0)
-            throw new ArgumentOutOfRangeException(nameof(elapsedSeconds));
-        foreach (var point in _openingDoors.Keys.ToArray())
-        {
-            var elapsed = _openingDoors[point] + elapsedSeconds;
-            if (elapsed < DoorOpeningSeconds)
-                _openingDoors[point] = elapsed;
-            else
-            {
-                _openingDoors.Remove(point);
-                _map[point.X, point.Y] = SiegeTile.Floor;
-            }
-        }
-    }
-
     public void AdvanceEnemyAnimations(double elapsedSeconds)
     {
         if (!double.IsFinite(elapsedSeconds) || elapsedSeconds < 0)
@@ -255,7 +232,7 @@ public sealed class SiegeSession
             LastMessage = "You leave the battle.";
             return SiegeAction.Exited;
         }
-        if (tile is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor or SiegeTile.Destructible || EnemyAt(nx, ny) is not null)
+        if (tile is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.Destructible || EnemyAt(nx, ny) is not null)
         {
             LastMessage = "The way is blocked."; TickEnemies(); return SiegeAction.Blocked;
         }
@@ -280,11 +257,22 @@ public sealed class SiegeSession
             }
             if (tile is SiegeTile.Door or SiegeTile.SecretDoor)
             {
-                _map[x, y] = SiegeTile.OpeningDoor;
-                _openingDoors[(x, y)] = 0;
-                LastMessage = "The door opens."; TickEnemies(); return SiegeAction.DoorOpened;
+                var door = ObjectAt(x, y);
+                if (door is null)
+                {
+                    // Clean-room fallback doors have no resource state record.
+                    _map[x, y] = SiegeTile.Floor;
+                    LastMessage = "The door opens."; TickEnemies(); return SiegeAction.DoorOpened;
+                }
+                if (!AdvanceObject(door))
+                {
+                    LastMessage = "Nothing happens."; TickEnemies(); return SiegeAction.None;
+                }
+                var opened = TileAt(x, y) is not (SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.Destructible);
+                LastMessage = opened ? "The door opens." : "The way remains blocked.";
+                TickEnemies(); return opened ? SiegeAction.DoorOpened : SiegeAction.Blocked;
             }
-            if (tile is SiegeTile.Wall or SiegeTile.OpeningDoor or SiegeTile.Destructible || EnemyAt(x, y) is not null)
+            if (tile is SiegeTile.Wall or SiegeTile.Destructible || EnemyAt(x, y) is not null)
                 break;
         }
         LastMessage = "Nothing happens."; TickEnemies(); return SiegeAction.None;
@@ -378,7 +366,7 @@ public sealed class SiegeSession
         for (var distance = 1; distance <= 8; distance++)
         {
             var x = PlayerX + dx * distance; var y = PlayerY + dy * distance;
-            if (TileAt(x, y) is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor or SiegeTile.Exit or SiegeTile.Destructible) return 0;
+            if (TileAt(x, y) is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.Exit or SiegeTile.Destructible) return 0;
             if (EnemyAt(x, y) is not null) return distance;
         }
         return 0;
@@ -470,7 +458,7 @@ public sealed class SiegeSession
         for (var i = 1; i <= range; i++)
         {
             var x = PlayerX + dx * i; var y = PlayerY + dy * i;
-            if (TileAt(x, y) is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor or SiegeTile.Exit or SiegeTile.Destructible) return null;
+            if (TileAt(x, y) is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.Exit or SiegeTile.Destructible) return null;
             if (EnemyAt(x, y) is { } enemy) return enemy;
         }
         return null;
@@ -501,16 +489,18 @@ public sealed class SiegeSession
         {
             var x = PlayerX + dx * i; var y = PlayerY + dy * i;
             if (TileAt(x, y) == SiegeTile.Destructible) return ObjectAt(x, y);
-            if (TileAt(x, y) is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.OpeningDoor or SiegeTile.Exit)
+            if (TileAt(x, y) is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.Exit)
                 return null;
             if (EnemyAt(x, y) is not null) return null;
         }
         return null;
     }
 
-    private void AdvanceObject(SiegeObject item)
+    private bool AdvanceObject(SiegeObject item)
     {
-        _map[item.X, item.Y] = item.Advance() ? item.Tile : SiegeTile.Floor;
+        if (!item.Advance()) return false;
+        _map[item.X, item.Y] = item.Tile;
+        return true;
     }
 
     private void RemoveDead()
