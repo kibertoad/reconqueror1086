@@ -37,6 +37,7 @@ public sealed class SiegeRetainer : SiegeEnemy
     internal double MovementElapsed { get; set; }
     internal int MovementTick { get; set; }
     internal bool MovementWanders { get; set; }
+    internal SiegeEnemy? PendingRangedTarget { get; set; }
 }
 
 public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int GarrisonPerEnemy,
@@ -381,8 +382,18 @@ public sealed partial class SiegeSession
                 _enemies.Remove(enemy);
                 continue;
             }
+            var completedState = enemy.VisualState;
             enemy.VisualState = SiegeEnemyVisualState.Walk;
             enemy.VisualElapsed = 0;
+            if (enemy is not SiegeRetainer retainer || retainer.Health <= 0) continue;
+            if (completedState == SiegeEnemyVisualState.Attack &&
+                retainer.PendingRangedTarget is { } rangedTarget)
+            {
+                retainer.PendingRangedTarget = null;
+                if (rangedTarget.Health > 0 && _enemies.Contains(rangedTarget))
+                    ResolveRetainerStrike(retainer, rangedTarget);
+            }
+            AdvanceRetainerOrder(retainer);
         }
     }
 
@@ -710,53 +721,72 @@ public sealed partial class SiegeSession
     {
         foreach (var retainer in _retainers.Where(retainer => retainer.Health > 0).ToArray())
         {
-            if (retainer.OrderedDestination is { } destination)
-            {
-                if (retainer.X == destination.X && retainer.Y == destination.Y)
-                    retainer.OrderedDestination = null;
-                continue;
-            }
-            var target = RetainerOrderTarget(retainer);
-            if (target is null) retainer.OrderedTarget = null;
-            switch (retainer.Command)
-            {
-                case SiegeRetainerCommand.Defend:
-                    if (target is not null && IsNeighbor(retainer.X, retainer.Y, target.X, target.Y))
-                        RetainerAttack(retainer, target);
-                    break;
-                case SiegeRetainerCommand.Attack:
-                    var attackTarget = AttackOrderTarget(retainer);
-                    if (attackTarget is not null) RetainerAttack(retainer, attackTarget);
-                    break;
-                case SiegeRetainerCommand.Follow:
-                    break;
-                case SiegeRetainerCommand.Retreat:
-                    var retreatTarget = RetreatOrderTarget(retainer);
-                    if (retreatTarget is null)
-                    {
-                        retainer.Command = SiegeRetainerCommand.Defend;
-                        retainer.OrderedTarget = null;
-                        break;
-                    }
-                    if (retainer.OriginalActorKind == 1)
-                        RetainerRangedAttack(retainer, retreatTarget);
-                    break;
-            }
+            AdvanceRetainerOrder(retainer);
         }
     }
 
-    private bool RetainerAttack(SiegeRetainer retainer, SiegeEnemy target, bool rangeAlreadyChecked = false)
+    private void AdvanceRetainerOrder(SiegeRetainer retainer)
+    {
+        if (retainer.VisualState != SiegeEnemyVisualState.Walk) return;
+        if (retainer.OrderedDestination is { } destination)
+        {
+            if (retainer.X == destination.X && retainer.Y == destination.Y)
+                retainer.OrderedDestination = null;
+            return;
+        }
+        var target = RetainerOrderTarget(retainer);
+        if (target is null) retainer.OrderedTarget = null;
+        switch (retainer.Command)
+        {
+            case SiegeRetainerCommand.Defend:
+                if (target is not null && IsNeighbor(retainer.X, retainer.Y, target.X, target.Y))
+                    RetainerAttack(retainer, target);
+                break;
+            case SiegeRetainerCommand.Attack:
+                var attackTarget = AttackOrderTarget(retainer);
+                if (attackTarget is not null)
+                {
+                    if (retainer.OriginalActorKind == 1)
+                        RetainerRangedAttack(retainer, attackTarget);
+                    else
+                        RetainerAttack(retainer, attackTarget);
+                }
+                break;
+            case SiegeRetainerCommand.Follow:
+                break;
+            case SiegeRetainerCommand.Retreat:
+                var retreatTarget = RetreatOrderTarget(retainer);
+                if (retreatTarget is null)
+                {
+                    retainer.Command = SiegeRetainerCommand.Defend;
+                    retainer.OrderedTarget = null;
+                    break;
+                }
+                if (retainer.OriginalActorKind == 1)
+                    RetainerRangedAttack(retainer, retreatTarget);
+                break;
+        }
+    }
+
+    private bool RetainerAttack(SiegeRetainer retainer, SiegeEnemy target)
     {
         var distance = Distance(retainer.X, retainer.Y, target.X, target.Y);
-        if (!rangeAlreadyChecked && distance > RetainerAttackRange(retainer)) return false;
+        if (distance > RetainerAttackRange(retainer)) return false;
         retainer.Facing = DirectionToward(retainer.X, retainer.Y, target.X, target.Y, retainer.Facing);
         StartVisual(retainer, SiegeEnemyVisualState.Attack);
+        ResolveRetainerStrike(retainer, target, distance);
+        return true;
+    }
+
+    private void ResolveRetainerStrike(SiegeRetainer retainer, SiegeEnemy target, int? gridDistance = null)
+    {
+        var distance = gridDistance ?? Distance(retainer.X, retainer.Y, target.X, target.Y);
         var hit = retainer.OriginalAttackSkill is { } skill && target.OriginalAttackSkill is { } targetSkill
             ? OriginalWeaponCombat.Hits(skill, targetSkill,
                 retainer.OriginalCombatRow is >= 23 && distance <= 1,
                 retainer.Facing == target.Facing, _random)
             : _random.Next(100) < 50;
-        if (!hit) return true;
+        if (!hit) return;
         target.Health -= retainer.OriginalCombatRow is { } combatRow && target.OriginalArmor is { } armor
             ? OriginalWeaponCombat.DamageForCombatRow(combatRow, armor, _random)
             : 1;
@@ -765,7 +795,6 @@ public sealed partial class SiegeSession
         LastMessage = target.Health <= 0
             ? "Your retainer brings down a defender."
             : "Your retainer strikes a defender.";
-        return true;
     }
 
     private SiegeEnemy? RetainerOrderTarget(SiegeRetainer retainer) =>
@@ -785,6 +814,7 @@ public sealed partial class SiegeSession
         retainer.MovementElapsed = 0;
         retainer.MovementTick = 0;
         retainer.MovementWanders = false;
+        retainer.PendingRangedTarget = null;
     }
 
     private void EnemyAttackRetainer(SiegeEnemy enemy, SiegeRetainer retainer, int distance)
@@ -925,6 +955,7 @@ public sealed partial class SiegeSession
 
     private static void StartVisual(SiegeEnemy enemy, SiegeEnemyVisualState state)
     {
+        if (enemy is SiegeRetainer retainer) retainer.PendingRangedTarget = null;
         enemy.VisualState = state;
         enemy.VisualElapsed = 0;
     }

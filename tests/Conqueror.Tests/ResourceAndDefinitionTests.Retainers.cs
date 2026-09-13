@@ -266,7 +266,8 @@ public sealed partial class ResourceAndDefinitionTests
         var army = new Army();
         army.Units[SiegeRetainerCombatUnit] = 1;
         var retainer = new SiegeSpawn(2, 2, false, OriginalArmor: 7, OriginalHealth: 12,
-            OriginalCombatRow: 23, OriginalAttackSkill: 1_000, OriginalActorKind: 1);
+            OriginalCombatRow: 23, OriginalAttackSkill: 1_000, OriginalActorKind: 1,
+            OriginalAnimation: new SiegeActorAnimation(0.384, 0.384, 0.384));
         var enemy = new SiegeSpawn(9, 2, false, OriginalArmor: 0, OriginalHealth: 20,
             OriginalCombatRow: 4, OriginalAttackSkill: 1);
         var battle = new SiegeSession(new Player(), army, 0, 1086,
@@ -278,7 +279,85 @@ public sealed partial class ResourceAndDefinitionTests
 
         Assert.Equal(SiegeEnemyVisualState.Attack, friendly.VisualState);
         Assert.Equal(Facing.East, friendly.Facing);
+        Assert.Equal(20, Assert.Single(battle.Enemies).Health);
+
+        battle.AdvanceEnemyAnimations(0.768);
+        Assert.Equal(20, Assert.Single(battle.Enemies).Health);
+        battle.AdvanceEnemyAnimations(0.0001);
+
         Assert.True(Assert.Single(battle.Enemies).Health < 20);
+        Assert.Equal(SiegeEnemyVisualState.Attack, friendly.VisualState);
+    }
+
+    [Fact]
+    public void ModeElevenDamageRepeatsOnlyAfterEachStrictDoubledEffectGate()
+    {
+        var battle = RetainerOrderBattle(retainerX: 2, enemyX: 9,
+            actorKind: 1, combatRow: 23, retainerAttackSkill: 1_000, enemyHealth: 200);
+        var friendly = Assert.Single(battle.Retainers);
+        battle.CommandRetainers(SiegeRetainerCommand.Retreat);
+        battle.AdvanceRetainerOrders();
+
+        battle.AdvanceEnemyAnimations(0.7681);
+        var afterFirst = Assert.Single(battle.Enemies).Health;
+        Assert.True(afterFirst < 200);
+        Assert.Equal(SiegeEnemyVisualState.Attack, friendly.VisualState);
+
+        battle.AdvanceEnemyAnimations(0.768);
+        Assert.Equal(afterFirst, Assert.Single(battle.Enemies).Health);
+        battle.AdvanceEnemyAnimations(0.0001);
+
+        Assert.True(Assert.Single(battle.Enemies).Health < afterFirst);
+        Assert.Equal(SiegeEnemyVisualState.Attack, friendly.VisualState);
+    }
+
+    [Fact]
+    public void BowmanAttackAlsoUsesTheModeElevenCompletionGate()
+    {
+        var battle = RetainerOrderBattle(retainerX: 2, enemyX: 9,
+            actorKind: 1, combatRow: 23, retainerAttackSkill: 1_000, enemyHealth: 200);
+        battle.CommandRetainers(SiegeRetainerCommand.Attack);
+
+        battle.AdvanceRetainerOrders();
+        Assert.Equal(200, Assert.Single(battle.Enemies).Health);
+        battle.AdvanceEnemyAnimations(0.7681);
+
+        Assert.True(Assert.Single(battle.Enemies).Health < 200);
+    }
+
+    [Fact]
+    public void ModeElevenCompletionIsIndependentOfAnimationUpdateSubdivision()
+    {
+        var whole = RetainerOrderBattle(retainerX: 2, enemyX: 9,
+            actorKind: 1, combatRow: 23, retainerAttackSkill: 1_000, enemyHealth: 200);
+        var divided = RetainerOrderBattle(retainerX: 2, enemyX: 9,
+            actorKind: 1, combatRow: 23, retainerAttackSkill: 1_000, enemyHealth: 200);
+        whole.CommandRetainers(SiegeRetainerCommand.Retreat);
+        divided.CommandRetainers(SiegeRetainerCommand.Retreat);
+        whole.AdvanceRetainerOrders();
+        divided.AdvanceRetainerOrders();
+
+        whole.AdvanceEnemyAnimations(0.7681);
+        divided.AdvanceEnemyAnimations(0.384);
+        divided.AdvanceEnemyAnimations(0.3841);
+
+        Assert.Equal(Assert.Single(whole.Enemies).Health, Assert.Single(divided.Enemies).Health);
+        Assert.Equal(Assert.Single(whole.Retainers).VisualState,
+            Assert.Single(divided.Retainers).VisualState);
+    }
+
+    [Fact]
+    public void RecommandingABowmanCancelsThePendingModeElevenDamage()
+    {
+        var battle = RetainerOrderBattle(retainerX: 2, enemyX: 9,
+            actorKind: 1, combatRow: 23, retainerAttackSkill: 1_000, enemyHealth: 200);
+        battle.CommandRetainers(SiegeRetainerCommand.Retreat);
+        battle.AdvanceRetainerOrders();
+
+        battle.CommandRetainers(SiegeRetainerCommand.Defend);
+        battle.AdvanceEnemyAnimations(0.7681);
+
+        Assert.Equal(200, Assert.Single(battle.Enemies).Health);
     }
 
     [Fact]
@@ -321,6 +400,7 @@ public sealed partial class ResourceAndDefinitionTests
         battle.CommandRetainers(SiegeRetainerCommand.Retreat);
 
         battle.AdvanceRetainerOrders();
+        battle.AdvanceEnemyAnimations(0.7681);
 
         Assert.True(Assert.Single(battle.Enemies).Health < 20);
     }
@@ -444,16 +524,21 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     private static SiegeSession RetainerOrderBattle(
-        int retainerX, int enemyX, int? actorKind = null, int combatRow = 0)
+        int retainerX, int enemyX, int? actorKind = null, int combatRow = 0,
+        int retainerAttackSkill = 50, int enemyHealth = 10)
     {
         var tiles = new SiegeTile[12, 5];
         var army = new Army();
         army.Units[SiegeRetainerCombatUnit] = 1;
         var retainer = new SiegeSpawn(retainerX, 2, false, 1,
             OriginalArmor: 7, OriginalHealth: 12, OriginalCombatRow: combatRow,
-            OriginalAttackSkill: 50, OriginalActorKind: actorKind);
+            OriginalAttackSkill: retainerAttackSkill, OriginalActorKind: actorKind,
+            OriginalAnimation: combatRow >= 23
+                ? new SiegeActorAnimation(0.384, 0.384, 0.384)
+                : null);
         var enemy = new SiegeSpawn(enemyX, 2, false, 2,
-            OriginalArmor: 6, OriginalHealth: 10, OriginalCombatRow: 4, OriginalAttackSkill: 50);
+            OriginalArmor: 6, OriginalHealth: enemyHealth, OriginalCombatRow: 4,
+            OriginalAttackSkill: 50);
         return new SiegeSession(new Player(), army, 0, seed: 1086,
             new SiegeLayout(tiles, 1, 2, Facing.East, [enemy], retainers: [retainer]));
     }

@@ -65,6 +65,7 @@ public sealed partial class SiegeSession
 
     private bool TryBeginRetainerMovement(SiegeRetainer retainer)
     {
+        if (retainer.VisualState != SiegeEnemyVisualState.Walk) return false;
         if (retainer.OrderedDestination is { } destination)
         {
             retainer.MovementWanders = false;
@@ -228,7 +229,10 @@ public sealed partial class SiegeSession
                 OriginalWeaponCombat.ActorContactDistanceForCombatRow(row) ||
             !ActorLineIsClear(retainer, target))
             return false;
-        return RetainerAttack(retainer, target, rangeAlreadyChecked: true);
+        retainer.Facing = DirectionToward(retainer.X, retainer.Y, target.X, target.Y, retainer.Facing);
+        StartVisual(retainer, SiegeEnemyVisualState.Attack);
+        retainer.PendingRangedTarget = target;
+        return true;
     }
 
     private bool ActorLineIsClear(SiegeEnemy source, SiegeEnemy target)

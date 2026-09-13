@@ -45,8 +45,13 @@ and flag-`0x40` left-turn collision response. Kind-1 mode 4 reacquires through
 Mode-11 handler `0x5010B` aims at the returned actor and requires ray distance
 strictly below raw combat-row contact column 4 at object-2
 `0xCE24 + 28 * row`; rows 23/24 double the attack effect interval. The runtime
-activates this bowman Retreat attack route through a bounded line-of-sight
-bridge. Defend does not seek. When mode-6 acquisition `0x4F98D` finds no
+activates this bowman Attack/Retreat route through a bounded line-of-sight
+bridge. Do not apply mode-11 damage when the handler creates the effect:
+scheduler `0x53365` calls `0x4F070` only when the live effect counter equals
+its configured count, then `0x53D47` clears actor effect handle `+0x08` and
+immediately recalls thinker `0x4F49C`. Preserve the strict doubled completion
+gate, pending-target cancellation, and same-actor re-entry. Defend does not
+seek. When mode-6 acquisition `0x4F98D` finds no
 visible opponent, kind-0 transition `0x4E71F` and kind-1 transition `0x4E745`
 both retain mode 6. Its handler `0x4FDCD` preserves heading and installs the
 same `(flags & 0xA7) | 0x40` movement family as melee Retreat. The runtime

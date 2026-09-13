@@ -83,6 +83,12 @@ bindings remain active reverse-engineering work.
 | Platform polish | Installers are unsigned. Native installer QA, macOS notarization, customizable bindings, and broader accessibility work remain. |
 | Save compatibility | Recreation saves are versioned and migrated, but their final post-1.0 compatibility policy is not yet set. Original DOS save import/export is not supported. |
 
+Bowman attacks now resolve on the original mode-11 effect boundary rather than
+the instant the shot begins. Rows 23/24 retain their doubled imported interval,
+damage waits for the strict completion gate, and the same bowman immediately
+starts the next eligible shot. This cadence uses the monotonic simulation clock
+and is independent of processor speed, rendering frequency, and player input.
+
 ### Permanent scope boundaries
 
 - Original copyrighted assets are never committed or distributed; players
