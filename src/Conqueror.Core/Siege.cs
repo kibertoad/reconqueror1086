@@ -15,6 +15,7 @@ public class SiegeEnemy
     public int? OriginalArmor { get; init; }
     public int? OriginalAttackSkill { get; init; }
     public int? OriginalCombatRow { get; init; }
+    public int? OriginalActorKind { get; init; }
     public SiegeActorAnimation? OriginalAnimation { get; init; }
     public SiegeActorMovement? OriginalMovement { get; init; }
     public int OffsetX8 { get; internal set; }
@@ -42,7 +43,8 @@ public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int
 public sealed record SiegeSpawn(int X, int Y, bool Champion, int VisualId = -1,
     int? OriginalArmor = null, int? OriginalHealth = null, int? OriginalCombatRow = null,
     int? OriginalAttackSkill = null, SiegeActorAnimation? OriginalAnimation = null,
-    SiegeActorMovement? OriginalMovement = null, int InitialOffsetX8 = 0, int InitialOffsetY8 = 0);
+    SiegeActorMovement? OriginalMovement = null, int InitialOffsetX8 = 0, int InitialOffsetY8 = 0,
+    int? OriginalActorKind = null);
 public sealed record SiegeActorAnimation(double AttackSeconds, double HitSeconds, double DeathSeconds);
 public sealed record SiegeActorMovement(
     int TickCount, int IntervalMilliseconds, int FixedXDeltaPerTick, int FixedYDeltaPerTick, int Flags,
@@ -230,6 +232,7 @@ public sealed partial class SiegeSession
                     OriginalArmor = spawn.OriginalArmor,
                     OriginalAttackSkill = spawn.OriginalAttackSkill,
                     OriginalCombatRow = spawn.OriginalCombatRow,
+                    OriginalActorKind = spawn.OriginalActorKind,
                     Champion = spawn.Champion,
                     VisualId = spawn.VisualId,
                     OriginalAnimation = spawn.OriginalAnimation,
@@ -268,6 +271,7 @@ public sealed partial class SiegeSession
         OriginalArmor = spawn.OriginalArmor,
         OriginalAttackSkill = spawn.OriginalAttackSkill,
         OriginalCombatRow = spawn.OriginalCombatRow,
+        OriginalActorKind = spawn.OriginalActorKind,
         VisualId = spawn.VisualId,
         OriginalAnimation = spawn.OriginalAnimation,
         OriginalMovement = spawn.OriginalMovement,
@@ -726,7 +730,6 @@ public sealed partial class SiegeSession
                 case SiegeRetainerCommand.Follow:
                     break;
                 case SiegeRetainerCommand.Retreat:
-                    if (target is not null) MoveRetainerAway(retainer, target.X, target.Y);
                     break;
             }
         }

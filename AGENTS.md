@@ -32,14 +32,18 @@ mode 6, Retreat mode 10, and Follow mode 16 with player `D4D0` as target.
 Commands affect selected living friendlies, or all living friendlies when none
 is selected, then clear selection. Preserve these identities and distinguish
 the retainer Retreat order from leaving the battle. Executable state dispatch
-confirms the intent of each mode: Defend attacks only inside the surrounding
-3x3 neighborhood, Attack seeks the nearest hostile, Follow moves toward the
-player target, and Retreat moves away from its hostile target. Acquired melee
-Attack mode 8 and Follow mode 16 share handler `0x4FE76`; the runtime routes
-both through the recovered `0x112` sub-cell movement effect. Defend does not
-seek. Retreat movement, Attack's no-target mode-6 wandering, acquisition
-visibility, contact thresholds, formation/path selection, and exact thinker
-cadence remain Provisional and must not be presented as recovered.
+confirms the intent of Defend, Attack, and Follow: Defend attacks only inside
+the surrounding 3x3 neighborhood, Attack seeks the nearest hostile, and Follow
+moves toward the player target. The earlier claim that the public Retreat
+command directly invokes away-vector handler `0x50020` is Disproved. Requested
+mode 10 instead transitions friendly kind 0 to preserved-heading mode 5 and
+kind 1 to mode 4 after acquisition. Acquired melee Attack mode 8 and Follow
+mode 16 share handler `0x4FE76`; the runtime routes both through the recovered
+`0x112` sub-cell movement effect. Melee Retreat uses mode 5's `0x142` effect
+and flag-`0x40` left-turn collision response. Defend does not seek. Attack's
+no-target wandering, exact acquisition visibility/contact thresholds, kind-1
+Retreat continuation, formation/path selection, and thinker cadence remain
+Provisional.
 
 First-person pointer dispatch is also mapped. Handler `0x55524` consumes the
 world hit returned by raycaster `0x470A8`: a friendly actor toggles selection;
@@ -72,9 +76,9 @@ the strict post-deadline 200 ms tick independently of processor speed and input
 frequency. From zero, offsets advance `0,64,128,192`, then strict `> 0x80`
 crossing changes the cell and wraps to `-64`: 600 ms is the first transition
 and effect-cycle duration, not a universal cell cadence. Sustained straight
-movement takes four ticks/800 ms per cell. Collision corner interactions and
-multi-actor destination behavior remain Provisional. The same timing and offset
-mapping is active for acquired Attack mode 8 and Follow mode 16; it is not yet
+movement takes four ticks/800 ms per cell. Multi-actor destination behavior
+remains Provisional. The same timing and offset mapping is active for acquired
+Attack mode 8, Follow mode 16, and melee Retreat mode 5; it is not yet
 established for every actor mode.
 
 Mode-12 route and collision handling is narrower than that general caveat.
@@ -95,6 +99,20 @@ the original bit-2 blocker separately from visual tile labels and update it
 when authored object states change. Broader modes, corner interaction,
 multi-actor destination behavior, and exact ground-ray coordinates remain
 provisional.
+
+Public Retreat command handler `0x5744B` resets current mode, requests mode 10,
+and calls transition helper `0x4E5F0`. On the following acquisition pass,
+friendly kind-0 transition `0x4E76B` chooses mode 5 when a visible opponent was
+found and mode 2 otherwise; friendly kind-1 transition `0x4E805` chooses mode 4
+or mode 2. Kind-0 mode-5 handler `0x4FDCD` preserves actor heading and rewrites
+the movement flags to `(flags & 0xA7) | 0x40`, leaving descriptor `0x142`
+unchanged. When collision reaches `0x53C13`-`0x53C6C`, it clears the colliding
+sub-cell axis and turns to
+`(((heading + 0x20) & 0xC0) - 0x40) & 0xFF`, the cardinal direction to the
+left; unlike flag `0x10`, the effect continues. Preserve this state route and
+do not identify handler `0x50020` as the command's direct action. Exact
+ray-visible acquisition, later mode-5 formation transitions, and kind-1 mode-4
+behavior remain Provisional.
 
 ## Git push destination
 

@@ -29,7 +29,7 @@ public sealed partial class SiegeSession
                     break;
                 }
                 var effectContinues = AdvanceMovementTick(retainer, movement,
-                    DirectMovementFlags(movement.Flags));
+                    MovementFlagsFor(retainer, movement.Flags));
                 retainer.MovementTick = effectContinues
                     ? (retainer.MovementTick + 1) % movement.TickCount
                     : 0;
@@ -52,6 +52,16 @@ public sealed partial class SiegeSession
     // byte: and 0xA7, then or 0x10 (0x142 therefore becomes 0x112).
     private static int DirectMovementFlags(int descriptorFlags) =>
         (descriptorFlags & ~0xFF) | ((descriptorFlags & 0xFF & 0xA7) | 0x10);
+
+    // Melee Retreat reaches kind-0 mode 5. Its handler keeps the descriptor's
+    // 0x40 collision family: and 0xA7, then or 0x40 (0x142 stays 0x142).
+    private static int WanderingMovementFlags(int descriptorFlags) =>
+        (descriptorFlags & ~0xFF) | ((descriptorFlags & 0xFF & 0xA7) | 0x40);
+
+    private static int MovementFlagsFor(SiegeRetainer retainer, int descriptorFlags) =>
+        retainer.OrderedDestination is null && retainer.Command == SiegeRetainerCommand.Retreat
+            ? WanderingMovementFlags(descriptorFlags)
+            : DirectMovementFlags(descriptorFlags);
 
     private bool TryBeginRetainerMovement(SiegeRetainer retainer)
     {
@@ -78,6 +88,15 @@ public sealed partial class SiegeSession
                 if (Distance(retainer.X, retainer.Y, PlayerX, PlayerY) <= 1) return false;
                 AimRetainerAt(retainer, PlayerX, PlayerY);
                 return true;
+            case SiegeRetainerCommand.Retreat:
+                // Requested mode 10 transitions to mode 5 for friendly kind 0
+                // after acquiring a visible opponent. Mode 5 preserves heading.
+                if (RetainerOrderTarget(retainer) is null)
+                {
+                    retainer.Command = SiegeRetainerCommand.Defend;
+                    return false;
+                }
+                return retainer.OriginalActorKind is null or 0;
             default:
                 return false;
         }
@@ -162,22 +181,6 @@ public sealed partial class SiegeSession
         Facing.West => (-x, -y),
         _ => (y, -x)
     };
-
-    private void MoveRetainerAway(SiegeRetainer retainer, int targetX, int targetY)
-    {
-        var candidates = CardinalSteps(retainer.X, retainer.Y)
-            .OrderByDescending(point => Distance(point.X, point.Y, targetX, targetY));
-        MoveRetainer(retainer, candidates.FirstOrDefault(point => RetainerCanEnter(retainer, point.X, point.Y)));
-    }
-
-    private void MoveRetainer(SiegeRetainer retainer, Point destination)
-    {
-        if (destination == default) return;
-        retainer.Facing = DirectionToward(retainer.X, retainer.Y, destination.X, destination.Y, retainer.Facing);
-        retainer.X = destination.X;
-        retainer.Y = destination.Y;
-        retainer.WalkFrame = (retainer.WalkFrame + 1) % 3;
-    }
 
     private bool RetainerCanEnter(SiegeRetainer self, int x, int y) =>
         x >= 0 && y >= 0 && x < Width && y < Height && !_movementBlocks[x, y] &&

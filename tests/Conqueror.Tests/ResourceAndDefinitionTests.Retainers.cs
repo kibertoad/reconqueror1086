@@ -91,14 +91,32 @@ public sealed partial class ResourceAndDefinitionTests
         var battle = new SiegeSession(new Player(), army, 0, 1, layout);
 
         var retainer = Assert.Single(layout.Retainers);
-        Assert.Equal((13, 21, 5, 0),
-            (retainer.X, retainer.Y, retainer.VisualId, retainer.OriginalCombatRow));
+        Assert.Equal((13, 21, 5, 0, 0),
+            (retainer.X, retainer.Y, retainer.VisualId, retainer.OriginalCombatRow,
+                retainer.OriginalActorKind));
         Assert.Single(layout.Enemies);
         Assert.DoesNotContain(layout.Objects, item => item.X == 13 && item.Y is 20 or 21);
         Assert.Equal(1, battle.AlliesStarted);
         var activeRetainer = Assert.Single(battle.Retainers);
-        Assert.Equal((13, 21, 5, 0),
-            (activeRetainer.X, activeRetainer.Y, activeRetainer.VisualId, activeRetainer.OriginalCombatRow));
+        Assert.Equal((13, 21, 5, 0, 0),
+            (activeRetainer.X, activeRetainer.Y, activeRetainer.VisualId, activeRetainer.OriginalCombatRow,
+                activeRetainer.OriginalActorKind));
+    }
+
+    [Theory]
+    [InlineData(0, 0)]
+    [InlineData(1, 0)]
+    [InlineData(2, 1)]
+    [InlineData(3, 2)]
+    [InlineData(4, 3)]
+    [InlineData(5, 4)]
+    [InlineData(6, 5)]
+    [InlineData(7, 6)]
+    [InlineData(8, 2)]
+    [InlineData(9, 7)]
+    public void CombatantTemplatesRetainTheirExecutableActorKind(int template, int expectedKind)
+    {
+        Assert.Equal(expectedKind, OriginalCombatantTemplates.ActorKindForSceneTemplate(template));
     }
 
     [Fact]
@@ -190,9 +208,74 @@ public sealed partial class ResourceAndDefinitionTests
                 Assert.Single(follow.Retainers).Facing));
 
         var retreat = RetainerOrderBattle(retainerX: 5, enemyX: 9);
+        Assert.Single(retreat.Retainers).Facing = Facing.South;
         retreat.CommandRetainers(SiegeRetainerCommand.Retreat);
         retreat.AdvanceRetainerOrders();
-        Assert.Equal(4, Assert.Single(retreat.Retainers).X);
+        Assert.Equal((5, 2), (Assert.Single(retreat.Retainers).X, Assert.Single(retreat.Retainers).Y));
+        retreat.AdvanceRetainerMovement(0.6001);
+        Assert.Equal((5, 3, 0, -64, Facing.South),
+            (Assert.Single(retreat.Retainers).X, Assert.Single(retreat.Retainers).Y,
+                Assert.Single(retreat.Retainers).OffsetX8, Assert.Single(retreat.Retainers).OffsetY8,
+                Assert.Single(retreat.Retainers).Facing));
+    }
+
+    [Fact]
+    public void MeleeRetreatUsesTheModeFiveCollisionTurnFamily()
+    {
+        var tiles = new SiegeTile[12, 5];
+        var movementBlocks = new bool[12, 5];
+        movementBlocks[5, 3] = true;
+        var army = new Army();
+        army.Units[SiegeRetainerCombatUnit] = 1;
+        var retainer = new SiegeSpawn(5, 2, false, OriginalHealth: 12, OriginalCombatRow: 0,
+            OriginalActorKind: 0);
+        var enemy = new SiegeSpawn(9, 2, false, OriginalHealth: 10, OriginalCombatRow: 4);
+        var battle = new SiegeSession(new Player(), army, 0, 1086,
+            new SiegeLayout(tiles, 1, 2, Facing.East, [enemy], retainers: [retainer],
+                movementBlocks: movementBlocks));
+        var friendly = Assert.Single(battle.Retainers);
+        friendly.Facing = Facing.South;
+        battle.CommandRetainers(SiegeRetainerCommand.Retreat);
+
+        battle.AdvanceRetainerMovement(0.4001);
+        Assert.Equal((5, 2, 0, 0, Facing.East),
+            (friendly.X, friendly.Y, friendly.OffsetX8, friendly.OffsetY8, friendly.Facing));
+        battle.AdvanceRetainerMovement(0.2001);
+        Assert.Equal((5, 2, 64, 0, Facing.East),
+            (friendly.X, friendly.Y, friendly.OffsetX8, friendly.OffsetY8, friendly.Facing));
+    }
+
+    [Fact]
+    public void BowmanRetreatDoesNotBorrowTheMeleeModeFiveMovementPath()
+    {
+        var battle = RetainerOrderBattle(retainerX: 5, enemyX: 9, actorKind: 1, combatRow: 23);
+        var friendly = Assert.Single(battle.Retainers);
+        friendly.Facing = Facing.South;
+        battle.CommandRetainers(SiegeRetainerCommand.Retreat);
+
+        battle.AdvanceRetainerMovement(1.0);
+
+        Assert.Equal((5, 2, 0, 0, Facing.South),
+            (friendly.X, friendly.Y, friendly.OffsetX8, friendly.OffsetY8, friendly.Facing));
+    }
+
+    [Fact]
+    public void RetreatWithoutAnOpponentFallsBackToDefend()
+    {
+        var tiles = new SiegeTile[12, 5];
+        var army = new Army();
+        army.Units[SiegeRetainerCombatUnit] = 1;
+        var battle = new SiegeSession(new Player(), army, 0, 1086,
+            new SiegeLayout(tiles, 1, 2, Facing.East, [], retainers:
+            [new SiegeSpawn(5, 2, false, OriginalHealth: 12, OriginalActorKind: 0)]));
+        var friendly = Assert.Single(battle.Retainers);
+        battle.CommandRetainers(SiegeRetainerCommand.Retreat);
+
+        battle.AdvanceRetainerMovement(0.2001);
+
+        Assert.Equal(SiegeRetainerCommand.Defend, friendly.Command);
+        Assert.Equal((5, 2, 0, 0),
+            (friendly.X, friendly.Y, friendly.OffsetX8, friendly.OffsetY8));
     }
 
     [Fact]
@@ -242,13 +325,15 @@ public sealed partial class ResourceAndDefinitionTests
             new SiegeLayout(tiles, 1, 2, Facing.East, [], retainers: retainers));
     }
 
-    private static SiegeSession RetainerOrderBattle(int retainerX, int enemyX)
+    private static SiegeSession RetainerOrderBattle(
+        int retainerX, int enemyX, int? actorKind = null, int combatRow = 0)
     {
         var tiles = new SiegeTile[12, 5];
         var army = new Army();
         army.Units[SiegeRetainerCombatUnit] = 1;
         var retainer = new SiegeSpawn(retainerX, 2, false, 1,
-            OriginalArmor: 7, OriginalHealth: 12, OriginalCombatRow: 0, OriginalAttackSkill: 50);
+            OriginalArmor: 7, OriginalHealth: 12, OriginalCombatRow: combatRow,
+            OriginalAttackSkill: 50, OriginalActorKind: actorKind);
         var enemy = new SiegeSpawn(enemyX, 2, false, 2,
             OriginalArmor: 6, OriginalHealth: 10, OriginalCombatRow: 4, OriginalAttackSkill: 50);
         return new SiegeSession(new Player(), army, 0, seed: 1086,

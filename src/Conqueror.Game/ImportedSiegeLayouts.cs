@@ -203,7 +203,8 @@ public static class ImportedSiegeLayouts
             block.Name.Contains("lord", StringComparison.OrdinalIgnoreCase);
         return new SiegeSpawn(x, y, champion, block.Index, template.Armor, template.Health,
             block.ActorCombatRow, template.AttackSkill, AnimationFor(scene, block), MovementFor(scene, block),
-            block.InitialXOffset8, block.InitialYOffset8);
+            block.InitialXOffset8, block.InitialYOffset8,
+            OriginalCombatantTemplates.ActorKindForSceneTemplate(block.ActorTemplate));
     }
 
     private static SiegeActorMovement? MovementFor(DynamixScene scene, DynamixSceneBlock block)

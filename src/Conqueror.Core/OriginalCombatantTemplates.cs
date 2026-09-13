@@ -23,4 +23,20 @@ public static class OriginalCombatantTemplates
     // The complete owned MELEE*/DEFEND* actor-base population uses templates
     // 0-2 for the player side and 3, 5, 8, and 9 for the opposing side.
     public static bool IsFriendlySceneTemplate(int template) => template is 0 or 1 or 2;
+
+    // CONQUER.EXE 0x542F8 initializes the actor-kind selector for templates
+    // 0-9 in this order. The selector chooses the transition table at 0x4E5F0.
+    public static int ActorKindForSceneTemplate(int template) => template switch
+    {
+        0 or 1 => 0,
+        2 => 1,
+        3 => 2,
+        4 => 3,
+        5 => 4,
+        6 => 5,
+        7 => 6,
+        8 => 2,
+        9 => 7,
+        _ => throw new ArgumentOutOfRangeException(nameof(template))
+    };
 }
