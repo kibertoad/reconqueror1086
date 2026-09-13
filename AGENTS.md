@@ -193,7 +193,21 @@ accepts any living same-side actor actually returned below `0x200`; transition
 the promoted first-friendly actor's authored metadata/order separately from
 the live player position: the resource cell need not equal the `Viewer` cell.
 The runtime player proxy therefore uses that actor's metadata but current
-session coordinates. Mode 1 onward and broader actor AI remain Provisional.
+session coordinates. Mode 1 is not terminal: acquisition `0x4F648` scans the
+surrounding 3x3 map cells in row-major relative order `y=-1..1`, then
+`x=-1..1`, skips self, and accepts the first living same-side actor. Kind-0
+transition `0x4E6C0` selects mode 4 when one is present or mode 3 otherwise.
+Mode 3 reuses same-side ray acquisition `0x4FC34`; transition `0x4E6E6`
+selects direct regroup mode 7 on success or mode 2 on failure. Mode 4 reuses
+opposite-side acquisition `0x4F98D`; transition `0x4E6F9` selects direct
+pursuit mode 8 on success or mode 1 on failure. Modes 1-4 use current handler
+`0x4FDAB`; modes 7/8 use direct `0x4FE76`. Preserve source-center calculation
+as `((cell << 8) + 0x80 + offset8) >> 8` for the neighborhood scan and keep
+one state decision per actor-thinker pass. The runtime implements this loop
+through the first mode-8 movement effect. Mode-8 contact transition and its
+mode-11 attack continuation in this Retreat-derived route, plus broader actor
+AI, remain Provisional. GameFAQs FAQ 66730 has no internal evidence for these
+states or the spatial scan order.
 GameFAQs FAQ 66730 contains no state-table, ray-identity, or threshold detail
 and neither corroborates nor conflicts with this executable-derived mapping.
 

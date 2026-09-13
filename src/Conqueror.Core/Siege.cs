@@ -711,57 +711,6 @@ public sealed partial class SiegeSession
         SyncPlayerActor();
     }
 
-    public void AdvanceRetainerOrders()
-    {
-        foreach (var retainer in _retainers.Where(retainer => retainer.Health > 0).ToArray())
-        {
-            AdvanceRetainerOrder(retainer);
-        }
-    }
-
-    private void AdvanceRetainerOrder(SiegeRetainer retainer)
-    {
-        if (retainer.VisualState != SiegeEnemyVisualState.Walk) return;
-        if (retainer.OrderedDestination is { } destination)
-        {
-            if (retainer.X == destination.X && retainer.Y == destination.Y)
-                retainer.OrderedDestination = null;
-            return;
-        }
-        var target = RetainerOrderTarget(retainer);
-        if (target is null) retainer.OrderedTarget = null;
-        switch (retainer.Command)
-        {
-            case SiegeRetainerCommand.Defend:
-                if (target is not null && IsNeighbor(retainer.X, retainer.Y, target.X, target.Y))
-                    RetainerAttack(retainer, target);
-                break;
-            case SiegeRetainerCommand.Attack:
-                var attackTarget = AttackOrderTarget(retainer);
-                if (attackTarget is not null)
-                {
-                    if (retainer.OriginalActorKind == 1)
-                        RetainerRangedAttack(retainer, attackTarget);
-                    else
-                        RetainerAttack(retainer, attackTarget);
-                }
-                break;
-            case SiegeRetainerCommand.Follow:
-                break;
-            case SiegeRetainerCommand.Retreat:
-                var retreatTarget = RetreatOrderTarget(retainer);
-                if (retreatTarget is null)
-                {
-                    retainer.Command = SiegeRetainerCommand.Defend;
-                    retainer.OrderedTarget = null;
-                    break;
-                }
-                if (retainer.OriginalActorKind == 1)
-                    RetainerRangedAttack(retainer, retreatTarget);
-                break;
-        }
-    }
-
     private bool RetainerAttack(SiegeRetainer retainer, SiegeEnemy target)
     {
         var distance = Distance(retainer.X, retainer.Y, target.X, target.Y);

@@ -156,6 +156,47 @@ public sealed partial class SiegeSession
                     retainer.MovementWanders = true;
                     return true;
                 }
+                if (retainer.RetreatMode == 1)
+                {
+                    // Acquisition 0x4F648 scans the surrounding 3x3 map
+                    // cells, y then x from -1 through +1, and accepts the
+                    // first living same-side actor other than self.
+                    retainer.RetreatRegroupTarget = AdjacentFriendlyActor(retainer);
+                    retainer.RetreatMode = retainer.RetreatRegroupTarget is null ? 3 : 4;
+                    retainer.MovementWanders = false;
+                    return false;
+                }
+                if (retainer.RetreatMode == 3)
+                {
+                    if (_actorRaycast is not null && RetreatFormationTarget(retainer) is { } formation)
+                    {
+                        retainer.RetreatMode = 7;
+                        retainer.RetreatRegroupTarget = formation;
+                        retainer.MovementWanders = false;
+                        AimRetainerAt(retainer, formation.X, formation.Y);
+                        return true;
+                    }
+                    retainer.RetreatMode = 2;
+                    retainer.RetreatRegroupTarget = null;
+                    retainer.MovementWanders = false;
+                    retainer.Command = SiegeRetainerCommand.Defend;
+                    return false;
+                }
+                if (retainer.RetreatMode == 4)
+                {
+                    if (RetreatOrderTarget(retainer) is { } opponent)
+                    {
+                        retainer.RetreatMode = 8;
+                        retainer.RetreatRegroupTarget = null;
+                        retainer.OrderedTarget = opponent;
+                        retainer.MovementWanders = false;
+                        AimRetainerAt(retainer, opponent.X, opponent.Y);
+                        return true;
+                    }
+                    retainer.RetreatMode = 1;
+                    retainer.MovementWanders = false;
+                    return false;
+                }
                 retainer.MovementWanders = false;
                 return false;
             default:
@@ -259,14 +300,15 @@ public sealed partial class SiegeSession
     // nearer opposite-side actor whose identity is returned by 0x470A8. It
     // exits early once the returned 8.8 depth is below 0x154.
     private SiegeEnemy? RetreatOrderTarget(SiegeRetainer retainer) =>
-        VisibleOrderTarget(retainer);
+        VisibleOrderTarget(retainer, preserveExplicitTarget: false);
 
     private SiegeEnemy? AttackOrderTarget(SiegeRetainer retainer) =>
-        VisibleOrderTarget(retainer);
+        VisibleOrderTarget(retainer, preserveExplicitTarget: true);
 
-    private SiegeEnemy? VisibleOrderTarget(SiegeRetainer retainer)
+    private SiegeEnemy? VisibleOrderTarget(SiegeRetainer retainer, bool preserveExplicitTarget)
     {
-        if (retainer.OrderedTarget is { Health: > 0 } ordered && _enemies.Contains(ordered))
+        if (preserveExplicitTarget &&
+            retainer.OrderedTarget is { Health: > 0 } ordered && _enemies.Contains(ordered))
             return ActorRayDistance(retainer, ordered) is not null ? ordered : null;
 
         SiegeEnemy? nearest = null;
@@ -331,6 +373,24 @@ public sealed partial class SiegeSession
         if (_actorRaycast?.Invoke(source, target) is not { Distance8: < 0x200 } hit) return false;
         return !ReferenceEquals(hit.Actor, source) && hit.Actor.Health > 0 &&
             (ReferenceEquals(hit.Actor, PlayerActor) || _retainers.Contains(hit.Actor));
+    }
+
+    private SiegeEnemy? AdjacentFriendlyActor(SiegeRetainer source)
+    {
+        var centerX = ((source.X << 8) + 0x80 + source.OffsetX8) >> 8;
+        var centerY = ((source.Y << 8) + 0x80 + source.OffsetY8) >> 8;
+        for (var dy = -1; dy <= 1; dy++)
+        for (var dx = -1; dx <= 1; dx++)
+        {
+            var x = centerX + dx;
+            var y = centerY + dy;
+            if (PlayerActor.Health > 0 && PlayerActor.X == x && PlayerActor.Y == y)
+                return PlayerActor;
+            var retainer = _retainers.FirstOrDefault(actor =>
+                !ReferenceEquals(actor, source) && actor.Health > 0 && actor.X == x && actor.Y == y);
+            if (retainer is not null) return retainer;
+        }
+        return null;
     }
 
     private IEnumerable<SiegeEnemy> FriendlyActorsInAuthoredOrder(SiegeRetainer source) =>
