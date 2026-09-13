@@ -29,6 +29,7 @@ public sealed class SiegeRetainer : SiegeEnemy
     public SiegeRetainerCommand Command { get; internal set; } = SiegeRetainerCommand.Attack;
     public bool Selected { get; internal set; }
     internal SiegeEnemy? OrderedTarget { get; set; }
+    internal (int X, int Y)? OrderedDestination { get; set; }
 }
 
 public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int GarrisonPerEnemy,
@@ -261,6 +262,7 @@ public sealed class SiegeSession
         {
             retainer.Command = command;
             retainer.OrderedTarget = null;
+            retainer.OrderedDestination = null;
         }
         foreach (var retainer in living) retainer.Selected = false;
         LastMessage = targets.Length == 0
@@ -280,9 +282,26 @@ public sealed class SiegeSession
         {
             retainer.Command = SiegeRetainerCommand.Attack;
             retainer.OrderedTarget = target;
+            retainer.OrderedDestination = null;
         }
         foreach (var retainer in living) retainer.Selected = false;
         LastMessage = "Retainers attack the selected defender.";
+        return true;
+    }
+
+    public bool CommandSelectedRetainersTo(int x, int y)
+    {
+        if (TileAt(x, y) != SiegeTile.Floor) return false;
+        var living = _retainers.Where(retainer => retainer.Health > 0).ToArray();
+        var selected = living.Where(retainer => retainer.Selected).ToArray();
+        if (selected.Length == 0) return false;
+        foreach (var retainer in selected)
+        {
+            retainer.OrderedTarget = null;
+            retainer.OrderedDestination = (x, y);
+        }
+        foreach (var retainer in living) retainer.Selected = false;
+        LastMessage = "Retainers move to the selected ground.";
         return true;
     }
 
@@ -630,6 +649,14 @@ public sealed class SiegeSession
     {
         foreach (var retainer in _retainers.Where(retainer => retainer.Health > 0).ToArray())
         {
+            if (retainer.OrderedDestination is { } destination)
+            {
+                if (retainer.X == destination.X && retainer.Y == destination.Y)
+                    retainer.OrderedDestination = null;
+                else
+                    MoveRetainerToward(retainer, destination.X, destination.Y);
+                continue;
+            }
             var target = retainer.OrderedTarget is { Health: > 0 } ordered && _enemies.Contains(ordered)
                 ? ordered
                 : _enemies.Where(enemy => enemy.Health > 0)

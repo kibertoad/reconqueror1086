@@ -445,7 +445,7 @@ public sealed partial class ConquerorGame
         var pointerCommand = click ? SiegePointerCommand(mouse) : null;
         if (pointerCommand is { } clickedCommand) _siege.CommandRetainers(clickedCommand);
         var pointerTarget = click && pointerCommand is null ? SiegePointerTarget(mouse) : null;
-        var pointerHit = pointerTarget is null ? null : SiegePointerWorldHit(mouse);
+        var pointerHit = pointerTarget is null ? null : SiegePointerWorldHit(pointerTarget.Value);
         SiegeEnemy? clickedEnemy = null;
         if (pointerHit?.Actor is SiegeRetainer clickedRetainer)
             _siege.ToggleRetainerSelection(clickedRetainer);
@@ -453,6 +453,8 @@ public sealed partial class ConquerorGame
             clickedEnemy = hostile;
         else if (pointerHit?.Object is { } clickedObject)
             _siege.Interact(clickedObject);
+        else if (pointerHit?.GroundCell is { } ground)
+            _siege.CommandSelectedRetainersTo(ground.X, ground.Y);
         var clickedForegroundTarget = clickedEnemy is null ? null : pointerTarget;
         var crossbowEquipped = _campaign.State.Player.Inventory.Weapon
             .Contains("Crossbow", StringComparison.OrdinalIgnoreCase);
@@ -599,13 +601,12 @@ public sealed partial class ConquerorGame
             new UiBounds(viewport.X, viewport.Y, viewport.Width, viewport.Height));
     }
 
-    private SiegePointerHit? SiegePointerWorldHit(MouseState mouse)
+    private SiegePointerHit? SiegePointerWorldHit((int X, int Y) centeredPointer)
     {
         if (_siege is null) return null;
-        var point = SiegePointerVirtualPoint(mouse);
         var viewport = SiegeViewport();
-        var localX = point.Item1 - viewport.X;
-        var localY = point.Item2 - viewport.Y;
+        var localX = centeredPointer.X * viewport.Width / SiegeCombatPresentation.Viewport.Width;
+        var localY = centeredPointer.Y * viewport.Height / SiegeCombatPresentation.Viewport.Height;
         if (localX < 0 || localY < 0 || localX >= viewport.Width || localY >= viewport.Height)
             return null;
         var camera = viewport.Width == 1 ? 0 : 2.0 * localX / (viewport.Width - 1) - 1.0;
@@ -620,7 +621,7 @@ public sealed partial class ConquerorGame
                 texture?.Width, texture?.Height);
             if (!layout.Contains(localX, localY) || !SiegeTextureContains(texture, layout, localX, localY, flip))
                 continue;
-            hits.Add(new SiegePointerHit(projection.ForwardDistance, projection.Enemy, null));
+            hits.Add(new SiegePointerHit(projection.ForwardDistance, projection.Enemy, null, null));
         }
         foreach (var projection in SiegeViewProjection.ProjectObjects(_siege))
         {
@@ -633,9 +634,12 @@ public sealed partial class ConquerorGame
                 texture?.Width, texture?.Height);
             if (!layout.Contains(localX, localY) || !SiegeTextureContains(texture, layout, localX, localY, false))
                 continue;
-            hits.Add(new SiegePointerHit(projection.ForwardDistance, null, projection.Object));
+            hits.Add(new SiegePointerHit(projection.ForwardDistance, null, projection.Object, null));
         }
-        return hits.OrderBy(hit => hit.Distance).FirstOrDefault() is { Distance: > 0 } hit ? hit : null;
+        if (hits.OrderBy(hit => hit.Distance).FirstOrDefault() is { Distance: > 0 } hit) return hit;
+        return SiegeViewProjection.GroundCell(_siege, localX, localY, viewport.Width, viewport.Height) is { } ground
+            ? new SiegePointerHit(0, null, null, ground)
+            : null;
     }
 
     private static bool SiegeTextureContains(
@@ -658,7 +662,8 @@ public sealed partial class ConquerorGame
         ? ScaleSiegeBounds(SiegeCombatPresentation.Viewport)
         : new Rectangle(0, 85, 1024, 520);
 
-    private readonly record struct SiegePointerHit(double Distance, SiegeEnemy? Actor, SiegeObject? Object);
+    private readonly record struct SiegePointerHit(
+        double Distance, SiegeEnemy? Actor, SiegeObject? Object, (int X, int Y)? GroundCell);
 
     private SiegeRetainerCommand? SiegePointerCommand(MouseState mouse)
     {

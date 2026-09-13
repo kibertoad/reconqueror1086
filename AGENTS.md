@@ -49,6 +49,15 @@ dispatch. The current renderer-consistent billboard/depth/alpha picker is an
 implementation mapping, not yet a claim that the original raycaster's full
 fixed-point ground/cell traversal has been reproduced.
 
+Empty-ground clicks use requested mode 12. Dispatcher `0x555BE`-`0x5562E`
+writes the raycaster's integer coordinates to actor `+0x28/+0x2C` for selected
+actors and clears selection. Acquisition branch `0x4FD7B` completes when both
+coordinates match; handler `0x4FF53` derives heading from `target - current`,
+clears actor target `+0x24`, and schedules movement. Preserve that destination
+state and prior-command resumption. The current floor-plane unprojection and
+cardinal stepping remain provisional until the full fixed-point ray and
+movement effect are recovered.
+
 ## Git push destination
 
 The authorized canonical repository is

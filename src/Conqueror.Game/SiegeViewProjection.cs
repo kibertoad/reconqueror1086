@@ -161,6 +161,28 @@ public static class SiegeViewProjection
         return BillboardLayout(projection.ScreenPosition, wallHeight, width, height, viewportWidth, viewportHeight);
     }
 
+    public static (int X, int Y)? GroundCell(
+        SiegeSession siege, int pointerX, int pointerY, int viewportWidth, int viewportHeight)
+    {
+        ArgumentNullException.ThrowIfNull(siege);
+        if (viewportWidth <= 1) throw new ArgumentOutOfRangeException(nameof(viewportWidth));
+        if (viewportHeight <= 1) throw new ArgumentOutOfRangeException(nameof(viewportHeight));
+        if (pointerX < 0 || pointerY < 0 || pointerX >= viewportWidth || pointerY >= viewportHeight)
+            return null;
+        var horizon = (viewportHeight - 1) / 2.0;
+        var verticalOffset = pointerY - horizon;
+        if (verticalOffset <= 0) return null;
+        var focalLength = viewportWidth / (2.0 * Math.Tan(FieldOfView / 2.0));
+        var distance = 0.5 * focalLength / verticalOffset;
+        var camera = 2.0 * pointerX / (viewportWidth - 1) - 1.0;
+        if (distance >= Cast(siege, camera).Distance || distance > MaximumDistance) return null;
+        var (forwardX, forwardY) = Direction(siege.Facing);
+        var angle = Math.Atan2(forwardY, forwardX) + camera * FieldOfView / 2.0;
+        var x = (int)Math.Floor(siege.PlayerX + 0.5 + Math.Cos(angle) * distance);
+        var y = (int)Math.Floor(siege.PlayerY + 0.5 + Math.Sin(angle) * distance);
+        return siege.TileAt(x, y) == SiegeTile.Floor ? (x, y) : null;
+    }
+
     private static SiegeBillboardLayout BillboardLayout(
         double screenPosition, double wallHeight, int width, int height, int viewportWidth, int viewportHeight)
     {

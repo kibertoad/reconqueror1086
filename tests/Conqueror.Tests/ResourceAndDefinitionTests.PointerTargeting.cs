@@ -27,6 +27,22 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void LowerViewportPointerMapsToVisibleGroundInFrontOfThePlayer()
+    {
+        var tiles = new SiegeTile[12, 12];
+        var battle = new SiegeSession(new Player(), new Army(), 0, 1,
+            new SiegeLayout(tiles, 5, 5, Facing.North, []));
+
+        Assert.Equal((5, 4), SiegeViewProjection.GroundCell(battle, 83, 116, 167, 117));
+        Assert.Null(SiegeViewProjection.GroundCell(battle, 83, 58, 167, 117));
+
+        tiles[5, 4] = SiegeTile.Wall;
+        var blocked = new SiegeSession(new Player(), new Army(), 0, 1,
+            new SiegeLayout(tiles, 5, 5, Facing.North, []));
+        Assert.Null(SiegeViewProjection.GroundCell(blocked, 83, 116, 167, 117));
+    }
+
+    [Fact]
     public void ExplicitActorTargetCanBeStruckOutsideTheKeyboardCenterRay()
     {
         var battle = PointerTargetBattle();
@@ -54,6 +70,31 @@ public sealed partial class ResourceAndDefinitionTests
         battle.AdvanceRetainerOrders();
 
         Assert.Equal((2, 3), (friendly.X, friendly.Y));
+        Assert.False(friendly.Selected);
+    }
+
+    [Fact]
+    public void SelectedRetainersMoveToTheGroundCellThenResumeTheirPriorCommand()
+    {
+        var tiles = new SiegeTile[10, 10];
+        var army = new Army();
+        army.Units[UnitType.Swordsmen] = 1;
+        var battle = new SiegeSession(new Player(), army, 0, 4,
+            new SiegeLayout(tiles, 1, 2, Facing.East, [],
+                retainers: [new SiegeSpawn(2, 2, false, OriginalHealth: 10)]));
+        var friendly = Assert.Single(battle.Retainers);
+        battle.CommandRetainers(SiegeRetainerCommand.Defend);
+        Assert.False(battle.CommandSelectedRetainersTo(2, 5));
+        battle.ToggleRetainerSelection(friendly);
+
+        Assert.True(battle.CommandSelectedRetainersTo(2, 5));
+        battle.AdvanceRetainerOrders();
+        battle.AdvanceRetainerOrders();
+        battle.AdvanceRetainerOrders();
+        battle.AdvanceRetainerOrders();
+
+        Assert.Equal((2, 5), (friendly.X, friendly.Y));
+        Assert.Equal(SiegeRetainerCommand.Defend, friendly.Command);
         Assert.False(friendly.Selected);
     }
 
