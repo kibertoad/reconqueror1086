@@ -39,6 +39,19 @@ public sealed record DynamixSceneBlock(
     int ActorCombatRow,
     string Name)
 {
+    public (int TextureIndex, bool FlipHorizontally) TextureForBillboardHeading(int relativeHeading)
+    {
+        if (Kind != 4 || Surface0 < 0 || Surface2 is <= 0 or > 256)
+            return (Surface0, false);
+
+        var divisions = Surface2;
+        var heading = relativeHeading & 0xff;
+        var sector = ((((heading + 0x80 / divisions) & 0xff) * divisions) >> 8);
+        var flip = (Behavior & 4) != 0 && sector > divisions / 2;
+        if (flip) sector = divisions - sector;
+        return (Surface0 + sector, flip);
+    }
+
     public int TextureForFace(DynamixSceneFace face) => face switch
     {
         DynamixSceneFace.North => Surface0,

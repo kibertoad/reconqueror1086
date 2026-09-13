@@ -13,19 +13,20 @@ public sealed class SiegeEnemy
     public int? OriginalArmor { get; init; }
     public int? OriginalAttackSkill { get; init; }
     public int? OriginalCombatRow { get; init; }
+    public SiegeActorAnimation? OriginalAnimation { get; init; }
     public bool Champion { get; init; }
     public int VisualId { get; init; } = -1;
     public Facing Facing { get; set; }
     public int WalkFrame { get; set; }
     public SiegeEnemyVisualState VisualState { get; internal set; }
-    public int VisualFrame { get; internal set; }
     internal double VisualElapsed { get; set; }
 }
 
 public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int GarrisonPerEnemy, int BaseChampionHealth, int FoodHealing, int WeaponBreakPercent);
 public sealed record SiegeSpawn(int X, int Y, bool Champion, int VisualId = -1,
     int? OriginalArmor = null, int? OriginalHealth = null, int? OriginalCombatRow = null,
-    int? OriginalAttackSkill = null);
+    int? OriginalAttackSkill = null, SiegeActorAnimation? OriginalAnimation = null);
+public sealed record SiegeActorAnimation(double AttackSeconds, double HitSeconds, double DeathSeconds);
 public sealed record SiegeObjectStage(int VisualId, SiegeTile Tile);
 public sealed record SiegeObjectSpawn(int X, int Y, IReadOnlyList<SiegeObjectStage> Stages);
 
@@ -95,9 +96,9 @@ public sealed class SiegeSession
 {
     public static readonly SiegeDefinition Rules = new(12, 12, 5, 3, 3, 25, 2);
     public const double DoorOpeningSeconds = 0.36;
-    public const double EnemyAttackFrameSeconds = 0.07;
+    public const double FallbackEnemyAttackSeconds = 0.63;
     public const double EnemyHitSeconds = 0.20;
-    public const double EnemyDeathFrameSeconds = 0.09;
+    public const double FallbackEnemyDeathSeconds = 0.72;
     private readonly Player _player;
     private readonly Random _random;
     private readonly SiegeTile[,] _map;
@@ -162,7 +163,8 @@ public sealed class SiegeSession
                     OriginalAttackSkill = spawn.OriginalAttackSkill,
                     OriginalCombatRow = spawn.OriginalCombatRow,
                     Champion = spawn.Champion,
-                    VisualId = spawn.VisualId
+                    VisualId = spawn.VisualId,
+                    OriginalAnimation = spawn.OriginalAnimation
                 };
                 enemy.Facing = DirectionToward(enemy.X, enemy.Y, PlayerX, PlayerY, Facing.South);
                 _enemies.Add(enemy);
@@ -219,22 +221,22 @@ public sealed class SiegeSession
         foreach (var enemy in _enemies.Where(enemy => enemy.VisualState != SiegeEnemyVisualState.Walk).ToArray())
         {
             enemy.VisualElapsed += elapsedSeconds;
-            if (enemy.VisualState == SiegeEnemyVisualState.Attack)
+            var duration = enemy.VisualState switch
             {
-                enemy.VisualFrame = (int)(enemy.VisualElapsed / EnemyAttackFrameSeconds);
-                if (enemy.VisualFrame < 9) continue;
-            }
-            else if (enemy.VisualState == SiegeEnemyVisualState.Dying)
+                SiegeEnemyVisualState.Attack => enemy.OriginalAnimation?.AttackSeconds is { } attack
+                    ? attack * (enemy.OriginalCombatRow is >= 23 ? 2 : 1)
+                    : FallbackEnemyAttackSeconds,
+                SiegeEnemyVisualState.Hit => enemy.OriginalAnimation?.HitSeconds ?? EnemyHitSeconds,
+                SiegeEnemyVisualState.Dying => enemy.OriginalAnimation?.DeathSeconds ?? FallbackEnemyDeathSeconds,
+                _ => 0
+            };
+            if (enemy.VisualElapsed <= duration) continue;
+            if (enemy.VisualState == SiegeEnemyVisualState.Dying)
             {
-                enemy.VisualFrame = (int)(enemy.VisualElapsed / EnemyDeathFrameSeconds);
-                if (enemy.VisualFrame < 8) continue;
                 _enemies.Remove(enemy);
                 continue;
             }
-            else if (enemy.VisualElapsed < EnemyHitSeconds)
-                continue;
             enemy.VisualState = SiegeEnemyVisualState.Walk;
-            enemy.VisualFrame = 0;
             enemy.VisualElapsed = 0;
         }
     }
@@ -524,7 +526,6 @@ public sealed class SiegeSession
     private static void StartVisual(SiegeEnemy enemy, SiegeEnemyVisualState state)
     {
         enemy.VisualState = state;
-        enemy.VisualFrame = 0;
         enemy.VisualElapsed = 0;
     }
 

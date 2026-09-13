@@ -59,7 +59,7 @@ public static class ImportedSiegeLayouts
 
         var enemies = points
             .Where(point => IsEnemy(scene.BlockAt(point.X, point.Y)))
-            .Select(point => EnemyFor(scene.BlockAt(point.X, point.Y), point.X - minX, point.Y - minY))
+            .Select(point => EnemyFor(scene, scene.BlockAt(point.X, point.Y), point.X - minX, point.Y - minY))
             .ToArray();
         var objects = points
             .Where(point => IsSceneObject(scene.BlockAt(point.X, point.Y)))
@@ -148,7 +148,7 @@ public static class ImportedSiegeLayouts
     private static bool IsEnemy(DynamixSceneBlock block) =>
         block.Behavior == 135 || IsEnemyName(block.Name);
 
-    private static SiegeSpawn EnemyFor(DynamixSceneBlock block, int x, int y)
+    private static SiegeSpawn EnemyFor(DynamixScene scene, DynamixSceneBlock block, int x, int y)
     {
         if (block.ActorCombatRow is < 0 or >= OriginalWeaponCombat.CombatRowCount)
             throw new InvalidDataException($"Scene actor {block.Index} references an unknown combat row.");
@@ -161,7 +161,23 @@ public static class ImportedSiegeLayouts
         var champion = block.Name.Contains("champion", StringComparison.OrdinalIgnoreCase) ||
             block.Name.Contains("lord", StringComparison.OrdinalIgnoreCase);
         return new SiegeSpawn(x, y, champion, block.Index, template.Armor, template.Health,
-            block.ActorCombatRow, template.AttackSkill);
+            block.ActorCombatRow, template.AttackSkill, AnimationFor(scene, block));
+    }
+
+    private static SiegeActorAnimation? AnimationFor(DynamixScene scene, DynamixSceneBlock initial)
+    {
+        var durations = new double[3];
+        for (var offset = 1; offset <= durations.Length; offset++)
+        {
+            if (initial.Index + offset >= scene.Blocks.Count) return null;
+            var state = scene.Blocks[initial.Index + offset];
+            if (state.Kind != 4 || !state.Name.Equals(initial.Name, StringComparison.OrdinalIgnoreCase) ||
+                state.EffectDefinitionIndex < 0 || state.EffectDefinitionIndex >= scene.EffectDefinitions.Count)
+                return null;
+            durations[offset - 1] = scene.EffectDefinitions[state.EffectDefinitionIndex]
+                .NominalCompletionMilliseconds / 1000d;
+        }
+        return new SiegeActorAnimation(durations[0], durations[1], durations[2]);
     }
 
     private static bool IsDestructible(DynamixSceneBlock block) =>

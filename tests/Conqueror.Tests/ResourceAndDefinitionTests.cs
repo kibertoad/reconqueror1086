@@ -381,17 +381,17 @@ public sealed partial class ResourceAndDefinitionTests
         for (var y = 0; y < 3; y++)
             tiles[x, y] = x == 0 || y == 0 || x == 4 || y == 2 ? SiegeTile.Wall : SiegeTile.Floor;
         var siege = new SiegeSession(new Player(), new Army(), 0, 7,
-            new SiegeLayout(tiles, 1, 1, Facing.East, [new SiegeSpawn(2, 1, true, 99)]));
+            new SiegeLayout(tiles, 1, 1, Facing.East, [new SiegeSpawn(2, 1, true, 99,
+                OriginalCombatRow: 0, OriginalAnimation: new SiegeActorAnimation(0.384, 0.384, 0.384))]));
         var enemy = Assert.Single(siege.Enemies);
 
         siege.Move(false);
         Assert.Equal(SiegeEnemyVisualState.Attack, enemy.VisualState);
         Assert.Equal(Facing.West, enemy.Facing);
-        siege.AdvanceEnemyAnimations(SiegeSession.EnemyAttackFrameSeconds * 4.1);
-        Assert.Equal(4, enemy.VisualFrame);
-        siege.AdvanceEnemyAnimations(SiegeSession.EnemyAttackFrameSeconds * 5);
+        siege.AdvanceEnemyAnimations(0.384);
+        Assert.Equal(SiegeEnemyVisualState.Attack, enemy.VisualState);
+        siege.AdvanceEnemyAnimations(0.002);
         Assert.Equal(SiegeEnemyVisualState.Walk, enemy.VisualState);
-        Assert.Equal(0, enemy.VisualFrame);
         Assert.Throws<ArgumentOutOfRangeException>(() => siege.AdvanceEnemyAnimations(double.NaN));
     }
 
@@ -406,16 +406,16 @@ public sealed partial class ResourceAndDefinitionTests
         for (var y = 0; y < 3; y++)
             tiles[x, y] = x == 0 || y == 0 || x == 4 || y == 2 ? SiegeTile.Wall : SiegeTile.Floor;
         var siege = new SiegeSession(player, new Army(), 0, 3,
-            new SiegeLayout(tiles, 1, 1, Facing.East, [new SiegeSpawn(2, 1, false, 99)]));
+            new SiegeLayout(tiles, 1, 1, Facing.East, [new SiegeSpawn(2, 1, false, 99,
+                OriginalAnimation: new SiegeActorAnimation(0.384, 0.384, 0.384))]));
 
         Assert.Equal(SiegeAction.Shot, siege.Shoot());
         var dying = Assert.Single(siege.Enemies);
         Assert.Equal(SiegeEnemyVisualState.Dying, dying.VisualState);
         Assert.Null(siege.EnemyAt(2, 1));
         Assert.False(siege.Won);
-        siege.AdvanceEnemyAnimations(SiegeSession.EnemyDeathFrameSeconds * 4.1);
-        Assert.Equal(4, dying.VisualFrame);
-        siege.AdvanceEnemyAnimations(SiegeSession.EnemyDeathFrameSeconds * 4);
+        siege.AdvanceEnemyAnimations(0.384); Assert.Single(siege.Enemies);
+        siege.AdvanceEnemyAnimations(0.002);
         Assert.Empty(siege.Enemies);
         Assert.True(siege.Won);
     }

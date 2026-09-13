@@ -1,3 +1,4 @@
+using Conqueror.Core;
 using Conqueror.Game;
 using Conqueror.Resources;
 using System.Buffers.Binary;
@@ -7,6 +8,77 @@ namespace Conqueror.Tests;
 
 public sealed partial class ResourceAndDefinitionTests
 {
+    [Fact]
+    public void BillboardHeadingUsesTheExecutableAngularDivisionAndMirrorFormula()
+    {
+        var walk = new DynamixSceneBlock(0, 4, 135, 0, 0, 128, 168,
+            175, 0, 8, 0, 0, 0, 0, 0, "knight");
+        var attack = walk with { Surface0 = 190, Surface2 = 4 };
+
+        Assert.Equal((175, false), walk.TextureForBillboardHeading(0));
+        Assert.Equal((176, false), walk.TextureForBillboardHeading(32));
+        Assert.Equal((179, false), walk.TextureForBillboardHeading(128));
+        Assert.Equal((176, true), walk.TextureForBillboardHeading(224));
+        Assert.Equal((190, false), attack.TextureForBillboardHeading(0));
+        Assert.Equal((191, false), attack.TextureForBillboardHeading(64));
+        Assert.Equal((192, false), attack.TextureForBillboardHeading(128));
+        Assert.Equal((191, true), attack.TextureForBillboardHeading(192));
+        Assert.Equal(walk.TextureForBillboardHeading(32), walk.TextureForBillboardHeading(288));
+        Assert.Equal((175, false), (walk with { Surface2 = 257 }).TextureForBillboardHeading(32));
+    }
+
+    [Fact]
+    public void ImportedActorStatesUseTheirSelectedEffectCompletionGate()
+    {
+        var source = SyntheticScene();
+        var blocks = new byte[DynamixSceneDecoder.BlockSize * 9];
+        source.Blocks.CopyTo(blocks, 0);
+        WriteInt(source.Scenario, 24, 9);
+        SetSceneCell(source.Map, 14, 20, 0);
+        for (var index = 5; index <= 8; index++)
+        {
+            var offset = index * DynamixSceneDecoder.BlockSize;
+            blocks.AsSpan(offset, DynamixSceneDecoder.BlockSize).Clear();
+            WriteInt(blocks, offset, 4);
+            WriteInt(blocks, offset + 4, 135);
+            WriteInt(blocks, offset + 44, 20 + index);
+            WriteInt(blocks, offset + 52, index == 5 ? 8 : index == 8 ? 2 : 4);
+            System.Text.Encoding.ASCII.GetBytes("knight").CopyTo(blocks, offset + 78);
+            blocks[offset + 94] = 0xcc;
+            blocks[offset + 95] = 0xcc;
+        }
+        var effects = new byte[DynamixSceneEffectDecoder.RecordSize];
+        WriteEffectField(effects, 0x0c, 2);
+        WriteEffectField(effects, 0x14, 192);
+        WriteEffectField(effects, 0x28, -1);
+
+        var scene = DynamixSceneDecoder.Decode(
+            source.Viewer, source.Scenario, source.Map, blocks, effects);
+        var animation = Assert.Single(ImportedSiegeLayouts.Convert(scene).Enemies).OriginalAnimation;
+
+        Assert.Equal(new SiegeActorAnimation(0.384, 0.384, 0.384), animation);
+    }
+
+    [Fact]
+    public void RangedActorAttackGateDoublesTheSelectedInterval()
+    {
+        var tiles = new SiegeTile[5, 3];
+        for (var x = 0; x < 5; x++)
+        for (var y = 0; y < 3; y++)
+            tiles[x, y] = x == 0 || y == 0 || x == 4 || y == 2 ? SiegeTile.Wall : SiegeTile.Floor;
+        var siege = new SiegeSession(new Player(), new Army(), 0, 7,
+            new SiegeLayout(tiles, 1, 1, Facing.East,
+                [new SiegeSpawn(2, 1, false, OriginalCombatRow: 23,
+                    OriginalAnimation: new SiegeActorAnimation(0.384, 0.384, 0.384))]));
+        var enemy = Assert.Single(siege.Enemies);
+
+        siege.Move(false);
+        siege.AdvanceEnemyAnimations(0.768);
+        Assert.Equal(SiegeEnemyVisualState.Attack, enemy.VisualState);
+        siege.AdvanceEnemyAnimations(0.002);
+        Assert.Equal(SiegeEnemyVisualState.Walk, enemy.VisualState);
+    }
+
     [Fact]
     public void SceneDecoderReadsExecutableMappedSfxDefinitions()
     {

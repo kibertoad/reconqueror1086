@@ -300,25 +300,31 @@ public sealed partial class ConquerorGame
         var frame = _siege is null
             ? new SiegeEnemyFrame(4, false)
             : SiegeViewProjection.FrameFor(enemy, _siege.PlayerX, _siege.PlayerY);
-        var textureIndex = block.Surface0 + enemy.WalkFrame * 5 + frame.DirectionOffset;
+        var relativeHeading = frame.FlipHorizontally
+            ? (256 - frame.DirectionOffset * 32) & 0xff
+            : frame.DirectionOffset * 32;
+        var selectedBlock = block;
         if (enemy.VisualState == SiegeEnemyVisualState.Attack)
-            textureIndex = ActorStateTexture(block, 1, enemy.VisualFrame, textureIndex);
+            selectedBlock = ActorStateBlock(block, 1);
         else if (enemy.VisualState == SiegeEnemyVisualState.Hit)
-            textureIndex = ActorStateTexture(block, 2, (frame.DirectionOffset + 1) / 2, textureIndex);
+            selectedBlock = ActorStateBlock(block, 2);
         else if (enemy.VisualState == SiegeEnemyVisualState.Dying)
-            textureIndex = ActorStateTexture(block, 3, enemy.VisualFrame, textureIndex);
-        return (_siegeVisuals.TextureFor(textureIndex) ?? FirstSceneTexture(block),
-            enemy.VisualState is SiegeEnemyVisualState.Attack or SiegeEnemyVisualState.Dying
-                ? false : frame.FlipHorizontally);
+            selectedBlock = ActorStateBlock(block, 3);
+        var selected = selectedBlock.TextureForBillboardHeading(relativeHeading);
+        var textureIndex = selected.TextureIndex;
+        if (enemy.VisualState == SiegeEnemyVisualState.Walk && block.Surface2 > 0)
+            textureIndex += enemy.WalkFrame * (block.Surface2 / 2 + 1);
+        return (_siegeVisuals.TextureFor(textureIndex) ?? FirstSceneTexture(selectedBlock),
+            selected.FlipHorizontally);
     }
 
-    private int ActorStateTexture(DynamixSceneBlock initial, int stateOffset, int frame, int fallback)
+    private DynamixSceneBlock ActorStateBlock(DynamixSceneBlock initial, int stateOffset)
     {
-        if (_siegeVisuals is null || initial.Index + stateOffset >= _siegeVisuals.Scene.Blocks.Count) return fallback;
+        if (_siegeVisuals is null || initial.Index + stateOffset >= _siegeVisuals.Scene.Blocks.Count) return initial;
         var state = _siegeVisuals.Scene.Blocks[initial.Index + stateOffset];
         return state.Kind == 4 && state.Name.Equals(initial.Name, StringComparison.OrdinalIgnoreCase) && state.Surface0 >= 0
-            ? state.Surface0 + frame
-            : fallback;
+            ? state
+            : initial;
     }
 
     private Texture2D? FirstSceneTexture(DynamixSceneBlock block)
