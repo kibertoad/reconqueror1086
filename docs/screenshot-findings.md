@@ -48,7 +48,7 @@ Local reference filenames:
 
 ### Estate/travel view
 
-- **Implemented:** split the strategic-map presentation into the exact `ICONTEMP.PCX` estate shell and a retained no-media map fallback.
+- **Implemented:** use the exact `ICONTEMP.PCX` estate shell; startup now requires a verified official-asset extraction instead of offering a no-media presentation.
 - Identify the background, terrain tiles, road pieces, crop/forest/building sprites, player shield, sword cursor, and inset England-map source by decoded-image comparison.
 - **Implemented:** render the decoded seasonal `ICA.CSF`/`ICS.CSF`/`ICW.CSF` 80x80 tiles with the `ICONTEMP.PCX` palette and switch their typed atlas role by campaign month. Terrain frame assignments remain provisional.
 - **Implemented:** replace the system pointer with the six classified `FFMOUSE.CSF` frames when imported media is present; travel, dialogue, targeting, and held-pointer contexts select the corresponding decoded frames. Exact executable timing and hourglass dispatch remain to be traced.
@@ -62,13 +62,13 @@ Local reference filenames:
 - **Implemented:** New Game, Load, Save, Resume, Exit, Credits, Movie, and Practice have real state transitions. Credits plays `CREDITZZ.SMK`; Movie replays `TITLE.SMK`; Practice uses its original screen and five regions, plays `JOUSPRAC.SMK`, and returns from isolated practice combat without campaign mutation.
 - **Implemented, timing corroborated:** render `OPTION.CSF` frames 0/1 and 2/3 as enabled/disabled released/held states below each setting label and frame 4 as Resume when a campaign is active. Activation occurs only when the pointer is released inside its originally pressed HAT region; exact executable branch confirmation remains outstanding.
 - **Partially implemented:** CD music, sound effects, speech state, animation, per-channel volumes, and reduced motion persist through an atomic recoverable settings file; `F11` switches windowed/borderless-fullscreen mode and `F10` selects aspect-fit/integer scaling. A centered 1024×768 virtual canvas preserves layout, aspect ratio, and hotspot alignment, while Pause freezes simulation and Smacker video/audio. MIDI remains explicitly unavailable; subtitles, controller support, and remapping remain follow-ups.
-- Replace Exit DOS wording only in fallback presentation; imported original-media mode may preserve the original label while exiting the application safely.
+- Preserve the original Exit DOS label while exiting the application safely on modern systems.
 
 ### Campaign briefing
 
 - **Implemented:** register screenshot-confirmed `FLUFF.PCX` as the campaign briefing and show it once for newly selected pregenerated characters or after a custom character completes all youth dilemmas.
 - **Implemented:** continue on keyboard or click to the estate/travel view; loaded campaigns resume directly and do not replay the one-time briefing.
-- **Implemented:** preserve a clean-room text summary when imported media is unavailable.
+- **Superseded:** startup now rejects missing official media, so no clean-room briefing substitute is supported.
 
 ### Home, farm, village, and blacksmith
 

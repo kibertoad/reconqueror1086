@@ -12,7 +12,7 @@ public sealed partial class ResourceAndDefinitionTests
     public void BillboardHeadingUsesTheExecutableAngularDivisionAndMirrorFormula()
     {
         var walk = new DynamixSceneBlock(0, 4, 135, 0, 0, 128, 168,
-            175, 0, 8, 0, 0, 0, 0, 0, "knight");
+            175, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, "knight");
         var attack = walk with { Surface0 = 190, Surface2 = 4 };
 
         Assert.Equal((175, false), walk.TextureForBillboardHeading(0));

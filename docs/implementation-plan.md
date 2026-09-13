@@ -2,7 +2,7 @@
 
 ## Objective
 
-Complete a clean-room MonoGame reimplementation of *Conqueror: A.D. 1086* that preserves the original campaign features and balance while remaining playable without proprietary media. Owners of a legal copy may use the local resource installer to enable original dialogue, artwork, animation, speech, sound effects, and music. No original asset may be committed to or distributed with this repository.
+Complete a clean-room MonoGame reimplementation of *Conqueror: A.D. 1086* that preserves the original campaign features and balance while requiring a verified local extraction from the supported official GOG release. The project never distributes original assets: a legal owner supplies them through the local resource importer, and startup fails clearly when they are missing, incomplete, damaged, or unsupported.
 
 ## Delivery principles
 
@@ -26,8 +26,8 @@ Complete a clean-room MonoGame reimplementation of *Conqueror: A.D. 1086* that p
 
 The repository currently provides:
 
-- A MonoGame desktop application and data-driven campaign core.
-- Character templates, representative fallback youth dilemmas, the executable-confirmed original 30-dilemma selection/outcome interpreter for imported content, economy, construction counters, army recruitment, travel, tournaments, courtship, equipment, field battles, sieges, crown victory, dragon victory, and the age limit.
+- A MonoGame desktop application and data-driven campaign core that requires verified owner-imported official assets.
+- Character templates, the executable-confirmed original 30-dilemma selection/outcome interpreter, economy, construction counters, army recruitment, travel, tournaments, courtship, equipment, field battles, sieges, crown victory, dragon victory, and the age limit.
 - Persistent strategic garrisons, spying, interception, retreat, conquest, and JSON saves.
 - A read-only original-disc inspector with ISO inventory, hashes, executable-string offsets, archive/compression reports, CSF previews, and HAT layout reports.
 - Bounded parsers for GOB/RES directories, kind-1 LZ/RLE blocks, indexed PCX/PCC images, headerless indexed screen planes, CSF animation frames, raw RGB palettes, HAT screen descriptors, and rate-tagged `.666` sound banks.
@@ -36,7 +36,7 @@ The repository currently provides:
 - An executable-confirmed `TITLE.HAT`/`FFTITLE.PCX` title load followed by a corroborated character-options flow whose exact geometry comes from installed `CGOPTS.HAT` and `PREGEN.HAT`.
 - Self-contained Windows x64, Linux x64, macOS arm64, and macOS x64 packaging automation, with a smart ownership-aware Windows installer and a pinned four-artifact release workflow.
 - A repository-wide 1,000-line compiled-source ceiling; the game shell and resource regression suite are split into focused partial modules so the limit passes without exemptions.
-- 140 xUnit test cases and 146 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
+- 156 xUnit test cases and 146 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
 
 ## Dependency map
 
@@ -52,7 +52,7 @@ Exact world/economy data --> multi-fief simulation --> political missions
 
 Exact combat tables -------> field battle + siege fidelity --> final balance pass
 
-Importer hardening --------> end-user original-media mode --> packaged release
+Importer hardening --------> required verified official assets --> packaged release
 ```
 
 ## Phase 1: Evidence and resource foundation
@@ -104,13 +104,13 @@ Deliverables:
 
 - Decode text encoding, speaker identifiers, conversation nodes, choices, conditions, and resource references.
 - Generate a local, versioned dialogue manifest keyed by stable original identifiers.
-- Add a runtime dialogue repository with built-in fallback summaries.
+- Add a runtime dialogue repository backed by the required local official-asset extraction.
 - Record short factual findings and confidence grades without committing complete copyrighted dialogue.
 
 Acceptance criteria:
 
-- Imported mode can display complete original dialogue from local files.
-- Default mode remains fully playable without imported dialogue.
+- The runtime displays complete original dialogue from verified local files.
+- Startup rejects an extraction that lacks the required dialogue database or youth-dilemma resources.
 - Long original text never appears in tracked source, tests, snapshots, or logs.
 
 ### 1.3 Image and palette decoding
@@ -125,7 +125,7 @@ Acceptance criteria:
 
 - Pixel hashes or rendered comparisons validate representative assets.
 - Imported textures load through the manifest without the MonoGame content pipeline.
-- Missing or unsupported resources fall back without crashing.
+- Missing, damaged, incomplete, or unsupported resources produce a clear startup failure before the graphics loop.
 
 ### 1.4 Smacker playback
 
@@ -273,7 +273,7 @@ Deliverables:
 
 Acceptance criteria for Phase 4:
 
-- Major dialogue trees can be completed in both fallback and imported modes.
+- Major dialogue trees can be completed from the verified owner-imported databases.
 - Quest flags survive save/load and cannot be advanced by unrelated actions.
 - Every reward is issued at most once.
 
@@ -375,7 +375,7 @@ Deliverables:
 - Track conquest spoils separately in the economics overview.
 - Apply correct estate transfer, fame, experience, strength, and victory effects.
 
-Current progress: the owned scene archives' bounded `Viewer`, `Scenario`, `Map`, `Blocks`, `Backdrop`, `BackImage`, and complete `Pal0`–`Pal127` color-map families now drive collision maps, initial position/facing, panorama, named doors and secret passages, food/treasure roles, defender/champion placements, and indexed wall shading in practice and campaign siege sessions. Executable tracing assigns `MELEE00`–`MELEE24` to tournament melee, confirms a random unsuffixed `MELEE0`–`MELEE2` selection for practice, and confirms common `MELEE0.RES` use for campaign castle and London assaults through callback registration, its sole indirect invocation, and dispatcher slot 128. Import floods from the Viewer and crops the 128x128 source map to its reachable play area plus enclosing wall; this excludes disconnected authoring galleries where they are separate from that component, while the defense scene currently retains its connected exterior. The palette-verified 320x200 `SKIRMISH.PCX` shell now supplies the original stone frame, combat viewport, message/status panels, command labels, health strip, and radar well. A map-aware raycast renders inside that exact 167x117 source-pixel viewport, with the generated full-canvas interface retained as the no-media fallback. It presents the facing-wrapped original panorama, executable-confirmed north/east/south/west wall or door texture slot, and knight/champion/footman billboard state templates through the executable's angular-sector and mirror formula, with three walking poses and data-selected base/attack/hit/death blocks under per-column occlusion. The 53-frame `SKIRMISH.CSF` sequence supplies original-scale, viewport-clipped axe, crossbow, hammer, mace, sword, and dagger foreground attacks plus executable-dispatched large fatal-hit and small wounding-hit sequences through its own raw `SKIRMISH.PAL`; exact item-to-row traces now bind all 23 store weapons and both crossbows to those runs and to their original break-roll ranges. Player strength, dexterity, and sword experience now produce the executable-confirmed attack skill, and both sides use the original 200-value hit threshold with defender-skill, close-crossbow, and rear-attack modifiers. Foregrounds now use the executable-confirmed row-family envelopes, viewport-relative outer anchors, mirror decisions, combat-row column-3 velocity `(target - outer) << 9 / divisor`, contact reversal, and position-selected poses under a bounded elapsed-millisecond update. Pointer events add the cursor's exact `(9,9)` center offset at `0x55DB8`-`0x55DE5`, and `0x5590C`-`0x5591D` forwards that pair unchanged, establishing direct foreground-coordinate provenance; mouse/controller aperture clicks now preserve that coordinate, while keyboard centering remains an accessibility fallback. Rows 23-24 rise one sprite height from the viewport bottom, render base 30 plus offset 2, and remain held until replacement or teardown. The executable's blood effect advances four frames once per unrestricted siege render loop and has no processor-independent original duration; `SiegeHitEffect` retains those four frames through explicit monotonic 70 ms compatibility steps, with the policy distinguished from an original formula. Dead actors cease collision and combat immediately but remain visible until their imported death-state completion gate expires, delaying victory presentation appropriately. Door behavior is now executable-backed: bit `0x10` accepts explicit action and immediately installs the record-offset-`0x40` target, while non-actionable doors remain closed and wall/water targets stay blocking. Mask-19 pickups use that same explicit-action branch and `< 0x280` range, represented as at most two `0x100`-unit cells, rather than firing on movement. The callback selector comes from the active player's combatant record, so callback target 19's sound is feedback rather than pickup identity; reward mutation remains provisional. Original indexed wall pixels regenerate the active family under the now-confirmed `SKIRMISH.PAL` association and use the decoded Scenario map count/distance shift plus block offset with the executable-confirmed fixed-depth clamp; all 90 stored active families match regenerated output byte-for-byte. Missing media uses shaded structures and generated combatants, and the generated 12x12 keep remains the no-media fallback. Status-field contents, exact click-selected world-object semantics, AI, retainers, and loot/consequence tables remain open.
+Current progress: bounded `Viewer`, `Scenario`, `Map`, `Blocks`, `Backdrop`, `BackImage`, and `Pal0`–`Pal127` data from the owned scene archives drive first-person geometry, presentation, interaction, and combat. Executable tracing assigns `MELEE00`–`MELEE24` to tournament melee, a random unsuffixed `MELEE0`–`MELEE2` to practice, and common `MELEE0.RES` to campaign castle and London assaults. The original `SKIRMISH.PCX`, `SKIRMISH.PAL`, and 53-frame `SKIRMISH.CSF` supply the exact viewport shell, wall shading, actors, weapon foregrounds, and fatal/wounding effects. Recovered formulas cover actor skill and maximum health, the 200-value hit test, weapon dice and penetration, row-family trajectory envelopes, `(target - outer) << 9 / divisor` velocity, contact reversal, state-completion gates, angular billboard selection, and immediate door state replacement. The original blood effect is processor-dependent because it advances once per unrestricted render loop; `SiegeHitEffect` preserves its confirmed four frames with explicit monotonic 70 ms compatibility steps, documented as a reimplementation policy rather than an original formula. Dispatcher `0x51E60` reads pickup selector `+0x48` and arguments `+0x4A/+0x4C` from the selected scene block: the four placed families produce +25 wealth, capped 2d6 healing, Chain Hauberk bit 6, and +12 bolts before generic state replacement. The desktop runtime now requires a fully verified extraction from the supported official GOG release and fails before graphics initialization when any mapped dependency is missing, damaged, incomplete, or unsupported; placeholder and no-media gameplay are outside the supported design. Dynamic status contents, exact click-selected world-object semantics, AI, retainers, defeated-enemy loot, and siege-consequence tables remain open.
 
 Combat recovery update (2026-09-13): placed behavior-135 actors now decode their block-offset-`0x4A` template and `0x4C` combat row. The runtime uses all ten executable-initialized attack-skill/armor/health triples, all 25 rows' dice and armor penetration, explicit object state targets, and symmetric row-specific contact distances for player and enemy attacks. Player attack skill, maximum health, and the shared hit threshold, including both positional bonuses, are executable-confirmed and active. This narrows the open combat work to cadence, grid/sub-cell reconciliation, movement AI, retainers, loot, and consequences rather than the already-restored health, hit, damage, and reach rules.
 
@@ -422,7 +422,7 @@ Acceptance criteria:
 Deliverables:
 
 - Map original backgrounds, portraits, heraldry, cursors, icons, transitions, and cinematics to runtime scenes.
-- Preserve a clean-room fallback skin for installations without original media.
+- Require verified locally imported official presentation assets and fail clearly when any mapped dependency is unavailable.
 - Match original aspect ratio and confirmed `WAR_MODE` behavior while supporting modern scaling.
 - Apply the owner-supplied dilemma, estate/travel, options-hub, village, Home/farm, and blacksmith observations and follow-ups recorded in [`screenshot-findings.md`](screenshot-findings.md).
 - Correct the startup flow to include the `OPTFIN.PCX` options hub, and separate the estate/fief presentation from the England-map navigation role.
@@ -440,7 +440,7 @@ Deliverables:
 Deliverables:
 
 - Fullscreen/windowed mode, integer scaling, music/speech/effects volume, subtitle controls, pause, and reduced-motion options.
-- Readable fallback text, keyboard-only navigation, visible focus, and configurable timing where it does not alter simulation balance.
+- Readable text, keyboard-only navigation, visible focus, and configurable timing where it does not alter simulation balance.
 
 ## Phase 10: Saves, importer, and distribution
 
@@ -474,8 +474,8 @@ Deliverables:
 
 Acceptance criteria:
 
-- A clean machine can launch fallback mode from a packaged build.
-- A legal owner can install resources, verify them, launch imported mode, and uninstall only generated content.
+- A clean machine receives a clear ownership/import diagnostic rather than entering placeholder gameplay.
+- A legal owner can install resources, verify them, launch the game, and uninstall only generated content.
 - CI proves that no prohibited asset extensions or oversized unapproved binaries enter tracked history.
 
 ## Cross-cutting test plan
@@ -498,8 +498,8 @@ All parser fixtures must be synthetic or independently authored; never commit ex
 
 ### Runtime tests
 
-- Headless catalog discovery and fallback behavior.
-- MonoGame smoke launch with no imported assets and with a synthetic manifest.
+- Required-catalog validation for missing, incomplete, damaged, and unsupported imports.
+- MonoGame platform smoke launch with a verified official extraction; CLI-only binary smoke remains asset-independent.
 - Render checks for every major screen at supported resolutions.
 - Audio lifecycle, scene changes, missing/corrupt files, and device loss.
 
@@ -553,14 +553,14 @@ Local static-analysis tool: Ghidra 12.1.3 is installed user-wide at `C:\Users\ki
   - [x] Recover kind 2 from the LE executable as MSB-first adaptive 9-to-14-bit LZW; validate exact expansion of all five GOB entries and strict 640x480 PCX decoding of all four image entries.
 - [x] Activate decoded `fftitle.pcx` and `engmap1.pcx` through definition-driven title and map roles.
 - [x] Correct the startup flow from executable/resource evidence: static `FFTITLE.PCX` title, then interactive `CHAR_OPS.PCX`, with `PREGEN.PCX` and `LOADGAME.PCX` registered as distinct screen roles.
-- [x] Decode HAT screen descriptors and use installed `CGOPTS.HAT`/`PREGEN.HAT` geometry at runtime with bounded fallback definitions.
+- [x] Decode HAT screen descriptors and use installed `CGOPTS.HAT`/`PREGEN.HAT` geometry at runtime; verified official assets are now a launch requirement.
 - [x] Split Home, farm management, blacksmith workshop, and blacksmith inventory into distinct runtime scenes using screenshot-verified `TACTICAL.PCX`, `FIEFMGMT.PCX`, `FORGESMI.PCX`, and `SWDTEMP.PCX` roles.
 - [x] Activate screenshot-confirmed `INNPEOPL.PCX`; bind its ten patrons, Exit, and footer through `VINN.HAT`; and use the executable-ordered name catalog plus matching PCC portraits in the shared conversation frame.
 - [x] Activate the populated inn's original conversation roots from the startup-decoded database: preload referenced portraits, select prompt variants, render all declared response rows, accept mouse/number selection, execute node/response action programs, follow action redirects plus response and zero-choice continuation edges, and terminate on target zero.
 - [x] Replace character-slicing fallback text wrapping with word-boundary wrapping; preserve explicit paragraph breaks and keep a single oversized token intact, matching the original text control's explicit `WORDWRAP` behavior at the level supported by the fixed-width fallback font.
 - [x] Decode the 40-record `WEAPONS.DAT` store table and bind its prices, local descriptions, item order, and `SWORDS.CSF` frame indices to typed equipment definitions and the original inventory shell.
 - [x] Decode and palette-verify all four `BUYSELL.CSF` overlays, then select blank/View and Sell/Purchase states from store metadata and current ownership through typed presentation definitions.
-- [x] Identify `ICONTEMP.PCX`/`ICONMAP.HAT` as the estate/travel shell, activate its exact viewport, inset-map, tab, information, and navigation regions, and retain a no-media map fallback.
+- [x] Identify `ICONTEMP.PCX`/`ICONMAP.HAT` as the estate/travel shell and activate its exact viewport, inset-map, tab, information, and navigation regions.
 - [x] Replace farm input branching and separately maintained help strings with one typed command/action registry.
 - [x] Add shared data-driven visual-scene hover labels and confirm the separate Blacksmith/Buy-Sell `VSMITH.HAT` targets. Correct the Home descriptor from `FCASTLE.HAT` to `FOPTS.HAT` and activate its seven visually/evidence-correlated office objects; three ambiguous targets remain disabled.
 - [x] Route the Home Castle model and Farm/Village/Forest books into a shared section-aware management screen, import `FCASTLE.HAT`, `FVILLAGE.HAT`, `FFARM.HAT`, and `FFOREST.HAT`, and source each variant's exact terrain/fullscreen region IDs from its descriptor. Row semantics remain deliberately unassigned where evidence is incomplete.
@@ -573,7 +573,7 @@ Local static-analysis tool: Ghidra 12.1.3 is installed user-wide at `C:\Users\ki
 - [x] Confirm unsigned 8-bit mono PCM from waveform centering, identify the identical shared UI sample across 17 screen banks, and activate it through a startup cache that decodes each referenced bank and converts each registered sample only once.
 - [x] Decode and classify all six `FFMOUSE.CSF` cursor frames, activate contextual travel/talk/target/pressed-hand selection, and use the decoded `OPTION.CSF` held states with same-region press/release activation.
 - [x] Activate the original `PRACTICE.PCX`/`PRACTICE.HAT` menu, preserve its executable-ordered War/Joust/Melee/Exit/Castle Skirmish labels, bind the directly decoded `JOUSPRAC.SMK`, and route War versus Melee/Castle Skirmish into isolated non-campaign tactical versus first-person practice sessions. Exact legacy combat presentation and parameters remain provisional.
-- [x] Decode the first-person `Viewer`, `Scenario`, 128x128 column-major `Map`, fixed-size named `Blocks`, and paired `Backdrop`/`BackImage` records; use original scene geometry, viewer start/facing, wrapping panorama, interactive block roles, exit/gate boundaries, and defender/champion placements in melee and castle-skirmish sessions while retaining a no-media fallback.
+- [x] Decode the first-person `Viewer`, `Scenario`, 128x128 column-major `Map`, fixed-size named `Blocks`, and paired `Backdrop`/`BackImage` records; use original scene geometry, viewer start/facing, wrapping panorama, interactive block roles, exit/gate boundaries, and defender/champion placements in melee and castle-skirmish sessions.
 - [x] Classify solid-block cardinal surface slots separately from kind-4 billboard references and render the contacted wall or door face through the map-aware raycaster. Executable hit masks `0x100/0x200/0x400/0x800` confirm north/east/south/west at block offsets 44/48/52/56; byte-exact color-map regeneration confirms the `SKIRMISH.PAL` association.
 - [x] Recover door behavior-bit and state-target semantics. The explicit-action bit is `0x10`; accepted actions immediately install record offset `0x40`, non-actionable doors remain closed, and wall/water targets preserve blocked passages. The former adjacent-record timer is Disproved.
 - [x] Classify and activate original knight/champion/footman state templates. Executable renderer `0x46E3B`-`0x46F23` maps relative heading through the block's base surface and angular divisions and mirrors behavior-bit-2 actors; all 144 placed actor bases in 42 owned combat scenes use adjacent base/attack/hit/death divisions `8/4/4/2`. Import each state's selected `SFXDEFS` completion gate, preserve ranged attack doubling and the strict deadline boundary, preserve wall-column occlusion, and remove dead actors from collision/combat before their death-state gate completes. Sequential nine-frame attack and eight-frame collapse playback is Disproved.
@@ -581,18 +581,18 @@ Local static-analysis tool: Ghidra 12.1.3 is installed user-wide at `C:\Users\ki
 - [x] Remove the incorrect 15-castle mapping across tournament's `MELEE00`-`MELEE24` family. Executable tracing assigns the two-digit builder to tournament melee and confirms an inclusive 0-2 roll over unsuffixed `MELEE0`-`MELEE2` for practice. Initialization registers dispatcher `0x21EEC` in engine callback field `+0xB0`; its sole indirect invocation reaches slot 128 and literal `MELEE0.RES`. Practice selection and common campaign use are Confirmed.
 - [x] Decode and palette-verify the 53-frame `SKIRMISH.CSF` sequence, classify its weapon, shield, and blood-effect runs, and bind the axe, crossbow, hammer, mace, sword, and dagger sequences to first-person combat. Executable traces now confirm the 23 store-weapon item-to-row permutation, Light and Heavy Crossbow rows, exact foreground bases, melee approach/contact/return pose order, crossbow offset, per-row break-roll ranges, symmetric player/enemy contact distances, fatal/nonfatal hit-effect bases, and four-frame effect extent. Exact state-linked timing remains Provisional.
 - [x] Decode the headerless 320x200 `SKIRMISH.PCX` indexed plane with its separate raw palette; use its exact 167x117 combat aperture, message/status panels, command labels, health strip, and radar well while retaining the generated interface when owned media is absent. Exact dynamic field contents and mouse-command semantics remain Provisional.
-- [x] Preserve mask-83 exits as visible scene boundaries and render every non-actor kind-4 pickup, debris, and behavior-bit-`0x20` contact object as an occluded billboard. The executable confirms weapon contact at `0x55A02`, combat-row column-4 distance, and one-contact replacement through record offset `0x40`. Mask-19 pickups carry explicit-action bit `0x10` and use the strict `< 0x280` range at `0x556AF`. Callback selector `0x51E60` comes from the active player's combatant record, so callback target 19's sound is feedback rather than pickup identity; the separate reward mutation remains provisional.
+- [x] Preserve mask-83 exits as visible scene boundaries and render every non-actor kind-4 pickup, debris, and behavior-bit-`0x20` contact object as an occluded billboard. The executable confirms weapon contact at `0x55A02`, combat-row column-4 distance, and one-contact replacement through record offset `0x40`. Mask-19 pickups carry explicit-action bit `0x10` and use the strict `< 0x280` range at `0x556AF`. Dispatcher `0x51E60` reads the selected block's selector at `+0x48`: cases 5, 7, 9, and 10 implement +25 wealth, capped 2d6 healing, Chain Hauberk bit 6, and +12 bolts from arguments at `+0x4A/+0x4C`; the active combatant record supplies only the recipient discriminator.
 - [ ] Trace the complete startup/menu state machine, input timing, cursor behavior, and region-action dispatch from `CONQUER.EXE`; keep semantics corroborated until each executable branch is confirmed.
 
 The resource-decoding sprint is first because it unlocks exact dialogue, screen mappings, opponent identities, construction data, and balance tables needed by most later phases.
 
 ## Next implementation priorities
 
-1. Continue first-person combat recovery: the original four render-counted blood steps are now mapped to a processor-independent compatibility timer because executable analysis proves no stable original duration exists. Pointer-to-foreground provenance and crossbow lifetime are now recovered and active. Next locate pickup reward mutations and replace the provisional combat, AI, retainer, loot, and consequence rules.
+1. Continue first-person combat recovery: the original four render-counted blood steps are mapped to a processor-independent compatibility timer because executable analysis proves no stable original duration exists. Pointer-to-foreground provenance, crossbow lifetime, and all placed pickup rewards are recovered and active. Next replace provisional defeated-enemy loot, retainer, siege-consequence, and broader AI rules.
    The timing architecture, state binding, and runtime path are now mapped and active: Scenario offset `0x1C` counts `0x40`-byte `SFXDEFS` descriptors; `0x4C7F4` copies them into live records, and `0x530D0` advances their independent deadlines immediately before actor thinking and rendering. Attack/hit/death copy adjacent state blocks and use their selected descriptors; renderer `0x46E3B`-`0x46F23` selects a heading-derived image from each block rather than consuming textures sequentially. All 144 placed actor bases across 42 owned combat scenes use angular divisions `8/4/4/2`, with 80 state families at 384 ms and 64 at 400 ms; ranged attack rows 23-24 double their interval. Door actions are immediate state-target replacements rather than scheduled animations. Foreground setup now follows the exact row-family random spans and coordinate branches at `0x54C07`-`0x54F12`, fixed-point motion at `0x54F98`-`0x5501E`, contact reversal at `0x550F2`-`0x55140`, and pose/mirror selection at `0x5529B`-`0x55448`. Runtime motion retains 8.8 subpixels and caps an update at the original 166 ms so processor speed and render frequency cannot affect its path. Cursor top-left plus `(9,9)` travels from `0x55DB8`-`0x55DE5` unchanged through `0x5590C`-`0x5591D`; rows 23-24 rise from viewport bottom to `bottom - sprite height`, retain offset 2, and remain held. Mouse/controller aperture clicks now supply those foreground coordinates, with keyboard centering retained as an accessibility fallback. Exact click-selected world-object semantics remain provisional.
    Future-proof the recovered design with a monotonic simulation clock and per-record deadlines. Preserve original interval values, state order, strict threshold, and deadline-overrun behavior in compatibility tests, but keep rendering observational and use bounded update catch-up after stalls. Do not make effect or combat speed depend on processor throughput, render-call count, monitor refresh rate, or wall-clock adjustments; represent the original four-render-call blood lifetime as four explicit presentation/simulation steps once the original render cadence is established.
 2. Continue tracing startup/menu input timing and HAT region-action dispatch from `CONQUER.EXE`; all ten Home labels, War Planning controls, and independent division movement are active, while exact path interaction, spy timing/cost, `JUMP!!`, and original input timing remain to be confirmed.
-3. [Completed 2026-09-08] Bind the decoded five-definition age groups to campaign state using the executable-confirmed per-age selection policy; keep original prose local and retain built-in fallback summaries.
+3. [Completed 2026-09-08; policy updated 2026-09-13] Bind the decoded five-definition age groups to campaign state using the executable-confirmed per-age selection policy and keep original prose local. Startup now requires those owner-imported resources rather than supporting built-in summary gameplay.
 4. In progress: bind menu CSF sequences to verified palettes and roles. `OPTION.CSF` ON/OFF held/released and Resume frames use `OPTFIN.PCX`; `SWORDS.CSF` item art and `BUYSELL.CSF` control states use `SWDTEMP.PCX`; all six `FFMOUSE.CSF` frames are classified and contextual travel/talk/target/pressed-hand selection is active. Exact cursor timing, hourglass dispatch, and other menu sequences still require evidence.
 5. [Completed 2026-09-10] Add legal-boundary automation that fails if imported media or generated analysis artifacts enter Git, then add Windows x64, Linux x64, macOS arm64, and macOS x64 CI restore/build/test/publish coverage plus native installer checks. `tools/Verify-Repository.ps1` interprets the data-only `repository-policy.json`; the local test launcher and every GitHub Actions package workflow enforce it before compiling.
 6. In progress: `ICA`/`ICS`/`ICW` are decoded and active as seasonal 337-frame estate atlases using the `ICONTEMP.PCX` palette. Recover the executable's exact terrain/frame table plus roads, shield, cursor, and layout data; current semantic frame assignments remain provisional.
@@ -602,4 +602,4 @@ The resource-decoding sprint is first because it unlocks exact dialogue, screen 
 
 The current migration branch builds with zero warnings under the enforced 1,000-line source limit. All 154 xUnit cases and 146 executable specifications pass. The Inno Setup 7.1.0 package compiles, installs into an isolated directory, launches through its generated **ReConqueror A.D. 1086** Start-menu shortcut, and removes that shortcut during uninstall. Repository policy passes with the expanded proprietary-image boundary.
 
-First-person combat now has the original `SKIRMISH.PCX` shell, exact viewport and panel geometry, scene-driven walls and actors, animated foreground weapons and blood effects, and the generated no-media fallback. The DOS/16M nested-module mapping correction places the LE data-page base at raw file offset `0x4C254` and `Pal%d` at object 2 offset `0x7D28`; its generator, loader, and repeated render paths establish the palette association, Scenario-driven map count, distance shift, blend target, per-block offset, fixed-depth clamp, RGB blend, half-up rounding, and Manhattan nearest-color rule now used by the runtime. All 90 owned active families match regenerated output byte-for-byte. Executable intersection masks and the corresponding render selector confirm north/east/south/west at block offsets 44/48/52/56. Weapon setup and selection confirm the complete store-item-to-combat-row permutation, both crossbow rows, foreground bases, break-roll ranges, dice, armor penetration, and symmetric contact distances. All 1,002 owned actor placements use bounded combat rows and templates. Record-offset-`0x40` targets replace contacted objects and doors immediately; 1,086 placed owned door cells carry action bit `0x10`, 632 do not, and their exact floor/ground/wall/water targets now drive runtime traversal and blocking. The scene field is a behavior bitmask, while the feedback callback selector comes from the player's combatant record; the former behavior-19 sound-only-pickup interpretation is Disproved. Scene loading binds Scenario offset 28 to `SFXDEFS`, actor state copying and angular rendering are active, and all 144 placed actor state families use imported completion gates. Pointer events, their `(9,9)` cursor-center offset, and unchanged foreground-call coordinates are mapped from `0x55DB8`-`0x55DE5` and `0x5590C`-`0x5591D`. Combat-row column 3 supplies `(screen displacement << 9) / divisor`, integrated with elapsed milliseconds; all 25 divisors, all four coordinate families, their random envelopes, crossbow rise/hold, contact reversal, position-selected poses, and mirror branch are mapped and active. The original four-step blood effect is now preserved through a processor-independent compatibility timer after proving that its executable path has no stable cadence to retain. The continuation point in `docs/handover.md` is pickup reward recovery, followed by retainer, loot, consequence, and broader AI rules.
+First-person combat now uses the required original `SKIRMISH.PCX` shell, exact viewport and panel geometry, scene-driven walls and actors, animated foreground weapons, and blood effects. The corrected DOS/16M mapping places the LE data-page base at raw `0x4C254` and `Pal%d` at object 2 offset `0x7D28`; all 90 owned active palette families reproduce byte-for-byte. Executable paths confirm north/east/south/west surfaces, the complete weapon-to-combat-row permutation, break rolls, dice, penetration, reach, actor templates, state-completion gates, pointer coordinates, and fixed-point foreground trajectory formulas. Record-offset `0x40` replaces contacted objects and doors immediately. Pickup dispatcher `0x51E60` reads the selected scene block's selector at `+0x48`, not the player record; cases 5, 7, 9, and 10 implement +25 wealth, capped 2d6 healing, Chain Hauberk bit 6, and +12 bolts. The original four render-counted blood steps have no stable hardware-independent duration, so the runtime preserves their order through a monotonic compatibility timer. `docs/handover.md` continues with defeated-enemy loot, retainers, siege consequences, and broader AI rules. Official imported assets are a verified launch requirement; no placeholder gameplay path is supported.

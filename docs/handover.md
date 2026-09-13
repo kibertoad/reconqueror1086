@@ -10,7 +10,7 @@ The authoritative gate is:
 & '.\Run Tests.bat'
 ```
 
-The last completed implementation gate passed 140 xUnit cases and 146 executable specifications with zero build warnings. Repository policy also passed. Re-run the gate after checkout; do not infer current health from this note alone.
+The last completed implementation gate passed 156 xUnit cases and 146 executable specifications with zero build warnings. Repository policy also passed. Re-run the gate after checkout; do not infer current health from this note alone.
 
 ## Latest completed combat recovery
 
@@ -26,7 +26,7 @@ Owned-scene evidence covers 12,784 combat-scene blocks. The 144 placed actor def
 
 ## Exact continuation point
 
-Continue priority 1 in `implementation-plan.md`: recover pickup rewards before broadening combat behavior. Campaign scene dispatch, door state replacement, pointer-to-foreground coordinates, melee and crossbow foreground trajectories, and processor-independent four-step blood presentation are now closed at the currently available fidelity.
+Continue priority 1 in `implementation-plan.md`: replace provisional defeated-enemy loot, retainer, siege-consequence, and broader AI rules. Campaign scene dispatch, door state replacement, placed pickup rewards, pointer-to-foreground coordinates, melee and crossbow foreground trajectories, and processor-independent four-step blood presentation are now closed at the currently available fidelity.
 
 The actor-versus-actor routine beginning at executable VA `0x4F070` is the active trace. Confirmed portions are:
 
@@ -47,13 +47,14 @@ dotnet run --project tools\Conqueror.Inspect --no-restore -- 'C:\GOG Games\Conqu
 ## Remaining high-priority gaps
 
 1. Finish exact foreground presentation. Pointer events load the cursor top-left and add `(9,9)` at `0x55DB8`-`0x55DE5`; the actor-contact path forwards that centered pair to foreground setup at `0x5590C`-`0x5591D`; runtime mouse/controller clicks inside the aperture now use those local coordinates, while keyboard actions retain the nearest projected target as an accessibility fallback. `0x54C07`-`0x54F12` supplies all row-family geometry, including the crossbow's one-frame-height rise from the viewport bottom; `0x54F98`-`0x5501E` supplies signed 8.8 motion; and `0x5529B`-`0x55448` proves rows 23-24 retain offset 2 and remain held instead of expiring. `SiegeForegroundTrajectory` covers every family, pointer scaling, frame subdivision, and persistent crossbow hold. The four-step blood effect remains the documented monotonic compatibility adaptation. Exact click-selected world-object targeting remains part of broader mouse-command recovery rather than foreground-coordinate provenance.
-2. Recover pickup reward semantics independently of the feedback callback. The field called `Behavior` is a bitmask: mask 19 pickups carry explicit-action bit `0x10`, but callback dispatcher `0x51E60` receives its selector from the active player's 68-byte combatant record, not the selected scene block. Callback target 19's sound ID `0x3FFEA` therefore does not identify a pickup reward. Explicit-action range and immediate offset-`0x40` replacement remain Confirmed and active. Door cells now use this same exact mechanism: 1,086 owned placements with bit `0x10` install their explicit floor/ground/wall/water target immediately, while 632 placements without the bit remain closed. The former timed adjacent-door model is removed.
-3. Replace provisional retainer, loot, siege consequence, and broader AI rules from evidence.
+2. Placed pickup rewards are closed for the hashed release. Dispatcher `0x51E60` reads the selected block's low word at `+0x48`; the active player's 68-byte combatant record supplies only the recipient discriminator. Cases 5, 7, 9, and 10 consume 36 bags of coins for +25 wealth, 70 meals for capped 2d6 healing, 36 Chain Hauberks for equipment bit 6, and 36 piles of bolts for +12 ammunition. Scene arguments live at `+0x4A/+0x4C`; actor records reuse those words for template/row selection. The exact case bodies, global addresses, population census, runtime mapping, and tests are recorded in `original-findings.md` and `resource-formats.md`.
+3. Replace provisional defeated-enemy loot, retainer, siege consequence, and broader AI rules from evidence.
 4. Continue exact route/`JUMP!!`/spy recovery, estate tile mapping, and remaining sound/event bindings as ordered in the migration plan.
 
 ## Safety and repository rules
 
 - The original installation at `C:\GOG Games\Conqueror AD1086` is read-only reference material.
+- The desktop game supports only a verified extraction from the supported official GOG release. `ImportedContentCatalog.LoadRequired` verifies the source hash, every manifest file, and all mapped runtime dependencies before the graphics loop; do not restore assetless or placeholder gameplay.
 - Never commit `analysis/original/`, imported `UserContent`, decoded media, screenshots from proprietary assets, or extracted executables.
 - Keep compiled C# files at or below 1,000 lines. `tools/Conqueror.Inspect/Program.cs` and `tests/Conqueror.Tests/ResourceAndDefinitionTests.cs` are already exactly at that limit; split new work instead of extending them.
 - Use `apply_patch` for source edits, run `git diff --check`, then run the full gate before committing.

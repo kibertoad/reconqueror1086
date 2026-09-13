@@ -117,7 +117,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private int _shopIndex;
     private int _ladyIndex = 1;
     private int _tournamentOpponent = 2;
-    private ImportedContentCatalog? _importedContent;
+    private readonly ImportedContentCatalog _importedContent;
     private ImportedSoundLibrary? _importedSoundLibrary;
     private ImportedDialogueRepository? _importedDialogue;
     private ImportedConversationSession? _conversationSession;
@@ -149,14 +149,13 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private bool _animationEnabled = true;
     private bool _paused;
     private bool _musicPausedByGame;
-    private readonly string? _userContentRoot;
     private readonly CampaignSaveSlots _saveSlots;
     private readonly GameSettingsStore _settingsStore;
     private GameSettings _settings = new();
 
-    public ConquerorGame(string? userContentRoot = null, string? stateRoot = null)
+    public ConquerorGame(ImportedContentCatalog importedContent, string? stateRoot = null)
     {
-        _userContentRoot = userContentRoot;
+        _importedContent = importedContent ?? throw new ArgumentNullException(nameof(importedContent));
         var writableStateRoot = stateRoot ?? AppContext.BaseDirectory;
         _saveSlots = new CampaignSaveSlots(Path.Combine(writableStateRoot, "saves"));
         _settingsStore = new GameSettingsStore(Path.Combine(writableStateRoot, "settings.json"));
@@ -179,58 +178,51 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
 
     protected override void LoadContent()
     {
+        string RequireId(string kind, string suffix) => _importedContent.FindId(kind, suffix)
+            ?? throw new InvalidDataException($"Required original {kind} asset '{suffix}' is missing.");
+        HatLayout RequireLayout(string suffix)
+        {
+            var id = RequireId("resource", suffix);
+            return _importedContent.DecodeHat(id)
+                ?? throw new InvalidDataException($"Required original layout '{suffix}' could not be decoded.");
+        }
+
         _batch = new SpriteBatch(GraphicsDevice);
         _pixel = new Texture2D(GraphicsDevice, 1, 1);
         _pixel.SetData([Color.White]);
         _canvas = new RenderTarget2D(GraphicsDevice, PresentationScaling.VirtualWidth,
             PresentationScaling.VirtualHeight, false, SurfaceFormat.Color, DepthFormat.None);
-        _importedContent = ImportedContentCatalog.Discover(_userContentRoot);
-        _importedSoundLibrary = _importedContent is null ? null : ImportedSoundLibrary.Load(_importedContent);
-        _importedDialogue = _importedContent is null ? null : new ImportedDialogueRepository(_importedContent);
-        var weaponStoreId = _importedContent?.FindId("resource", ":weapons.dat");
-        _weaponStore = weaponStoreId is null ? null : _importedContent?.DecodeWeaponStore(weaponStoreId);
-        var optionsLayoutId = _importedContent?.FindId("resource", ":gameopts.hat");
-        var optionsLayout = optionsLayoutId is null ? null : _importedContent?.DecodeHat(optionsLayoutId);
+        _importedSoundLibrary = ImportedSoundLibrary.Load(_importedContent);
+        _importedDialogue = new ImportedDialogueRepository(_importedContent);
+        var weaponStoreId = RequireId("resource", ":weapons.dat");
+        _weaponStore = _importedContent.DecodeWeaponStore(weaponStoreId)
+            ?? throw new InvalidDataException("Required original WEAPONS.DAT could not be decoded.");
+        var optionsLayout = RequireLayout(":gameopts.hat");
         _optionsHubOptions = OptionsHubDefinitions.OptionsFrom(optionsLayout);
-        var practiceLayoutId = _importedContent?.FindId("resource", ":practice.hat");
-        var practiceLayout = practiceLayoutId is null ? null : _importedContent?.DecodeHat(practiceLayoutId);
+        var practiceLayout = RequireLayout(":practice.hat");
         _practiceOptions = PracticePresentationDefinitions.OptionsFrom(practiceLayout);
-        var characterLayoutId = _importedContent?.FindId("resource", ":cgopts.hat");
-        var characterLayout = characterLayoutId is null ? null : _importedContent?.DecodeHat(characterLayoutId);
+        var characterLayout = RequireLayout(":cgopts.hat");
         _characterOptions = CharacterCreationDefinitions.OptionsFrom(characterLayout);
         _heraldicColors = CharacterCreationDefinitions.ColorsFrom(characterLayout);
-        var pregeneratedLayoutId = _importedContent?.FindId("resource", ":pregen.hat");
-        var pregeneratedLayout = pregeneratedLayoutId is null ? null : _importedContent?.DecodeHat(pregeneratedLayoutId);
+        var pregeneratedLayout = RequireLayout(":pregen.hat");
         _pregeneratedBounds = CharacterCreationDefinitions.PregeneratedFrom(pregeneratedLayout);
-        var dilemmaLayoutId = _importedContent?.FindId("resource", ":chargen.hat");
-        var dilemmaLayout = dilemmaLayoutId is null ? null : _importedContent?.DecodeHat(dilemmaLayoutId);
+        var dilemmaLayout = RequireLayout(":chargen.hat");
         _dilemmaChoiceBounds = YouthDilemmaPresentationDefinitions.ChoicesFrom(dilemmaLayout);
         _dilemmaContinueBounds = YouthDilemmaPresentationDefinitions.ContinueFrom(dilemmaLayout);
-        var estateLayoutId = _importedContent?.FindId("resource", ":iconmap.hat");
-        _estateLayout = EstatePresentationDefinitions.From(estateLayoutId is null ? null : _importedContent?.DecodeHat(estateLayoutId));
-        var homeLayoutId = _importedContent?.FindId("resource", ":fopts.hat");
-        _homeHotspots = HomePresentationDefinitions.HotspotsFrom(homeLayoutId is null ? null : _importedContent?.DecodeHat(homeLayoutId));
-        var warPlanningLayoutId = _importedContent?.FindId("resource", ":fwarplan.hat");
-        _warPlanningLayout = WarPlanningPresentationDefinitions.From(
-            warPlanningLayoutId is null ? null : _importedContent?.DecodeHat(warPlanningLayoutId));
+        _estateLayout = EstatePresentationDefinitions.From(RequireLayout(":iconmap.hat"));
+        _homeHotspots = HomePresentationDefinitions.HotspotsFrom(RequireLayout(":fopts.hat"));
+        _warPlanningLayout = WarPlanningPresentationDefinitions.From(RequireLayout(":fwarplan.hat"));
         _fiefLayouts = FarmPresentationDefinitions.Layouts.ToDictionary(
             layout => layout.Section,
-            layout =>
-            {
-                var id = _importedContent?.FindId("resource", layout.LayoutSuffix);
-                return FarmPresentationDefinitions.LayoutFrom(layout.Section,
-                    id is null ? null : _importedContent?.DecodeHat(id));
-            });
-        var blacksmithLayoutId = _importedContent?.FindId("resource", ":vsmith.hat");
-        var blacksmithLayout = blacksmithLayoutId is null ? null : _importedContent?.DecodeHat(blacksmithLayoutId);
-        _blacksmithHotspots = BlacksmithPresentationDefinitions.HotspotsFrom(blacksmithLayout);
-        var innLayoutId = _importedContent?.FindId("resource", ":vinn.hat");
-        _innLayout = InnPresentationDefinitions.From(
-            innLayoutId is null ? null : _importedContent?.DecodeHat(innLayoutId));
+            layout => FarmPresentationDefinitions.LayoutFrom(
+                layout.Section, RequireLayout(layout.LayoutSuffix)));
+        _blacksmithHotspots = BlacksmithPresentationDefinitions.HotspotsFrom(RequireLayout(":vsmith.hat"));
+        _innLayout = InnPresentationDefinitions.From(RequireLayout(":vinn.hat"));
         foreach (var definition in ImportedArt.Definitions)
         {
-            var id = _importedContent?.FindId(definition.Kind, definition.IdSuffix);
-            if (id is null || _importedContent?.DecodePcx(id) is not { } image) continue;
+            var id = RequireId(definition.Kind, definition.IdSuffix);
+            var image = _importedContent.DecodePcx(id) ?? throw new InvalidDataException(
+                $"Required original image '{definition.IdSuffix}' could not be decoded.");
             var texture = new Texture2D(GraphicsDevice, image.Width, image.Height, false, SurfaceFormat.Color);
             texture.SetData(image.ToRgba());
             _originalArt.Add(definition.Role, texture);
@@ -239,10 +231,11 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         }
         foreach (var definition in ImportedRawArt.Definitions)
         {
-            var id = _importedContent?.FindId("image", definition.IdSuffix);
-            var paletteId = _importedContent?.FindId("palette", definition.PaletteIdSuffix);
-            if (id is null || paletteId is null || _importedContent?.DecodeRawIndexedImage(
-                    id, paletteId, definition.Width, definition.Height) is not { } image) continue;
+            var id = RequireId("image", definition.IdSuffix);
+            var paletteId = RequireId("palette", definition.PaletteIdSuffix);
+            var image = _importedContent.DecodeRawIndexedImage(
+                id, paletteId, definition.Width, definition.Height) ?? throw new InvalidDataException(
+                $"Required original image '{definition.IdSuffix}' could not be decoded.");
             var texture = new Texture2D(GraphicsDevice, image.Width, image.Height, false, SurfaceFormat.Color);
             texture.SetData(image.ToRgba());
             _originalArt.Add(definition.Role, texture);
@@ -251,18 +244,21 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         LoadOriginalConversations();
         foreach (var definition in ImportedAnimations.Definitions)
         {
-            var id = _importedContent?.FindId("indexed-animation", definition.IdSuffix);
+            var id = RequireId("indexed-animation", definition.IdSuffix);
             byte[]? palette;
             if (definition.PaletteIdSuffix is { } paletteSuffix)
             {
-                var paletteId = _importedContent?.FindId("palette", paletteSuffix);
-                palette = paletteId is null ? null : _importedContent?.DecodePalette(paletteId)?.Rgb;
+                var paletteId = RequireId("palette", paletteSuffix);
+                palette = _importedContent.DecodePalette(paletteId)?.Rgb;
             }
             else
             {
                 _originalPalettes.TryGetValue(definition.PaletteArtRole, out palette);
             }
-            if (id is null || palette is null || _importedContent?.DecodeCsf(id) is not { } sequence) continue;
+            if (palette is null)
+                throw new InvalidDataException($"Required palette for '{definition.IdSuffix}' could not be decoded.");
+            var sequence = _importedContent.DecodeCsf(id) ?? throw new InvalidDataException(
+                $"Required original animation '{definition.IdSuffix}' could not be decoded.");
             var frames = sequence.Chunks.Select(chunk =>
             {
                 var frame = sequence.DecodeFrame(chunk);
@@ -275,7 +271,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         IsMouseVisible = !_originalAnimations.ContainsKey(OriginalCursorAnimationRole);
         LoadOriginalSounds();
         LoadTitleMovie();
-        if (_importedContent?.Open("CDDA/TRACK02") is { } music)
+        if (_importedContent.Open("CDDA/TRACK02") is { } music)
         {
             using (music)
             try
@@ -591,7 +587,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
                 var meleeSeed = Environment.TickCount;
                 var meleeScene = ImportedSiegeLayouts.ForPracticeMelee(_importedContent, new Random(meleeSeed).Next(3));
                 ActivateSiegeVisuals(meleeScene);
-                _siege = PracticeCombatDefinitions.CreateMelee(meleeSeed, meleeScene?.Layout);
+                _siege = PracticeCombatDefinitions.CreateMelee(meleeSeed, meleeScene.Layout);
                 _screen = Screen.Siege;
                 _notice = "MELEE PRACTICE";
                 break;
@@ -599,7 +595,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
                 _activePracticeCombat = PracticeCombatKind.CastleSkirmish;
                 var castleScene = ImportedSiegeLayouts.ForPracticeCastleSkirmish(_importedContent);
                 ActivateSiegeVisuals(castleScene);
-                _siege = PracticeCombatDefinitions.CreateCastleSkirmish(Environment.TickCount, castleScene?.Layout);
+                _siege = PracticeCombatDefinitions.CreateCastleSkirmish(Environment.TickCount, castleScene.Layout);
                 _screen = Screen.Siege;
                 _notice = "CASTLE SKIRMISH PRACTICE";
                 break;

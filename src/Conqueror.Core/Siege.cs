@@ -4,6 +4,7 @@ public enum Facing { North, East, South, West }
 public enum SiegeTile { Floor, Wall, Door, SecretDoor, Barrel, Treasure, Exit, Destructible }
 public enum SiegeAction { None, Moved, Blocked, DoorOpened, Healed, Looted, Hit, Missed, WeaponBroke, Shot, NoAmmunition, Exited }
 public enum SiegeEnemyVisualState { Walk, Attack, Hit, Dying }
+public enum SiegePickupRewardKind { Wealth, Healing, Equipment, CrossbowBolts }
 
 public sealed class SiegeEnemy
 {
@@ -22,12 +23,15 @@ public sealed class SiegeEnemy
     internal double VisualElapsed { get; set; }
 }
 
-public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int GarrisonPerEnemy, int BaseChampionHealth, int FoodHealing, int WeaponBreakPercent);
+public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int GarrisonPerEnemy,
+    int BaseChampionHealth, int WeaponBreakPercent);
 public sealed record SiegeSpawn(int X, int Y, bool Champion, int VisualId = -1,
     int? OriginalArmor = null, int? OriginalHealth = null, int? OriginalCombatRow = null,
     int? OriginalAttackSkill = null, SiegeActorAnimation? OriginalAnimation = null);
 public sealed record SiegeActorAnimation(double AttackSeconds, double HitSeconds, double DeathSeconds);
-public sealed record SiegeObjectStage(int VisualId, SiegeTile Tile);
+public sealed record SiegePickupReward(SiegePickupRewardKind Kind, int Amount, int DieSides = 0,
+    string? EquipmentName = null);
+public sealed record SiegeObjectStage(int VisualId, SiegeTile Tile, SiegePickupReward? Pickup = null);
 public sealed record SiegeObjectSpawn(int X, int Y, IReadOnlyList<SiegeObjectStage> Stages);
 
 public sealed class SiegeObject
@@ -46,6 +50,7 @@ public sealed class SiegeObject
     public int State { get; private set; }
     public int VisualId => _stages[State].VisualId;
     public SiegeTile Tile => _stages[State].Tile;
+    public SiegePickupReward? Pickup => _stages[State].Pickup;
     internal bool Advance()
     {
         if (State + 1 >= _stages.Length) return false;
@@ -94,7 +99,7 @@ public sealed class SiegeLayout
 
 public sealed class SiegeSession
 {
-    public static readonly SiegeDefinition Rules = new(12, 12, 5, 3, 3, 25, 2);
+    public static readonly SiegeDefinition Rules = new(12, 12, 5, 3, 3, 2);
     public const double FallbackEnemyAttackSeconds = 0.63;
     public const double EnemyHitSeconds = 0.20;
     public const double FallbackEnemyDeathSeconds = 0.72;
@@ -382,26 +387,48 @@ public sealed class SiegeSession
 
     private SiegeAction CollectTile(int x, int y)
     {
-        var tile = TileAt(x, y);
-        if (tile == SiegeTile.Barrel)
+        var pickup = ObjectAt(x, y)?.Pickup ?? throw new InvalidOperationException(
+            "A pickup tile is missing its decoded original reward metadata.");
+        // CONQUER.EXE 0x51E60 dispatches on block+0x48. The four placed
+        // pickup families mutate one resource, then the caller replaces
+        // the scene cell through its block+0x40 target.
+        var result = ApplyPickup(pickup);
+        ConsumeObjectAt(x, y);
+        return result;
+    }
+
+    private SiegeAction ApplyPickup(SiegePickupReward pickup)
+    {
+        switch (pickup.Kind)
         {
-            Health = Math.Min(MaxHealth, Health + Rules.FoodHealing);
-            ConsumeObjectAt(x, y);
-            LastMessage = $"Food restores {Rules.FoodHealing} health."; return SiegeAction.Healed;
+            case SiegePickupRewardKind.Wealth:
+                GoldFound += pickup.Amount;
+                _player.Wealth += pickup.Amount;
+                LastMessage = $"Found {pickup.Amount}s.";
+                break;
+            case SiegePickupRewardKind.Healing:
+                var healing = Roll(pickup.Amount, pickup.DieSides);
+                Health = Math.Min(MaxHealth, Health + healing);
+                LastMessage = $"Food restores {healing} health.";
+                return SiegeAction.Healed;
+            case SiegePickupRewardKind.Equipment:
+                if (_player.Inventory.Items.Add(pickup.EquipmentName!))
+                    ItemsFound.Add(pickup.EquipmentName!);
+                LastMessage = $"Found {pickup.EquipmentName}.";
+                break;
+            case SiegePickupRewardKind.CrossbowBolts:
+                _player.Inventory.CrossbowBolts += pickup.Amount;
+                LastMessage = $"Found {pickup.Amount} crossbow bolts.";
+                break;
         }
-        if (tile == SiegeTile.Treasure)
-        {
-            ConsumeObjectAt(x, y);
-            var gold = _random.Next(20, 81); GoldFound += gold; _player.Wealth += gold;
-            if (_random.Next(2) == 0)
-            {
-                var loot = Balance.Equipment.Where(x => !x.Shop || x.BuyPrice is > 0 and <= 1800).ElementAt(_random.Next(Balance.Equipment.Count(x => !x.Shop || x.BuyPrice is > 0 and <= 1800)));
-                if (_player.Inventory.Items.Add(loot.Name)) ItemsFound.Add(loot.Name);
-            }
-            var bolts = _random.Next(2, 7); _player.Inventory.CrossbowBolts += bolts;
-            LastMessage = $"Found {gold}s and {bolts} crossbow bolts."; return SiegeAction.Looted;
-        }
-        return SiegeAction.None;
+        return SiegeAction.Looted;
+    }
+
+    private int Roll(int count, int sides)
+    {
+        var result = 0;
+        for (var die = 0; die < count; die++) result += _random.Next(sides) + 1;
+        return result;
     }
 
     private void ConsumeObjectAt(int x, int y)

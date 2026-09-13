@@ -20,7 +20,7 @@ public static class ImportedSiegeLayouts
             : null;
     }
 
-    public static ImportedSiegeScene? ForCampaignLocation(ImportedContentCatalog? catalog, int location) =>
+    public static ImportedSiegeScene? ForCampaignLocation(ImportedContentCatalog catalog, int location) =>
         SceneNameForCampaignLocation(location) is { } name ? Load(catalog, name) : null;
 
     public static string SceneNameForPracticeMelee(int variant) => variant switch
@@ -31,9 +31,9 @@ public static class ImportedSiegeLayouts
         _ => throw new ArgumentOutOfRangeException(nameof(variant))
     };
 
-    public static ImportedSiegeScene? ForPracticeMelee(ImportedContentCatalog? catalog, int variant) =>
+    public static ImportedSiegeScene ForPracticeMelee(ImportedContentCatalog catalog, int variant) =>
         Load(catalog, SceneNameForPracticeMelee(variant));
-    public static ImportedSiegeScene? ForPracticeCastleSkirmish(ImportedContentCatalog? catalog) => Load(catalog, "DEFEND0.RES");
+    public static ImportedSiegeScene ForPracticeCastleSkirmish(ImportedContentCatalog catalog) => Load(catalog, "DEFEND0.RES");
 
     public static SiegeLayout Convert(DynamixScene scene) => ConvertWithOrigin(scene).Layout;
 
@@ -97,14 +97,17 @@ public static class ImportedSiegeLayouts
         return reachable;
     }
 
-    private static ImportedSiegeScene? Load(ImportedContentCatalog? catalog, string name)
+    private static ImportedSiegeScene Load(ImportedContentCatalog catalog, string name)
     {
         var archiveId = $"CONQUER/{name}";
-        var scene = catalog?.DecodeScene(archiveId);
-        if (scene is null) return null;
+        var scene = catalog.DecodeScene(archiveId) ?? throw new InvalidDataException(
+            $"Required original scene '{archiveId}' could not be decoded.");
         var converted = ConvertWithOrigin(scene);
-        return new ImportedSiegeScene(archiveId, scene, catalog!.DecodeSceneBackdrop(archiveId),
-            catalog.DecodeSceneColorMaps(archiveId),
+        return new ImportedSiegeScene(archiveId, scene,
+            catalog.DecodeSceneBackdrop(archiveId) ?? throw new InvalidDataException(
+                $"Required original backdrop for '{archiveId}' could not be decoded."),
+            catalog.DecodeSceneColorMaps(archiveId) ?? throw new InvalidDataException(
+                $"Required original color maps for '{archiveId}' could not be decoded."),
             converted.Layout, converted.OriginX, converted.OriginY);
     }
 
@@ -194,7 +197,7 @@ public static class ImportedSiegeLayouts
     {
         var initial = scene.BlockAt(x, y);
         var initialTile = TileFor(initial);
-        var stages = new List<SiegeObjectStage> { new(initial.Index, initialTile) };
+        var stages = new List<SiegeObjectStage> { new(initial.Index, initialTile, PickupFor(initial)) };
         if (initialTile is SiegeTile.Destructible or SiegeTile.Barrel or SiegeTile.Treasure ||
             IsActionableDoor(initial))
         {
@@ -205,13 +208,41 @@ public static class ImportedSiegeLayouts
             var targetVisual = targetTile is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor || target.Kind == 4
                 ? target.Index
                 : -1;
-            stages.Add(new(targetVisual, targetTile));
+            stages.Add(new(targetVisual, targetTile, PickupFor(target)));
         }
         return new SiegeObjectSpawn(x - minX, y - minY, stages);
     }
 
     private static bool IsActionableDoor(DynamixSceneBlock block) =>
         (TileFor(block) is SiegeTile.Door or SiegeTile.SecretDoor) && (block.Behavior & 0x10) != 0;
+
+    private static SiegePickupReward? PickupFor(DynamixSceneBlock block)
+    {
+        if (block.Kind != 4 || (block.Behavior & 0x10) == 0) return null;
+        return block.InteractionSelector switch
+        {
+            // Callback jump table at object-1 offset 0x41E10; cases 5, 7,
+            // 9, and 10 begin at 0x52509, 0x5269F, 0x52929, and 0x52BFC.
+            5 when block.InteractionArgument > 0 =>
+                new(SiegePickupRewardKind.Wealth, block.InteractionArgument),
+            7 when block.InteractionArgument > 0 && block.InteractionArgument2 > 0 =>
+                new(SiegePickupRewardKind.Healing, block.InteractionArgument, block.InteractionArgument2),
+            9 when EquipmentPickupName(block.Name) is { } equipment =>
+                new(SiegePickupRewardKind.Equipment, block.InteractionArgument, EquipmentName: equipment),
+            10 when block.InteractionArgument > 0 =>
+                new(SiegePickupRewardKind.CrossbowBolts, block.InteractionArgument),
+            _ => null
+        };
+    }
+
+    private static string? EquipmentPickupName(string sceneName)
+    {
+        var normalized = sceneName.Equals("horseman's ax", StringComparison.OrdinalIgnoreCase)
+            ? "Horseman's Axe"
+            : sceneName;
+        return Balance.Equipment.FirstOrDefault(item =>
+            item.Name.Equals(normalized, StringComparison.OrdinalIgnoreCase))?.Name;
+    }
 
     private static bool IsEnemyName(string name) =>
         name.Contains("knight", StringComparison.OrdinalIgnoreCase) ||

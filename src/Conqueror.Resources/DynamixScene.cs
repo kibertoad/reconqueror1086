@@ -35,6 +35,9 @@ public sealed record DynamixSceneBlock(
     int Surface3,
     int EffectDefinitionIndex,
     int StateTarget,
+    int InteractionSelector,
+    int InteractionArgument,
+    int InteractionArgument2,
     int ActorTemplate,
     int ActorCombatRow,
     string Name)
@@ -193,6 +196,9 @@ public static class DynamixSceneDecoder
                 ReadInt32(record, 56),
                 BinaryPrimitives.ReadInt16LittleEndian(record.Slice(46, sizeof(short))),
                 ReadInt32(record, 64),
+                BinaryPrimitives.ReadInt16LittleEndian(record.Slice(0x48, sizeof(short))),
+                BinaryPrimitives.ReadInt16LittleEndian(record.Slice(0x4a, sizeof(short))),
+                BinaryPrimitives.ReadInt16LittleEndian(record.Slice(0x4c, sizeof(short))),
                 BinaryPrimitives.ReadInt16LittleEndian(record.Slice(0x4a, sizeof(short))),
                 BinaryPrimitives.ReadInt16LittleEndian(record.Slice(0x4c, sizeof(short))),
                 DecodeName(record.Slice(BlockNameOffset, BlockNameSize), index));

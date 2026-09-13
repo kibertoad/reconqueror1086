@@ -150,6 +150,7 @@ public sealed partial class ResourceAndDefinitionTests
         WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 4, 4);
         WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 4 + 4, 19);
         WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 4 + 64, 6);
+        WriteInteraction(source.Blocks, 4, 7, 2, 6);
         SetSceneBlockName(source.Blocks, 6, "broken barrel");
         WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 6, 4);
         WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize * 6 + 4, 1);
@@ -181,7 +182,8 @@ public sealed partial class ResourceAndDefinitionTests
         var stages = new[]
         {
             new SiegeObjectStage(20, SiegeTile.Destructible),
-            new SiegeObjectStage(21, SiegeTile.Barrel),
+            new SiegeObjectStage(21, SiegeTile.Barrel,
+                new(SiegePickupRewardKind.Healing, 2, 6)),
             new SiegeObjectStage(22, SiegeTile.Floor)
         };
         var siege = new SiegeSession(new Player(), new Army(), 0, 1,
@@ -206,7 +208,9 @@ public sealed partial class ResourceAndDefinitionTests
         tiles[3, 1] = SiegeTile.Barrel;
         var siege = new SiegeSession(new Player(), new Army(), 0, 1,
             new SiegeLayout(tiles, 1, 1, Facing.East, [],
-                [new SiegeObjectSpawn(3, 1, [new(30, SiegeTile.Barrel), new(31, SiegeTile.Floor)])]));
+                [new SiegeObjectSpawn(3, 1, [
+                    new(30, SiegeTile.Barrel, new(SiegePickupRewardKind.Healing, 2, 6)),
+                    new(31, SiegeTile.Floor)])]));
 
         Assert.Equal(SiegeAction.Healed, siege.Interact());
         Assert.Equal(SiegeTile.Floor, siege.TileAt(3, 1));
@@ -222,7 +226,9 @@ public sealed partial class ResourceAndDefinitionTests
         tiles[2, 1] = SiegeTile.Barrel;
         var siege = new SiegeSession(new Player(), new Army(), 0, 1,
             new SiegeLayout(tiles, 1, 1, Facing.East, [],
-                [new SiegeObjectSpawn(2, 1, [new(30, SiegeTile.Barrel), new(31, SiegeTile.Floor)])]));
+                [new SiegeObjectSpawn(2, 1, [
+                    new(30, SiegeTile.Barrel, new(SiegePickupRewardKind.Healing, 2, 6)),
+                    new(31, SiegeTile.Floor)])]));
 
         Assert.Equal(SiegeAction.Moved, siege.Move(true));
         Assert.Equal(SiegeTile.Barrel, siege.TileAt(2, 1));
@@ -817,6 +823,14 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     private static void WriteInt(byte[] target, int offset, int value) => BinaryPrimitives.WriteInt32LittleEndian(target.AsSpan(offset, 4), value);
+
+    private static void WriteInteraction(byte[] blocks, int index, short selector, short argument, short argument2)
+    {
+        var offset = index * DynamixSceneDecoder.BlockSize;
+        BinaryPrimitives.WriteInt16LittleEndian(blocks.AsSpan(offset + 0x48, 2), selector);
+        BinaryPrimitives.WriteInt16LittleEndian(blocks.AsSpan(offset + 0x4a, 2), argument);
+        BinaryPrimitives.WriteInt16LittleEndian(blocks.AsSpan(offset + 0x4c, 2), argument2);
+    }
 
     private static (byte[] Viewer, byte[] Scenario, byte[] Map, byte[] Blocks) SyntheticScene()
     {

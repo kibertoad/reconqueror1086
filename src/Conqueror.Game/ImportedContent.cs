@@ -155,6 +155,57 @@ public sealed class ImportedContentCatalog
         return null;
     }
 
+    public static ImportedContentCatalog LoadRequired(string root)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(root);
+        var fullRoot = Path.GetFullPath(root);
+        var manifestPath = Path.Combine(fullRoot, "manifest.json");
+        if (!File.Exists(manifestPath))
+            throw new InvalidDataException(
+                $"Original Conqueror resources are required. Run the resource importer for '{fullRoot}' before starting the game.");
+        var manifest = ImportManifest.Read(manifestPath);
+        var release = SupportedOriginalReleases.NameForSourceImage(manifest.SourceImageSha256);
+        if (release is null)
+            throw new InvalidDataException("The imported resources are not from a supported original Conqueror release.");
+        var verification = ImportManifestVerifier.Verify(fullRoot, manifest);
+        if (!verification.IsValid)
+        {
+            var first = verification.Issues[0];
+            throw new InvalidDataException(
+                $"Original resource verification failed for '{first.AssetId}': {first.Reason}. Run the resource importer again.");
+        }
+        var catalog = new ImportedContentCatalog(fullRoot, manifest);
+        var required = ImportedArt.Definitions.Select(item => (item.Kind, item.IdSuffix))
+            .Concat(ImportedLayouts.Definitions.Select(item => ("resource", item.IdSuffix)))
+            .Concat(ImportedRawArt.Definitions.SelectMany(item => new[]
+            {
+                ("image", item.IdSuffix), ("palette", item.PaletteIdSuffix)
+            }))
+            .Concat(ImportedAnimations.Definitions.SelectMany(item => item.PaletteIdSuffix is { } palette
+                ? new[] { ("indexed-animation", item.IdSuffix), ("palette", palette) }
+                : new[] { ("indexed-animation", item.IdSuffix) }))
+            .Concat(ImportedSounds.Definitions.Select(item => ("sound-bank", item.IdSuffix)))
+            .Concat(ImportedMovies.Definitions.Select(item => ("movie", item.IdSuffix)))
+            .Concat(new[]
+            {
+                ("resource", ":all.cbf"), ("resource", ":all.cif"),
+                ("resource", ":all.tmb"), ("resource", ":all.tmi"),
+                ("resource", ":all.vtb")
+            })
+            .Concat(Enumerable.Range(0, 30).Select(number => ("resource", $":dilem{number}.dat")))
+            .Append(("resource", ":weapons.dat"))
+            .ToArray();
+        var missing = required.FirstOrDefault(item => catalog.FindId(item.Item1, item.Item2) is null);
+        if (missing != default)
+            throw new InvalidDataException(
+                $"The {release} import is incomplete: required {missing.Item1} asset '{missing.Item2}' is missing. Run the resource importer again.");
+        foreach (var scene in new[] { "MELEE0.RES", "MELEE1.RES", "MELEE2.RES", "DEFEND0.RES" })
+            if (!catalog.Ids("resource").Any(id => id.StartsWith($"CONQUER/{scene}#", StringComparison.OrdinalIgnoreCase)))
+                throw new InvalidDataException(
+                    $"The {release} import is incomplete: required scene '{scene}' is missing. Run the resource importer again.");
+        return catalog;
+    }
+
     public Stream? Open(string id)
     {
         var asset = _assets.FirstOrDefault(x => x.Id.Equals(id, StringComparison.OrdinalIgnoreCase));

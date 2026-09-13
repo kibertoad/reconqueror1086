@@ -26,7 +26,8 @@ try
     stateRoot = GamePathResolver.ResolveStateRoot(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
 
-    using var game = new ConquerorGame(userContentRoot, stateRoot);
+    var importedContent = ImportedContentCatalog.LoadRequired(userContentRoot);
+    using var game = new ConquerorGame(importedContent, stateRoot);
     if (platformSmokeTest) return 0;
     game.Run();
     return 0;

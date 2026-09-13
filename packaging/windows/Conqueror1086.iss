@@ -47,7 +47,6 @@ const
 
 var
   OriginalPage: TInputDirWizardPage;
-  ImportCheckBox: TNewCheckBox;
   PurchaseButton: TNewButton;
   DetectedOriginalPath: String;
 
@@ -158,9 +157,8 @@ begin
   OriginalPage := CreateInputDirPage(wpSelectDir,
     'Resources from the original Conqueror: A.D. 1086',
     'Import art, music, sound, video, and other game resources from your legally owned copy.',
-    'If you own Conqueror: A.D. 1086, install it before running this installer. Setup can copy and convert the ' +
-    'required game resources without modifying your original installation. Select that installation below, ' +
-    'or clear the import option if you do not have it installed yet.',
+    'Install a legal GOG copy of Conqueror: A.D. 1086 before continuing. Setup copies and converts the required ' +
+    'resources without modifying the original installation. Select that installation below.',
     False, '');
   OriginalPage.Add('GOG installation folder:');
   if DetectedOriginalPath <> '' then
@@ -168,18 +166,10 @@ begin
   else
     OriginalPage.Values[0] := ExpandConstant('{sd}\GOG Games\Conqueror AD1086');
 
-  ImportCheckBox := TNewCheckBox.Create(OriginalPage);
-  ImportCheckBox.Parent := OriginalPage.Surface;
-  ImportCheckBox.Left := OriginalPage.Edits[0].Left;
-  ImportCheckBox.Top := OriginalPage.Edits[0].Top + OriginalPage.Edits[0].Height + ScaleY(20);
-  ImportCheckBox.Width := OriginalPage.SurfaceWidth;
-  ImportCheckBox.Caption := 'Import art, music, sound, video, and other resources from my legal Conqueror copy';
-  ImportCheckBox.Checked := ExpandConstant('{param:NOIMPORT|0}') <> '1';
-
   PurchaseButton := TNewButton.Create(OriginalPage);
   PurchaseButton.Parent := OriginalPage.Surface;
   PurchaseButton.Left := OriginalPage.Edits[0].Left;
-  PurchaseButton.Top := ImportCheckBox.Top + ImportCheckBox.Height + ScaleY(18);
+  PurchaseButton.Top := OriginalPage.Edits[0].Top + OriginalPage.Edits[0].Height + ScaleY(20);
   PurchaseButton.Width := ScaleX(210);
   PurchaseButton.Caption := 'Buy a legal copy on GOG';
   PurchaseButton.OnClick := @OpenPurchasePage;
@@ -188,22 +178,14 @@ end;
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   Result := True;
-  if (CurPageID = OriginalPage.ID) and ImportCheckBox.Checked and
+  if (CurPageID = OriginalPage.ID) and
+     (ExpandConstant('{param:NOIMPORT|0}') <> '1') and
      not IsOriginalInstall(OriginalPage.Values[0]) then
   begin
     MsgBox('That folder is not a complete Conqueror: A.D. 1086 GOG installation. Select the folder containing ' +
-      'game.gog, game.ins, and C1086.GOB. If you own the game, install it before running this installer; ' +
-      'otherwise clear the resource import option.', mbError, MB_OK);
+       'game.gog, game.ins, and C1086.GOB. Install the game from GOG before continuing.', mbError, MB_OK);
     Result := False;
   end;
-end;
-
-function ShouldImportOriginal: Boolean;
-begin
-  if WizardSilent then
-    Result := IsOriginalInstall(DetectedOriginalPath)
-  else
-    Result := ImportCheckBox.Checked and IsOriginalInstall(OriginalPage.Values[0]);
 end;
 
 function SelectedOriginalPath: String;
@@ -212,6 +194,12 @@ begin
     Result := DetectedOriginalPath
   else
     Result := OriginalPage.Values[0];
+end;
+
+function ShouldImportOriginal: Boolean;
+begin
+  Result := (ExpandConstant('{param:NOIMPORT|0}') <> '1') and
+    IsOriginalInstall(SelectedOriginalPath);
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -226,10 +214,7 @@ begin
   WizardForm.StatusLabel.Caption := 'Importing art, music, sound, video, and other resources from your legal copy...';
   if not Exec(Importer, Parameters, ExpandConstant('{app}'), SW_SHOW,
       ewWaitUntilTerminated, ResultCode) then
-    MsgBox('The original Conqueror resource importer could not be started. You can retry later with ' +
-      'Import or Manage Original Conqueror Resources in the Start menu.', mbError, MB_OK)
+    RaiseException('The required original Conqueror resource importer could not be started.')
   else if ResultCode <> 0 then
-    MsgBox('ReConqueror was installed, but original Conqueror resource import returned error ' +
-      IntToStr(ResultCode) + '. You can retry later with Import or Manage Original Conqueror Resources ' +
-      'in the Start menu.', mbError, MB_OK);
+    RaiseException('Required original Conqueror resource import returned error ' + IntToStr(ResultCode) + '.');
 end;
