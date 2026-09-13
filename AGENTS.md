@@ -39,6 +39,16 @@ use documented provisional grid stepping for these intents, but exact
 fixed-point movement, collision/path selection, and thinker cadence must not be
 presented as recovered until their executable paths are closed.
 
+First-person pointer dispatch is also mapped. Handler `0x55524` consumes the
+world hit returned by raycaster `0x470A8`: a friendly actor toggles selection;
+a hostile actor becomes requested mode-8 target `+0x24` for selected
+friendlies and consumes the click; with no selected friendly, the player acts
+on that exact hostile; and an explicit-action object is accepted only while
+ray distance is `< 0x280`. Preserve exact actor/object identity through input
+dispatch. The current renderer-consistent billboard/depth/alpha picker is an
+implementation mapping, not yet a claim that the original raycaster's full
+fixed-point ground/cell traversal has been reproduced.
+
 ## Git push destination
 
 The authorized canonical repository is

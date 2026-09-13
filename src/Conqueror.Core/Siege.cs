@@ -28,6 +28,7 @@ public sealed class SiegeRetainer : SiegeEnemy
 {
     public SiegeRetainerCommand Command { get; internal set; } = SiegeRetainerCommand.Attack;
     public bool Selected { get; internal set; }
+    internal SiegeEnemy? OrderedTarget { get; set; }
 }
 
 public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int GarrisonPerEnemy,
@@ -238,9 +239,16 @@ public sealed class SiegeSession
     public void ToggleRetainerSelection(int index)
     {
         if ((uint)index >= (uint)_retainers.Count) throw new ArgumentOutOfRangeException(nameof(index));
-        if (_retainers[index].Health <= 0) return;
-        _retainers[index].Selected = !_retainers[index].Selected;
-        LastMessage = _retainers[index].Selected ? "Retainer selected." : "Retainer released.";
+        ToggleRetainerSelection(_retainers[index]);
+    }
+
+    public void ToggleRetainerSelection(SiegeRetainer retainer)
+    {
+        ArgumentNullException.ThrowIfNull(retainer);
+        if (!_retainers.Contains(retainer)) throw new ArgumentException("Retainer does not belong to this battle.", nameof(retainer));
+        if (retainer.Health <= 0) return;
+        retainer.Selected = !retainer.Selected;
+        LastMessage = retainer.Selected ? "Retainer selected." : "Retainer released.";
     }
 
     public void CommandRetainers(SiegeRetainerCommand command)
@@ -249,11 +257,33 @@ public sealed class SiegeSession
         var living = _retainers.Where(retainer => retainer.Health > 0).ToArray();
         var selected = living.Where(retainer => retainer.Selected).ToArray();
         var targets = selected.Length > 0 ? selected : living;
-        foreach (var retainer in targets) retainer.Command = command;
+        foreach (var retainer in targets)
+        {
+            retainer.Command = command;
+            retainer.OrderedTarget = null;
+        }
         foreach (var retainer in living) retainer.Selected = false;
         LastMessage = targets.Length == 0
             ? "No retainers can hear the order."
             : $"Retainers: {command}.";
+    }
+
+    public bool CommandSelectedRetainersAt(SiegeEnemy target)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+        if (!_enemies.Contains(target)) throw new ArgumentException("Target does not belong to this battle.", nameof(target));
+        if (target.Health <= 0) return false;
+        var living = _retainers.Where(retainer => retainer.Health > 0).ToArray();
+        var selected = living.Where(retainer => retainer.Selected).ToArray();
+        if (selected.Length == 0) return false;
+        foreach (var retainer in selected)
+        {
+            retainer.Command = SiegeRetainerCommand.Attack;
+            retainer.OrderedTarget = target;
+        }
+        foreach (var retainer in living) retainer.Selected = false;
+        LastMessage = "Retainers attack the selected defender.";
+        return true;
     }
 
     public void AdvanceEnemyAnimations(double elapsedSeconds)
@@ -344,16 +374,59 @@ public sealed class SiegeSession
         LastMessage = "Nothing happens."; TickEnemies(); return SiegeAction.None;
     }
 
-    public SiegeAction Attack()
+    public SiegeAction Interact(SiegeObject target)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+        if (!_objects.Contains(target)) throw new ArgumentException("Object does not belong to this battle.", nameof(target));
+        var distance = Math.Sqrt(Math.Pow(target.X - PlayerX, 2) + Math.Pow(target.Y - PlayerY, 2));
+        if (distance >= 2.5)
+        {
+            LastMessage = "That is too far away.";
+            TickEnemies();
+            return SiegeAction.None;
+        }
+        if (target.Pickup is not null)
+        {
+            var result = CollectTile(target.X, target.Y);
+            TickEnemies();
+            return result;
+        }
+        if (target.Tile is not (SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.Destructible) ||
+            !AdvanceObject(target))
+        {
+            LastMessage = "Nothing happens.";
+            TickEnemies();
+            return SiegeAction.None;
+        }
+        var opened = TileAt(target.X, target.Y) is not
+            (SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.Destructible);
+        LastMessage = opened ? "The way opens." : "The way remains blocked.";
+        TickEnemies();
+        return opened ? SiegeAction.DoorOpened : SiegeAction.Blocked;
+    }
+
+    public SiegeAction Attack() => AttackCore(null);
+
+    public SiegeAction Attack(SiegeEnemy target)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+        if (!_enemies.Contains(target)) throw new ArgumentException("Target does not belong to this battle.", nameof(target));
+        return AttackCore(target);
+    }
+
+    private SiegeAction AttackCore(SiegeEnemy? requestedTarget)
     {
         var weapon = Balance.Equipment.FirstOrDefault(x => x.Name.Equals(_player.Inventory.Weapon, StringComparison.OrdinalIgnoreCase));
-        var reach = weapon?.OriginalWeaponItemId is { } reachItemId
+        var originalItemId = weapon?.OriginalWeaponItemId;
+        var reach = originalItemId is { } reachItemId
             ? OriginalWeaponCombat.GridReachFor(reachItemId)
             : weapon is null ? 1 : Math.Clamp(weapon.Power / 70, 1, 2);
-        var target = FirstEnemyAhead(reach);
+        var target = requestedTarget is null
+            ? FirstEnemyAhead(reach)
+            : PlayerCanReach(requestedTarget, originalItemId, reach) ? requestedTarget : null;
         if (target is null)
         {
-            if (FirstDestructibleAhead(reach) is { } obstacle)
+            if (requestedTarget is null && FirstDestructibleAhead(reach) is { } obstacle)
             {
                 AdvanceObject(obstacle);
                 LastMessage = "You smash through the obstacle.";
@@ -364,7 +437,7 @@ public sealed class SiegeSession
         }
         var hit = weapon?.OriginalWeaponItemId is { } attackItemId && target.OriginalAttackSkill is { } targetSkill
             ? OriginalWeaponCombat.Hits(OriginalWeaponCombat.PlayerAttackSkill(_player), targetSkill,
-                OriginalWeaponCombat.CombatRowFor(attackItemId) >= 23, Facing == target.Facing, _random)
+                IsCloseRangedAttack(attackItemId, target), Facing == target.Facing, _random)
             : _random.Next(220) < Math.Clamp((weapon?.Power ?? 35) + _player.Stats.Dexterity * 3
                 - (target.Champion ? 35 : 0), 15, 210);
         if (hit)
@@ -377,7 +450,6 @@ public sealed class SiegeSession
             RemoveDead();
         }
         else LastMessage = "The enemy turns your blow.";
-        var originalItemId = weapon?.OriginalWeaponItemId;
         var usesOriginalBreakRule = originalItemId is not null;
         var originalBreakRange = usesOriginalBreakRule
             ? OriginalWeaponCombat.BreakRollRangeFor(originalItemId!.Value)
@@ -395,7 +467,16 @@ public sealed class SiegeSession
         return broke ? SiegeAction.WeaponBroke : target.Health <= 0 ? SiegeAction.Hit : SiegeAction.Hit;
     }
 
-    public SiegeAction Shoot()
+    public SiegeAction Shoot() => ShootCore(null);
+
+    public SiegeAction Shoot(SiegeEnemy target)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+        if (!_enemies.Contains(target)) throw new ArgumentException("Target does not belong to this battle.", nameof(target));
+        return ShootCore(target);
+    }
+
+    private SiegeAction ShootCore(SiegeEnemy? requestedTarget)
     {
         if (_player.Inventory.CrossbowBolts <= 0) { LastMessage = "You have no crossbow bolts."; return SiegeAction.NoAmmunition; }
         if (!_player.Inventory.Weapon.Contains("Crossbow", StringComparison.OrdinalIgnoreCase)) { LastMessage = "Equip a crossbow first."; return SiegeAction.NoAmmunition; }
@@ -405,12 +486,15 @@ public sealed class SiegeSession
             ? OriginalWeaponCombat.GridReachFor(originalItemId)
             : 8;
         _player.Inventory.CrossbowBolts--;
-        var target = FirstEnemyAhead(range);
+        var target = requestedTarget is null
+            ? FirstEnemyAhead(range)
+            : PlayerCanReach(requestedTarget, weapon?.OriginalWeaponItemId, range) ? requestedTarget : null;
         if (target is not null)
         {
             var hit = weapon?.OriginalWeaponItemId is { } attackItemId && target.OriginalAttackSkill is { } targetSkill
                 ? OriginalWeaponCombat.Hits(OriginalWeaponCombat.PlayerAttackSkill(_player), targetSkill,
-                    closeRanged: true, behindDefender: Facing == target.Facing, _random)
+                    closeRanged: IsCloseRangedAttack(attackItemId, target),
+                    behindDefender: Facing == target.Facing, _random)
                 : true;
             if (hit)
             {
@@ -546,9 +630,12 @@ public sealed class SiegeSession
     {
         foreach (var retainer in _retainers.Where(retainer => retainer.Health > 0).ToArray())
         {
-            var target = _enemies.Where(enemy => enemy.Health > 0)
-                .OrderBy(enemy => Distance(retainer.X, retainer.Y, enemy.X, enemy.Y))
-                .FirstOrDefault();
+            var target = retainer.OrderedTarget is { Health: > 0 } ordered && _enemies.Contains(ordered)
+                ? ordered
+                : _enemies.Where(enemy => enemy.Health > 0)
+                    .OrderBy(enemy => Distance(retainer.X, retainer.Y, enemy.X, enemy.Y))
+                    .FirstOrDefault();
+            if (target is null) retainer.OrderedTarget = null;
             switch (retainer.Command)
             {
                 case SiegeRetainerCommand.Defend:
@@ -667,6 +754,38 @@ public sealed class SiegeSession
             if (EnemyAt(x, y) is { } enemy) return enemy;
         }
         return null;
+    }
+
+    private bool PlayerCanReach(SiegeEnemy target, int? originalItemId, int fallbackReach)
+    {
+        if (target.Health <= 0) return false;
+        var dx = target.X - PlayerX;
+        var dy = target.Y - PlayerY;
+        var fixedDistance = PlayerDistanceInFixedPoint(target);
+        var fixedReach = originalItemId is { } itemId
+            ? OriginalWeaponCombat.ContactDistanceFor(itemId)
+            : fallbackReach * 256;
+        if (fixedDistance >= fixedReach) return false;
+        var steps = Math.Max(Math.Abs(dx), Math.Abs(dy));
+        for (var step = 1; step < steps; step++)
+        {
+            var x = PlayerX + (int)Math.Round(dx * step / (double)steps);
+            var y = PlayerY + (int)Math.Round(dy * step / (double)steps);
+            if (TileAt(x, y) is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or
+                SiegeTile.Exit or SiegeTile.Destructible)
+                return false;
+        }
+        return true;
+    }
+
+    private bool IsCloseRangedAttack(int originalItemId, SiegeEnemy target) =>
+        OriginalWeaponCombat.CombatRowFor(originalItemId) >= 23 && PlayerDistanceInFixedPoint(target) <= 256;
+
+    private int PlayerDistanceInFixedPoint(SiegeEnemy target)
+    {
+        var dx = target.X - PlayerX;
+        var dy = target.Y - PlayerY;
+        return (int)Math.Round(Math.Sqrt(dx * dx + dy * dy) * 256.0);
     }
 
     private bool CanEnemyAttack(SiegeEnemy enemy, int targetX, int targetY, int distance)

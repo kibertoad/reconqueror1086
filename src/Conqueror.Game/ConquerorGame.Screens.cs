@@ -613,15 +613,12 @@ public sealed partial class ConquerorGame
         if (_siegeVisuals is not null && projection.Object.VisualId >= 0 &&
             projection.Object.VisualId < _siegeVisuals.Scene.Blocks.Count)
             texture = FirstSceneTexture(_siegeVisuals.Scene.Blocks[projection.Object.VisualId]);
-        var wallHeight = viewport.Height / projection.ForwardDistance;
-        var height = texture is null
-            ? Math.Clamp((int)(wallHeight * 0.6), 12, viewport.Height)
-            : Math.Clamp((int)(wallHeight * texture.Height / 256.0), 12, viewport.Height);
-        var width = texture is null ? Math.Max(8, height / 2) : Math.Max(8, height * texture.Width / texture.Height);
-        var center = viewport.X + (int)(projection.ScreenPosition * viewport.Width);
-        var left = center - width / 2;
-        var floor = viewport.Center.Y + (int)(wallHeight / 2);
-        var top = floor - height;
+        var layout = SiegeViewProjection.ObjectLayout(projection, viewport.Width, viewport.Height,
+            texture?.Width, texture?.Height);
+        var left = viewport.X + layout.Left;
+        var top = viewport.Y + layout.Top;
+        var width = layout.Width;
+        var height = layout.Height;
         for (var x = Math.Max(viewport.Left, left); x < Math.Min(viewport.Right, left + width); x++)
         {
             if (projection.ForwardDistance >= depths[x - viewport.X]) continue;
@@ -640,15 +637,12 @@ public sealed partial class ConquerorGame
         SiegeEnemyProjection projection, bool friendly, Rectangle viewport, double[] depths)
     {
         var (texture, flip) = SceneEnemyTexture(projection.Enemy);
-        var wallHeight = viewport.Height / projection.ForwardDistance;
-        var height = texture is null
-            ? Math.Clamp((int)(wallHeight * 0.75), 20, viewport.Height)
-            : Math.Clamp((int)(wallHeight * texture.Height / 256.0), 20, viewport.Height);
-        var width = texture is null ? Math.Max(10, height / 2) : Math.Max(10, height * texture.Width / texture.Height);
-        var center = viewport.X + (int)(projection.ScreenPosition * viewport.Width);
-        var left = center - width / 2;
-        var floor = viewport.Center.Y + (int)(wallHeight / 2);
-        var top = floor - height;
+        var layout = SiegeViewProjection.ActorLayout(projection, viewport.Width, viewport.Height,
+            texture?.Width, texture?.Height);
+        var left = viewport.X + layout.Left;
+        var top = viewport.Y + layout.Top;
+        var width = layout.Width;
+        var height = layout.Height;
         var body = friendly ? Color.RoyalBlue : projection.Enemy.Champion ? Color.DarkRed : new Color(120, 75, 50);
         for (var x = Math.Max(viewport.Left, left); x < Math.Min(viewport.Right, left + width); x++)
         {

@@ -445,6 +445,15 @@ public sealed partial class ConquerorGame
         var pointerCommand = click ? SiegePointerCommand(mouse) : null;
         if (pointerCommand is { } clickedCommand) _siege.CommandRetainers(clickedCommand);
         var pointerTarget = click && pointerCommand is null ? SiegePointerTarget(mouse) : null;
+        var pointerHit = pointerTarget is null ? null : SiegePointerWorldHit(mouse);
+        SiegeEnemy? clickedEnemy = null;
+        if (pointerHit?.Actor is SiegeRetainer clickedRetainer)
+            _siege.ToggleRetainerSelection(clickedRetainer);
+        else if (pointerHit?.Actor is { } hostile && !_siege.CommandSelectedRetainersAt(hostile))
+            clickedEnemy = hostile;
+        else if (pointerHit?.Object is { } clickedObject)
+            _siege.Interact(clickedObject);
+        var clickedForegroundTarget = clickedEnemy is null ? null : pointerTarget;
         var crossbowEquipped = _campaign.State.Player.Inventory.Weapon
             .Contains("Crossbow", StringComparison.OrdinalIgnoreCase);
         var movement = SiegeAction.None;
@@ -453,23 +462,23 @@ public sealed partial class ConquerorGame
         if (movement == SiegeAction.Exited) { LeaveSiege(); return; }
         if (press(Keys.A)) _siege.TurnLeft(); if (press(Keys.D)) _siege.TurnRight();
         if (press(Keys.E)) _siege.Interact();
-        if (press(Keys.Space) || pointerTarget is not null && !crossbowEquipped)
+        if (press(Keys.Space) || clickedEnemy is not null && !crossbowEquipped)
         {
             var enemiesBeforeAttack = LivingSiegeEnemyState();
             var attackFrames = SiegeCombatPresentation.AttackFramesFor(_campaign.State.Player.Inventory.Weapon);
-            var action = _siege.Attack();
+            var action = clickedEnemy is null ? _siege.Attack() : _siege.Attack(clickedEnemy);
             StartSiegeWeapon(attackFrames,
                 SiegeCombatPresentation.OriginalCombatRowFor(_campaign.State.Player.Inventory.Weapon),
-                action == SiegeAction.Hit, pointerTarget);
+                action == SiegeAction.Hit, clickedForegroundTarget);
             StartSiegeHitEffect(enemiesBeforeAttack);
         }
-        if (press(Keys.X) || pointerTarget is not null && crossbowEquipped)
+        if (press(Keys.X) || clickedEnemy is not null && crossbowEquipped)
         {
             var enemiesBeforeShot = LivingSiegeEnemyState();
-            var action = _siege.Shoot();
+            var action = clickedEnemy is null ? _siege.Shoot() : _siege.Shoot(clickedEnemy);
             if (action == SiegeAction.Shot)
             {
-                StartSiegeWeapon(SiegeCombatPresentation.CrossbowAttack, 23, contacted: false, pointerTarget);
+                StartSiegeWeapon(SiegeCombatPresentation.CrossbowAttack, 23, contacted: false, clickedForegroundTarget);
                 StartSiegeHitEffect(enemiesBeforeShot);
             }
             else if (crossbowEquipped && _campaign.State.Player.Inventory.CrossbowBolts <= 0)
@@ -584,15 +593,72 @@ public sealed partial class ConquerorGame
 
     private (int X, int Y)? SiegePointerTarget(MouseState mouse)
     {
-        var point = _controllerPointerActive
-            ? ((int)(_controllerPointer.X * 1024 / 640), (int)(_controllerPointer.Y * 768 / 480))
-            : PresentationScaling.ToVirtual(mouse.X, mouse.Y, CanvasBounds());
-        var viewport = _originalArt.ContainsKey("Combat.Shell")
-            ? ScaleSiegeBounds(SiegeCombatPresentation.Viewport)
-            : new Rectangle(0, 85, 1024, 520);
+        var point = SiegePointerVirtualPoint(mouse);
+        var viewport = SiegeViewport();
         return SiegeCombatPresentation.ForegroundTarget(point.Item1, point.Item2,
             new UiBounds(viewport.X, viewport.Y, viewport.Width, viewport.Height));
     }
+
+    private SiegePointerHit? SiegePointerWorldHit(MouseState mouse)
+    {
+        if (_siege is null) return null;
+        var point = SiegePointerVirtualPoint(mouse);
+        var viewport = SiegeViewport();
+        var localX = point.Item1 - viewport.X;
+        var localY = point.Item2 - viewport.Y;
+        if (localX < 0 || localY < 0 || localX >= viewport.Width || localY >= viewport.Height)
+            return null;
+        var camera = viewport.Width == 1 ? 0 : 2.0 * localX / (viewport.Width - 1) - 1.0;
+        var wallDepth = SiegeViewProjection.Cast(_siege, camera).Distance;
+        var hits = new List<SiegePointerHit>();
+        foreach (var projection in SiegeViewProjection.ProjectEnemies(_siege)
+                     .Concat(SiegeViewProjection.ProjectRetainers(_siege)))
+        {
+            if (projection.ForwardDistance >= wallDepth) continue;
+            var (texture, flip) = SceneEnemyTexture(projection.Enemy);
+            var layout = SiegeViewProjection.ActorLayout(projection, viewport.Width, viewport.Height,
+                texture?.Width, texture?.Height);
+            if (!layout.Contains(localX, localY) || !SiegeTextureContains(texture, layout, localX, localY, flip))
+                continue;
+            hits.Add(new SiegePointerHit(projection.ForwardDistance, projection.Enemy, null));
+        }
+        foreach (var projection in SiegeViewProjection.ProjectObjects(_siege))
+        {
+            if (projection.ForwardDistance >= wallDepth) continue;
+            Texture2D? texture = null;
+            if (_siegeVisuals is not null && projection.Object.VisualId >= 0 &&
+                projection.Object.VisualId < _siegeVisuals.Scene.Blocks.Count)
+                texture = FirstSceneTexture(_siegeVisuals.Scene.Blocks[projection.Object.VisualId]);
+            var layout = SiegeViewProjection.ObjectLayout(projection, viewport.Width, viewport.Height,
+                texture?.Width, texture?.Height);
+            if (!layout.Contains(localX, localY) || !SiegeTextureContains(texture, layout, localX, localY, false))
+                continue;
+            hits.Add(new SiegePointerHit(projection.ForwardDistance, null, projection.Object));
+        }
+        return hits.OrderBy(hit => hit.Distance).FirstOrDefault() is { Distance: > 0 } hit ? hit : null;
+    }
+
+    private static bool SiegeTextureContains(
+        Texture2D? texture, SiegeBillboardLayout layout, int x, int y, bool flip)
+    {
+        if (texture is null) return true;
+        var sourceX = Math.Clamp((x - layout.Left) * texture.Width / layout.Width, 0, texture.Width - 1);
+        if (flip) sourceX = texture.Width - 1 - sourceX;
+        var sourceY = Math.Clamp((y - layout.Top) * texture.Height / layout.Height, 0, texture.Height - 1);
+        var pixel = new Color[1];
+        texture.GetData(0, new Rectangle(sourceX, sourceY, 1, 1), pixel, 0, 1);
+        return pixel[0].A != 0;
+    }
+
+    private (int X, int Y) SiegePointerVirtualPoint(MouseState mouse) => _controllerPointerActive
+        ? ((int)(_controllerPointer.X * 1024 / 640), (int)(_controllerPointer.Y * 768 / 480))
+        : PresentationScaling.ToVirtual(mouse.X, mouse.Y, CanvasBounds());
+
+    private Rectangle SiegeViewport() => _originalArt.ContainsKey("Combat.Shell")
+        ? ScaleSiegeBounds(SiegeCombatPresentation.Viewport)
+        : new Rectangle(0, 85, 1024, 520);
+
+    private readonly record struct SiegePointerHit(double Distance, SiegeEnemy? Actor, SiegeObject? Object);
 
     private SiegeRetainerCommand? SiegePointerCommand(MouseState mouse)
     {
