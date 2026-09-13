@@ -19,6 +19,9 @@ public static class SiegeViewProjection
 {
     public const double FieldOfView = Math.PI / 3.0;
     public const double MaximumDistance = 48.0;
+    private const int OriginalCameraHeight8 = 0x80;
+    private const int OriginalRayForward14 = 0x4000;
+    private const int OriginalRayTraversalSteps = 0x40;
 
     public static SiegeRayHit Cast(SiegeSession siege, double cameraPosition)
     {
@@ -172,18 +175,60 @@ public static class SiegeViewProjection
         if (viewportHeight <= 1) throw new ArgumentOutOfRangeException(nameof(viewportHeight));
         if (pointerX < 0 || pointerY < 0 || pointerX >= viewportWidth || pointerY >= viewportHeight)
             return null;
-        var horizon = (viewportHeight - 1) / 2.0;
+        var horizon = viewportHeight / 2;
         var verticalOffset = pointerY - horizon;
         if (verticalOffset <= 0) return null;
-        var focalLength = viewportWidth / (2.0 * Math.Tan(FieldOfView / 2.0));
-        var distance = 0.5 * focalLength / verticalOffset;
-        var camera = 2.0 * pointerX / (viewportWidth - 1) - 1.0;
-        if (distance >= Cast(siege, camera).Distance || distance > MaximumDistance) return null;
-        var (forwardX, forwardY) = Direction(siege.Facing);
-        var angle = Math.Atan2(forwardY, forwardX) + camera * FieldOfView / 2.0;
-        var x = (int)Math.Floor(siege.PlayerX + 0.5 + Math.Cos(angle) * distance);
-        var y = (int)Math.Floor(siege.PlayerY + 0.5 + Math.Sin(angle) * distance);
+        // Viewer init 0x5421F uses elevation 0x80 and horizon H/2; 0x470A8
+        // builds the horizontal ray as 0x4000 + ((0x400000 / W) * dx >> 8).
+        var forward8 = OriginalCameraHeight8 * viewportWidth / verticalOffset;
+        var lateral14 = (0x400000 / viewportWidth * (pointerX - viewportWidth / 2)) >> 8;
+        var lateral8 = lateral14 * forward8 / OriginalRayForward14;
+        var (forwardX, forwardY) = CardinalDirection(siege.Facing);
+        var rightX = -forwardY;
+        var rightY = forwardX;
+        var originX8 = (siege.PlayerX << 8) + 0x80;
+        var originY8 = (siege.PlayerY << 8) + 0x80;
+        var contactX8 = originX8 + forwardX * forward8 + rightX * lateral8;
+        var contactY8 = originY8 + forwardY * forward8 + rightY * lateral8;
+        if (!GroundPathOpen(siege, originX8, originY8, contactX8, contactY8)) return null;
+        var x = contactX8 >> 8;
+        var y = contactY8 >> 8;
         return siege.TileAt(x, y) == SiegeTile.Floor ? (x, y) : null;
+    }
+
+    private static bool GroundPathOpen(
+        SiegeSession siege, int originX8, int originY8, int contactX8, int contactY8)
+    {
+        var mapX = originX8 >> 8;
+        var mapY = originY8 >> 8;
+        var targetX = contactX8 >> 8;
+        var targetY = contactY8 >> 8;
+        var deltaX = contactX8 - originX8;
+        var deltaY = contactY8 - originY8;
+        var stepX = Math.Sign(deltaX);
+        var stepY = Math.Sign(deltaY);
+        var absoluteX = Math.Abs(deltaX);
+        var absoluteY = Math.Abs(deltaY);
+        var numeratorX = stepX < 0 ? originX8 - (mapX << 8) : ((mapX + 1) << 8) - originX8;
+        var numeratorY = stepY < 0 ? originY8 - (mapY << 8) : ((mapY + 1) << 8) - originY8;
+
+        for (var step = 0; step < OriginalRayTraversalSteps && (mapX != targetX || mapY != targetY); step++)
+        {
+            var crossX = stepX == 0 ? long.MaxValue : (long)numeratorX * absoluteY;
+            var crossY = stepY == 0 ? long.MaxValue : (long)numeratorY * absoluteX;
+            if (crossX < crossY)
+            {
+                mapX += stepX;
+                numeratorX += 0x100;
+            }
+            else
+            {
+                mapY += stepY;
+                numeratorY += 0x100;
+            }
+            if (IsSolid(siege.TileAt(mapX, mapY))) return false;
+        }
+        return mapX == targetX && mapY == targetY;
     }
 
     private static SiegeBillboardLayout BillboardLayout(
@@ -219,6 +264,14 @@ public static class SiegeViewProjection
         tile is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor or SiegeTile.Exit;
 
     private static (double X, double Y) Direction(Facing facing) => facing switch
+    {
+        Facing.North => (0, -1),
+        Facing.East => (1, 0),
+        Facing.South => (0, 1),
+        _ => (-1, 0)
+    };
+
+    private static (int X, int Y) CardinalDirection(Facing facing) => facing switch
     {
         Facing.North => (0, -1),
         Facing.East => (1, 0),

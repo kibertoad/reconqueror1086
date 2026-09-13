@@ -43,6 +43,24 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void GroundPointerUsesTheExecutableFixedPointCameraAndTraversalLimit()
+    {
+        var tiles = new SiegeTile[128, 128];
+        var battle = new SiegeSession(new Player(), new Army(), 0, 1,
+            new SiegeLayout(tiles, 64, 100, Facing.North, []));
+
+        Assert.Equal((64, 58), SiegeViewProjection.GroundCell(battle, 83, 60, 167, 117));
+        Assert.Equal((43, 58), SiegeViewProjection.GroundCell(battle, 0, 60, 167, 117));
+        Assert.Equal((85, 58), SiegeViewProjection.GroundCell(battle, 166, 60, 167, 117));
+        Assert.Null(SiegeViewProjection.GroundCell(battle, 83, 59, 167, 117));
+
+        tiles[64, 80] = SiegeTile.Wall;
+        var blocked = new SiegeSession(new Player(), new Army(), 0, 1,
+            new SiegeLayout(tiles, 64, 100, Facing.North, []));
+        Assert.Null(SiegeViewProjection.GroundCell(blocked, 83, 60, 167, 117));
+    }
+
+    [Fact]
     public void ExplicitActorTargetCanBeStruckOutsideTheKeyboardCenterRay()
     {
         var battle = PointerTargetBattle();

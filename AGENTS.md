@@ -76,16 +76,25 @@ on that exact hostile; and an explicit-action object is accepted only while
 ray distance is `< 0x280`. Preserve exact actor/object identity through input
 dispatch. The current renderer-consistent billboard/depth/alpha picker is an
 implementation mapping, not yet a claim that the original raycaster's full
-fixed-point ground/cell traversal has been reproduced.
+fixed-point projected-candidate selection has been reproduced. The empty-floor
+camera/vector component is recovered separately below.
 
 Empty-ground clicks use requested mode 12. Dispatcher `0x555BE`-`0x5562E`
 writes the raycaster's integer coordinates to actor `+0x28/+0x2C` for selected
 actors and clears selection. Acquisition branch `0x4FD7B` completes when both
 coordinates match; handler `0x4FF53` derives heading from `target - current`,
 clears actor target `+0x24`, and schedules movement. Preserve that destination
-state and prior-command resumption. Cardinal heading and sub-cell stepping are
-recovered below; the current floor-plane unprojection and unmapped path
-behavior remain Provisional.
+state and prior-command resumption. Viewer setup at `0x5421F`-`0x542E4`
+initializes elevation `0x80`, horizon `height / 2`, and ray width from the
+viewport width. Raycaster `0x470A8` forms its horizontal basis as
+`0x4000 + (((0x400000 / width) * (x - width / 2)) >> 8)` and traversal
+`0x45158` normalizes the major axis to signed `0x100` for at most `0x40` map
+steps. `GroundCell` preserves that fixed-point camera/vector formula and bound
+for empty-floor orders. The candidate helper's exact returned surface, wrapped
+128-cell source-map lookup, and simultaneous corner treatment remain
+Provisional; do not infer them from the compatibility ground DDA. GameFAQs FAQ
+66730 is a trusted gameplay starting point but contains no internal projection
+math and does not corroborate these formulas.
 
 Actor blocks have two distinct signed effect selectors: `+0x2E` selects the
 visual state-completion effect, while `+0x46` selects movement. Mode handler
@@ -118,8 +127,8 @@ not mode 12. Open-path completion is evaluated only after its three-tick effect
 returns to the actor thinker, even if the actor entered the target cell
 mid-cycle. Carry
 the original bit-2 blocker separately from visual tile labels and update it
-when authored object states change. Broader modes, corner interaction,
-and exact ground-ray coordinates remain provisional.
+when authored object states change. Broader modes, projected candidate
+surfaces, source-map wrapping, and exact corner interaction remain provisional.
 
 Every placed actor base and all 576 adjacent base/attack/hit/death state blocks
 use behavior `0x87`, so actor bit `0x02` blocks the cell. At a cell crossing,
