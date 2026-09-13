@@ -70,6 +70,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(new SiegeActorAnimation(0.384, 0.384, 0.384), actor.OriginalAnimation);
         Assert.Equal(new SiegeActorMovement(3, 200, 64, 0, 0x142, 5), actor.OriginalMovement);
         Assert.Equal((12, -34), (actor.InitialOffsetX8, actor.InitialOffsetY8));
+        Assert.Equal(3, actor.OriginalActorTemplate);
     }
 
     [Fact]

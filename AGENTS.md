@@ -39,10 +39,13 @@ command directly invokes away-vector handler `0x50020` is Disproved. Requested
 mode 10 instead transitions friendly kind 0 to preserved-heading mode 5 and
 kind 1 to mode 4 after acquisition. The initializer census proves only that
 supported actors do not *start* in mode 9/10; its former dynamic-unreachability
-conclusion is Disproved. Kind-0 mode-11 transition `0x4E77E` records mode 13 as
-failure and mode 11 as success. At `0x504F2`-`0x50517`, target health `<=`
-source health keeps mode 11; a stronger, possibly ray-replaced target selects
-mode 13 and transition helper `0x4E5F0` cancels the new attack effect.
+conclusion is Disproved. Transition `0x4E77E` records mode 13 as failure and
+mode 11 as success. Mode-14 hit handler `0x503EC` compares the actor's stored
+target health with its newly reduced source health before constructing the hit
+effect: target health `<=` source health keeps mode 11, while a stronger target
+selects mode 13. Mode-15 handler `0x504C0` repeats the comparison at `0x504F2`.
+Transition helper `0x4E5F0` cancels the source actor's prior live effect when
+the hit/death state changes it; this is not mode-11 attack rejection.
 Mode-13 predicate `0x4FD9A` succeeds at source health `>= 6`; kind-0 transition
 `0x4E7A4` chooses mode 2 on success or mode 10 on failure. Low-health mode 10
 therefore invokes handler `0x50020`: heading is `0x445C4(current - stored
@@ -75,6 +78,23 @@ stores that family on the live movement effect so later order evaluation cannot
 change its collision behavior mid-cycle. The runtime uses this exact imported
 scene/texture acquisition path; formation/path selection and thinker cadence
 remain Provisional.
+
+The supported hostile templates retain their initializer modes as runtime
+metadata: template 3 is `6/8/6`, template 5 is `4/8/1`, template 8 is
+`6/8/4`, and template 9 is `4/8/4`; their actor kinds are 2/4/2/7, with kind
+7 sharing kind 2's transition table. Fixup sources `0x4E4D8/0x4E550` map
+hostile mode 6 to transition `0x4E71F`, `0x4E4E0/0x4E558` map mode 8 to
+`0x4E745`, `0x4E4EC/0x4E564` map mode 11 to `0x4E77E`, and
+`0x4E4F4/0x4E56C` map mode 13 to `0x4E851`. Thus supported hostile kinds
+share acquisition 6 -> pursuit 8 -> contact 11. Their mode-14/15 entries also
+use `0x4E77E`, so being hit while facing a stronger stored target selects 13
+and the health-six split then chooses mode 6 or scaled escape mode 10. Their mode-10
+entries select mode 4 on reacquisition or mode 3 on failure through
+`0x4E6C0`; mode-4 failure is kind-specific (`2` via `0x4E8B2` for kinds 2/7,
+`1` via `0x4E6F9` for kind 4), while success is mode 8. Preserve this path
+through imported `OriginalActorTemplate`/`OriginalModeProfile`, `ActorMode`,
+`AdvanceHostileMovement`, deferred mode-11 damage, and the shared exact motion
+math. The GameFAQs guide has no internal AI-state or timing evidence.
 
 First-person pointer dispatch is also mapped. Handler `0x55524` consumes the
 world hit returned by raycaster `0x470A8`. On primary flag 0, selected
@@ -217,8 +237,8 @@ stored actor at synthetic distance `0x154`; otherwise it casts a new ray and
 may accept an intervening opposite-side actor. Both branches require strict
 raw combat-row contact range. Damage is applied only at the completed mode-11
 effect gate through `0x53365`/`0x4F070`, not when contact is first detected.
-The runtime implements the post-contact health comparison, canceled stronger-
-target strike, mode-13 health-six boundary, and reachable mode-10 escape.
+The runtime implements the hit-state stored-target health comparison, prior-
+effect cancellation, mode-13 health-six boundary, and reachable mode-10 escape.
 Broader actor AI remains Provisional. GameFAQs FAQ 66730 has no internal
 evidence for these states, thresholds, or the spatial scan order.
 GameFAQs FAQ 66730 contains no state-table, ray-identity, or threshold detail

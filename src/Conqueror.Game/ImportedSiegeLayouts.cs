@@ -215,7 +215,8 @@ public static class ImportedSiegeLayouts
         return new SiegeSpawn(x, y, champion, block.Index, template.Armor, template.Health,
             block.ActorCombatRow, template.AttackSkill, AnimationFor(scene, block), MovementFor(scene, block),
             block.InitialXOffset8, block.InitialYOffset8,
-            OriginalCombatantTemplates.ActorKindForSceneTemplate(block.ActorTemplate), actorOrder);
+            OriginalCombatantTemplates.ActorKindForSceneTemplate(block.ActorTemplate), actorOrder,
+            block.ActorTemplate);
     }
 
     private static SiegeActorMovement? MovementFor(DynamixScene scene, DynamixSceneBlock block)

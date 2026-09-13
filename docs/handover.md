@@ -10,7 +10,7 @@ The authoritative gate is:
 & '.\Run Tests.bat'
 ```
 
-The latest completed implementation gate passed 262 xUnit cases and 146 executable specifications with zero build warnings. Repository policy also passed. Re-run the gate after checkout; do not infer current health from this note alone.
+The current hostile-AI implementation gate passes 271 xUnit cases and 146 executable specifications with zero build warnings. Repository policy passes; re-run the gate after checkout rather than inferring current health from this note alone.
 
 ## Latest completed combat recovery
 
@@ -27,9 +27,11 @@ Owned-scene evidence covers 12,784 combat-scene blocks. The 144 placed actor def
 ## Exact continuation point
 
 The former `0x50020` unreachability conclusion is Disproved. It considered
-initializer state but missed the dynamic kind-0 route. Mode-11 transition
-`0x4E77E` selects mode 13 and cancels the attack effect when target health is
-greater than source health. Predicate `0x4FD9A` then branches at source health
+initializer state but missed the dynamic hit-state route. Mode-14 handler
+`0x503EC` compares stored-target health with newly reduced source health before
+constructing the hit effect; mode 15 repeats it at `0x504F2`. Shared transition
+`0x4E77E` selects mode 13 for a stronger target and cancels the prior live
+effect. Predicate `0x4FD9A` then branches at source health
 6 through transition `0x4E7A4`: mode 2 at or above 6, mode 10 below it. Handler
 `0x50020` is therefore active and performs the exact non-cardinal away heading,
 independent `1.5` x/y scaling, and `0x112` movement effect.
@@ -46,7 +48,17 @@ free effect slot, and the cursor advances on each unrestricted main-loop pass.
 Runtime authored order is the documented stable compatibility tie-breaker and
 is regression-tested across update subdivisions.
 
-Continue priority 1 in `implementation-plan.md` with broader actor AI after the now-closed kind-0 mode-11/mode-13 branch. The Retreat route includes mode-5/7 regroup, mode-1/3/4 support, renewed mode-8 pursuit, strict raw-row contact, the target/source health comparison, and the health-six mode-13 split. A stronger target cancels the pending strike; a low-health retainer enters mode 10 and moves away using the exact `1.5` non-cardinal formula. Boundary, cancellation, and integer-rotation regressions are active. The GameFAQs FAQ has no comparable internal formula. Movement retains strict 200 ms ticks, signed 8.8 offsets, collision families, and a processor-independent clock.
+Continue priority 1 in `implementation-plan.md` with broader actor AI after the now-closed hit/morale branch. The Retreat route includes mode-5/7 regroup, mode-1/3/4 support, renewed mode-8 pursuit, strict raw-row contact, and completion-gated mode-11 damage. When mode 14 records a hit, the actor compares its stored target with its reduced health; a stronger target selects mode 13, and a low-health actor enters mode 10 and moves away using the exact `1.5` non-cardinal formula. The former mode-11 attack-rejection attribution is Disproved. Boundary, cancellation, and integer-rotation regressions are active. The GameFAQs FAQ has no comparable internal formula. Movement retains strict 200 ms ticks, signed 8.8 offsets, collision families, and a processor-independent clock.
+
+The adjacent supported-hostile slice is now implemented. Imported templates
+3/5/8/9 retain their initial profiles and kinds 2/4/2/7. Kind-2/4 table
+fixups share transitions `0x4E71F`, `0x4E745`, `0x4E77E`, and `0x4E851`
+for modes 6/8/11/13, while kind 7 shares kind 2. `AdvanceHostileMovement`
+runs visible player-side acquisition, exact direct pursuit, raw-row contact,
+completion-gated strikes, hit-state prior-effect cancellation, health-6 morale
+recovery, and low-health escape from a stronger stored target instead of randomized whole-cell
+official enemy AI. Continue with hostile modes 1-3 and exact no-effect thinker
+frequency; those remain Provisional.
 
 The projected candidate helper, actor acquisition, and shared actor-movement paths are active. Switch table `0x34A0C`, the 31-usable `0x44F7C` contact arrays, block geometry fields `+0x10..+0x20`, traversal order, continuation, projection formulas, and primary dispatch precedence are closed. Acquisition `0x4F98D` adds authored-order scanning, heading `0x445C4`, centered ray `0x470A8`, exact identity through `0x4CEA0`, strict-nearest replacement from `0x7FFF`, and the `< 0x154` early exit. `OriginalSiegeProjection` and `OriginalSiegeActorAcquisition` implement these paths with heading, non-cardinal depth, alpha, identity, ordering, and tie tests. The movement slice at `0x5185F`-`0x51875` and `0x530D0`-`0x53D5F` includes direct boundary aiming, bit-2 collision, retained partial offset, early effect termination, effect-boundary arrival, and shared-destination occupancy. Earlier confirmed actor-versus-actor portions include:
 
@@ -72,7 +84,7 @@ The older item 3 wording below is superseded for command dispatch, intent, visib
 
 1. Finish exact foreground presentation. Pointer events load the cursor top-left and add `(9,9)` at `0x55DB8`-`0x55DE5`; the actor-contact path forwards that centered pair to foreground setup at `0x5590C`-`0x5591D`; runtime mouse/controller clicks inside the aperture now use those local coordinates, while keyboard actions retain the nearest projected target as an accessibility fallback. `0x54C07`-`0x54F12` supplies all row-family geometry, including the crossbow's one-frame-height rise from the viewport bottom; `0x54F98`-`0x5501E` supplies signed 8.8 motion; and `0x5529B`-`0x55448` proves rows 23-24 retain offset 2 and remain held instead of expiring. `SiegeForegroundTrajectory` covers every family, pointer scaling, frame subdivision, and persistent crossbow hold. The four-step blood effect remains the documented monotonic compatibility adaptation. Exact click-selected world-object targeting remains part of broader mouse-command recovery rather than foreground-coordinate provenance.
 2. Placed pickup rewards are closed for the hashed release. Dispatcher `0x51E60` reads the selected block's low word at `+0x48`; the active player's 68-byte combatant record supplies only the recipient discriminator. Cases 5, 7, 9, and 10 consume 36 bags of coins for +25 wealth, 70 meals for capped 2d6 healing, 36 Chain Hauberks for equipment bit 6, and 36 piles of bolts for +12 ammunition. Scene arguments live at `+0x4A/+0x4C`; actor records reuse those words for template/row selection. The exact case bodies, global addresses, population census, runtime mapping, and tests are recorded in `original-findings.md` and `resource-formats.md`.
-3. Continue exact actor movement and broader AI recovery from evidence. Selected mode-12 travel uses the imported per-tick 8.8 path and shared projection; its direct cardinal aim, strict bit-2 collision gate, live `0x112` stop/retry behavior, and effect-boundary completion are now mapped. The other command intents and enemies still use provisional whole-cell stepping, and the scheduler's `0x40` corner/turn branches plus multiple actors converging on one destination remain open. Authored side selection is closed for the supported official scene population: loader `0x51560` uses behavior bit `0x80` plus selector 1, scans x-major, and promotes the first friendly to player `D4D0`; the complete 1,002-placement census partitions templates 0-2 as friendly and 3/5/8/9 as hostile. `ImportedSiegeLayouts` preserves those positions and `SiegeSession` caps them with the campaign formula. Campaign caller `0x39EAA`-`0x39F79` builds one contribution per strategic unit type as `min(floor(units / 3), 3)`, while `0x3A101`-`0x3A1CE` converts missing retainers into one-for-one strategic losses in Swordsmen, Halberdiers, Knights order. Raw surface/color normalization remains unmapped; defeated-enemy loot remains Disproved.
+3. Continue exact actor movement and broader AI recovery from evidence. Selected mode-12 travel and supported hostile modes 4/6/8/10/11/13 use the imported per-tick 8.8 path and shared projection; their direct aim, strict bit-2 collision gate, live `0x112` stop/retry behavior, effect-boundary completion, contact, deferred damage, and morale escape are mapped. Hostile modes 1-3, later friendly formations, and exact no-effect thinker frequency remain open. Authored side selection is closed for the supported official scene population: loader `0x51560` uses behavior bit `0x80` plus selector 1, scans x-major, and promotes the first friendly to player `D4D0`; the complete 1,002-placement census partitions templates 0-2 as friendly and 3/5/8/9 as hostile. `ImportedSiegeLayouts` preserves those positions and `SiegeSession` caps them with the campaign formula. Campaign caller `0x39EAA`-`0x39F79` builds one contribution per strategic unit type as `min(floor(units / 3), 3)`, while `0x3A101`-`0x3A1CE` converts missing retainers into one-for-one strategic losses in Swordsmen, Halberdiers, Knights order. Raw surface/color normalization remains unmapped; defeated-enemy loot remains Disproved.
 4. Continue exact route/`JUMP!!`/spy recovery, estate tile mapping, and remaining sound/event bindings as ordered in the migration plan.
 
 ## Safety and repository rules

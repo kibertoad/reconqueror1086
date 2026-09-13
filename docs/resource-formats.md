@@ -433,7 +433,7 @@ The relocated current-mode handler table at runtime VA `0x4F458` maps modes 1-17
 
 Kind-0 mode 1 continues that route rather than stopping. Predicate `0x4F648` scans the 3x3 map neighborhood in nested relative y/x order, using live fixed center `((cell << 8) + 0x80 + offset8) >> 8`, and accepts the first non-self same-side actor. Fixups at table sources `0x4E43C`, `0x4E444`, and `0x4E448` resolve transitions `0x4E6C0`, `0x4E6E6`, and `0x4E6F9`: mode 1 chooses supported mode 4 or isolated mode 3; mode 3 uses `0x4FC34` to choose regroup mode 7 or fallback 2; mode 4 uses `0x4F98D` to choose pursuit mode 8 or fallback 1. `SiegeSession` preserves one decision per thinker-equivalent call and begins the direct `0x112` mode-7/8 effect. The following recovery supersedes the former Provisional mode-8 boundary.
 
-Mode 8 is **Confirmed** through its post-strike decision. Predicate `0x4F7A2` aims at stored actor `+0x24`, but accepts any living opposite-side actor returned by `0x470A8`/`0x4CEA0` with depth strictly below raw contact column `0xCE24 + 28 * sourceRow`. Fixup source `0x4E458` resolves kind-0 transition `0x4E745`, selecting mode 11 on success or mode 6 on failure; mode 6 clears the target and resumes the recovered `0x40` wandering/acquisition family. Handler `0x5010B` uses fixed Manhattan separation `abs(dx8)+abs(dy8) <= 0x154` to accept stored target at comparison distance `0x154`, otherwise rays again and can replace the target with an intervening opponent. Scheduler `0x53365` calls `0x4F070` only at completed mode-11 effect time. At `0x504F2`, target health `<=` source health retains mode 11 through `0x4E77E`; a stronger target selects mode 13 and `0x4E5F0` cancels the constructed strike. Predicate `0x4FD9A` tests source health `>= 6`, and transition `0x4E7A4` selects mode 2 on success or mode 10 on failure. `SiegeSession` implements these boundaries and cancellation. GameFAQs FAQ 66730 has no internal evidence for this mapping.
+Mode 8 is **Confirmed** through strike construction. Predicate `0x4F7A2` aims at stored actor `+0x24`, but accepts any living opposite-side actor returned by `0x470A8`/`0x4CEA0` with depth strictly below raw contact column `0xCE24 + 28 * sourceRow`. Fixup source `0x4E458` resolves kind-0 transition `0x4E745`, selecting mode 11 on success or mode 6 on failure; mode 6 clears the target and resumes the recovered `0x40` wandering/acquisition family. Handler `0x5010B` uses fixed Manhattan separation `abs(dx8)+abs(dy8) <= 0x154` to accept stored target at comparison distance `0x154`, otherwise rays again and can replace the target with an intervening opponent. Scheduler `0x53365` calls `0x4F070` only at completed mode-11 effect time. The health comparison is later state handling, not a mode-11 outcome: mode-14 hit handler `0x503EC` compares stored target health with newly reduced source health before constructing the hit effect, and mode-15 handler `0x504C0` repeats it at `0x504F2`. Their shared transition `0x4E77E` selects mode 11 when target health is `<=` source health or mode 13 for a stronger target; `0x4E5F0` cancels the source's prior live effect. Predicate `0x4FD9A` then tests source health `>= 6`, and transition `0x4E7A4` selects mode 2 on success or mode 10 on failure. `SiegeSession` implements the hit-triggered boundary and cancellation. The former attack-rejection attribution is **Disproved**. GameFAQs FAQ 66730 has no internal evidence for this mapping.
 
 Pointer world dispatch is **Confirmed** at `0x55524`-`0x55A58`. The handler calls fixed-point raycaster `0x470A8` with the centered pointer and receives a block index, ray distance, fixed-point contact coordinates, and a hit class. When the hit class is zero, selected actor records receive target coordinates at `+0x28/+0x2C` and requested mode 12. A block with explicit-action bit `0x10` is dispatched through `0x51E60` and replaced through `0x4C900` only when ray distance is strictly below `0x280`. Actor bit `0x80` routes through block-to-actor lookup `0x4CEA0`: clicking a living side-zero actor sets selection byte `+5` bit 0; clicking a hostile writes that actor to selected friendlies' target field `+0x24`, requests mode 8, clears their selection, and consumes the click when at least one friendly was ordered. Otherwise the same exact hostile continues to the player weapon path, whose recovered combat-row contact distance is compared with the ray distance before foreground setup. Raycaster `0x470A8` enumerates projected block candidates and calls pixel test `0x444E8`, so transparent sprite pixels do not select the block.
 
@@ -490,12 +490,33 @@ current/requested/previous fields `+0x18/+0x1C/+0x20` as
 The official placement census contains only templates 0,1,2,3,5,8,9, so no
 supported actor initializes mode 9/10. That evidence does not establish
 dynamic reachability: the former dormant conclusion is **Disproved** by the
-mode-11 -> mode-13 -> mode-10 route. Handler `0x50020` reads current minus
+mode-14 hit -> mode-13 -> mode-10 route. Handler `0x50020` reads current minus
 stored target coordinates for `0x445C4`, multiplies descriptor x/y by the
 object-2 double at `0x7CEA` (`1.5`), converts each with x87 `FISTP`, rewrites
 flags to `0x112`, and relies on signed-1.15 non-cardinal rotation. Runtime
 mapping is `OriginalCombatantTemplates.ModeProfileForSceneTemplate` for initial
 state and `OriginalActorMotion`/`SiegeSession` for the reachable effect.
+
+Supported hostile actor transitions are now **Confirmed and active** through
+contact and morale escape. Templates 3/5/8/9 preserve initializer profiles
+`6/8/6`, `4/8/1`, `6/8/4`, and `4/8/4` and select kinds 2/4/2/7; kind 7
+shares kind 2. For kind 2, table fixup sources
+`0x4E4D8/0x4E4E0/0x4E4EC/0x4E4F4` resolve modes 6/8/11/13 to transitions
+`0x4E71F/0x4E745/0x4E77E/0x4E851`; kind 4 sources
+`0x4E550/0x4E558/0x4E564/0x4E56C` resolve to the same four transitions.
+They choose pursuit mode 8 after opposite-side acquisition and attack mode 11
+at strict raw-row contact. Mode-14/15 entries also resolve to `0x4E77E`, so a
+hit actor with a stronger stored target enters mode 13 and then chooses mode 6
+at health `>= 6` or mode 10 below it. Their mode-10 entries use transition `0x4E6C0`
+to select mode 4 after reacquisition or mode 3 on failure. Mode 4 selects mode
+8 on success; failure is mode 2 through kind-2/7 transition `0x4E8B2` and mode
+1 through kind-4 transition `0x4E6F9`. `SiegeSpawn.OriginalActorTemplate`,
+`SiegeEnemy.OriginalModeProfile/ActorMode`, and `AdvanceHostileMovement`
+preserve this state and run pursuit, deferred effect-completion damage, hit-state
+prior-effect cancellation, and `1.5`-scaled escape on the shared strict elapsed
+clock. Exact unrestricted no-effect thinker frequency remains **Provisional**.
+GameFAQs FAQ 66730 contains no state-table, effect-timing, or movement-formula
+detail and neither corroborates nor conflicts with this executable mapping.
 
 ## Open questions
 

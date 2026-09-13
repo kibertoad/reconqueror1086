@@ -444,18 +444,6 @@ public sealed partial class SiegeSession
         retainer.Facing = DirectionToward(retainer.X, retainer.Y, target.X, target.Y, retainer.Facing);
         StartVisual(retainer, SiegeEnemyVisualState.Attack);
         retainer.PendingRangedTarget = target;
-        if (retainer.Command == SiegeRetainerCommand.Retreat &&
-            retainer.OriginalActorKind == 0 && retainer.RetreatMode == 11 &&
-            target.Health > retainer.Health)
-        {
-            // 0x504F2-0x50517 selects the failure half of 0x4E77E when
-            // the (possibly ray-replaced) target is stronger. 0x4E5F0
-            // cancels the mode-11 effect while changing current mode to 13.
-            retainer.PendingRangedTarget = null;
-            retainer.VisualState = SiegeEnemyVisualState.Walk;
-            retainer.VisualElapsed = 0;
-            retainer.RetreatMode = 13;
-        }
         return true;
     }
 

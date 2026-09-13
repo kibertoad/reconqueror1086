@@ -11,6 +11,10 @@ public sealed partial class SiegeSession
         OriginalAttackSkill = spawn.OriginalAttackSkill,
         OriginalCombatRow = spawn.OriginalCombatRow,
         OriginalActorKind = spawn.OriginalActorKind,
+        OriginalActorTemplate = spawn.OriginalActorTemplate,
+        OriginalModeProfile = spawn.OriginalActorTemplate is { } actorTemplate
+            ? OriginalCombatantTemplates.ModeProfileForSceneTemplate(actorTemplate)
+            : null,
         OriginalActorOrder = spawn.OriginalActorOrder,
         VisualId = spawn.VisualId,
         OriginalAnimation = spawn.OriginalAnimation,
@@ -29,6 +33,10 @@ public sealed partial class SiegeSession
         OriginalAttackSkill = spawn?.OriginalAttackSkill,
         OriginalCombatRow = spawn?.OriginalCombatRow,
         OriginalActorKind = spawn?.OriginalActorKind,
+        OriginalActorTemplate = spawn?.OriginalActorTemplate,
+        OriginalModeProfile = spawn?.OriginalActorTemplate is { } actorTemplate
+            ? OriginalCombatantTemplates.ModeProfileForSceneTemplate(actorTemplate)
+            : null,
         OriginalActorOrder = spawn?.OriginalActorOrder ?? -1,
         VisualId = spawn?.VisualId ?? -1,
         OriginalAnimation = spawn?.OriginalAnimation,

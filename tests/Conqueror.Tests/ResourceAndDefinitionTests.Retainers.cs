@@ -469,57 +469,26 @@ public sealed partial class ResourceAndDefinitionTests
     [Theory]
     [InlineData(5, false)]
     [InlineData(6, true)]
-    public void StrongModeElevenTargetCancelsTheStrikeThenModeThirteenTestsHealthSix(
+    public void HitActorComparesStoredTargetThenModeThirteenTestsHealthSix(
         int retainerHealth, bool defends)
     {
-        var tiles = new SiegeTile[16, 6];
-        var army = new Army();
-        army.Units[SiegeRetainerCombatUnit] = 6;
-        var playerActor = new SiegeSpawn(1, 2, false, OriginalHealth: 12,
-            OriginalActorKind: 0, OriginalActorOrder: 0);
-        var ally = new SiegeSpawn(6, 2, false, OriginalHealth: 12,
-            OriginalActorKind: 0, OriginalActorOrder: 1);
-        var runner = new SiegeSpawn(8, 2, false, OriginalHealth: retainerHealth,
-            OriginalCombatRow: 0, OriginalAttackSkill: 1_000,
-            OriginalActorKind: 0, OriginalActorOrder: 2,
-            OriginalAnimation: new SiegeActorAnimation(0.384, 0.384, 0.384));
-        var enemy = new SiegeSpawn(12, 3, false, OriginalArmor: 0, OriginalHealth: 20,
-            OriginalAttackSkill: 1, OriginalActorKind: 2, OriginalActorOrder: 3);
-        var battle = new SiegeSession(new Player(), army, 0, 1086,
-            new SiegeLayout(tiles, 1, 2, Facing.East, [enemy], retainers: [ally, runner],
-                playerActor: playerActor));
-        var activeRunner = battle.Retainers.Single(item => item.OriginalActorOrder == 2);
-        activeRunner.Facing = Facing.West;
-        var reached = false;
-        var enemyDistance8 = 0x400;
-        battle.ConfigureActorRaycast((_, target) =>
-        {
-            if (ReferenceEquals(target, battle.Enemies[0]))
-                return new SiegeActorRayHit(target, enemyDistance8);
-            if (reached && ReferenceEquals(target, battle.Retainers[0]))
-                return new SiegeActorRayHit(battle.PlayerActor, 0x1ff);
-            return new SiegeActorRayHit(target,
-                ReferenceEquals(target, battle.PlayerActor) ? 0x500 : 0x300);
-        });
-        battle.ToggleRetainerSelection(battle.Retainers[0]);
-        battle.CommandRetainers(SiegeRetainerCommand.Defend);
+        var battle = HostileBattle(enemyX: 5, retainerX: 4, enemyHealth: 20,
+            retainerHealth: retainerHealth, enemyAttackSkill: 1_000, retainerArmor: 10);
+        var activeRunner = Assert.Single(battle.Retainers);
+        var enemy = Assert.Single(battle.Enemies);
         battle.ToggleRetainerSelection(activeRunner);
-        battle.CommandRetainers(SiegeRetainerCommand.Retreat);
+        Assert.True(battle.CommandSelectedRetainersAt(enemy));
 
-        battle.AdvanceRetainerMovement(0);
-        battle.AdvanceRetainerMovement(0.6001);
-        battle.AdvanceRetainerMovement(0);
-        reached = true;
-        battle.AdvanceRetainerMovement(0.6001);
-        battle.AdvanceRetainerMovement(0);
-        battle.AdvanceRetainerMovement(0);
-        battle.AdvanceRetainerMovement(0);
-        enemyDistance8 = 0x153;
-        battle.AdvanceRetainerMovement(0.6001);
-        battle.AdvanceRetainerMovement(0);
+        battle.AdvanceHostileMovement(0);
 
+        Assert.Equal(SiegeEnemyVisualState.Attack, enemy.VisualState);
         Assert.Equal(SiegeEnemyVisualState.Walk, activeRunner.VisualState);
-        Assert.Equal(20, Assert.Single(battle.Enemies).Health);
+        battle.AdvanceEnemyAnimations(0.3841);
+        Assert.Equal(SiegeEnemyVisualState.Hit, activeRunner.VisualState);
+        Assert.Equal(SiegeRetainerCommand.Retreat, activeRunner.Command);
+        Assert.Equal(retainerHealth, activeRunner.Health);
+        Assert.Equal(20, enemy.Health);
+        battle.AdvanceEnemyAnimations(0.3841);
         battle.AdvanceRetainerMovement(0);
 
         Assert.Equal(defends ? SiegeRetainerCommand.Defend : SiegeRetainerCommand.Retreat,
@@ -538,7 +507,6 @@ public sealed partial class ResourceAndDefinitionTests
             (activeRunner.X << 8) + activeRunner.OffsetX8 - beforeX8,
             (activeRunner.Y << 8) + activeRunner.OffsetY8 - beforeY8);
         Assert.Equal(OriginalActorMotion.Rotate(96, 0, heading), actualDelta);
-        Assert.NotEqual(0, heading & 0x3f);
     }
 
     [Fact]

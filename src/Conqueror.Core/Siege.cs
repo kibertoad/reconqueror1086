@@ -18,6 +18,8 @@ public class SiegeEnemy
     public int? OriginalAttackSkill { get; init; }
     public int? OriginalCombatRow { get; init; }
     public int? OriginalActorKind { get; init; }
+    public int? OriginalActorTemplate { get; init; }
+    public OriginalActorModeProfile? OriginalModeProfile { get; init; }
     public SiegeActorAnimation? OriginalAnimation { get; init; }
     public SiegeActorMovement? OriginalMovement { get; init; }
     public int OffsetX8 { get; internal set; }
@@ -30,6 +32,16 @@ public class SiegeEnemy
     public int WalkFrame { get; set; }
     public SiegeEnemyVisualState VisualState { get; internal set; }
     internal double VisualElapsed { get; set; }
+    public int ActorMode { get; internal set; }
+    internal SiegeEnemy? HostileTarget { get; set; }
+    internal SiegeEnemy? PendingHostileTarget { get; set; }
+    internal int? HostileTargetX8 { get; set; }
+    internal int? HostileTargetY8 { get; set; }
+    internal double HostileMovementElapsed { get; set; }
+    internal int HostileMovementTick { get; set; }
+    internal bool HostileMovementActive { get; set; }
+    internal bool HostileMovementWanders { get; set; }
+    internal bool HostileMovementScalesEscapeDelta { get; set; }
 }
 
 public sealed class SiegeRetainer : SiegeEnemy
@@ -56,7 +68,7 @@ public sealed record SiegeSpawn(int X, int Y, bool Champion, int VisualId = -1,
     int? OriginalArmor = null, int? OriginalHealth = null, int? OriginalCombatRow = null,
     int? OriginalAttackSkill = null, SiegeActorAnimation? OriginalAnimation = null,
     SiegeActorMovement? OriginalMovement = null, int InitialOffsetX8 = 0, int InitialOffsetY8 = 0,
-    int? OriginalActorKind = null, int OriginalActorOrder = -1);
+    int? OriginalActorKind = null, int OriginalActorOrder = -1, int? OriginalActorTemplate = null);
 public sealed record SiegeActorAnimation(double AttackSeconds, double HitSeconds, double DeathSeconds);
 public sealed record SiegeActorMovement(
     int TickCount, int IntervalMilliseconds, int FixedXDeltaPerTick, int FixedYDeltaPerTick, int Flags,
@@ -249,13 +261,20 @@ public sealed partial class SiegeSession
                     OriginalAttackSkill = spawn.OriginalAttackSkill,
                     OriginalCombatRow = spawn.OriginalCombatRow,
                     OriginalActorKind = spawn.OriginalActorKind,
+                    OriginalActorTemplate = spawn.OriginalActorTemplate,
+                    OriginalModeProfile = spawn.OriginalActorTemplate is { } actorTemplate
+                        ? OriginalCombatantTemplates.ModeProfileForSceneTemplate(actorTemplate)
+                        : null,
                     OriginalActorOrder = spawn.OriginalActorOrder,
                     Champion = spawn.Champion,
                     VisualId = spawn.VisualId,
                     OriginalAnimation = spawn.OriginalAnimation,
                     OriginalMovement = spawn.OriginalMovement,
                     OffsetX8 = spawn.InitialOffsetX8,
-                    OffsetY8 = spawn.InitialOffsetY8
+                    OffsetY8 = spawn.InitialOffsetY8,
+                    ActorMode = spawn.OriginalActorTemplate is { } hostileTemplate
+                        ? OriginalCombatantTemplates.ModeProfileForSceneTemplate(hostileTemplate).Current
+                        : 0
                 };
                 enemy.Facing = DirectionToward(enemy.X, enemy.Y, PlayerX, PlayerY, Facing.South);
                 _enemies.Add(enemy);
@@ -382,7 +401,19 @@ public sealed partial class SiegeSession
             var completedState = enemy.VisualState;
             enemy.VisualState = SiegeEnemyVisualState.Walk;
             enemy.VisualElapsed = 0;
-            if (enemy is not SiegeRetainer retainer || retainer.Health <= 0) continue;
+            if (enemy is not SiegeRetainer)
+            {
+                if (completedState == SiegeEnemyVisualState.Attack &&
+                    enemy.PendingHostileTarget is { } hostileTarget)
+                {
+                    enemy.PendingHostileTarget = null;
+                    ResolveHostileStrike(enemy, hostileTarget);
+                }
+                if (enemy.Health > 0 && _enemies.Contains(enemy)) AdvanceHostileOrder(enemy);
+                continue;
+            }
+            var retainer = (SiegeRetainer)enemy;
+            if (retainer.Health <= 0) continue;
             if (completedState == SiegeEnemyVisualState.Attack &&
                 retainer.PendingRangedTarget is { } attackTarget)
             {
@@ -675,6 +706,11 @@ public sealed partial class SiegeSession
         if (Defeated || !_enemies.Any(enemy => enemy.Health > 0)) return;
         foreach (var enemy in _enemies.Where(enemy => enemy.Health > 0).ToArray())
         {
+            if (enemy.OriginalModeProfile is not null)
+            {
+                AdvanceHostileOrder(enemy);
+                continue;
+            }
             var playerDistance = Distance(enemy.X, enemy.Y, PlayerX, PlayerY);
             var retainerTarget = _retainers.Where(retainer => retainer.Health > 0)
                 .OrderBy(retainer => Distance(enemy.X, enemy.Y, retainer.X, retainer.Y))
@@ -905,13 +941,6 @@ public sealed partial class SiegeSession
             enemy.Facing = DirectionToward(enemy.X, enemy.Y, PlayerX, PlayerY, enemy.Facing);
             StartVisual(enemy, SiegeEnemyVisualState.Dying);
         }
-    }
-
-    private static void StartVisual(SiegeEnemy enemy, SiegeEnemyVisualState state)
-    {
-        if (enemy is SiegeRetainer retainer) retainer.PendingRangedTarget = null;
-        enemy.VisualState = state;
-        enemy.VisualElapsed = 0;
     }
 
     private Point EmptySpawn(int index)

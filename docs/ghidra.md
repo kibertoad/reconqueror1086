@@ -181,7 +181,7 @@ Continue kind-0 mode 5 through its own acquisition entry `0x4FC34` and transitio
 
 For that next kind-0 loop, fixups at runtime table sources `0x4E43C`, `0x4E444`, and `0x4E448` resolve mode-1/3/4 transitions `0x4E6C0`, `0x4E6E6`, and `0x4E6F9`. Mode-1 predicate `0x4F648` walks the nine map cells around the actor in nested relative order `y=-1..1`, `x=-1..1`, resolves actor blocks through `0x4CEA0`, skips self, and stops at the first same-side actor. Its center is derived from the live fixed coordinate, equivalent to `((cell << 8) + 0x80 + offset8) >> 8`; success chooses mode 4 and failure mode 3. Mode 3 reuses authored-order same-side ray scan `0x4FC34` and selects mode 7 or fallback 2. Mode 4 reuses opposite-side scan `0x4F98D` and selects mode 8 or fallback 1. All three decision states dispatch to `0x4FDAB`, while modes 7/8 use `0x4FE76`. Trace mode-8 predicate `0x4F7A2`, transition `0x4E745`, and mode-11 handler `0x5010B` next rather than treating entry into mode 8 as complete combat parity. GameFAQs has no state-table or scan-order corroboration.
 
-Mode-8 tracing is now closed through the first strike. Predicate `0x4F7A2` aims the centered `0x470A8` ray at stored actor `+0x24`, maps the returned block with `0x4CEA0`, and does **not** require returned identity to match the aimed actor. It requires returned depth `< [0xCE24 + 28 * source combat row]` and an opposite-side actor. The kind-0 entry is independently fixed up at source `0x4E458` to transition `0x4E745`, whose failure/success modes are 6/11. In `0x5010B`, calculate live `abs(targetX8-sourceX8) + abs(targetY8-sourceY8)` first: `<= 0x154` bypasses the ray and supplies stored actor plus comparison distance `0x154`; the farther branch casts again and may replace `+0x24` with an intervening opponent. Both paths use the same strict raw-row range. At effect completion, `0x53365` checks current mode 11 and calls damage routine `0x4F070`; `0x53D47` re-enters thinking after cleanup. Continue with mode-11 transition `0x4E77E` and mode 13. GameFAQs has no ray, actor-state, or threshold corroboration.
+Mode-8 tracing is now closed through the first strike. Predicate `0x4F7A2` aims the centered `0x470A8` ray at stored actor `+0x24`, maps the returned block with `0x4CEA0`, and does **not** require returned identity to match the aimed actor. It requires returned depth `< [0xCE24 + 28 * source combat row]` and an opposite-side actor. The kind-0 entry is independently fixed up at source `0x4E458` to transition `0x4E745`, whose failure/success modes are 6/11. In `0x5010B`, calculate live `abs(targetX8-sourceX8) + abs(targetY8-sourceY8)` first: `<= 0x154` bypasses the ray and supplies stored actor plus comparison distance `0x154`; the farther branch casts again and may replace `+0x24` with an intervening opponent. Both paths use the same strict raw-row range. At effect completion, `0x53365` checks current mode 11 and calls damage routine `0x4F070`; `0x53D47` re-enters thinking after cleanup. Continue with mode-14/15 hit/death handlers `0x503EC/0x504C0`, whose table entries also use `0x4E77E`; do not attribute their health comparison to mode 11. GameFAQs has no ray, actor-state, or threshold corroboration.
 
 For public Attack's no-target path, start with requested mode 6 and acquisition-table entry `0x4F98D`. Decode kind-0 transition `0x4E71F` and kind-1 transition `0x4E745`: failure leaves both kinds in mode 6, whereas success selects modes 8 and 11. The mode-6 current-handler table entry is `0x4FDCD`; verify that it preserves heading and rewrites low descriptor flags with `(flags & 0xA7) | 0x40`. Follow that live flag into scheduler `0x53C13`-`0x53C6C`, where collision clears the blocked axis and applies `(((heading + 0x20) & 0xC0) - 0x40) & 0xFF`. Record the failed acquisition edge as part of the route; inspecting only successful Attack movement incorrectly hides mode-6 wandering.
 
@@ -195,12 +195,15 @@ For numeric action-tree inspection, `--action-groups=1101,2011` writes an ignore
 
 The mode-9/10 table and initializer census establish initial state but cannot
 prove dynamic unreachability. The former dormant conclusion is Disproved by
-tracing beyond mode 11. Fixup source `0x4E464` resolves kind-0 mode 11 to
-transition `0x4E77E` (failure 13, success 11). At `0x504F2`-`0x50517`, compare
-the stored, possibly ray-replaced target's health `+0x40` with source health:
-target `<=` source retains mode 11; target `>` source selects mode 13, and
-helper `0x4E5F0` cancels the newly constructed effect because current mode
-changes. Predicate `0x4FD9A` is true at source health `>= 6`. Fixup source
+tracing the hit/death handlers. Current-handler table `0x4F458` maps mode 14 to
+`0x503EC` and mode 15 to `0x504C0`. At `0x503EC`-`0x50411`, the hit handler
+compares stored target health `+0x40` with newly reduced source health before
+constructing base-state + 2; the death handler repeats that comparison at
+`0x504F2`-`0x50517`. Kind-0 fixup sources `0x4E470/0x4E474` resolve both to
+transition `0x4E77E` (failure 13, success 11). Target `<=` source retains mode
+11; target `>` source selects mode 13, and helper `0x4E5F0` cancels the prior
+live effect as the state changes. The former mode-11 attack-rejection reading
+is Disproved. Predicate `0x4FD9A` is true at source health `>= 6`. Fixup source
 `0x4E46C` resolves mode 13 to transition `0x4E7A4` (failure 10, success 2),
 while current handler `0x5051A` is a no-op. Thus low health reaches `0x50020`.
 That handler calls `0x445C4` with `current - stored target`, multiplies
@@ -208,6 +211,20 @@ descriptor dwords `+0x20/+0x1C` independently by object-2 double `0x7CEA =
 1.5`, converts with x87 `FISTP`, rewrites flags to `0x112`, and constructs the
 effect. Close movement with `0x446BC`, `0x4472C`, and `0x44740`; retain
 per-product `(product + 0x3FFF) >> 15` rounding.
+
+Apply the same trace to supported hostile kinds rather than assuming the
+kind-0 result is friendly-only. Kind-2 fixup sources
+`0x4E4D0/0x4E4D8/0x4E4E0/0x4E4EC/0x4E4F4/0x4E4F8/0x4E4FC` resolve mode 4/6/8/11/13/14/15 to
+`0x4E8B2/0x4E71F/0x4E745/0x4E77E/0x4E851/0x4E77E/0x4E77E`. Kind-4 sources
+`0x4E548/0x4E550/0x4E558/0x4E564/0x4E56C/0x4E570/0x4E574` resolve to
+`0x4E6F9/0x4E71F/0x4E745/0x4E77E/0x4E851/0x4E77E/0x4E77E`; kind 7 shares kind 2.
+Disassembly of `0x4E851` writes failure/previous mode 10 and
+success/requested mode 6, so predicate `0x4FD9A` sends health below 6 into the
+same `0x50020` escape while healthy hostiles resume acquisition. Both supported
+tables' mode-10 entries resolve to `0x4E6C0` (failure 3, success 4). Mode 4
+then enters 8 on success but falls back to 2 for kinds 2/7 through `0x4E8B2`
+or 1 for kind 4 through `0x4E6F9`. Preserve the hit-effect completion before
+the next mode-13 thinker visit.
 
 For shared-destination behavior, correlate scheduler `0x53425`-`0x53694`
 with the ignored `--scene-blocks` census. The neighbor test reads behavior bit

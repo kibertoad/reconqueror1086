@@ -443,6 +443,7 @@ public sealed partial class ConquerorGame
         AdvanceSiegeForeground(gameTime.ElapsedGameTime.TotalSeconds);
         _siege.AdvanceEnemyAnimations(_animationEnabled ? gameTime.ElapsedGameTime.TotalSeconds : 1);
         _siege.AdvanceRetainerMovement(gameTime.ElapsedGameTime.TotalSeconds);
+        _siege.AdvanceHostileMovement(gameTime.ElapsedGameTime.TotalSeconds);
         var pointerCommand = click ? SiegePointerCommand(mouse) : null;
         if (pointerCommand is { } clickedCommand) _siege.CommandRetainers(clickedCommand);
         var pointerTarget = click && pointerCommand is null ? SiegePointerTarget(mouse) : null;
