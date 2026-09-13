@@ -6,23 +6,62 @@ namespace Conqueror.Tests;
 public sealed partial class ResourceAndDefinitionTests
 {
     [Theory]
-    [InlineData(0, 2)]
-    [InlineData(99, 2)]
-    [InlineData(100, 2)]
-    [InlineData(149, 2)]
-    [InlineData(150, 3)]
-    [InlineData(499, 9)]
-    [InlineData(500, 10)]
-    [InlineData(6_000, 10)]
-    public void CampaignRetainerCapUsesOriginalArmyScaling(int soldiers, int expected)
+    [InlineData(0, 1)]
+    [InlineData(1, 1)]
+    [InlineData(2, 1)]
+    [InlineData(3, 1)]
+    [InlineData(6, 2)]
+    [InlineData(9, 3)]
+    [InlineData(99, 3)]
+    public void CampaignRetainerCapUsesOriginalPerUnitTypeScaling(int soldiers, int expected)
     {
-        Assert.Equal(expected, OriginalRetainerCombat.RetainerCapFor(soldiers));
-
         var player = Campaign.NewFromTemplate(2).Player;
-        player.Army.Units[UnitType.Swordsmen] = soldiers;
+        foreach (var type in Enum.GetValues<UnitType>()) player.Army.Units[type] = 0;
+        player.Army.Units[UnitType.Halberdiers] = soldiers;
         var battle = new SiegeSession(player, player.Army, 0, seed: 1);
 
+        Assert.Equal(expected, OriginalRetainerCombat.CampaignRetainerCapFor(player.Army));
         Assert.Equal(expected, battle.AlliesStarted);
+    }
+
+    [Fact]
+    public void CampaignRetainerCapAddsTheThreeIndependentlyCappedUnitPools()
+    {
+        var army = new Army();
+        army.Units[UnitType.Swordsmen] = 9;
+        army.Units[UnitType.Halberdiers] = 30;
+        army.Units[UnitType.Knights] = 300;
+
+        Assert.Equal(9, OriginalRetainerCombat.CampaignRetainerCapFor(army));
+    }
+
+    [Fact]
+    public void CampaignRetainerDeathsRemoveRepresentedUnitsInOriginalOrder()
+    {
+        var army = new Army();
+        army.Units[UnitType.Swordsmen] = 9;
+        army.Units[UnitType.Halberdiers] = 6;
+        army.Units[UnitType.Knights] = 3;
+
+        OriginalRetainerCombat.ApplyCampaignLosses(army, 4);
+
+        Assert.Equal(6, army.Units[UnitType.Swordsmen]);
+        Assert.Equal(5, army.Units[UnitType.Halberdiers]);
+        Assert.Equal(3, army.Units[UnitType.Knights]);
+    }
+
+    [Theory]
+    [InlineData(UnitType.Swordsmen)]
+    [InlineData(UnitType.Halberdiers)]
+    [InlineData(UnitType.Knights)]
+    public void DeathOfTheFallbackRetainerRemovesTheOnlySoldier(UnitType type)
+    {
+        var army = new Army();
+        army.Units[type] = 1;
+
+        OriginalRetainerCombat.ApplyCampaignLosses(army, 1);
+
+        Assert.Equal(0, army.Total);
     }
 
     [Fact]

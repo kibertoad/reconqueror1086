@@ -587,7 +587,7 @@ public sealed class Campaign
         var location = State.PendingSiegeLocation;
         var armyIndex = ActiveArmyIndex();
         var army = State.Player.ArmyAt(armyIndex);
-        army.RemoveUnits(siege.RetainerLosses);
+        OriginalRetainerCombat.ApplyCampaignLosses(army, siege.RetainerLosses);
         if (!siege.Won)
         {
             Log(siege.Defeated ? "You are carried unconscious from the keep." : "The assault is abandoned.");

@@ -300,7 +300,7 @@ foreach (var name in new[] { "Full Plate", "Heraldic Shield", "Great War Helm" }
     var item = Balance.Equipment.Single(x => x.Name == name); siegePlayer.Inventory.Items.Add(name); siegePlayer.Inventory.Equip(item);
 }
 var siege = new SiegeSession(siegePlayer, 12, 99);
-Check(siege.Enemies.Count == SiegeSession.Rules.BaseEnemies + 4 && siege.AlliesStarted == 2, "siege generated from definitions with original retainer floor");
+Check(siege.Enemies.Count == SiegeSession.Rules.BaseEnemies + 4 && siege.AlliesStarted == 3, "siege generated from definitions with original per-type retainer cap");
 Check(siege.ArmorRating() == 65, "equipped armor plus gambeson protection");
 Check(siege.TileAt(4, 5) == SiegeTile.Door && siege.TileAt(8, 7) == SiegeTile.SecretDoor, "doors and secret rooms generated");
 Check(siege.Shoot() == SiegeAction.NoAmmunition, "crossbow requires weapon and bolts");
