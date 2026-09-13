@@ -84,8 +84,8 @@ actors and clears selection. Acquisition branch `0x4FD7B` completes when both
 coordinates match; handler `0x4FF53` derives heading from `target - current`,
 clears actor target `+0x24`, and schedules movement. Preserve that destination
 state and prior-command resumption. Cardinal heading and sub-cell stepping are
-recovered below; the current floor-plane unprojection, actor convergence, and
-unmapped collision/path behavior remain Provisional.
+recovered below; the current floor-plane unprojection and unmapped path
+behavior remain Provisional.
 
 Actor blocks have two distinct signed effect selectors: `+0x2E` selects the
 visual state-completion effect, while `+0x46` selects movement. Mode handler
@@ -99,8 +99,7 @@ the strict post-deadline 200 ms tick independently of processor speed and input
 frequency. From zero, offsets advance `0,64,128,192`, then strict `> 0x80`
 crossing changes the cell and wraps to `-64`: 600 ms is the first transition
 and effect-cycle duration, not a universal cell cadence. Sustained straight
-movement takes four ticks/800 ms per cell. Multi-actor destination behavior
-remains Provisional. The same timing and offset mapping is active for acquired
+movement takes four ticks/800 ms per cell. The same timing and offset mapping is active for acquired
 Attack mode 8, no-visible-target Attack mode 6, Follow mode 16, and melee
 Retreat mode 5; it is not yet established for every actor mode.
 
@@ -120,8 +119,18 @@ returns to the actor thinker, even if the actor entered the target cell
 mid-cycle. Carry
 the original bit-2 blocker separately from visual tile labels and update it
 when authored object states change. Broader modes, corner interaction,
-multi-actor destination behavior, and exact ground-ray coordinates remain
-provisional.
+and exact ground-ray coordinates remain provisional.
+
+Every placed actor base and all 576 adjacent base/attack/hit/death state blocks
+use behavior `0x87`, so actor bit `0x02` blocks the cell. At a cell crossing,
+scheduler `0x53624`-`0x53694` restores the mover's saved underlying block to
+its former cell, captures the destination block, and installs the actor block
+there before the next live effect is processed. Multiple mode-12 actors sent
+to one coordinate therefore never stack or fan out: one occupies the cell and
+later arrivals hit the strict collision band, stop their live `0x112` effect,
+and retry. Preserve single-cell occupancy and persistent retry. Which actor
+wins a simultaneous tie remains Provisional until the original round-robin
+thinker/effect-slot ordering is reproduced.
 
 Public Retreat command handler `0x5744B` resets current mode, requests mode 10,
 and calls transition helper `0x4E5F0`. On the following acquisition pass,

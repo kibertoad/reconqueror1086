@@ -197,6 +197,9 @@ public sealed partial class SiegeSession
         _ => (y, -x)
     };
 
+    // All supported actor states use behavior 0x87, so their installed map
+    // block contributes bit 0x02 exactly like an authored static blocker.
+    // Keep actor occupancy exclusive while direct movers retain/retry offsets.
     private bool RetainerCanEnter(SiegeRetainer self, int x, int y) =>
         x >= 0 && y >= 0 && x < Width && y < Height && !_movementBlocks[x, y] &&
         (x != PlayerX || y != PlayerY) &&

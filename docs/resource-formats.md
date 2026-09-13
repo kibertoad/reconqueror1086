@@ -444,6 +444,23 @@ Mode-11 damage cadence is also **Confirmed**. Constructor `0x4C7F4` stores the c
 
 No-visible-target Attack now closes the former mode-6 gap. Acquisition-table entry `0x4F98D` searches for the nearest visible opposite-side actor; kind-0 transition `0x4E71F` and kind-1 transition `0x4E745` retain mode 6 on failure and select modes 8/11 on success. The current-mode table maps mode 6 to `0x4FDCD`, which preserves heading, clears actor target fields, reads movement selector `+0x46`, and rewrites low descriptor flags as `(flags & 0xA7) | 0x40`. Official descriptor `0x142` is therefore unchanged. The scheduler's flag-`0x40` branch at `0x53C13`-`0x53C6C` clears a blocked local axis and applies `(((heading + 0x20) & 0xC0) - 0x40) & 0xFF` while the effect continues. `SiegeRetainer.MovementWanders` records the selected live-effect family; `SiegeSession.AttackOrderTarget` uses the bounded visibility bridge, and focused tests cover unobstructed and blocked mode-6 motion. The route, rewrite, and turn formula are **Confirmed**; exact cell-trace equivalence to `0x470A8` remains **Corroborated**. The GameFAQs guide contains no corresponding internal detail.
 
+Multi-actor destination occupancy is now **Confirmed**. All 144 placed actor
+bases and all four adjacent state blocks for each base—576 blocks total—use
+behavior `0x87`; bit `0x02` therefore makes every live actor a movement
+blocker. When a coordinate crosses a cell boundary, scheduler
+`0x53624`-`0x53694` writes actor record `+0x28` (the saved underlying block) to
+the old map cell, captures the destination block back into `+0x28`, copies it
+to the live actor block's state target `+0x40`, and writes the actor block from
+record `+0x24` into the new cell. This swap completes before the next live
+effect is processed. Actors ordered to one mode-12 coordinate consequently do
+not overlap or choose alternate formation cells: one actor can occupy it,
+while later arrivals see bit 2 beyond the strict collision band, terminate
+their direct `0x112` effect, and retry from their retained offset. Runtime
+actor occupancy and the shared-destination regression preserve that rule.
+Exact winner ordering in a simultaneous tie remains **Provisional** pending
+equivalence with thinker cursor `D5C4` and live-effect slot allocation. The
+GameFAQs guide does not describe this low-level convergence behavior.
+
 The remaining mode-9/10 table columns are now **Confirmed**. For actor kinds
 0-6, acquisition success selects `9/5`, `9/4`, `6/4`, `9/10`, `6/4`, `9/10`,
 and `9/10`, while failure/previous selects `6/2`, `6/2`, `1/3`, `1/5`, `1/3`,

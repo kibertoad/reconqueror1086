@@ -142,6 +142,17 @@ not absence of a public button alone, proves `0x50020` unreachable for the
 supported population. Preserve the handler's 1.5 non-cardinal formula as a
 dormant technical mapping rather than inventing a runtime entry.
 
+For shared-destination behavior, correlate scheduler `0x53425`-`0x53694`
+with the ignored `--scene-blocks` census. The neighbor test reads behavior bit
+`0x02`; every placed actor base and each adjacent attack/hit/death state is
+`0x87`. On a successful cell change, follow actor record `+0x28` as the saved
+underlying block: it is restored into the old map cell, replaced with the new
+cell's block, copied into live block state target `+0x40`, and followed by
+actor block `+0x24` being installed in the new cell. Because this occurs before
+the next effect record, the trace proves single-cell occupancy and blocked
+retry without relying on a visual observation. Do not infer the simultaneous
+winner until thinker cursor and effect-slot order have also been traced.
+
 ## Evidence discipline
 
 - Hash the executable before analysis and compare it with the reference hash above.

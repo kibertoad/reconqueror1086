@@ -5,6 +5,11 @@ public sealed record OriginalActorModeProfile(int Current, int Requested, int Pr
 
 public static class OriginalCombatantTemplates
 {
+    // Every placed actor base and each adjacent attack/hit/death state in the
+    // supported scenes uses behavior 0x87. Bit 0x02 makes the live actor block
+    // its current map cell while the scheduler swaps its underlying block.
+    public const int PlacedActorBehavior = 0x87;
+
     // CONQUER.EXE object 2 offset 0xCE10 is initialized as ten 0x44-byte
     // combatant templates. Attack skill, armor, and health occupy offsets
     // 0x34, 0x3c, and 0x40.

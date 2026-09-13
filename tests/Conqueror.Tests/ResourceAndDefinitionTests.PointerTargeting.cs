@@ -194,6 +194,42 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void SharedGroundDestinationAllowsOneOccupantAndBlocksFollowers()
+    {
+        var army = new Army();
+        army.Units[UnitType.Swordsmen] = 6;
+        var movement = new SiegeActorMovement(3, 200, 64, 0, 0x142, 5);
+        var battle = new SiegeSession(new Player(), army, 0, 4,
+            new SiegeLayout(new SiegeTile[8, 5], 0, 0, Facing.East, [], retainers:
+            [
+                new SiegeSpawn(2, 2, false, OriginalHealth: 10, OriginalMovement: movement),
+                new SiegeSpawn(4, 2, false, OriginalHealth: 10, OriginalMovement: movement)
+            ]));
+        var first = battle.Retainers[0];
+        var second = battle.Retainers[1];
+        battle.CommandRetainers(SiegeRetainerCommand.Defend);
+        battle.ToggleRetainerSelection(first);
+        battle.ToggleRetainerSelection(second);
+
+        Assert.Equal(0x87, OriginalCombatantTemplates.PlacedActorBehavior);
+        Assert.NotEqual(0, OriginalCombatantTemplates.PlacedActorBehavior & 0x02);
+        Assert.True(battle.CommandSelectedRetainersTo(3, 2));
+        battle.AdvanceRetainerMovement(0.6001);
+
+        var occupant = Assert.Single(battle.Retainers, retainer => retainer.X == 3);
+        var follower = Assert.Single(battle.Retainers,
+            retainer => !ReferenceEquals(retainer, occupant));
+        Assert.Equal((3, 2, -64), (occupant.X, occupant.Y, occupant.OffsetX8));
+        Assert.Equal(64, Math.Abs(follower.OffsetX8));
+
+        battle.AdvanceRetainerMovement(1.6001);
+
+        Assert.Equal((3, 2), (occupant.X, occupant.Y));
+        Assert.NotEqual((3, 2), (follower.X, follower.Y));
+        Assert.Equal(64, Math.Abs(follower.OffsetX8));
+    }
+
+    [Fact]
     public void AuthoredObjectStateReplacementUpdatesTheMovementBlockerPlane()
     {
         var tiles = new SiegeTile[10, 10];
