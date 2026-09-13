@@ -21,6 +21,14 @@ public sealed class DynamixSceneEffectDefinition
     public int IntervalMilliseconds => FieldAt(0x14);
     public int Flags => FieldAt(0x18);
     public int MapBlockIndex => FieldAt(0x28);
+    public int MapXDeltaPerTick => FieldAt(0x1c);
+    public int MapYDeltaPerTick => FieldAt(0x20);
+    public int BlockIndexDeltaPerTick => FieldAt(0x2c);
+    public int LoopBlockIndex => FieldAt(0x30);
+    public int SurfaceIndexDeltaPerTick => FieldAt(0x34);
+    public int TerminalSurfaceIndex => FieldAt(0x38);
+    public int HeadingDeltaPerTick => FieldAt(0x3c);
+    public long NominalCompletionMilliseconds => checked((long)FrameCount * IntervalMilliseconds);
 
     public int FieldAt(int byteOffset)
     {

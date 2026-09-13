@@ -17,8 +17,14 @@ public sealed partial class ResourceAndDefinitionTests
         WriteEffectField(effects, 0x0c, 3);
         WriteEffectField(effects, 0x14, 192);
         WriteEffectField(effects, 0x18, 5);
+        WriteEffectField(effects, 0x1c, -16);
+        WriteEffectField(effects, 0x20, 32);
         WriteEffectField(effects, 0x28, -1);
-        WriteEffectField(effects, 0x3c, 77);
+        WriteEffectField(effects, 0x2c, 1);
+        WriteEffectField(effects, 0x30, 9);
+        WriteEffectField(effects, 0x34, 3);
+        WriteEffectField(effects, 0x38, 27);
+        WriteEffectField(effects, 0x3c, 64);
         WriteEffectField(effects, 0x40 + 0x0c, 1);
         WriteEffectField(effects, 0x40 + 0x14, 100);
         WriteEffectField(effects, 0x40 + 0x28, -1);
@@ -31,7 +37,13 @@ public sealed partial class ResourceAndDefinitionTests
         var definition = scene.EffectDefinitions[0];
         Assert.Equal((3, 192, 5, -1),
             (definition.FrameCount, definition.IntervalMilliseconds, definition.Flags, definition.MapBlockIndex));
-        Assert.Equal(77, definition.FieldAt(0x3c));
+        Assert.Equal((-16, 32, 1, 9, 3, 27, 64),
+            (definition.MapXDeltaPerTick, definition.MapYDeltaPerTick,
+                definition.BlockIndexDeltaPerTick, definition.LoopBlockIndex,
+                definition.SurfaceIndexDeltaPerTick, definition.TerminalSurfaceIndex,
+                definition.HeadingDeltaPerTick));
+        Assert.Equal(576, definition.NominalCompletionMilliseconds);
+        Assert.Equal(64, definition.FieldAt(0x3c));
         Assert.Throws<ArgumentOutOfRangeException>(() => definition.FieldAt(2));
     }
 

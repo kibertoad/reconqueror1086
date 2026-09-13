@@ -60,7 +60,7 @@ and the current parity limits are summarized in the [fidelity ledger](docs/fidel
 | Area | Remaining work |
 | --- | --- |
 | Exact gameplay parity | Recover remaining economy interpolation, construction costs, character edge cases, tournament records, world tables, political simulation, quest boundaries, and native RNG consumption. The FAQ consistency audit identifies known provisional matches and conflicts. |
-| Combat parity | Confirm foreground and door cadence, critical-hit behavior, sub-cell movement, enemy/retainer AI, stair transitions, enemy food use, pickup reward payloads, loot, siege consequences, and the remaining campaign-scene callback. Explicit behavior-19 pickup interaction/range is executable-confirmed. |
+| Combat parity | Confirm foreground and door cadence, critical-hit behavior, sub-cell movement, enemy/retainer AI, stair transitions, enemy food use, pickup reward payloads, loot, siege consequences, and the remaining campaign-scene callback. Explicit behavior-19 pickup interaction/range and the data-driven actor state-completion gate are executable-confirmed; sequential playback of every adjacent actor texture remains provisional. |
 | Strategic AI | Replace generated routing, garrisons, tournament movement, field-battle coefficients, captain battle rules, and opponent behavior with executable-backed logic and fixed reference traces. |
 | Visual and audio parity | Bind remaining palettes, Sierra payloads, conversation entry points, `.666` events, Smacker triggers/seeking, original font metrics, status fields, terrain composition, and exact hit regions. |
 | Platform polish | Installers are unsigned. Native installer QA, macOS notarization, customizable bindings, and broader accessibility work remain. |
