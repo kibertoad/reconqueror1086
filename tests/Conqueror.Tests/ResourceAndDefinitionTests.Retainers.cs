@@ -326,6 +326,58 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void AttackWithoutAVisibleTargetUsesModeSixWanderingMovement()
+    {
+        var tiles = new SiegeTile[12, 5];
+        var movementBlocks = new bool[12, 5];
+        movementBlocks[7, 2] = true;
+        var army = new Army();
+        army.Units[SiegeRetainerCombatUnit] = 1;
+        var retainer = new SiegeSpawn(5, 2, false, OriginalHealth: 12,
+            OriginalCombatRow: 0, OriginalAttackSkill: 50, OriginalActorKind: 0);
+        var enemy = new SiegeSpawn(9, 2, false, OriginalArmor: 6, OriginalHealth: 10,
+            OriginalCombatRow: 4, OriginalAttackSkill: 50);
+        var battle = new SiegeSession(new Player(), army, 0, 1086,
+            new SiegeLayout(tiles, 1, 1, Facing.East, [enemy], retainers: [retainer],
+                movementBlocks: movementBlocks));
+        var friendly = Assert.Single(battle.Retainers);
+        friendly.Facing = Facing.South;
+        battle.CommandRetainers(SiegeRetainerCommand.Attack);
+
+        battle.AdvanceRetainerOrders();
+        battle.AdvanceRetainerMovement(0.6001);
+
+        Assert.Equal((5, 3, 0, -64, Facing.South),
+            (friendly.X, friendly.Y, friendly.OffsetX8, friendly.OffsetY8, friendly.Facing));
+        Assert.Equal(SiegeEnemyVisualState.Walk, friendly.VisualState);
+        Assert.Equal(10, Assert.Single(battle.Enemies).Health);
+    }
+
+    [Fact]
+    public void ModeSixWanderingKeepsItsFlagFortyCollisionFamilyForTheWholeEffect()
+    {
+        var tiles = new SiegeTile[12, 5];
+        var movementBlocks = new bool[12, 5];
+        movementBlocks[7, 2] = true;
+        movementBlocks[5, 3] = true;
+        var army = new Army();
+        army.Units[SiegeRetainerCombatUnit] = 1;
+        var battle = new SiegeSession(new Player(), army, 0, 1086,
+            new SiegeLayout(tiles, 1, 1, Facing.East,
+                [new SiegeSpawn(9, 2, false, OriginalHealth: 10)], retainers:
+                [new SiegeSpawn(5, 2, false, OriginalHealth: 12, OriginalActorKind: 0)],
+                movementBlocks: movementBlocks));
+        var friendly = Assert.Single(battle.Retainers);
+        friendly.Facing = Facing.South;
+        battle.CommandRetainers(SiegeRetainerCommand.Attack);
+
+        battle.AdvanceRetainerMovement(0.4001);
+
+        Assert.Equal((5, 2, 0, 0, Facing.East),
+            (friendly.X, friendly.Y, friendly.OffsetX8, friendly.OffsetY8, friendly.Facing));
+    }
+
+    [Fact]
     public void RetreatWithoutAnOpponentFallsBackToDefend()
     {
         var tiles = new SiegeTile[12, 5];

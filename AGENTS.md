@@ -46,9 +46,13 @@ Mode-11 handler `0x5010B` aims at the returned actor and requires ray distance
 strictly below raw combat-row contact column 4 at object-2
 `0xCE24 + 28 * row`; rows 23/24 double the attack effect interval. The runtime
 activates this bowman Retreat attack route through a bounded line-of-sight
-bridge. Defend does not seek. Attack's no-target wandering, exact fixed-point
-ray equivalence, formation/path selection, and thinker cadence remain
-Provisional.
+bridge. Defend does not seek. When mode-6 acquisition `0x4F98D` finds no
+visible opponent, kind-0 transition `0x4E71F` and kind-1 transition `0x4E745`
+both retain mode 6. Its handler `0x4FDCD` preserves heading and installs the
+same `(flags & 0xA7) | 0x40` movement family as melee Retreat. The runtime
+stores that family on the live movement effect so later order evaluation cannot
+change its collision behavior mid-cycle. Exact fixed-point ray equivalence,
+formation/path selection, and thinker cadence remain Provisional.
 
 First-person pointer dispatch is also mapped. Handler `0x55524` consumes the
 world hit returned by raycaster `0x470A8`: a friendly actor toggles selection;
@@ -83,8 +87,8 @@ crossing changes the cell and wraps to `-64`: 600 ms is the first transition
 and effect-cycle duration, not a universal cell cadence. Sustained straight
 movement takes four ticks/800 ms per cell. Multi-actor destination behavior
 remains Provisional. The same timing and offset mapping is active for acquired
-Attack mode 8, Follow mode 16, and melee Retreat mode 5; it is not yet
-established for every actor mode.
+Attack mode 8, no-visible-target Attack mode 6, Follow mode 16, and melee
+Retreat mode 5; it is not yet established for every actor mode.
 
 Mode-12 route and collision handling is narrower than that general caveat.
 Heading helper `0x445C4` followed by `(heading + 0x20) & 0xC0` aims directly

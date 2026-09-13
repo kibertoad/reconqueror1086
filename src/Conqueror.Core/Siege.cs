@@ -36,6 +36,7 @@ public sealed class SiegeRetainer : SiegeEnemy
     internal (int X, int Y)? OrderedDestination { get; set; }
     internal double MovementElapsed { get; set; }
     internal int MovementTick { get; set; }
+    internal bool MovementWanders { get; set; }
 }
 
 public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int GarrisonPerEnemy,
@@ -724,8 +725,8 @@ public sealed partial class SiegeSession
                         RetainerAttack(retainer, target);
                     break;
                 case SiegeRetainerCommand.Attack:
-                    if (target is null) break;
-                    RetainerAttack(retainer, target);
+                    var attackTarget = AttackOrderTarget(retainer);
+                    if (attackTarget is not null) RetainerAttack(retainer, attackTarget);
                     break;
                 case SiegeRetainerCommand.Follow:
                     break;
@@ -783,6 +784,7 @@ public sealed partial class SiegeSession
     {
         retainer.MovementElapsed = 0;
         retainer.MovementTick = 0;
+        retainer.MovementWanders = false;
     }
 
     private void EnemyAttackRetainer(SiegeEnemy enemy, SiegeRetainer retainer, int distance)

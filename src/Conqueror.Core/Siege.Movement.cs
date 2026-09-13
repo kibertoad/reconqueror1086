@@ -59,7 +59,7 @@ public sealed partial class SiegeSession
         (descriptorFlags & ~0xFF) | ((descriptorFlags & 0xFF & 0xA7) | 0x40);
 
     private static int MovementFlagsFor(SiegeRetainer retainer, int descriptorFlags) =>
-        retainer.OrderedDestination is null && retainer.Command == SiegeRetainerCommand.Retreat
+        retainer.MovementWanders
             ? WanderingMovementFlags(descriptorFlags)
             : DirectMovementFlags(descriptorFlags);
 
@@ -67,6 +67,7 @@ public sealed partial class SiegeSession
     {
         if (retainer.OrderedDestination is { } destination)
         {
+            retainer.MovementWanders = false;
             if (retainer.X == destination.X && retainer.Y == destination.Y)
             {
                 CompleteDestination(retainer);
@@ -79,12 +80,21 @@ public sealed partial class SiegeSession
         switch (retainer.Command)
         {
             case SiegeRetainerCommand.Attack:
-                var target = RetainerOrderTarget(retainer);
-                if (target is null || Distance(retainer.X, retainer.Y, target.X, target.Y) <=
+                var target = AttackOrderTarget(retainer);
+                if (target is null)
+                {
+                    // Failed mode-6 acquisition leaves both friendly kinds in
+                    // mode 6, whose handler preserves heading and installs 0x40.
+                    retainer.MovementWanders = true;
+                    return true;
+                }
+                retainer.MovementWanders = false;
+                if (Distance(retainer.X, retainer.Y, target.X, target.Y) <=
                     RetainerAttackRange(retainer) || retainer.OriginalCombatRow is >= 23) return false;
                 AimRetainerAt(retainer, target.X, target.Y);
                 return true;
             case SiegeRetainerCommand.Follow:
+                retainer.MovementWanders = false;
                 if (Distance(retainer.X, retainer.Y, PlayerX, PlayerY) <= 1) return false;
                 AimRetainerAt(retainer, PlayerX, PlayerY);
                 return true;
@@ -94,11 +104,14 @@ public sealed partial class SiegeSession
                 // Mode 5 preserves heading; kind 1 continues through ranged mode 11.
                 if (RetreatOrderTarget(retainer) is null)
                 {
+                    retainer.MovementWanders = false;
                     retainer.Command = SiegeRetainerCommand.Defend;
                     return false;
                 }
-                return retainer.OriginalActorKind is null or 0;
+                retainer.MovementWanders = retainer.OriginalActorKind is null or 0;
+                return retainer.MovementWanders;
             default:
+                retainer.MovementWanders = false;
                 return false;
         }
     }
@@ -194,9 +207,19 @@ public sealed partial class SiegeSession
     // identity is returned by raycaster 0x470A8. This bounded cell trace is the
     // current compatibility bridge until that fixed-point ray is reproduced.
     private SiegeEnemy? RetreatOrderTarget(SiegeRetainer retainer) =>
-        _enemies.Where(enemy => enemy.Health > 0 && ActorLineIsClear(retainer, enemy))
+        VisibleOrderTarget(retainer);
+
+    private SiegeEnemy? AttackOrderTarget(SiegeRetainer retainer) =>
+        VisibleOrderTarget(retainer);
+
+    private SiegeEnemy? VisibleOrderTarget(SiegeRetainer retainer)
+    {
+        if (retainer.OrderedTarget is { Health: > 0 } ordered && _enemies.Contains(ordered))
+            return ActorLineIsClear(retainer, ordered) ? ordered : null;
+        return _enemies.Where(enemy => enemy.Health > 0 && ActorLineIsClear(retainer, enemy))
             .OrderBy(enemy => ActorDistanceInFixedPoint(retainer, enemy))
             .FirstOrDefault();
+    }
 
     private bool RetainerRangedAttack(SiegeRetainer retainer, SiegeEnemy target)
     {
