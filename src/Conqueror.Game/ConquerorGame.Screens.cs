@@ -297,7 +297,12 @@ public sealed partial class ConquerorGame
         var selected = selectedBlock.TextureForBillboardHeading(relativeHeading);
         var textureIndex = selected.TextureIndex;
         if (enemy.VisualState == SiegeEnemyVisualState.Walk && block.Surface2 > 0)
-            textureIndex += enemy.WalkFrame * (block.Surface2 / 2 + 1);
+        {
+            var stride = enemy.OriginalMovement?.SurfaceIndexDeltaPerTick is > 0 and <= 4096
+                ? enemy.OriginalMovement.SurfaceIndexDeltaPerTick
+                : block.Surface2 / 2 + 1;
+            textureIndex += enemy.WalkFrame * stride;
+        }
         return (_siegeVisuals.TextureFor(textureIndex) ?? FirstSceneTexture(selectedBlock),
             selected.FlipHorizontally);
     }

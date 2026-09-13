@@ -62,10 +62,16 @@ Actor blocks have two distinct signed effect selectors: `+0x2E` selects the
 visual state-completion effect, while `+0x46` selects movement. Mode handler
 `0x4FFBC` reads the latter through the high word at `+0x44`. Across all 144
 placed actor bases (1,002 placements), movement selectors 7/10 both resolve to
-three ticks at 200 ms, flags `0x142`, and local 8.8 delta `(64,0)`. Preserve the
-strict post-deadline cell cadence (`3 * 200 = 600 ms` nominal) independently of
-processor speed and input frequency. Route choice, intermediate sub-cell
-rendering, and full collision response remain provisional.
+three ticks at 200 ms, flags `0x142`, local 8.8 delta `(64,0)`, and surface
+stride 5. Loader `0x5185F`/`0x5186F` centers actor records at
+`(cell << 8) + 0x80`; cloned kind-4 block offsets `+0x24/+0x28` begin at zero
+across the complete official population and retain movement remainder. Preserve
+the strict post-deadline 200 ms tick independently of processor speed and input
+frequency. From zero, offsets advance `0,64,128,192`, then strict `> 0x80`
+crossing changes the cell and wraps to `-64`: 600 ms is the first transition
+and effect-cycle duration, not a universal cell cadence. Sustained straight
+movement takes four ticks/800 ms per cell. Route choice, collision deflection,
+and actor modes other than selected ground travel remain provisional.
 
 ## Git push destination
 

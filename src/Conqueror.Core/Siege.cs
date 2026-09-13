@@ -17,6 +17,8 @@ public class SiegeEnemy
     public int? OriginalCombatRow { get; init; }
     public SiegeActorAnimation? OriginalAnimation { get; init; }
     public SiegeActorMovement? OriginalMovement { get; init; }
+    public int OffsetX8 { get; internal set; }
+    public int OffsetY8 { get; internal set; }
     public bool Champion { get; init; }
     public int VisualId { get; init; } = -1;
     public Facing Facing { get; set; }
@@ -32,6 +34,7 @@ public sealed class SiegeRetainer : SiegeEnemy
     internal SiegeEnemy? OrderedTarget { get; set; }
     internal (int X, int Y)? OrderedDestination { get; set; }
     internal double MovementElapsed { get; set; }
+    internal int MovementTick { get; set; }
 }
 
 public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int GarrisonPerEnemy,
@@ -39,11 +42,13 @@ public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int
 public sealed record SiegeSpawn(int X, int Y, bool Champion, int VisualId = -1,
     int? OriginalArmor = null, int? OriginalHealth = null, int? OriginalCombatRow = null,
     int? OriginalAttackSkill = null, SiegeActorAnimation? OriginalAnimation = null,
-    SiegeActorMovement? OriginalMovement = null);
+    SiegeActorMovement? OriginalMovement = null, int InitialOffsetX8 = 0, int InitialOffsetY8 = 0);
 public sealed record SiegeActorAnimation(double AttackSeconds, double HitSeconds, double DeathSeconds);
 public sealed record SiegeActorMovement(
-    int TickCount, int IntervalMilliseconds, int FixedXDeltaPerTick, int FixedYDeltaPerTick, int Flags)
+    int TickCount, int IntervalMilliseconds, int FixedXDeltaPerTick, int FixedYDeltaPerTick, int Flags,
+    int SurfaceIndexDeltaPerTick = 0)
 {
+    public double TickSeconds => IntervalMilliseconds / 1000d;
     public double NominalSeconds => checked((long)TickCount * IntervalMilliseconds) / 1000d;
 }
 public sealed record SiegePickupReward(SiegePickupRewardKind Kind, int Amount, int DieSides = 0,
@@ -124,7 +129,7 @@ public sealed class SiegeLayout
     public SiegeTile[,] CopyTiles() => (SiegeTile[,])_tiles.Clone();
 }
 
-public sealed class SiegeSession
+public sealed partial class SiegeSession
 {
     public static readonly SiegeDefinition Rules = new(12, 12, 5, 3, 3, 2);
     public const double FallbackEnemyAttackSeconds = 0.63;
@@ -202,7 +207,9 @@ public sealed class SiegeSession
                     Champion = spawn.Champion,
                     VisualId = spawn.VisualId,
                     OriginalAnimation = spawn.OriginalAnimation,
-                    OriginalMovement = spawn.OriginalMovement
+                    OriginalMovement = spawn.OriginalMovement,
+                    OffsetX8 = spawn.InitialOffsetX8,
+                    OffsetY8 = spawn.InitialOffsetY8
                 };
                 enemy.Facing = DirectionToward(enemy.X, enemy.Y, PlayerX, PlayerY, Facing.South);
                 _enemies.Add(enemy);
@@ -238,6 +245,8 @@ public sealed class SiegeSession
         VisualId = spawn.VisualId,
         OriginalAnimation = spawn.OriginalAnimation,
         OriginalMovement = spawn.OriginalMovement,
+        OffsetX8 = spawn.InitialOffsetX8,
+        OffsetY8 = spawn.InitialOffsetY8,
         Facing = DirectionToward(spawn.X, spawn.Y, PlayerX, PlayerY, Facing.South)
     };
 
@@ -310,6 +319,7 @@ public sealed class SiegeSession
             retainer.OrderedTarget = null;
             retainer.OrderedDestination = (x, y);
             retainer.MovementElapsed = 0;
+            retainer.MovementTick = 0;
         }
         foreach (var retainer in living) retainer.Selected = false;
         LastMessage = "Retainers move to the selected ground.";
@@ -341,42 +351,6 @@ public sealed class SiegeSession
             }
             enemy.VisualState = SiegeEnemyVisualState.Walk;
             enemy.VisualElapsed = 0;
-        }
-    }
-
-    public void AdvanceRetainerMovement(double elapsedSeconds)
-    {
-        if (!double.IsFinite(elapsedSeconds) || elapsedSeconds < 0)
-            throw new ArgumentOutOfRangeException(nameof(elapsedSeconds));
-        foreach (var retainer in _retainers.Where(retainer =>
-                     retainer.Health > 0 && retainer.OrderedDestination is not null))
-        {
-            var destination = retainer.OrderedDestination!.Value;
-            if (retainer.X == destination.X && retainer.Y == destination.Y)
-            {
-                retainer.OrderedDestination = null;
-                retainer.MovementElapsed = 0;
-                continue;
-            }
-            var cellSeconds = retainer.OriginalMovement?.NominalSeconds is > 0 and <= 60
-                ? retainer.OriginalMovement.NominalSeconds
-                : 0.6;
-            retainer.MovementElapsed += elapsedSeconds;
-            var catchUp = 0;
-            while (retainer.MovementElapsed > cellSeconds && catchUp < 8 &&
-                   retainer.OrderedDestination is not null)
-            {
-                catchUp++;
-                retainer.MovementElapsed -= cellSeconds;
-                MoveRetainerToward(retainer, destination.X, destination.Y);
-                if (retainer.X == destination.X && retainer.Y == destination.Y)
-                {
-                    retainer.OrderedDestination = null;
-                    retainer.MovementElapsed = 0;
-                }
-            }
-            if (catchUp == 8 && retainer.MovementElapsed > cellSeconds)
-                retainer.MovementElapsed = cellSeconds;
         }
     }
 
@@ -754,44 +728,6 @@ public sealed class SiegeSession
             : "Your retainer strikes a defender.";
         return true;
     }
-
-    private void MoveRetainerToward(SiegeRetainer retainer, int targetX, int targetY)
-    {
-        var candidates = CardinalSteps(retainer.X, retainer.Y)
-            .OrderBy(point => Distance(point.X, point.Y, targetX, targetY));
-        MoveRetainer(retainer, candidates.FirstOrDefault(point => RetainerCanEnter(retainer, point.X, point.Y)));
-    }
-
-    private void MoveRetainerAway(SiegeRetainer retainer, int targetX, int targetY)
-    {
-        var candidates = CardinalSteps(retainer.X, retainer.Y)
-            .OrderByDescending(point => Distance(point.X, point.Y, targetX, targetY));
-        MoveRetainer(retainer, candidates.FirstOrDefault(point => RetainerCanEnter(retainer, point.X, point.Y)));
-    }
-
-    private void MoveRetainer(SiegeRetainer retainer, Point destination)
-    {
-        if (destination == default) return;
-        retainer.Facing = DirectionToward(retainer.X, retainer.Y, destination.X, destination.Y, retainer.Facing);
-        retainer.X = destination.X;
-        retainer.Y = destination.Y;
-        retainer.WalkFrame = (retainer.WalkFrame + 1) % 3;
-    }
-
-    private bool RetainerCanEnter(SiegeRetainer self, int x, int y) =>
-        TileAt(x, y) == SiegeTile.Floor && (x != PlayerX || y != PlayerY) &&
-        EnemyAt(x, y) is null &&
-        _retainers.All(retainer => ReferenceEquals(retainer, self) || retainer.Health <= 0 ||
-            retainer.X != x || retainer.Y != y);
-
-    private static IReadOnlyList<Point> CardinalSteps(int x, int y) =>
-        [new(x + 1, y), new(x - 1, y), new(x, y + 1), new(x, y - 1)];
-
-    private static int Distance(int x1, int y1, int x2, int y2) =>
-        Math.Abs(x1 - x2) + Math.Abs(y1 - y2);
-
-    private static bool IsNeighbor(int x1, int y1, int x2, int y2) =>
-        Math.Abs(x1 - x2) <= 1 && Math.Abs(y1 - y2) <= 1;
 
     private void EnemyAttackRetainer(SiegeEnemy enemy, SiegeRetainer retainer, int distance)
     {

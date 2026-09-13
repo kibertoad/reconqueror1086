@@ -11,7 +11,7 @@ public sealed partial class ResourceAndDefinitionTests
     [Fact]
     public void BillboardHeadingUsesTheExecutableAngularDivisionAndMirrorFormula()
     {
-        var walk = new DynamixSceneBlock(0, 4, 135, 0, 0, 128, 168,
+        var walk = new DynamixSceneBlock(0, 4, 135, 0, 0, 128, 168, 0, 0,
             175, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, "knight");
         var attack = walk with { Surface0 = 190, Surface2 = 4 };
 
@@ -49,6 +49,8 @@ public sealed partial class ResourceAndDefinitionTests
         }
         WriteInteraction(blocks, 5, 1, 3, 0);
         WriteInt(blocks, 5 * DynamixSceneDecoder.BlockSize + 0x44, 1 << 16);
+        WriteInt(blocks, 5 * DynamixSceneDecoder.BlockSize + 0x24, 12);
+        WriteInt(blocks, 5 * DynamixSceneDecoder.BlockSize + 0x28, -34);
         WriteInt(source.Scenario, 28, 2);
         var effects = new byte[DynamixSceneEffectDecoder.RecordSize * 2];
         WriteEffectField(effects, 0x0c, 2);
@@ -58,6 +60,7 @@ public sealed partial class ResourceAndDefinitionTests
         WriteEffectField(effects, 0x40 + 0x14, 200);
         WriteEffectField(effects, 0x40 + 0x18, 0x142);
         WriteEffectField(effects, 0x40 + 0x1c, 64);
+        WriteEffectField(effects, 0x40 + 0x34, 5);
         WriteEffectField(effects, 0x40 + 0x28, -1);
 
         var scene = DynamixSceneDecoder.Decode(
@@ -65,7 +68,8 @@ public sealed partial class ResourceAndDefinitionTests
         var actor = Assert.Single(ImportedSiegeLayouts.Convert(scene).Enemies);
 
         Assert.Equal(new SiegeActorAnimation(0.384, 0.384, 0.384), actor.OriginalAnimation);
-        Assert.Equal(new SiegeActorMovement(3, 200, 64, 0, 0x142), actor.OriginalMovement);
+        Assert.Equal(new SiegeActorMovement(3, 200, 64, 0, 0x142, 5), actor.OriginalMovement);
+        Assert.Equal((12, -34), (actor.InitialOffsetX8, actor.InitialOffsetY8));
     }
 
     [Fact]
@@ -116,6 +120,7 @@ public sealed partial class ResourceAndDefinitionTests
 
         Assert.Equal((12, 1, 1), (scene.Blocks[0].Surface0, scene.Blocks[0].EffectDefinitionIndex,
             scene.Blocks[0].MovementEffectDefinitionIndex));
+        Assert.Equal((0, 0), (scene.Blocks[0].InitialXOffset8, scene.Blocks[0].InitialYOffset8));
         Assert.Equal(2, scene.EffectDefinitionCount);
         var definition = scene.EffectDefinitions[0];
         Assert.Equal((3, 192, 5, -1),

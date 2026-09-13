@@ -90,11 +90,14 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.True(battle.CommandSelectedRetainersTo(2, 5));
         battle.AdvanceRetainerMovement(0.6);
         Assert.Equal((2, 2), (friendly.X, friendly.Y));
+        Assert.Equal((0, 128), (friendly.OffsetX8, friendly.OffsetY8));
         battle.AdvanceRetainerMovement(0.0001);
         Assert.Equal((2, 3), (friendly.X, friendly.Y));
-        battle.AdvanceRetainerMovement(1.2);
+        Assert.Equal((0, -64), (friendly.OffsetX8, friendly.OffsetY8));
+        battle.AdvanceRetainerMovement(1.6001);
 
         Assert.Equal((2, 5), (friendly.X, friendly.Y));
+        Assert.Equal((0, -64), (friendly.OffsetX8, friendly.OffsetY8));
         Assert.Equal(SiegeRetainerCommand.Defend, friendly.Command);
         Assert.False(friendly.Selected);
     }
@@ -113,18 +116,53 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal((Assert.Single(oneUpdate.Retainers).X, Assert.Single(oneUpdate.Retainers).Y),
             (Assert.Single(splitUpdates.Retainers).X, Assert.Single(splitUpdates.Retainers).Y));
         Assert.Equal((2, 3), (Assert.Single(oneUpdate.Retainers).X, Assert.Single(oneUpdate.Retainers).Y));
+        Assert.Equal((Assert.Single(oneUpdate.Retainers).OffsetX8, Assert.Single(oneUpdate.Retainers).OffsetY8),
+            (Assert.Single(splitUpdates.Retainers).OffsetX8, Assert.Single(splitUpdates.Retainers).OffsetY8));
+        Assert.Equal((0, -64),
+            (Assert.Single(oneUpdate.Retainers).OffsetX8, Assert.Single(oneUpdate.Retainers).OffsetY8));
     }
 
-    private static SiegeSession GroundOrderBattle()
+    [Theory]
+    [InlineData(3, 2, Facing.East, 64, 0)]
+    [InlineData(1, 2, Facing.West, -64, 0)]
+    [InlineData(2, 3, Facing.South, 0, 64)]
+    [InlineData(2, 1, Facing.North, 0, -64)]
+    public void MovementDescriptorDeltaRotatesIntoEachCardinalSubcellDirection(
+        int targetX, int targetY, Facing expectedFacing, int expectedOffsetX8, int expectedOffsetY8)
+    {
+        var battle = GroundOrderBattle(targetX, targetY);
+        var friendly = Assert.Single(battle.Retainers);
+
+        battle.AdvanceRetainerMovement(0.2001);
+
+        Assert.Equal((2, 2), (friendly.X, friendly.Y));
+        Assert.Equal(expectedFacing, friendly.Facing);
+        Assert.Equal((expectedOffsetX8, expectedOffsetY8), (friendly.OffsetX8, friendly.OffsetY8));
+    }
+
+    [Fact]
+    public void ActorProjectionUsesTheExecutableMappedSubcellOffsets()
+    {
+        var battle = GroundOrderBattle(3, 2, 0, 2);
+        battle.AdvanceRetainerMovement(0.2001);
+
+        var projection = Assert.Single(SiegeViewProjection.ProjectRetainers(battle));
+
+        Assert.Equal(2.25, projection.ForwardDistance);
+        Assert.Equal(0.5, projection.ScreenPosition);
+    }
+
+    private static SiegeSession GroundOrderBattle(
+        int targetX = 2, int targetY = 5, int playerX = 0, int playerY = 0)
     {
         var army = new Army();
         army.Units[UnitType.Swordsmen] = 1;
         var battle = new SiegeSession(new Player(), army, 0, 4,
-            new SiegeLayout(new SiegeTile[10, 10], 1, 2, Facing.East, [], retainers:
+            new SiegeLayout(new SiegeTile[10, 10], playerX, playerY, Facing.East, [], retainers:
             [new SiegeSpawn(2, 2, false, OriginalHealth: 10,
-                OriginalMovement: new SiegeActorMovement(3, 200, 64, 0, 0x142))]));
+                OriginalMovement: new SiegeActorMovement(3, 200, 64, 0, 0x142, 5))]));
         battle.ToggleRetainerSelection(Assert.Single(battle.Retainers));
-        Assert.True(battle.CommandSelectedRetainersTo(2, 5));
+        Assert.True(battle.CommandSelectedRetainersTo(targetX, targetY));
         return battle;
     }
 

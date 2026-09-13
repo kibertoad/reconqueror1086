@@ -114,7 +114,7 @@ dotnet run --project tools\Conqueror.Inspect -- `
 
 `--executable-only` returns after artifact extraction and requested executable string, disassembly, or relocation reports. Use it for iterative static analysis so unrelated GOB, scene-container, and movie population scans are not repeated.
 
-`--scene-blocks` writes the ignored `scene-block-report.txt`. Its actor rows distinguish the visual-state effect selector at block `+0x2E` from the movement selector at `+0x46`, and include the selected movement descriptor's tick count, interval, flags, and coordinate deltas. Use this census to corroborate handler traces against every owned scene variant; never commit the generated report.
+`--scene-blocks` writes the ignored `scene-block-report.txt`. Its actor rows distinguish the visual-state effect selector at block `+0x2E` from the movement selector at `+0x46`; expose initial signed 8.8 block offsets `+0x24/+0x28`; and include the selected movement descriptor's tick count, interval, flags, coordinate/block/surface/heading deltas, loop block, and terminal surface. Use this census to corroborate handler traces against every owned scene variant; never commit the generated report.
 
 For bounded conversation entry-point analysis, pass decimal or hexadecimal node identifiers with `--conversation-nodes=1100,0x44C`. The ignored `conversation-node-report.txt` records only structural metadata plus portrait and speaker identifiers; it does not copy prompts or response text into the repository.
 

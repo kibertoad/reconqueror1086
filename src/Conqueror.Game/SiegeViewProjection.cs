@@ -93,8 +93,11 @@ public static class SiegeViewProjection
         var result = new List<SiegeEnemyProjection>();
         foreach (var enemy in actors.Where(actor => actor.Health > 0))
         {
-            var dx = enemy.X - siege.PlayerX;
-            var dy = enemy.Y - siege.PlayerY;
+            // Kind-4 blocks keep signed 8.8 offsets at +0x24/+0x28. The
+            // scheduler moves them between cells before updating the owning
+            // cell index, so drawing and picking must use the same sub-cell point.
+            var dx = enemy.X - siege.PlayerX + enemy.OffsetX8 / 256d;
+            var dy = enemy.Y - siege.PlayerY + enemy.OffsetY8 / 256d;
             var forward = dx * forwardX + dy * forwardY;
             if (forward <= 0.05 || forward > MaximumDistance) continue;
             var lateral = dx * rightX + dy * rightY;
