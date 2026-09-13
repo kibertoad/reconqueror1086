@@ -96,5 +96,84 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Single(layout.Enemies);
         Assert.DoesNotContain(layout.Objects, item => item.X == 13 && item.Y is 20 or 21);
         Assert.Equal(1, battle.AlliesStarted);
+        var activeRetainer = Assert.Single(battle.Retainers);
+        Assert.Equal((13, 21, 5, 0),
+            (activeRetainer.X, activeRetainer.Y, activeRetainer.VisualId, activeRetainer.OriginalCombatRow));
     }
+
+    [Fact]
+    public void OriginalRetainerCommandModesAndShellHitRegionsRemainMapped()
+    {
+        Assert.Equal(2, (int)SiegeRetainerCommand.Defend);
+        Assert.Equal(6, (int)SiegeRetainerCommand.Attack);
+        Assert.Equal(10, (int)SiegeRetainerCommand.Retreat);
+        Assert.Equal(16, (int)SiegeRetainerCommand.Follow);
+        Assert.Equal(
+            [
+                (SiegeRetainerCommand.Attack, new UiBounds(4, 175, 56, 13)),
+                (SiegeRetainerCommand.Defend, new UiBounds(60, 175, 56, 13)),
+                (SiegeRetainerCommand.Follow, new UiBounds(116, 175, 56, 13)),
+                (SiegeRetainerCommand.Retreat, new UiBounds(172, 175, 38, 13))
+            ],
+            SiegeCombatPresentation.RetainerCommandButtons.Select(button => (button.Command, button.Bounds)));
+        Assert.Equal(SiegeRetainerCommand.Attack, SiegeCombatPresentation.RetainerCommandAt(4, 175));
+        Assert.Equal(SiegeRetainerCommand.Defend, SiegeCombatPresentation.RetainerCommandAt(60, 187));
+        Assert.Equal(SiegeRetainerCommand.Follow, SiegeCombatPresentation.RetainerCommandAt(171, 180));
+        Assert.Equal(SiegeRetainerCommand.Retreat, SiegeCombatPresentation.RetainerCommandAt(209, 187));
+        Assert.Null(SiegeCombatPresentation.RetainerCommandAt(210, 187));
+        Assert.Null(SiegeCombatPresentation.RetainerCommandAt(4, 188));
+    }
+
+    [Fact]
+    public void RetainerOrdersTargetSelectionOrFallBackToEveryLivingFriendly()
+    {
+        var battle = RetainerBattle(3, armyCount: 9, seed: 7);
+
+        battle.ToggleRetainerSelection(1);
+        battle.CommandRetainers(SiegeRetainerCommand.Follow);
+
+        Assert.Equal(
+            [SiegeRetainerCommand.Attack, SiegeRetainerCommand.Follow, SiegeRetainerCommand.Attack],
+            battle.Retainers.Select(retainer => retainer.Command));
+        Assert.All(battle.Retainers, retainer => Assert.False(retainer.Selected));
+
+        battle.CommandRetainers(SiegeRetainerCommand.Defend);
+        Assert.All(battle.Retainers, retainer => Assert.Equal(SiegeRetainerCommand.Defend, retainer.Command));
+    }
+
+    [Fact]
+    public void RetainerCapRandomlyPrunesAuthoredActorsWithoutInventingReplacements()
+    {
+        var battle = RetainerBattle(4, armyCount: 1, seed: 11);
+
+        var retainer = Assert.Single(battle.Retainers);
+        Assert.Equal(1, battle.AlliesStarted);
+        Assert.Contains(retainer.X, Enumerable.Range(2, 4));
+        Assert.Equal(7 + retainer.X, retainer.Health);
+        Assert.Equal(20 + retainer.X, retainer.OriginalArmor);
+    }
+
+    [Fact]
+    public void AuthoredRetainersUseTheSamePerspectiveProjectionAsHostileActors()
+    {
+        var battle = RetainerBattle(2, armyCount: 9, seed: 3);
+
+        Assert.Equal(2, SiegeViewProjection.ProjectRetainers(battle).Count);
+    }
+
+    private static SiegeSession RetainerBattle(int authoredCount, int armyCount, int seed)
+    {
+        var tiles = new SiegeTile[8, 5];
+        var retainers = Enumerable.Range(0, authoredCount)
+            .Select(index => new SiegeSpawn(2 + index, 2, false, 30 + index,
+                OriginalArmor: 22 + index, OriginalHealth: 9 + index,
+                OriginalCombatRow: index, OriginalAttackSkill: 40 + index))
+            .ToArray();
+        var army = new Army();
+        army.Units[SiegeRetainerCombatUnit] = armyCount;
+        return new SiegeSession(new Player(), army, 0, seed,
+            new SiegeLayout(tiles, 1, 2, Facing.East, [], retainers: retainers));
+    }
+
+    private const UnitType SiegeRetainerCombatUnit = UnitType.Swordsmen;
 }

@@ -16,6 +16,8 @@ public readonly record struct SiegeFrameRun(int Start, int Count, bool Descendin
     }
 }
 
+public readonly record struct SiegeRetainerCommandButton(SiegeRetainerCommand Command, UiBounds Bounds);
+
 public static class SiegeCombatPresentation
 {
     private static readonly int[] ForegroundBasesByCombatRow =
@@ -33,6 +35,15 @@ public static class SiegeCombatPresentation
     public static readonly UiBounds Message = new(5, 145, 205, 26);
     public static readonly UiBounds PrimaryStatus = new(225, 22, 90, 25);
     public static readonly UiBounds SecondaryStatus = new(225, 54, 90, 35);
+    // CONQUER.EXE 0x55D20-0x55DAE divides (x - 4) by 56 in this y band.
+    // The final button is clipped by the command region's exclusive x=210 bound.
+    public static readonly IReadOnlyList<SiegeRetainerCommandButton> RetainerCommandButtons =
+    [
+        new(SiegeRetainerCommand.Attack, new UiBounds(4, 175, 56, 13)),
+        new(SiegeRetainerCommand.Defend, new UiBounds(60, 175, 56, 13)),
+        new(SiegeRetainerCommand.Follow, new UiBounds(116, 175, 56, 13)),
+        new(SiegeRetainerCommand.Retreat, new UiBounds(172, 175, 38, 13))
+    ];
     // CONQUER.EXE 0x5529B-0x55448 selects offset 2 on approach, offset 1
     // near contact, and offset 0 on return. Rows 23+ retain offset 2.
     public static readonly SiegeFrameRun AxeAttack = new(27, 3, true);
@@ -94,6 +105,15 @@ public static class SiegeCombatPresentation
     };
 
     public static SiegeFrameRun BloodFramesFor(bool fatal) => fatal ? FatalHitBlood : WoundingHitBlood;
+
+    public static SiegeRetainerCommand? RetainerCommandAt(int x, int y)
+    {
+        foreach (var button in RetainerCommandButtons)
+            if (x >= button.Bounds.X && x < button.Bounds.X + button.Bounds.Width &&
+                y >= button.Bounds.Y && y < button.Bounds.Y + button.Bounds.Height)
+                return button.Command;
+        return null;
+    }
 
     // CONQUER.EXE 0x55DB8-0x55DE5 adds nine pixels to the stored cursor
     // top-left before raycasting; 0x5590C-0x5591D forwards that center point.

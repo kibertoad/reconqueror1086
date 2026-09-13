@@ -27,6 +27,13 @@ official `MELEE*`/`DEFEND*` population, templates 0-2 are friendly and
 3/5/8/9 hostile. Preserve this authored partition and cap retainers to the
 available authored positions; do not infer sides from actor names.
 
+First-person retainer commands are executable-mapped: Defend mode 2, Attack
+mode 6, Retreat mode 10, and Follow mode 16 with player `D4D0` as target.
+Commands affect selected living friendlies, or all living friendlies when none
+is selected, then clear selection. Preserve these identities and distinguish
+the retainer Retreat order from leaving the battle. The exact movement and
+pathfinding behind these modes remain provisional and must not be guessed.
+
 ## Git push destination
 
 The authorized canonical repository is

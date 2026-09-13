@@ -442,7 +442,9 @@ public sealed partial class ConquerorGame
         }
         AdvanceSiegeForeground(gameTime.ElapsedGameTime.TotalSeconds);
         _siege.AdvanceEnemyAnimations(_animationEnabled ? gameTime.ElapsedGameTime.TotalSeconds : 1);
-        var pointerTarget = click ? SiegePointerTarget(mouse) : null;
+        var pointerCommand = click ? SiegePointerCommand(mouse) : null;
+        if (pointerCommand is { } clickedCommand) _siege.CommandRetainers(clickedCommand);
+        var pointerTarget = click && pointerCommand is null ? SiegePointerTarget(mouse) : null;
         var crossbowEquipped = _campaign.State.Player.Inventory.Weapon
             .Contains("Crossbow", StringComparison.OrdinalIgnoreCase);
         var movement = SiegeAction.None;
@@ -474,12 +476,11 @@ public sealed partial class ConquerorGame
                 ClearSiegeWeapon();
         }
         if (press(Keys.M)) _showRadar = !_showRadar;
+        if (press(Keys.D1)) _siege.CommandRetainers(SiegeRetainerCommand.Attack);
+        if (press(Keys.D2)) _siege.CommandRetainers(SiegeRetainerCommand.Defend);
+        if (press(Keys.D3)) _siege.CommandRetainers(SiegeRetainerCommand.Follow);
+        if (press(Keys.D4) || press(Keys.R)) _siege.CommandRetainers(SiegeRetainerCommand.Retreat);
         _notice = _siege.LastMessage;
-        if (press(Keys.R))
-        {
-            LeaveSiege();
-            return;
-        }
         if (_siege.Won)
         {
             if (_drogoCombat) FinishDrogoCombat();
@@ -591,6 +592,16 @@ public sealed partial class ConquerorGame
             : new Rectangle(0, 85, 1024, 520);
         return SiegeCombatPresentation.ForegroundTarget(point.Item1, point.Item2,
             new UiBounds(viewport.X, viewport.Y, viewport.Width, viewport.Height));
+    }
+
+    private SiegeRetainerCommand? SiegePointerCommand(MouseState mouse)
+    {
+        var point = _controllerPointerActive
+            ? ((int)_controllerPointer.X, (int)_controllerPointer.Y)
+            : PresentationScaling.ToLogical(mouse.X, mouse.Y, CanvasBounds(), 640, 480);
+        return SiegeCombatPresentation.RetainerCommandAt(
+            point.Item1 * SiegeCombatPresentation.OriginalWidth / 640,
+            point.Item2 * SiegeCombatPresentation.OriginalHeight / 480);
     }
 
     private void StartSiegeHitEffect((int Health, int Count) before)

@@ -5,8 +5,9 @@ public enum SiegeTile { Floor, Wall, Door, SecretDoor, Barrel, Treasure, Exit, D
 public enum SiegeAction { None, Moved, Blocked, DoorOpened, Healed, Looted, Hit, Missed, WeaponBroke, Shot, NoAmmunition, Exited }
 public enum SiegeEnemyVisualState { Walk, Attack, Hit, Dying }
 public enum SiegePickupRewardKind { Wealth, Healing, Equipment, CrossbowBolts }
+public enum SiegeRetainerCommand { Defend = 2, Attack = 6, Retreat = 10, Follow = 16 }
 
-public sealed class SiegeEnemy
+public class SiegeEnemy
 {
     public int X { get; set; }
     public int Y { get; set; }
@@ -21,6 +22,12 @@ public sealed class SiegeEnemy
     public int WalkFrame { get; set; }
     public SiegeEnemyVisualState VisualState { get; internal set; }
     internal double VisualElapsed { get; set; }
+}
+
+public sealed class SiegeRetainer : SiegeEnemy
+{
+    public SiegeRetainerCommand Command { get; internal set; } = SiegeRetainerCommand.Attack;
+    public bool Selected { get; internal set; }
 }
 
 public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int GarrisonPerEnemy,
@@ -118,6 +125,8 @@ public sealed class SiegeSession
     private readonly SiegeTile[,] _map;
     public IReadOnlyList<SiegeEnemy> Enemies => _enemies;
     private readonly List<SiegeEnemy> _enemies = [];
+    public IReadOnlyList<SiegeRetainer> Retainers => _retainers;
+    private readonly List<SiegeRetainer> _retainers = [];
     public IReadOnlyList<SiegeObject> Objects => _objects;
     private readonly List<SiegeObject> _objects = [];
 
@@ -166,6 +175,10 @@ public sealed class SiegeSession
         AlliesAlive = AlliesStarted;
         if (layout is not null)
         {
+            var retainerSpawns = layout.Retainers.ToList();
+            while (retainerSpawns.Count > AlliesStarted)
+                retainerSpawns.RemoveAt(_random.Next(retainerSpawns.Count));
+            _retainers.AddRange(retainerSpawns.Select(RetainerFor));
             foreach (var spawn in layout.Enemies)
             {
                 var enemy = new SiegeEnemy
@@ -203,9 +216,44 @@ public sealed class SiegeSession
         }
     }
 
+    private static SiegeRetainer RetainerFor(SiegeSpawn spawn) => new()
+    {
+        X = spawn.X,
+        Y = spawn.Y,
+        Health = spawn.OriginalHealth ?? 1,
+        OriginalArmor = spawn.OriginalArmor,
+        OriginalAttackSkill = spawn.OriginalAttackSkill,
+        OriginalCombatRow = spawn.OriginalCombatRow,
+        VisualId = spawn.VisualId,
+        OriginalAnimation = spawn.OriginalAnimation
+    };
+
     public SiegeTile TileAt(int x, int y) => x < 0 || y < 0 || x >= Width || y >= Height ? SiegeTile.Wall : _map[x, y];
     public SiegeEnemy? EnemyAt(int x, int y) => _enemies.FirstOrDefault(e => e.Health > 0 && e.X == x && e.Y == y);
+    public SiegeRetainer? RetainerAt(int x, int y) =>
+        _retainers.FirstOrDefault(retainer => retainer.Health > 0 && retainer.X == x && retainer.Y == y);
     public SiegeObject? ObjectAt(int x, int y) => _objects.FirstOrDefault(item => item.X == x && item.Y == y);
+
+    public void ToggleRetainerSelection(int index)
+    {
+        if ((uint)index >= (uint)_retainers.Count) throw new ArgumentOutOfRangeException(nameof(index));
+        if (_retainers[index].Health <= 0) return;
+        _retainers[index].Selected = !_retainers[index].Selected;
+        LastMessage = _retainers[index].Selected ? "Retainer selected." : "Retainer released.";
+    }
+
+    public void CommandRetainers(SiegeRetainerCommand command)
+    {
+        if (!Enum.IsDefined(command)) throw new ArgumentOutOfRangeException(nameof(command));
+        var living = _retainers.Where(retainer => retainer.Health > 0).ToArray();
+        var selected = living.Where(retainer => retainer.Selected).ToArray();
+        var targets = selected.Length > 0 ? selected : living;
+        foreach (var retainer in targets) retainer.Command = command;
+        foreach (var retainer in living) retainer.Selected = false;
+        LastMessage = targets.Length == 0
+            ? "No retainers can hear the order."
+            : $"Retainers: {command}.";
+    }
 
     public void AdvanceEnemyAnimations(double elapsedSeconds)
     {
@@ -460,7 +508,12 @@ public sealed class SiegeSession
                 enemy.WalkFrame = 0;
                 if (enemy.VisualState != SiegeEnemyVisualState.Hit)
                     StartVisual(enemy, SiegeEnemyVisualState.Attack);
-                if (AlliesAlive > 0 && _random.Next(100) < 18) { AlliesAlive--; LastMessage = "A retainer falls defending you."; continue; }
+                if (AlliesAlive > 0 && _random.Next(100) < 18)
+                {
+                    KillRetainer();
+                    LastMessage = "A retainer falls defending you.";
+                    continue;
+                }
                 var hit = enemy.OriginalCombatRow is { } enemyRow && enemy.OriginalAttackSkill is { } enemySkill
                     ? OriginalWeaponCombat.Hits(enemySkill, OriginalWeaponCombat.PlayerAttackSkill(_player),
                         enemyRow >= 23 && distance <= 1, enemy.Facing == Facing, _random)
@@ -488,6 +541,13 @@ public sealed class SiegeSession
             var victim = vulnerable[0]; victim.Health--; RemoveDead(); LastMessage = "Your retainers bring down a defender.";
         }
         Health = Math.Max(0, Health);
+    }
+
+    private void KillRetainer()
+    {
+        var living = _retainers.Where(retainer => retainer.Health > 0).ToArray();
+        if (living.Length > 0) living[_random.Next(living.Length)].Health = 0;
+        AlliesAlive--;
     }
 
     private SiegeEnemy? FirstEnemyAhead(int range)

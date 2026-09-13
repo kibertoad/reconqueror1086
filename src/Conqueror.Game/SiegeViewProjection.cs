@@ -71,11 +71,23 @@ public static class SiegeViewProjection
     public static IReadOnlyList<SiegeEnemyProjection> ProjectEnemies(SiegeSession siege)
     {
         ArgumentNullException.ThrowIfNull(siege);
+        return ProjectActors(siege, siege.Enemies);
+    }
+
+    public static IReadOnlyList<SiegeEnemyProjection> ProjectRetainers(SiegeSession siege)
+    {
+        ArgumentNullException.ThrowIfNull(siege);
+        return ProjectActors(siege, siege.Retainers);
+    }
+
+    private static IReadOnlyList<SiegeEnemyProjection> ProjectActors(
+        SiegeSession siege, IEnumerable<SiegeEnemy> actors)
+    {
         var (forwardX, forwardY) = Direction(siege.Facing);
         var rightX = -forwardY;
         var rightY = forwardX;
         var result = new List<SiegeEnemyProjection>();
-        foreach (var enemy in siege.Enemies)
+        foreach (var enemy in actors.Where(actor => actor.Health > 0))
         {
             var dx = enemy.X - siege.PlayerX;
             var dy = enemy.Y - siege.PlayerY;

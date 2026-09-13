@@ -396,48 +396,25 @@ public sealed partial class ConquerorGame
                 Fill(new Rectangle(viewport.X + column, top, 1, wallHeight), baseColor * distanceShade);
             }
         }
-        var enemies = SiegeViewProjection.ProjectEnemies(_siege);
+        var actors = SiegeViewProjection.ProjectEnemies(_siege)
+            .Select(projection => (Projection: projection, Friendly: false))
+            .Concat(SiegeViewProjection.ProjectRetainers(_siege)
+                .Select(projection => (Projection: projection, Friendly: true)))
+            .OrderByDescending(item => item.Projection.ForwardDistance)
+            .ToArray();
         var objects = SiegeViewProjection.ProjectObjects(_siege);
-        var enemyIndex = 0;
+        var actorIndex = 0;
         var objectIndex = 0;
-        while (enemyIndex < enemies.Count || objectIndex < objects.Count)
+        while (actorIndex < actors.Length || objectIndex < objects.Count)
         {
-            if (objectIndex < objects.Count && (enemyIndex >= enemies.Count ||
-                objects[objectIndex].ForwardDistance > enemies[enemyIndex].ForwardDistance))
+            if (objectIndex < objects.Count && (actorIndex >= actors.Length ||
+                objects[objectIndex].ForwardDistance > actors[actorIndex].Projection.ForwardDistance))
             {
                 DrawSiegeObject(objects[objectIndex++], viewport, depths);
                 continue;
             }
-            var projection = enemies[enemyIndex++];
-            var (enemyTexture, flipEnemy) = SceneEnemyTexture(projection.Enemy);
-            var wallHeight = viewport.Height / projection.ForwardDistance;
-            var height = enemyTexture is null
-                ? Math.Clamp((int)(wallHeight * 0.75), 20, viewport.Height)
-                : Math.Clamp((int)(wallHeight * enemyTexture.Height / 256.0), 20, viewport.Height);
-            var width = enemyTexture is null
-                ? Math.Max(10, height / 2)
-                : Math.Max(10, height * enemyTexture.Width / enemyTexture.Height);
-            var center = viewport.X + (int)(projection.ScreenPosition * viewport.Width);
-            var left = center - width / 2;
-            var floor = viewport.Center.Y + (int)(wallHeight / 2);
-            var top = floor - height;
-            var body = projection.Enemy.Champion ? Color.DarkRed : new Color(120, 75, 50);
-            for (var x = Math.Max(viewport.Left, left); x < Math.Min(viewport.Right, left + width); x++)
-            {
-                if (projection.ForwardDistance >= depths[x - viewport.X]) continue;
-                if (enemyTexture is not null)
-                {
-                    var sourceX = Math.Clamp((x - left) * enemyTexture.Width / width, 0, enemyTexture.Width - 1);
-                    if (flipEnemy) sourceX = enemyTexture.Width - 1 - sourceX;
-                    _batch.Draw(enemyTexture, new Rectangle(x, top, 1, height),
-                        new Rectangle(sourceX, 0, 1, enemyTexture.Height), Color.White);
-                }
-                else
-                {
-                    Fill(new Rectangle(x, top + height / 4, 1, height * 3 / 4), body);
-                    Fill(new Rectangle(x, top, 1, height / 4), Color.Gray);
-                }
-            }
+            var actor = actors[actorIndex++];
+            DrawSiegeActor(actor.Projection, actor.Friendly, viewport, depths);
         }
         DrawSiegeForeground(viewport, originalShell);
         if (originalShell)
@@ -448,7 +425,7 @@ public sealed partial class ConquerorGame
             DrawText($"FACING {_siege.Facing}  ARMOR {_siege.ArmorRating()}  GOLD FOUND {_siege.GoldFound}", 25, 55, Color.Wheat, 2);
             if (_showRadar) DrawRadar(_siege);
             DrawText("W/S MOVE  A/D TURN  E OPEN  SPACE SWING  X CROSSBOW", 130, 655, Color.Gold, 2);
-            DrawText("M RADAR  R RETREAT", 380, 685, Color.Gold, 2);
+            DrawText("1 ATTACK  2 DEFEND  3 FOLLOW  4/R RETAINERS", 210, 685, Color.Gold, 2);
         }
     }
 
@@ -580,7 +557,12 @@ public sealed partial class ConquerorGame
             var color = tile switch { SiegeTile.Wall => Color.Gray, SiegeTile.Door => Color.SaddleBrown, SiegeTile.SecretDoor => Color.DarkSlateGray, SiegeTile.Barrel => Color.Green, SiegeTile.Treasure => Color.Gold, SiegeTile.Exit => Color.DarkRed, SiegeTile.Destructible => Color.SaddleBrown, _ => new Color(35, 35, 35) };
             Fill(new Rectangle(ox + x * scale, oy + y * scale, scale - 1, scale - 1), color);
         }
-        foreach (var enemy in siege.Enemies) Fill(new Rectangle(ox + enemy.X * scale, oy + enemy.Y * scale, scale - 1, scale - 1), enemy.Champion ? Color.Magenta : Color.Red);
+        foreach (var enemy in siege.Enemies.Where(enemy => enemy.Health > 0))
+            Fill(new Rectangle(ox + enemy.X * scale, oy + enemy.Y * scale, scale - 1, scale - 1),
+                enemy.Champion ? Color.Magenta : Color.Red);
+        foreach (var retainer in siege.Retainers.Where(retainer => retainer.Health > 0))
+            Fill(new Rectangle(ox + retainer.X * scale, oy + retainer.Y * scale, scale - 1, scale - 1),
+                retainer.Selected ? Color.Gold : Color.RoyalBlue);
         Fill(new Rectangle(ox + siege.PlayerX * scale, oy + siege.PlayerY * scale, scale - 1, scale - 1), Color.Cyan);
     }
 
@@ -651,6 +633,38 @@ public sealed partial class ConquerorGame
             var sourceX = Math.Clamp((x - left) * texture.Width / width, 0, texture.Width - 1);
             _batch.Draw(texture, new Rectangle(x, top, 1, height),
                 new Rectangle(sourceX, 0, 1, texture.Height), Color.White);
+        }
+    }
+
+    private void DrawSiegeActor(
+        SiegeEnemyProjection projection, bool friendly, Rectangle viewport, double[] depths)
+    {
+        var (texture, flip) = SceneEnemyTexture(projection.Enemy);
+        var wallHeight = viewport.Height / projection.ForwardDistance;
+        var height = texture is null
+            ? Math.Clamp((int)(wallHeight * 0.75), 20, viewport.Height)
+            : Math.Clamp((int)(wallHeight * texture.Height / 256.0), 20, viewport.Height);
+        var width = texture is null ? Math.Max(10, height / 2) : Math.Max(10, height * texture.Width / texture.Height);
+        var center = viewport.X + (int)(projection.ScreenPosition * viewport.Width);
+        var left = center - width / 2;
+        var floor = viewport.Center.Y + (int)(wallHeight / 2);
+        var top = floor - height;
+        var body = friendly ? Color.RoyalBlue : projection.Enemy.Champion ? Color.DarkRed : new Color(120, 75, 50);
+        for (var x = Math.Max(viewport.Left, left); x < Math.Min(viewport.Right, left + width); x++)
+        {
+            if (projection.ForwardDistance >= depths[x - viewport.X]) continue;
+            if (texture is not null)
+            {
+                var sourceX = Math.Clamp((x - left) * texture.Width / width, 0, texture.Width - 1);
+                if (flip) sourceX = texture.Width - 1 - sourceX;
+                _batch.Draw(texture, new Rectangle(x, top, 1, height),
+                    new Rectangle(sourceX, 0, 1, texture.Height), Color.White);
+            }
+            else
+            {
+                Fill(new Rectangle(x, top + height / 4, 1, height * 3 / 4), body);
+                Fill(new Rectangle(x, top, 1, height / 4), Color.Gray);
+            }
         }
     }
 
