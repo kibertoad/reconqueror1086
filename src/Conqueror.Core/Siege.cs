@@ -16,6 +16,7 @@ public class SiegeEnemy
     public int? OriginalAttackSkill { get; init; }
     public int? OriginalCombatRow { get; init; }
     public SiegeActorAnimation? OriginalAnimation { get; init; }
+    public SiegeActorMovement? OriginalMovement { get; init; }
     public bool Champion { get; init; }
     public int VisualId { get; init; } = -1;
     public Facing Facing { get; set; }
@@ -30,14 +31,21 @@ public sealed class SiegeRetainer : SiegeEnemy
     public bool Selected { get; internal set; }
     internal SiegeEnemy? OrderedTarget { get; set; }
     internal (int X, int Y)? OrderedDestination { get; set; }
+    internal double MovementElapsed { get; set; }
 }
 
 public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int GarrisonPerEnemy,
     int BaseChampionHealth, int WeaponBreakPercent);
 public sealed record SiegeSpawn(int X, int Y, bool Champion, int VisualId = -1,
     int? OriginalArmor = null, int? OriginalHealth = null, int? OriginalCombatRow = null,
-    int? OriginalAttackSkill = null, SiegeActorAnimation? OriginalAnimation = null);
+    int? OriginalAttackSkill = null, SiegeActorAnimation? OriginalAnimation = null,
+    SiegeActorMovement? OriginalMovement = null);
 public sealed record SiegeActorAnimation(double AttackSeconds, double HitSeconds, double DeathSeconds);
+public sealed record SiegeActorMovement(
+    int TickCount, int IntervalMilliseconds, int FixedXDeltaPerTick, int FixedYDeltaPerTick, int Flags)
+{
+    public double NominalSeconds => checked((long)TickCount * IntervalMilliseconds) / 1000d;
+}
 public sealed record SiegePickupReward(SiegePickupRewardKind Kind, int Amount, int DieSides = 0,
     string? EquipmentName = null);
 public sealed record SiegeObjectStage(int VisualId, SiegeTile Tile, SiegePickupReward? Pickup = null);
@@ -193,7 +201,8 @@ public sealed class SiegeSession
                     OriginalCombatRow = spawn.OriginalCombatRow,
                     Champion = spawn.Champion,
                     VisualId = spawn.VisualId,
-                    OriginalAnimation = spawn.OriginalAnimation
+                    OriginalAnimation = spawn.OriginalAnimation,
+                    OriginalMovement = spawn.OriginalMovement
                 };
                 enemy.Facing = DirectionToward(enemy.X, enemy.Y, PlayerX, PlayerY, Facing.South);
                 _enemies.Add(enemy);
@@ -228,6 +237,7 @@ public sealed class SiegeSession
         OriginalCombatRow = spawn.OriginalCombatRow,
         VisualId = spawn.VisualId,
         OriginalAnimation = spawn.OriginalAnimation,
+        OriginalMovement = spawn.OriginalMovement,
         Facing = DirectionToward(spawn.X, spawn.Y, PlayerX, PlayerY, Facing.South)
     };
 
@@ -299,6 +309,7 @@ public sealed class SiegeSession
         {
             retainer.OrderedTarget = null;
             retainer.OrderedDestination = (x, y);
+            retainer.MovementElapsed = 0;
         }
         foreach (var retainer in living) retainer.Selected = false;
         LastMessage = "Retainers move to the selected ground.";
@@ -330,6 +341,42 @@ public sealed class SiegeSession
             }
             enemy.VisualState = SiegeEnemyVisualState.Walk;
             enemy.VisualElapsed = 0;
+        }
+    }
+
+    public void AdvanceRetainerMovement(double elapsedSeconds)
+    {
+        if (!double.IsFinite(elapsedSeconds) || elapsedSeconds < 0)
+            throw new ArgumentOutOfRangeException(nameof(elapsedSeconds));
+        foreach (var retainer in _retainers.Where(retainer =>
+                     retainer.Health > 0 && retainer.OrderedDestination is not null))
+        {
+            var destination = retainer.OrderedDestination!.Value;
+            if (retainer.X == destination.X && retainer.Y == destination.Y)
+            {
+                retainer.OrderedDestination = null;
+                retainer.MovementElapsed = 0;
+                continue;
+            }
+            var cellSeconds = retainer.OriginalMovement?.NominalSeconds is > 0 and <= 60
+                ? retainer.OriginalMovement.NominalSeconds
+                : 0.6;
+            retainer.MovementElapsed += elapsedSeconds;
+            var catchUp = 0;
+            while (retainer.MovementElapsed > cellSeconds && catchUp < 8 &&
+                   retainer.OrderedDestination is not null)
+            {
+                catchUp++;
+                retainer.MovementElapsed -= cellSeconds;
+                MoveRetainerToward(retainer, destination.X, destination.Y);
+                if (retainer.X == destination.X && retainer.Y == destination.Y)
+                {
+                    retainer.OrderedDestination = null;
+                    retainer.MovementElapsed = 0;
+                }
+            }
+            if (catchUp == 8 && retainer.MovementElapsed > cellSeconds)
+                retainer.MovementElapsed = cellSeconds;
         }
     }
 
@@ -653,8 +700,6 @@ public sealed class SiegeSession
             {
                 if (retainer.X == destination.X && retainer.Y == destination.Y)
                     retainer.OrderedDestination = null;
-                else
-                    MoveRetainerToward(retainer, destination.X, destination.Y);
                 continue;
             }
             var target = retainer.OrderedTarget is { Health: > 0 } ordered && _enemies.Contains(ordered)

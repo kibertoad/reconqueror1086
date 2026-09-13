@@ -10,7 +10,7 @@ The authoritative gate is:
 & '.\Run Tests.bat'
 ```
 
-The latest completed implementation gate passed 184 xUnit cases and 146 executable specifications with zero build warnings. Repository policy also passed. Re-run the gate after checkout; do not infer current health from this note alone.
+The latest completed implementation gate passed 185 xUnit cases and 146 executable specifications with zero build warnings. Repository policy also passed. Re-run the gate after checkout; do not infer current health from this note alone.
 
 ## Latest completed combat recovery
 
@@ -26,7 +26,7 @@ Owned-scene evidence covers 12,784 combat-scene blocks. The 144 placed actor def
 
 ## Exact continuation point
 
-Continue priority 1 in `implementation-plan.md`: recover exact fixed-point ray/floor projection, actor traversal/pathfinding, multi-retainer destination routing, and broader AI rules. Visible actor/object click identity, empty-ground mode-12 state semantics, authored friendly placement, the campaign cap and strategic losses, all four command identities, dispatch rules, and local-defend/seek/follow/flee intents, campaign scene dispatch, doors, pickups, absence of enemy drops, foreground coordinates/trajectories, and processor-independent blood presentation are closed at the currently available fidelity.
+Continue priority 1 in `implementation-plan.md`: recover exact fixed-point map-ray ground selection, intermediate 8.8 actor presentation, route/collision behavior, actor-wide cadence, multi-retainer destination routing, and broader AI rules. Visible actor/object click identity, empty-ground mode-12 state semantics and its imported strict 600 ms nominal cell deadline, authored friendly placement, the campaign cap and strategic losses, all four command identities, dispatch rules, and local-defend/seek/follow/flee intents, campaign scene dispatch, doors, pickups, absence of enemy drops, foreground coordinates/trajectories, and processor-independent blood presentation are closed at the currently available fidelity.
 
 The actor-versus-actor routine beginning at executable VA `0x4F070` is the active trace. Confirmed portions are:
 

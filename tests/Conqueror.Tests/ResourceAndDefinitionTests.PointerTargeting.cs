@@ -88,14 +88,44 @@ public sealed partial class ResourceAndDefinitionTests
         battle.ToggleRetainerSelection(friendly);
 
         Assert.True(battle.CommandSelectedRetainersTo(2, 5));
-        battle.AdvanceRetainerOrders();
-        battle.AdvanceRetainerOrders();
-        battle.AdvanceRetainerOrders();
-        battle.AdvanceRetainerOrders();
+        battle.AdvanceRetainerMovement(0.6);
+        Assert.Equal((2, 2), (friendly.X, friendly.Y));
+        battle.AdvanceRetainerMovement(0.0001);
+        Assert.Equal((2, 3), (friendly.X, friendly.Y));
+        battle.AdvanceRetainerMovement(1.2);
 
         Assert.Equal((2, 5), (friendly.X, friendly.Y));
         Assert.Equal(SiegeRetainerCommand.Defend, friendly.Command);
         Assert.False(friendly.Selected);
+    }
+
+    [Fact]
+    public void GroundOrderMovementIsIndependentOfUpdateFrequencyAtStrictEffectDeadlines()
+    {
+        var oneUpdate = GroundOrderBattle();
+        var splitUpdates = GroundOrderBattle();
+
+        oneUpdate.AdvanceRetainerMovement(0.6001);
+        splitUpdates.AdvanceRetainerMovement(0.2);
+        splitUpdates.AdvanceRetainerMovement(0.2);
+        splitUpdates.AdvanceRetainerMovement(0.2001);
+
+        Assert.Equal((Assert.Single(oneUpdate.Retainers).X, Assert.Single(oneUpdate.Retainers).Y),
+            (Assert.Single(splitUpdates.Retainers).X, Assert.Single(splitUpdates.Retainers).Y));
+        Assert.Equal((2, 3), (Assert.Single(oneUpdate.Retainers).X, Assert.Single(oneUpdate.Retainers).Y));
+    }
+
+    private static SiegeSession GroundOrderBattle()
+    {
+        var army = new Army();
+        army.Units[UnitType.Swordsmen] = 1;
+        var battle = new SiegeSession(new Player(), army, 0, 4,
+            new SiegeLayout(new SiegeTile[10, 10], 1, 2, Facing.East, [], retainers:
+            [new SiegeSpawn(2, 2, false, OriginalHealth: 10,
+                OriginalMovement: new SiegeActorMovement(3, 200, 64, 0, 0x142))]));
+        battle.ToggleRetainerSelection(Assert.Single(battle.Retainers));
+        Assert.True(battle.CommandSelectedRetainersTo(2, 5));
+        return battle;
     }
 
     [Fact]

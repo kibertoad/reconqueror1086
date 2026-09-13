@@ -185,7 +185,16 @@ public static class ImportedSiegeLayouts
         var champion = block.Name.Contains("champion", StringComparison.OrdinalIgnoreCase) ||
             block.Name.Contains("lord", StringComparison.OrdinalIgnoreCase);
         return new SiegeSpawn(x, y, champion, block.Index, template.Armor, template.Health,
-            block.ActorCombatRow, template.AttackSkill, AnimationFor(scene, block));
+            block.ActorCombatRow, template.AttackSkill, AnimationFor(scene, block), MovementFor(scene, block));
+    }
+
+    private static SiegeActorMovement? MovementFor(DynamixScene scene, DynamixSceneBlock block)
+    {
+        if (block.MovementEffectDefinitionIndex < 0 ||
+            block.MovementEffectDefinitionIndex >= scene.EffectDefinitions.Count) return null;
+        var effect = scene.EffectDefinitions[block.MovementEffectDefinitionIndex];
+        return new SiegeActorMovement(effect.FrameCount, effect.IntervalMilliseconds,
+            effect.MapXDeltaPerTick, effect.MapYDeltaPerTick, effect.Flags);
     }
 
     private static SiegeActorAnimation? AnimationFor(DynamixScene scene, DynamixSceneBlock initial)

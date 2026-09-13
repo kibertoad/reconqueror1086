@@ -34,6 +34,7 @@ public sealed record DynamixSceneBlock(
     int Surface2,
     int Surface3,
     int EffectDefinitionIndex,
+    int MovementEffectDefinitionIndex,
     int StateTarget,
     int InteractionSelector,
     int InteractionArgument,
@@ -195,6 +196,7 @@ public static class DynamixSceneDecoder
                 ReadInt32(record, 52),
                 ReadInt32(record, 56),
                 BinaryPrimitives.ReadInt16LittleEndian(record.Slice(46, sizeof(short))),
+                BinaryPrimitives.ReadInt16LittleEndian(record.Slice(0x46, sizeof(short))),
                 ReadInt32(record, 64),
                 BinaryPrimitives.ReadInt16LittleEndian(record.Slice(0x48, sizeof(short))),
                 BinaryPrimitives.ReadInt16LittleEndian(record.Slice(0x4a, sizeof(short))),
@@ -205,8 +207,10 @@ public static class DynamixSceneDecoder
             if (decoded.TextureReferences()
                 .Any(surface => surface < -1 || surface >= textureCount))
                 throw new InvalidDataException($"Scene block {index} references a texture outside the Scenario table.");
-            if (requireEffectDefinitions &&
-                (decoded.EffectDefinitionIndex < -1 || decoded.EffectDefinitionIndex >= effectDefinitionCount))
+            if (requireEffectDefinitions && (decoded.EffectDefinitionIndex < -1 ||
+                decoded.EffectDefinitionIndex >= effectDefinitionCount ||
+                decoded.MovementEffectDefinitionIndex < -1 ||
+                decoded.MovementEffectDefinitionIndex >= effectDefinitionCount))
                 throw new InvalidDataException($"Scene block {index} references an effect outside SFXDEFS.");
             decodedBlocks[index] = decoded;
         }

@@ -481,7 +481,7 @@ if (File.Exists(gobPath))
 var sceneReport = new StringBuilder("# Result  Entries  Stored  Kind1  Kind2  CompressedBlocks  StoredBlocks  ISO path\n");
 var sceneTextureReport = new StringBuilder("# Textures  Dimensions  ISO path\n");
 var sceneScenarioReport = new StringBuilder("# Enabled  MapCount  DistanceShift  BlendTarget  Generated  BlockOffsets  ISO path\n");
-var sceneBlockReport = new StringBuilder("# Archive  Index  Placed  Kind  Behavior  Flags  ColorMap  Field40  Effect  Field48  Field4A  Field4C  Size  Surfaces  Name\n");
+var sceneBlockReport = SceneBlockReport.Create();
 var paletteReport = new StringBuilder("# Minimum  Maximum  SHA-256  Resource  ISO path\n");
 var skirmishFile = files.Single(file =>
     Path.GetFileName(file.Path).Equals("SKIRMISH.RES", StringComparison.OrdinalIgnoreCase));
@@ -548,16 +548,8 @@ foreach (var file in files.Where(x => DynamixArchive.HasContainerExtension(x.Pat
                 for (var y = 0; y < DynamixScene.MapHeight; y++)
                     placements[scene.BlockIndexAt(x, y)]++;
                 foreach (var block in scene.Blocks)
-                {
-                    var record = blockBytes.AsSpan(block.Index * DynamixSceneDecoder.BlockSize,
-                        DynamixSceneDecoder.BlockSize);
-                    sceneBlockReport.AppendLine($"{file.Path}  {block.Index,5}  {placements[block.Index],6}  "
-                        + $"{block.Kind,4}  {block.Behavior,8}  0x{block.Flags:X8}  {block.ColorMapOffset,8}  "
-                        + $"{BinaryPrimitives.ReadInt32LittleEndian(record.Slice(0x40, 4)),7}  {block.EffectDefinitionIndex,6}  "
-                        + $"{BinaryPrimitives.ReadInt16LittleEndian(record.Slice(0x48, 2)),7}  {BinaryPrimitives.ReadInt16LittleEndian(record.Slice(0x4A, 2)),7}  {BinaryPrimitives.ReadInt16LittleEndian(record.Slice(0x4C, 2)),7}  "
-                        + $"{block.Width}x{block.Height}  {block.Surface0},{block.Surface1},{block.Surface2},{block.Surface3}  "
-                        + block.Name.Replace('\r', ' ').Replace('\n', ' '));
-                }
+                    SceneBlockReport.Append(sceneBlockReport, file.Path, block, blockBytes, scene.EffectDefinitions,
+                        placements[block.Index]);
             }
             var colorMaps = new DynamixSceneColorMaps(Enumerable.Range(0, DynamixSceneColorMaps.Count).Select(index =>
             {

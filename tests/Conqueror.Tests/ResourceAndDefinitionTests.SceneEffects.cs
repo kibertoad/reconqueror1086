@@ -12,7 +12,7 @@ public sealed partial class ResourceAndDefinitionTests
     public void BillboardHeadingUsesTheExecutableAngularDivisionAndMirrorFormula()
     {
         var walk = new DynamixSceneBlock(0, 4, 135, 0, 0, 128, 168,
-            175, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, "knight");
+            175, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, "knight");
         var attack = walk with { Surface0 = 190, Surface2 = 4 };
 
         Assert.Equal((175, false), walk.TextureForBillboardHeading(0));
@@ -48,16 +48,24 @@ public sealed partial class ResourceAndDefinitionTests
             blocks[offset + 95] = 0xcc;
         }
         WriteInteraction(blocks, 5, 1, 3, 0);
-        var effects = new byte[DynamixSceneEffectDecoder.RecordSize];
+        WriteInt(blocks, 5 * DynamixSceneDecoder.BlockSize + 0x44, 1 << 16);
+        WriteInt(source.Scenario, 28, 2);
+        var effects = new byte[DynamixSceneEffectDecoder.RecordSize * 2];
         WriteEffectField(effects, 0x0c, 2);
         WriteEffectField(effects, 0x14, 192);
         WriteEffectField(effects, 0x28, -1);
+        WriteEffectField(effects, 0x40 + 0x0c, 3);
+        WriteEffectField(effects, 0x40 + 0x14, 200);
+        WriteEffectField(effects, 0x40 + 0x18, 0x142);
+        WriteEffectField(effects, 0x40 + 0x1c, 64);
+        WriteEffectField(effects, 0x40 + 0x28, -1);
 
         var scene = DynamixSceneDecoder.Decode(
             source.Viewer, source.Scenario, source.Map, blocks, effects);
-        var animation = Assert.Single(ImportedSiegeLayouts.Convert(scene).Enemies).OriginalAnimation;
+        var actor = Assert.Single(ImportedSiegeLayouts.Convert(scene).Enemies);
 
-        Assert.Equal(new SiegeActorAnimation(0.384, 0.384, 0.384), animation);
+        Assert.Equal(new SiegeActorAnimation(0.384, 0.384, 0.384), actor.OriginalAnimation);
+        Assert.Equal(new SiegeActorMovement(3, 200, 64, 0, 0x142), actor.OriginalMovement);
     }
 
     [Fact]
@@ -86,6 +94,7 @@ public sealed partial class ResourceAndDefinitionTests
         var source = SyntheticScene();
         WriteInt(source.Scenario, 28, 2);
         WriteInt(source.Blocks, 44, 1 << 16 | 12);
+        WriteInt(source.Blocks, 0x44, 1 << 16);
         var effects = new byte[DynamixSceneEffectDecoder.RecordSize * 2];
         WriteEffectField(effects, 0x0c, 3);
         WriteEffectField(effects, 0x14, 192);
@@ -105,7 +114,8 @@ public sealed partial class ResourceAndDefinitionTests
         var scene = DynamixSceneDecoder.Decode(
             source.Viewer, source.Scenario, source.Map, source.Blocks, effects);
 
-        Assert.Equal((12, 1), (scene.Blocks[0].Surface0, scene.Blocks[0].EffectDefinitionIndex));
+        Assert.Equal((12, 1, 1), (scene.Blocks[0].Surface0, scene.Blocks[0].EffectDefinitionIndex,
+            scene.Blocks[0].MovementEffectDefinitionIndex));
         Assert.Equal(2, scene.EffectDefinitionCount);
         var definition = scene.EffectDefinitions[0];
         Assert.Equal((3, 192, 5, -1),
@@ -131,6 +141,10 @@ public sealed partial class ResourceAndDefinitionTests
 
         Assert.Throws<InvalidDataException>(() => DynamixSceneDecoder.Decode(
             source.Viewer, source.Scenario, source.Map, source.Blocks, effects[..^1]));
+        WriteInt(source.Blocks, 0x44, 1 << 16);
+        Assert.Throws<InvalidDataException>(() => DynamixSceneDecoder.Decode(
+            source.Viewer, source.Scenario, source.Map, source.Blocks, effects));
+        WriteInt(source.Blocks, 0x44, 0);
         WriteEffectField(effects, 0x28, 7);
         Assert.Throws<InvalidDataException>(() => DynamixSceneDecoder.Decode(
             source.Viewer, source.Scenario, source.Map, source.Blocks, effects));

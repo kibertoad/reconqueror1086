@@ -55,8 +55,17 @@ actors and clears selection. Acquisition branch `0x4FD7B` completes when both
 coordinates match; handler `0x4FF53` derives heading from `target - current`,
 clears actor target `+0x24`, and schedules movement. Preserve that destination
 state and prior-command resumption. The current floor-plane unprojection and
-cardinal stepping remain provisional until the full fixed-point ray and
-movement effect are recovered.
+cardinal stepping remain provisional until the full fixed-point map ray and
+collision/path behavior are recovered.
+
+Actor blocks have two distinct signed effect selectors: `+0x2E` selects the
+visual state-completion effect, while `+0x46` selects movement. Mode handler
+`0x4FFBC` reads the latter through the high word at `+0x44`. Across all 144
+placed actor bases (1,002 placements), movement selectors 7/10 both resolve to
+three ticks at 200 ms, flags `0x142`, and local 8.8 delta `(64,0)`. Preserve the
+strict post-deadline cell cadence (`3 * 200 = 600 ms` nominal) independently of
+processor speed and input frequency. Route choice, intermediate sub-cell
+rendering, and full collision response remain provisional.
 
 ## Git push destination
 
