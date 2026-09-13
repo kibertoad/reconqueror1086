@@ -26,13 +26,14 @@ Owned-scene evidence covers 12,784 combat-scene blocks. The 144 placed actor def
 
 ## Exact continuation point
 
-Continue priority 1 in `implementation-plan.md`: recover first-person hit eligibility and timing before broadening combat behavior.
+Continue priority 1 in `implementation-plan.md`: recover first-person timing and remaining scene dispatch before broadening combat behavior.
 
 The actor-versus-actor routine beginning at executable VA `0x4F070` is the active trace. Confirmed portions are:
 
 - `0x4F10D`-`0x4F125`: attacker combat-row column 4 plus `0x40` is compared with fixed-point Manhattan separation.
 - `0x4F2DC`-`0x4F30E`: the attacker's combat row supplies dice count, die sides, and penetration to the shared damage path.
-- The hit threshold around `0x4F2AC` appears to combine combatant field `+0x34`, half the defender's `+0x34`, a base 100, and positional bonuses before `random(200)`. Do not mark that formula Confirmed until the player combatant and every bonus branch are traced.
+- `0x4F2AC`-`0x4F2D6` confirms `random(200) < 100 + attacker skill - defender skill / 2`, plus 30 for a crossbow attacker within one cell of the player and 30 when attacker and defender face the same direction.
+- Player combatant field `+0x34` is initialized at `0x58851`-`0x58887` as strength plus dexterity plus twice sword experience; field `+0x40` is strength plus stamina plus honor. The ten template attack-skill values are `50,70,60,50,50,50,50,50,70,85`.
 
 The ignored `executable-data-xrefs.txt` was most recently regenerated for object-2 offset `0xD4D0`, the player combatant index. Promising references include `0x5191B`, `0x5192A`, `0x550D8`, and the `0x573xx`/`0x57Fxx` families. A follow-up inspector run targeting `0x51880,0x55080,0x572E0,0x57F40` was interrupted; treat its output as incomplete and rerun only the focused addresses needed.
 
@@ -45,7 +46,7 @@ dotnet run --project tools\Conqueror.Inspect --no-restore -- 'C:\GOG Games\Conqu
 
 ## Remaining high-priority gaps
 
-1. Confirm player combatant field `+0x34`, positional hit bonuses, exact attack cadence, and state-linked foreground timing.
+1. Confirm exact attack cadence and state-linked foreground timing.
 2. Close the last indirect campaign-scene callback and confirm behavior-19 pickup dispatch/timing.
 3. Replace provisional retainer, loot, siege consequence, and broader AI rules from evidence.
 4. Continue exact route/`JUMP!!`/spy recovery, estate tile mapping, and remaining sound/event bindings as ordered in the migration plan.

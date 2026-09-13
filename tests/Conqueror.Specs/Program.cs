@@ -305,6 +305,11 @@ Check(siege.ArmorRating() == 65, "equipped armor plus gambeson protection");
 Check(siege.TileAt(4, 5) == SiegeTile.Door && siege.TileAt(8, 7) == SiegeTile.SecretDoor, "doors and secret rooms generated");
 Check(siege.Shoot() == SiegeAction.NoAmmunition, "crossbow requires weapon and bolts");
 Check(siege.Move(true) != SiegeAction.Blocked && siege.Move(true) != SiegeAction.Blocked && siege.Move(true) == SiegeAction.Blocked, "walls block first-person movement");
+Check(OriginalWeaponCombat.PlayerAttackSkill(siegePlayer) == siegePlayer.Stats.Strength + siegePlayer.Stats.Dexterity + siegePlayer.SwordExperience * 2
+    && OriginalWeaponCombat.PlayerHealth(siegePlayer) == siegePlayer.Stats.Strength + siegePlayer.Stats.Stamina + siegePlayer.Stats.Honor
+    && OriginalWeaponCombat.HitThreshold(47, 50, false, false) == 122
+    && OriginalWeaponCombat.HitThreshold(47, 50, true, true) == 182,
+    "first-person hit threshold uses original combat skills and positional bonuses");
 
 var fieldFriendly = new Army(); var fieldEnemy = new Army();
 fieldFriendly.Units[UnitType.Swordsmen] = 8; fieldFriendly.Units[UnitType.Halberdiers] = 8; fieldFriendly.Units[UnitType.Knights] = 8;

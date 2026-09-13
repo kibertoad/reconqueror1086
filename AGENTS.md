@@ -1,5 +1,25 @@
 # Repository agent instructions
 
+## Original technical-design documentation
+
+The final reimplementation deliverable includes a documented technical map of
+the original game, not only working replacement code. As implementation work
+progresses, update the relevant files under `docs/` with:
+
+- original executable/resource addresses, fields, table layouts, state
+  transitions, and subsystem relationships discovered during analysis;
+- recovered formulas and values, labeled Confirmed, Corroborated, Provisional,
+  or Disproved;
+- the source of each original-game claim, such as executable control flow,
+  decoded resource data, the owned manual, or controlled observation;
+- the corresponding reimplementation types, methods, definitions, and tests so
+  readers can trace original behavior into the new architecture.
+
+Keep proprietary bytes and generated analysis artifacts out of Git. Commit only
+independently authored technical descriptions, compact facts, hashes, and legal
+fixtures. A gameplay batch is not complete until its new technical mappings and
+evidence have been documented alongside the implementation.
+
 ## Git push destination
 
 The authorized canonical repository is

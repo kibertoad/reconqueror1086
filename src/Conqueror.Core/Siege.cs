@@ -11,6 +11,7 @@ public sealed class SiegeEnemy
     public int Y { get; set; }
     public int Health { get; set; }
     public int? OriginalArmor { get; init; }
+    public int? OriginalAttackSkill { get; init; }
     public int? OriginalCombatRow { get; init; }
     public bool Champion { get; init; }
     public int VisualId { get; init; } = -1;
@@ -23,7 +24,8 @@ public sealed class SiegeEnemy
 
 public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int GarrisonPerEnemy, int BaseChampionHealth, int FoodHealing, int WeaponBreakPercent);
 public sealed record SiegeSpawn(int X, int Y, bool Champion, int VisualId = -1,
-    int? OriginalArmor = null, int? OriginalHealth = null, int? OriginalCombatRow = null);
+    int? OriginalArmor = null, int? OriginalHealth = null, int? OriginalCombatRow = null,
+    int? OriginalAttackSkill = null);
 public sealed record SiegeObjectStage(int VisualId, SiegeTile Tile);
 public sealed record SiegeObjectSpawn(int X, int Y, IReadOnlyList<SiegeObjectStage> Stages);
 
@@ -143,7 +145,7 @@ public sealed class SiegeSession
             PlayerY = layout.PlayerY;
             Facing = layout.Facing;
         }
-        MaxHealth = 80 + player.Stats.Stamina * 5;
+        MaxHealth = OriginalWeaponCombat.PlayerHealth(player);
         Health = MaxHealth;
         AlliesStarted = includeRetainers ? Math.Clamp(1 + army.Total / 10, 1, 5) : 0;
         AlliesAlive = AlliesStarted;
@@ -157,6 +159,7 @@ public sealed class SiegeSession
                     Y = spawn.Y,
                     Health = spawn.OriginalHealth ?? (spawn.Champion ? Rules.BaseChampionHealth : 1),
                     OriginalArmor = spawn.OriginalArmor,
+                    OriginalAttackSkill = spawn.OriginalAttackSkill,
                     OriginalCombatRow = spawn.OriginalCombatRow,
                     Champion = spawn.Champion,
                     VisualId = spawn.VisualId
@@ -290,8 +293,11 @@ public sealed class SiegeSession
             }
             LastMessage = "Your blow meets empty air."; TickEnemies(); return SiegeAction.Missed;
         }
-        var chance = Math.Clamp((weapon?.Power ?? 35) + _player.Stats.Dexterity * 3 - (target.Champion ? 35 : 0), 15, 210);
-        var hit = _random.Next(220) < chance;
+        var hit = weapon?.OriginalWeaponItemId is { } attackItemId && target.OriginalAttackSkill is { } targetSkill
+            ? OriginalWeaponCombat.Hits(OriginalWeaponCombat.PlayerAttackSkill(_player), targetSkill,
+                OriginalWeaponCombat.CombatRowFor(attackItemId) >= 23, Facing == target.Facing, _random)
+            : _random.Next(220) < Math.Clamp((weapon?.Power ?? 35) + _player.Stats.Dexterity * 3
+                - (target.Champion ? 35 : 0), 15, 210);
         if (hit)
         {
             target.Health -= weapon?.OriginalWeaponItemId is { } damageItemId && target.OriginalArmor is { } armor
@@ -333,11 +339,19 @@ public sealed class SiegeSession
         var target = FirstEnemyAhead(range);
         if (target is not null)
         {
-            target.Health -= weapon?.OriginalWeaponItemId is { } damageItemId && target.OriginalArmor is { } armor
-                ? OriginalWeaponCombat.DamageFor(damageItemId, armor, _random)
-                : 2;
-            if (target.Health > 0) StartVisual(target, SiegeEnemyVisualState.Hit);
-            RemoveDead(); LastMessage = "The bolt strikes true.";
+            var hit = weapon?.OriginalWeaponItemId is { } attackItemId && target.OriginalAttackSkill is { } targetSkill
+                ? OriginalWeaponCombat.Hits(OriginalWeaponCombat.PlayerAttackSkill(_player), targetSkill,
+                    closeRanged: true, behindDefender: Facing == target.Facing, _random)
+                : true;
+            if (hit)
+            {
+                target.Health -= weapon?.OriginalWeaponItemId is { } damageItemId && target.OriginalArmor is { } armor
+                    ? OriginalWeaponCombat.DamageFor(damageItemId, armor, _random)
+                    : 2;
+                if (target.Health > 0) StartVisual(target, SiegeEnemyVisualState.Hit);
+                RemoveDead(); LastMessage = "The bolt strikes true.";
+            }
+            else LastMessage = "The enemy turns your shot.";
         }
         else LastMessage = "The bolt vanishes into the dark.";
         TickEnemies(); return SiegeAction.Shot;
@@ -406,8 +420,11 @@ public sealed class SiegeSession
                 if (enemy.VisualState != SiegeEnemyVisualState.Hit)
                     StartVisual(enemy, SiegeEnemyVisualState.Attack);
                 if (AlliesAlive > 0 && _random.Next(100) < 18) { AlliesAlive--; LastMessage = "A retainer falls defending you."; continue; }
-                var hitChance = enemy.OriginalCombatRow is null ? Math.Clamp(70 - ArmorRating(), 5, 70) : 70;
-                if (_random.Next(100) < hitChance)
+                var hit = enemy.OriginalCombatRow is { } enemyRow && enemy.OriginalAttackSkill is { } enemySkill
+                    ? OriginalWeaponCombat.Hits(enemySkill, OriginalWeaponCombat.PlayerAttackSkill(_player),
+                        enemyRow >= 23 && distance <= 1, enemy.Facing == Facing, _random)
+                    : _random.Next(100) < Math.Clamp(70 - ArmorRating(), 5, 70);
+                if (hit)
                     Health -= enemy.OriginalCombatRow is { } combatRow
                         ? OriginalWeaponCombat.DamageForCombatRow(combatRow, ArmorRating(), _random)
                         : Math.Max(2, 12 - _player.Stats.Stamina / 3);

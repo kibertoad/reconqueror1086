@@ -318,12 +318,32 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
-    public void OriginalCombatantTemplatesRetainExecutableArmorAndHealth()
+    public void OriginalCombatantTemplatesRetainExecutableSkillArmorAndHealth()
     {
-        Assert.Equal(new OriginalCombatantTemplate(7, 12), OriginalCombatantTemplates.For(0));
-        Assert.Equal(new OriginalCombatantTemplate(8, 15), OriginalCombatantTemplates.For(1));
-        Assert.Equal(new OriginalCombatantTemplate(10, 20), OriginalCombatantTemplates.For(9));
+        Assert.Equal(new OriginalCombatantTemplate(50, 7, 12), OriginalCombatantTemplates.For(0));
+        Assert.Equal(new OriginalCombatantTemplate(70, 8, 15), OriginalCombatantTemplates.For(1));
+        Assert.Equal(new OriginalCombatantTemplate(85, 10, 20), OriginalCombatantTemplates.For(9));
         Assert.Throws<ArgumentOutOfRangeException>(() => OriginalCombatantTemplates.For(10));
+    }
+
+    [Fact]
+    public void OriginalHitEligibilityUsesCombatSkillsAndPositionalBonuses()
+    {
+        var player = new Player
+        {
+            Stats = new CharacterStats(12, 17, 8, 10, 10),
+            SwordExperience = 9
+        };
+
+        Assert.Equal(47, OriginalWeaponCombat.PlayerAttackSkill(player));
+        Assert.Equal(32, OriginalWeaponCombat.PlayerHealth(player));
+        Assert.Equal(122, OriginalWeaponCombat.HitThreshold(47, 50, false, false));
+        Assert.Equal(152, OriginalWeaponCombat.HitThreshold(47, 50, true, false));
+        Assert.Equal(182, OriginalWeaponCombat.HitThreshold(47, 50, true, true));
+        Assert.True(OriginalWeaponCombat.Hits(47, 50, false, false, new FixedRandom(121)));
+        Assert.False(OriginalWeaponCombat.Hits(47, 50, false, false, new FixedRandom(122)));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            OriginalWeaponCombat.HitThreshold(-1, 50, false, false));
     }
 
     [Fact]
@@ -834,6 +854,11 @@ public sealed partial class ResourceAndDefinitionTests
     private sealed class MaximumRandom : Random
     {
         public override int Next(int maxValue) => maxValue - 1;
+    }
+
+    private sealed class FixedRandom(int value) : Random
+    {
+        public override int Next(int maxValue) => Math.Clamp(value, 0, maxValue - 1);
     }
 
     private static byte[] SyntheticSmacker()

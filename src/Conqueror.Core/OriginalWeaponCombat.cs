@@ -3,6 +3,9 @@ namespace Conqueror.Core;
 public static class OriginalWeaponCombat
 {
     public const int CombatRowCount = 25;
+    public const int HitRollRange = 200;
+    public const int BaseHitThreshold = 100;
+    public const int PositionalHitBonus = 30;
     private static readonly int[] CombatRowsByItemId =
     [
         4, 5, 12, 14, 6, 13, 11, 7, 9, 8, 10, 16,
@@ -71,6 +74,38 @@ public static class OriginalWeaponCombat
 
     public static int GridReachForCombatRow(int combatRow) =>
         Math.Max(1, ContactDistanceForCombatRow(combatRow) >> 8);
+
+    // CONQUER.EXE 0x58851-0x58887 initializes player combatant field +0x34
+    // from character attributes 0 (strength), 1 (dexterity), and 15 (sword experience).
+    public static int PlayerAttackSkill(Player player)
+    {
+        ArgumentNullException.ThrowIfNull(player);
+        return checked(player.Stats.Strength + player.Stats.Dexterity + player.SwordExperience * 2);
+    }
+
+    // CONQUER.EXE 0x58851-0x58887 initializes player combatant field +0x40
+    // from character attributes 0 (strength), 3 (stamina), and 5 (honor).
+    public static int PlayerHealth(Player player)
+    {
+        ArgumentNullException.ThrowIfNull(player);
+        return checked(player.Stats.Strength + player.Stats.Stamina + player.Stats.Honor);
+    }
+
+    // CONQUER.EXE 0x4F2AC-0x4F2D6 compares random(200) with this threshold.
+    public static int HitThreshold(int attackerSkill, int defenderSkill, bool closeRanged, bool behindDefender)
+    {
+        if (attackerSkill < 0) throw new ArgumentOutOfRangeException(nameof(attackerSkill));
+        if (defenderSkill < 0) throw new ArgumentOutOfRangeException(nameof(defenderSkill));
+        return checked(BaseHitThreshold + attackerSkill - defenderSkill / 2
+            + (closeRanged ? PositionalHitBonus : 0)
+            + (behindDefender ? PositionalHitBonus : 0));
+    }
+
+    public static bool Hits(int attackerSkill, int defenderSkill, bool closeRanged, bool behindDefender, Random random)
+    {
+        ArgumentNullException.ThrowIfNull(random);
+        return random.Next(HitRollRange) < HitThreshold(attackerSkill, defenderSkill, closeRanged, behindDefender);
+    }
 
     public static int DamageFor(int itemId, int targetArmor, Random random)
         => DamageForCombatRow(CombatRowFor(itemId), targetArmor, random);

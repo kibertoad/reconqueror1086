@@ -1,70 +1,156 @@
-# Conqueror: A.D. 1086 - MonoGame reimplementation
+# ReConqueror A.D. 1086
 
-This is a clean C# / MonoGame reimplementation of the campaign systems in the owned DOS release. It does not modify or redistribute the original installation. The simulation and its balance tables live in `Conqueror.Core`; the desktop front end lives in `Conqueror.Game`.
+A clean-room C# and MonoGame reimplementation of *Conqueror: A.D. 1086*.
+This repository contains no original copyrighted game assets. It is playable
+with generated fallback presentation, while owners of a legal GOG copy can use
+the included importer to enable the original artwork, animation, dialogue,
+speech, sound effects, and music from their own installation.
 
-Gameplay is definition-driven: buildings, equipment slots, population bands, unit counters, courtship ladders, victory requirements, world locations, and youth dilemmas are declared centrally and interpreted generically. See `docs/architecture.md`.
+The simulation lives in `Conqueror.Core`; the desktop runtime lives in
+`Conqueror.Game`. This is a broad, playable pre-1.0 recreation, not yet a claim
+of pixel-perfect or rule-perfect parity with the original executable.
 
-## Run
+## Quick start
 
-```powershell
-dotnet run --project src/Conqueror.Game
-```
+1. Install the .NET SDK, then clone this repository.
+2. On Windows, double-click `Start Conqueror 1086.bat`, or run:
 
-The game opens at 1024x768. Press any key or click through the title to reach the original options hub, then choose New Game for the character-options screen, where you can set a name and heraldic color, generate a new character, or select one of six pre-generated characters. Keyboard navigation remains available. `F11` switches between borderless fullscreen and windowed mode; `F10` switches between aspect-fit and integer scaling. Rendering stays on a centered 1024×768 virtual canvas, with mouse coordinates transformed through the same letterboxed viewport. The options-hub music, sound, speech, and animation choices plus display state persist independently of campaign saves and recover from a damaged settings file. `F5` saves atomically to the active slot while retaining the previous valid generation as a recovery backup; `F9` opens the original five-slot load screen and automatically offers that backup when the primary is damaged. The selected slot identifies malformed, invalid, inaccessible, unsupported-format, and missing generations, and reports when recovery actually loads a backup. Travel, manual time advancement, campaign start, and resolved battles also update a separate recoverable autosave; press `F8` on the load screen to restore it. Autosave never consumes or overwrites a manual slot. Escape or the Resume scroll returns without loading. Saves are versioned JSON with an explicit migration path; the former unversioned single `campaign.json` save remains readable as slot 1.
+   ```powershell
+   dotnet run --project src/Conqueror.Game
+   ```
 
-On the options hub, select CD Music, Sound Effects, or Digitized Speech and use Left/Right to adjust that channel in 10% steps; `R` toggles reduced motion. The Pause key freezes simulation and Smacker playback, including its audio, from any screen and displays an explicit pause overlay.
+3. To use media from a legal original installation, double-click
+   `Install Original Resources.bat`. The importer reads the source without
+   modifying it and installs validated resources under the Git-ignored
+   `UserContent` directory.
 
-The first connected controller can navigate with the D-pad or left stick, select with A, go back with B, pause with Start, and open Load Game with Back/View. The right stick controls a visible virtual pointer; right trigger clicks and left trigger performs a secondary click, exposing every original hotspot and management control. Context mappings expose dialogue choices on A/X/Y/LB/RB, map siege/spy/overview actions to X/RB/LB, shop transactions to X/Y, and first-person movement and field-battle orders to the sticks, face buttons, and shoulders. Keyboard and mouse remain available concurrently; moving the mouse immediately retakes pointer control. Custom binding remapping is still planned.
+Windows, Linux, and macOS packaging scripts are available under `tools`.
+Published installers, when available, are listed on
+[GitHub Releases](https://github.com/kibertoad/reconqueror1086/releases/latest).
+No package includes original game resources.
 
-On Windows, double-click `Start Conqueror 1086.bat` in the repository root. It checks for the .NET SDK and builds/starts the game locally.
+## Project status
 
-To create an SDK-free Windows package, run `./tools/Publish-Windows.ps1`. The verified self-contained build is written below `artifacts/Conqueror1086-win-x64`, with launch and resource-management batch files at its root; a ZIP is produced unless `-SkipArchive` is supplied. `./tools/Build-WindowsInstaller.ps1` additionally creates the versioned `artifacts/ReConqueror1086-Setup-0.1.0.exe` with the pinned Inno Setup 7.1.0 compiler. It installs as the separately identified **ReConqueror A.D. 1086**, scans GOG registry and uninstall records plus common paths on every fixed drive, accepts a manually selected original installation, and defaults to importing the original game's art, music, sound, video, and other required resources automatically. If you own *Conqueror: A.D. 1086*, install your legal copy before running this installer. If no installed copy is found, the installer explains how to select it or skip import and links to the legal GOG store. For unattended installs, `/ORIGINAL="C:\path\to\Conqueror AD1086"` supplies the source and `/NOIMPORT=1` explicitly selects clean-room mode. Startup failures produce a visible error on Windows and a diagnostic log below `%LOCALAPPDATA%\ReConquerorAD1086\Logs`.
+The campaign can be played from character creation through estate management,
+tournaments, field battles, castle assaults, and either major ending. Original
+media import, modern saves, controller input, and cross-platform packaging are
+operational. Exact rules, AI, presentation timing, and some original resource
+bindings remain active reverse-engineering work.
 
-Linux and macOS packages are built with `./tools/Build-LinuxInstaller.ps1` and `./tools/Build-MacInstaller.ps1`. They install the self-contained game without proprietary resources; use `--user-content PATH` or `RECONQUEROR_USER_CONTENT` to select an imported catalog. Otherwise packaged builds discover an adjacent or package-root `UserContent` directory and then the per-user application-data location. Saves and settings always live below the per-user `ReConquerorAD1086` state directory. Linux `.deb` and macOS `.pkg` outputs are currently unsigned. The manual `Release installers` workflow validates a numeric version, tests one immutable commit, builds Windows x64, Linux x64, macOS arm64, and macOS x64 installers, and publishes exactly those four assets. Original game resources are never included in any package.
+Technical claims are graded as Confirmed, Corroborated, or Provisional in the
+[original findings register](docs/original-findings.md). The complete delivery
+sequence and proof gates are in the [implementation plan](docs/implementation-plan.md),
+and the current parity limits are summarized in the [fidelity ledger](docs/fidelity.md).
 
-Owners of the original GOG release can first double-click `Install Original Resources.bat`. The importer reads the original installation without modifying it, installs exact resources into the Git-ignored `UserContent` directory, converts CDDA tracks losslessly to PCM WAV, and writes a provenance manifest. The launcher makes that catalog available to the game automatically. Imported CD music and the original shared interface click now play; every imported `.666` sample is decoded and converted once into a session cache at startup. Original title/options/character screens and sword pointer, animated dilemmas, seasonal estate tiles, maps, location screens, store art and controls, a tournament portrait, and all 30 youth dilemmas are active. Confirmed blacksmith hotspots and the executable-ordered ten-region Home catalog expose hover labels and actions; the Castle model and three distinct desk books open section-specific `FIEFMGMT` descriptor variants whose OK/Cancel controls commit or roll back pending management changes. Overview and War Planning use their original installed backgrounds. War Planning renders its decoded five-army controls through `FWARPLAN.HAT`, raises or disbands 100-serf companies, enforces the original 60-company limit and away-army restriction, tracks field/join state and recurring spies, and commits or rolls back the full plan. A joined division accompanies the player through travel, interception, field battle, siege, and retreat without falling back to Army 1. Unjoined fielded divisions can be selected and dispatched independently; their dated orders survive saves, their icons advance across the map, and their captains report remote battles. Built-in presentation and dilemma summaries remain the no-media fallback. Rerun the installer after importer upgrades; exact path-by-path army routing and captain battle rules, exact `JUMP!!` behavior, other `.666` and SMK event bindings, seeking, and the remaining Sierra containers still require adapters.
+### Implemented
 
-The importer recognizes the supported GOG disc-image hash before extraction and warns—but continues bounded validation—for an unknown release. Before writing, it inventories the exact generated footprint, reports required and available disk space, and fails early if atomic installation cannot fit. It reports the current resource plus written/reused totals during long runs. It also supports `--verify [UserContent path]` to hash-check every manifest entry, `--repair [original installation] [UserContent path]` to rebuild and verify generated content from the read-only source installation, and `--uninstall [UserContent path]` to remove only manifest-owned files. Installs use atomic replacement and leave matching generated files untouched. Verification rejects missing, modified, duplicated, malformed, or root-escaping manifest entries; uninstall prevalidates every path and preserves unlisted files.
+| Area | Available now |
+| --- | --- |
+| Character and campaign | Six named profiles, custom character generation, the six formative ages, March 1086 start, daily/monthly progression, and the age-30 deadline. Imported content activates all 30 original dilemma definitions and their executable-confirmed selection/outcome rules. |
+| Estate and economy | Castle staffing, farm, village, forest, productivity, population, taxation, loans, harvest debt, army upkeep, shop transactions, and transactional management books. Original crop/forest tables, unit endpoints, shop prices, and the 75% resale rule are represented. |
+| Strategy | Eighteen destinations, travel time, five persistent army divisions, recruitment, joining, spies, field orders, hostile garrisons, interception, conquest, and a moving tournament circuit. |
+| Tournaments and quests | Three jousts and one skirmish per tournament, wagers, courtship ladders, marriage, imported conversations, the dragon equipment quest, and crown/dragon/age endings. |
+| Field and siege combat | Playable formation orders and counter-based field battles. First-person assaults include imported scene geometry, facing, doors, secret rooms, radar, melee, crossbows, ammunition, champions, retainers, food, treasure, equipment breakage, retreat, and progression. Executable-confirmed combat rows now drive reach, hit eligibility, damage, armor penetration, combatant attributes, and player health. |
+| Original-content mode | Read-only import with hash/provenance validation; decoded PCX/PCC/HAT/CSF scenes, conversations, `.666` audio, CD music, and direct Smacker playback. The title, options, character flow, dilemmas, estate, map, village, tournament, shop, combat, dragon, credits, and endings use owned media where bindings are known. |
+| Persistence and input | Five atomic manual slots with backups, a separate autosave, schema migration, settings recovery, keyboard/mouse controls, controller navigation and virtual pointer, pause, reduced motion, and aspect/integer scaling. |
+| Engineering baseline | Headless deterministic core, bounded parsers, strict legal-boundary checks, isolated xUnit and executable-specification suites, a 1,000-line compiled-source ceiling, and self-contained Windows/Linux/macOS packaging automation. |
 
-The importer also validates stored CSF files as indexed animation sequences. Bound sequences use verified screen palettes; unbound sequences remain undisplayed until their palette and role are established. Rerun the installer after importer upgrades to refresh manifest classifications.
+### Still missing or provisional
 
-## Implemented systems
+| Area | Remaining work |
+| --- | --- |
+| Exact gameplay parity | Recover remaining economy interpolation, construction costs, character edge cases, tournament records, world tables, political simulation, quest boundaries, and native RNG consumption. The FAQ consistency audit identifies known provisional matches and conflicts. |
+| Combat parity | Confirm foreground and door cadence, critical-hit behavior, sub-cell movement, enemy/retainer AI, stair transitions, enemy food use, loot, siege consequences, and the remaining campaign-scene callback. |
+| Strategic AI | Replace generated routing, garrisons, tournament movement, field-battle coefficients, captain battle rules, and opponent behavior with executable-backed logic and fixed reference traces. |
+| Visual and audio parity | Bind remaining palettes, Sierra payloads, conversation entry points, `.666` events, Smacker triggers/seeking, original font metrics, status fields, terrain composition, and exact hit regions. |
+| Platform polish | Installers are unsigned. Native installer QA, macOS notarization, customizable bindings, and broader accessibility work remain. |
+| Compatibility policy | Recreation saves are versioned and migrated, but their final post-1.0 compatibility policy is not yet set. Importing or exporting original DOS save files is not currently supported. |
 
-- Original six-attribute character model, descriptive ranks, templates, custom rolls, and six formative ages
-- March 1086 start at age 18, daily/monthly simulation, and the age-30 loss condition
-- Castle staffing, farm, village, forest, productivity and population systems
-- All crop and forest development choices, adjustable taxation, and the full scrollable blacksmith catalog
-- July bean, housing, servant-room, harvest and debt checks
-- Original crop and forest costs/returns; original unit price/upkeep endpoints
-- Swordsmen/halberdiers/knights counter triangle and attritional field battles
-- Playable continuous field battles with per-formation hold, advance, flank, withdrawal, or captain-control orders
-- Named England destinations, calendar-costed travel, a moving tournament circuit, and persistent per-castle conquest
-- Persistent hostile field garrisons, 80-shilling spy reports, 98% stronghold interception, route fallback, and siege approach gating
-- 50% harvest loan with a persisted pay-or-fight Drogo collection encounter, church donations, recruiting, taxation, wealth and army upkeep
-- Blacksmith purchases, automatic equipment, and the original 75% resale rule
-- Three-joust/one-skirmish tournament limits, selectable ladies, individual eligibility rules, multi-stage reward ladders, marriage, and imported original lady, blacksmith, ordinary parish, and Cambridge armor-quest conversations
-- First-person castle simulation with facing and movement, doors and secret rooms, melee reach, crossbows and ammunition, enemy pursuit, champions, armor checks, commandable retainers, food, treasure, breakable weapons, radar, retreat losses, and progression
-- Equipment catalog with the original shop prices and armor-bar values
-- Crown victory by conquering London's real garrison; quest-gated dragon-lair discovery and timed dragon-eye encounter with keyboard, mouse, and controller aim; campaign defeat, journal, save/load
+### Permanent scope boundaries
+
+- Original copyrighted assets are never committed or distributed; users import
+  them locally from a legal copy.
+- The original installation is treated as read-only.
+- Reverse-engineering reports contain metadata, mappings, and formulas rather
+  than proprietary executable bytes or extracted resources.
+- Modern safety and platform requirements take precedence over reproducing
+  unsafe legacy behavior.
+
+## Quality-of-life additions
+
+- Borderless fullscreen and aspect-fit/integer scaling on a centered 1024x768
+  virtual canvas.
+- Concurrent keyboard, mouse, and controller input with a controller-driven
+  virtual pointer.
+- Independent music, sound-effect, and speech levels plus reduced motion.
+- Five recoverable manual save slots and a separate transition-triggered
+  autosave.
+- Generated presentation and summaries when original media is unavailable.
+- Visible Windows startup diagnostics under
+  `%LOCALAPPDATA%\ReConquerorAD1086\Logs`.
+
+## Controls
+
+| Action | Keyboard | Controller / mouse |
+| --- | --- | --- |
+| Navigate | Arrow keys; screen-specific shortcuts | D-pad or left stick; point and click |
+| Select / confirm | Enter | A / primary click |
+| Back | Escape | B / secondary click |
+| Pause | Pause | Start |
+| Load game | F9 | Back/View |
+| Save active slot | F5 | Use the save screen controls |
+| Restore autosave | F8 on the load screen | Use the load screen control |
+| Scaling mode | F10 | — |
+| Windowed / fullscreen | F11 | — |
+| Pointer control | Mouse | Right stick; right trigger clicks, left trigger secondary-clicks |
+
+Screen-specific prompts expose travel, dialogue, shop, tournament, army, and
+first-person commands. Keyboard, mouse, and controller input can be used
+concurrently; moving the mouse immediately retakes pointer control.
 
 ## Verification
 
-On Windows, double-click `Run Tests.bat`. It first enforces the repository legal boundary, then builds into a unique directory under `%TEMP%`, disables the shared compiler, and runs both the xUnit suite and the broader executable specifications without touching the game's normal output files. This prevents a running game from locking test build outputs. The manual-only `Continuous integration` workflow independently verifies, builds, tests, publishes, and smoke-tests on Windows x64, Linux x64, macOS arm64, and macOS x64; installer jobs then validate each platform package. Ordinary pushes do not start CI. A pinned `zizmor` workflow audits pull requests and can also be run manually.
+On Windows, double-click `Run Tests.bat`. It enforces the repository legal
+boundary, builds into an isolated temporary directory, and runs both the xUnit
+suite and broader executable specifications without requiring a graphics
+device or touching normal game output files.
 
-The legal-boundary policy rejects tracked `UserContent`, tracked `analysis/original` material, restricted original-media extensions outside explicitly approved clean-room or synthetic-fixture roots, and unreviewed files over 1 MiB. Its definitions live in `tools/repository-policy.json`; `tools/Verify-Repository.ps1` is the generic interpreter.
+The resource importer also supports `--verify`, `--repair`, and `--uninstall`.
+See [original analysis](docs/original-analysis.md) for the read-only inspection
+workflow and [resource formats](docs/resource-formats.md) for the clean-room
+technical specifications.
 
-The xUnit project uses xUnit.net v3 4.0.0, and the desktop project uses MonoGame 3.8.5.1—the latest stable NuGet releases checked on 2026-09-07.
+## Crash reports
 
-Both test paths check resource boundaries, externally documented balance values, and core campaign invariants without requiring a graphics device.
-It reports every `PASS`/`FAIL`, prints one compact summary, and returns a normal nonzero process exit code on failure rather than throwing an application exception.
-Unexpected fixture or parser errors are caught by the runner and reported as a concise failed check. The import and inspection utilities use the same clean command-line error boundary.
+Windows startup failures produce a visible error and a local diagnostic log
+below `%LOCALAPPDATA%\ReConquerorAD1086\Logs`. Nothing is uploaded
+automatically.
 
-## Inspecting the owned original
+## Acknowledgements
 
-The read-only `tools/Conqueror.Inspect` utility inventories the mixed-mode GOG CD image, extracts selected executables/configuration files to an ignored local directory, records hashes, and searches binary strings by byte offset. See [`docs/original-analysis.md`](docs/original-analysis.md) for usage and [`docs/original-findings.md`](docs/original-findings.md) for reviewed learnings with explicit confidence grades. Generated proprietary artifacts are never tracked.
+First and foremost, thank you to the developers, artists, writers, musicians,
+and publishers of the original *Conqueror: A.D. 1086*. Their unusually rich
+blend of strategy, role-playing, simulation, and first-person action is the
+reason this recreation exists.
 
-## Original media
+Special thanks to **mikel123456** for the extensive
+[*Conqueror 1086 A.D.* FAQ](https://gamefaqs.gamespot.com/pc/574792-conqueror-1086-ad/faqs/66730).
+It is an important, generally trusted starting point for mechanics, routes, and
+observed behavior. Its claims are still corroborated against the owned
+executable, decoded resources, original documentation, or controlled play
+before exact formulas and values are labeled Confirmed. The current comparison
+is maintained in the
+[GameFAQs consistency audit](docs/original-findings.md#gamefaqs-secondary-source-consistency-audit).
 
-The project is playable without copyrighted media. When locally imported from an owned GOG installation, original screens, CD audio, the dragon screen and lance animation, and directly decoded Smacker title, credits, item, dragon-lair travel, and dragon-outcome movies are activated from ignored user content. `C1086.GOB`, the raw CD tracks, Smacker movies, and CD audio are intentionally not copied into this repository. See `docs/fidelity.md` for the fidelity ledger and remaining audiovisual work.
+This project copies no original source code and redistributes no copyrighted
+resources. Players are expected to own a legal copy and import its assets
+locally.
 
-The complete phased backlog and acceptance criteria are tracked in [`docs/implementation-plan.md`](docs/implementation-plan.md).
+## License
+
+Copyright (C) 2026 kibertoad.
+
+The original code in this repository is licensed under the
+[GNU General Public License v3.0](LICENSE). The license does not cover or grant
+rights to the original *Conqueror: A.D. 1086* assets, which are not distributed
+by this project.

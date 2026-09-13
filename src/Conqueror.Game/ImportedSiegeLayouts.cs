@@ -160,7 +160,8 @@ public static class ImportedSiegeLayouts
         }
         var champion = block.Name.Contains("champion", StringComparison.OrdinalIgnoreCase) ||
             block.Name.Contains("lord", StringComparison.OrdinalIgnoreCase);
-        return new SiegeSpawn(x, y, champion, block.Index, template.Armor, template.Health, block.ActorCombatRow);
+        return new SiegeSpawn(x, y, champion, block.Index, template.Armor, template.Health,
+            block.ActorCombatRow, template.AttackSkill);
     }
 
     private static bool IsDestructible(DynamixSceneBlock block) =>
