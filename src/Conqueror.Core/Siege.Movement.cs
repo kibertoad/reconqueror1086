@@ -8,34 +8,33 @@ public sealed partial class SiegeSession
     {
         if (!double.IsFinite(elapsedSeconds) || elapsedSeconds < 0)
             throw new ArgumentOutOfRangeException(nameof(elapsedSeconds));
-        foreach (var retainer in _retainers.Where(retainer =>
-                     retainer.Health > 0 && retainer.OrderedDestination is not null))
+        foreach (var retainer in _retainers.Where(retainer => retainer.Health > 0))
         {
-            var destination = retainer.OrderedDestination!.Value;
-            if (retainer.MovementTick == 0 &&
-                retainer.X == destination.X && retainer.Y == destination.Y)
+            if (retainer.MovementTick == 0 && !TryBeginRetainerMovement(retainer))
             {
-                CompleteDestination(retainer);
+                retainer.MovementElapsed = 0;
                 continue;
             }
 
             var movement = ValidMovement(retainer.OriginalMovement) ?? FallbackActorMovement;
             retainer.MovementElapsed += elapsedSeconds;
             var catchUp = 0;
-            while (retainer.MovementElapsed > movement.TickSeconds && catchUp < 24 &&
-                   retainer.OrderedDestination is not null)
+            while (retainer.MovementElapsed > movement.TickSeconds && catchUp < 24)
             {
                 catchUp++;
                 retainer.MovementElapsed -= movement.TickSeconds;
-                if (retainer.MovementTick == 0)
-                    AimRetainerAt(retainer, destination.X, destination.Y);
+                if (retainer.MovementTick == 0 && !TryBeginRetainerMovement(retainer))
+                {
+                    retainer.MovementElapsed = 0;
+                    break;
+                }
                 var effectContinues = AdvanceMovementTick(retainer, movement,
-                    GroundTravelFlags(movement.Flags));
+                    DirectMovementFlags(movement.Flags));
                 retainer.MovementTick = effectContinues
                     ? (retainer.MovementTick + 1) % movement.TickCount
                     : 0;
                 retainer.WalkFrame = (retainer.WalkFrame + 1) % movement.TickCount;
-                if (retainer.MovementTick == 0 &&
+                if (retainer.MovementTick == 0 && retainer.OrderedDestination is { } destination &&
                     retainer.X == destination.X && retainer.Y == destination.Y)
                     CompleteDestination(retainer);
             }
@@ -49,10 +48,40 @@ public sealed partial class SiegeSession
             ? movement
             : null;
 
-    // Mode 12 rewrites only the descriptor's low flag byte before constructing
-    // the live effect: and 0xA7, then or 0x10 (0x142 therefore becomes 0x112).
-    private static int GroundTravelFlags(int descriptorFlags) =>
+    // Direct chase/follow and mode 12 rewrite only the descriptor's low flag
+    // byte: and 0xA7, then or 0x10 (0x142 therefore becomes 0x112).
+    private static int DirectMovementFlags(int descriptorFlags) =>
         (descriptorFlags & ~0xFF) | ((descriptorFlags & 0xFF & 0xA7) | 0x10);
+
+    private bool TryBeginRetainerMovement(SiegeRetainer retainer)
+    {
+        if (retainer.OrderedDestination is { } destination)
+        {
+            if (retainer.X == destination.X && retainer.Y == destination.Y)
+            {
+                CompleteDestination(retainer);
+                return false;
+            }
+            AimRetainerAt(retainer, destination.X, destination.Y);
+            return true;
+        }
+
+        switch (retainer.Command)
+        {
+            case SiegeRetainerCommand.Attack:
+                var target = RetainerOrderTarget(retainer);
+                if (target is null || Distance(retainer.X, retainer.Y, target.X, target.Y) <=
+                    RetainerAttackRange(retainer) || retainer.OriginalCombatRow is >= 23) return false;
+                AimRetainerAt(retainer, target.X, target.Y);
+                return true;
+            case SiegeRetainerCommand.Follow:
+                if (Distance(retainer.X, retainer.Y, PlayerX, PlayerY) <= 1) return false;
+                AimRetainerAt(retainer, PlayerX, PlayerY);
+                return true;
+            default:
+                return false;
+        }
+    }
 
     private static void CompleteDestination(SiegeRetainer retainer)
     {
@@ -133,13 +162,6 @@ public sealed partial class SiegeSession
         Facing.West => (-x, -y),
         _ => (y, -x)
     };
-
-    private void MoveRetainerToward(SiegeRetainer retainer, int targetX, int targetY)
-    {
-        var candidates = CardinalSteps(retainer.X, retainer.Y)
-            .OrderBy(point => Distance(point.X, point.Y, targetX, targetY));
-        MoveRetainer(retainer, candidates.FirstOrDefault(point => RetainerCanEnter(retainer, point.X, point.Y)));
-    }
 
     private void MoveRetainerAway(SiegeRetainer retainer, int targetX, int targetY)
     {

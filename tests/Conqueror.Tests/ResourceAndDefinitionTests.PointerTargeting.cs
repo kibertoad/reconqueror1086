@@ -68,8 +68,11 @@ public sealed partial class ResourceAndDefinitionTests
         battle.ToggleRetainerSelection(friendly);
         Assert.True(battle.CommandSelectedRetainersAt(battle.Enemies[1]));
         battle.AdvanceRetainerOrders();
+        Assert.Equal((2, 2), (friendly.X, friendly.Y));
+        battle.AdvanceRetainerMovement(0.6001);
 
-        Assert.Equal((2, 3), (friendly.X, friendly.Y));
+        Assert.Equal((2, 3, 0, -64, Facing.South),
+            (friendly.X, friendly.Y, friendly.OffsetX8, friendly.OffsetY8, friendly.Facing));
         Assert.False(friendly.Selected);
     }
 

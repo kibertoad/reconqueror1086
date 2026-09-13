@@ -308,6 +308,7 @@ public sealed partial class SiegeSession
             retainer.Command = command;
             retainer.OrderedTarget = null;
             retainer.OrderedDestination = null;
+            ResetRetainerMovement(retainer);
         }
         foreach (var retainer in living) retainer.Selected = false;
         LastMessage = targets.Length == 0
@@ -328,6 +329,7 @@ public sealed partial class SiegeSession
             retainer.Command = SiegeRetainerCommand.Attack;
             retainer.OrderedTarget = target;
             retainer.OrderedDestination = null;
+            ResetRetainerMovement(retainer);
         }
         foreach (var retainer in living) retainer.Selected = false;
         LastMessage = "Retainers attack the selected defender.";
@@ -344,8 +346,7 @@ public sealed partial class SiegeSession
         {
             retainer.OrderedTarget = null;
             retainer.OrderedDestination = (x, y);
-            retainer.MovementElapsed = 0;
-            retainer.MovementTick = 0;
+            ResetRetainerMovement(retainer);
         }
         foreach (var retainer in living) retainer.Selected = false;
         LastMessage = "Retainers move to the selected ground.";
@@ -710,11 +711,7 @@ public sealed partial class SiegeSession
                     retainer.OrderedDestination = null;
                 continue;
             }
-            var target = retainer.OrderedTarget is { Health: > 0 } ordered && _enemies.Contains(ordered)
-                ? ordered
-                : _enemies.Where(enemy => enemy.Health > 0)
-                    .OrderBy(enemy => Distance(retainer.X, retainer.Y, enemy.X, enemy.Y))
-                    .FirstOrDefault();
+            var target = RetainerOrderTarget(retainer);
             if (target is null) retainer.OrderedTarget = null;
             switch (retainer.Command)
             {
@@ -724,11 +721,9 @@ public sealed partial class SiegeSession
                     break;
                 case SiegeRetainerCommand.Attack:
                     if (target is null) break;
-                    if (!RetainerAttack(retainer, target)) MoveRetainerToward(retainer, target.X, target.Y);
+                    RetainerAttack(retainer, target);
                     break;
                 case SiegeRetainerCommand.Follow:
-                    if (Distance(retainer.X, retainer.Y, PlayerX, PlayerY) > 1)
-                        MoveRetainerToward(retainer, PlayerX, PlayerY);
                     break;
                 case SiegeRetainerCommand.Retreat:
                     if (target is not null) MoveRetainerAway(retainer, target.X, target.Y);
@@ -740,10 +735,7 @@ public sealed partial class SiegeSession
     private bool RetainerAttack(SiegeRetainer retainer, SiegeEnemy target)
     {
         var distance = Distance(retainer.X, retainer.Y, target.X, target.Y);
-        var range = retainer.OriginalCombatRow is { } row
-            ? OriginalWeaponCombat.GridReachForCombatRow(row)
-            : 1;
-        if (distance > range) return false;
+        if (distance > RetainerAttackRange(retainer)) return false;
         retainer.Facing = DirectionToward(retainer.X, retainer.Y, target.X, target.Y, retainer.Facing);
         StartVisual(retainer, SiegeEnemyVisualState.Attack);
         var hit = retainer.OriginalAttackSkill is { } skill && target.OriginalAttackSkill is { } targetSkill
@@ -761,6 +753,24 @@ public sealed partial class SiegeSession
             ? "Your retainer brings down a defender."
             : "Your retainer strikes a defender.";
         return true;
+    }
+
+    private SiegeEnemy? RetainerOrderTarget(SiegeRetainer retainer) =>
+        retainer.OrderedTarget is { Health: > 0 } ordered && _enemies.Contains(ordered)
+            ? ordered
+            : _enemies.Where(enemy => enemy.Health > 0)
+                .OrderBy(enemy => Distance(retainer.X, retainer.Y, enemy.X, enemy.Y))
+                .FirstOrDefault();
+
+    private static int RetainerAttackRange(SiegeRetainer retainer) =>
+        retainer.OriginalCombatRow is { } row
+            ? OriginalWeaponCombat.GridReachForCombatRow(row)
+            : 1;
+
+    private static void ResetRetainerMovement(SiegeRetainer retainer)
+    {
+        retainer.MovementElapsed = 0;
+        retainer.MovementTick = 0;
     }
 
     private void EnemyAttackRetainer(SiegeEnemy enemy, SiegeRetainer retainer, int distance)

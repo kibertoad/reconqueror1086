@@ -167,7 +167,12 @@ public sealed partial class ResourceAndDefinitionTests
         var attack = RetainerOrderBattle(retainerX: 2, enemyX: 9);
         attack.CommandRetainers(SiegeRetainerCommand.Attack);
         attack.AdvanceRetainerOrders();
-        Assert.Equal(3, Assert.Single(attack.Retainers).X);
+        Assert.Equal(2, Assert.Single(attack.Retainers).X);
+        attack.AdvanceRetainerMovement(0.6001);
+        Assert.Equal((3, 2, -64, 0, Facing.East),
+            (Assert.Single(attack.Retainers).X, Assert.Single(attack.Retainers).Y,
+                Assert.Single(attack.Retainers).OffsetX8, Assert.Single(attack.Retainers).OffsetY8,
+                Assert.Single(attack.Retainers).Facing));
 
         var defend = RetainerOrderBattle(retainerX: 2, enemyX: 9);
         defend.CommandRetainers(SiegeRetainerCommand.Defend);
@@ -177,7 +182,12 @@ public sealed partial class ResourceAndDefinitionTests
         var follow = RetainerOrderBattle(retainerX: 5, enemyX: 10);
         follow.CommandRetainers(SiegeRetainerCommand.Follow);
         follow.AdvanceRetainerOrders();
-        Assert.Equal(4, Assert.Single(follow.Retainers).X);
+        Assert.Equal(5, Assert.Single(follow.Retainers).X);
+        follow.AdvanceRetainerMovement(0.6001);
+        Assert.Equal((4, 2, 64, 0, Facing.West),
+            (Assert.Single(follow.Retainers).X, Assert.Single(follow.Retainers).Y,
+                Assert.Single(follow.Retainers).OffsetX8, Assert.Single(follow.Retainers).OffsetY8,
+                Assert.Single(follow.Retainers).Facing));
 
         var retreat = RetainerOrderBattle(retainerX: 5, enemyX: 9);
         retreat.CommandRetainers(SiegeRetainerCommand.Retreat);

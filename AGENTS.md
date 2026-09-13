@@ -34,10 +34,12 @@ is selected, then clear selection. Preserve these identities and distinguish
 the retainer Retreat order from leaving the battle. Executable state dispatch
 confirms the intent of each mode: Defend attacks only inside the surrounding
 3x3 neighborhood, Attack seeks the nearest hostile, Follow moves toward the
-player target, and Retreat moves away from its hostile target. The runtime may
-use documented provisional grid stepping for these intents, but exact
-fixed-point movement, collision/path selection, and thinker cadence must not be
-presented as recovered until their executable paths are closed.
+player target, and Retreat moves away from its hostile target. Acquired melee
+Attack mode 8 and Follow mode 16 share handler `0x4FE76`; the runtime routes
+both through the recovered `0x112` sub-cell movement effect. Defend does not
+seek. Retreat movement, Attack's no-target mode-6 wandering, acquisition
+visibility, contact thresholds, formation/path selection, and exact thinker
+cadence remain Provisional and must not be presented as recovered.
 
 First-person pointer dispatch is also mapped. Handler `0x55524` consumes the
 world hit returned by raycaster `0x470A8`: a friendly actor toggles selection;
@@ -54,9 +56,9 @@ writes the raycaster's integer coordinates to actor `+0x28/+0x2C` for selected
 actors and clears selection. Acquisition branch `0x4FD7B` completes when both
 coordinates match; handler `0x4FF53` derives heading from `target - current`,
 clears actor target `+0x24`, and schedules movement. Preserve that destination
-state and prior-command resumption. The current floor-plane unprojection and
-cardinal stepping remain provisional until the full fixed-point map ray and
-collision/path behavior are recovered.
+state and prior-command resumption. Cardinal heading and sub-cell stepping are
+recovered below; the current floor-plane unprojection, actor convergence, and
+unmapped collision/path behavior remain Provisional.
 
 Actor blocks have two distinct signed effect selectors: `+0x2E` selects the
 visual state-completion effect, while `+0x46` selects movement. Mode handler
@@ -70,9 +72,10 @@ the strict post-deadline 200 ms tick independently of processor speed and input
 frequency. From zero, offsets advance `0,64,128,192`, then strict `> 0x80`
 crossing changes the cell and wraps to `-64`: 600 ms is the first transition
 and effect-cycle duration, not a universal cell cadence. Sustained straight
-movement takes four ticks/800 ms per cell. Collision corner interactions,
-multi-actor destination behavior, and actor modes other than selected ground
-travel remain provisional.
+movement takes four ticks/800 ms per cell. Collision corner interactions and
+multi-actor destination behavior remain Provisional. The same timing and offset
+mapping is active for acquired Attack mode 8 and Follow mode 16; it is not yet
+established for every actor mode.
 
 Mode-12 route and collision handling is narrower than that general caveat.
 Heading helper `0x445C4` followed by `(heading + 0x20) & 0xC0` aims directly
