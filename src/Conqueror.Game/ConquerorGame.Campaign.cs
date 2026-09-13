@@ -452,8 +452,10 @@ public sealed partial class ConquerorGame
         {
             var enemiesBeforeAttack = LivingSiegeEnemyState();
             var attackFrames = SiegeCombatPresentation.AttackFramesFor(_campaign.State.Player.Inventory.Weapon);
-            _siege.Attack();
-            StartSiegeWeapon(attackFrames);
+            var action = _siege.Attack();
+            StartSiegeWeapon(attackFrames,
+                SiegeCombatPresentation.OriginalCombatRowFor(_campaign.State.Player.Inventory.Weapon),
+                action == SiegeAction.Hit);
             StartSiegeHitEffect(enemiesBeforeAttack);
         }
         if (press(Keys.X))
@@ -461,7 +463,7 @@ public sealed partial class ConquerorGame
             var enemiesBeforeShot = LivingSiegeEnemyState();
             if (_siege.Shoot() == SiegeAction.Shot)
             {
-                StartSiegeWeapon(SiegeCombatPresentation.CrossbowAttack);
+                StartSiegeWeapon(SiegeCombatPresentation.CrossbowAttack, 23, contacted: false);
                 StartSiegeHitEffect(enemiesBeforeShot);
             }
         }
@@ -540,11 +542,37 @@ public sealed partial class ConquerorGame
         Autosave();
     }
 
-    private void StartSiegeWeapon(SiegeFrameRun run)
+    private void StartSiegeWeapon(SiegeFrameRun run, int combatRow, bool contacted)
     {
         _siegeWeaponRun = run;
+        _siegeWeaponTrajectory = null;
         _siegeWeaponFrame = _animationEnabled ? run.First : run.Last;
         _siegeWeaponElapsed = 0;
+        if (!_animationEnabled || combatRow >= 23 ||
+            !_originalAnimations.TryGetValue("Combat.FirstPerson", out var animation)) return;
+        var setupFrame = SiegeCombatPresentation.SetupFrameForCombatRow(combatRow, run.Start);
+        if ((uint)setupFrame >= (uint)animation.Frames.Count) return;
+        var setupTexture = animation.Frames[setupFrame];
+        var target = SiegeForegroundTarget();
+        _siegeWeaponTrajectory = SiegeForegroundTrajectory.Create(combatRow, run.Start,
+            setupTexture.Width, setupTexture.Height, target.X, target.Y,
+            SiegeCombatPresentation.Viewport.Width, SiegeCombatPresentation.Viewport.Height,
+            contacted, Random.Shared);
+        _siegeWeaponFrame = _siegeWeaponTrajectory.Frame;
+    }
+
+    private (int X, int Y) SiegeForegroundTarget()
+    {
+        var projections = _siege is null
+            ? []
+            : SiegeViewProjection.ProjectEnemies(_siege)
+                .Where(item => item.Enemy.Health > 0 || item.Enemy.VisualState == SiegeEnemyVisualState.Dying)
+                .OrderBy(item => item.ForwardDistance)
+                .ToArray();
+        var x = projections.Length == 0
+            ? SiegeCombatPresentation.Viewport.Width / 2
+            : (int)Math.Round(projections[0].ScreenPosition * SiegeCombatPresentation.Viewport.Width);
+        return (x, SiegeCombatPresentation.Viewport.Height / 2);
     }
 
     private void StartSiegeHitEffect((int Health, int Count) before)
@@ -565,7 +593,14 @@ public sealed partial class ConquerorGame
 
     private void AdvanceSiegeForeground(double elapsedSeconds)
     {
-        AdvanceSiegeRun(ref _siegeWeaponFrame, _siegeWeaponRun, ref _siegeWeaponElapsed, elapsedSeconds);
+        if (_siegeWeaponTrajectory is { } trajectory)
+        {
+            trajectory.Advance(elapsedSeconds);
+            _siegeWeaponFrame = trajectory.Frame;
+            if (trajectory.Phase == SiegeForegroundPhase.Complete) _siegeWeaponTrajectory = null;
+        }
+        else
+            AdvanceSiegeRun(ref _siegeWeaponFrame, _siegeWeaponRun, ref _siegeWeaponElapsed, elapsedSeconds);
         AdvanceSiegeRun(ref _siegeHitFrame, _siegeHitRun, ref _siegeHitElapsed, elapsedSeconds);
     }
 

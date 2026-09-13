@@ -323,6 +323,7 @@ public sealed partial class ConquerorGame
     {
         _siegeVisuals?.Dispose();
         _siegeVisuals = null;
+        _siegeWeaponTrajectory = null;
         _siegeWeaponFrame = -1;
         _siegeWeaponRun = default;
         _siegeWeaponElapsed = 0;
@@ -476,14 +477,28 @@ public sealed partial class ConquerorGame
         if (_siegeWeaponFrame >= 0 && _siegeWeaponFrame < animation.Frames.Count)
         {
             var texture = animation.Frames[_siegeWeaponFrame];
-            var width = originalScale
-                ? texture.Width * 1024 / SiegeCombatPresentation.OriginalWidth
-                : Math.Max(1, (int)Math.Round(texture.Width * Math.Min(2.5f, viewport.Height / 200f)));
-            var height = originalScale
-                ? texture.Height * 768 / SiegeCombatPresentation.OriginalHeight
-                : Math.Max(1, (int)Math.Round(texture.Height * Math.Min(2.5f, viewport.Height / 200f)));
-            DrawClipped(texture,
-                new Rectangle(viewport.Center.X - width / 2, viewport.Bottom - height, width, height), viewport);
+            if (_siegeWeaponTrajectory is { } trajectory)
+            {
+                var localX = trajectory.Mirror ? trajectory.AnchorX : trajectory.AnchorX - texture.Width;
+                var destination = new Rectangle(
+                    viewport.X + localX * viewport.Width / SiegeCombatPresentation.Viewport.Width,
+                    viewport.Y + trajectory.AnchorY * viewport.Height / SiegeCombatPresentation.Viewport.Height,
+                    Math.Max(1, texture.Width * viewport.Width / SiegeCombatPresentation.Viewport.Width),
+                    Math.Max(1, texture.Height * viewport.Height / SiegeCombatPresentation.Viewport.Height));
+                DrawClipped(texture, destination, viewport,
+                    trajectory.Mirror ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+            }
+            else
+            {
+                var width = originalScale
+                    ? texture.Width * 1024 / SiegeCombatPresentation.OriginalWidth
+                    : Math.Max(1, (int)Math.Round(texture.Width * Math.Min(2.5f, viewport.Height / 200f)));
+                var height = originalScale
+                    ? texture.Height * 768 / SiegeCombatPresentation.OriginalHeight
+                    : Math.Max(1, (int)Math.Round(texture.Height * Math.Min(2.5f, viewport.Height / 200f)));
+                DrawClipped(texture,
+                    new Rectangle(viewport.Center.X - width / 2, viewport.Bottom - height, width, height), viewport);
+            }
         }
         if (_siegeHitFrame >= 0 && _siegeHitFrame < animation.Frames.Count)
         {
@@ -505,7 +520,8 @@ public sealed partial class ConquerorGame
             new Rectangle(viewport.Center.X - width / 2, viewport.Center.Y - height / 2, width, height), viewport);
     }
 
-    private void DrawClipped(Texture2D texture, Rectangle destination, Rectangle clip)
+    private void DrawClipped(Texture2D texture, Rectangle destination, Rectangle clip,
+        SpriteEffects effects = SpriteEffects.None)
     {
         var visible = Rectangle.Intersect(destination, clip);
         if (visible.Width <= 0 || visible.Height <= 0) return;
@@ -514,9 +530,10 @@ public sealed partial class ConquerorGame
             (visible.Y - destination.Y) * texture.Height / destination.Height,
             Math.Max(1, visible.Width * texture.Width / destination.Width),
             Math.Max(1, visible.Height * texture.Height / destination.Height));
+        if ((effects & SpriteEffects.FlipHorizontally) != 0) source.X = texture.Width - source.Right;
         source.Width = Math.Min(source.Width, texture.Width - source.X);
         source.Height = Math.Min(source.Height, texture.Height - source.Y);
-        _batch.Draw(texture, visible, source, Color.White);
+        _batch.Draw(texture, visible, source, Color.White, 0, Vector2.Zero, effects, 0);
     }
 
     private void DrawFieldBattle()

@@ -71,5 +71,26 @@ public static class SiegeCombatPresentation
     public static int OriginalForegroundBaseFor(int originalItemId) =>
         ForegroundBasesByCombatRow[OriginalWeaponCombat.CombatRowFor(originalItemId)];
 
+    public static int OriginalCombatRowFor(string? weapon)
+    {
+        var definition = Balance.Equipment.FirstOrDefault(item =>
+            item.Slot == EquipmentSlot.Weapon && string.Equals(item.Name, weapon, StringComparison.Ordinal));
+        if (definition?.OriginalWeaponItemId is { } itemId) return OriginalWeaponCombat.CombatRowFor(itemId);
+        if (weapon?.Contains("Crossbow", StringComparison.OrdinalIgnoreCase) == true) return 23;
+        if (weapon?.Contains("Dagger", StringComparison.OrdinalIgnoreCase) == true) return 0;
+        if (weapon?.Contains("Axe", StringComparison.OrdinalIgnoreCase) == true) return 15;
+        if (weapon?.Contains("Hammer", StringComparison.OrdinalIgnoreCase) == true) return 19;
+        if (weapon?.Contains("Mace", StringComparison.OrdinalIgnoreCase) == true) return 21;
+        return 4;
+    }
+
+    public static int SetupFrameForCombatRow(int combatRow, int baseFrame) => combatRow switch
+    {
+        <= 3 => baseFrame,
+        <= 14 => baseFrame + 1,
+        <= 22 => baseFrame + 2,
+        _ => baseFrame
+    };
+
     public static SiegeFrameRun BloodFramesFor(bool fatal) => fatal ? FatalHitBlood : WoundingHitBlood;
 }
