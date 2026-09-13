@@ -77,7 +77,10 @@ the strict `< 0x280` distance test. Preserve this precedence and exact hit
 identity. Runtime pointer candidates now use the original fixed horizontal ray,
 wrapped 128-cell source lookup, neighbor probe order, pass-through stop bit,
 state-target continuation, center/diagonal shapes, vertical bounds, and alpha.
-Exact kind-4 billboard transformation remains Corroborated.
+Kind-4 pointer candidates use their live centered 8.8 position, negative-view
+rotation, forward depth, ray-relative horizontal texture coordinate, heading
+sector, behavior-bit-4 mirror, vertical bounds, and alpha in original insertion
+order. Non-cardinal acquisition-ray integration remains Corroborated.
 
 Requested mode 12 uses a projected surface contact, not empty ground.
 Dispatcher `0x555AB`-`0x5562E` writes the raycaster's integer coordinates to

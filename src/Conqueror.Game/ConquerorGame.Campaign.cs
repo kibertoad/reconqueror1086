@@ -608,79 +608,59 @@ public sealed partial class ConquerorGame
 
     private SiegePointerHit? SiegePointerWorldHit((int X, int Y) centeredPointer)
     {
-        if (_siege is null) return null;
+        if (_siege is null || _siegeVisuals is null) return null;
         var viewport = SiegeViewport();
         var localX = centeredPointer.X * viewport.Width / SiegeCombatPresentation.Viewport.Width;
         var localY = centeredPointer.Y * viewport.Height / SiegeCombatPresentation.Viewport.Height;
         if (localX < 0 || localY < 0 || localX >= viewport.Width || localY >= viewport.Height)
             return null;
-        var sceneCandidates = _siegeVisuals is null
-            ? Array.Empty<SiegeSceneRayCandidate>()
-            : OriginalSiegeProjection.CastColumn(_siege, _siegeVisuals.Scene,
-                _siegeVisuals.SourceOriginX, _siegeVisuals.SourceOriginY,
-                localX, viewport.Width, SceneProjectionBlockAt);
-        var fallbackWall = SiegeViewProjection.CastColumn(_siege, localX, viewport.Width);
-        var wallDepth = sceneCandidates
-            .FirstOrDefault(candidate => (candidate.Block.Behavior & 1) == 0).Hit.Distance;
-        if (wallDepth <= 0) wallDepth = fallbackWall.Distance;
-        var hits = new List<SiegePointerHit>();
-        foreach (var projection in SiegeViewProjection.ProjectEnemies(_siege)
-                     .Concat(SiegeViewProjection.ProjectRetainers(_siege)))
-        {
-            if (projection.ForwardDistance >= wallDepth) continue;
-            var (texture, flip) = SceneEnemyTexture(projection.Enemy);
-            var layout = SiegeViewProjection.ActorLayout(projection, viewport.Width, viewport.Height,
-                texture?.Width, texture?.Height);
-            if (!layout.Contains(localX, localY) || !SiegeTextureContains(texture, layout, localX, localY, flip))
-                continue;
-            hits.Add(new SiegePointerHit(
-                projection.ForwardDistance, projection.Enemy, null,
-                (projection.Enemy.X, projection.Enemy.Y)));
-        }
-        foreach (var projection in SiegeViewProjection.ProjectObjects(_siege))
-        {
-            if (projection.ForwardDistance >= wallDepth) continue;
-            Texture2D? texture = null;
-            if (_siegeVisuals is not null && projection.Object.VisualId >= 0 &&
-                projection.Object.VisualId < _siegeVisuals.Scene.Blocks.Count)
-                texture = FirstSceneTexture(_siegeVisuals.Scene.Blocks[projection.Object.VisualId]);
-            var layout = SiegeViewProjection.ObjectLayout(projection, viewport.Width, viewport.Height,
-                texture?.Width, texture?.Height);
-            if (!layout.Contains(localX, localY) || !SiegeTextureContains(texture, layout, localX, localY, false))
-                continue;
-            hits.Add(new SiegePointerHit(
-                projection.ForwardDistance, null, projection.Object,
-                (projection.Object.X, projection.Object.Y)));
-        }
+        var sceneCandidates = OriginalSiegeProjection.CastColumn(_siege, _siegeVisuals.Scene,
+            _siegeVisuals.SourceOriginX, _siegeVisuals.SourceOriginY,
+            localX, viewport.Width, SceneProjectionBlockAt);
         var localViewport = new Rectangle(0, 0, viewport.Width, viewport.Height);
-        foreach (var candidate in sceneCandidates.Where(candidate => candidate.Block.Kind != 4))
+        foreach (var candidate in sceneCandidates)
         {
-            var wallHit = candidate.Hit;
-            if (candidate.Block.TextureForFace(wallHit.Face switch
+            var hit = candidate.Hit;
+            if (hit.Distance8 <= 0) continue;
+            var bounds = SiegeWallBounds(hit, localViewport);
+            if (!bounds.Contains(localX, localY)) continue;
+            if (candidate.Block.Kind == 4)
+            {
+                var texture = _siegeVisuals.TextureFor(candidate.TextureIndex);
+                if (!SiegeCandidatePixelContains(texture, candidate, bounds, localY)) continue;
+                var actor = candidate.Actor ?? _siege.EnemyAt(candidate.SourceMapX, candidate.SourceMapY) ??
+                    _siege.RetainerAt(candidate.SourceMapX, candidate.SourceMapY);
+                var item = candidate.Object ?? _siege.ObjectAt(candidate.SourceMapX, candidate.SourceMapY);
+                var target = actor is not null ? (actor.X, actor.Y) :
+                    item is not null ? (item.X, item.Y) :
+                    (candidate.SourceMapX, candidate.SourceMapY);
+                return new SiegePointerHit(hit.Distance, actor, item, target);
+            }
+
+            if (candidate.Block.TextureForFace(hit.Face switch
                 {
                     SiegeWallFace.North => DynamixSceneFace.North,
                     SiegeWallFace.East => DynamixSceneFace.East,
                     SiegeWallFace.South => DynamixSceneFace.South,
                     _ => DynamixSceneFace.West
                 }) < 0) continue;
-            var wallBounds = SiegeWallBounds(wallHit, localViewport);
-            var wallTexture = SceneWallTexture(wallHit);
-            if (!wallBounds.Contains(localX, localY) ||
-                !SiegeWallPixelContains(wallTexture, wallHit, wallBounds, localY)) continue;
-            hits.Add(new SiegePointerHit(
-                wallHit.Distance, null, _siege.ObjectAt(wallHit.MapX, wallHit.MapY),
-                (wallHit.ContactX8 >> 8, wallHit.ContactY8 >> 8)));
+            if (!SiegeWallPixelContains(SceneWallTexture(hit), hit, bounds, localY)) continue;
+            return new SiegePointerHit(
+                hit.Distance, null, _siege.ObjectAt(hit.MapX, hit.MapY),
+                (hit.ContactX8 >> 8, hit.ContactY8 >> 8));
         }
-        if (_siegeVisuals is null && fallbackWall.ContactedBlock)
-        {
-            var bounds = SiegeWallBounds(fallbackWall, localViewport);
-            if (bounds.Contains(localX, localY))
-                hits.Add(new SiegePointerHit(
-                    fallbackWall.Distance, null, _siege.ObjectAt(fallbackWall.MapX, fallbackWall.MapY),
-                    (fallbackWall.ContactX8 >> 8, fallbackWall.ContactY8 >> 8)));
-        }
-        if (hits.OrderBy(hit => hit.Distance).FirstOrDefault() is { Distance: > 0 } hit) return hit;
         return null;
+    }
+
+    private static bool SiegeCandidatePixelContains(
+        Texture2D? texture, SiegeSceneRayCandidate candidate, Rectangle bounds, int pointerY)
+    {
+        if (texture is null || candidate.TextureX < 0 || candidate.TextureX >= texture.Width) return false;
+        var sourceY = Math.Clamp(
+            (pointerY - bounds.Top) * texture.Height / bounds.Height, 0, texture.Height - 1);
+        var pixel = new Color[1];
+        texture.GetData(0, new Rectangle(candidate.TextureX, sourceY, 1, 1), pixel, 0, 1);
+        return pixel[0].A != 0;
     }
 
     private static bool SiegeWallPixelContains(
@@ -689,18 +669,6 @@ public sealed partial class ConquerorGame
         if (texture is null) return true;
         var sourceX = Math.Clamp((int)(hit.TextureOffset * texture.Width), 0, texture.Width - 1);
         var sourceY = Math.Clamp((pointerY - bounds.Top) * texture.Height / bounds.Height, 0, texture.Height - 1);
-        var pixel = new Color[1];
-        texture.GetData(0, new Rectangle(sourceX, sourceY, 1, 1), pixel, 0, 1);
-        return pixel[0].A != 0;
-    }
-
-    private static bool SiegeTextureContains(
-        Texture2D? texture, SiegeBillboardLayout layout, int x, int y, bool flip)
-    {
-        if (texture is null) return true;
-        var sourceX = Math.Clamp((x - layout.Left) * texture.Width / layout.Width, 0, texture.Width - 1);
-        if (flip) sourceX = texture.Width - 1 - sourceX;
-        var sourceY = Math.Clamp((y - layout.Top) * texture.Height / layout.Height, 0, texture.Height - 1);
         var pixel = new Color[1];
         texture.GetData(0, new Rectangle(sourceX, sourceY, 1, 1), pixel, 0, 1);
         return pixel[0].A != 0;

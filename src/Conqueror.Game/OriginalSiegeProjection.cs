@@ -4,10 +4,23 @@ using Conqueror.Resources;
 namespace Conqueror.Game;
 
 public readonly record struct SiegeProjectedBlock(
-    DynamixSceneBlock Block, int OffsetX8, int OffsetY8, int MapBlockIndex);
+    DynamixSceneBlock Block, int OffsetX8, int OffsetY8, int MapBlockIndex)
+{
+    public SiegeEnemy? Actor { get; init; }
+    public SiegeObject? Object { get; init; }
+}
 
 public readonly record struct SiegeSceneRayCandidate(
-    SiegeRayHit Hit, DynamixSceneBlock Block, int TextureCoordinate8);
+    SiegeRayHit Hit, DynamixSceneBlock Block, int TextureCoordinate8)
+{
+    public int TextureIndex { get; init; } = -1;
+    public int TextureX { get; init; } = -1;
+    public bool FlipHorizontally { get; init; }
+    public int SourceMapX { get; init; }
+    public int SourceMapY { get; init; }
+    public SiegeEnemy? Actor { get; init; }
+    public SiegeObject? Object { get; init; }
+}
 
 public static class OriginalSiegeProjection
 {
@@ -121,7 +134,11 @@ public static class OriginalSiegeProjection
                 var target = scene.Blocks[current.Block.StateTarget];
                 if (target.Kind == 0) return false;
                 current = new SiegeProjectedBlock(target, target.InitialXOffset8,
-                    target.InitialYOffset8, projected.MapBlockIndex);
+                    target.InitialYOffset8, projected.MapBlockIndex)
+                {
+                    Actor = projected.Actor,
+                    Object = projected.Object
+                };
             }
             return false;
         }
@@ -178,11 +195,6 @@ public static class OriginalSiegeProjection
 
         var worldX8 = contactX + viewerX8 - projected.OffsetX8;
         var worldY8 = contactY + viewerY8 - projected.OffsetY8;
-        if (block.Kind == 4)
-        {
-            worldX8 += projected.OffsetX8;
-            worldY8 += projected.OffsetY8;
-        }
         var localContactX8 = worldX8 - (sourceOriginX << 8);
         var localContactY8 = worldY8 - (sourceOriginY << 8);
         var localMapX = localContactX8 >> 8;
@@ -190,28 +202,71 @@ public static class OriginalSiegeProjection
         var distance8 = ForwardDistance8(siege.Facing,
             localContactX8 - ((siege.PlayerX << 8) + 0x80),
             localContactY8 - ((siege.PlayerY << 8) + 0x80));
-        if (distance8 <= 0)
-        {
-            candidate = default;
-            return false;
-        }
-
-        var coordinate8 = face is SiegeWallFace.East or SiegeWallFace.West
+        var textureCoordinate8 = face is SiegeWallFace.East or SiegeWallFace.West
             ? worldY8 & 0xff
             : worldX8 & 0xff;
-        if (face is SiegeWallFace.North or SiegeWallFace.East) coordinate8 = 0xff - coordinate8;
+        var textureIndex = -1;
+        var textureX = -1;
+        var flip = false;
+        if (block.Kind == 4)
+        {
+            var centerX8 = (sourceCellX << 8) + 0x80 + projected.OffsetX8;
+            var centerY8 = (sourceCellY << 8) + 0x80 + projected.OffsetY8;
+            var relativeX8 = centerX8 - viewerX8;
+            var relativeY8 = centerY8 - viewerY8;
+            var (forwardX, forwardY) = CardinalDirection(siege.Facing);
+            var rightX = -forwardY;
+            var rightY = forwardX;
+            distance8 = relativeX8 * forwardX + relativeY8 * forwardY;
+            var lateral8 = relativeX8 * rightX + relativeY8 * rightY;
+            var rayLateral14 = rayX * rightX + rayY * rightY;
+            textureCoordinate8 = (int)(((long)rayLateral14 * distance8) >> 14) - lateral8 + 0x80;
+            var selected = block.TextureForBillboardHeading(
+                block.Surface3 - FacingHeading(siege.Facing));
+            textureIndex = selected.TextureIndex;
+            flip = selected.FlipHorizontally;
+            if (textureCoordinate8 is >= 0 and <= 0xff && block.TextureWidthShift is >= 0 and <= 8)
+            {
+                textureX = textureCoordinate8 >> (8 - block.TextureWidthShift);
+                if (flip) textureX = block.TextureWidth - 1 - textureX;
+            }
+            else
+            {
+                distance8 = -1;
+            }
+        }
+        if (distance8 <= 0)
+        {
+            if (block.Kind != 4)
+            {
+                candidate = default;
+                return false;
+            }
+        }
+
+        if (block.Kind != 4 && face is (SiegeWallFace.North or SiegeWallFace.East))
+            textureCoordinate8 = 0xff - textureCoordinate8;
         var tile = siege.TileAt(localMapX, localMapY);
         candidate = new SiegeSceneRayCandidate(
             new SiegeRayHit(distance8 / 256d, tile,
                 face is SiegeWallFace.East or SiegeWallFace.West,
-                face, localMapX, localMapY, coordinate8 / 256d)
+                face, localMapX, localMapY, textureCoordinate8 / 256d)
             {
                 Distance8 = distance8,
                 ContactX8 = localContactX8,
                 ContactY8 = localContactY8,
                 ContactedBlock = true,
                 SceneBlockIndex = block.Index
-            }, block, coordinate8);
+            }, block, textureCoordinate8)
+            {
+                TextureIndex = textureIndex,
+                TextureX = textureX,
+                FlipHorizontally = flip,
+                SourceMapX = sourceCellX - sourceOriginX,
+                SourceMapY = sourceCellY - sourceOriginY,
+                Actor = projected.Actor,
+                Object = projected.Object
+            };
         return true;
     }
 
@@ -320,6 +375,8 @@ public static class OriginalSiegeProjection
         Facing.South => dy8,
         _ => -dx8
     };
+
+    private static int FacingHeading(Facing facing) => (int)facing << 6;
 
     private static (int X, int Y) CardinalDirection(Facing facing) => facing switch
     {

@@ -148,8 +148,17 @@ actor/object-specific actions. These mappings Disprove the former empty-floor
 plane. `OriginalSiegeProjection` implements the fixed step, wrapped source-map
 lookup, exact probe order, pass/stop behavior, state-target chaining, 31-entry
 sentinel, center/diagonal shapes, and insertion-ordered alpha candidates for
-pointer picking. The exact kind-4 billboard transform and its integration with
-per-pixel actor occlusion remain Corroborated rather than arithmetic identity.
+pointer picking. For kind 4, `0x47308`-`0x4735A` forms the live center as
+`cell * 0x100 + 0x80 + offset`, subtracts the viewer, and rotates by negative
+view heading through `0x447C4`. `0x4737B`-`0x473C3` uses the rotated forward
+coordinate as depth and computes horizontal coordinate
+`((rayLateral * depth) >> 14) - centerLateral + 0x80`, rejecting values outside
+`0..0xFF` and shifting by `8 - block.TextureWidthShift`. `0x473CE`-`0x47419`
+selects sector `(((block.Surface3 - viewHeading + 0x80 / divisions) & 0xFF) *
+divisions) >> 8`; behavior bit 2 (`0x04`) folds the far half and mirrors the
+texture coordinate. Pointer picking implements this transform, vertical bounds,
+alpha, and live actor/object identity in candidate insertion order. General
+non-cardinal acquisition still needs to use the same rotation/table path.
 GameFAQs FAQ 66730 has no low-level ray mathematics and must not be cited as
 corroboration for this trace.
 

@@ -83,7 +83,35 @@ public sealed partial class ResourceAndDefinitionTests
             battle, scene, 10, 20, 83, 167);
 
         Assert.Equal([1, 2], candidates.Select(candidate => candidate.Block.Index));
-        Assert.Equal([128, 384], candidates.Select(candidate => candidate.Hit.Distance8));
+        Assert.Equal([256, 384], candidates.Select(candidate => candidate.Hit.Distance8));
+    }
+
+    [Theory]
+    [InlineData(3, 18, 32, false)]
+    [InlineData(7, 14, 31, true)]
+    public void OriginalKindFourProjectionUsesCenterDepthHeadingSectorAndMirror(
+        int behavior, int textureIndex, int textureX, bool flip)
+    {
+        var source = SyntheticScene();
+        source.Map.AsSpan().Clear();
+        var offset = DynamixSceneDecoder.BlockSize;
+        WriteInt(source.Blocks, offset, 4);
+        WriteInt(source.Blocks, offset + 4, behavior);
+        WriteInt(source.Blocks, offset + 44, 12);
+        WriteInt(source.Blocks, offset + 52, 8);
+        WriteInt(source.Blocks, offset + 56, 0);
+        SetSceneCell(source.Map, 11, 20, 1);
+        var scene = DynamixSceneDecoder.Decode(source.Viewer, source.Scenario, source.Map, source.Blocks);
+
+        var candidate = Assert.Single(OriginalSiegeProjection.CastColumn(
+            ProjectionBattle(), scene, 10, 20, 83, 167));
+
+        Assert.Equal(256, candidate.Hit.Distance8);
+        Assert.Equal(128, candidate.TextureCoordinate8);
+        Assert.Equal(textureIndex, candidate.TextureIndex);
+        Assert.Equal(textureX, candidate.TextureX);
+        Assert.Equal(flip, candidate.FlipHorizontally);
+        Assert.Equal((1, 0), (candidate.SourceMapX, candidate.SourceMapY));
     }
 
     [Theory]

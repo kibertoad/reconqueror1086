@@ -298,7 +298,10 @@ public sealed partial class ConquerorGame
         {
             var active = _siegeVisuals.Scene.Blocks[item.VisualId];
             return new SiegeProjectedBlock(active, active.InitialXOffset8,
-                active.InitialYOffset8, active.Index);
+                active.InitialYOffset8, active.Index)
+            {
+                Object = item
+            };
         }
 
         var sourceX = localX + _siegeVisuals.SourceOriginX;
@@ -322,7 +325,11 @@ public sealed partial class ConquerorGame
                 SiegeEnemyVisualState.Dying => ActorStateBlock(initial, 3),
                 _ => initial
             };
-            return new SiegeProjectedBlock(active, actor.OffsetX8, actor.OffsetY8, active.Index);
+            active = active with { Surface3 = (int)actor.Facing << 6 };
+            return new SiegeProjectedBlock(active, actor.OffsetX8, actor.OffsetY8, active.Index)
+            {
+                Actor = actor
+            };
         }
     }
 
