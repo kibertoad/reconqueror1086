@@ -8,6 +8,9 @@ public sealed partial class SiegeSession
     {
         if (!double.IsFinite(elapsedSeconds) || elapsedSeconds < 0)
             throw new ArgumentOutOfRangeException(nameof(elapsedSeconds));
+        // The original D5C4 cursor advances per unrestricted main-loop pass,
+        // so simultaneous actor precedence is processor/input-timing dependent.
+        // Authored list order is the stable compatibility tie-breaker.
         foreach (var retainer in _retainers.Where(retainer => retainer.Health > 0))
         {
             if (retainer.MovementTick == 0 && !TryBeginRetainerMovement(retainer))

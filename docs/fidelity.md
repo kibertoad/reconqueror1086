@@ -50,9 +50,14 @@ cell before processing a later effect. One converging actor can therefore
 occupy the requested cell; followers stop at the strict collision band and
 repeatedly reconstruct their direct effect instead of overlapping or fanning
 out. Runtime occupancy and a focused two-retainer regression implement this
-**Confirmed** result. Only the identity of the winner in a simultaneous tie
-remains Provisional until thinker cursor/effect-slot ordering is matched.
-GameFAQs contains no equivalent low-level account. This supersedes older
+**Confirmed** result. A processor-stable original winner for an exact
+simultaneous tie is **Disproved**: input precedes scheduler `0x530D0` and
+thinker `0x50524`, the thinker begins at persistent cursor `D5C4`, constructor
+`0x4C7F4` takes the first free effect slot, and the cursor advances on every
+unrestricted main-loop pass. The runtime therefore uses authored retainer-list
+order (x-major for official imports) as an explicit deterministic compatibility
+policy, with a regression proving update-subdivision independence. GameFAQs
+contains no equivalent low-level account. This supersedes older
 multi-actor-convergence clauses below.
 
 ## Controls represented

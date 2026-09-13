@@ -128,9 +128,14 @@ its former cell, captures the destination block, and installs the actor block
 there before the next live effect is processed. Multiple mode-12 actors sent
 to one coordinate therefore never stack or fan out: one occupies the cell and
 later arrivals hit the strict collision band, stop their live `0x112` effect,
-and retry. Preserve single-cell occupancy and persistent retry. Which actor
-wins a simultaneous tie remains Provisional until the original round-robin
-thinker/effect-slot ordering is reproduced.
+and retry. Preserve single-cell occupancy and persistent retry. The original
+does not define a processor-stable winner for an exact simultaneous tie:
+input installs the orders before scheduler `0x530D0` and thinker `0x50524`,
+the thinker starts at persistent cursor `D5C4`, and constructor `0x4C7F4`
+takes the first free effect slot. Because `D5C4` advances once per unrestricted
+main-loop pass, precedence depends on processor and input timing. Use authored
+retainer-list order (official import order is x-major) as the explicit,
+deterministic compatibility tie-breaker; never derive it from render cadence.
 
 Public Retreat command handler `0x5744B` resets current mode, requests mode 10,
 and calls transition helper `0x4E5F0`. On the following acquisition pass,

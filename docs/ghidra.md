@@ -150,8 +150,15 @@ underlying block: it is restored into the old map cell, replaced with the new
 cell's block, copied into live block state target `+0x40`, and followed by
 actor block `+0x24` being installed in the new cell. Because this occurs before
 the next effect record, the trace proves single-cell occupancy and blocked
-retry without relying on a visual observation. Do not infer the simultaneous
-winner until thinker cursor and effect-slot order have also been traced.
+retry without relying on a visual observation. Exact simultaneous precedence
+is not a stable original rule. Input dispatch at `0x55D0F`-`0x561DB` installs
+orders before the loop calls scheduler `0x530D0` and thinker `0x50524`;
+`0x50524` starts from persistent actor cursor `D5C4`, while constructor
+`0x4C7F4` scans live effects from slot zero and takes the first free slot.
+The cursor advances once per unrestricted main-loop pass, whose `0x584DF`
+jump has no wait, so the actor encountered first after input depends on
+processor/input timing. Record stable list-order precedence as an adaptation,
+not as recovered executable behavior.
 
 ## Evidence discipline
 
