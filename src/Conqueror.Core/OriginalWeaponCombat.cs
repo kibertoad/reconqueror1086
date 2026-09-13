@@ -37,6 +37,14 @@ public static class OriginalWeaponCombat
         0, 1, 3, 2, 1, 1, 3, 1, 3, 3, 6, 6
     ];
 
+    // CONQUER.EXE 0x54FB8-0x54FC8 reads column 3 and calculates signed
+    // foreground velocity as (screen displacement << 9) / this divisor.
+    private static readonly int[] ForegroundMotionDivisorsByCombatRow =
+    [
+        400, 400, 380, 380, 400, 420, 460, 450, 470, 480, 500, 440, 480,
+        480, 480, 520, 500, 500, 500, 520, 530, 520, 530, 900, 1000
+    ];
+
     // CONQUER.EXE object 2 offset 0xCE24 + 28 * row, column 4 of each combat row.
     // Contact processing at 0x558D4/0x559CA adds 0x40 before comparing range.
     private static readonly int[] ContactDistancesByCombatRow =
@@ -74,6 +82,15 @@ public static class OriginalWeaponCombat
 
     public static int GridReachForCombatRow(int combatRow) =>
         Math.Max(1, ContactDistanceForCombatRow(combatRow) >> 8);
+
+    public static int ForegroundMotionDivisorForCombatRow(int combatRow)
+    {
+        if ((uint)combatRow >= (uint)CombatRowCount) throw new ArgumentOutOfRangeException(nameof(combatRow));
+        return ForegroundMotionDivisorsByCombatRow[combatRow];
+    }
+
+    public static int ForegroundVelocityForCombatRow(int combatRow, int screenDisplacement) =>
+        checked((int)(((long)screenDisplacement << 9) / ForegroundMotionDivisorForCombatRow(combatRow)));
 
     // CONQUER.EXE 0x58851-0x58887 initializes player combatant field +0x34
     // from character attributes 0 (strength), 1 (dexterity), and 15 (sword experience).

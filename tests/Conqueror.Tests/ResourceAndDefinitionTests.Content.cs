@@ -305,9 +305,18 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal((484, 1), (OriginalWeaponCombat.ContactDistanceFor(2), OriginalWeaponCombat.GridReachFor(2)));
         Assert.Equal((7064, 27), (OriginalWeaponCombat.ContactDistanceFor(43), OriginalWeaponCombat.GridReachFor(43)));
         Assert.Equal((8256, 32), (OriginalWeaponCombat.ContactDistanceFor(44), OriginalWeaponCombat.GridReachFor(44)));
+        Assert.Equal(
+            [400, 400, 380, 380, 400, 420, 460, 450, 470, 480, 500, 440, 480,
+                480, 480, 520, 500, 500, 500, 520, 530, 520, 530, 900, 1000],
+            Enumerable.Range(0, OriginalWeaponCombat.CombatRowCount)
+                .Select(OriginalWeaponCombat.ForegroundMotionDivisorForCombatRow));
+        Assert.Equal(128, OriginalWeaponCombat.ForegroundVelocityForCombatRow(0, 100));
+        Assert.Equal(-128, OriginalWeaponCombat.ForegroundVelocityForCombatRow(0, -100));
+        Assert.Equal(56, OriginalWeaponCombat.ForegroundVelocityForCombatRow(23, 100));
         Assert.Equal(43, Balance.Equipment.Single(item => item.Name == "Light Crossbow").OriginalWeaponItemId);
         Assert.Equal(44, Balance.Equipment.Single(item => item.Name == "Heavy Crossbow").OriginalWeaponItemId);
         Assert.Throws<ArgumentOutOfRangeException>(() => OriginalWeaponCombat.CombatRowFor(23));
+        Assert.Throws<ArgumentOutOfRangeException>(() => OriginalWeaponCombat.ForegroundMotionDivisorForCombatRow(25));
     }
 
     [Fact]

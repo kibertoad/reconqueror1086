@@ -9,6 +9,9 @@ public sealed record ImportedSiegeScene(
 
 public static class ImportedSiegeLayouts
 {
+    // CONQUER.EXE registers campaign dispatcher 0x21EEC at engine callback
+    // slot +0xB0 (0x21E09 -> 0x59C24); slot 128 reaches the literal
+    // MELEE0.RES load at 0x22226. The same scene serves every campaign siege.
     public static string? SceneNameForCampaignLocation(int location)
     {
         if (location < 0 || location >= World.Locations.Length) return null;
