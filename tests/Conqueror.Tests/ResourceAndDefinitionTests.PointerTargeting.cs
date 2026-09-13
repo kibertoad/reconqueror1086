@@ -115,6 +115,80 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Theory]
+    [InlineData(0, -256, 0)]
+    [InlineData(256, -256, 32)]
+    [InlineData(256, 0, 64)]
+    [InlineData(256, 256, 96)]
+    [InlineData(0, 256, 128)]
+    [InlineData(-256, 256, 160)]
+    [InlineData(-256, 0, 192)]
+    [InlineData(-256, -256, 224)]
+    public void OriginalHeadingHelperMapsLocalVectorsIntoTheExecutableByteTurn(
+        int deltaX8, int deltaY8, int expectedHeading)
+    {
+        Assert.Equal(expectedHeading, OriginalSiegeProjection.HeadingToward(deltaX8, deltaY8));
+    }
+
+    [Fact]
+    public void NonCardinalHeadingRayUsesTheExecutableIntegerDirectionTable()
+    {
+        var source = SyntheticScene();
+        source.Map.AsSpan().Clear();
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize, 1);
+        WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize + 4, 2);
+        SetSceneCell(source.Map, 12, 21, 1);
+        var scene = DynamixSceneDecoder.Decode(source.Viewer, source.Scenario, source.Map, source.Blocks);
+
+        var candidates = OriginalSiegeProjection.CastHeading(
+            ProjectionBattle(), scene, 10, 20, 0x80, 0x80,
+            OriginalSiegeProjection.HeadingToward(0x200, 0x100));
+
+        var candidate = Assert.Single(candidates);
+        Assert.Equal((2, 1), (candidate.SourceMapX, candidate.SourceMapY));
+        Assert.Equal(0x1a1, candidate.Hit.Distance8);
+    }
+
+    [Fact]
+    public void ActorAcquisitionRequiresTheTargetIdentityAtAnOpaqueCenterRayPixel()
+    {
+        var source = SyntheticScene();
+        source.Map.AsSpan().Clear();
+        var blockOffset = DynamixSceneDecoder.BlockSize;
+        WriteInt(source.Blocks, blockOffset, 4);
+        WriteInt(source.Blocks, blockOffset + 4, 0x87);
+        WriteInt(source.Blocks, blockOffset + 44, 0);
+        WriteInt(source.Blocks, blockOffset + 52, 1);
+        WriteInt(source.Blocks, blockOffset + 56, 0);
+        var scene = DynamixSceneDecoder.Decode(source.Viewer, source.Scenario, source.Map, source.Blocks);
+        var army = new Army();
+        army.Units[UnitType.Swordsmen] = 1;
+        var battle = new SiegeSession(new Player(), army, 0, 4,
+            new SiegeLayout(new SiegeTile[6, 5], 0, 0, Facing.East,
+                [new SiegeSpawn(3, 2, false, 1, OriginalHealth: 10)], retainers:
+                [new SiegeSpawn(1, 1, false, 1, OriginalHealth: 10)]));
+        var friendly = Assert.Single(battle.Retainers);
+        var target = Assert.Single(battle.Enemies);
+        var opaque = new DynamixSceneTexture(0, 64, 128,
+            Enumerable.Repeat((byte)1, 64 * 128).ToArray());
+
+        SiegeProjectedBlock? ActiveBlockAt(int x, int y)
+        {
+            var actor = battle.EnemyAt(x, y) ?? (SiegeEnemy?)battle.RetainerAt(x, y);
+            return actor is null ? null : new SiegeProjectedBlock(
+                scene.Blocks[1], actor.OffsetX8, actor.OffsetY8, 1) { Actor = actor };
+        }
+
+        var depth = OriginalSiegeActorAcquisition.TargetDepth(
+            battle, scene, 10, 20, friendly, target, ActiveBlockAt, _ => opaque);
+        var transparent = OriginalSiegeActorAcquisition.TargetDepth(
+            battle, scene, 10, 20, friendly, target, ActiveBlockAt,
+            _ => opaque with { Indices = new byte[64 * 128] });
+
+        Assert.InRange(Assert.IsType<int>(depth), 0x230, 0x250);
+        Assert.Null(transparent);
+    }
+
+    [Theory]
     [InlineData(3, 256)]
     [InlineData(5, 256)]
     [InlineData(6, 255)]

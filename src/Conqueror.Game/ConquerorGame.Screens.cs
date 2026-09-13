@@ -333,6 +333,16 @@ public sealed partial class ConquerorGame
         }
     }
 
+    private void ConfigureSiegeActorRaycast()
+    {
+        if (_siege is null || _siegeVisuals is null)
+            throw new InvalidOperationException("Original siege assets must be active before actor acquisition is configured.");
+        _siege.ConfigureActorRaycast((source, target) => OriginalSiegeActorAcquisition.TargetDepth(
+            _siege, _siegeVisuals.Scene,
+            _siegeVisuals.SourceOriginX, _siegeVisuals.SourceOriginY,
+            source, target, SceneProjectionBlockAt, _siegeVisuals.SourceFor));
+    }
+
     private Rectangle SiegeWallBounds(SiegeRayHit hit, Rectangle viewport)
     {
         var block = SceneBlockForHit(hit);

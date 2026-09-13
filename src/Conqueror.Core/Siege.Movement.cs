@@ -2,6 +2,11 @@ namespace Conqueror.Core;
 
 public sealed partial class SiegeSession
 {
+    public void ConfigureActorRaycast(SiegeActorRaycast raycast)
+    {
+        ArgumentNullException.ThrowIfNull(raycast);
+        _actorRaycast = raycast;
+    }
     private static readonly SiegeActorMovement FallbackActorMovement = new(3, 200, 64, 0, 0x142, 5);
 
     public void AdvanceRetainerMovement(double elapsedSeconds)
@@ -210,9 +215,9 @@ public sealed partial class SiegeSession
         _retainers.All(retainer => ReferenceEquals(retainer, self) || retainer.Health <= 0 ||
             retainer.X != x || retainer.Y != y);
 
-    // Acquisition 0x4F98D keeps the nearest opposite-side actor whose exact
-    // identity is returned by raycaster 0x470A8. This bounded cell trace is the
-    // current compatibility bridge until that fixed-point ray is reproduced.
+    // Acquisition 0x4F98D walks authored actor order and keeps only a strictly
+    // nearer opposite-side actor whose identity is returned by 0x470A8. It
+    // exits early once the returned 8.8 depth is below 0x154.
     private SiegeEnemy? RetreatOrderTarget(SiegeRetainer retainer) =>
         VisibleOrderTarget(retainer);
 
@@ -222,18 +227,27 @@ public sealed partial class SiegeSession
     private SiegeEnemy? VisibleOrderTarget(SiegeRetainer retainer)
     {
         if (retainer.OrderedTarget is { Health: > 0 } ordered && _enemies.Contains(ordered))
-            return ActorLineIsClear(retainer, ordered) ? ordered : null;
-        return _enemies.Where(enemy => enemy.Health > 0 && ActorLineIsClear(retainer, enemy))
-            .OrderBy(enemy => ActorDistanceInFixedPoint(retainer, enemy))
-            .FirstOrDefault();
+            return ActorRayDistance(retainer, ordered) is not null ? ordered : null;
+
+        SiegeEnemy? nearest = null;
+        var nearestDistance8 = 0x7fff;
+        foreach (var enemy in _enemies.Where(enemy => enemy.Health > 0))
+        {
+            if (ActorRayDistance(retainer, enemy) is not { } distance8 || distance8 >= nearestDistance8)
+                continue;
+            nearest = enemy;
+            nearestDistance8 = distance8;
+            if (distance8 < 0x154) break;
+        }
+        return nearest;
     }
 
     private bool RetainerRangedAttack(SiegeRetainer retainer, SiegeEnemy target)
     {
-        if (retainer.OriginalCombatRow is not { } row ||
-            ActorDistanceInFixedPoint(retainer, target) >=
-                OriginalWeaponCombat.ActorContactDistanceForCombatRow(row) ||
-            !ActorLineIsClear(retainer, target))
+        if (retainer.OriginalCombatRow is not { } row) return false;
+        var separation8 = ActorDistanceInFixedPoint(retainer, target);
+        if (separation8 >= OriginalWeaponCombat.ActorContactDistanceForCombatRow(row) ||
+            separation8 > 0x154 && ActorRayDistance(retainer, target) is null)
             return false;
         retainer.Facing = DirectionToward(retainer.X, retainer.Y, target.X, target.Y, retainer.Facing);
         StartVisual(retainer, SiegeEnemyVisualState.Attack);
@@ -257,11 +271,15 @@ public sealed partial class SiegeSession
         return true;
     }
 
+    private int? ActorRayDistance(SiegeEnemy source, SiegeEnemy target) => _actorRaycast is not null
+        ? _actorRaycast(source, target)
+        : ActorLineIsClear(source, target) ? ActorDistanceInFixedPoint(source, target) : null;
+
     private static int ActorDistanceInFixedPoint(SiegeEnemy source, SiegeEnemy target)
     {
-        var dx = target.X - source.X;
-        var dy = target.Y - source.Y;
-        return (int)Math.Round(Math.Sqrt((long)dx * dx + (long)dy * dy) * 256.0);
+        var dx8 = ((target.X - source.X) << 8) + target.OffsetX8 - source.OffsetX8;
+        var dy8 = ((target.Y - source.Y) << 8) + target.OffsetY8 - source.OffsetY8;
+        return (int)Math.Round(Math.Sqrt((long)dx8 * dx8 + (long)dy8 * dy8));
     }
 
     private static IReadOnlyList<Point> CardinalSteps(int x, int y) =>

@@ -6,6 +6,7 @@ public enum SiegeAction { None, Moved, Blocked, DoorOpened, Healed, Looted, Hit,
 public enum SiegeEnemyVisualState { Walk, Attack, Hit, Dying }
 public enum SiegePickupRewardKind { Wealth, Healing, Equipment, CrossbowBolts }
 public enum SiegeRetainerCommand { Defend = 2, Attack = 6, Retreat = 10, Follow = 16 }
+public delegate int? SiegeActorRaycast(SiegeEnemy source, SiegeEnemy target);
 
 public class SiegeEnemy
 {
@@ -173,6 +174,7 @@ public sealed partial class SiegeSession
     private readonly List<SiegeRetainer> _retainers = [];
     public IReadOnlyList<SiegeObject> Objects => _objects;
     private readonly List<SiegeObject> _objects = [];
+    private SiegeActorRaycast? _actorRaycast;
 
     public int PlayerX { get; private set; } = 1;
     public int PlayerY { get; private set; } = 1;

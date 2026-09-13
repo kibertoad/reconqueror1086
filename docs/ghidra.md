@@ -158,7 +158,20 @@ selects sector `(((block.Surface3 - viewHeading + 0x80 / divisions) & 0xFF) *
 divisions) >> 8`; behavior bit 2 (`0x04`) folds the far half and mirrors the
 texture coordinate. Pointer picking implements this transform, vertical bounds,
 alpha, and live actor/object identity in candidate insertion order. General
-non-cardinal acquisition still needs to use the same rotation/table path.
+Actor acquisition now uses that same rotation/table path. Routine `0x4F98D`
+walks 68-byte actor records in authored order, skips inactive, self, and
+same-side records, subtracts live fixed positions at `+0x0C/+0x10`, derives a
+byte heading with `0x445C4`, and casts from the source through the centered
+viewport column with `0x470A8`. The returned block is resolved through
+`0x4CEA0`, and a candidate is accepted only when its actor identity matches.
+Nearest depth begins at `0x7FFF`, only strictly smaller depths replace it, and
+an accepted depth below `0x154` ends the scan. `0x445C4` folds quadrants around
+`floor(0x20 * minor / major)`; local `(dx,dy)` maps to original-coordinate
+`(-dy,dx)`. Sine `0x446BC`, cosine `0x4472C`, and rotation `0x447C4` address the
+64 signed 1.15 quarter-wave samples at object-2 `+0xC904`; each multiplied term
+is rounded with `(product + 0x3FFF) >> 15`. `OriginalSiegeProjection` and
+`OriginalSiegeActorAcquisition` implement the heading, ray, ordered identity,
+vertical-bound, and palette-index-zero alpha path for imported scenes.
 GameFAQs FAQ 66730 has no low-level ray mathematics and must not be cited as
 corroboration for this trace.
 

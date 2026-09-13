@@ -26,6 +26,17 @@ public static class OriginalSiegeProjection
 {
     private const int MaximumTraversalSteps = 0x40;
     private const int MaximumCandidates = 0x1f;
+    private static readonly int[] QuarterSine15 =
+    [
+        0, 817, 1633, 2449, 3263, 4074, 4884, 5690,
+        6493, 7291, 8085, 8875, 9658, 10436, 11207, 11971,
+        12728, 13477, 14217, 14949, 15671, 16384, 17086, 17778,
+        18458, 19128, 19785, 20430, 21062, 21681, 22287, 22879,
+        23457, 24020, 24568, 25101, 25618, 26120, 26605, 27073,
+        27525, 27960, 28377, 28777, 29158, 29522, 29867, 30194,
+        30502, 30791, 31061, 31311, 31542, 31754, 31945, 32117,
+        32269, 32401, 32513, 32604, 32675, 32726, 32757, 32767
+    ];
 
     public static IReadOnlyList<SiegeSceneRayCandidate> CastColumn(
         SiegeSession siege,
@@ -42,14 +53,35 @@ public static class OriginalSiegeProjection
         if (column < 0 || column >= viewportWidth) throw new ArgumentOutOfRangeException(nameof(column));
 
         var lateral14 = (0x400000 / viewportWidth * (column - viewportWidth / 2)) >> 8;
-        var (forwardX, forwardY) = CardinalDirection(siege.Facing);
-        var rayX = forwardX * 0x4000 - forwardY * lateral14;
-        var rayY = forwardY * 0x4000 + forwardX * lateral14;
+        var heading = FacingHeading(siege.Facing);
+        var (rayX, rayY) = RayFor(heading, lateral14);
         var viewerX8 = ((siege.PlayerX + sourceOriginX) << 8) + 0x80;
         var viewerY8 = ((siege.PlayerY + sourceOriginY) << 8) + 0x80;
         return CastFixed(scene, sourceOriginX, sourceOriginY, viewerX8, viewerY8,
-            rayX, rayY, siege, activeBlockAt);
+            rayX, rayY, heading, siege, activeBlockAt);
     }
+
+    public static IReadOnlyList<SiegeSceneRayCandidate> CastHeading(
+        SiegeSession siege,
+        DynamixScene scene,
+        int sourceOriginX,
+        int sourceOriginY,
+        int localViewerX8,
+        int localViewerY8,
+        int heading,
+        Func<int, int, SiegeProjectedBlock?>? activeBlockAt = null)
+    {
+        ArgumentNullException.ThrowIfNull(siege);
+        ArgumentNullException.ThrowIfNull(scene);
+        var (rayX, rayY) = RayFor(heading, 0);
+        var viewerX8 = localViewerX8 + (sourceOriginX << 8);
+        var viewerY8 = localViewerY8 + (sourceOriginY << 8);
+        return CastFixed(scene, sourceOriginX, sourceOriginY, viewerX8, viewerY8,
+            rayX, rayY, heading & 0xff, siege, activeBlockAt);
+    }
+
+    public static int HeadingToward(int deltaX8, int deltaY8) =>
+        OriginalHeading(-deltaY8, deltaX8);
 
     private static IReadOnlyList<SiegeSceneRayCandidate> CastFixed(
         DynamixScene scene,
@@ -59,6 +91,7 @@ public static class OriginalSiegeProjection
         int viewerY8,
         int rayX,
         int rayY,
+        int heading,
         SiegeSession siege,
         Func<int, int, SiegeProjectedBlock?>? activeBlockAt)
     {
@@ -120,7 +153,7 @@ public static class OriginalSiegeProjection
             while (current.Block.Kind != 0)
             {
                 if (TryIntersect(current, sourceX, sourceY, viewerX8, viewerY8,
-                        rayX, rayY, sourceOriginX, sourceOriginY, siege, out var candidate))
+                        rayX, rayY, heading, sourceOriginX, sourceOriginY, siege, out var candidate))
                 {
                     candidates.Add(candidate);
                     if ((current.Block.Behavior & 1) == 0 || candidates.Count == MaximumCandidates)
@@ -159,6 +192,7 @@ public static class OriginalSiegeProjection
         int viewerY8,
         int rayX,
         int rayY,
+        int heading,
         int sourceOriginX,
         int sourceOriginY,
         SiegeSession siege,
@@ -199,9 +233,9 @@ public static class OriginalSiegeProjection
         var localContactY8 = worldY8 - (sourceOriginY << 8);
         var localMapX = localContactX8 >> 8;
         var localMapY = localContactY8 >> 8;
-        var distance8 = ForwardDistance8(siege.Facing,
-            localContactX8 - ((siege.PlayerX << 8) + 0x80),
-            localContactY8 - ((siege.PlayerY << 8) + 0x80));
+        var (forwardX15, forwardY15) = ForwardFor(heading);
+        var (rightX15, rightY15) = (FixedCos15(heading), FixedSin15(heading));
+        var distance8 = FixedDot15(contactX, contactY, forwardX15, forwardY15);
         var textureCoordinate8 = face is SiegeWallFace.East or SiegeWallFace.West
             ? worldY8 & 0xff
             : worldX8 & 0xff;
@@ -214,15 +248,12 @@ public static class OriginalSiegeProjection
             var centerY8 = (sourceCellY << 8) + 0x80 + projected.OffsetY8;
             var relativeX8 = centerX8 - viewerX8;
             var relativeY8 = centerY8 - viewerY8;
-            var (forwardX, forwardY) = CardinalDirection(siege.Facing);
-            var rightX = -forwardY;
-            var rightY = forwardX;
-            distance8 = relativeX8 * forwardX + relativeY8 * forwardY;
-            var lateral8 = relativeX8 * rightX + relativeY8 * rightY;
-            var rayLateral14 = rayX * rightX + rayY * rightY;
+            distance8 = FixedDot15(relativeX8, relativeY8, forwardX15, forwardY15);
+            var lateral8 = FixedDot15(relativeX8, relativeY8, rightX15, rightY15);
+            var rayLateral14 = FixedDot15(rayX, rayY, rightX15, rightY15);
             textureCoordinate8 = (int)(((long)rayLateral14 * distance8) >> 14) - lateral8 + 0x80;
             var selected = block.TextureForBillboardHeading(
-                block.Surface3 - FacingHeading(siege.Facing));
+                block.Surface3 - heading);
             textureIndex = selected.TextureIndex;
             flip = selected.FlipHorizontally;
             if (textureCoordinate8 is >= 0 and <= 0xff && block.TextureWidthShift is >= 0 and <= 8)
@@ -368,21 +399,54 @@ public static class OriginalSiegeProjection
         return false;
     }
 
-    private static int ForwardDistance8(Facing facing, int dx8, int dy8) => facing switch
-    {
-        Facing.North => -dy8,
-        Facing.East => dx8,
-        Facing.South => dy8,
-        _ => -dx8
-    };
-
     private static int FacingHeading(Facing facing) => (int)facing << 6;
 
-    private static (int X, int Y) CardinalDirection(Facing facing) => facing switch
+    private static (int X, int Y) RayFor(int heading, int lateral14)
     {
-        Facing.North => (0, -1),
-        Facing.East => (1, 0),
-        Facing.South => (0, 1),
-        _ => (-1, 0)
-    };
+        var sine = FixedSin15(heading);
+        var cosine = FixedCos15(heading);
+        var rayX = FixedProduct15(sine, 0x4000) + FixedProduct15(cosine, lateral14);
+        var rayY = -FixedProduct15(cosine, 0x4000) + FixedProduct15(sine, lateral14);
+        return (rayX, rayY);
+    }
+
+    private static (int X, int Y) ForwardFor(int heading) =>
+        (FixedSin15(heading), -FixedCos15(heading));
+
+    private static int FixedDot15(int x, int y, int basisX, int basisY) =>
+        FixedProduct15(x, basisX) + FixedProduct15(y, basisY);
+
+    private static int FixedProduct15(int left, int right) =>
+        checked((int)(((long)left * right + 0x3fff) >> 15));
+
+    private static int FixedCos15(int heading) => FixedSin15(heading + 0x40);
+
+    private static int FixedSin15(int heading)
+    {
+        var angle = heading & 0xff;
+        return (angle >> 6) switch
+        {
+            0 => QuarterSine15[angle],
+            1 => QuarterSine15[0x7f - angle],
+            2 => -QuarterSine15[angle - 0x80],
+            _ => -QuarterSine15[0xff - angle]
+        };
+    }
+
+    private static int OriginalHeading(int deltaX, int deltaY)
+    {
+        if (deltaX == 0 && deltaY == 0) return 0;
+        var x = Math.Abs((long)deltaX);
+        var y = Math.Abs((long)deltaY);
+        if (deltaY >= 0)
+        {
+            if (deltaX >= 0)
+                return x > y ? (int)(y * 0x20 / x) : 0x40 - (int)(x * 0x20 / y);
+            return x >= y ? 0x80 - (int)(y * 0x20 / x) : 0x40 + (int)(x * 0x20 / y);
+        }
+        if (deltaX < 0)
+            return x > y ? 0x80 + (int)(y * 0x20 / x) : 0xc0 - (int)(x * 0x20 / y);
+        var result = x < y ? 0xc0 + (int)(x * 0x20 / y) : 0x100 - (int)(y * 0x20 / x);
+        return result & 0xff;
+    }
 }

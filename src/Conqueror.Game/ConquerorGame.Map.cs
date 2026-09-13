@@ -33,6 +33,7 @@ public sealed partial class ConquerorGame
                 throw new InvalidOperationException("A campaign siege has no mapped original scene.");
             ActivateSiegeVisuals(importedScene);
             _siege = _campaign.CreateSiege(importedScene.Layout);
+            ConfigureSiegeActorRaycast();
             _showRadar = true;
             _screen = Screen.Siege;
         }

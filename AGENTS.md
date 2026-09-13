@@ -54,8 +54,13 @@ and flag-`0x40` left-turn collision response. Kind-1 mode 4 reacquires through
 Mode-11 handler `0x5010B` aims at the returned actor and requires ray distance
 strictly below raw combat-row contact column 4 at object-2
 `0xCE24 + 28 * row`; rows 23/24 double the attack effect interval. The runtime
-activates this bowman Attack/Retreat route through a bounded line-of-sight
-bridge. Do not apply mode-11 damage when the handler creates the effect:
+activates this bowman Attack/Retreat route through the recovered actor ray.
+Acquisition `0x4F98D` scans the 68-byte actor records in authored order, skips
+inactive/self/same-side records, and retains a candidate only when centered
+raycaster `0x470A8` returns that actor's exact identity. It replaces the chosen
+actor only for a strictly smaller depth than the initial `0x7FFF`, and stops
+once accepted depth is below `0x154`. Do not apply mode-11 damage when the
+handler creates the effect:
 scheduler `0x53365` calls `0x4F070` only when the live effect counter equals
 its configured count, then `0x53D47` clears actor effect handle `+0x08` and
 immediately recalls thinker `0x4F49C`. Preserve the strict doubled completion
@@ -65,8 +70,9 @@ visible opponent, kind-0 transition `0x4E71F` and kind-1 transition `0x4E745`
 both retain mode 6. Its handler `0x4FDCD` preserves heading and installs the
 same `(flags & 0xA7) | 0x40` movement family as melee Retreat. The runtime
 stores that family on the live movement effect so later order evaluation cannot
-change its collision behavior mid-cycle. Exact fixed-point ray equivalence,
-formation/path selection, and thinker cadence remain Provisional.
+change its collision behavior mid-cycle. The runtime uses this exact imported
+scene/texture acquisition path; formation/path selection and thinker cadence
+remain Provisional.
 
 First-person pointer dispatch is also mapped. Handler `0x55524` consumes the
 world hit returned by raycaster `0x470A8`. On primary flag 0, selected
@@ -80,7 +86,12 @@ state-target continuation, center/diagonal shapes, vertical bounds, and alpha.
 Kind-4 pointer candidates use their live centered 8.8 position, negative-view
 rotation, forward depth, ray-relative horizontal texture coordinate, heading
 sector, behavior-bit-4 mirror, vertical bounds, and alpha in original insertion
-order. Non-cardinal acquisition-ray integration remains Corroborated.
+order. Non-cardinal actor acquisition is active through the same projection
+path. Helper `0x445C4` folds quadrants around
+`floor(0x20 * minor / major)`; local delta `(dx,dy)` is supplied as original
+coordinates `(-dy,dx)`. Sine `0x446BC`, cosine `0x4472C`, and rotation
+`0x447C4` use the signed 1.15 quarter-wave table at object-2 `+0xC904` and
+round every product as `(product + 0x3FFF) >> 15`.
 
 Requested mode 12 uses a projected surface contact, not empty ground.
 Dispatcher `0x555AB`-`0x5562E` writes the raycaster's integer coordinates to
@@ -165,8 +176,8 @@ left; unlike flag `0x10`, the effect continues. Preserve this state route and
 do not identify handler `0x50020` as the command's direct action. Kind-1 mode 4
 repeats acquisition and reaches ranged mode 11 through `0x4E6D3`; `0x5010B`
 uses a strict raw contact-distance gate and doubled ranged effect interval.
-Exact fixed-point ray-visible acquisition and later mode-5 formation
-transitions remain Provisional.
+Exact fixed-point ray-visible acquisition is active for imported scenes;
+later mode-5 formation transitions remain Provisional.
 
 ## Git push destination
 

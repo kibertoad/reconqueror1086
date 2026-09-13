@@ -25,6 +25,8 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         public int SourceOriginY { get; } = sourceOriginY;
         public IReadOnlyDictionary<int, Texture2D> Textures { get; } = textures;
         public Texture2D? Backdrop { get; } = backdrop;
+        public DynamixSceneTexture? SourceFor(int textureIndex) =>
+            sources.GetValueOrDefault(textureIndex);
 
         public Texture2D? TextureFor(int textureIndex, int? colorMapIndex = null)
         {
@@ -588,6 +590,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
                 var meleeScene = ImportedSiegeLayouts.ForPracticeMelee(_importedContent, new Random(meleeSeed).Next(3));
                 ActivateSiegeVisuals(meleeScene);
                 _siege = PracticeCombatDefinitions.CreateMelee(meleeSeed, meleeScene.Layout);
+                ConfigureSiegeActorRaycast();
                 _screen = Screen.Siege;
                 _notice = "MELEE PRACTICE";
                 break;
@@ -596,6 +599,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
                 var castleScene = ImportedSiegeLayouts.ForPracticeCastleSkirmish(_importedContent);
                 ActivateSiegeVisuals(castleScene);
                 _siege = PracticeCombatDefinitions.CreateCastleSkirmish(Environment.TickCount, castleScene.Layout);
+                ConfigureSiegeActorRaycast();
                 _screen = Screen.Siege;
                 _notice = "CASTLE SKIRMISH PRACTICE";
                 break;

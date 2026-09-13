@@ -471,6 +471,42 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void AcquisitionKeepsTheFirstAuthoredActorAtAnEqualRayDepth()
+    {
+        var battle = AcquisitionOrderBattle();
+        var calls = new List<SiegeEnemy>();
+        battle.ConfigureActorRaycast((_, target) =>
+        {
+            calls.Add(target);
+            return 0x200;
+        });
+        battle.CommandRetainers(SiegeRetainerCommand.Attack);
+
+        battle.AdvanceRetainerMovement(0);
+
+        Assert.Equal(battle.Enemies, calls);
+        Assert.Equal(Facing.East, Assert.Single(battle.Retainers).Facing);
+    }
+
+    [Fact]
+    public void AcquisitionStopsAtTheFirstAuthoredActorInsideTheCloseThreshold()
+    {
+        var battle = AcquisitionOrderBattle();
+        var calls = new List<SiegeEnemy>();
+        battle.ConfigureActorRaycast((_, target) =>
+        {
+            calls.Add(target);
+            return ReferenceEquals(target, battle.Enemies[0]) ? 0x153 : 0x100;
+        });
+        battle.CommandRetainers(SiegeRetainerCommand.Attack);
+
+        battle.AdvanceRetainerMovement(0);
+
+        Assert.Equal([battle.Enemies[0]], calls);
+        Assert.Equal(Facing.East, Assert.Single(battle.Retainers).Facing);
+    }
+
+    [Fact]
     public void ModeSixWanderingKeepsItsFlagFortyCollisionFamilyForTheWholeEffect()
     {
         var tiles = new SiegeTile[12, 5];
@@ -578,6 +614,18 @@ public sealed partial class ResourceAndDefinitionTests
             OriginalAttackSkill: 50);
         return new SiegeSession(new Player(), army, 0, seed: 1086,
             new SiegeLayout(tiles, 1, 2, Facing.East, [enemy], retainers: [retainer]));
+    }
+
+    private static SiegeSession AcquisitionOrderBattle()
+    {
+        var tiles = new SiegeTile[8, 8];
+        var army = new Army();
+        army.Units[SiegeRetainerCombatUnit] = 1;
+        return new SiegeSession(new Player(), army, 0, seed: 1086,
+            new SiegeLayout(tiles, 0, 0, Facing.East,
+                [new SiegeSpawn(5, 2, false, OriginalHealth: 10),
+                    new SiegeSpawn(2, 5, false, OriginalHealth: 10)], retainers:
+                [new SiegeSpawn(2, 2, false, OriginalHealth: 12, OriginalActorKind: 0)]));
     }
 
     private const UnitType SiegeRetainerCombatUnit = UnitType.Swordsmen;
