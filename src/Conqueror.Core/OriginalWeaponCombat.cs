@@ -80,6 +80,14 @@ public static class OriginalWeaponCombat
         return checked(ContactDistancesByCombatRow[combatRow] + 0x40);
     }
 
+    // Actor mode 11 compares the ray distance directly with object-2 table
+    // column 4 at 0xCE24 + 28 * row, without the player's +0x40 allowance.
+    public static int ActorContactDistanceForCombatRow(int combatRow)
+    {
+        if ((uint)combatRow >= (uint)CombatRowCount) throw new ArgumentOutOfRangeException(nameof(combatRow));
+        return ContactDistancesByCombatRow[combatRow];
+    }
+
     public static int GridReachForCombatRow(int combatRow) =>
         Math.Max(1, ContactDistanceForCombatRow(combatRow) >> 8);
 

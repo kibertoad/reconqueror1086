@@ -90,8 +90,9 @@ public sealed partial class SiegeSession
                 return true;
             case SiegeRetainerCommand.Retreat:
                 // Requested mode 10 transitions to mode 5 for friendly kind 0
-                // after acquiring a visible opponent. Mode 5 preserves heading.
-                if (RetainerOrderTarget(retainer) is null)
+                // and mode 4 for kind 1 after acquiring a visible opponent.
+                // Mode 5 preserves heading; kind 1 continues through ranged mode 11.
+                if (RetreatOrderTarget(retainer) is null)
                 {
                     retainer.Command = SiegeRetainerCommand.Defend;
                     return false;
@@ -188,6 +189,47 @@ public sealed partial class SiegeSession
         EnemyAt(x, y) is null &&
         _retainers.All(retainer => ReferenceEquals(retainer, self) || retainer.Health <= 0 ||
             retainer.X != x || retainer.Y != y);
+
+    // Acquisition 0x4F98D keeps the nearest opposite-side actor whose exact
+    // identity is returned by raycaster 0x470A8. This bounded cell trace is the
+    // current compatibility bridge until that fixed-point ray is reproduced.
+    private SiegeEnemy? RetreatOrderTarget(SiegeRetainer retainer) =>
+        _enemies.Where(enemy => enemy.Health > 0 && ActorLineIsClear(retainer, enemy))
+            .OrderBy(enemy => ActorDistanceInFixedPoint(retainer, enemy))
+            .FirstOrDefault();
+
+    private bool RetainerRangedAttack(SiegeRetainer retainer, SiegeEnemy target)
+    {
+        if (retainer.OriginalCombatRow is not { } row ||
+            ActorDistanceInFixedPoint(retainer, target) >=
+                OriginalWeaponCombat.ActorContactDistanceForCombatRow(row) ||
+            !ActorLineIsClear(retainer, target))
+            return false;
+        return RetainerAttack(retainer, target, rangeAlreadyChecked: true);
+    }
+
+    private bool ActorLineIsClear(SiegeEnemy source, SiegeEnemy target)
+    {
+        var dx = target.X - source.X;
+        var dy = target.Y - source.Y;
+        var steps = Math.Max(Math.Abs(dx), Math.Abs(dy));
+        for (var step = 1; step < steps; step++)
+        {
+            var x = source.X + (int)Math.Round(dx * step / (double)steps);
+            var y = source.Y + (int)Math.Round(dy * step / (double)steps);
+            if (_movementBlocks[x, y] || x == PlayerX && y == PlayerY ||
+                EnemyAt(x, y) is not null || RetainerAt(x, y) is not null)
+                return false;
+        }
+        return true;
+    }
+
+    private static int ActorDistanceInFixedPoint(SiegeEnemy source, SiegeEnemy target)
+    {
+        var dx = target.X - source.X;
+        var dy = target.Y - source.Y;
+        return (int)Math.Round(Math.Sqrt((long)dx * dx + (long)dy * dy) * 256.0);
+    }
 
     private static IReadOnlyList<Point> CardinalSteps(int x, int y) =>
         [new(x + 1, y), new(x - 1, y), new(x, y + 1), new(x, y - 1)];

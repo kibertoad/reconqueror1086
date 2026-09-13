@@ -40,9 +40,14 @@ mode 10 instead transitions friendly kind 0 to preserved-heading mode 5 and
 kind 1 to mode 4 after acquisition. Acquired melee Attack mode 8 and Follow
 mode 16 share handler `0x4FE76`; the runtime routes both through the recovered
 `0x112` sub-cell movement effect. Melee Retreat uses mode 5's `0x142` effect
-and flag-`0x40` left-turn collision response. Defend does not seek. Attack's
-no-target wandering, exact acquisition visibility/contact thresholds, kind-1
-Retreat continuation, formation/path selection, and thinker cadence remain
+and flag-`0x40` left-turn collision response. Kind-1 mode 4 reacquires through
+`0x4F98D`; transition `0x4E6D3` then chooses ranged mode 11 or fallback mode 1.
+Mode-11 handler `0x5010B` aims at the returned actor and requires ray distance
+strictly below raw combat-row contact column 4 at object-2
+`0xCE24 + 28 * row`; rows 23/24 double the attack effect interval. The runtime
+activates this bowman Retreat attack route through a bounded line-of-sight
+bridge. Defend does not seek. Attack's no-target wandering, exact fixed-point
+ray equivalence, formation/path selection, and thinker cadence remain
 Provisional.
 
 First-person pointer dispatch is also mapped. Handler `0x55524` consumes the
@@ -110,9 +115,11 @@ unchanged. When collision reaches `0x53C13`-`0x53C6C`, it clears the colliding
 sub-cell axis and turns to
 `(((heading + 0x20) & 0xC0) - 0x40) & 0xFF`, the cardinal direction to the
 left; unlike flag `0x10`, the effect continues. Preserve this state route and
-do not identify handler `0x50020` as the command's direct action. Exact
-ray-visible acquisition, later mode-5 formation transitions, and kind-1 mode-4
-behavior remain Provisional.
+do not identify handler `0x50020` as the command's direct action. Kind-1 mode 4
+repeats acquisition and reaches ranged mode 11 through `0x4E6D3`; `0x5010B`
+uses a strict raw contact-distance gate and doubled ranged effect interval.
+Exact fixed-point ray-visible acquisition and later mode-5 formation
+transitions remain Provisional.
 
 ## Git push destination
 

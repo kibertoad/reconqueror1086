@@ -315,6 +315,9 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal((484, 1), (OriginalWeaponCombat.ContactDistanceFor(2), OriginalWeaponCombat.GridReachFor(2)));
         Assert.Equal((7064, 27), (OriginalWeaponCombat.ContactDistanceFor(43), OriginalWeaponCombat.GridReachFor(43)));
         Assert.Equal((8256, 32), (OriginalWeaponCombat.ContactDistanceFor(44), OriginalWeaponCombat.GridReachFor(44)));
+        Assert.Equal((7000, 8192),
+            (OriginalWeaponCombat.ActorContactDistanceForCombatRow(23),
+                OriginalWeaponCombat.ActorContactDistanceForCombatRow(24)));
         Assert.Equal(
             [400, 400, 380, 380, 400, 420, 460, 450, 470, 480, 500, 440, 480,
                 480, 480, 520, 500, 500, 500, 520, 530, 520, 530, 900, 1000],

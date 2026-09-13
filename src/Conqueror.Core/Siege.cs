@@ -730,15 +730,24 @@ public sealed partial class SiegeSession
                 case SiegeRetainerCommand.Follow:
                     break;
                 case SiegeRetainerCommand.Retreat:
+                    var retreatTarget = RetreatOrderTarget(retainer);
+                    if (retreatTarget is null)
+                    {
+                        retainer.Command = SiegeRetainerCommand.Defend;
+                        retainer.OrderedTarget = null;
+                        break;
+                    }
+                    if (retainer.OriginalActorKind == 1)
+                        RetainerRangedAttack(retainer, retreatTarget);
                     break;
             }
         }
     }
 
-    private bool RetainerAttack(SiegeRetainer retainer, SiegeEnemy target)
+    private bool RetainerAttack(SiegeRetainer retainer, SiegeEnemy target, bool rangeAlreadyChecked = false)
     {
         var distance = Distance(retainer.X, retainer.Y, target.X, target.Y);
-        if (distance > RetainerAttackRange(retainer)) return false;
+        if (!rangeAlreadyChecked && distance > RetainerAttackRange(retainer)) return false;
         retainer.Facing = DirectionToward(retainer.X, retainer.Y, target.X, target.Y, retainer.Facing);
         StartVisual(retainer, SiegeEnemyVisualState.Attack);
         var hit = retainer.OriginalAttackSkill is { } skill && target.OriginalAttackSkill is { } targetSkill

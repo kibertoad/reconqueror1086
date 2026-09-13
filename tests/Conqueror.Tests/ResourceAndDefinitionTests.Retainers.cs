@@ -260,6 +260,72 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void BowmanRetreatContinuesThroughModeFourIntoRangedModeEleven()
+    {
+        var tiles = new SiegeTile[12, 5];
+        var army = new Army();
+        army.Units[SiegeRetainerCombatUnit] = 1;
+        var retainer = new SiegeSpawn(2, 2, false, OriginalArmor: 7, OriginalHealth: 12,
+            OriginalCombatRow: 23, OriginalAttackSkill: 1_000, OriginalActorKind: 1);
+        var enemy = new SiegeSpawn(9, 2, false, OriginalArmor: 0, OriginalHealth: 20,
+            OriginalCombatRow: 4, OriginalAttackSkill: 1);
+        var battle = new SiegeSession(new Player(), army, 0, 1086,
+            new SiegeLayout(tiles, 1, 1, Facing.East, [enemy], retainers: [retainer]));
+        var friendly = Assert.Single(battle.Retainers);
+        battle.CommandRetainers(SiegeRetainerCommand.Retreat);
+
+        battle.AdvanceRetainerOrders();
+
+        Assert.Equal(SiegeEnemyVisualState.Attack, friendly.VisualState);
+        Assert.Equal(Facing.East, friendly.Facing);
+        Assert.True(Assert.Single(battle.Enemies).Health < 20);
+    }
+
+    [Fact]
+    public void BowmanRetreatFallsBackToDefendWhenTheAcquisitionRayIsBlocked()
+    {
+        var tiles = new SiegeTile[12, 5];
+        var movementBlocks = new bool[12, 5];
+        movementBlocks[5, 2] = true;
+        var army = new Army();
+        army.Units[SiegeRetainerCombatUnit] = 1;
+        var retainer = new SiegeSpawn(2, 2, false, OriginalHealth: 12,
+            OriginalCombatRow: 23, OriginalAttackSkill: 1_000, OriginalActorKind: 1);
+        var enemy = new SiegeSpawn(9, 2, false, OriginalArmor: 0, OriginalHealth: 20,
+            OriginalCombatRow: 4, OriginalAttackSkill: 1);
+        var battle = new SiegeSession(new Player(), army, 0, 1086,
+            new SiegeLayout(tiles, 1, 1, Facing.East, [enemy], retainers: [retainer],
+                movementBlocks: movementBlocks));
+        var friendly = Assert.Single(battle.Retainers);
+        battle.CommandRetainers(SiegeRetainerCommand.Retreat);
+
+        battle.AdvanceRetainerOrders();
+
+        Assert.Equal(SiegeRetainerCommand.Defend, friendly.Command);
+        Assert.Equal(SiegeEnemyVisualState.Walk, friendly.VisualState);
+        Assert.Equal(20, Assert.Single(battle.Enemies).Health);
+    }
+
+    [Fact]
+    public void BowmanModeElevenUsesEuclideanFixedPointRangeNotManhattanGridRange()
+    {
+        var tiles = new SiegeTile[32, 32];
+        var army = new Army();
+        army.Units[SiegeRetainerCombatUnit] = 1;
+        var retainer = new SiegeSpawn(2, 2, false, OriginalHealth: 12,
+            OriginalCombatRow: 23, OriginalAttackSkill: 1_000, OriginalActorKind: 1);
+        var enemy = new SiegeSpawn(21, 21, false, OriginalArmor: 0, OriginalHealth: 20,
+            OriginalCombatRow: 4, OriginalAttackSkill: 1);
+        var battle = new SiegeSession(new Player(), army, 0, 1086,
+            new SiegeLayout(tiles, 1, 1, Facing.East, [enemy], retainers: [retainer]));
+        battle.CommandRetainers(SiegeRetainerCommand.Retreat);
+
+        battle.AdvanceRetainerOrders();
+
+        Assert.True(Assert.Single(battle.Enemies).Health < 20);
+    }
+
+    [Fact]
     public void RetreatWithoutAnOpponentFallsBackToDefend()
     {
         var tiles = new SiegeTile[12, 5];
