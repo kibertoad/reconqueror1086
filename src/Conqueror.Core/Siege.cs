@@ -380,11 +380,11 @@ public sealed partial class SiegeSession
             enemy.VisualElapsed = 0;
             if (enemy is not SiegeRetainer retainer || retainer.Health <= 0) continue;
             if (completedState == SiegeEnemyVisualState.Attack &&
-                retainer.PendingRangedTarget is { } rangedTarget)
+                retainer.PendingRangedTarget is { } attackTarget)
             {
                 retainer.PendingRangedTarget = null;
-                if (rangedTarget.Health > 0 && _enemies.Contains(rangedTarget))
-                    ResolveRetainerStrike(retainer, rangedTarget);
+                if (attackTarget.Health > 0 && _enemies.Contains(attackTarget))
+                    ResolveRetainerStrike(retainer, attackTarget);
             }
             AdvanceRetainerOrder(retainer);
         }

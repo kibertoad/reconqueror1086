@@ -203,11 +203,22 @@ opposite-side acquisition `0x4F98D`; transition `0x4E6F9` selects direct
 pursuit mode 8 on success or mode 1 on failure. Modes 1-4 use current handler
 `0x4FDAB`; modes 7/8 use direct `0x4FE76`. Preserve source-center calculation
 as `((cell << 8) + 0x80 + offset8) >> 8` for the neighborhood scan and keep
-one state decision per actor-thinker pass. The runtime implements this loop
-through the first mode-8 movement effect. Mode-8 contact transition and its
-mode-11 attack continuation in this Retreat-derived route, plus broader actor
-AI, remain Provisional. GameFAQs FAQ 66730 has no internal evidence for these
-states or the spatial scan order.
+one state decision per actor-thinker pass. Mode-8 predicate `0x4F7A2` always
+rays toward stored actor `+0x24`, resolves the returned block through
+`0x4CEA0`, accepts any living opposite-side actor strictly below the source
+combat row's raw contact distance at `0xCE24 + 28 * row`, and otherwise fails.
+Kind-0 table fixup source `0x4E458` resolves transition `0x4E745`, selecting
+mode 11 on success or mode 6 on failure. Mode 6 clears the target and resumes
+the `0x40` wandering/acquisition loop. Mode-11 handler `0x5010B` separately
+uses fixed Manhattan separation `abs(dx8) + abs(dy8) <= 0x154` to accept the
+stored actor at synthetic distance `0x154`; otherwise it casts a new ray and
+may accept an intervening opposite-side actor. Both branches require strict
+raw combat-row contact range. Damage is applied only at the completed mode-11
+effect gate through `0x53365`/`0x4F070`, not when contact is first detected.
+The runtime implements this route through that first delayed strike. The
+mode-11 outcome transition at `0x4E77E` and broader actor AI remain
+Provisional. GameFAQs FAQ 66730 has no internal evidence for these states,
+thresholds, or the spatial scan order.
 GameFAQs FAQ 66730 contains no state-table, ray-identity, or threshold detail
 and neither corroborates nor conflicts with this executable-derived mapping.
 

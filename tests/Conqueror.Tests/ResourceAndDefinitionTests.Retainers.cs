@@ -359,19 +359,22 @@ public sealed partial class ResourceAndDefinitionTests
         var ally = new SiegeSpawn(6, 2, false, OriginalHealth: 12,
             OriginalActorKind: 0, OriginalActorOrder: 1);
         var runner = new SiegeSpawn(8, 2, false, OriginalHealth: 12,
-            OriginalActorKind: 0, OriginalActorOrder: 2);
-        var enemy = new SiegeSpawn(12, 2, false, OriginalHealth: 10,
-            OriginalActorKind: 2, OriginalActorOrder: 3);
+            OriginalCombatRow: 0, OriginalAttackSkill: 1_000,
+            OriginalActorKind: 0, OriginalActorOrder: 2,
+            OriginalAnimation: new SiegeActorAnimation(0.384, 0.384, 0.384));
+        var enemy = new SiegeSpawn(12, 2, false, OriginalArmor: 0, OriginalHealth: 10,
+            OriginalAttackSkill: 1, OriginalActorKind: 2, OriginalActorOrder: 3);
         var battle = new SiegeSession(new Player(), army, 0, 1086,
             new SiegeLayout(tiles, 1, 2, Facing.East, [enemy], retainers: [ally, runner],
                 playerActor: playerActor));
         var activeRunner = battle.Retainers.Single(item => item.OriginalActorOrder == 2);
         activeRunner.Facing = Facing.West;
         var reached = false;
+        var enemyDistance8 = 0x400;
         battle.ConfigureActorRaycast((_, target) =>
         {
             if (ReferenceEquals(target, battle.Enemies[0]))
-                return new SiegeActorRayHit(target, 0x400);
+                return new SiegeActorRayHit(target, enemyDistance8);
             if (reached && ReferenceEquals(target, battle.Retainers[0]))
                 return new SiegeActorRayHit(battle.PlayerActor, 0x1ff);
             return new SiegeActorRayHit(target,
@@ -395,6 +398,72 @@ public sealed partial class ResourceAndDefinitionTests
         var beforeModeEightTick = activeRunner.OffsetX8;
         battle.AdvanceRetainerMovement(0.2001);
         Assert.True(activeRunner.OffsetX8 > beforeModeEightTick);
+
+        enemyDistance8 = 349;
+        for (var tick = 0; tick < 6 && activeRunner.VisualState == SiegeEnemyVisualState.Walk; tick++)
+            battle.AdvanceRetainerMovement(0.2001);
+
+        Assert.Equal(SiegeEnemyVisualState.Attack, activeRunner.VisualState);
+        Assert.Equal(10, Assert.Single(battle.Enemies).Health);
+        battle.AdvanceEnemyAnimations(0.3841);
+        Assert.True(Assert.Single(battle.Enemies).Health < 10);
+    }
+
+    [Fact]
+    public void ModeEightRejectsContactAtTheRawCombatRowBoundaryAndFallsBackToWandering()
+    {
+        var tiles = new SiegeTile[16, 5];
+        var army = new Army();
+        army.Units[SiegeRetainerCombatUnit] = 6;
+        var playerActor = new SiegeSpawn(1, 2, false, OriginalHealth: 12,
+            OriginalActorKind: 0, OriginalActorOrder: 0);
+        var ally = new SiegeSpawn(6, 2, false, OriginalHealth: 12,
+            OriginalActorKind: 0, OriginalActorOrder: 1);
+        var runner = new SiegeSpawn(8, 2, false, OriginalHealth: 12,
+            OriginalCombatRow: 0, OriginalAttackSkill: 1_000,
+            OriginalActorKind: 0, OriginalActorOrder: 2,
+            OriginalAnimation: new SiegeActorAnimation(0.384, 0.384, 0.384));
+        var enemy = new SiegeSpawn(12, 2, false, OriginalArmor: 0, OriginalHealth: 10,
+            OriginalAttackSkill: 1, OriginalActorKind: 2, OriginalActorOrder: 3);
+        var battle = new SiegeSession(new Player(), army, 0, 1086,
+            new SiegeLayout(tiles, 1, 2, Facing.East, [enemy], retainers: [ally, runner],
+                playerActor: playerActor));
+        var activeRunner = battle.Retainers.Single(item => item.OriginalActorOrder == 2);
+        activeRunner.Facing = Facing.West;
+        var reached = false;
+        var enemyDistance8 = 0x400;
+        battle.ConfigureActorRaycast((_, target) =>
+        {
+            if (ReferenceEquals(target, battle.Enemies[0]))
+                return new SiegeActorRayHit(target, enemyDistance8);
+            if (reached && ReferenceEquals(target, battle.Retainers[0]))
+                return new SiegeActorRayHit(battle.PlayerActor, 0x1ff);
+            return new SiegeActorRayHit(target,
+                ReferenceEquals(target, battle.PlayerActor) ? 0x500 : 0x300);
+        });
+        battle.ToggleRetainerSelection(battle.Retainers[0]);
+        battle.CommandRetainers(SiegeRetainerCommand.Defend);
+        battle.ToggleRetainerSelection(activeRunner);
+        battle.CommandRetainers(SiegeRetainerCommand.Retreat);
+
+        battle.AdvanceRetainerMovement(0);
+        battle.AdvanceRetainerMovement(0.6001);
+        battle.AdvanceRetainerMovement(0);
+        reached = true;
+        battle.AdvanceRetainerMovement(0.6001);
+        battle.AdvanceRetainerMovement(0);
+        battle.AdvanceRetainerMovement(0);
+        battle.AdvanceRetainerMovement(0);
+        battle.AdvanceRetainerMovement(0.6001);
+        enemyDistance8 = 350;
+        battle.AdvanceRetainerMovement(0);
+
+        Assert.Equal(SiegeEnemyVisualState.Walk, activeRunner.VisualState);
+        Assert.Equal(10, Assert.Single(battle.Enemies).Health);
+        var beforeWander = (activeRunner.X, activeRunner.Y, activeRunner.OffsetX8, activeRunner.OffsetY8);
+        battle.AdvanceRetainerMovement(0.2001);
+        Assert.NotEqual(beforeWander,
+            (activeRunner.X, activeRunner.Y, activeRunner.OffsetX8, activeRunner.OffsetY8));
     }
 
     [Fact]
@@ -439,6 +508,39 @@ public sealed partial class ResourceAndDefinitionTests
 
         Assert.True(Assert.Single(battle.Enemies).Health < 20);
         Assert.Equal(SiegeEnemyVisualState.Attack, friendly.VisualState);
+    }
+
+    [Fact]
+    public void ModeElevenCanStrikeTheInterveningOpponentReturnedByItsSecondRay()
+    {
+        var tiles = new SiegeTile[14, 5];
+        var army = new Army();
+        army.Units[SiegeRetainerCombatUnit] = 1;
+        var retainer = new SiegeSpawn(2, 2, false, OriginalHealth: 12,
+            OriginalCombatRow: 23, OriginalAttackSkill: 1_000, OriginalActorKind: 1,
+            OriginalAnimation: new SiegeActorAnimation(0.384, 0.384, 0.384));
+        var aimed = new SiegeSpawn(10, 2, false, OriginalArmor: 0, OriginalHealth: 20,
+            OriginalCombatRow: 4, OriginalAttackSkill: 1, OriginalActorOrder: 1);
+        var intervening = new SiegeSpawn(6, 2, false, OriginalArmor: 0, OriginalHealth: 20,
+            OriginalCombatRow: 4, OriginalAttackSkill: 1, OriginalActorOrder: 2);
+        var battle = new SiegeSession(new Player(), army, 0, 1086,
+            new SiegeLayout(tiles, 1, 1, Facing.East, [aimed, intervening], retainers: [retainer]));
+        var aimedActor = battle.Enemies.Single(actor => actor.OriginalActorOrder == 1);
+        var interveningActor = battle.Enemies.Single(actor => actor.OriginalActorOrder == 2);
+        var aimedRays = 0;
+        battle.ConfigureActorRaycast((_, target) =>
+        {
+            if (ReferenceEquals(target, aimedActor) && aimedRays++ == 0)
+                return new SiegeActorRayHit(aimedActor, 0x153);
+            return new SiegeActorRayHit(interveningActor, 0x180);
+        });
+        battle.CommandRetainers(SiegeRetainerCommand.Retreat);
+
+        battle.AdvanceRetainerOrders();
+        battle.AdvanceEnemyAnimations(0.7681);
+
+        Assert.Equal(20, aimedActor.Health);
+        Assert.True(interveningActor.Health < 20);
     }
 
     [Fact]

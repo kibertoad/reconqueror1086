@@ -197,6 +197,37 @@ public sealed partial class SiegeSession
                     retainer.MovementWanders = false;
                     return false;
                 }
+                if (retainer.RetreatMode == 8)
+                {
+                    if (retainer.OrderedTarget is { Health: > 0 } pursued &&
+                        _enemies.Contains(pursued) && ModeEightHasContact(retainer, pursued))
+                    {
+                        retainer.RetreatMode = 11;
+                        retainer.MovementWanders = false;
+                        RetainerRangedAttack(retainer, pursued);
+                        return false;
+                    }
+                    // Kind-0 transition 0x4E745 selects mode 6 after failed
+                    // contact. Its handler clears the target and resumes the
+                    // same 0x40 wandering family used by public Attack.
+                    retainer.RetreatMode = 6;
+                    retainer.OrderedTarget = null;
+                    retainer.MovementWanders = true;
+                    return true;
+                }
+                if (retainer.RetreatMode == 6)
+                {
+                    if (RetreatOrderTarget(retainer) is { } reacquired)
+                    {
+                        retainer.RetreatMode = 8;
+                        retainer.OrderedTarget = reacquired;
+                        retainer.MovementWanders = false;
+                        AimRetainerAt(retainer, reacquired.X, reacquired.Y);
+                        return true;
+                    }
+                    retainer.MovementWanders = true;
+                    return true;
+                }
                 retainer.MovementWanders = false;
                 return false;
             default:
@@ -324,17 +355,43 @@ public sealed partial class SiegeSession
         return nearest;
     }
 
+    // Mode-8 predicate 0x4F7A2 always casts toward the stored target, but it
+    // accepts any living opposite-side actor returned by that ray. Contact is
+    // strict against the source combat row's raw column-4 distance.
+    private bool ModeEightHasContact(SiegeRetainer retainer, SiegeEnemy target)
+    {
+        if (retainer.OriginalCombatRow is not { } row ||
+            RayToward(retainer, target) is not { } hit)
+            return false;
+        return hit.Actor.Health > 0 && _enemies.Contains(hit.Actor) &&
+               hit.Distance8 < OriginalWeaponCombat.ActorContactDistanceForCombatRow(row);
+    }
+
     private bool RetainerRangedAttack(SiegeRetainer retainer, SiegeEnemy target)
     {
         if (retainer.OriginalCombatRow is not { } row) return false;
-        var separation8 = ActorDistanceInFixedPoint(retainer, target);
-        if (separation8 >= OriginalWeaponCombat.ActorContactDistanceForCombatRow(row) ||
-            separation8 > 0x154 && ActorRayDistance(retainer, target) is null)
+        SiegeActorRayHit? hit;
+        if (ActorManhattanDistanceInFixedPoint(retainer, target) <= 0x154)
+            hit = new SiegeActorRayHit(target, 0x154);
+        else
+            hit = RayToward(retainer, target);
+        if (hit is null || hit.Actor.Health <= 0 || !_enemies.Contains(hit.Actor) ||
+            hit.Distance8 >= OriginalWeaponCombat.ActorContactDistanceForCombatRow(row))
             return false;
+        target = hit.Actor;
+        retainer.OrderedTarget = target;
         retainer.Facing = DirectionToward(retainer.X, retainer.Y, target.X, target.Y, retainer.Facing);
         StartVisual(retainer, SiegeEnemyVisualState.Attack);
         retainer.PendingRangedTarget = target;
         return true;
+    }
+
+    private SiegeActorRayHit? RayToward(SiegeEnemy source, SiegeEnemy target)
+    {
+        if (_actorRaycast is not null) return _actorRaycast(source, target);
+        return ActorLineIsClear(source, target)
+            ? new SiegeActorRayHit(target, ActorDistanceInFixedPoint(source, target))
+            : null;
     }
 
     private bool ActorLineIsClear(SiegeEnemy source, SiegeEnemy target)
@@ -407,6 +464,13 @@ public sealed partial class SiegeSession
         var dx8 = ((target.X - source.X) << 8) + target.OffsetX8 - source.OffsetX8;
         var dy8 = ((target.Y - source.Y) << 8) + target.OffsetY8 - source.OffsetY8;
         return (int)Math.Round(Math.Sqrt((long)dx8 * dx8 + (long)dy8 * dy8));
+    }
+
+    private static int ActorManhattanDistanceInFixedPoint(SiegeEnemy source, SiegeEnemy target)
+    {
+        var dx8 = ((target.X - source.X) << 8) + target.OffsetX8 - source.OffsetX8;
+        var dy8 = ((target.Y - source.Y) << 8) + target.OffsetY8 - source.OffsetY8;
+        return checked(Math.Abs(dx8) + Math.Abs(dy8));
     }
 
     private static IReadOnlyList<Point> CardinalSteps(int x, int y) =>

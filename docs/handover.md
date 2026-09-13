@@ -10,7 +10,7 @@ The authoritative gate is:
 & '.\Run Tests.bat'
 ```
 
-The latest completed implementation gate passed 257 xUnit cases and 146 executable specifications with zero build warnings. Repository policy also passed. Re-run the gate after checkout; do not infer current health from this note alone.
+The latest completed implementation gate passed 259 xUnit cases and 146 executable specifications with zero build warnings. Repository policy also passed. Re-run the gate after checkout; do not infer current health from this note alone.
 
 ## Latest completed combat recovery
 
@@ -44,7 +44,7 @@ free effect slot, and the cursor advances on each unrestricted main-loop pass.
 Runtime authored order is the documented stable compatibility tie-breaker and
 is regression-tested across update subdivisions.
 
-Continue priority 1 in `implementation-plan.md`: close kind-0 mode-8 contact transition `0x4F7A2`/`0x4E745`, its mode-11 attack continuation, and broader AI. Mode-5/7 regroup and the following mode-1/3/4 loop are now closed through construction of the first mode-8 movement effect. Mode 1 scans its 3x3 neighborhood in relative y/x order; supported actors use mode 4 to reacquire an opponent and enter mode 8, while isolated actors use mode 3 to reacquire formation through mode 7 or fall back to mode 2. The promoted player's authored metadata/order remains separate from its live session/Viewer coordinates. Fixed-point pointer projection and non-cardinal actor acquisition remain active with wrapped traversal, decoded elevation spans, texture alpha, and live identity. The GameFAQs FAQ has no comparable internal formula. Movement retains the documented strict 200 ms ticks, signed 8.8 offsets, collision families, and processor-independent update clock.
+Continue priority 1 in `implementation-plan.md`: trace kind-0 mode-11 outcome transition `0x4E77E`, mode 13, and broader AI. The Retreat route is now closed from mode-5/7 regroup through mode-1/3/4 support, renewed mode-8 pursuit, strict raw-row ray contact, and its first delayed mode-11 strike. Mode-8 predicate `0x4F7A2` accepts any opposite-side actor actually hit strictly below `0xCE24 + 28 * sourceRow`; kind-0 transition `0x4E745` selects mode 11 or failure mode 6. Mode-11 handler `0x5010B` uses the `<= 0x154` fixed-Manhattan shortcut or a fresh ray, and scheduler `0x53365` delays `0x4F070` damage until effect completion. Exact-boundary rejection and delayed damage have regressions. The GameFAQs FAQ has no comparable internal formula. Movement retains strict 200 ms ticks, signed 8.8 offsets, collision families, and a processor-independent clock.
 
 The projected candidate helper, actor acquisition, and shared actor-movement paths are active. Switch table `0x34A0C`, the 31-usable `0x44F7C` contact arrays, block geometry fields `+0x10..+0x20`, traversal order, continuation, projection formulas, and primary dispatch precedence are closed. Acquisition `0x4F98D` adds authored-order scanning, heading `0x445C4`, centered ray `0x470A8`, exact identity through `0x4CEA0`, strict-nearest replacement from `0x7FFF`, and the `< 0x154` early exit. `OriginalSiegeProjection` and `OriginalSiegeActorAcquisition` implement these paths with heading, non-cardinal depth, alpha, identity, ordering, and tie tests. The movement slice at `0x5185F`-`0x51875` and `0x530D0`-`0x53D5F` includes direct boundary aiming, bit-2 collision, retained partial offset, early effect termination, effect-boundary arrival, and shared-destination occupancy. Earlier confirmed actor-versus-actor portions include:
 
