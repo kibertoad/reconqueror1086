@@ -98,6 +98,9 @@ public sealed partial class ResourceAndDefinitionTests
 
         Assert.Equal((2, 5), (friendly.X, friendly.Y));
         Assert.Equal((0, -64), (friendly.OffsetX8, friendly.OffsetY8));
+        battle.AdvanceRetainerMovement(0.2001);
+        Assert.Equal((2, 5), (friendly.X, friendly.Y));
+        Assert.Equal((0, 0), (friendly.OffsetX8, friendly.OffsetY8));
         Assert.Equal(SiegeRetainerCommand.Defend, friendly.Command);
         Assert.False(friendly.Selected);
     }
@@ -138,6 +141,83 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal((2, 2), (friendly.X, friendly.Y));
         Assert.Equal(expectedFacing, friendly.Facing);
         Assert.Equal((expectedOffsetX8, expectedOffsetY8), (friendly.OffsetX8, friendly.OffsetY8));
+    }
+
+    [Theory]
+    [InlineData(3, 3, Facing.South)]
+    [InlineData(1, 3, Facing.West)]
+    [InlineData(1, 1, Facing.North)]
+    [InlineData(3, 1, Facing.East)]
+    public void ModeTwelveCardinalQuantizationChoosesClockwiseAtDiagonalTies(
+        int targetX, int targetY, Facing expectedFacing)
+    {
+        var battle = GroundOrderBattle(targetX, targetY);
+        var friendly = Assert.Single(battle.Retainers);
+
+        battle.AdvanceRetainerMovement(0.2001);
+
+        Assert.Equal(expectedFacing, friendly.Facing);
+    }
+
+    [Fact]
+    public void ModeTwelveCollisionUsesBehaviorBitTwoAndTurnsLeftAtTheStrictBand()
+    {
+        var tiles = new SiegeTile[10, 10];
+        var movementBlocks = new bool[10, 10];
+        movementBlocks[3, 2] = true;
+        var army = new Army();
+        army.Units[UnitType.Swordsmen] = 1;
+        var battle = new SiegeSession(new Player(), army, 0, 4,
+            new SiegeLayout(tiles, 0, 0, Facing.East, [], retainers:
+            [new SiegeSpawn(2, 2, false, OriginalHealth: 10,
+                OriginalMovement: new SiegeActorMovement(3, 200, 64, 0, 0x142, 5))],
+                movementBlocks: movementBlocks));
+        var friendly = Assert.Single(battle.Retainers);
+        battle.ToggleRetainerSelection(friendly);
+        Assert.True(battle.CommandSelectedRetainersTo(4, 2));
+
+        battle.AdvanceRetainerMovement(0.2001);
+        Assert.Equal((64, 0, Facing.East),
+            (friendly.OffsetX8, friendly.OffsetY8, friendly.Facing));
+        battle.AdvanceRetainerMovement(0.2001);
+        Assert.Equal((2, 2, 0, 0, Facing.North),
+            (friendly.X, friendly.Y, friendly.OffsetX8, friendly.OffsetY8, friendly.Facing));
+        battle.AdvanceRetainerMovement(0.2001);
+        Assert.Equal((0, -64, Facing.North),
+            (friendly.OffsetX8, friendly.OffsetY8, friendly.Facing));
+        battle.AdvanceRetainerMovement(0.2001);
+        Assert.Equal((64, -64, Facing.East),
+            (friendly.OffsetX8, friendly.OffsetY8, friendly.Facing));
+    }
+
+    [Fact]
+    public void AuthoredObjectStateReplacementUpdatesTheMovementBlockerPlane()
+    {
+        var tiles = new SiegeTile[10, 10];
+        tiles[3, 2] = SiegeTile.Destructible;
+        var army = new Army();
+        army.Units[UnitType.Swordsmen] = 1;
+        var obstacle = new SiegeObjectSpawn(3, 2,
+        [
+            new SiegeObjectStage(1, SiegeTile.Destructible, BlocksMovement: true),
+            new SiegeObjectStage(2, SiegeTile.Floor, BlocksMovement: false)
+        ]);
+        var battle = new SiegeSession(new Player(), army, 0, 4,
+            new SiegeLayout(tiles, 3, 1, Facing.South, [], [obstacle],
+                [new SiegeSpawn(2, 2, false, OriginalHealth: 10,
+                    OriginalMovement: new SiegeActorMovement(3, 200, 64, 0, 0x142, 5))]));
+        var friendly = Assert.Single(battle.Retainers);
+        battle.ToggleRetainerSelection(friendly);
+        Assert.True(battle.CommandSelectedRetainersTo(5, 2));
+        battle.AdvanceRetainerMovement(0.4001);
+        Assert.Equal((2, 2, Facing.North), (friendly.X, friendly.Y, friendly.Facing));
+
+        Assert.Equal(SiegeAction.DoorOpened, battle.Interact(Assert.Single(battle.Objects)));
+        battle.ToggleRetainerSelection(friendly);
+        Assert.True(battle.CommandSelectedRetainersTo(5, 2));
+        battle.AdvanceRetainerMovement(0.6001);
+
+        Assert.Equal((3, 2, -64), (friendly.X, friendly.Y, friendly.OffsetX8));
     }
 
     [Fact]

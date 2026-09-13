@@ -14,6 +14,7 @@ public sealed partial class ResourceAndDefinitionTests
     public void ImportedSceneLayoutUsesOriginalBehaviorClassesBeforeNames()
     {
         var source = SyntheticScene();
+        WriteInt(source.Blocks, 4, 2);
         SetSceneBlockName(source.Blocks, 1, "gate");
         WriteInt(source.Blocks, DynamixSceneDecoder.BlockSize + 4, 83);
         SetSceneBlockName(source.Blocks, 4, "mystery pickup");
@@ -26,6 +27,9 @@ public sealed partial class ResourceAndDefinitionTests
             source.Viewer, source.Scenario, source.Map, source.Blocks));
 
         var tiles = layout.CopyTiles();
+        Assert.Equal(SiegeTile.Floor, tiles[8, 20]);
+        Assert.True(layout.BlocksMovementAt(8, 20));
+        Assert.False(layout.BlocksMovementAt(10, 20));
         Assert.Equal(SiegeTile.Exit, tiles[11, 20]);
         Assert.Equal(SiegeTile.Treasure, tiles[9, 20]);
         Assert.Contains(layout.Enemies, enemy => (enemy.X, enemy.Y, enemy.VisualId) == (13, 20, 5));

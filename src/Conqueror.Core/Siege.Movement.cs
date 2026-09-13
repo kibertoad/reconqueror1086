@@ -12,7 +12,8 @@ public sealed partial class SiegeSession
                      retainer.Health > 0 && retainer.OrderedDestination is not null))
         {
             var destination = retainer.OrderedDestination!.Value;
-            if (retainer.X == destination.X && retainer.Y == destination.Y)
+            if (retainer.MovementTick == 0 &&
+                retainer.X == destination.X && retainer.Y == destination.Y)
             {
                 CompleteDestination(retainer);
                 continue;
@@ -26,16 +27,13 @@ public sealed partial class SiegeSession
             {
                 catchUp++;
                 retainer.MovementElapsed -= movement.TickSeconds;
-                if (retainer.MovementTick == 0 &&
-                    !BeginRetainerStep(retainer, destination.X, destination.Y))
-                {
-                    retainer.MovementElapsed = 0;
-                    break;
-                }
+                if (retainer.MovementTick == 0)
+                    AimRetainerAt(retainer, destination.X, destination.Y);
                 AdvanceMovementTick(retainer, movement);
                 retainer.MovementTick = (retainer.MovementTick + 1) % movement.TickCount;
                 retainer.WalkFrame = (retainer.WalkFrame + 1) % movement.TickCount;
-                if (retainer.X == destination.X && retainer.Y == destination.Y)
+                if (retainer.MovementTick == 0 &&
+                    retainer.X == destination.X && retainer.Y == destination.Y)
                     CompleteDestination(retainer);
             }
             if (catchUp == 24 && retainer.MovementElapsed > movement.TickSeconds)
@@ -55,28 +53,37 @@ public sealed partial class SiegeSession
         retainer.MovementTick = 0;
     }
 
-    private bool BeginRetainerStep(SiegeRetainer retainer, int targetX, int targetY)
+    private static void AimRetainerAt(SiegeRetainer retainer, int targetX, int targetY)
     {
-        foreach (var destination in CardinalSteps(retainer.X, retainer.Y)
-                     .OrderBy(point => Distance(point.X, point.Y, targetX, targetY)))
+        var dx = targetX - retainer.X;
+        var dy = targetY - retainer.Y;
+        var absX = Math.Abs(dx);
+        var absY = Math.Abs(dy);
+        if (absX > absY)
         {
-            if (!RetainerCanEnter(retainer, destination.X, destination.Y)) continue;
-            retainer.Facing = DirectionToward(
-                retainer.X, retainer.Y, destination.X, destination.Y, retainer.Facing);
-            return true;
+            retainer.Facing = dx > 0 ? Facing.East : Facing.West;
+            return;
         }
-        return false;
+        if (absY > absX)
+        {
+            retainer.Facing = dy > 0 ? Facing.South : Facing.North;
+            return;
+        }
+        // 0x445C4 yields exact diagonal headings 0x20/0x60/0xA0/0xE0;
+        // mode 12 adds 0x20 and masks with 0xC0, choosing clockwise on ties.
+        if (dy > 0) retainer.Facing = dx > 0 ? Facing.South : Facing.West;
+        else if (dy < 0) retainer.Facing = dx > 0 ? Facing.East : Facing.North;
     }
 
     private void AdvanceMovementTick(SiegeRetainer retainer, SiegeActorMovement movement)
     {
         var (deltaX, deltaY) = RotateMovement(
             movement.FixedXDeltaPerTick, movement.FixedYDeltaPerTick, retainer.Facing);
-        AdvanceMovementAxis(retainer, deltaX, true);
-        AdvanceMovementAxis(retainer, deltaY, false);
+        AdvanceMovementAxis(retainer, deltaX, true, movement.Flags);
+        AdvanceMovementAxis(retainer, deltaY, false, movement.Flags);
     }
 
-    private void AdvanceMovementAxis(SiegeRetainer retainer, int delta, bool xAxis)
+    private void AdvanceMovementAxis(SiegeRetainer retainer, int delta, bool xAxis, int flags)
     {
         if (delta == 0) return;
         var offset = (xAxis ? retainer.OffsetX8 : retainer.OffsetY8) + delta;
@@ -88,8 +95,12 @@ public sealed partial class SiegeSession
             var nextY = retainer.Y + (xAxis ? 0 : step);
             if (!RetainerCanEnter(retainer, nextX, nextY))
             {
-                if (xAxis) retainer.OffsetX8 = 0;
-                else retainer.OffsetY8 = 0;
+                if ((flags & 0x40) != 0)
+                {
+                    if (xAxis) retainer.OffsetX8 = 0;
+                    else retainer.OffsetY8 = 0;
+                    retainer.Facing = (Facing)(((int)retainer.Facing + 3) & 3);
+                }
                 return;
             }
         }
@@ -136,7 +147,8 @@ public sealed partial class SiegeSession
     }
 
     private bool RetainerCanEnter(SiegeRetainer self, int x, int y) =>
-        TileAt(x, y) == SiegeTile.Floor && (x != PlayerX || y != PlayerY) &&
+        x >= 0 && y >= 0 && x < Width && y < Height && !_movementBlocks[x, y] &&
+        (x != PlayerX || y != PlayerY) &&
         EnemyAt(x, y) is null &&
         _retainers.All(retainer => ReferenceEquals(retainer, self) || retainer.Health <= 0 ||
             retainer.X != x || retainer.Y != y);
@@ -149,4 +161,13 @@ public sealed partial class SiegeSession
 
     private static bool IsNeighbor(int x1, int y1, int x2, int y2) =>
         Math.Abs(x1 - x2) <= 1 && Math.Abs(y1 - y2) <= 1;
+
+    private static bool[,] MovementBlocksFor(SiegeTile[,] tiles)
+    {
+        var result = new bool[tiles.GetLength(0), tiles.GetLength(1)];
+        for (var x = 0; x < tiles.GetLength(0); x++)
+        for (var y = 0; y < tiles.GetLength(1); y++)
+            result[x, y] = tiles[x, y] != SiegeTile.Floor;
+        return result;
+    }
 }

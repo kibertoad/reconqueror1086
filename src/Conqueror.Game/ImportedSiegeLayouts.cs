@@ -41,10 +41,16 @@ public static class ImportedSiegeLayouts
     {
         ArgumentNullException.ThrowIfNull(scene);
         var sourceTiles = new SiegeTile[DynamixScene.MapWidth, DynamixScene.MapHeight];
+        var sourceMovementBlocks = new bool[DynamixScene.MapWidth, DynamixScene.MapHeight];
         for (var x = 0; x < DynamixScene.MapWidth; x++)
         for (var y = 0; y < DynamixScene.MapHeight; y++)
-            sourceTiles[x, y] = TileFor(scene.BlockAt(x, y));
+        {
+            var block = scene.BlockAt(x, y);
+            sourceTiles[x, y] = TileFor(block);
+            sourceMovementBlocks[x, y] = BlocksActorMovement(scene, block);
+        }
         sourceTiles[scene.Viewer.CellX, scene.Viewer.CellY] = SiegeTile.Floor;
+        sourceMovementBlocks[scene.Viewer.CellX, scene.Viewer.CellY] = false;
 
         var reachable = ReachableFromViewer(sourceTiles, scene.Viewer.CellX, scene.Viewer.CellY);
         var mapPoints = Enumerable.Range(0, DynamixScene.MapWidth)
@@ -58,9 +64,13 @@ public static class ImportedSiegeLayouts
         var minY = Math.Max(0, points.Min(point => point.Y) - 1);
         var maxY = Math.Min(DynamixScene.MapHeight - 1, points.Max(point => point.Y) + 1);
         var tiles = new SiegeTile[maxX - minX + 1, maxY - minY + 1];
+        var movementBlocks = new bool[tiles.GetLength(0), tiles.GetLength(1)];
         for (var x = minX; x <= maxX; x++)
         for (var y = minY; y <= maxY; y++)
+        {
             tiles[x - minX, y - minY] = reachable[x, y] ? sourceTiles[x, y] : SiegeTile.Wall;
+            movementBlocks[x - minX, y - minY] = !reachable[x, y] || sourceMovementBlocks[x, y];
+        }
 
         var enemies = points
             .Where(point => IsEnemyActor(scene.BlockAt(point.X, point.Y)))
@@ -83,7 +93,7 @@ public static class ImportedSiegeLayouts
             .ToArray();
         var heading = (scene.Viewer.Heading + 8192) / 16384 & 3;
         var layout = new SiegeLayout(tiles, scene.Viewer.CellX - minX, scene.Viewer.CellY - minY,
-            (Facing)heading, enemies, objects, retainers);
+            (Facing)heading, enemies, objects, retainers, movementBlocks);
         return (layout, minX, minY);
     }
 
@@ -167,6 +177,13 @@ public static class ImportedSiegeLayouts
     private static bool IsActor(DynamixSceneBlock block) =>
         (block.Behavior & 0x80) != 0 && block.InteractionSelector == 1;
 
+    private static bool BlocksActorMovement(DynamixScene scene, DynamixSceneBlock block)
+    {
+        if (!IsActor(block)) return (block.Behavior & 2) != 0;
+        return (uint)block.StateTarget < (uint)scene.Blocks.Count &&
+            (scene.Blocks[block.StateTarget].Behavior & 2) != 0;
+    }
+
     private static bool IsFriendlyActor(DynamixSceneBlock block) =>
         IsActor(block) && OriginalCombatantTemplates.IsFriendlySceneTemplate(block.ActorTemplate);
 
@@ -226,7 +243,8 @@ public static class ImportedSiegeLayouts
     {
         var initial = scene.BlockAt(x, y);
         var initialTile = TileFor(initial);
-        var stages = new List<SiegeObjectStage> { new(initial.Index, initialTile, PickupFor(initial)) };
+        var stages = new List<SiegeObjectStage>
+            { new(initial.Index, initialTile, PickupFor(initial), (initial.Behavior & 2) != 0) };
         if (initialTile is SiegeTile.Destructible or SiegeTile.Barrel or SiegeTile.Treasure ||
             IsActionableDoor(initial))
         {
@@ -237,7 +255,7 @@ public static class ImportedSiegeLayouts
             var targetVisual = targetTile is SiegeTile.Wall or SiegeTile.Door or SiegeTile.SecretDoor || target.Kind == 4
                 ? target.Index
                 : -1;
-            stages.Add(new(targetVisual, targetTile, PickupFor(target)));
+            stages.Add(new(targetVisual, targetTile, PickupFor(target), (target.Behavior & 2) != 0));
         }
         return new SiegeObjectSpawn(x - minX, y - minY, stages);
     }

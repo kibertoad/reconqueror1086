@@ -70,8 +70,24 @@ the strict post-deadline 200 ms tick independently of processor speed and input
 frequency. From zero, offsets advance `0,64,128,192`, then strict `> 0x80`
 crossing changes the cell and wraps to `-64`: 600 ms is the first transition
 and effect-cycle duration, not a universal cell cadence. Sustained straight
-movement takes four ticks/800 ms per cell. Route choice, collision deflection,
-and actor modes other than selected ground travel remain provisional.
+movement takes four ticks/800 ms per cell. Collision corner interactions,
+multi-actor destination behavior, and actor modes other than selected ground
+travel remain provisional.
+
+Mode-12 route and collision handling is narrower than that general caveat.
+Heading helper `0x445C4` followed by `(heading + 0x20) & 0xC0` aims directly
+at the destination at each three-tick effect boundary; exact diagonal ties
+choose the clockwise cardinal. Scheduler `0x53425`-`0x535E5` tests the
+neighboring map block's behavior bit `0x02` only beyond the strict
+`-0x59..0x59` band. With official flags `0x142`, rejection at
+`0x53BCE`-`0x53C6C` zeros the moving-axis remainder and turns a kind-4 actor
+90 degrees left; the next tick rerotates the local delta through the new
+heading. Completion is evaluated only after the three-tick effect returns to
+the actor thinker, even if the actor entered the target cell mid-cycle. Carry
+the original bit-2 blocker separately from visual tile labels and update it
+when authored object states change. Broader modes, corner interaction,
+multi-actor destination behavior, and exact ground-ray coordinates remain
+provisional.
 
 ## Git push destination
 

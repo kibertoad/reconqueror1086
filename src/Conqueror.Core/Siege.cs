@@ -53,7 +53,11 @@ public sealed record SiegeActorMovement(
 }
 public sealed record SiegePickupReward(SiegePickupRewardKind Kind, int Amount, int DieSides = 0,
     string? EquipmentName = null);
-public sealed record SiegeObjectStage(int VisualId, SiegeTile Tile, SiegePickupReward? Pickup = null);
+public sealed record SiegeObjectStage(
+    int VisualId, SiegeTile Tile, SiegePickupReward? Pickup = null, bool? BlocksMovement = null)
+{
+    internal bool MovementBlocked => BlocksMovement ?? Tile != SiegeTile.Floor;
+}
 public sealed record SiegeObjectSpawn(int X, int Y, IReadOnlyList<SiegeObjectStage> Stages);
 
 public sealed class SiegeObject
@@ -73,6 +77,7 @@ public sealed class SiegeObject
     public int VisualId => _stages[State].VisualId;
     public SiegeTile Tile => _stages[State].Tile;
     public SiegePickupReward? Pickup => _stages[State].Pickup;
+    internal bool MovementBlocked => _stages[State].MovementBlocked;
     internal bool Advance()
     {
         if (State + 1 >= _stages.Length) return false;
@@ -84,9 +89,11 @@ public sealed class SiegeObject
 public sealed class SiegeLayout
 {
     private readonly SiegeTile[,] _tiles;
+    private readonly bool[,] _movementBlocks;
 
     public SiegeLayout(SiegeTile[,] tiles, int playerX, int playerY, Facing facing, IReadOnlyList<SiegeSpawn> enemies,
-        IReadOnlyList<SiegeObjectSpawn>? objects = null, IReadOnlyList<SiegeSpawn>? retainers = null)
+        IReadOnlyList<SiegeObjectSpawn>? objects = null, IReadOnlyList<SiegeSpawn>? retainers = null,
+        bool[,]? movementBlocks = null)
     {
         ArgumentNullException.ThrowIfNull(tiles);
         ArgumentNullException.ThrowIfNull(enemies);
@@ -110,8 +117,12 @@ public sealed class SiegeLayout
         if (objects.Any(item => item.X < 0 || item.Y < 0 || item.X >= tiles.GetLength(0) || item.Y >= tiles.GetLength(1)
                 || item.Stages.Count == 0))
             throw new ArgumentException("Siege objects require a map cell and at least one state.", nameof(objects));
+        if (movementBlocks is not null && (movementBlocks.GetLength(0) != tiles.GetLength(0) ||
+                movementBlocks.GetLength(1) != tiles.GetLength(1)))
+            throw new ArgumentException("Movement-block map dimensions must match the siege layout.", nameof(movementBlocks));
 
         _tiles = (SiegeTile[,])tiles.Clone();
+        _movementBlocks = movementBlocks is null ? MovementBlocksFor(tiles) : (bool[,])movementBlocks.Clone();
         PlayerX = playerX;
         PlayerY = playerY;
         Facing = facing;
@@ -127,6 +138,19 @@ public sealed class SiegeLayout
     public IReadOnlyList<SiegeSpawn> Retainers { get; }
     public IReadOnlyList<SiegeObjectSpawn> Objects { get; }
     public SiegeTile[,] CopyTiles() => (SiegeTile[,])_tiles.Clone();
+    public bool BlocksMovementAt(int x, int y) =>
+        x < 0 || y < 0 || x >= _movementBlocks.GetLength(0) || y >= _movementBlocks.GetLength(1) ||
+        _movementBlocks[x, y];
+    internal bool[,] CopyMovementBlocks() => (bool[,])_movementBlocks.Clone();
+
+    private static bool[,] MovementBlocksFor(SiegeTile[,] tiles)
+    {
+        var result = new bool[tiles.GetLength(0), tiles.GetLength(1)];
+        for (var x = 0; x < tiles.GetLength(0); x++)
+        for (var y = 0; y < tiles.GetLength(1); y++)
+            result[x, y] = tiles[x, y] != SiegeTile.Floor;
+        return result;
+    }
 }
 
 public sealed partial class SiegeSession
@@ -138,6 +162,7 @@ public sealed partial class SiegeSession
     private readonly Player _player;
     private readonly Random _random;
     private readonly SiegeTile[,] _map;
+    private readonly bool[,] _movementBlocks;
     public IReadOnlyList<SiegeEnemy> Enemies => _enemies;
     private readonly List<SiegeEnemy> _enemies = [];
     public IReadOnlyList<SiegeRetainer> Retainers => _retainers;
@@ -177,6 +202,7 @@ public sealed partial class SiegeSession
         _player = player;
         _random = new Random(seed);
         _map = layout?.CopyTiles() ?? GenerateMap(Rules.Width, Rules.Height);
+        _movementBlocks = layout?.CopyMovementBlocks() ?? MovementBlocksFor(_map);
         if (layout is not null)
         {
             PlayerX = layout.PlayerX;
@@ -618,8 +644,16 @@ public sealed partial class SiegeSession
 
     private void ConsumeObjectAt(int x, int y)
     {
-        if (ObjectAt(x, y) is { } item && item.Advance()) _map[x, y] = item.Tile;
-        else _map[x, y] = SiegeTile.Floor;
+        if (ObjectAt(x, y) is { } item && item.Advance())
+        {
+            _map[x, y] = item.Tile;
+            _movementBlocks[x, y] = item.MovementBlocked;
+        }
+        else
+        {
+            _map[x, y] = SiegeTile.Floor;
+            _movementBlocks[x, y] = false;
+        }
     }
 
     private void TickEnemies()
@@ -851,6 +885,7 @@ public sealed partial class SiegeSession
     {
         if (!item.Advance()) return false;
         _map[item.X, item.Y] = item.Tile;
+        _movementBlocks[item.X, item.Y] = item.MovementBlocked;
         return true;
     }
 
