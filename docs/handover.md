@@ -47,7 +47,7 @@ dotnet run --project tools\Conqueror.Inspect --no-restore -- 'C:\GOG Games\Conqu
 ## Remaining high-priority gaps
 
 1. Confirm exact attack cadence and state-linked foreground timing.
-2. Close the last indirect campaign-scene callback and confirm behavior-19 pickup dispatch/timing.
+2. Close the last indirect campaign-scene callback and recover behavior-19 pickup reward semantics. Its explicit-action dispatch, strict `< 0x280` range, callback-before-replacement order, and immediate offset-`0x40` state transition are now Confirmed at `0x55524`-`0x55744` and implemented by `SiegeSession.Interact`/`CollectTile(x,y)` with two-cell-range and no-movement-collection tests.
 3. Replace provisional retainer, loot, siege consequence, and broader AI rules from evidence.
 4. Continue exact route/`JUMP!!`/spy recovery, estate tile mapping, and remaining sound/event bindings as ordered in the migration plan.
 

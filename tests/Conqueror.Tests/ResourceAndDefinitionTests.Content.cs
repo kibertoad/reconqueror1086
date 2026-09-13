@@ -161,10 +161,11 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal([(4, SiegeTile.Barrel), (6, SiegeTile.Floor)],
             item.Stages.Select(stage => (stage.VisualId, stage.Tile)));
         var siege = new SiegeSession(new Player(), new Army(), 0, 1, layout);
-        Assert.Equal(SiegeAction.Healed, siege.Move(false));
+        siege.TurnLeft();
+        siege.TurnLeft();
+        Assert.Equal(SiegeAction.Healed, siege.Interact());
         Assert.Equal((1, 6, SiegeTile.Floor),
             (siege.ObjectAt(9, 20)!.State, siege.ObjectAt(9, 20)!.VisualId, siege.TileAt(9, 20)));
-        Assert.Equal(SiegeAction.Moved, siege.Move(false));
         Assert.Contains(SiegeViewProjection.ProjectObjects(siege), projection =>
             projection.Object.X == 9 && projection.Object.VisualId == 6);
     }
@@ -190,9 +191,42 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal((1, 21, SiegeTile.Barrel),
             (Assert.Single(siege.Objects).State, Assert.Single(siege.Objects).VisualId, siege.TileAt(2, 1)));
         Assert.Equal(21, Assert.Single(SiegeViewProjection.ProjectObjects(siege)).Object.VisualId);
-        Assert.Equal(SiegeAction.Healed, siege.Move(true));
+        Assert.Equal(SiegeAction.Healed, siege.Interact());
         Assert.Equal((2, 22, SiegeTile.Floor),
             (Assert.Single(siege.Objects).State, Assert.Single(siege.Objects).VisualId, siege.TileAt(2, 1)));
+    }
+
+    [Fact]
+    public void PickupRequiresExplicitInteractionAndUsesOriginalTwoCellRange()
+    {
+        var tiles = new SiegeTile[6, 3];
+        for (var x = 0; x < 6; x++)
+        for (var y = 0; y < 3; y++)
+            tiles[x, y] = x == 0 || y == 0 || x == 5 || y == 2 ? SiegeTile.Wall : SiegeTile.Floor;
+        tiles[3, 1] = SiegeTile.Barrel;
+        var siege = new SiegeSession(new Player(), new Army(), 0, 1,
+            new SiegeLayout(tiles, 1, 1, Facing.East, [],
+                [new SiegeObjectSpawn(3, 1, [new(30, SiegeTile.Barrel), new(31, SiegeTile.Floor)])]));
+
+        Assert.Equal(SiegeAction.Healed, siege.Interact());
+        Assert.Equal(SiegeTile.Floor, siege.TileAt(3, 1));
+    }
+
+    [Fact]
+    public void WalkingOntoPickupDoesNotCollectIt()
+    {
+        var tiles = new SiegeTile[5, 3];
+        for (var x = 0; x < 5; x++)
+        for (var y = 0; y < 3; y++)
+            tiles[x, y] = x == 0 || y == 0 || x == 4 || y == 2 ? SiegeTile.Wall : SiegeTile.Floor;
+        tiles[2, 1] = SiegeTile.Barrel;
+        var siege = new SiegeSession(new Player(), new Army(), 0, 1,
+            new SiegeLayout(tiles, 1, 1, Facing.East, [],
+                [new SiegeObjectSpawn(2, 1, [new(30, SiegeTile.Barrel), new(31, SiegeTile.Floor)])]));
+
+        Assert.Equal(SiegeAction.Moved, siege.Move(true));
+        Assert.Equal(SiegeTile.Barrel, siege.TileAt(2, 1));
+        Assert.Equal(0, Assert.Single(siege.Objects).State);
     }
 
     [Fact]

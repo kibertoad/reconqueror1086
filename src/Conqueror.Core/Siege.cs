@@ -258,19 +258,32 @@ public sealed class SiegeSession
             LastMessage = "The way is blocked."; TickEnemies(); return SiegeAction.Blocked;
         }
         PlayerX = nx; PlayerY = ny;
-        var result = CollectTile();
         TickEnemies();
-        return result == SiegeAction.None ? SiegeAction.Moved : result;
+        return SiegeAction.Moved;
     }
 
     public SiegeAction Interact()
     {
-        var (dx, dy) = Direction(Facing); var x = PlayerX + dx; var y = PlayerY + dy;
-        if (TileAt(x, y) is SiegeTile.Door or SiegeTile.SecretDoor)
+        var (dx, dy) = Direction(Facing);
+        for (var distance = 1; distance <= 2; distance++)
         {
-            _map[x, y] = SiegeTile.OpeningDoor;
-            _openingDoors[(x, y)] = 0;
-            LastMessage = "The door opens."; TickEnemies(); return SiegeAction.DoorOpened;
+            var x = PlayerX + dx * distance;
+            var y = PlayerY + dy * distance;
+            var tile = TileAt(x, y);
+            if (tile is SiegeTile.Barrel or SiegeTile.Treasure)
+            {
+                var result = CollectTile(x, y);
+                TickEnemies();
+                return result;
+            }
+            if (tile is SiegeTile.Door or SiegeTile.SecretDoor)
+            {
+                _map[x, y] = SiegeTile.OpeningDoor;
+                _openingDoors[(x, y)] = 0;
+                LastMessage = "The door opens."; TickEnemies(); return SiegeAction.DoorOpened;
+            }
+            if (tile is SiegeTile.Wall or SiegeTile.OpeningDoor or SiegeTile.Destructible || EnemyAt(x, y) is not null)
+                break;
         }
         LastMessage = "Nothing happens."; TickEnemies(); return SiegeAction.None;
     }
@@ -377,18 +390,18 @@ public sealed class SiegeSession
         return armor;
     }
 
-    private SiegeAction CollectTile()
+    private SiegeAction CollectTile(int x, int y)
     {
-        var tile = TileAt(PlayerX, PlayerY);
+        var tile = TileAt(x, y);
         if (tile == SiegeTile.Barrel)
         {
             Health = Math.Min(MaxHealth, Health + Rules.FoodHealing);
-            ConsumeObjectAtPlayer();
+            ConsumeObjectAt(x, y);
             LastMessage = $"Food restores {Rules.FoodHealing} health."; return SiegeAction.Healed;
         }
         if (tile == SiegeTile.Treasure)
         {
-            ConsumeObjectAtPlayer();
+            ConsumeObjectAt(x, y);
             var gold = _random.Next(20, 81); GoldFound += gold; _player.Wealth += gold;
             if (_random.Next(2) == 0)
             {
@@ -401,10 +414,10 @@ public sealed class SiegeSession
         return SiegeAction.None;
     }
 
-    private void ConsumeObjectAtPlayer()
+    private void ConsumeObjectAt(int x, int y)
     {
-        if (ObjectAt(PlayerX, PlayerY) is { } item && item.Advance()) _map[PlayerX, PlayerY] = item.Tile;
-        else _map[PlayerX, PlayerY] = SiegeTile.Floor;
+        if (ObjectAt(x, y) is { } item && item.Advance()) _map[x, y] = item.Tile;
+        else _map[x, y] = SiegeTile.Floor;
     }
 
     private void TickEnemies()
