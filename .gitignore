@@ -36,6 +36,9 @@ ScaffoldingReadMe.txt
 analysis/original/artifacts/
 analysis/original/*.txt
 analysis/original/screenshots/
+analysis/original/ghidra/
+analysis/original/ghidra-appdata/
+analysis/original/ghidra-user/
 UserContent/
 
 # Runtime output
