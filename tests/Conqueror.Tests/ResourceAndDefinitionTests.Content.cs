@@ -862,6 +862,11 @@ public sealed partial class ResourceAndDefinitionTests
         {
             var offset = index * DynamixSceneDecoder.BlockSize;
             System.Text.Encoding.ASCII.GetBytes(names[index]).CopyTo(blocks, offset + 78);
+            WriteInt(blocks, offset + 0x10, 64);
+            WriteInt(blocks, offset + 0x14, 6);
+            WriteInt(blocks, offset + 0x18, 128);
+            WriteInt(blocks, offset + 0x1c, 0);
+            WriteInt(blocks, offset + 0x20, 256);
             WriteInt(blocks, offset + 44, 12 + index);
             WriteInt(blocks, offset + 12, 2);
             WriteInt(blocks, offset + 48, 13 + index);

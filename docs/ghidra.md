@@ -118,7 +118,7 @@ dotnet run --project tools\Conqueror.Inspect -- `
 
 For mode-12 routing, disassemble `0x445C4`, `0x4FF53`, and `0x530D0`. The first is the piecewise integer heading helper, the second applies cardinal quantization and rewrites descriptor flags `0x142` to live flags `0x112`, and the scheduler span through `0x53D5F` contains the strict movement bands, behavior-bit-2 neighbor test, flag-`0x10` early effect termination, and return to actor thinking. Compare `0x4FFD1`-`0x4FFDA` with `0x4FE27`-`0x4FE30`: the latter installs `0x40` for modes 5/6/17 and reaches the left-turn branch, while mode 12 does not. Corroborate the blocker predicate by grouping `Behavior & 2` and `Placed` from `scene-block-report.txt`, then join actor `Field40` state targets back to rows in the same archive to identify the underlying block restored after movement. Generated disassembly and census rows remain ignored owner-local evidence.
 
-For empty-ground projection, begin at viewer initialization `0x5421F`-`0x542E4`
+For pointer-contact projection, begin at viewer initialization `0x5421F`-`0x542E4`
 and pointer dispatcher `0x55524`, then decode all of `0x470A8` and traversal
 `0x45158` rather than labeling the former a generic floor-plane routine. Record
 the initialized elevation `0x80`, integer horizon `viewportHeight / 2`, and
@@ -126,13 +126,22 @@ viewport-width inputs. `0x470A8` constructs forward basis `0x4000` and lateral
 basis `((0x400000 / viewportWidth) * (pointerX - viewportWidth / 2)) >> 8`
 before rotation through `0x447C4`. `0x45158` normalizes the signed major axis to
 `0x100`, derives the minor increment by signed division, performs original map
-lookup with `& 0x7F`, and permits only `0x40` iterations. Follow candidate
-helper `0x44F7C` and the output stores before claiming an exact returned ground
-surface: kind-4 offsets, adjacent-cell/corner candidates, and pixel test
-`0x444E8` make `0x470A8` a projected-candidate picker. The formula and bound
-are Confirmed; the clean-room ground DDA is Corroborated pending exact helper,
-wrapping, and simultaneous-corner equivalence. GameFAQs FAQ 66730 has no
-low-level ray mathematics and must not be cited as corroboration for this trace.
+lookup with `& 0x7F`, and permits only `0x40` iterations. Intersection switch
+table `0x34A0C` maps kind 0 to no candidate, kinds 1/4 to an inclusive cell
+box, kinds 2/3 to horizontal/vertical center planes, and kinds 5/6 to the two
+diagonals. Helper `0x44F7C` stores at most 32 contact-x, contact-y, packed-face,
+and block-pointer entries at globals `1C220`, `1C1A0`, `1C2A0`, and `1C320`.
+`0x470A8` selects surfaces `+0x2C..+0x38`, flips north/east texture
+coordinates, projects `top = horizon - (upper - cameraElevation) *
+viewportWidth / depth` and `bottom = horizon + (cameraElevation - lower) *
+viewportWidth / depth` from block `+0x20/+0x1C`, and calls alpha sampler
+`0x444E8`; raw palette index zero is transparent. Primary flag-0 dispatch at
+`0x555AB` gives selected friendlies mode 12 at the contact cell before
+actor/object-specific actions. These mappings Disprove the former empty-floor
+plane. The runtime's first-solid DDA is Corroborated pending full
+multi-candidate order, cropped wrapping, diagonals, and simultaneous corners.
+GameFAQs FAQ 66730 has no low-level ray mathematics and must not be cited as
+corroboration for this trace.
 
 For public Retreat, trace the command handler `0x5744B` through transition helper `0x4E5F0`, acquisition `0x4F98D`, kind-0 transition `0x4E76B`, kind-1 transition `0x4E805`, and handlers `0x4FDCD`/`0x4FDAB`; a handler-table label alone is insufficient. Kind 0 selects mode 5 after visible-opponent acquisition and preserves heading with flags `0x142`; the scheduler's flag-`0x40` collision branch clears the blocked remainder and applies `(((heading + 0x20) & 0xC0) - 0x40) & 0xFF`. Kind 1 selects mode 4, whose acquisition-table entry repeats `0x4F98D`; decode mode 4 of the kind-1 table at object-1 `0x3E480` to transition `0x4E6D3`, which selects ranged mode 11 or fallback mode 1. Handler `0x5010B` aims at the acquired actor, uses a close branch at Manhattan fixed distance `<= 0x154`, otherwise raycasts, and requires returned distance to be strictly below object-2 raw contact column `0xCE24 + 28 * combatRow`. Its row-23/24 effect construction doubles descriptor field `+0x14`. The mode-9/10 handler at `0x50020` is a separate later-state route, not the immediate public Retreat path: relocation source `0x5009E` resolves object-2 offset `0x7CEA`, whose supported executable value is the double `1.5`. Use `0x446BC`, `0x4472C`, and `0x44740` when closing its non-cardinal motion; the quarter-wave table matches `round(sin(i * pi / 126) * 32767)` for `i=0..63`, and rotation rounds with `(product + 0x3FFF) >> 15`.
 

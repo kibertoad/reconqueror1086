@@ -69,30 +69,32 @@ change its collision behavior mid-cycle. Exact fixed-point ray equivalence,
 formation/path selection, and thinker cadence remain Provisional.
 
 First-person pointer dispatch is also mapped. Handler `0x55524` consumes the
-world hit returned by raycaster `0x470A8`: a friendly actor toggles selection;
-a hostile actor becomes requested mode-8 target `+0x24` for selected
-friendlies and consumes the click; with no selected friendly, the player acts
-on that exact hostile; and an explicit-action object is accepted only while
-ray distance is `< 0x280`. Preserve exact actor/object identity through input
-dispatch. The current renderer-consistent billboard/depth/alpha picker is an
-implementation mapping, not yet a claim that the original raycaster's full
-fixed-point projected-candidate selection has been reproduced. The empty-floor
-camera/vector component is recovered separately below.
+world hit returned by raycaster `0x470A8`. On primary flag 0, selected
+friendlies first receive the hit contact coordinates as requested mode 12 and
+consume the click; only otherwise does a friendly actor toggle selection, a
+hostile become an explicit mode-8/player target, or an actionable object pass
+the strict `< 0x280` distance test. Preserve this precedence and exact hit
+identity. The runtime now shares fixed horizontal rays, decoded vertical block
+bounds, depth, and texture alpha between rendering and picking. Its first-solid
+DDA remains Corroborated pending the original multi-candidate ordering,
+diagonal shapes, cropped wrapping, and corner behavior.
 
-Empty-ground clicks use requested mode 12. Dispatcher `0x555BE`-`0x5562E`
-writes the raycaster's integer coordinates to actor `+0x28/+0x2C` for selected
-actors and clears selection. Acquisition branch `0x4FD7B` completes when both
-coordinates match; handler `0x4FF53` derives heading from `target - current`,
-clears actor target `+0x24`, and schedules movement. Preserve that destination
-state and prior-command resumption. Viewer setup at `0x5421F`-`0x542E4`
+Requested mode 12 uses a projected surface contact, not empty ground.
+Dispatcher `0x555AB`-`0x5562E` writes the raycaster's integer coordinates to
+actor `+0x28/+0x2C` for selected actors and clears selection. Acquisition branch
+`0x4FD7B` completes when both coordinates match; handler `0x4FF53` derives
+heading from `target - current`, clears actor target `+0x24`, and schedules
+movement. The destination may name a blocked contact cell; movement collision
+decides whether it is enterable. Viewer setup at `0x5421F`-`0x542E4`
 initializes elevation `0x80`, horizon `height / 2`, and ray width from the
 viewport width. Raycaster `0x470A8` forms its horizontal basis as
 `0x4000 + (((0x400000 / width) * (x - width / 2)) >> 8)` and traversal
 `0x45158` normalizes the major axis to signed `0x100` for at most `0x40` map
-steps. `GroundCell` preserves that fixed-point camera/vector formula and bound
-for empty-floor orders. The candidate helper's exact returned surface, wrapped
-128-cell source-map lookup, and simultaneous corner treatment remain
-Provisional; do not infer them from the compatibility ground DDA. GameFAQs FAQ
+steps. Switch table `0x34A0C` sends kind 0 to no candidate, kinds 1/4 to a
+cell box, kinds 2/3 to center planes, and kinds 5/6 to opposing diagonals.
+`0x44F7C` records at most 32 contacts, while `0x470A8` projects each block's
+`+0x1C/+0x20` lower/upper elevations and samples its texture through `0x444E8`.
+The former below-horizon floor-plane implementation is Disproved. GameFAQs FAQ
 66730 is a trusted gameplay starting point but contains no internal projection
 math and does not corroborate these formulas.
 

@@ -27,37 +27,41 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
-    public void LowerViewportPointerMapsToVisibleGroundInFrontOfThePlayer()
+    public void PrimaryPointerRequiresAProjectedBlockRatherThanInventingAFloorPlane()
     {
         var tiles = new SiegeTile[12, 12];
         var battle = new SiegeSession(new Player(), new Army(), 0, 1,
             new SiegeLayout(tiles, 5, 5, Facing.North, []));
 
-        Assert.Equal((5, 4), SiegeViewProjection.GroundCell(battle, 83, 116, 167, 117));
-        Assert.Null(SiegeViewProjection.GroundCell(battle, 83, 58, 167, 117));
+        Assert.Null(SiegeViewProjection.GroundCell(battle, 83, 116, 167, 117));
 
-        tiles[5, 4] = SiegeTile.Wall;
-        var blocked = new SiegeSession(new Player(), new Army(), 0, 1,
+        tiles[5, 3] = SiegeTile.Wall;
+        var projected = new SiegeSession(new Player(), new Army(), 0, 1,
             new SiegeLayout(tiles, 5, 5, Facing.North, []));
-        Assert.Null(SiegeViewProjection.GroundCell(blocked, 83, 116, 167, 117));
+        Assert.Equal((5, 3), SiegeViewProjection.GroundCell(projected, 83, 58, 167, 117));
+        Assert.Null(SiegeViewProjection.GroundCell(projected, 83, 116, 167, 117));
     }
 
     [Fact]
-    public void GroundPointerUsesTheExecutableFixedPointCameraAndTraversalLimit()
+    public void PointerContactUsesTheExecutableFixedPointCameraAndTraversalLimit()
     {
         var tiles = new SiegeTile[128, 128];
+        tiles[64, 58] = SiegeTile.Wall;
+        tiles[43, 58] = SiegeTile.Wall;
+        tiles[85, 58] = SiegeTile.Wall;
         var battle = new SiegeSession(new Player(), new Army(), 0, 1,
             new SiegeLayout(tiles, 64, 100, Facing.North, []));
 
         Assert.Equal((64, 58), SiegeViewProjection.GroundCell(battle, 83, 60, 167, 117));
         Assert.Equal((43, 58), SiegeViewProjection.GroundCell(battle, 0, 60, 167, 117));
         Assert.Equal((85, 58), SiegeViewProjection.GroundCell(battle, 166, 60, 167, 117));
-        Assert.Null(SiegeViewProjection.GroundCell(battle, 83, 59, 167, 117));
+        Assert.Null(SiegeViewProjection.GroundCell(battle, 83, 61, 167, 117));
 
-        tiles[64, 80] = SiegeTile.Wall;
-        var blocked = new SiegeSession(new Player(), new Army(), 0, 1,
-            new SiegeLayout(tiles, 64, 100, Facing.North, []));
-        Assert.Null(SiegeViewProjection.GroundCell(blocked, 83, 60, 167, 117));
+        var beyondLimit = new SiegeTile[128, 128];
+        beyondLimit[64, 35] = SiegeTile.Wall;
+        var limited = new SiegeSession(new Player(), new Army(), 0, 1,
+            new SiegeLayout(beyondLimit, 64, 100, Facing.North, []));
+        Assert.Null(SiegeViewProjection.GroundCell(limited, 83, 58, 167, 117));
     }
 
     [Fact]
@@ -124,6 +128,30 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal((0, 0), (friendly.OffsetX8, friendly.OffsetY8));
         Assert.Equal(SiegeRetainerCommand.Defend, friendly.Command);
         Assert.False(friendly.Selected);
+    }
+
+    [Fact]
+    public void SelectedRetainersAcceptAProjectedBlockedContactAndLetMovementRejectIt()
+    {
+        var tiles = new SiegeTile[10, 10];
+        tiles[2, 3] = SiegeTile.Wall;
+        var army = new Army();
+        army.Units[UnitType.Swordsmen] = 1;
+        var battle = new SiegeSession(new Player(), army, 0, 4,
+            new SiegeLayout(tiles, 1, 2, Facing.East, [],
+                retainers: [new SiegeSpawn(2, 2, false, OriginalHealth: 10)]));
+        var friendly = Assert.Single(battle.Retainers);
+        battle.ToggleRetainerSelection(friendly);
+
+        Assert.True(battle.CommandSelectedRetainersTo(2, 3));
+        Assert.False(friendly.Selected);
+        battle.AdvanceRetainerMovement(0.6001);
+
+        Assert.Equal((2, 2), (friendly.X, friendly.Y));
+        Assert.Equal((0, 64), (friendly.OffsetX8, friendly.OffsetY8));
+        battle.AdvanceRetainerMovement(0.6001);
+        Assert.Equal((2, 2, 0, 64),
+            (friendly.X, friendly.Y, friendly.OffsetX8, friendly.OffsetY8));
     }
 
     [Fact]

@@ -344,7 +344,6 @@ public sealed partial class SiegeSession
 
     public bool CommandSelectedRetainersTo(int x, int y)
     {
-        if (TileAt(x, y) != SiegeTile.Floor) return false;
         var living = _retainers.Where(retainer => retainer.Health > 0).ToArray();
         var selected = living.Where(retainer => retainer.Selected).ToArray();
         if (selected.Length == 0) return false;
@@ -355,7 +354,7 @@ public sealed partial class SiegeSession
             ResetRetainerMovement(retainer);
         }
         foreach (var retainer in living) retainer.Selected = false;
-        LastMessage = "Retainers move to the selected ground.";
+        LastMessage = "Retainers move to the selected point.";
         return true;
     }
 

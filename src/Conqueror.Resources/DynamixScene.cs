@@ -45,6 +45,14 @@ public sealed record DynamixSceneBlock(
     int ActorCombatRow,
     string Name)
 {
+    // CONQUER.EXE 0x470A8-0x474D3 uses these raw projection fields. Width is
+    // the decoded texture height at +0x18; Height is upper elevation +0x20.
+    public int TextureWidth { get; init; }
+    public int TextureWidthShift { get; init; }
+    public int LowerElevation { get; init; }
+    public int TextureHeight => Width;
+    public int UpperElevation => Height;
+
     public (int TextureIndex, bool FlipHorizontally) TextureForBillboardHeading(int relativeHeading)
     {
         if (Kind != 4 || Surface0 < 0 || Surface2 is <= 0 or > 256)
@@ -207,7 +215,12 @@ public static class DynamixSceneDecoder
                 BinaryPrimitives.ReadInt16LittleEndian(record.Slice(0x4c, sizeof(short))),
                 BinaryPrimitives.ReadInt16LittleEndian(record.Slice(0x4a, sizeof(short))),
                 BinaryPrimitives.ReadInt16LittleEndian(record.Slice(0x4c, sizeof(short))),
-                DecodeName(record.Slice(BlockNameOffset, BlockNameSize), index));
+                DecodeName(record.Slice(BlockNameOffset, BlockNameSize), index))
+            {
+                TextureWidth = ReadInt32(record, 0x10),
+                TextureWidthShift = ReadInt32(record, 0x14),
+                LowerElevation = ReadInt32(record, 0x1c)
+            };
             if (decoded.TextureReferences()
                 .Any(surface => surface < -1 || surface >= textureCount))
                 throw new InvalidDataException($"Scene block {index} references a texture outside the Scenario table.");

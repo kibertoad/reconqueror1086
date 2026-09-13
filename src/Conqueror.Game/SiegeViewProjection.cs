@@ -6,7 +6,13 @@ public enum SiegeWallFace { North, East, South, West }
 
 public readonly record struct SiegeRayHit(
     double Distance, SiegeTile Tile, bool HitVerticalSide, SiegeWallFace Face,
-    int MapX, int MapY, double TextureOffset);
+    int MapX, int MapY, double TextureOffset)
+{
+    public int Distance8 { get; init; }
+    public int ContactX8 { get; init; }
+    public int ContactY8 { get; init; }
+    public bool ContactedBlock { get; init; }
+}
 public readonly record struct SiegeEnemyProjection(double ScreenPosition, double ForwardDistance, SiegeEnemy Enemy);
 public readonly record struct SiegeObjectProjection(double ScreenPosition, double ForwardDistance, SiegeObject Object);
 public readonly record struct SiegeEnemyFrame(int DirectionOffset, bool FlipHorizontally);
@@ -26,53 +32,88 @@ public static class SiegeViewProjection
     public static SiegeRayHit Cast(SiegeSession siege, double cameraPosition)
     {
         ArgumentNullException.ThrowIfNull(siege);
-        var (forwardX, forwardY) = Direction(siege.Facing);
-        var angle = Math.Atan2(forwardY, forwardX) + cameraPosition * FieldOfView / 2.0;
-        var rayX = Math.Cos(angle);
-        var rayY = Math.Sin(angle);
+        if (!double.IsFinite(cameraPosition) || cameraPosition is < -1 or > 1)
+            throw new ArgumentOutOfRangeException(nameof(cameraPosition));
+        return CastFixed(siege, (int)Math.Round(cameraPosition * 0x2000));
+    }
+
+    public static SiegeRayHit CastColumn(SiegeSession siege, int column, int viewportWidth)
+    {
+        ArgumentNullException.ThrowIfNull(siege);
+        if (viewportWidth <= 1) throw new ArgumentOutOfRangeException(nameof(viewportWidth));
+        if (column < 0 || column >= viewportWidth) throw new ArgumentOutOfRangeException(nameof(column));
+        var lateral14 = (0x400000 / viewportWidth * (column - viewportWidth / 2)) >> 8;
+        return CastFixed(siege, lateral14);
+    }
+
+    private static SiegeRayHit CastFixed(SiegeSession siege, int lateral14)
+    {
+        var (forwardX, forwardY) = CardinalDirection(siege.Facing);
+        var rightX = -forwardY;
+        var rightY = forwardX;
+        var rayX = forwardX * OriginalRayForward14 + rightX * lateral14;
+        var rayY = forwardY * OriginalRayForward14 + rightY * lateral14;
+        var originX8 = (siege.PlayerX << 8) + 0x80;
+        var originY8 = (siege.PlayerY << 8) + 0x80;
         var mapX = siege.PlayerX;
         var mapY = siege.PlayerY;
-        var originX = siege.PlayerX + 0.5;
-        var originY = siege.PlayerY + 0.5;
-        var deltaX = rayX == 0 ? double.PositiveInfinity : Math.Abs(1.0 / rayX);
-        var deltaY = rayY == 0 ? double.PositiveInfinity : Math.Abs(1.0 / rayY);
-        var stepX = rayX < 0 ? -1 : 1;
-        var stepY = rayY < 0 ? -1 : 1;
-        var sideX = rayX < 0 ? (originX - mapX) * deltaX : (mapX + 1.0 - originX) * deltaX;
-        var sideY = rayY < 0 ? (originY - mapY) * deltaY : (mapY + 1.0 - originY) * deltaY;
+        var stepX = Math.Sign(rayX);
+        var stepY = Math.Sign(rayY);
+        var absoluteX = Math.Abs(rayX);
+        var absoluteY = Math.Abs(rayY);
+        var numeratorX = stepX < 0 ? originX8 - (mapX << 8) : ((mapX + 1) << 8) - originX8;
+        var numeratorY = stepY < 0 ? originY8 - (mapY << 8) : ((mapY + 1) << 8) - originY8;
 
-        for (var step = 0; step < 256; step++)
+        for (var step = 0; step < OriginalRayTraversalSteps; step++)
         {
-            bool vertical;
-            double distance;
-            if (sideX < sideY)
+            var crossX = stepX == 0 ? long.MaxValue : (long)numeratorX * absoluteY;
+            var crossY = stepY == 0 ? long.MaxValue : (long)numeratorY * absoluteX;
+            var vertical = crossX < crossY;
+            int contactX8;
+            int contactY8;
+            SiegeWallFace face;
+            if (vertical)
             {
-                distance = sideX;
-                sideX += deltaX;
+                var boundaryX8 = stepX > 0 ? (mapX + 1) << 8 : mapX << 8;
+                contactX8 = stepX > 0 ? boundaryX8 : boundaryX8 - 1;
+                contactY8 = originY8 + (int)((long)rayY * (boundaryX8 - originX8) / rayX);
                 mapX += stepX;
-                vertical = true;
+                numeratorX += 0x100;
+                face = stepX > 0 ? SiegeWallFace.West : SiegeWallFace.East;
             }
             else
             {
-                distance = sideY;
-                sideY += deltaY;
+                var boundaryY8 = stepY > 0 ? (mapY + 1) << 8 : mapY << 8;
+                contactY8 = stepY > 0 ? boundaryY8 : boundaryY8 - 1;
+                contactX8 = originX8 + (int)((long)rayX * (boundaryY8 - originY8) / rayY);
                 mapY += stepY;
-                vertical = false;
+                numeratorY += 0x100;
+                face = stepY > 0 ? SiegeWallFace.North : SiegeWallFace.South;
             }
 
             var tile = siege.TileAt(mapX, mapY);
-            if (!IsSolid(tile) && distance < MaximumDistance) continue;
-            var corrected = Math.Max(0.01, Math.Min(distance, MaximumDistance) * Math.Cos(cameraPosition * FieldOfView / 2.0));
-            var textureOffset = vertical ? originY + rayY * distance : originX + rayX * distance;
-            textureOffset -= Math.Floor(textureOffset);
-            if ((vertical && rayX > 0) || (!vertical && rayY < 0)) textureOffset = 1.0 - textureOffset;
-            var face = vertical
-                ? stepX > 0 ? SiegeWallFace.West : SiegeWallFace.East
-                : stepY > 0 ? SiegeWallFace.North : SiegeWallFace.South;
-            return new SiegeRayHit(corrected, tile, vertical, face, mapX, mapY, textureOffset);
+            if (!IsSolid(tile)) continue;
+            var distance8 = (contactX8 - originX8) * forwardX + (contactY8 - originY8) * forwardY;
+            var coordinate = vertical ? contactY8 & 0xff : contactX8 & 0xff;
+            if (face is SiegeWallFace.North or SiegeWallFace.East) coordinate = 0xff - coordinate;
+            return new SiegeRayHit(
+                Math.Max(0.01, distance8 / 256d), tile, vertical, face, mapX, mapY, coordinate / 256d)
+            {
+                Distance8 = distance8,
+                ContactX8 = contactX8,
+                ContactY8 = contactY8,
+                ContactedBlock = true
+            };
         }
 
-        return new SiegeRayHit(MaximumDistance, SiegeTile.Wall, false, SiegeWallFace.North, mapX, mapY, 0);
+        var fallbackDistance8 = OriginalRayTraversalSteps << 8;
+        return new SiegeRayHit(
+            OriginalRayTraversalSteps, SiegeTile.Wall, false, SiegeWallFace.North, mapX, mapY, 0)
+        {
+            Distance8 = fallbackDistance8,
+            ContactX8 = originX8 + forwardX * fallbackDistance8,
+            ContactY8 = originY8 + forwardY * fallbackDistance8
+        };
     }
 
     public static IReadOnlyList<SiegeEnemyProjection> ProjectEnemies(SiegeSession siege)
@@ -175,60 +216,14 @@ public static class SiegeViewProjection
         if (viewportHeight <= 1) throw new ArgumentOutOfRangeException(nameof(viewportHeight));
         if (pointerX < 0 || pointerY < 0 || pointerX >= viewportWidth || pointerY >= viewportHeight)
             return null;
+        var hit = CastColumn(siege, pointerX, viewportWidth);
+        if (!hit.ContactedBlock || hit.Distance8 <= 0) return null;
+        // The common official wall span is 0..0x100 around viewer elevation
+        // 0x80. Full block-specific bounds and alpha are applied by the game.
         var horizon = viewportHeight / 2;
-        var verticalOffset = pointerY - horizon;
-        if (verticalOffset <= 0) return null;
-        // Viewer init 0x5421F uses elevation 0x80 and horizon H/2; 0x470A8
-        // builds the horizontal ray as 0x4000 + ((0x400000 / W) * dx >> 8).
-        var forward8 = OriginalCameraHeight8 * viewportWidth / verticalOffset;
-        var lateral14 = (0x400000 / viewportWidth * (pointerX - viewportWidth / 2)) >> 8;
-        var lateral8 = lateral14 * forward8 / OriginalRayForward14;
-        var (forwardX, forwardY) = CardinalDirection(siege.Facing);
-        var rightX = -forwardY;
-        var rightY = forwardX;
-        var originX8 = (siege.PlayerX << 8) + 0x80;
-        var originY8 = (siege.PlayerY << 8) + 0x80;
-        var contactX8 = originX8 + forwardX * forward8 + rightX * lateral8;
-        var contactY8 = originY8 + forwardY * forward8 + rightY * lateral8;
-        if (!GroundPathOpen(siege, originX8, originY8, contactX8, contactY8)) return null;
-        var x = contactX8 >> 8;
-        var y = contactY8 >> 8;
-        return siege.TileAt(x, y) == SiegeTile.Floor ? (x, y) : null;
-    }
-
-    private static bool GroundPathOpen(
-        SiegeSession siege, int originX8, int originY8, int contactX8, int contactY8)
-    {
-        var mapX = originX8 >> 8;
-        var mapY = originY8 >> 8;
-        var targetX = contactX8 >> 8;
-        var targetY = contactY8 >> 8;
-        var deltaX = contactX8 - originX8;
-        var deltaY = contactY8 - originY8;
-        var stepX = Math.Sign(deltaX);
-        var stepY = Math.Sign(deltaY);
-        var absoluteX = Math.Abs(deltaX);
-        var absoluteY = Math.Abs(deltaY);
-        var numeratorX = stepX < 0 ? originX8 - (mapX << 8) : ((mapX + 1) << 8) - originX8;
-        var numeratorY = stepY < 0 ? originY8 - (mapY << 8) : ((mapY + 1) << 8) - originY8;
-
-        for (var step = 0; step < OriginalRayTraversalSteps && (mapX != targetX || mapY != targetY); step++)
-        {
-            var crossX = stepX == 0 ? long.MaxValue : (long)numeratorX * absoluteY;
-            var crossY = stepY == 0 ? long.MaxValue : (long)numeratorY * absoluteX;
-            if (crossX < crossY)
-            {
-                mapX += stepX;
-                numeratorX += 0x100;
-            }
-            else
-            {
-                mapY += stepY;
-                numeratorY += 0x100;
-            }
-            if (IsSolid(siege.TileAt(mapX, mapY))) return false;
-        }
-        return mapX == targetX && mapY == targetY;
+        var halfHeight = OriginalCameraHeight8 * viewportWidth / hit.Distance8;
+        if (pointerY < horizon - halfHeight || pointerY > horizon + halfHeight) return null;
+        return (hit.ContactX8 >> 8, hit.ContactY8 >> 8);
     }
 
     private static SiegeBillboardLayout BillboardLayout(

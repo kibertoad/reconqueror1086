@@ -255,15 +255,7 @@ public sealed partial class ConquerorGame
 
     private Texture2D? SceneWallTexture(SiegeRayHit hit)
     {
-        if (_siegeVisuals is null) return null;
-        var sourceX = hit.MapX + _siegeVisuals.SourceOriginX;
-        var sourceY = hit.MapY + _siegeVisuals.SourceOriginY;
-        if (sourceX is < 0 or >= DynamixScene.MapWidth || sourceY is < 0 or >= DynamixScene.MapHeight)
-            return null;
-        var block = _siegeVisuals.Scene.BlockAt(sourceX, sourceY);
-        if (_siege?.ObjectAt(hit.MapX, hit.MapY) is { VisualId: >= 0 } state &&
-            state.VisualId < _siegeVisuals.Scene.Blocks.Count)
-            block = _siegeVisuals.Scene.Blocks[state.VisualId];
+        if (_siegeVisuals is null || SceneBlockForHit(hit) is not { } block) return null;
         var face = hit.Face switch
         {
             SiegeWallFace.North => DynamixSceneFace.North,
@@ -274,6 +266,31 @@ public sealed partial class ConquerorGame
         var colorMapIndex = SiegeColorMapping.WallDistanceMap(
             hit.Distance, _siegeVisuals.Scene.ColorMapping, block.ColorMapOffset);
         return _siegeVisuals.TextureFor(block.TextureForFace(face), colorMapIndex);
+    }
+
+    private DynamixSceneBlock? SceneBlockForHit(SiegeRayHit hit)
+    {
+        if (_siegeVisuals is null) return null;
+        var sourceX = hit.MapX + _siegeVisuals.SourceOriginX;
+        var sourceY = hit.MapY + _siegeVisuals.SourceOriginY;
+        if (sourceX is < 0 or >= DynamixScene.MapWidth || sourceY is < 0 or >= DynamixScene.MapHeight)
+            return null;
+        if (_siege?.ObjectAt(hit.MapX, hit.MapY) is { VisualId: >= 0 } state &&
+            state.VisualId < _siegeVisuals.Scene.Blocks.Count)
+            return _siegeVisuals.Scene.Blocks[state.VisualId];
+        return _siegeVisuals.Scene.BlockAt(sourceX, sourceY);
+    }
+
+    private Rectangle SiegeWallBounds(SiegeRayHit hit, Rectangle viewport)
+    {
+        var block = SceneBlockForHit(hit);
+        var lower = block?.LowerElevation ?? 0;
+        var upper = block?.UpperElevation ?? 0x100;
+        var depth8 = Math.Max(0x10, hit.Distance8);
+        var horizon = viewport.Y + viewport.Height / 2;
+        var top = Math.Max(viewport.Top, horizon - (upper - 0x80) * viewport.Width / depth8);
+        var bottom = Math.Min(viewport.Bottom - 1, horizon + (0x80 - lower) * viewport.Width / depth8);
+        return new Rectangle(viewport.X, top, viewport.Width, Math.Max(1, bottom - top + 1));
     }
 
     private (Texture2D? Texture, bool Flip) SceneEnemyTexture(SiegeEnemy enemy)
@@ -377,11 +394,9 @@ public sealed partial class ConquerorGame
         var depths = new double[viewport.Width];
         for (var column = 0; column < viewport.Width; column++)
         {
-            var camera = 2.0 * column / (viewport.Width - 1) - 1.0;
-            var hit = SiegeViewProjection.Cast(_siege, camera);
+            var hit = SiegeViewProjection.CastColumn(_siege, column, viewport.Width);
             depths[column] = hit.Distance;
-            var wallHeight = Math.Min(viewport.Height, (int)(viewport.Height / hit.Distance));
-            var top = viewport.Center.Y - wallHeight / 2;
+            var wall = SiegeWallBounds(hit, viewport);
             var baseColor = hit.Tile switch
             {
                 SiegeTile.Door => new Color(126, 83, 48),
@@ -393,12 +408,12 @@ public sealed partial class ConquerorGame
             if (SceneWallTexture(hit) is { } wallTexture)
             {
                 var sourceX = Math.Clamp((int)(hit.TextureOffset * wallTexture.Width), 0, wallTexture.Width - 1);
-                _batch.Draw(wallTexture, new Rectangle(viewport.X + column, top, 1, wallHeight),
+                _batch.Draw(wallTexture, new Rectangle(viewport.X + column, wall.Y, 1, wall.Height),
                     new Rectangle(sourceX, 0, 1, wallTexture.Height), Color.White);
             }
             else
             {
-                Fill(new Rectangle(viewport.X + column, top, 1, wallHeight), baseColor * distanceShade);
+                Fill(new Rectangle(viewport.X + column, wall.Y, 1, wall.Height), baseColor * distanceShade);
             }
         }
         var actors = SiegeViewProjection.ProjectEnemies(_siege)
