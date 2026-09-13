@@ -163,7 +163,7 @@ public sealed partial class ResourceAndDefinitionTests
         var scene = DynamixSceneDecoder.Decode(source.Viewer, source.Scenario, source.Map, source.Blocks);
 
         Assert.Equal((10, 20, 16384), (scene.Viewer.CellX, scene.Viewer.CellY, scene.Viewer.Heading));
-        Assert.Equal((7, 32, 1), (scene.Blocks.Count, scene.TextureCount, scene.SoundEffectCount));
+        Assert.Equal((7, 32, 1), (scene.Blocks.Count, scene.TextureCount, scene.EffectDefinitionCount));
         Assert.Equal((new DynamixSceneColorMapping(true, 32, 10, 20), 2),
             (scene.ColorMapping, scene.Blocks[0].ColorMapOffset));
         Assert.Equal("arched door", scene.BlockAt(11, 20).Name);

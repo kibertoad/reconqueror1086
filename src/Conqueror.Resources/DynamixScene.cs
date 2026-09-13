@@ -33,6 +33,7 @@ public sealed record DynamixSceneBlock(
     int Surface1,
     int Surface2,
     int Surface3,
+    int EffectDefinitionIndex,
     int StateTarget,
     int ActorTemplate,
     int ActorCombatRow,
@@ -71,22 +72,25 @@ public sealed class DynamixScene
         DynamixSceneViewer viewer,
         DynamixSceneColorMapping colorMapping,
         int textureCount,
-        int soundEffectCount,
+        int effectDefinitionCount,
         DynamixSceneBlock[] blocks,
-        ushort[] cells)
+        ushort[] cells,
+        IReadOnlyList<DynamixSceneEffectDefinition> effectDefinitions)
     {
         Viewer = viewer;
         ColorMapping = colorMapping;
         TextureCount = textureCount;
-        SoundEffectCount = soundEffectCount;
+        EffectDefinitionCount = effectDefinitionCount;
         Blocks = blocks;
+        EffectDefinitions = effectDefinitions;
         _cells = cells;
     }
 
     public DynamixSceneViewer Viewer { get; }
     public DynamixSceneColorMapping ColorMapping { get; }
     public int TextureCount { get; }
-    public int SoundEffectCount { get; }
+    public int EffectDefinitionCount { get; }
+    public IReadOnlyList<DynamixSceneEffectDefinition> EffectDefinitions { get; }
     public IReadOnlyList<DynamixSceneBlock> Blocks { get; }
 
     // The original resource stores complete Y columns consecutively.
@@ -113,7 +117,23 @@ public static class DynamixSceneDecoder
         ReadOnlySpan<byte> viewer,
         ReadOnlySpan<byte> scenario,
         ReadOnlySpan<byte> map,
-        ReadOnlySpan<byte> blocks)
+        ReadOnlySpan<byte> blocks) => Decode(viewer, scenario, map, blocks, default, requireEffectDefinitions: false);
+
+    public static DynamixScene Decode(
+        ReadOnlySpan<byte> viewer,
+        ReadOnlySpan<byte> scenario,
+        ReadOnlySpan<byte> map,
+        ReadOnlySpan<byte> blocks,
+        ReadOnlySpan<byte> effectDefinitions) =>
+        Decode(viewer, scenario, map, blocks, effectDefinitions, requireEffectDefinitions: true);
+
+    private static DynamixScene Decode(
+        ReadOnlySpan<byte> viewer,
+        ReadOnlySpan<byte> scenario,
+        ReadOnlySpan<byte> map,
+        ReadOnlySpan<byte> blocks,
+        ReadOnlySpan<byte> effectDefinitions,
+        bool requireEffectDefinitions)
     {
         if (viewer.Length != ViewerSize) throw new InvalidDataException($"Scene Viewer must be exactly {ViewerSize} bytes.");
         if (scenario.Length != ScenarioSize) throw new InvalidDataException($"Scene Scenario must be exactly {ScenarioSize} bytes.");
@@ -121,7 +141,7 @@ public static class DynamixSceneDecoder
 
         var textureCount = ReadInt32(scenario, 20);
         var blockCount = ReadInt32(scenario, 24);
-        var soundEffectCount = ReadInt32(scenario, 28);
+        var effectDefinitionCount = ReadInt32(scenario, 28);
         var colorMappingEnabled = ReadInt32(scenario, 40);
         if (colorMappingEnabled is not (0 or 1))
             throw new InvalidDataException("Scene color-map enable flag is invalid.");
@@ -132,7 +152,7 @@ public static class DynamixSceneDecoder
             ReadInt32(scenario, 52));
         if (textureCount is < 1 or > 4096) throw new InvalidDataException("Scene texture count is outside bounded limits.");
         if (blockCount is < 1 or > 4096) throw new InvalidDataException("Scene block count is outside bounded limits.");
-        if (soundEffectCount is < 0 or > 4096) throw new InvalidDataException("Scene sound-effect count is outside bounded limits.");
+        if (effectDefinitionCount is < 0 or > 4096) throw new InvalidDataException("Scene SFXDEFS count is outside bounded limits.");
         if (colorMapping.Enabled && (colorMapping.MapCount is < 1 or > DynamixSceneColorMaps.Count
             || colorMapping.DistanceShift is < 2 or > 30
             || colorMapping.BlendTarget is < 0 or >= DynamixSceneColorMaps.EntryCount))
@@ -154,10 +174,11 @@ public static class DynamixSceneDecoder
                 ReadInt32(record, 12),
                 ReadInt32(record, 24),
                 ReadInt32(record, 32),
-                ReadInt32(record, 44),
+                BinaryPrimitives.ReadInt16LittleEndian(record.Slice(44, sizeof(short))),
                 ReadInt32(record, 48),
                 ReadInt32(record, 52),
                 ReadInt32(record, 56),
+                BinaryPrimitives.ReadInt16LittleEndian(record.Slice(46, sizeof(short))),
                 ReadInt32(record, 64),
                 BinaryPrimitives.ReadInt16LittleEndian(record.Slice(0x4a, sizeof(short))),
                 BinaryPrimitives.ReadInt16LittleEndian(record.Slice(0x4c, sizeof(short))),
@@ -165,6 +186,9 @@ public static class DynamixSceneDecoder
             if (decoded.TextureReferences()
                 .Any(surface => surface < -1 || surface >= textureCount))
                 throw new InvalidDataException($"Scene block {index} references a texture outside the Scenario table.");
+            if (requireEffectDefinitions &&
+                (decoded.EffectDefinitionIndex < -1 || decoded.EffectDefinitionIndex >= effectDefinitionCount))
+                throw new InvalidDataException($"Scene block {index} references an effect outside SFXDEFS.");
             decodedBlocks[index] = decoded;
         }
 
@@ -184,7 +208,11 @@ public static class DynamixSceneDecoder
         if (decodedViewer.Heading is < 0 or > ushort.MaxValue)
             throw new InvalidDataException("Scene Viewer heading is outside its 16-bit turn range.");
 
-        return new(decodedViewer, colorMapping, textureCount, soundEffectCount, decodedBlocks, cells);
+        var decodedEffects = requireEffectDefinitions
+            ? DynamixSceneEffectDecoder.Decode(effectDefinitions, effectDefinitionCount, blockCount)
+            : Array.Empty<DynamixSceneEffectDefinition>();
+        return new(decodedViewer, colorMapping, textureCount, effectDefinitionCount,
+            decodedBlocks, cells, decodedEffects);
     }
 
     private static int ReadInt32(ReadOnlySpan<byte> bytes, int offset) =>

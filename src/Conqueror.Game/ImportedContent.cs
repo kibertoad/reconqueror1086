@@ -291,10 +291,13 @@ public sealed class ImportedContentCatalog
             x.Id.StartsWith(prefix + "#", StringComparison.OrdinalIgnoreCase))?.Id;
         var blocksId = _assets.FirstOrDefault(x => x.Id.EndsWith(":Blocks", StringComparison.OrdinalIgnoreCase) &&
             x.Id.StartsWith(prefix + "#", StringComparison.OrdinalIgnoreCase))?.Id;
-        if (viewerId is null || scenarioId is null || mapId is null || blocksId is null) return null;
+        var effectsId = _assets.FirstOrDefault(x => x.Id.EndsWith(":SFXDEFS", StringComparison.OrdinalIgnoreCase) &&
+            x.Id.StartsWith(prefix + "#", StringComparison.OrdinalIgnoreCase))?.Id;
+        if (viewerId is null || scenarioId is null || mapId is null || blocksId is null || effectsId is null) return null;
         try
         {
-            return DynamixSceneDecoder.Decode(ReadBytes(viewerId), ReadBytes(scenarioId), ReadBytes(mapId), ReadBytes(blocksId));
+            return DynamixSceneDecoder.Decode(ReadBytes(viewerId), ReadBytes(scenarioId), ReadBytes(mapId),
+                ReadBytes(blocksId), ReadBytes(effectsId));
         }
         catch (InvalidDataException)
         {

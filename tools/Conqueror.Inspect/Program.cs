@@ -478,7 +478,6 @@ if (File.Exists(gobPath))
         }
     }
 }
-
 var sceneReport = new StringBuilder("# Result  Entries  Stored  Kind1  Kind2  CompressedBlocks  StoredBlocks  ISO path\n");
 var sceneTextureReport = new StringBuilder("# Textures  Dimensions  ISO path\n");
 var sceneScenarioReport = new StringBuilder("# Enabled  MapCount  DistanceShift  BlendTarget  Generated  BlockOffsets  ISO path\n");
@@ -536,9 +535,10 @@ foreach (var file in files.Where(x => DynamixArchive.HasContainerExtension(x.Pat
             var viewerEntry = archive.Entries.Single(entry => entry.Name.Equals("Viewer", StringComparison.OrdinalIgnoreCase));
             var mapEntry = archive.Entries.Single(entry => entry.Name.Equals("Map", StringComparison.OrdinalIgnoreCase));
             var blocksEntry = archive.Entries.Single(entry => entry.Name.Equals("Blocks", StringComparison.OrdinalIgnoreCase));
+            var effectsEntry = archive.Entries.Single(entry => entry.Name.Equals("SFXDEFS", StringComparison.OrdinalIgnoreCase));
             var blockBytes = archive.ReadDecoded(blocksEntry);
             var scene = DynamixSceneDecoder.Decode(archive.ReadDecoded(viewerEntry), scenario,
-                archive.ReadDecoded(mapEntry), blockBytes);
+                archive.ReadDecoded(mapEntry), blockBytes, archive.ReadDecoded(effectsEntry));
             var sceneName = Path.GetFileNameWithoutExtension(file.Path);
             if (reportSceneBlocks && (sceneName.StartsWith("MELEE", StringComparison.OrdinalIgnoreCase)
                 || sceneName.StartsWith("DEFEND", StringComparison.OrdinalIgnoreCase)))
