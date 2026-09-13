@@ -161,6 +161,63 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(2, SiegeViewProjection.ProjectRetainers(battle).Count);
     }
 
+    [Fact]
+    public void RetainerCommandIntentsDriveTheirExplicitAuthoredActors()
+    {
+        var attack = RetainerOrderBattle(retainerX: 2, enemyX: 9);
+        attack.CommandRetainers(SiegeRetainerCommand.Attack);
+        attack.AdvanceRetainerOrders();
+        Assert.Equal(3, Assert.Single(attack.Retainers).X);
+
+        var defend = RetainerOrderBattle(retainerX: 2, enemyX: 9);
+        defend.CommandRetainers(SiegeRetainerCommand.Defend);
+        defend.AdvanceRetainerOrders();
+        Assert.Equal(2, Assert.Single(defend.Retainers).X);
+
+        var follow = RetainerOrderBattle(retainerX: 5, enemyX: 10);
+        follow.CommandRetainers(SiegeRetainerCommand.Follow);
+        follow.AdvanceRetainerOrders();
+        Assert.Equal(4, Assert.Single(follow.Retainers).X);
+
+        var retreat = RetainerOrderBattle(retainerX: 5, enemyX: 9);
+        retreat.CommandRetainers(SiegeRetainerCommand.Retreat);
+        retreat.AdvanceRetainerOrders();
+        Assert.Equal(4, Assert.Single(retreat.Retainers).X);
+    }
+
+    [Fact]
+    public void DefendingRetainerAttacksOnlyWhenAnOpponentEntersItsNeighborhood()
+    {
+        var battle = RetainerOrderBattle(retainerX: 2, enemyX: 3);
+        battle.CommandRetainers(SiegeRetainerCommand.Defend);
+
+        battle.AdvanceRetainerOrders();
+
+        var retainer = Assert.Single(battle.Retainers);
+        Assert.Equal(2, retainer.X);
+        Assert.Equal(SiegeEnemyVisualState.Attack, retainer.VisualState);
+    }
+
+    [Fact]
+    public void DefenderTargetsTheNearestExplicitFriendlyInsteadOfRollingGlobalInterception()
+    {
+        var tiles = new SiegeTile[10, 5];
+        var army = new Army();
+        army.Units[SiegeRetainerCombatUnit] = 1;
+        var retainer = new SiegeSpawn(5, 2, false, 1,
+            OriginalArmor: 0, OriginalHealth: 1, OriginalCombatRow: 0, OriginalAttackSkill: 0);
+        var enemy = new SiegeSpawn(6, 2, false, 2,
+            OriginalArmor: 0, OriginalHealth: 10, OriginalCombatRow: 18, OriginalAttackSkill: 1_000);
+        var battle = new SiegeSession(new Player(), army, 0, seed: 1086,
+            new SiegeLayout(tiles, 1, 2, Facing.West, [enemy], retainers: [retainer]));
+
+        battle.Move(forward: true);
+
+        Assert.Equal(0, Assert.Single(battle.Retainers).Health);
+        Assert.Equal(0, battle.AlliesAlive);
+        Assert.Equal("A retainer falls in battle.", battle.LastMessage);
+    }
+
     private static SiegeSession RetainerBattle(int authoredCount, int armyCount, int seed)
     {
         var tiles = new SiegeTile[8, 5];
@@ -173,6 +230,19 @@ public sealed partial class ResourceAndDefinitionTests
         army.Units[SiegeRetainerCombatUnit] = armyCount;
         return new SiegeSession(new Player(), army, 0, seed,
             new SiegeLayout(tiles, 1, 2, Facing.East, [], retainers: retainers));
+    }
+
+    private static SiegeSession RetainerOrderBattle(int retainerX, int enemyX)
+    {
+        var tiles = new SiegeTile[12, 5];
+        var army = new Army();
+        army.Units[SiegeRetainerCombatUnit] = 1;
+        var retainer = new SiegeSpawn(retainerX, 2, false, 1,
+            OriginalArmor: 7, OriginalHealth: 12, OriginalCombatRow: 0, OriginalAttackSkill: 50);
+        var enemy = new SiegeSpawn(enemyX, 2, false, 2,
+            OriginalArmor: 6, OriginalHealth: 10, OriginalCombatRow: 4, OriginalAttackSkill: 50);
+        return new SiegeSession(new Player(), army, 0, seed: 1086,
+            new SiegeLayout(tiles, 1, 2, Facing.East, [enemy], retainers: [retainer]));
     }
 
     private const UnitType SiegeRetainerCombatUnit = UnitType.Swordsmen;

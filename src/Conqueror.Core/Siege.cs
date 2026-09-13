@@ -216,7 +216,7 @@ public sealed class SiegeSession
         }
     }
 
-    private static SiegeRetainer RetainerFor(SiegeSpawn spawn) => new()
+    private SiegeRetainer RetainerFor(SiegeSpawn spawn) => new()
     {
         X = spawn.X,
         Y = spawn.Y,
@@ -225,7 +225,8 @@ public sealed class SiegeSession
         OriginalAttackSkill = spawn.OriginalAttackSkill,
         OriginalCombatRow = spawn.OriginalCombatRow,
         VisualId = spawn.VisualId,
-        OriginalAnimation = spawn.OriginalAnimation
+        OriginalAnimation = spawn.OriginalAnimation,
+        Facing = DirectionToward(spawn.X, spawn.Y, PlayerX, PlayerY, Facing.South)
     };
 
     public SiegeTile TileAt(int x, int y) => x < 0 || y < 0 || x >= Width || y >= Height ? SiegeTile.Wall : _map[x, y];
@@ -259,7 +260,8 @@ public sealed class SiegeSession
     {
         if (!double.IsFinite(elapsedSeconds) || elapsedSeconds < 0)
             throw new ArgumentOutOfRangeException(nameof(elapsedSeconds));
-        foreach (var enemy in _enemies.Where(enemy => enemy.VisualState != SiegeEnemyVisualState.Walk).ToArray())
+        var actors = _enemies.Cast<SiegeEnemy>().Concat(_retainers);
+        foreach (var enemy in actors.Where(enemy => enemy.VisualState != SiegeEnemyVisualState.Walk).ToArray())
         {
             enemy.VisualElapsed += elapsedSeconds;
             var duration = enemy.VisualState switch
@@ -272,7 +274,7 @@ public sealed class SiegeSession
                 _ => 0
             };
             if (enemy.VisualElapsed <= duration) continue;
-            if (enemy.VisualState == SiegeEnemyVisualState.Dying)
+            if (enemy.VisualState == SiegeEnemyVisualState.Dying && enemy is not SiegeRetainer)
             {
                 _enemies.Remove(enemy);
                 continue;
@@ -501,17 +503,26 @@ public sealed class SiegeSession
         if (Defeated || !_enemies.Any(enemy => enemy.Health > 0)) return;
         foreach (var enemy in _enemies.Where(enemy => enemy.Health > 0).ToArray())
         {
-            var distance = Math.Abs(enemy.X - PlayerX) + Math.Abs(enemy.Y - PlayerY);
-            if (CanEnemyAttack(enemy, distance))
+            var playerDistance = Distance(enemy.X, enemy.Y, PlayerX, PlayerY);
+            var retainerTarget = _retainers.Where(retainer => retainer.Health > 0)
+                .OrderBy(retainer => Distance(enemy.X, enemy.Y, retainer.X, retainer.Y))
+                .FirstOrDefault();
+            var targetRetainer = retainerTarget is not null &&
+                Distance(enemy.X, enemy.Y, retainerTarget.X, retainerTarget.Y) < playerDistance
+                    ? retainerTarget
+                    : null;
+            var targetX = targetRetainer?.X ?? PlayerX;
+            var targetY = targetRetainer?.Y ?? PlayerY;
+            var distance = Distance(enemy.X, enemy.Y, targetX, targetY);
+            if (CanEnemyAttack(enemy, targetX, targetY, distance))
             {
-                enemy.Facing = DirectionToward(enemy.X, enemy.Y, PlayerX, PlayerY, enemy.Facing);
+                enemy.Facing = DirectionToward(enemy.X, enemy.Y, targetX, targetY, enemy.Facing);
                 enemy.WalkFrame = 0;
                 if (enemy.VisualState != SiegeEnemyVisualState.Hit)
                     StartVisual(enemy, SiegeEnemyVisualState.Attack);
-                if (AlliesAlive > 0 && _random.Next(100) < 18)
+                if (targetRetainer is not null)
                 {
-                    KillRetainer();
-                    LastMessage = "A retainer falls defending you.";
+                    EnemyAttackRetainer(enemy, targetRetainer, distance);
                     continue;
                 }
                 var hit = enemy.OriginalCombatRow is { } enemyRow && enemy.OriginalAttackSkill is { } enemySkill
@@ -525,29 +536,125 @@ public sealed class SiegeSession
                 continue;
             }
             if (distance > 6 || _random.Next(100) >= 55) continue;
-            var dx = Math.Sign(PlayerX - enemy.X); var dy = Math.Sign(PlayerY - enemy.Y);
-            if (Math.Abs(PlayerX - enemy.X) < Math.Abs(PlayerY - enemy.Y)) dx = 0; else dy = 0;
-            var nx = enemy.X + dx; var ny = enemy.Y + dy;
-            if (TileAt(nx, ny) is SiegeTile.Floor or SiegeTile.Barrel or SiegeTile.Treasure && EnemyAt(nx, ny) is null && (nx != PlayerX || ny != PlayerY))
-            {
-                enemy.Facing = DirectionToward(enemy.X, enemy.Y, nx, ny, enemy.Facing);
-                enemy.X = nx; enemy.Y = ny;
-                enemy.WalkFrame = (enemy.WalkFrame + 1) % 3;
-            }
+            MoveEnemyToward(enemy, targetX, targetY);
         }
-        var vulnerable = _enemies.Where(enemy => enemy.Health > 0 && !enemy.Champion).ToArray();
-        if (AlliesAlive > 0 && vulnerable.Length > 0 && _random.Next(100) < AlliesAlive * 7)
-        {
-            var victim = vulnerable[0]; victim.Health--; RemoveDead(); LastMessage = "Your retainers bring down a defender.";
-        }
+        AdvanceRetainerOrders();
         Health = Math.Max(0, Health);
     }
 
-    private void KillRetainer()
+    public void AdvanceRetainerOrders()
     {
-        var living = _retainers.Where(retainer => retainer.Health > 0).ToArray();
-        if (living.Length > 0) living[_random.Next(living.Length)].Health = 0;
+        foreach (var retainer in _retainers.Where(retainer => retainer.Health > 0).ToArray())
+        {
+            var target = _enemies.Where(enemy => enemy.Health > 0)
+                .OrderBy(enemy => Distance(retainer.X, retainer.Y, enemy.X, enemy.Y))
+                .FirstOrDefault();
+            switch (retainer.Command)
+            {
+                case SiegeRetainerCommand.Defend:
+                    if (target is not null && IsNeighbor(retainer.X, retainer.Y, target.X, target.Y))
+                        RetainerAttack(retainer, target);
+                    break;
+                case SiegeRetainerCommand.Attack:
+                    if (target is null) break;
+                    if (!RetainerAttack(retainer, target)) MoveRetainerToward(retainer, target.X, target.Y);
+                    break;
+                case SiegeRetainerCommand.Follow:
+                    if (Distance(retainer.X, retainer.Y, PlayerX, PlayerY) > 1)
+                        MoveRetainerToward(retainer, PlayerX, PlayerY);
+                    break;
+                case SiegeRetainerCommand.Retreat:
+                    if (target is not null) MoveRetainerAway(retainer, target.X, target.Y);
+                    break;
+            }
+        }
+    }
+
+    private bool RetainerAttack(SiegeRetainer retainer, SiegeEnemy target)
+    {
+        var distance = Distance(retainer.X, retainer.Y, target.X, target.Y);
+        var range = retainer.OriginalCombatRow is { } row
+            ? OriginalWeaponCombat.GridReachForCombatRow(row)
+            : 1;
+        if (distance > range) return false;
+        retainer.Facing = DirectionToward(retainer.X, retainer.Y, target.X, target.Y, retainer.Facing);
+        StartVisual(retainer, SiegeEnemyVisualState.Attack);
+        var hit = retainer.OriginalAttackSkill is { } skill && target.OriginalAttackSkill is { } targetSkill
+            ? OriginalWeaponCombat.Hits(skill, targetSkill,
+                retainer.OriginalCombatRow is >= 23 && distance <= 1,
+                retainer.Facing == target.Facing, _random)
+            : _random.Next(100) < 50;
+        if (!hit) return true;
+        target.Health -= retainer.OriginalCombatRow is { } combatRow && target.OriginalArmor is { } armor
+            ? OriginalWeaponCombat.DamageForCombatRow(combatRow, armor, _random)
+            : 1;
+        if (target.Health > 0) StartVisual(target, SiegeEnemyVisualState.Hit);
+        RemoveDead();
+        LastMessage = target.Health <= 0
+            ? "Your retainer brings down a defender."
+            : "Your retainer strikes a defender.";
+        return true;
+    }
+
+    private void MoveRetainerToward(SiegeRetainer retainer, int targetX, int targetY)
+    {
+        var candidates = CardinalSteps(retainer.X, retainer.Y)
+            .OrderBy(point => Distance(point.X, point.Y, targetX, targetY));
+        MoveRetainer(retainer, candidates.FirstOrDefault(point => RetainerCanEnter(retainer, point.X, point.Y)));
+    }
+
+    private void MoveRetainerAway(SiegeRetainer retainer, int targetX, int targetY)
+    {
+        var candidates = CardinalSteps(retainer.X, retainer.Y)
+            .OrderByDescending(point => Distance(point.X, point.Y, targetX, targetY));
+        MoveRetainer(retainer, candidates.FirstOrDefault(point => RetainerCanEnter(retainer, point.X, point.Y)));
+    }
+
+    private void MoveRetainer(SiegeRetainer retainer, Point destination)
+    {
+        if (destination == default) return;
+        retainer.Facing = DirectionToward(retainer.X, retainer.Y, destination.X, destination.Y, retainer.Facing);
+        retainer.X = destination.X;
+        retainer.Y = destination.Y;
+        retainer.WalkFrame = (retainer.WalkFrame + 1) % 3;
+    }
+
+    private bool RetainerCanEnter(SiegeRetainer self, int x, int y) =>
+        TileAt(x, y) == SiegeTile.Floor && (x != PlayerX || y != PlayerY) &&
+        EnemyAt(x, y) is null &&
+        _retainers.All(retainer => ReferenceEquals(retainer, self) || retainer.Health <= 0 ||
+            retainer.X != x || retainer.Y != y);
+
+    private static IReadOnlyList<Point> CardinalSteps(int x, int y) =>
+        [new(x + 1, y), new(x - 1, y), new(x, y + 1), new(x, y - 1)];
+
+    private static int Distance(int x1, int y1, int x2, int y2) =>
+        Math.Abs(x1 - x2) + Math.Abs(y1 - y2);
+
+    private static bool IsNeighbor(int x1, int y1, int x2, int y2) =>
+        Math.Abs(x1 - x2) <= 1 && Math.Abs(y1 - y2) <= 1;
+
+    private void EnemyAttackRetainer(SiegeEnemy enemy, SiegeRetainer retainer, int distance)
+    {
+        var hit = enemy.OriginalCombatRow is { } enemyRow && enemy.OriginalAttackSkill is { } enemySkill &&
+                  retainer.OriginalAttackSkill is { } retainerSkill
+            ? OriginalWeaponCombat.Hits(enemySkill, retainerSkill,
+                enemyRow >= 23 && distance <= 1, enemy.Facing == retainer.Facing, _random)
+            : _random.Next(100) < 50;
+        if (!hit) return;
+        retainer.Health -= enemy.OriginalCombatRow is { } combatRow && retainer.OriginalArmor is { } armor
+            ? OriginalWeaponCombat.DamageForCombatRow(combatRow, armor, _random)
+            : 1;
+        if (retainer.Health > 0)
+        {
+            StartVisual(retainer, SiegeEnemyVisualState.Hit);
+            LastMessage = "A defender strikes your retainer.";
+            return;
+        }
+        retainer.Health = 0;
         AlliesAlive--;
+        StartVisual(retainer, SiegeEnemyVisualState.Dying);
+        LastMessage = "A retainer falls in battle.";
     }
 
     private SiegeEnemy? FirstEnemyAhead(int range)
@@ -562,23 +669,42 @@ public sealed class SiegeSession
         return null;
     }
 
-    private bool CanEnemyAttack(SiegeEnemy enemy, int distance)
+    private bool CanEnemyAttack(SiegeEnemy enemy, int targetX, int targetY, int distance)
     {
         var range = enemy.OriginalCombatRow is { } combatRow
             ? OriginalWeaponCombat.GridReachForCombatRow(combatRow)
             : 1;
-        if (distance > range || enemy.X != PlayerX && enemy.Y != PlayerY) return false;
-        var dx = Math.Sign(PlayerX - enemy.X);
-        var dy = Math.Sign(PlayerY - enemy.Y);
+        if (distance > range || enemy.X != targetX && enemy.Y != targetY) return false;
+        var dx = Math.Sign(targetX - enemy.X);
+        var dy = Math.Sign(targetY - enemy.Y);
         for (var step = 1; step < distance; step++)
         {
             var x = enemy.X + dx * step;
             var y = enemy.Y + dy * step;
             if (TileAt(x, y) is not (SiegeTile.Floor or SiegeTile.Barrel or SiegeTile.Treasure) ||
-                EnemyAt(x, y) is not null) return false;
+                EnemyAt(x, y) is not null || RetainerAt(x, y) is not null || x == PlayerX && y == PlayerY)
+                return false;
         }
         return true;
     }
+
+    private void MoveEnemyToward(SiegeEnemy enemy, int targetX, int targetY)
+    {
+        var destination = CardinalSteps(enemy.X, enemy.Y)
+            .OrderBy(point => Distance(point.X, point.Y, targetX, targetY))
+            .FirstOrDefault(point => EnemyCanEnter(enemy, point.X, point.Y));
+        if (destination == default) return;
+        enemy.Facing = DirectionToward(enemy.X, enemy.Y, destination.X, destination.Y, enemy.Facing);
+        enemy.X = destination.X;
+        enemy.Y = destination.Y;
+        enemy.WalkFrame = (enemy.WalkFrame + 1) % 3;
+    }
+
+    private bool EnemyCanEnter(SiegeEnemy self, int x, int y) =>
+        TileAt(x, y) is SiegeTile.Floor or SiegeTile.Barrel or SiegeTile.Treasure &&
+        (x != PlayerX || y != PlayerY) && RetainerAt(x, y) is null &&
+        _enemies.All(enemy => ReferenceEquals(enemy, self) || enemy.Health <= 0 ||
+            enemy.X != x || enemy.Y != y);
 
     private SiegeObject? FirstDestructibleAhead(int range)
     {

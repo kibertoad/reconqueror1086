@@ -31,8 +31,13 @@ First-person retainer commands are executable-mapped: Defend mode 2, Attack
 mode 6, Retreat mode 10, and Follow mode 16 with player `D4D0` as target.
 Commands affect selected living friendlies, or all living friendlies when none
 is selected, then clear selection. Preserve these identities and distinguish
-the retainer Retreat order from leaving the battle. The exact movement and
-pathfinding behind these modes remain provisional and must not be guessed.
+the retainer Retreat order from leaving the battle. Executable state dispatch
+confirms the intent of each mode: Defend attacks only inside the surrounding
+3x3 neighborhood, Attack seeks the nearest hostile, Follow moves toward the
+player target, and Retreat moves away from its hostile target. The runtime may
+use documented provisional grid stepping for these intents, but exact
+fixed-point movement, collision/path selection, and thinker cadence must not be
+presented as recovered until their executable paths are closed.
 
 ## Git push destination
 
