@@ -254,17 +254,40 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
-    public void ActiveSpiesProduceRecurringMonthlyIntel()
+    public void ActiveSpyProducesOneMonthlyProxyReportAndIsConsumed()
     {
         var campaign = new Campaign(seed: 17);
         campaign.State.Player.Wealth = 500;
 
         Assert.True(campaign.AssignSpy());
         Assert.Equal((420, 1), (campaign.State.Player.Wealth, campaign.State.Player.ActiveSpies));
+        Assert.False(campaign.AssignSpy());
+        Assert.Equal(420, campaign.State.Player.Wealth);
         campaign.SettleMonth();
 
         Assert.Single(campaign.State.SpiedLocations);
-        Assert.Contains(campaign.State.Journal, entry => entry.Contains("A spy reports", StringComparison.Ordinal));
+        Assert.Equal(0, campaign.State.Player.ActiveSpies);
+        Assert.Single(campaign.State.Journal,
+            entry => entry.Contains("A spy reports", StringComparison.Ordinal));
+        campaign.SettleMonth();
+        Assert.Single(campaign.State.Journal,
+            entry => entry.Contains("A spy reports", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void ActiveSpyWaitsWhenTheCompatibilityCheckpointHasNothingNewToReport()
+    {
+        var campaign = new Campaign();
+        campaign.State.Player.Wealth = 500;
+        foreach (var location in Enumerable.Range(1, World.Locations.Length - 1))
+            campaign.State.SpiedLocations.Add(location);
+
+        Assert.True(campaign.AssignSpy());
+        campaign.SettleMonth();
+
+        Assert.Equal(1, campaign.State.Player.ActiveSpies);
+        Assert.DoesNotContain(campaign.State.Journal,
+            entry => entry.Contains("A spy reports", StringComparison.Ordinal));
     }
 
     [Fact]

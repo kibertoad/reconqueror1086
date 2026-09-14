@@ -176,8 +176,8 @@ public sealed class Campaign
 
     public bool AssignSpy()
     {
-        if (!Spend(Balance.Strategy.SpyCost, "assign spy")) return false;
-        State.Player.ActiveSpies++;
+        if (State.Player.ActiveSpies != 0 || !Spend(Balance.Strategy.SpyCost, "assign spy")) return false;
+        State.Player.ActiveSpies = 1;
         Log("A spy is sent to observe troop movements across England.");
         return true;
     }
@@ -563,15 +563,14 @@ public sealed class Campaign
 
     private void ResolveSpyReports()
     {
-        for (var report = 0; report < State.Player.ActiveSpies; report++)
-        {
-            var targets = Enumerable.Range(1, World.Locations.Length - 1)
-                .Where(index => IsHostileStronghold(index) && !State.SpiedLocations.Contains(index)).ToArray();
-            if (targets.Length == 0) return;
-            var target = targets[_random.Next(targets.Length)];
-            State.SpiedLocations.Add(target);
-            Log($"A spy reports {GarrisonAt(target)} soldiers guarding {World.Locations[target].Name}.");
-        }
+        if (State.Player.ActiveSpies <= 0) return;
+        var targets = Enumerable.Range(1, World.Locations.Length - 1)
+            .Where(index => IsHostileStronghold(index) && !State.SpiedLocations.Contains(index)).ToArray();
+        if (targets.Length == 0) return;
+        var target = targets[_random.Next(targets.Length)];
+        State.SpiedLocations.Add(target);
+        State.Player.ActiveSpies = 0;
+        Log($"A spy reports {GarrisonAt(target)} soldiers guarding {World.Locations[target].Name}.");
     }
 
     public SiegeSession CreateSiege(SiegeLayout? layout = null)

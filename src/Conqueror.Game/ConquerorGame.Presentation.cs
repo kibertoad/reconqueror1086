@@ -630,7 +630,7 @@ public sealed partial class ConquerorGame
         DrawWarPlanningFrame(animation, hasArmy && editableAtHome
             ? WarPlanningPresentationDefinitions.FieldArmyFrame
             : WarPlanningPresentationDefinitions.FieldArmyUnavailableFrame, _warPlanningLayout.FieldArmy);
-        DrawWarPlanningFrame(animation, player.Wealth >= Balance.Strategy.SpyCost
+        DrawWarPlanningFrame(animation, player.ActiveSpies == 0 && player.Wealth >= Balance.Strategy.SpyCost
             ? WarPlanningPresentationDefinitions.SendSpyFrame
             : WarPlanningPresentationDefinitions.SendSpyUnavailableFrame, _warPlanningLayout.SendSpy);
         DrawWarPlanningFrame(animation, !hasArmy
