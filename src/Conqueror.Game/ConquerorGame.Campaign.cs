@@ -292,7 +292,7 @@ public sealed partial class ConquerorGame
 
     private void ActivateSceneHotspot(SceneHotspot? hotspot)
     {
-        if (hotspot is null) return;
+        if (hotspot is null || !hotspot.Interactive) return;
         switch (hotspot.Action)
         {
             case SceneNavigationAction.Overview: EnterOverview(Screen.Home); break;
@@ -302,7 +302,7 @@ public sealed partial class ConquerorGame
             case SceneNavigationAction.Forest: EnterFiefManagement(FarmPresentationDefinitions.Section.Forest); break;
             case SceneNavigationAction.WarPlanning: EnterWarPlanning(); break;
             case SceneNavigationAction.Exit: _screen = Screen.Map; break;
-            case SceneNavigationAction.Jump: _notice = "JUMP ACTION REQUIRES EXECUTABLE CONFIRMATION"; break;
+            case SceneNavigationAction.Jump: break;
             case SceneNavigationAction.Map: _estatePanel = EstatePanel.Map; _screen = Screen.Map; break;
             case SceneNavigationAction.Orders: _estatePanel = EstatePanel.Orders; _screen = Screen.Map; break;
             case SceneNavigationAction.BlacksmithDialogue:

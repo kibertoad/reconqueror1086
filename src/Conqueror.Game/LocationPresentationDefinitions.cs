@@ -32,7 +32,9 @@ public enum SceneNavigationAction
     BlacksmithDialogue,
     Shop
 }
-public sealed record SceneHotspot(SceneNavigationAction Action, string HoverLabel, int HatRegionId, UiBounds Bounds);
+public sealed record SceneHotspot(
+    SceneNavigationAction Action, string HoverLabel, int HatRegionId, UiBounds Bounds,
+    bool Interactive = true);
 
 public static class HomePresentationDefinitions
 {
@@ -62,7 +64,10 @@ public static class HomePresentationDefinitions
         new(SceneNavigationAction.Forest, "Forest", ForestBookRegionId, new UiBounds(314, 147, 15, 39)),
         new(SceneNavigationAction.WarPlanning, "War Planning", WarPlanningRegionId, new UiBounds(359, 123, 35, 76)),
         new(SceneNavigationAction.Exit, "Exit", LeftExitRegionId, new UiBounds(0, 113, 66, 210)),
-        new(SceneNavigationAction.Jump, "JUMP!!", RightExitRegionId, new UiBounds(568, 84, 72, 200)),
+        // Region 7 is enabled in FOPTS.HAT and has a label-table entry, but
+        // 0x302A0-0x30492 omits it from all three callback registrations.
+        new(SceneNavigationAction.Jump, "JUMP!!", RightExitRegionId,
+            new UiBounds(568, 84, 72, 200), Interactive: false),
         new(SceneNavigationAction.Map, "Map", MapRegionId, new UiBounds(200, 55, 68, 85)),
         new(SceneNavigationAction.Orders, "Orders", OrdersRegionId, new UiBounds(332, 180, 26, 37))
     ];
