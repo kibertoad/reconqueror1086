@@ -37,6 +37,7 @@ public sealed partial class SiegeSession
         if (actor is SiegeRetainer friendly)
         {
             friendly.Command = SiegeRetainerCommand.Retreat;
+            friendly.ActorMode = nextMode;
             friendly.RetreatMode = nextMode;
             friendly.OrderedTarget = target;
             friendly.RetreatTargetX8 = FixedActorX8(target);

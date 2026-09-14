@@ -310,6 +310,7 @@ public sealed partial class ResourceAndDefinitionTests
         var reached = false;
         battle.ConfigureActorRaycast((source, target) =>
         {
+            if (!ReferenceEquals(source, activeRunner)) return null;
             if (ReferenceEquals(target, battle.Enemies[0]))
                 return new SiegeActorRayHit(target, 0x400);
             formationCalls.Add(target);

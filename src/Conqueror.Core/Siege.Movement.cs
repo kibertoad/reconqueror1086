@@ -94,6 +94,10 @@ public sealed partial class SiegeSession
 
         switch (retainer.Command)
         {
+            case SiegeRetainerCommand.Defend:
+                if (retainer.MovementActive) return true;
+                AdvanceDefendOrder(retainer);
+                return retainer.MovementActive;
             case SiegeRetainerCommand.Attack:
                 var target = AttackOrderTarget(retainer);
                 if (target is null)
@@ -518,6 +522,32 @@ public sealed partial class SiegeSession
             if (retainer is not null) return retainer;
         }
         return null;
+    }
+
+    private SiegeEnemy? AdjacentOpponentActor(SiegeRetainer source)
+    {
+        var centerX = FixedActorX8(source) >> 8;
+        var centerY = FixedActorY8(source) >> 8;
+        for (var dy = -1; dy <= 1; dy++)
+        for (var dx = -1; dx <= 1; dx++)
+        {
+            var opponent = EnemyAt(centerX + dx, centerY + dy);
+            if (opponent is not null) return opponent;
+        }
+        return null;
+    }
+
+    private void BeginFriendlyEscape(SiegeRetainer source)
+    {
+        var sourceX8 = FixedActorX8(source);
+        var sourceY8 = FixedActorY8(source);
+        source.OriginalHeading8 = OriginalActorMotion.HeadingToward(
+            sourceX8 - (source.RetreatTargetX8 ?? sourceX8),
+            sourceY8 - (source.RetreatTargetY8 ?? sourceY8));
+        source.Facing = FacingForHeading(source.OriginalHeading8.Value);
+        source.MovementWanders = false;
+        source.MovementScalesEscapeDelta = true;
+        source.MovementActive = true;
     }
 
     private IEnumerable<SiegeEnemy> FriendlyActorsInAuthoredOrder(SiegeRetainer source) =>

@@ -329,6 +329,7 @@ public sealed partial class SiegeSession
         foreach (var retainer in targets)
         {
             retainer.Command = command;
+            retainer.ActorMode = (int)command;
             retainer.OrderedTarget = null;
             retainer.OrderedDestination = null;
             ResetRetainerMovement(retainer);
@@ -350,6 +351,7 @@ public sealed partial class SiegeSession
         foreach (var retainer in selected)
         {
             retainer.Command = SiegeRetainerCommand.Attack;
+            retainer.ActorMode = 8;
             retainer.OrderedTarget = target;
             retainer.OrderedDestination = null;
             ResetRetainerMovement(retainer);
@@ -366,6 +368,7 @@ public sealed partial class SiegeSession
         if (selected.Length == 0) return false;
         foreach (var retainer in selected)
         {
+            retainer.ActorMode = 12;
             retainer.OrderedTarget = null;
             retainer.OrderedDestination = (x, y);
             ResetRetainerMovement(retainer);

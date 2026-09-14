@@ -15,6 +15,9 @@ public sealed partial class SiegeSession
         OriginalModeProfile = spawn.OriginalActorTemplate is { } actorTemplate
             ? OriginalCombatantTemplates.ModeProfileForSceneTemplate(actorTemplate)
             : null,
+        ActorMode = spawn.OriginalActorTemplate is { } initialTemplate
+            ? OriginalCombatantTemplates.ModeProfileForSceneTemplate(initialTemplate).Current
+            : (int)SiegeRetainerCommand.Attack,
         OriginalActorOrder = spawn.OriginalActorOrder,
         VisualId = spawn.VisualId,
         OriginalAnimation = spawn.OriginalAnimation,
@@ -62,7 +65,7 @@ public sealed partial class SiegeSession
 
     private void AdvanceRetainerOrder(SiegeRetainer retainer)
     {
-        if (retainer.VisualState != SiegeEnemyVisualState.Walk) return;
+        if (retainer.VisualState != SiegeEnemyVisualState.Walk || retainer.MovementActive) return;
         if (retainer.OrderedDestination is { } destination)
         {
             if (retainer.X == destination.X && retainer.Y == destination.Y)
@@ -74,8 +77,7 @@ public sealed partial class SiegeSession
         switch (retainer.Command)
         {
             case SiegeRetainerCommand.Defend:
-                if (target is not null && IsNeighbor(retainer.X, retainer.Y, target.X, target.Y))
-                    RetainerAttack(retainer, target);
+                AdvanceDefendOrder(retainer);
                 break;
             case SiegeRetainerCommand.Attack:
                 var attackTarget = AttackOrderTarget(retainer);
@@ -116,5 +118,110 @@ public sealed partial class SiegeSession
                     RetainerRangedAttack(retainer, retreatTarget);
                 break;
         }
+    }
+
+    private void AdvanceDefendOrder(SiegeRetainer retainer)
+    {
+        // Friendly mode tables begin at object-1 offsets 0x3E43C (kind 0)
+        // and 0x3E480 (kind 1). Like 0x4F49C, evaluate one predicate and
+        // invoke only the selected mode handler during this thinker pass.
+        switch (retainer.ActorMode)
+        {
+            case 1:
+            {
+                var ally = AdjacentFriendlyActor(retainer);
+                if (ally is not null) retainer.RetreatRegroupTarget = ally;
+                retainer.ActorMode = ally is null
+                    ? retainer.OriginalActorKind == 1 ? 2 : 3
+                    : 4;
+                break;
+            }
+            case 2:
+            {
+                var opponent = AdjacentOpponentActor(retainer);
+                if (opponent is not null) StoreFriendlyTarget(retainer, opponent);
+                retainer.ActorMode = opponent is null ? 1 : retainer.OriginalActorKind == 1 ? 10 : 11;
+                break;
+            }
+            case 3:
+            {
+                var ally = RetreatFormationTarget(retainer);
+                if (ally is not null) retainer.RetreatRegroupTarget = ally;
+                retainer.ActorMode = ally is null ? 2 : 7;
+                break;
+            }
+            case 4:
+            {
+                var opponent = AcquireRetreatOrderTarget(retainer);
+                if (opponent is not null) StoreFriendlyTarget(retainer, opponent);
+                retainer.ActorMode = opponent is null ? 1 : retainer.OriginalActorKind == 1 ? 11 : 8;
+                break;
+            }
+            case 7:
+                retainer.ActorMode = retainer.RetreatRegroupTarget is { Health: > 0 } regroup &&
+                    RetreatFormationReached(retainer, regroup)
+                        ? retainer.OriginalActorKind == 1 ? 3 : 1
+                        : 5;
+                break;
+            case 8:
+                retainer.ActorMode = retainer.OrderedTarget is { Health: > 0 } pursued &&
+                    ModeEightHasContact(retainer, pursued) ? 11 : 6;
+                break;
+            case 10:
+            {
+                var opponent = AcquireRetreatOrderTarget(retainer);
+                if (opponent is not null) StoreFriendlyTarget(retainer, opponent);
+                retainer.ActorMode = opponent is null ? 2 : retainer.OriginalActorKind == 1 ? 4 : 5;
+                break;
+            }
+            case 13:
+                retainer.ActorMode = retainer.Health >= 6
+                    ? retainer.OriginalActorKind == 1 ? 6 : 2
+                    : 10;
+                break;
+        }
+        BeginDefendMode(retainer);
+    }
+
+    private void BeginDefendMode(SiegeRetainer retainer)
+    {
+        retainer.MovementWanders = false;
+        switch (retainer.ActorMode)
+        {
+            case 5:
+            case 6:
+                retainer.OrderedTarget = null;
+                retainer.MovementWanders = true;
+                retainer.MovementActive = true;
+                break;
+            case 7:
+                if (retainer.RetreatRegroupTarget is { Health: > 0 } ally)
+                {
+                    AimRetainerAt(retainer, ally.X, ally.Y);
+                    retainer.MovementActive = true;
+                }
+                break;
+            case 8:
+                if (retainer.OrderedTarget is { Health: > 0 } opponent)
+                {
+                    AimRetainerAt(retainer, opponent.X, opponent.Y);
+                    retainer.MovementActive = true;
+                }
+                break;
+            case 10:
+                BeginFriendlyEscape(retainer);
+                break;
+            case 11:
+                if (retainer.OrderedTarget is { Health: > 0 } target)
+                    RetainerRangedAttack(retainer, target);
+                break;
+        }
+    }
+
+    private static void StoreFriendlyTarget(SiegeRetainer retainer, SiegeEnemy target)
+    {
+        retainer.OrderedTarget = target;
+        retainer.RetreatTargetX8 = FixedActorX8(target);
+        retainer.RetreatTargetY8 = FixedActorY8(target);
     }
 }
