@@ -87,6 +87,9 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(SiegeEnemyVisualState.Walk, hostile.VisualState);
         battle.CommandRetainers(SiegeRetainerCommand.Attack);
         battle.AdvanceRetainerOrders();
+        battle.AdvanceRetainerMovement(0.4001);
+        battle.AdvanceRetainerMovement(0);
+        battle.AdvanceEnemyAnimations(1.0001);
         Assert.Equal(13, hostile.ActorMode);
         Assert.Equal(SiegeEnemyVisualState.Hit, hostile.VisualState);
         Assert.Equal(5, hostile.Health);
@@ -114,6 +117,9 @@ public sealed partial class ResourceAndDefinitionTests
         battle.AdvanceHostileMovement(0);
         battle.CommandRetainers(SiegeRetainerCommand.Attack);
         battle.AdvanceRetainerOrders();
+        battle.AdvanceRetainerMovement(0.4001);
+        battle.AdvanceRetainerMovement(0);
+        battle.AdvanceEnemyAnimations(1.0001);
         Assert.Equal(13, hostile.ActorMode);
         Assert.Equal(SiegeEnemyVisualState.Hit, hostile.VisualState);
         Assert.Equal(6, hostile.Health);

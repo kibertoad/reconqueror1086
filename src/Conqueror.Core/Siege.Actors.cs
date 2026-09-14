@@ -72,22 +72,13 @@ public sealed partial class SiegeSession
                 retainer.OrderedDestination = null;
             return;
         }
-        var target = RetainerOrderTarget(retainer);
-        if (target is null) retainer.OrderedTarget = null;
         switch (retainer.Command)
         {
             case SiegeRetainerCommand.Defend:
                 AdvanceDefendOrder(retainer);
                 break;
             case SiegeRetainerCommand.Attack:
-                var attackTarget = AttackOrderTarget(retainer);
-                if (attackTarget is not null)
-                {
-                    if (retainer.OriginalActorKind == 1)
-                        RetainerRangedAttack(retainer, attackTarget);
-                    else
-                        RetainerAttack(retainer, attackTarget);
-                }
+                AdvanceAttackOrder(retainer);
                 break;
             case SiegeRetainerCommand.Follow:
                 break;
@@ -164,9 +155,14 @@ public sealed partial class SiegeSession
                         : 5;
                 break;
             case 8:
-                retainer.ActorMode = retainer.OrderedTarget is { Health: > 0 } pursued &&
-                    ModeEightHasContact(retainer, pursued) ? 11 : 6;
+            {
+                var opponent = retainer.OrderedTarget is { Health: > 0 } pursued
+                    ? ModeEightContactTarget(retainer, pursued)
+                    : null;
+                if (opponent is not null) StoreFriendlyTarget(retainer, opponent);
+                retainer.ActorMode = opponent is null ? 6 : 11;
                 break;
+            }
             case 10:
             {
                 var opponent = AcquireRetreatOrderTarget(retainer);
@@ -180,10 +176,39 @@ public sealed partial class SiegeSession
                     : 10;
                 break;
         }
-        BeginDefendMode(retainer);
+        BeginFriendlyMode(retainer);
     }
 
-    private void BeginDefendMode(SiegeRetainer retainer)
+    private void AdvanceAttackOrder(SiegeRetainer retainer)
+    {
+        switch (retainer.ActorMode)
+        {
+            case 6:
+            {
+                var target = AttackOrderTarget(retainer);
+                if (target is not null) StoreFriendlyTarget(retainer, target);
+                retainer.ActorMode = target is null ? 6 : retainer.OriginalActorKind == 1 ? 11 : 8;
+                break;
+            }
+            case 8:
+            {
+                var target = retainer.OrderedTarget is { Health: > 0 } aimed
+                    ? ModeEightContactTarget(retainer, aimed)
+                    : null;
+                if (target is not null) StoreFriendlyTarget(retainer, target);
+                retainer.ActorMode = target is null ? 6 : 11;
+                break;
+            }
+            case 11:
+                break;
+            default:
+                retainer.ActorMode = 6;
+                break;
+        }
+        BeginFriendlyMode(retainer);
+    }
+
+    private void BeginFriendlyMode(SiegeRetainer retainer)
     {
         retainer.MovementWanders = false;
         switch (retainer.ActorMode)

@@ -735,6 +735,12 @@ trusted gameplay starting point, but supplies none of these formulas.
 6. In progress: `ICA`/`ICS`/`ICW` are decoded and active as seasonal 337-frame estate atlases using the `ICONTEMP.PCX` palette. Recover the executable's exact terrain/frame table plus roads, shield, cursor, and layout data; current semantic frame assignments remain provisional.
 7. In progress: unsigned 8-bit mono PCM is confirmed; all imported samples are eagerly converted into a retained startup cache and the shared 2,159-byte interface sample is active. Trace and bind the remaining 101 sample event identifiers; `VSMITH.666` is audio, not the blacksmith dialogue database.
 
+## Combat checkpoint: 2026-09-14 complete friendly Attack loop
+
+Public handler `0x5700E` resets current mode, requests mode 6, and calls transition helper `0x4E5F0`; it never invokes a synchronous grid-range strike. On the next thinker pass acquisition `0x4F98D` retains mode 6 on failure, selects mode 8 for kind 0, or selects mode 11 for kind 1. Kind-0 predicate `0x4F7A2` aims at the stored target but retains the actual returned living opposite-side actor only when its ray depth is strictly below raw combat-row contact column `0xCE24 + 28 * row`; exact equality returns to mode 6 through `0x4E745`. Handler `0x5010B` constructs the attack effect, scheduler `0x53365` applies damage only at completion, and `0x53D47` clears the effect before same-actor thinker re-entry.
+
+`AdvanceAttackOrder`, `ModeEightContactTarget`, `BeginFriendlyMode`, and `PendingRangedTarget` preserve this complete public and pointer-selected route. Regressions cover pursuit before damage, strict below/equal contact boundaries, intervening-opponent identity, and completion-gated damage. The state loop is **Confirmed** and the former synchronous kind-0 melee shortcut is **Disproved**. The next friendly-state recovery target is exact Follow modes 16/17, followed by raw actor color normalization and remaining first-person combat transitions.
+
 ## Session checkpoint: 2026-09-10
 
 The current migration branch builds with zero warnings under the enforced 1,000-line source limit. All 154 xUnit cases and 146 executable specifications pass. The Inno Setup 7.1.0 package compiles, installs into an isolated directory, launches through its generated **ReConqueror A.D. 1086** Start-menu shortcut, and removes that shortcut during uninstall. Repository policy passes with the expanded proprietary-image boundary.

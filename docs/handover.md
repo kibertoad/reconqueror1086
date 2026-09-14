@@ -10,7 +10,7 @@ The authoritative gate is:
 & '.\Run Tests.bat'
 ```
 
-The current friendly-formation implementation gate passes 280 xUnit cases and 146 executable specifications with zero build warnings. Repository policy passes; re-run the gate after checkout rather than inferring current health from this note alone.
+The current friendly-Attack implementation gate passes 283 xUnit cases and 146 executable specifications with zero build warnings. Repository policy passes; re-run the gate after checkout rather than inferring current health from this note alone.
 
 ## Latest completed combat recovery
 
@@ -96,6 +96,12 @@ The older item 3 wording below is superseded for command dispatch, intent, visib
 2. Placed pickup rewards are closed for the hashed release. Dispatcher `0x51E60` reads the selected block's low word at `+0x48`; the active player's 68-byte combatant record supplies only the recipient discriminator. Cases 5, 7, 9, and 10 consume 36 bags of coins for +25 wealth, 70 meals for capped 2d6 healing, 36 Chain Hauberks for equipment bit 6, and 36 piles of bolts for +12 ammunition. Scene arguments live at `+0x4A/+0x4C`; actor records reuse those words for template/row selection. The exact case bodies, global addresses, population census, runtime mapping, and tests are recorded in `original-findings.md` and `resource-formats.md`.
 3. Continue exact actor movement and broader AI recovery from evidence. Selected mode-12 travel and the supported hostile loop now cover modes 1-8, 10-11, and 13 with imported per-tick 8.8 movement and shared projection. Formation, defend, regroup, pursuit, direct/wandering collision families, effect-boundary completion, contact, deferred damage, and morale escape are mapped. Later friendly formation outcomes remain open. Authored side selection is closed for the supported official scene population: loader `0x51560` uses behavior bit `0x80` plus selector 1, scans x-major, and promotes the first friendly to player `D4D0`; the complete 1,002-placement census partitions templates 0-2 as friendly and 3/5/8/9 as hostile. `ImportedSiegeLayouts` preserves those positions and `SiegeSession` caps them with the campaign formula. Campaign caller `0x39EAA`-`0x39F79` builds one contribution per strategic unit type as `min(floor(units / 3), 3)`, while `0x3A101`-`0x3A1CE` converts missing retainers into one-for-one strategic losses in Swordsmen, Halberdiers, Knights order. Raw surface/color normalization remains unmapped; defeated-enemy loot remains Disproved.
 4. Continue exact route/`JUMP!!`/spy recovery, estate tile mapping, and remaining sound/event bindings as ordered in the migration plan.
+
+## Friendly Attack checkpoint: 2026-09-14
+
+Public Attack is now closed through its executable state loop. Handler `0x5700E` requests mode 6 through `0x4E5F0`; acquisition `0x4F98D` retains wandering mode 6 on failure, sends kind 0 through pursuit mode 8, and sends kind 1 directly to mode 11. Predicate `0x4F7A2` accepts the actual returned hostile only strictly below the raw combat-row contact threshold, including an intervening hostile rather than necessarily the aimed identity. Handler `0x5010B` constructs the attack effect and scheduler `0x53365` alone applies damage at completion before `0x53D47` recalls the same actor thinker.
+
+`AdvanceAttackOrder`, `ModeEightContactTarget`, `BeginFriendlyMode`, and `PendingRangedTarget` replace the former synchronous kind-0 grid strike. Tests cover public and pointer-selected pursuit without immediate damage, exact contact equality rejection, intervening-target identity, and completion-gated damage. The synchronous shortcut is **Disproved**. Continue next with exact Follow modes 16/17, then raw actor color normalization and remaining first-person combat transitions.
 
 ## Safety and repository rules
 

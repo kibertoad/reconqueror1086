@@ -755,16 +755,6 @@ public sealed partial class SiegeSession
         SyncPlayerActor();
     }
 
-    private bool RetainerAttack(SiegeRetainer retainer, SiegeEnemy target)
-    {
-        var distance = Distance(retainer.X, retainer.Y, target.X, target.Y);
-        if (distance > RetainerAttackRange(retainer)) return false;
-        retainer.Facing = DirectionToward(retainer.X, retainer.Y, target.X, target.Y, retainer.Facing);
-        StartVisual(retainer, SiegeEnemyVisualState.Attack);
-        ResolveRetainerStrike(retainer, target, distance);
-        return true;
-    }
-
     private void ResolveRetainerStrike(SiegeRetainer retainer, SiegeEnemy target, int? gridDistance = null)
     {
         var distance = gridDistance ?? Distance(retainer.X, retainer.Y, target.X, target.Y);
@@ -783,18 +773,6 @@ public sealed partial class SiegeSession
             ? "Your retainer brings down a defender."
             : "Your retainer strikes a defender.";
     }
-
-    private SiegeEnemy? RetainerOrderTarget(SiegeRetainer retainer) =>
-        retainer.OrderedTarget is { Health: > 0 } ordered && _enemies.Contains(ordered)
-            ? ordered
-            : _enemies.Where(enemy => enemy.Health > 0)
-                .OrderBy(enemy => Distance(retainer.X, retainer.Y, enemy.X, enemy.Y))
-                .FirstOrDefault();
-
-    private static int RetainerAttackRange(SiegeRetainer retainer) =>
-        retainer.OriginalCombatRow is { } row
-            ? OriginalWeaponCombat.GridReachForCombatRow(row)
-            : 1;
 
     private static void ResetRetainerMovement(SiegeRetainer retainer)
     {

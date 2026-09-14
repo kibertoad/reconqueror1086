@@ -302,21 +302,33 @@ public sealed partial class ResourceAndDefinitionTests
         var tiles = new SiegeTile[10, 10];
         var army = new Army();
         army.Units[UnitType.Swordsmen] = 1;
-        var near = new SiegeSpawn(4, 2, false, OriginalHealth: 10);
-        var chosen = new SiegeSpawn(2, 6, false, OriginalHealth: 10);
-        var retainer = new SiegeSpawn(2, 2, false, OriginalHealth: 10);
+        var near = new SiegeSpawn(4, 2, false, OriginalArmor: 0, OriginalHealth: 10,
+            OriginalAttackSkill: 1);
+        var chosen = new SiegeSpawn(2, 6, false, OriginalArmor: 0, OriginalHealth: 10,
+            OriginalAttackSkill: 1);
+        var retainer = new SiegeSpawn(2, 2, false, OriginalHealth: 10,
+            OriginalCombatRow: 0, OriginalAttackSkill: 1_000,
+            OriginalAnimation: new SiegeActorAnimation(0.384, 0.384, 0.384));
         var battle = new SiegeSession(new Player(), army, 0, 4,
             new SiegeLayout(tiles, 1, 2, Facing.East, [near, chosen], retainers: [retainer]));
         var friendly = Assert.Single(battle.Retainers);
+        var chosenActor = battle.Enemies[1];
+        battle.ConfigureActorRaycast((_, target) => ReferenceEquals(target, chosenActor)
+            ? new SiegeActorRayHit(chosenActor, 0x100)
+            : null);
 
         battle.ToggleRetainerSelection(friendly);
-        Assert.True(battle.CommandSelectedRetainersAt(battle.Enemies[1]));
+        Assert.True(battle.CommandSelectedRetainersAt(chosenActor));
         battle.AdvanceRetainerOrders();
-        Assert.Equal((2, 2), (friendly.X, friendly.Y));
-        battle.AdvanceRetainerMovement(0.6001);
+        Assert.Equal(11, friendly.ActorMode);
+        Assert.Equal(SiegeEnemyVisualState.Attack, friendly.VisualState);
+        Assert.Equal(10, battle.Enemies[0].Health);
+        Assert.Equal(10, chosenActor.Health);
 
-        Assert.Equal((2, 3, 0, -64, Facing.South),
-            (friendly.X, friendly.Y, friendly.OffsetX8, friendly.OffsetY8, friendly.Facing));
+        battle.AdvanceEnemyAnimations(0.3841);
+
+        Assert.Equal(10, battle.Enemies[0].Health);
+        Assert.True(chosenActor.Health < 10);
         Assert.False(friendly.Selected);
     }
 

@@ -99,19 +99,8 @@ public sealed partial class SiegeSession
                 AdvanceDefendOrder(retainer);
                 return retainer.MovementActive;
             case SiegeRetainerCommand.Attack:
-                var target = AttackOrderTarget(retainer);
-                if (target is null)
-                {
-                    // Failed mode-6 acquisition leaves both friendly kinds in
-                    // mode 6, whose handler preserves heading and installs 0x40.
-                    retainer.MovementWanders = true;
-                    return true;
-                }
-                retainer.MovementWanders = false;
-                if (Distance(retainer.X, retainer.Y, target.X, target.Y) <=
-                    RetainerAttackRange(retainer) || retainer.OriginalCombatRow is >= 23) return false;
-                AimRetainerAt(retainer, target.X, target.Y);
-                return true;
+                AdvanceAttackOrder(retainer);
+                return retainer.MovementActive;
             case SiegeRetainerCommand.Follow:
                 retainer.MovementWanders = false;
                 if (Distance(retainer.X, retainer.Y, PlayerX, PlayerY) <= 1) return false;
@@ -207,11 +196,12 @@ public sealed partial class SiegeSession
                 if (retainer.RetreatMode == 8)
                 {
                     if (retainer.OrderedTarget is { Health: > 0 } pursued &&
-                        _enemies.Contains(pursued) && ModeEightHasContact(retainer, pursued))
+                        _enemies.Contains(pursued) && ModeEightContactTarget(retainer, pursued) is { } contact)
                     {
                         retainer.RetreatMode = 11;
+                        StoreFriendlyTarget(retainer, contact);
                         retainer.MovementWanders = false;
-                        RetainerRangedAttack(retainer, pursued);
+                        RetainerRangedAttack(retainer, contact);
                         return false;
                     }
                     // Kind-0 transition 0x4E745 selects mode 6 after failed
@@ -423,13 +413,15 @@ public sealed partial class SiegeSession
     // Mode-8 predicate 0x4F7A2 always casts toward the stored target, but it
     // accepts any living opposite-side actor returned by that ray. Contact is
     // strict against the source combat row's raw column-4 distance.
-    private bool ModeEightHasContact(SiegeRetainer retainer, SiegeEnemy target)
+    private SiegeEnemy? ModeEightContactTarget(SiegeRetainer retainer, SiegeEnemy target)
     {
         if (retainer.OriginalCombatRow is not { } row ||
             RayToward(retainer, target) is not { } hit)
-            return false;
+            return null;
         return hit.Actor.Health > 0 && _enemies.Contains(hit.Actor) &&
-               hit.Distance8 < OriginalWeaponCombat.ActorContactDistanceForCombatRow(row);
+               hit.Distance8 < OriginalWeaponCombat.ActorContactDistanceForCombatRow(row)
+            ? hit.Actor
+            : null;
     }
 
     private bool RetainerRangedAttack(SiegeRetainer retainer, SiegeEnemy target)
