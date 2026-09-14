@@ -297,6 +297,21 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void PointerActorTargetUsesStrictReturnedRayDepthInsteadOfActorCellCenter()
+    {
+        var inside = PointerTargetBattle();
+        var insideTarget = Assert.Single(inside.Enemies);
+        var contactDistance8 = OriginalWeaponCombat.ContactDistanceFor(9);
+
+        Assert.Equal(SiegeAction.Hit, inside.Attack(insideTarget, contactDistance8 - 1));
+
+        var boundary = PointerTargetBattle();
+        var boundaryTarget = Assert.Single(boundary.Enemies);
+        Assert.Equal(SiegeAction.Missed, boundary.Attack(boundaryTarget, contactDistance8));
+        Assert.Equal(20, boundaryTarget.Health);
+    }
+
+    [Fact]
     public void SelectedRetainersKeepTheHostileActorChosenByThePointer()
     {
         var tiles = new SiegeTile[10, 10];
@@ -613,6 +628,30 @@ public sealed partial class ResourceAndDefinitionTests
 
         Assert.Equal(SiegeAction.Looted, battle.Interact(Assert.Single(battle.Objects)));
         Assert.Equal(wealthBefore + 25, player.Wealth);
+    }
+
+    [Fact]
+    public void PointerObjectTargetUsesTheStrictFixedPointActionLimit()
+    {
+        var inside = PointerObjectBattle();
+        Assert.Equal(SiegeAction.Looted,
+            inside.Interact(Assert.Single(inside.Objects), 0x27f));
+
+        var boundary = PointerObjectBattle();
+        Assert.Equal(SiegeAction.None,
+            boundary.Interact(Assert.Single(boundary.Objects), 0x280));
+        Assert.Single(boundary.Objects);
+        Assert.Equal(0, boundary.GoldFound);
+    }
+
+    private static SiegeSession PointerObjectBattle()
+    {
+        var tiles = new SiegeTile[6, 6];
+        var pickup = new SiegeObjectSpawn(5, 5,
+            [new SiegeObjectStage(1, SiegeTile.Treasure,
+                new SiegePickupReward(SiegePickupRewardKind.Wealth, 25))]);
+        return new SiegeSession(new Player(), new Army(), 0, 1,
+            new SiegeLayout(tiles, 1, 1, Facing.East, [], [pickup]));
     }
 
     private static SiegeSession PointerTargetBattle()

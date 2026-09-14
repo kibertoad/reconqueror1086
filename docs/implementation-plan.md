@@ -759,6 +759,14 @@ Kind-1 table source `0x4E4A4` maps mode 10 to transition `0x4E805`, selecting mo
 
 `AdvanceKindOneRetreatOrder` now routes public and hit-triggered kind-1 states through `AdvanceDefendOrder` one decision at a time. Regressions cover explicit mode-4 separation, intervening-target mode-11 resolution, strict doubled completion gates, cancellation, the mode-13 health 5/6 boundary, 1.5-scaled escape, and ordinary mode-6 movement. This state slice is **Confirmed**, and the same-pass public Retreat shot is **Disproved**. Continue with remaining first-person transitions, exact pointer-object semantics, and broader menu/estate/audio work.
 
+## Combat checkpoint: 2026-09-14 exact pointer action depth
+
+World dispatcher `0x55524` receives an 8.8 depth from fixed-point raycaster `0x470A8`. Explicit-action comparison `0x556AF` accepts only depth `< 0x280`; the later player weapon path compares the same returned depth strictly with the selected combat row's raw contact column plus its `0x40` player allowance. The runtime formerly preserved hit identity but discarded this depth at the session boundary, substituting Euclidean actor/object cell-center distance.
+
+`SiegePointerHit.Distance8` now flows into depth-aware `SiegeSession.Attack`, `Shoot`, and `Interact` overloads. Pointer actions use the returned depth without a second grid occlusion or center-distance calculation; keyboard actions preserve their existing forward-grid compatibility path. Tests cover `weapon contact - 1` acceptance and equality rejection, plus explicit-action acceptance at `0x27F` and rejection at `0x280`. These depth and strict-boundary semantics are **Confirmed**; the cell-center substitution is **Disproved**.
+
+Potential higher-powered-machine presentation work should be opt-in and observational: viewport supersampling and filtering can be explored after fidelity completion, while visibility, picking, occlusion, interaction, and AI retain the original 64-step ray. A longer ray is not planned because source lookup wraps in the 128-cell authored map and could reveal duplicated or unauthored scenery.
+
 ## Session checkpoint: 2026-09-10
 
 The current migration branch builds with zero warnings under the enforced 1,000-line source limit. All 154 xUnit cases and 146 executable specifications pass. The Inno Setup 7.1.0 package compiles, installs into an isolated directory, launches through its generated **ReConqueror A.D. 1086** Start-menu shortcut, and removes that shortcut during uninstall. Repository policy passes with the expanded proprietary-image boundary.

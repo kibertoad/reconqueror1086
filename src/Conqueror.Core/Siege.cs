@@ -492,8 +492,24 @@ public sealed partial class SiegeSession
     {
         ArgumentNullException.ThrowIfNull(target);
         if (!_objects.Contains(target)) throw new ArgumentException("Object does not belong to this battle.", nameof(target));
-        var distance = Math.Sqrt(Math.Pow(target.X - PlayerX, 2) + Math.Pow(target.Y - PlayerY, 2));
-        if (distance >= 2.5)
+        var distance8 = (int)Math.Round(Math.Sqrt(
+            Math.Pow(target.X - PlayerX, 2) + Math.Pow(target.Y - PlayerY, 2)) * 256);
+        return InteractCore(target, distance8);
+    }
+
+    public SiegeAction Interact(SiegeObject target, int rayDistance8)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+        if (!_objects.Contains(target)) throw new ArgumentException("Object does not belong to this battle.", nameof(target));
+        if (rayDistance8 <= 0) throw new ArgumentOutOfRangeException(nameof(rayDistance8));
+        return InteractCore(target, rayDistance8);
+    }
+
+    private SiegeAction InteractCore(SiegeObject target, int distance8)
+    {
+        // Pointer dispatcher 0x556AF compares the fixed-point ray depth
+        // directly against 0x280. Do not replace it with cell-center range.
+        if (distance8 >= 0x280)
         {
             LastMessage = "That is too far away.";
             TickEnemies();
@@ -519,16 +535,22 @@ public sealed partial class SiegeSession
         return opened ? SiegeAction.DoorOpened : SiegeAction.Blocked;
     }
 
-    public SiegeAction Attack() => AttackCore(null);
+    public SiegeAction Attack() => AttackCore(null, null);
 
     public SiegeAction Attack(SiegeEnemy target)
     {
         ArgumentNullException.ThrowIfNull(target);
         if (!_enemies.Contains(target)) throw new ArgumentException("Target does not belong to this battle.", nameof(target));
-        return AttackCore(target);
+        return AttackCore(target, null);
     }
 
-    private SiegeAction AttackCore(SiegeEnemy? requestedTarget)
+    public SiegeAction Attack(SiegeEnemy target, int rayDistance8)
+    {
+        ValidatePointerTarget(target, rayDistance8);
+        return AttackCore(target, rayDistance8);
+    }
+
+    private SiegeAction AttackCore(SiegeEnemy? requestedTarget, int? requestedDistance8)
     {
         var weapon = Balance.Equipment.FirstOrDefault(x => x.Name.Equals(_player.Inventory.Weapon, StringComparison.OrdinalIgnoreCase));
         var originalItemId = weapon?.OriginalWeaponItemId;
@@ -537,7 +559,7 @@ public sealed partial class SiegeSession
             : weapon is null ? 1 : Math.Clamp(weapon.Power / 70, 1, 2);
         var target = requestedTarget is null
             ? FirstEnemyAhead(reach)
-            : PlayerCanReach(requestedTarget, originalItemId, reach) ? requestedTarget : null;
+            : PlayerCanReach(requestedTarget, originalItemId, reach, requestedDistance8) ? requestedTarget : null;
         if (target is null)
         {
             if (requestedTarget is null && FirstDestructibleAhead(reach) is { } obstacle)
@@ -551,7 +573,7 @@ public sealed partial class SiegeSession
         }
         var hit = weapon?.OriginalWeaponItemId is { } attackItemId && target.OriginalAttackSkill is { } targetSkill
             ? OriginalWeaponCombat.Hits(OriginalWeaponCombat.PlayerAttackSkill(_player), targetSkill,
-                IsCloseRangedAttack(attackItemId, target), Facing == target.Facing, _random)
+                IsCloseRangedAttack(attackItemId, target, requestedDistance8), Facing == target.Facing, _random)
             : _random.Next(220) < Math.Clamp((weapon?.Power ?? 35) + _player.Stats.Dexterity * 3
                 - (target.Champion ? 35 : 0), 15, 210);
         if (hit)
@@ -581,16 +603,22 @@ public sealed partial class SiegeSession
         return broke ? SiegeAction.WeaponBroke : target.Health <= 0 ? SiegeAction.Hit : SiegeAction.Hit;
     }
 
-    public SiegeAction Shoot() => ShootCore(null);
+    public SiegeAction Shoot() => ShootCore(null, null);
 
     public SiegeAction Shoot(SiegeEnemy target)
     {
         ArgumentNullException.ThrowIfNull(target);
         if (!_enemies.Contains(target)) throw new ArgumentException("Target does not belong to this battle.", nameof(target));
-        return ShootCore(target);
+        return ShootCore(target, null);
     }
 
-    private SiegeAction ShootCore(SiegeEnemy? requestedTarget)
+    public SiegeAction Shoot(SiegeEnemy target, int rayDistance8)
+    {
+        ValidatePointerTarget(target, rayDistance8);
+        return ShootCore(target, rayDistance8);
+    }
+
+    private SiegeAction ShootCore(SiegeEnemy? requestedTarget, int? requestedDistance8)
     {
         if (_player.Inventory.CrossbowBolts <= 0) { LastMessage = "You have no crossbow bolts."; return SiegeAction.NoAmmunition; }
         if (!_player.Inventory.Weapon.Contains("Crossbow", StringComparison.OrdinalIgnoreCase)) { LastMessage = "Equip a crossbow first."; return SiegeAction.NoAmmunition; }
@@ -602,12 +630,12 @@ public sealed partial class SiegeSession
         _player.Inventory.CrossbowBolts--;
         var target = requestedTarget is null
             ? FirstEnemyAhead(range)
-            : PlayerCanReach(requestedTarget, weapon?.OriginalWeaponItemId, range) ? requestedTarget : null;
+            : PlayerCanReach(requestedTarget, weapon?.OriginalWeaponItemId, range, requestedDistance8) ? requestedTarget : null;
         if (target is not null)
         {
             var hit = weapon?.OriginalWeaponItemId is { } attackItemId && target.OriginalAttackSkill is { } targetSkill
                 ? OriginalWeaponCombat.Hits(OriginalWeaponCombat.PlayerAttackSkill(_player), targetSkill,
-                    closeRanged: IsCloseRangedAttack(attackItemId, target),
+                    closeRanged: IsCloseRangedAttack(attackItemId, target, requestedDistance8),
                     behindDefender: Facing == target.Facing, _random)
                 : true;
             if (hit)
@@ -824,16 +852,18 @@ public sealed partial class SiegeSession
         return null;
     }
 
-    private bool PlayerCanReach(SiegeEnemy target, int? originalItemId, int fallbackReach)
+    private bool PlayerCanReach(SiegeEnemy target, int? originalItemId, int fallbackReach,
+        int? rayDistance8 = null)
     {
         if (target.Health <= 0) return false;
         var dx = target.X - PlayerX;
         var dy = target.Y - PlayerY;
-        var fixedDistance = PlayerDistanceInFixedPoint(target);
+        var fixedDistance = rayDistance8 ?? PlayerDistanceInFixedPoint(target);
         var fixedReach = originalItemId is { } itemId
             ? OriginalWeaponCombat.ContactDistanceFor(itemId)
             : fallbackReach * 256;
         if (fixedDistance >= fixedReach) return false;
+        if (rayDistance8 is not null) return true;
         var steps = Math.Max(Math.Abs(dx), Math.Abs(dy));
         for (var step = 1; step < steps; step++)
         {
@@ -846,8 +876,16 @@ public sealed partial class SiegeSession
         return true;
     }
 
-    private bool IsCloseRangedAttack(int originalItemId, SiegeEnemy target) =>
-        OriginalWeaponCombat.CombatRowFor(originalItemId) >= 23 && PlayerDistanceInFixedPoint(target) <= 256;
+    private bool IsCloseRangedAttack(int originalItemId, SiegeEnemy target, int? rayDistance8 = null) =>
+        OriginalWeaponCombat.CombatRowFor(originalItemId) >= 23 &&
+        (rayDistance8 ?? PlayerDistanceInFixedPoint(target)) <= 256;
+
+    private void ValidatePointerTarget(SiegeEnemy target, int rayDistance8)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+        if (!_enemies.Contains(target)) throw new ArgumentException("Target does not belong to this battle.", nameof(target));
+        if (rayDistance8 <= 0) throw new ArgumentOutOfRangeException(nameof(rayDistance8));
+    }
 
     private int PlayerDistanceInFixedPoint(SiegeEnemy target)
     {

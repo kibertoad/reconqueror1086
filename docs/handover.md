@@ -117,6 +117,12 @@ Actor loader `0x51A8B`-`0x51B74` maps player red/green/blue to palette-family an
 
 Kind-1 public Retreat now preserves separate `10→4` and `4→11` thinker passes through transitions `0x4E805/0x4E6D3`; the former runtime shot in the first pass. The previously uncovered mode-13 slot at source `0x4E4B0` resolves to `0x4E851`, choosing mode 6 at health `>=6` or scaled mode 10 below it. Adjacent mode-5/6 sources `0x4E490/0x4E494` resolve to `0x4E70C/0x4E745`. `AdvanceKindOneRetreatOrder` reuses the complete friendly table path for public and hit-triggered states. Focused tests cover pass separation, health 5/6 movement, deferred damage, intervening targets, repetition, and cancellation. Continue with exact pointer-object semantics and the remaining migration priorities.
 
+## Pointer depth checkpoint: 2026-09-14
+
+Primary world dispatch now carries the exact `0x470A8` 8.8 ray depth through `SiegePointerHit` into targeted player attacks, shots, and explicit object actions. `SiegeSession.Attack/Shoot` compare that supplied depth directly with the equipped combat row's confirmed contact distance, while `Interact` uses the strict `< 0x280` test at `0x556AF`; none of these pointer paths substitute actor/object cell-center distance. Existing keyboard targeting retains its grid/occlusion compatibility path. Boundary regressions cover `contact - 1` versus `contact` and `0x27F` versus `0x280`. Continue with remaining friendly states and broader migration priorities.
+
+An optional enhanced renderer may eventually supersample the viewport or improve presentation filtering, but it should retain the original 64-step compatibility ray for visibility, picking, occlusion, and AI. Extending the ray is not presently recommended: the source lookup wraps within the authored 128-cell map and could expose duplicated or unauthored space. This is a post-fidelity option, not a change to original-game claims.
+
 ## Safety and repository rules
 
 - The original installation at `C:\GOG Games\Conqueror AD1086` is read-only reference material.

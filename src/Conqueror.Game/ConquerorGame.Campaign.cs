@@ -460,7 +460,7 @@ public sealed partial class ConquerorGame
         else if (pointerHit?.Actor is { } hostile && !_siege.CommandSelectedRetainersAt(hostile))
             clickedEnemy = hostile;
         else if (pointerHit?.Object is { } clickedObject)
-            _siege.Interact(clickedObject);
+            _siege.Interact(clickedObject, pointerHit.Value.Distance8);
         var clickedForegroundTarget = clickedEnemy is null ? null : pointerTarget;
         var crossbowEquipped = _campaign.State.Player.Inventory.Weapon
             .Contains("Crossbow", StringComparison.OrdinalIgnoreCase);
@@ -474,7 +474,9 @@ public sealed partial class ConquerorGame
         {
             var enemiesBeforeAttack = LivingSiegeEnemyState();
             var attackFrames = SiegeCombatPresentation.AttackFramesFor(_campaign.State.Player.Inventory.Weapon);
-            var action = clickedEnemy is null ? _siege.Attack() : _siege.Attack(clickedEnemy);
+            var action = clickedEnemy is null
+                ? _siege.Attack()
+                : _siege.Attack(clickedEnemy, pointerHit!.Value.Distance8);
             StartSiegeWeapon(attackFrames,
                 SiegeCombatPresentation.OriginalCombatRowFor(_campaign.State.Player.Inventory.Weapon),
                 action == SiegeAction.Hit, clickedForegroundTarget);
@@ -483,7 +485,9 @@ public sealed partial class ConquerorGame
         if (press(Keys.X) || clickedEnemy is not null && crossbowEquipped)
         {
             var enemiesBeforeShot = LivingSiegeEnemyState();
-            var action = clickedEnemy is null ? _siege.Shoot() : _siege.Shoot(clickedEnemy);
+            var action = clickedEnemy is null
+                ? _siege.Shoot()
+                : _siege.Shoot(clickedEnemy, pointerHit!.Value.Distance8);
             if (action == SiegeAction.Shot)
             {
                 StartSiegeWeapon(SiegeCombatPresentation.CrossbowAttack, 23, contacted: false, clickedForegroundTarget);
@@ -635,7 +639,7 @@ public sealed partial class ConquerorGame
                 var target = actor is not null ? (actor.X, actor.Y) :
                     item is not null ? (item.X, item.Y) :
                     (candidate.SourceMapX, candidate.SourceMapY);
-                return new SiegePointerHit(hit.Distance, actor, item, target);
+                return new SiegePointerHit(hit.Distance8, actor, item, target);
             }
 
             if (candidate.Block.TextureForFace(hit.Face switch
@@ -647,7 +651,7 @@ public sealed partial class ConquerorGame
                 }) < 0) continue;
             if (!SiegeWallPixelContains(SceneWallTexture(hit), hit, bounds, localY)) continue;
             return new SiegePointerHit(
-                hit.Distance, null, _siege.ObjectAt(hit.MapX, hit.MapY),
+                hit.Distance8, null, _siege.ObjectAt(hit.MapX, hit.MapY),
                 (hit.ContactX8 >> 8, hit.ContactY8 >> 8));
         }
         return null;
@@ -684,7 +688,7 @@ public sealed partial class ConquerorGame
         : new Rectangle(0, 85, 1024, 520);
 
     private readonly record struct SiegePointerHit(
-        double Distance, SiegeEnemy? Actor, SiegeObject? Object, (int X, int Y)? TargetCell);
+        int Distance8, SiegeEnemy? Actor, SiegeObject? Object, (int X, int Y)? TargetCell);
 
     private SiegeRetainerCommand? SiegePointerCommand(MouseState mouse)
     {
