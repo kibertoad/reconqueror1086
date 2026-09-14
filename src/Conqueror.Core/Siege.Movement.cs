@@ -109,7 +109,10 @@ public sealed partial class SiegeSession
                 // and mode 4 for kind 1 after acquiring a visible opponent.
                 // Mode 5 preserves heading; kind 1 continues through ranged mode 11.
                 if (retainer.OriginalActorKind == 1)
-                    return false;
+                {
+                    AdvanceKindOneRetreatOrder(retainer);
+                    return retainer.MovementActive;
+                }
                 if (retainer.RetreatMode == 0)
                 {
                     if (AcquireRetreatOrderTarget(retainer) is not null)

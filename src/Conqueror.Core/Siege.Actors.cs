@@ -100,15 +100,23 @@ public sealed partial class SiegeSession
                         RetainerRangedAttack(retainer, meleeTarget);
                     break;
                 }
-                var retreatTarget = RetreatOrderTarget(retainer);
-                if (retreatTarget is null)
-                {
-                    retainer.Command = SiegeRetainerCommand.Defend;
-                    retainer.OrderedTarget = null;
-                }
-                else
-                    RetainerRangedAttack(retainer, retreatTarget);
+                // Kind 1 does not jump directly from requested mode 10 to a
+                // shot. It uses its ordinary table one predicate at a time:
+                // 10 -> 4/2, then 4 -> 11/1. The same route owns mode 13
+                // recovery after a hit.
+                AdvanceKindOneRetreatOrder(retainer);
                 break;
+        }
+    }
+
+    private void AdvanceKindOneRetreatOrder(SiegeRetainer retainer)
+    {
+        var previousMode = retainer.ActorMode;
+        AdvanceDefendOrder(retainer);
+        if (previousMode == 10 && retainer.ActorMode == 2)
+        {
+            retainer.Command = SiegeRetainerCommand.Defend;
+            retainer.OrderedTarget = null;
         }
     }
 
@@ -147,6 +155,22 @@ public sealed partial class SiegeSession
                 var opponent = AcquireRetreatOrderTarget(retainer);
                 if (opponent is not null) StoreFriendlyTarget(retainer, opponent);
                 retainer.ActorMode = opponent is null ? 1 : retainer.OriginalActorKind == 1 ? 11 : 8;
+                break;
+            }
+            case 5:
+            {
+                var ally = RetreatFormationTarget(retainer);
+                if (ally is not null) retainer.RetreatRegroupTarget = ally;
+                retainer.ActorMode = ally is null ? 5 : 7;
+                break;
+            }
+            case 6:
+            {
+                var opponent = AcquireRetreatOrderTarget(retainer);
+                if (opponent is not null) StoreFriendlyTarget(retainer, opponent);
+                retainer.ActorMode = opponent is null
+                    ? 6
+                    : retainer.OriginalActorKind == 1 ? 11 : 8;
                 break;
             }
             case 7:

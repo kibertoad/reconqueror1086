@@ -242,7 +242,7 @@ public sealed partial class ResourceAndDefinitionTests
     private static SiegeSession HostileBattle(int enemyX, int retainerX, int enemyHealth,
         int retainerHealth, int actorTemplate = 3, int enemyAttackSkill = 50,
         int enemyArmor = 6, int retainerAttackSkill = 50, int retainerArmor = 0,
-        int retainerY = 2)
+        int retainerY = 2, int retainerActorKind = 0)
     {
         var tiles = new SiegeTile[12, 5];
         var army = new Army();
@@ -257,7 +257,7 @@ public sealed partial class ResourceAndDefinitionTests
         var retainer = new SiegeSpawn(retainerX, retainerY, false, OriginalArmor: retainerArmor,
             OriginalHealth: retainerHealth, OriginalCombatRow: 0,
             OriginalAttackSkill: retainerAttackSkill,
-            OriginalActorKind: 0, OriginalActorOrder: 0);
+            OriginalActorKind: retainerActorKind, OriginalActorOrder: 0);
         var battle = new SiegeSession(new Player(), army, 0, 1086,
             new SiegeLayout(tiles, 1, 1, Facing.East, [enemy], retainers: [retainer]));
         Assert.Equal(modes.Current, Assert.Single(battle.Enemies).ActorMode);

@@ -753,6 +753,12 @@ Loader `0x51A8B`-`0x51B74` maps player red, green, and blue to palette-family / 
 
 `SiegeActorColorMapping` and `SceneEnemyTexture` implement this **Confirmed** path, including unknown-color fallback to executable default red. Focused tests cover all player tuples, both conflict alternatives, non-conflicting hostile preservation, all 32 distance variants, and invalid family bounds. The complete owned census covers 144 actor bases and 1,002 placements with authored selector bases 0/32/64/96; no decoded bytes or generated report is committed. Continue with remaining friendly states and first-person combat transitions.
 
+## Combat checkpoint: 2026-09-14 kind-1 Retreat and hit recovery ordering
+
+Kind-1 table source `0x4E4A4` maps mode 10 to transition `0x4E805`, selecting mode 4 after visible-opponent acquisition or mode 2 on failure. Mode-4 source `0x4E48C` maps to `0x4E6D3`, selecting ranged mode 11 or fallback mode 1. State routine `0x4F49C` permits only one predicate before invoking the new handler, so public Retreat requires distinct `10→4` and `4→11` thinker passes; the former runtime constructed its shot one pass too early. Mode-13 source `0x4E4B0` maps to `0x4E851`, which records failure mode 10 and success mode 6 around the shared health-`>=6` predicate. Mode-5/6 sources `0x4E490/0x4E494` map to `0x4E70C/0x4E745`, retaining their wandering states or selecting regroup mode 7 / ranged mode 11.
+
+`AdvanceKindOneRetreatOrder` now routes public and hit-triggered kind-1 states through `AdvanceDefendOrder` one decision at a time. Regressions cover explicit mode-4 separation, intervening-target mode-11 resolution, strict doubled completion gates, cancellation, the mode-13 health 5/6 boundary, 1.5-scaled escape, and ordinary mode-6 movement. This state slice is **Confirmed**, and the same-pass public Retreat shot is **Disproved**. Continue with remaining first-person transitions, exact pointer-object semantics, and broader menu/estate/audio work.
+
 ## Session checkpoint: 2026-09-10
 
 The current migration branch builds with zero warnings under the enforced 1,000-line source limit. All 154 xUnit cases and 146 executable specifications pass. The Inno Setup 7.1.0 package compiles, installs into an isolated directory, launches through its generated **ReConqueror A.D. 1086** Start-menu shortcut, and removes that shortcut during uninstall. Repository policy passes with the expanded proprietary-image boundary.

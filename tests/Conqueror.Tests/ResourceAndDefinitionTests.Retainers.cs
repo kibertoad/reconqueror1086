@@ -511,6 +511,37 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(OriginalActorMotion.Rotate(96, 0, heading), actualDelta);
     }
 
+    [Theory]
+    [InlineData(5, 10, 96)]
+    [InlineData(6, 6, 64)]
+    public void KindOneHitUsesItsModeThirteenSixOrTenTransition(
+        int retainerHealth, int expectedMode, int expectedMovement)
+    {
+        var battle = HostileBattle(enemyX: 5, retainerX: 4, enemyHealth: 20,
+            retainerHealth: retainerHealth, enemyAttackSkill: 1_000, retainerArmor: 10,
+            retainerActorKind: 1);
+        var bowman = Assert.Single(battle.Retainers);
+        var enemy = Assert.Single(battle.Enemies);
+        battle.ToggleRetainerSelection(bowman);
+        Assert.True(battle.CommandSelectedRetainersAt(enemy));
+
+        battle.AdvanceHostileMovement(0);
+        battle.AdvanceHostileMovement(0.4001);
+        battle.AdvanceEnemyAnimations(0.3841);
+
+        Assert.Equal(13, bowman.ActorMode);
+        Assert.Equal(SiegeEnemyVisualState.Hit, bowman.VisualState);
+        battle.AdvanceEnemyAnimations(0.3841);
+
+        Assert.Equal(expectedMode, bowman.ActorMode);
+        var beforeX8 = (bowman.X << 8) + bowman.OffsetX8;
+        var beforeY8 = (bowman.Y << 8) + bowman.OffsetY8;
+        battle.AdvanceRetainerMovement(0.2001);
+        var movement = Math.Abs((bowman.X << 8) + bowman.OffsetX8 - beforeX8) +
+            Math.Abs((bowman.Y << 8) + bowman.OffsetY8 - beforeY8);
+        Assert.Equal(expectedMovement, movement);
+    }
+
     [Fact]
     public void ModeTenEscapeUsesExecutableThreeHalvesAndNonCardinalRounding()
     {
@@ -551,6 +582,11 @@ public sealed partial class ResourceAndDefinitionTests
 
         battle.AdvanceRetainerOrders();
 
+        Assert.Equal(4, friendly.ActorMode);
+        Assert.Equal(SiegeEnemyVisualState.Walk, friendly.VisualState);
+        battle.AdvanceRetainerOrders();
+
+        Assert.Equal(11, friendly.ActorMode);
         Assert.Equal(SiegeEnemyVisualState.Attack, friendly.VisualState);
         Assert.Equal(Facing.East, friendly.Facing);
         Assert.Equal(20, Assert.Single(battle.Enemies).Health);
@@ -590,6 +626,7 @@ public sealed partial class ResourceAndDefinitionTests
         battle.CommandRetainers(SiegeRetainerCommand.Retreat);
 
         battle.AdvanceRetainerOrders();
+        battle.AdvanceRetainerOrders();
         battle.AdvanceEnemyAnimations(0.7681);
 
         Assert.Equal(20, aimedActor.Health);
@@ -603,6 +640,7 @@ public sealed partial class ResourceAndDefinitionTests
             actorKind: 1, combatRow: 23, retainerAttackSkill: 1_000, enemyHealth: 200);
         var friendly = Assert.Single(battle.Retainers);
         battle.CommandRetainers(SiegeRetainerCommand.Retreat);
+        battle.AdvanceRetainerOrders();
         battle.AdvanceRetainerOrders();
 
         battle.AdvanceEnemyAnimations(0.7681);
@@ -643,6 +681,8 @@ public sealed partial class ResourceAndDefinitionTests
         divided.CommandRetainers(SiegeRetainerCommand.Retreat);
         whole.AdvanceRetainerOrders();
         divided.AdvanceRetainerOrders();
+        whole.AdvanceRetainerOrders();
+        divided.AdvanceRetainerOrders();
 
         whole.AdvanceEnemyAnimations(0.7681);
         divided.AdvanceEnemyAnimations(0.384);
@@ -659,6 +699,7 @@ public sealed partial class ResourceAndDefinitionTests
         var battle = RetainerOrderBattle(retainerX: 2, enemyX: 9,
             actorKind: 1, combatRow: 23, retainerAttackSkill: 1_000, enemyHealth: 200);
         battle.CommandRetainers(SiegeRetainerCommand.Retreat);
+        battle.AdvanceRetainerOrders();
         battle.AdvanceRetainerOrders();
 
         battle.CommandRetainers(SiegeRetainerCommand.Defend);
@@ -706,6 +747,7 @@ public sealed partial class ResourceAndDefinitionTests
             new SiegeLayout(tiles, 1, 1, Facing.East, [enemy], retainers: [retainer]));
         battle.CommandRetainers(SiegeRetainerCommand.Retreat);
 
+        battle.AdvanceRetainerOrders();
         battle.AdvanceRetainerOrders();
         battle.AdvanceEnemyAnimations(0.7681);
 

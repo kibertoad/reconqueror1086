@@ -10,7 +10,7 @@ The authoritative gate is:
 & '.\Run Tests.bat'
 ```
 
-The current actor-color implementation gate passes 295 xUnit cases and 146 executable specifications with zero build warnings. Repository policy passes; re-run the gate after checkout rather than inferring current health from this note alone.
+The current kind-1 recovery implementation gate passes 297 xUnit cases and 146 executable specifications with zero build warnings. Repository policy passes; re-run the gate after checkout rather than inferring current health from this note alone.
 
 ## Latest completed combat recovery
 
@@ -112,6 +112,10 @@ Both friendly kind tables map modes 16/17 identically. Fixup sources `0x4E478/0x
 ## Actor color checkpoint: 2026-09-14
 
 Actor loader `0x51A8B`-`0x51B74` maps player red/green/blue to palette-family and walk-texture tuples `(0,64)`, `(32,128)`, and `(64,96)`, assigns the tuple to every friendly, and changes only a conflicting hostile (to blue, or green against blue). State copier `0x4E39C` replaces state textures without replacing normalized selector `+0x08`; renderer `0x46E3B`-`0x47057` adds the recovered 0-31 distance map. `SiegeActorColorMapping` and `SceneEnemyTexture` implement the exact mapping. The owned census covers 144 bases / 1,002 placements and all four authored family bases; generated reports remain ignored. Continue with remaining friendly states and first-person combat transitions.
+
+## Kind-1 recovery checkpoint: 2026-09-14
+
+Kind-1 public Retreat now preserves separate `10→4` and `4→11` thinker passes through transitions `0x4E805/0x4E6D3`; the former runtime shot in the first pass. The previously uncovered mode-13 slot at source `0x4E4B0` resolves to `0x4E851`, choosing mode 6 at health `>=6` or scaled mode 10 below it. Adjacent mode-5/6 sources `0x4E490/0x4E494` resolve to `0x4E70C/0x4E745`. `AdvanceKindOneRetreatOrder` reuses the complete friendly table path for public and hit-triggered states. Focused tests cover pass separation, health 5/6 movement, deferred damage, intervening targets, repetition, and cancellation. Continue with exact pointer-object semantics and the remaining migration priorities.
 
 ## Safety and repository rules
 
