@@ -359,11 +359,14 @@ public sealed partial class ConquerorGame
         return new Rectangle(viewport.X, top, viewport.Width, Math.Max(1, bottom - top + 1));
     }
 
-    private (Texture2D? Texture, bool Flip) SceneEnemyTexture(SiegeEnemy enemy)
+    private (Texture2D? Texture, bool Flip) SceneEnemyTexture(
+        SiegeEnemy enemy, bool friendly, double distance)
     {
         if (_siegeVisuals is null || enemy.VisualId < 0 || enemy.VisualId >= _siegeVisuals.Scene.Blocks.Count)
             return (null, false);
         var block = _siegeVisuals.Scene.Blocks[enemy.VisualId];
+        var colors = SiegeActorColorMapping.Normalize(
+            _campaign.State.Player.HeraldicColor, friendly, block.Flags, block.Surface0);
         var frame = _siege is null
             ? new SiegeEnemyFrame(4, false)
             : SiegeViewProjection.FrameFor(enemy, _siege.PlayerX, _siege.PlayerY);
@@ -377,6 +380,8 @@ public sealed partial class ConquerorGame
             selectedBlock = ActorStateBlock(block, 2);
         else if (enemy.VisualState == SiegeEnemyVisualState.Dying)
             selectedBlock = ActorStateBlock(block, 3);
+        if (enemy.VisualState == SiegeEnemyVisualState.Walk)
+            selectedBlock = selectedBlock with { Surface0 = colors.WalkTextureBase };
         var selected = selectedBlock.TextureForBillboardHeading(relativeHeading);
         var textureIndex = selected.TextureIndex;
         if (enemy.VisualState == SiegeEnemyVisualState.Walk && block.Surface2 > 0)
@@ -386,7 +391,9 @@ public sealed partial class ConquerorGame
                 : block.Surface2 / 2 + 1;
             textureIndex += enemy.WalkFrame * stride;
         }
-        return (_siegeVisuals.TextureFor(textureIndex) ?? FirstSceneTexture(selectedBlock),
+        var colorMapIndex = SiegeActorColorMapping.DistanceMapIndex(
+            colors, distance, _siegeVisuals.Scene.ColorMapping, selectedBlock.ColorMapOffset);
+        return (_siegeVisuals.TextureFor(textureIndex, colorMapIndex) ?? FirstSceneTexture(selectedBlock),
             selected.FlipHorizontally);
     }
 
@@ -722,7 +729,8 @@ public sealed partial class ConquerorGame
     private void DrawSiegeActor(
         SiegeEnemyProjection projection, bool friendly, Rectangle viewport, double[] depths)
     {
-        var (texture, flip) = SceneEnemyTexture(projection.Enemy);
+        var (texture, flip) = SceneEnemyTexture(
+            projection.Enemy, friendly, projection.ForwardDistance);
         var layout = SiegeViewProjection.ActorLayout(projection, viewport.Width, viewport.Height,
             texture?.Width, texture?.Height);
         var left = viewport.X + layout.Left;
