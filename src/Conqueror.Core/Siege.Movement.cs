@@ -102,10 +102,8 @@ public sealed partial class SiegeSession
                 AdvanceAttackOrder(retainer);
                 return retainer.MovementActive;
             case SiegeRetainerCommand.Follow:
-                retainer.MovementWanders = false;
-                if (Distance(retainer.X, retainer.Y, PlayerX, PlayerY) <= 1) return false;
-                AimRetainerAt(retainer, PlayerX, PlayerY);
-                return true;
+                AdvanceFollowOrder(retainer);
+                return retainer.MovementActive;
             case SiegeRetainerCommand.Retreat:
                 // Requested mode 10 transitions to mode 5 for friendly kind 0
                 // and mode 4 for kind 1 after acquiring a visible opponent.

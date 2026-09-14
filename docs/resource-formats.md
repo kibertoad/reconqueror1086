@@ -547,6 +547,8 @@ tests cover kind-2/7 and kind-4 fallbacks, mode-2 contact, non-cardinal input
 cardinalization, hit cancellation, and delayed attack completion. GameFAQs FAQ
 66730 contains no comparable state or scheduling detail.
 
+Follow modes 16/17 are now **Confirmed** for both friendly kinds. Fixup sources `0x4E478/0x4E47C` in the kind-0 table and `0x4E4BC/0x4E4C0` in the kind-1 table resolve to the same transition bodies `0x4E7CA/0x4E7DD`. Mode 16 evaluates same-side contact predicate `0x4F8B0`, then `0x4E7CA` selects mode 17 for both Boolean outcomes. Mode-17 handler `0x4FDCD` clears target fields and installs the preserved-heading `0x40` family. Predicate `0x4FB39` casts specifically toward player `D4D0`, accepts only that exact actor below strict depth `0x7FFF`, and stores its integer coordinates; `0x4E7DD` retains 17 on failure or selects direct mode 16 on success. Handler `0x4FE76` then installs cardinalized `0x112` movement. `AdvanceFollowOrder`, `FollowModeSixteenHasContact`, `FollowPlayerIsVisible`, and `BeginFriendlyMode` preserve this alternating effect-boundary loop. Tests cover the initial unconditional mode-17 effect, preserved heading, wrong returned identity, equality rejection, and below-boundary return to mode 16. The former one-cell stop is **Disproved**.
+
 ## Open questions
 
 1. Recover the semantic meaning of directory field `0x24` and test whether data extents may alias or overlap.

@@ -330,7 +330,7 @@ public sealed partial class SiegeSession
         {
             retainer.Command = command;
             retainer.ActorMode = (int)command;
-            retainer.OrderedTarget = null;
+            retainer.OrderedTarget = command == SiegeRetainerCommand.Follow ? PlayerActor : null;
             retainer.OrderedDestination = null;
             ResetRetainerMovement(retainer);
         }

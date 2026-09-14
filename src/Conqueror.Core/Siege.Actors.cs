@@ -81,6 +81,7 @@ public sealed partial class SiegeSession
                 AdvanceAttackOrder(retainer);
                 break;
             case SiegeRetainerCommand.Follow:
+                AdvanceFollowOrder(retainer);
                 break;
             case SiegeRetainerCommand.Retreat:
                 if (retainer.OriginalActorKind != 1)
@@ -179,6 +180,27 @@ public sealed partial class SiegeSession
         BeginFriendlyMode(retainer);
     }
 
+    private void AdvanceFollowOrder(SiegeRetainer retainer)
+    {
+        switch (retainer.ActorMode)
+        {
+            case 16:
+                // Predicate 0x4F8B0 is evaluated, but transition 0x4E7CA
+                // records mode 17 for both success and failure.
+                _ = FollowModeSixteenHasContact(retainer);
+                retainer.ActorMode = 17;
+                break;
+            case 17:
+                retainer.ActorMode = FollowPlayerIsVisible(retainer) ? 16 : 17;
+                break;
+            default:
+                retainer.ActorMode = 16;
+                retainer.OrderedTarget = PlayerActor;
+                break;
+        }
+        BeginFriendlyMode(retainer);
+    }
+
     private void AdvanceAttackOrder(SiegeRetainer retainer)
     {
         switch (retainer.ActorMode)
@@ -240,7 +262,37 @@ public sealed partial class SiegeSession
                 if (retainer.OrderedTarget is { Health: > 0 } target)
                     RetainerRangedAttack(retainer, target);
                 break;
+            case 16:
+                if (retainer.OrderedTarget is { Health: > 0 } followed)
+                {
+                    AimRetainerAt(retainer, followed.X, followed.Y);
+                    retainer.MovementActive = true;
+                }
+                break;
+            case 17:
+                retainer.OrderedTarget = null;
+                retainer.MovementWanders = true;
+                retainer.MovementActive = true;
+                break;
         }
+    }
+
+    private bool FollowModeSixteenHasContact(SiegeRetainer retainer)
+    {
+        if (retainer.OrderedTarget is not { Health: > 0 } target ||
+            RayToward(retainer, target) is not { Distance8: < 0x200 } hit)
+            return false;
+        return hit.Actor.Health > 0 &&
+            (ReferenceEquals(hit.Actor, PlayerActor) || _retainers.Contains(hit.Actor));
+    }
+
+    private bool FollowPlayerIsVisible(SiegeRetainer retainer)
+    {
+        if (PlayerActor.Health <= 0 || RayToward(retainer, PlayerActor) is not { } hit ||
+            !ReferenceEquals(hit.Actor, PlayerActor) || hit.Distance8 >= 0x7fff)
+            return false;
+        StoreFriendlyTarget(retainer, PlayerActor);
+        return true;
     }
 
     private static void StoreFriendlyTarget(SiegeRetainer retainer, SiegeEnemy target)

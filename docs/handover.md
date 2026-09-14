@@ -10,7 +10,7 @@ The authoritative gate is:
 & '.\Run Tests.bat'
 ```
 
-The current friendly-Attack implementation gate passes 283 xUnit cases and 146 executable specifications with zero build warnings. Repository policy passes; re-run the gate after checkout rather than inferring current health from this note alone.
+The current friendly-Follow implementation gate passes 285 xUnit cases and 146 executable specifications with zero build warnings. Repository policy passes; re-run the gate after checkout rather than inferring current health from this note alone.
 
 ## Latest completed combat recovery
 
@@ -101,7 +101,13 @@ The older item 3 wording below is superseded for command dispatch, intent, visib
 
 Public Attack is now closed through its executable state loop. Handler `0x5700E` requests mode 6 through `0x4E5F0`; acquisition `0x4F98D` retains wandering mode 6 on failure, sends kind 0 through pursuit mode 8, and sends kind 1 directly to mode 11. Predicate `0x4F7A2` accepts the actual returned hostile only strictly below the raw combat-row contact threshold, including an intervening hostile rather than necessarily the aimed identity. Handler `0x5010B` constructs the attack effect and scheduler `0x53365` alone applies damage at completion before `0x53D47` recalls the same actor thinker.
 
-`AdvanceAttackOrder`, `ModeEightContactTarget`, `BeginFriendlyMode`, and `PendingRangedTarget` replace the former synchronous kind-0 grid strike. Tests cover public and pointer-selected pursuit without immediate damage, exact contact equality rejection, intervening-target identity, and completion-gated damage. The synchronous shortcut is **Disproved**. Continue next with exact Follow modes 16/17, then raw actor color normalization and remaining first-person combat transitions.
+`AdvanceAttackOrder`, `ModeEightContactTarget`, `BeginFriendlyMode`, and `PendingRangedTarget` replace the former synchronous kind-0 grid strike. Tests cover public and pointer-selected pursuit without immediate damage, exact contact equality rejection, intervening-target identity, and completion-gated damage. The synchronous shortcut is **Disproved**.
+
+## Friendly Follow checkpoint: 2026-09-14
+
+Both friendly kind tables map modes 16/17 identically. Fixup sources `0x4E478/0x4E47C` and `0x4E4BC/0x4E4C0` resolve to `0x4E7CA/0x4E7DD`. Mode 16 evaluates same-side contact predicate `0x4F8B0`, but transition `0x4E7CA` selects mode 17 regardless of its result. Mode 17 clears the target and runs preserved-heading handler `0x4FDCD`; predicate `0x4FB39` then returns to direct mode 16 only for exact player actor `D4D0` below strict depth `0x7FFF`, storing its live integer coordinates. The former one-cell stop is **Disproved**.
+
+`AdvanceFollowOrder`, `FollowModeSixteenHasContact`, `FollowPlayerIsVisible`, and `BeginFriendlyMode` implement the alternating wandering/direct effect loop with one predicate at each effect boundary. Focused tests cover the unconditional first mode-17 effect, preserved heading, wrong returned identity, exact-boundary rejection, and below-boundary mode-16 return. Continue with raw actor color normalization and remaining first-person combat transitions.
 
 ## Safety and repository rules
 
