@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Conqueror.Core;
 
-public sealed class Campaign
+public sealed partial class Campaign
 {
     public const int CurrentSaveSchemaVersion = 1;
 
@@ -330,7 +330,10 @@ public sealed class Campaign
             var previousMonth = State.Date.Month;
             var previousYear = State.Date.Year;
             State.Date = State.Date.AddDays(1);
+            ResolveSpyReportFromEnemyMovement();
             ResolveArmyOrders();
+            ResolveEnemyMovements();
+            TryStartEnemyMovement();
             if (State.Date.Month != previousMonth) SettleMonth();
             if (State.Date.Year != previousYear)
             {
@@ -372,7 +375,6 @@ public sealed class Campaign
             State.PendingDrogoEncounter = true;
             Log($"Drogo, the moneylender's thug, comes to collect the {p.Debt}s debt.");
         }
-        ResolveSpyReports();
         Log($"Month settled: +{revenue}s revenue, -{upkeep}s upkeep, {productivity}% productivity.");
     }
 
@@ -521,6 +523,17 @@ public sealed class Campaign
                 || order.Destination >= World.Locations.Length || order.Arrives <= order.Departed
                 || State.Player.ArmyLocationAt(armyIndex) != order.Origin)
                 throw new InvalidDataException("Campaign contains an invalid army movement order.");
+        if (State.EnemyMovements is null || State.EnemyMovements.Count > OriginalEnemyMovementSlotCount
+            || State.EnemyMovements.Select(movement => movement.Slot).Distinct().Count() != State.EnemyMovements.Count)
+            throw new InvalidDataException("Campaign contains an invalid enemy movement roster.");
+        foreach (var movement in State.EnemyMovements)
+            if (movement.Slot is < 0 or >= OriginalEnemyMovementSlotCount
+                || movement.Origin <= 0 || movement.Origin >= World.Locations.Length
+                || movement.Destination <= 0 || movement.Destination >= World.Locations.Length
+                || movement.Origin == movement.Destination || movement.Arrives <= movement.Departed
+                || movement.Swordsmen < 0 || movement.Halberdiers < 0 || movement.Knights < 0
+                || movement.Total <= 0)
+                throw new InvalidDataException("Campaign contains an invalid enemy movement record.");
     }
 
     private void ResolveArmyOrders()
@@ -560,18 +573,6 @@ public sealed class Campaign
     private int ActiveArmyIndex() => State.PendingFriendlyArmyIndex is >= 0 and < Player.ArmyDivisionLimit
         ? State.PendingFriendlyArmyIndex
         : State.Player.JoinedArmyIndex is int joined and >= 0 and < Player.ArmyDivisionLimit ? joined : 0;
-
-    private void ResolveSpyReports()
-    {
-        if (State.Player.ActiveSpies <= 0) return;
-        var targets = Enumerable.Range(1, World.Locations.Length - 1)
-            .Where(index => IsHostileStronghold(index) && !State.SpiedLocations.Contains(index)).ToArray();
-        if (targets.Length == 0) return;
-        var target = targets[_random.Next(targets.Length)];
-        State.SpiedLocations.Add(target);
-        State.Player.ActiveSpies = 0;
-        Log($"A spy reports {GarrisonAt(target)} soldiers guarding {World.Locations[target].Name}.");
-    }
 
     public SiegeSession CreateSiege(SiegeLayout? layout = null)
     {

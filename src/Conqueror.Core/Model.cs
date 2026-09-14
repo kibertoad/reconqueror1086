@@ -92,6 +92,27 @@ public sealed class StrategicArmyDivision
 
 public sealed record StrategicArmyOrder(int Origin, int Destination, DateTime Departed, DateTime Arrives);
 
+public sealed record StrategicEnemyMovement(
+    int Slot,
+    int Origin,
+    int Destination,
+    DateTime Departed,
+    DateTime Arrives,
+    int Swordsmen,
+    int Halberdiers,
+    int Knights)
+{
+    public int Total => Swordsmen + Halberdiers + Knights;
+}
+
+public sealed record StrategicSpyReport(
+    DateTime Date,
+    int MovementSlot,
+    int Location,
+    int Swordsmen,
+    int Halberdiers,
+    int Knights);
+
 public sealed class Fief
 {
     public string Name { get; init; } = "Home Fief";
@@ -236,6 +257,8 @@ public sealed class CampaignState
     public bool PendingDrogoEncounter { get; set; }
     public bool DrogoDefeated { get; set; }
     public Dictionary<int, StrategicArmyOrder> ArmyOrders { get; init; } = [];
+    public List<StrategicEnemyMovement> EnemyMovements { get; init; } = [];
+    public StrategicSpyReport? LatestSpyReport { get; set; }
     public int TournamentToken { get; set; } = -1;
     public int JoustsThisTournament { get; set; }
     public bool SkirmishedThisTournament { get; set; }

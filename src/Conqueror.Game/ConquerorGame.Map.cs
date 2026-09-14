@@ -55,7 +55,13 @@ public sealed partial class ConquerorGame
             : "SPY NOT SENT (NEED HOSTILE CASTLE AND 80S)";
         if (press(Keys.C)) _notice = "TO CLAIM THE CROWN, TRAVEL TO LONDON AND PRESS S TO BESIEGE IT";
         if (press(Keys.D)) BeginDragonChallenge();
-        if (press(Keys.E)) { _campaign.AdvanceDays(_campaign.State.DaySpeed); Autosave(); }
+        if (press(Keys.E))
+        {
+            var previousReport = _campaign.State.LatestSpyReport;
+            _campaign.AdvanceDays(_campaign.State.DaySpeed);
+            ShowNewSpyReport(previousReport);
+            Autosave();
+        }
         if (press(Keys.OemPlus) || press(Keys.Add)) _campaign.State.DaySpeed = Math.Min(15, _campaign.State.DaySpeed + 1);
         if (press(Keys.OemMinus) || press(Keys.Subtract)) _campaign.State.DaySpeed = Math.Max(1, _campaign.State.DaySpeed - 1);
         if (!click || !_originalArt.ContainsKey("Estate.Shell")) return;
@@ -86,8 +92,10 @@ public sealed partial class ConquerorGame
             _notice = "THE DRAGON'S LAIR HAS NOT YET BEEN DISCOVERED";
             return;
         }
+        var previousReport = _campaign.State.LatestSpyReport;
         var days = _campaign.TravelTo(_selectedLocation);
         _notice = days == 0 ? $"ALREADY AT {World.Locations[_selectedLocation].Name}" : $"TRAVELLED {days} DAYS TO {World.Locations[_selectedLocation].Name}";
+        ShowNewSpyReport(previousReport);
         if (days > 0) Autosave();
         if (_campaign.HasPendingFieldBattle) { BeginFieldBattle("YOUR ARMY HAS BEEN INTERCEPTED"); return; }
         if (days > 0 && World.Locations[_selectedLocation].Kind == LocationKind.DragonLair)
@@ -104,6 +112,14 @@ public sealed partial class ConquerorGame
             _screen = Screen.DragonBattle;
             PlayEventMovie("Travel.DragonLair", Screen.DragonBattle);
         }
+    }
+
+    private void ShowNewSpyReport(StrategicSpyReport? previousReport)
+    {
+        var report = _campaign.State.LatestSpyReport;
+        if (report is null || report == previousReport) return;
+        _notice = $"SPY REPORT—{World.Locations[report.Location].Name.ToUpperInvariant()}: " +
+            $"{report.Swordsmen} SWORDSMEN, {report.Halberdiers} HALBERDIERS, {report.Knights} KNIGHTS MOVING";
     }
 
     private void BeginDragonChallenge()

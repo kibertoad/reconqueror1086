@@ -254,40 +254,80 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
-    public void ActiveSpyProducesOneMonthlyProxyReportAndIsConsumed()
+    public void ActiveSpyReportsTheFirstMovementSlotAndIsConsumedBeforeMovementAdvances()
     {
         var campaign = new Campaign(seed: 17);
         campaign.State.Player.Wealth = 500;
+        var departed = campaign.State.Date;
+        campaign.State.EnemyMovements.Add(new StrategicEnemyMovement(
+            3, 2, 4, departed, departed.AddDays(4), 2, 3, 4));
+        campaign.State.EnemyMovements.Add(new StrategicEnemyMovement(
+            1, 6, 8, departed, departed.AddDays(1), 5, 6, 7));
 
         Assert.True(campaign.AssignSpy());
         Assert.Equal((420, 1), (campaign.State.Player.Wealth, campaign.State.Player.ActiveSpies));
         Assert.False(campaign.AssignSpy());
         Assert.Equal(420, campaign.State.Player.Wealth);
-        campaign.SettleMonth();
+        campaign.AdvanceDays(1);
 
-        Assert.Single(campaign.State.SpiedLocations);
         Assert.Equal(0, campaign.State.Player.ActiveSpies);
-        Assert.Single(campaign.State.Journal,
-            entry => entry.Contains("A spy reports", StringComparison.Ordinal));
-        campaign.SettleMonth();
-        Assert.Single(campaign.State.Journal,
-            entry => entry.Contains("A spy reports", StringComparison.Ordinal));
+        Assert.Equal(new StrategicSpyReport(
+            departed.AddDays(1), 1, 6, 5, 6, 7), campaign.State.LatestSpyReport);
+        Assert.Contains(campaign.State.Journal,
+            entry => entry.Contains("Spy report from Cambridge", StringComparison.Ordinal));
+        Assert.Single(campaign.State.EnemyMovements);
+        Assert.Equal(3, campaign.State.EnemyMovements[0].Slot);
     }
 
     [Fact]
-    public void ActiveSpyWaitsWhenTheCompatibilityCheckpointHasNothingNewToReport()
+    public void ActiveSpyIsNotConsumedByMonthlySettlementWithoutAMovement()
     {
         var campaign = new Campaign();
         campaign.State.Player.Wealth = 500;
-        foreach (var location in Enumerable.Range(1, World.Locations.Length - 1))
-            campaign.State.SpiedLocations.Add(location);
 
         Assert.True(campaign.AssignSpy());
         campaign.SettleMonth();
 
         Assert.Equal(1, campaign.State.Player.ActiveSpies);
+        Assert.Null(campaign.State.LatestSpyReport);
         Assert.DoesNotContain(campaign.State.Journal,
-            entry => entry.Contains("A spy reports", StringComparison.Ordinal));
+            entry => entry.Contains("Spy report from", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void AutonomousEnemyMovementEventuallySuppliesTheSpyTrigger()
+    {
+        var campaign = new Campaign(seed: 17);
+        campaign.State.Player.Wealth = 500;
+        Assert.True(campaign.AssignSpy());
+
+        for (var day = 0; day < 365 && campaign.State.Player.ActiveSpies != 0; day++)
+            campaign.AdvanceDays(1);
+
+        Assert.Equal(0, campaign.State.Player.ActiveSpies);
+        Assert.NotNull(campaign.State.LatestSpyReport);
+        Assert.InRange(campaign.State.LatestSpyReport!.MovementSlot, 0, 4);
+        Assert.Equal(campaign.State.LatestSpyReport.Swordsmen,
+            campaign.State.LatestSpyReport.Halberdiers);
+        Assert.Equal(campaign.State.LatestSpyReport.Swordsmen,
+            campaign.State.LatestSpyReport.Knights);
+    }
+
+    [Fact]
+    public void EnemyMovementReinforcesItsDestinationAndReleasesItsSlotOnArrival()
+    {
+        var campaign = new Campaign(seed: 17);
+        var departed = campaign.State.Date;
+        var destinationBefore = campaign.GarrisonAt(4);
+        campaign.State.EnemyMovements.Add(new StrategicEnemyMovement(
+            2, 2, 4, departed, departed.AddDays(1), 2, 3, 4));
+
+        campaign.AdvanceDays(1);
+
+        Assert.Empty(campaign.State.EnemyMovements);
+        Assert.Equal(destinationBefore + 9, campaign.GarrisonAt(4));
+        Assert.Contains(campaign.State.Journal,
+            entry => entry.Contains("enemy column reaches Bristol", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -477,6 +517,10 @@ public sealed partial class ResourceAndDefinitionTests
             campaign.State.Player.AdditionalArmies[1].IsFielded = true;
             campaign.State.Player.JoinedArmyIndex = 2;
             campaign.State.Player.ActiveSpies = 3;
+            campaign.State.EnemyMovements.Add(new StrategicEnemyMovement(
+                4, 13, 15, campaign.State.Date, campaign.State.Date.AddDays(3), 4, 5, 6));
+            campaign.State.LatestSpyReport = new StrategicSpyReport(
+                campaign.State.Date, 2, 8, 7, 8, 9);
             slots.Save(campaign, 3);
 
             var third = slots.Inspect(3);
@@ -492,6 +536,8 @@ public sealed partial class ResourceAndDefinitionTests
                  loaded.State.Player.AdditionalArmies[1].IsFielded,
                  loaded.State.Player.JoinedArmyIndex,
                  loaded.State.Player.ActiveSpies));
+            Assert.Equal(campaign.State.EnemyMovements, loaded.State.EnemyMovements);
+            Assert.Equal(campaign.State.LatestSpyReport, loaded.State.LatestSpyReport);
 
             campaign.Save(Path.Combine(root, "campaign.json"));
             Assert.True(slots.Inspect(1).IsValid);
