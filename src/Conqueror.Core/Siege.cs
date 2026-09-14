@@ -59,7 +59,6 @@ public sealed class SiegeRetainer : SiegeEnemy
     internal SiegeEnemy? RetreatRegroupTarget { get; set; }
     internal int? RetreatTargetX8 { get; set; }
     internal int? RetreatTargetY8 { get; set; }
-    internal int RetreatMode { get; set; }
 }
 
 public sealed record SiegeDefinition(int Width, int Height, int BaseEnemies, int GarrisonPerEnemy,
@@ -813,7 +812,6 @@ public sealed partial class SiegeSession
         retainer.RetreatRegroupTarget = null;
         retainer.RetreatTargetX8 = null;
         retainer.RetreatTargetY8 = null;
-        retainer.RetreatMode = 0;
         retainer.OriginalHeading8 = null;
     }
 

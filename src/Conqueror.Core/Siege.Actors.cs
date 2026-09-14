@@ -84,36 +84,15 @@ public sealed partial class SiegeSession
                 AdvanceFollowOrder(retainer);
                 break;
             case SiegeRetainerCommand.Retreat:
-                if (retainer.OriginalActorKind != 1)
-                {
-                    // After the public mode-10 decision, kind 0 owns a
-                    // multi-state regroup/re-entry route. Do not collapse a
-                    // later mode-1/3/4 decision to Defend merely because its
-                    // hostile acquisition is temporarily empty.
-                    if (retainer.RetreatMode == 0 && RetreatOrderTarget(retainer) is null)
-                    {
-                        retainer.Command = SiegeRetainerCommand.Defend;
-                        retainer.OrderedTarget = null;
-                    }
-                    else if (retainer.RetreatMode == 11 &&
-                        retainer.OrderedTarget is { Health: > 0 } meleeTarget)
-                        RetainerRangedAttack(retainer, meleeTarget);
-                    break;
-                }
-                // Kind 1 does not jump directly from requested mode 10 to a
-                // shot. It uses its ordinary table one predicate at a time:
-                // 10 -> 4/2, then 4 -> 11/1. The same route owns mode 13
-                // recovery after a hit.
-                AdvanceKindOneRetreatOrder(retainer);
+                AdvanceRetreatOrder(retainer);
                 break;
         }
     }
 
-    private void AdvanceKindOneRetreatOrder(SiegeRetainer retainer)
+    private void AdvanceRetreatOrder(SiegeRetainer retainer)
     {
-        var previousMode = retainer.ActorMode;
         AdvanceDefendOrder(retainer);
-        if (previousMode == 10 && retainer.ActorMode == 2)
+        if (retainer.ActorMode == 2)
         {
             retainer.Command = SiegeRetainerCommand.Defend;
             retainer.OrderedTarget = null;

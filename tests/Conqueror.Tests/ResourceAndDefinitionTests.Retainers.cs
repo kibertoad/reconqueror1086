@@ -280,6 +280,7 @@ public sealed partial class ResourceAndDefinitionTests
         battle.CommandRetainers(SiegeRetainerCommand.Retreat);
 
         battle.AdvanceRetainerMovement(0.4001);
+        Assert.Equal(5, friendly.ActorMode);
         Assert.Equal((5, 2, 0, 0, Facing.East),
             (friendly.X, friendly.Y, friendly.OffsetX8, friendly.OffsetY8, friendly.Facing));
         battle.AdvanceRetainerMovement(0.2001);
@@ -325,23 +326,29 @@ public sealed partial class ResourceAndDefinitionTests
         battle.CommandRetainers(SiegeRetainerCommand.Retreat);
 
         battle.AdvanceRetainerMovement(0);
+        Assert.Equal(5, activeRunner.ActorMode);
         battle.AdvanceRetainerMovement(0.6001);
+        Assert.Equal(5, activeRunner.ActorMode);
         Assert.Equal((7, 2, 64), (activeRunner.X, activeRunner.Y, activeRunner.OffsetX8));
 
         battle.AdvanceRetainerMovement(0);
+        Assert.Equal(7, activeRunner.ActorMode);
         Assert.Equal([battle.PlayerActor, battle.Retainers[0]], formationCalls);
         Assert.Equal(Facing.West, activeRunner.Facing);
 
         reached = true;
         battle.AdvanceRetainerMovement(0.6001);
         battle.AdvanceRetainerMovement(0);
+        Assert.Equal(1, activeRunner.ActorMode);
         var regrouped = (activeRunner.X, activeRunner.Y, activeRunner.OffsetX8, activeRunner.OffsetY8);
         Assert.Equal((7, 2, -128, 0), regrouped);
         battle.AdvanceRetainerMovement(1.0);
+        Assert.Equal(3, activeRunner.ActorMode);
         Assert.Equal(regrouped,
             (activeRunner.X, activeRunner.Y, activeRunner.OffsetX8, activeRunner.OffsetY8));
 
         battle.AdvanceRetainerMovement(0);
+        Assert.Equal(7, activeRunner.ActorMode);
         Assert.Equal(Facing.West, activeRunner.Facing);
         battle.AdvanceRetainerMovement(0.2001);
         Assert.Equal(Facing.West, activeRunner.Facing);
@@ -387,13 +394,18 @@ public sealed partial class ResourceAndDefinitionTests
         battle.CommandRetainers(SiegeRetainerCommand.Retreat);
 
         battle.AdvanceRetainerMovement(0);
+        Assert.Equal(5, activeRunner.ActorMode);
         battle.AdvanceRetainerMovement(0.6001);
         battle.AdvanceRetainerMovement(0);
+        Assert.Equal(7, activeRunner.ActorMode);
         reached = true;
         battle.AdvanceRetainerMovement(0.6001);
         battle.AdvanceRetainerMovement(0);
+        Assert.Equal(1, activeRunner.ActorMode);
         battle.AdvanceRetainerMovement(0);
+        Assert.Equal(4, activeRunner.ActorMode);
         battle.AdvanceRetainerMovement(0);
+        Assert.Equal(8, activeRunner.ActorMode);
 
         Assert.Equal(Facing.East, activeRunner.Facing);
         var beforeModeEightTick = activeRunner.OffsetX8;

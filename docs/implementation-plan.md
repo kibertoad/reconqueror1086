@@ -757,7 +757,7 @@ Loader `0x51A8B`-`0x51B74` maps player red, green, and blue to palette-family / 
 
 Kind-1 table source `0x4E4A4` maps mode 10 to transition `0x4E805`, selecting mode 4 after visible-opponent acquisition or mode 2 on failure. Mode-4 source `0x4E48C` maps to `0x4E6D3`, selecting ranged mode 11 or fallback mode 1. State routine `0x4F49C` permits only one predicate before invoking the new handler, so public Retreat requires distinct `10→4` and `4→11` thinker passes; the former runtime constructed its shot one pass too early. Mode-13 source `0x4E4B0` maps to `0x4E851`, which records failure mode 10 and success mode 6 around the shared health-`>=6` predicate. Mode-5/6 sources `0x4E490/0x4E494` map to `0x4E70C/0x4E745`, retaining their wandering states or selecting regroup mode 7 / ranged mode 11.
 
-`AdvanceKindOneRetreatOrder` now routes public and hit-triggered kind-1 states through `AdvanceDefendOrder` one decision at a time. Regressions cover explicit mode-4 separation, intervening-target mode-11 resolution, strict doubled completion gates, cancellation, the mode-13 health 5/6 boundary, 1.5-scaled escape, and ordinary mode-6 movement. This state slice is **Confirmed**, and the same-pass public Retreat shot is **Disproved**. Continue with remaining first-person transitions, exact pointer-object semantics, and broader menu/estate/audio work.
+`AdvanceRetreatOrder` now routes public and hit-triggered states through `AdvanceDefendOrder` one decision at a time. Regressions cover explicit mode-4 separation, intervening-target mode-11 resolution, strict doubled completion gates, cancellation, the mode-13 health 5/6 boundary, 1.5-scaled escape, and ordinary mode-6 movement. This state slice is **Confirmed**, and the same-pass public Retreat shot is **Disproved**. Continue with remaining first-person transitions and broader menu/estate/audio work.
 
 ## Combat checkpoint: 2026-09-14 exact pointer action depth
 
@@ -766,6 +766,12 @@ World dispatcher `0x55524` receives an 8.8 depth from fixed-point raycaster `0x4
 `SiegePointerHit.Distance8` now flows into depth-aware `SiegeSession.Attack`, `Shoot`, and `Interact` overloads. Pointer actions use the returned depth without a second grid occlusion or center-distance calculation; keyboard actions preserve their existing forward-grid compatibility path. Tests cover `weapon contact - 1` acceptance and equality rejection, plus explicit-action acceptance at `0x27F` and rejection at `0x280`. These depth and strict-boundary semantics are **Confirmed**; the cell-center substitution is **Disproved**.
 
 Potential higher-powered-machine presentation work should be opt-in and observational: viewport supersampling and filtering can be explored after fidelity completion, while visibility, picking, occlusion, interaction, and AI retain the original 64-step ray. A longer ray is not planned because source lookup wraps in the 128-cell authored map and could reveal duplicated or unauthored scenery.
+
+## Combat checkpoint: 2026-09-14 unified friendly actor state
+
+The executable has one current-mode field at actor `+0x1C`; `0x4F49C` reads it, evaluates one predicate, stores the selected transition, and invokes only the new handler. The runtime nevertheless retained a parallel private `RetreatMode` for kind 0, duplicating the mapped mode 1-8/10/11/13 graph and leaving public `ActorMode` at 10 while later states executed.
+
+`AdvanceRetreatOrder` now sends both friendly kinds through the same `AdvanceDefendOrder` table and `BeginFriendlyMode` handlers. Hit transition writes only `ActorMode`, and effect-boundary re-entry observes that same field. The 165-line duplicate movement switch and shadow state are removed. Regressions now expose kind-0 mode `10→5→7→1→3→7` and `10→5→7→1→4→8` sequences as well as the previously covered kind-1 and hit routes. This is an architecture correction to the **Confirmed** actor `+0x1C` mapping; no original transition or timing rule changes.
 
 ## Session checkpoint: 2026-09-10
 

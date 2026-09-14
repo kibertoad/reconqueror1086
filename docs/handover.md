@@ -115,13 +115,17 @@ Actor loader `0x51A8B`-`0x51B74` maps player red/green/blue to palette-family an
 
 ## Kind-1 recovery checkpoint: 2026-09-14
 
-Kind-1 public Retreat now preserves separate `10→4` and `4→11` thinker passes through transitions `0x4E805/0x4E6D3`; the former runtime shot in the first pass. The previously uncovered mode-13 slot at source `0x4E4B0` resolves to `0x4E851`, choosing mode 6 at health `>=6` or scaled mode 10 below it. Adjacent mode-5/6 sources `0x4E490/0x4E494` resolve to `0x4E70C/0x4E745`. `AdvanceKindOneRetreatOrder` reuses the complete friendly table path for public and hit-triggered states. Focused tests cover pass separation, health 5/6 movement, deferred damage, intervening targets, repetition, and cancellation. Continue with exact pointer-object semantics and the remaining migration priorities.
+Kind-1 public Retreat now preserves separate `10→4` and `4→11` thinker passes through transitions `0x4E805/0x4E6D3`; the former runtime shot in the first pass. The previously uncovered mode-13 slot at source `0x4E4B0` resolves to `0x4E851`, choosing mode 6 at health `>=6` or scaled mode 10 below it. Adjacent mode-5/6 sources `0x4E490/0x4E494` resolve to `0x4E70C/0x4E745`. `AdvanceRetreatOrder` reuses the complete friendly table path for public and hit-triggered states. Focused tests cover pass separation, health 5/6 movement, deferred damage, intervening targets, repetition, and cancellation. The later unified-state checkpoint closes the parallel kind-0 state representation; continue with the remaining migration priorities.
 
 ## Pointer depth checkpoint: 2026-09-14
 
 Primary world dispatch now carries the exact `0x470A8` 8.8 ray depth through `SiegePointerHit` into targeted player attacks, shots, and explicit object actions. `SiegeSession.Attack/Shoot` compare that supplied depth directly with the equipped combat row's confirmed contact distance, while `Interact` uses the strict `< 0x280` test at `0x556AF`; none of these pointer paths substitute actor/object cell-center distance. Existing keyboard targeting retains its grid/occlusion compatibility path. Boundary regressions cover `contact - 1` versus `contact` and `0x27F` versus `0x280`. Continue with remaining friendly states and broader migration priorities.
 
 An optional enhanced renderer may eventually supersample the viewport or improve presentation filtering, but it should retain the original 64-step compatibility ray for visibility, picking, occlusion, and AI. Extending the ray is not presently recommended: the source lookup wraps within the authored 128-cell map and could expose duplicated or unauthored space. This is a post-fidelity option, not a change to original-game claims.
+
+## Unified friendly-state checkpoint: 2026-09-14
+
+Both friendly kinds now use `ActorMode` as the single runtime counterpart of original current-mode field `+0x1C`. `AdvanceRetreatOrder` routes public Retreat and hit recovery through the common one-predicate `AdvanceDefendOrder` graph and `BeginFriendlyMode` handlers. The former private kind-0 `RetreatMode` shadow and its 165-line duplicated switch are removed; it could remain at public mode 10 while executing modes 5/7/1/3/4/8/11 internally. Existing transition timing is unchanged, and tests now assert the visible kind-0 sequences at each thinker/effect boundary. Continue with remaining migration priorities rather than a second friendly state machine.
 
 ## Safety and repository rules
 
