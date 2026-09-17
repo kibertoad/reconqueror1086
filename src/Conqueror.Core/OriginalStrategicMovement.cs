@@ -43,6 +43,7 @@ public static class OriginalStrategicMovement
     public const int PersonTableAddress = 0xBA50;
     public const int PersonCount = 176;
     public const int PersonRecordSize = 0x12;
+    public const int PersonNameAddressOffset = 0x00;
     public const int PersonGroupOffset = 0x04;
     public const int PersonFlagsOffset = 0x06;
     public const int PersonAssignmentOffset = 0x07;
@@ -72,9 +73,29 @@ public static class OriginalStrategicMovement
 
     private static readonly int[] InitialHouseholdCounts = [4, 6, 7, 5, 2, 2, 4, 3, 3, 1, 9, 3, 3, 6];
 
+    private static readonly OriginalStrategicPropertyIdentity[] PropertyIdentityRows =
+    [
+        new("York", 0x66A0, 0, 1, 30),
+        new("Lincoln", 0x66F4, 1, 2, 24),
+        new("Chester", 0x67B4, 2, 3, 16),
+        new("Gloucester", 0x68AC, 3, 4, 20),
+        new("Warwick", 0x694C, 4, 5, 18),
+        new("Oxford", 0x6A04, 5, 6, 20),
+        new("Cambridge", 0x6A58, 6, 7, 16),
+        new("London", 0x6A80, 7, 8, 70),
+        new("Norwich", 0x6628, 8, 9, 24),
+        new("Colchester", 0x6AFC, 9, 10, 28),
+        new("Arundel", 0x6B48, 10, 11, 33),
+        new("Windsor", 0x6C4C, 11, 12, 32),
+        new("Dunster", 0x6CE4, 12, 13, 28),
+        new("Okehampton", 0x6D80, 13, 14, 24)
+    ];
+
     public static IReadOnlyList<OriginalStrategicPropertyDefinition> Properties => PropertyRows;
 
     public static IReadOnlyList<int> InitialActiveHouseholdCounts => InitialHouseholdCounts;
+
+    public static IReadOnlyList<OriginalStrategicPropertyIdentity> PropertyIdentities => PropertyIdentityRows;
 
     public static StrategicTroopCounts InitialForces(int activeHouseholdCount, int lordRating)
     {
@@ -99,6 +120,13 @@ public readonly record struct OriginalStrategicPropertyDefinition(
     byte Garrison,
     byte State13,
     byte State14);
+
+public readonly record struct OriginalStrategicPropertyIdentity(
+    string Name,
+    int NameAddress,
+    byte PersonGroup,
+    byte InitialAssignment,
+    byte LordRating);
 
 public readonly record struct StrategicTroopCounts(int Swordsmen, int Halberdiers, int Knights)
 {

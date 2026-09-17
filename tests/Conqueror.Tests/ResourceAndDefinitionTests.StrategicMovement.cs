@@ -72,6 +72,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(0xBA50, OriginalStrategicMovement.PersonTableAddress);
         Assert.Equal(176, OriginalStrategicMovement.PersonCount);
         Assert.Equal(0x12, OriginalStrategicMovement.PersonRecordSize);
+        Assert.Equal(0x00, OriginalStrategicMovement.PersonNameAddressOffset);
         Assert.Equal(0x04, OriginalStrategicMovement.PersonGroupOffset);
         Assert.Equal(0x06, OriginalStrategicMovement.PersonFlagsOffset);
         Assert.Equal(0x07, OriginalStrategicMovement.PersonAssignmentOffset);
@@ -82,6 +83,33 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(0x01, OriginalStrategicMovement.HouseholdEligibleFlag);
         Assert.Equal([4, 6, 7, 5, 2, 2, 4, 3, 3, 1, 9, 3, 3, 6],
             OriginalStrategicMovement.InitialActiveHouseholdCounts);
+    }
+
+    [Fact]
+    public void OriginalStrategicPropertyNamesAndLordInputsFollowTheirPersonRecords()
+    {
+        OriginalStrategicPropertyIdentity[] expected =
+        [
+            new("York", 0x66A0, 0, 1, 30),
+            new("Lincoln", 0x66F4, 1, 2, 24),
+            new("Chester", 0x67B4, 2, 3, 16),
+            new("Gloucester", 0x68AC, 3, 4, 20),
+            new("Warwick", 0x694C, 4, 5, 18),
+            new("Oxford", 0x6A04, 5, 6, 20),
+            new("Cambridge", 0x6A58, 6, 7, 16),
+            new("London", 0x6A80, 7, 8, 70),
+            new("Norwich", 0x6628, 8, 9, 24),
+            new("Colchester", 0x6AFC, 9, 10, 28),
+            new("Arundel", 0x6B48, 10, 11, 33),
+            new("Windsor", 0x6C4C, 11, 12, 32),
+            new("Dunster", 0x6CE4, 12, 13, 28),
+            new("Okehampton", 0x6D80, 13, 14, 24)
+        ];
+
+        Assert.Equal(expected, OriginalStrategicMovement.PropertyIdentities);
+        Assert.Equal(
+            OriginalStrategicMovement.Properties.Select(property => (int)property.Lord),
+            [13, 20, 35, 59, 73, 88, 96, 100, 1, 113, 119, 143, 155, 171]);
     }
 
     [Theory]

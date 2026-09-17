@@ -24,7 +24,7 @@ Gameplay content is described in typed definition records in `Balance.cs` and in
 | `FieldBattleDefinition` | battlefield size, counter bonus, morale and withdrawal pressure | `FieldBattleSession` |
 | `StrategicDefinition` | spy cost, interception chance and minimum field force | campaign travel and reconnaissance |
 | `StrategicEnemyMovement` / `StrategicSpyReport` | persisted five-slot hostile movement and the one-shot report captured before movement advances | `Campaign.AdvanceDays` / enemy movement partial |
-| `OriginalStrategicMovement` | executable movement/person/property layouts, all 14 initial numeric property rows, household eligibility/counts, generation gate, and lord/household force initializer; deliberately does not identify property rows with the runtime's named destinations | strategic movement recovery boundary |
+| `OriginalStrategicMovement` | executable movement/person/property layouts, all 14 named initial property rows, linked lord inputs, household eligibility/counts, generation gate, and force initializer; runtime index/save migration remains separate | strategic movement recovery boundary |
 | `TournamentOpponentDefinition` | wager, joust tolerance and eight-man melee composition | joust and tournament skirmish settlement |
 
 The remaining switches in the core are state adapters: they map typed equipment slots, building kinds, and dilemma attributes to serialized player fields. They contain no prices, balance coefficients, content names, reward order, or eligibility rules. Imported resource names are translated at boundaries such as `ImportedDilemmaAdapter` and `ImportedSiegeLayouts`; screen code does not interpret raw resource records.
