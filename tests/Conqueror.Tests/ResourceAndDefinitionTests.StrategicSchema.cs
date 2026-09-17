@@ -93,6 +93,7 @@ public sealed partial class ResourceAndDefinitionTests
         movement.RouteReversed = false;
         strategic.SelectedPlayerMovementSlot = 4;
         strategic.EngagedPlayerMovementSlot = 3;
+        strategic.PlayerRouteInputActive = true;
         var playerMovement = strategic.PlayerMovementSlots[4];
         playerMovement.Active = true;
         playerMovement.WaypointCount = 2;
@@ -133,9 +134,10 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal((7_438.5f, 2_801.25f, 0.75f, -0.25f),
             (restoredMovement.CurrentX, restoredMovement.CurrentY,
              restoredMovement.DirectionX, restoredMovement.DirectionY));
-        Assert.Equal((4, 3, true, 2, 1, 19, 3),
+        Assert.Equal((4, 3, true, true, 2, 1, 19, 3),
             (roundTripped.SelectedPlayerMovementSlot, roundTripped.EngagedPlayerMovementSlot,
-             restoredPlayerMovement.Active, restoredPlayerMovement.WaypointCount,
+             roundTripped.PlayerRouteInputActive, restoredPlayerMovement.Active,
+             restoredPlayerMovement.WaypointCount,
              restoredPlayerMovement.WaypointIndex, restoredPlayerMovement.CollisionCooldown,
              restoredPlayerMovement.TerrainKind));
         Assert.Equal(playerMovement.Waypoints, restoredPlayerMovement.Waypoints);

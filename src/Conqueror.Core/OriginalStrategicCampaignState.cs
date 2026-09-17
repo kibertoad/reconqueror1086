@@ -20,6 +20,7 @@ public sealed class OriginalStrategicCampaignState
     public byte PersonListHead { get; set; } = 0xFF;
     public int SelectedPlayerMovementSlot { get; set; }
     public int EngagedPlayerMovementSlot { get; set; }
+    public bool PlayerRouteInputActive { get; set; }
     public List<OriginalStrategicPropertyState> Properties { get; init; } = [];
     public List<OriginalStrategicPersonState> Persons { get; init; } = [];
     public List<OriginalStrategicPlayerMovementSlot> PlayerMovementSlots { get; init; } = [];

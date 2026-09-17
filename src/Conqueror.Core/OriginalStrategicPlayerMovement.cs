@@ -26,12 +26,21 @@ public sealed class OriginalStrategicPlayerMovementSlot
     public List<OriginalStrategicRoutePoint> Waypoints { get; init; } = [];
 
     public bool TargetsEnemyMovement => (TargetHandle & OriginalStrategicMovement.PlayerEnemyTargetFlag) != 0;
+    public bool TargetsDivisionForce => (TargetHandle & OriginalStrategicMovement.PlayerDivisionTargetFlag) != 0;
     public int TargetIndex => TargetHandle & 0xFF;
 
     public void Validate()
     {
+        var targetKind = TargetHandle
+            & (OriginalStrategicMovement.PlayerEnemyTargetFlag
+                | OriginalStrategicMovement.PlayerDivisionTargetFlag);
         if (Slot is < 0 or >= OriginalStrategicMovement.PlayerMovementRecordCount
-            || TargetHandle < 0 || WaypointCount < 0
+            || TargetHandle < 0
+            || (TargetHandle != 0
+                && (targetKind is not OriginalStrategicMovement.PlayerEnemyTargetFlag
+                    and not OriginalStrategicMovement.PlayerDivisionTargetFlag
+                    || (TargetHandle & ~0x110FF) != 0))
+            || WaypointCount < 0
             || WaypointCount > OriginalStrategicMovement.PlayerWaypointCapacity
             || WaypointIndex < 0 || WaypointIndex > WaypointCount
             || CollisionCooldown < 0 || TerrainKind is < 0 or >= OriginalStrategicMovement.TerrainKindCount
@@ -246,13 +255,16 @@ public static partial class OriginalStrategicMovement
             var enemy = state.MovementSlots.Single(candidate => candidate.Slot == slot.TargetIndex);
             target = new(enemy.Active, enemy.CurrentX, enemy.CurrentY);
         }
-        else
+        else if (slot.TargetsDivisionForce)
         {
             if (slot.TargetIndex >= worldTargets.Count)
                 throw new InvalidDataException(
                     $"Player movement record {slot.Slot} targets missing world record {slot.TargetIndex}.");
             target = worldTargets[slot.TargetIndex];
         }
+        else
+            throw new InvalidDataException(
+                $"Player movement record {slot.Slot} has untagged target handle {slot.TargetHandle}.");
         return target.Active;
     }
 

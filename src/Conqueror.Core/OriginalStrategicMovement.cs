@@ -15,6 +15,7 @@ public static partial class OriginalStrategicMovement
     public const int PlayerAvatarMovementSlot = 5;
     public const int SelectedPlayerMovementSlotAddress = 0xAE64;
     public const int EngagedPlayerMovementSlotAddress = 0xAE6C;
+    public const int PlayerRouteInputActiveAddress = 0xAE58;
     public const int PlayerSelectedOffset = 0x04;
     public const int PlayerTargetHandleOffset = 0x14;
     public const int PlayerWaypointCountOffset = 0x18;
@@ -23,7 +24,10 @@ public static partial class OriginalStrategicMovement
     public const int PlayerTerrainKindOffset = 0x58;
     public const int PlayerWaypointArrayOffset = 0x70;
     public const int PlayerWaypointCapacity = 21;
+    public const int PlayerRouteInputLimit = 20;
     public const int PlayerEnemyTargetFlag = 0x1000;
+    public const int PlayerDivisionTargetFlag = 0x10000;
+    public const int PlayerDivisionTargetCount = 3;
     public const int PlayerDirectionLimit = 40;
     public const double PlayerBlockedProbeDistance = 50;
     public const double PlayerEnemyContactDistance = 30;

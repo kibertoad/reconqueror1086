@@ -93,12 +93,12 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
-    public void PlayerWorldTargetUsesTheRawLowByteIdentityAndCompletesAtExactContact()
+    public void PlayerDivisionTargetUsesTheTaggedLowByteIdentityAndCompletesAtExactContact()
     {
         var state = RuntimeState();
         var player = state.PlayerMovementSlots[0];
         player.Active = true;
-        player.TargetHandle = 2;
+        player.TargetHandle = OriginalStrategicMovement.PlayerDivisionTargetFlag | 2;
         var targets = new OriginalStrategicPlayerTarget[3];
         targets[2] = new(true, 0, 0);
 
@@ -109,6 +109,97 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.True(player.PathComplete);
         Assert.Equal((0, 0, 0f, 0f),
             (player.TargetHandle, player.WaypointIndex, player.DirectionX, player.DirectionY));
+    }
+
+    [Fact]
+    public void PlayerMapCommandUsesPlayerEnemyDivisionThenRoutePrecedence()
+    {
+        var state = RuntimeState();
+        state.PlayerMovementSlots[0].Active = true;
+        state.PlayerMovementSlots[0].PathComplete = true;
+        state.PlayerMovementSlots[3].Active = true;
+        state.PlayerMovementSlots[3].PathComplete = true;
+        var resources = new StubStrategicResources();
+
+        var selected = OriginalStrategicMovement.DispatchPlayerMapCommand(
+            state, resources, new(3, 2, 1), 80, 90, targetConfirmed: true);
+        Assert.True(selected.Applied);
+        Assert.Equal(3, state.SelectedPlayerMovementSlot);
+        Assert.Equal(0, state.PlayerMovementSlots[3].TargetHandle);
+        Assert.True(state.PlayerRouteInputActive);
+
+        var enemyDeclined = OriginalStrategicMovement.DispatchPlayerMapCommand(
+            state, resources, new(null, 2, 1), 80, 90, targetConfirmed: false);
+        Assert.False(enemyDeclined.Applied);
+        Assert.Equal(0, state.PlayerMovementSlots[3].TargetHandle);
+
+        var enemy = OriginalStrategicMovement.DispatchPlayerMapCommand(
+            state, resources, new(null, 2, 1), 80, 90, targetConfirmed: true);
+        Assert.True(enemy.Applied);
+        Assert.Equal(OriginalStrategicMovement.PlayerEnemyTargetFlag | 2,
+            state.PlayerMovementSlots[3].TargetHandle);
+        Assert.False(state.PlayerRouteInputActive);
+
+        var division = OriginalStrategicMovement.DispatchPlayerMapCommand(
+            state, resources, new(null, null, 1), 80, 90, targetConfirmed: true);
+        Assert.True(division.Applied);
+        Assert.Equal(OriginalStrategicMovement.PlayerDivisionTargetFlag | 1,
+            state.PlayerMovementSlots[3].TargetHandle);
+    }
+
+    [Fact]
+    public void PlayerRouteCommandClearsTargetPrimesFirstPointAndRetainsStalePairs()
+    {
+        var state = RuntimeState();
+        var slot = state.PlayerMovementSlots[0];
+        slot.Active = true;
+        slot.TargetHandle = OriginalStrategicMovement.PlayerEnemyTargetFlag | 2;
+        slot.PathComplete = true;
+        slot.WaypointCount = 1;
+        slot.Waypoints.Add(new(999, 999));
+        var resources = new StubStrategicResources();
+
+        var first = OriginalStrategicMovement.AppendPlayerRoutePoint(
+            state, resources, 100, 0);
+
+        Assert.True(first.Applied);
+        Assert.True(first.RouteStarted);
+        Assert.Equal((0, 1, 0, false),
+            (slot.TargetHandle, slot.WaypointCount, slot.WaypointIndex, slot.PathComplete));
+        Assert.Equal(new OriginalStrategicRoutePoint(100, 0), slot.Waypoints[0]);
+        Assert.Equal((100, 0, 1f, 0f),
+            (slot.DestinationX, slot.DestinationY, slot.DirectionX, slot.DirectionY));
+
+        Assert.True(OriginalStrategicMovement.RemoveLastPlayerRoutePoint(state));
+        Assert.True(slot.PathComplete);
+        Assert.False(state.PlayerRouteInputActive);
+        Assert.Equal(0, slot.WaypointCount);
+        Assert.Single(slot.Waypoints);
+        Assert.Equal(new OriginalStrategicRoutePoint(100, 0), slot.Waypoints[0]);
+        state.Validate();
+    }
+
+    [Fact]
+    public void PlayerRouteInputStopsAtTwentyDespiteTwentyOnePairRecordCapacity()
+    {
+        var state = RuntimeState();
+        var slot = state.PlayerMovementSlots[0];
+        slot.Active = true;
+        slot.PathComplete = true;
+        var resources = new StubStrategicResources();
+
+        for (var index = 0; index < OriginalStrategicMovement.PlayerRouteInputLimit; index++)
+            Assert.True(OriginalStrategicMovement.AppendPlayerRoutePoint(
+                state, resources, 100 + index, index).Applied);
+
+        var capped = OriginalStrategicMovement.AppendPlayerRoutePoint(
+            state, resources, 999, 999);
+
+        Assert.False(capped.Applied);
+        Assert.True(capped.RouteLimitReached);
+        Assert.Equal(20, slot.WaypointCount);
+        Assert.Equal(20, slot.Waypoints.Count);
+        Assert.Equal(21, OriginalStrategicMovement.PlayerWaypointCapacity);
     }
 
     [Fact]
