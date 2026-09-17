@@ -225,6 +225,9 @@ public sealed partial class ConquerorGame
         foreach (var stage in imported.Layout.Objects.SelectMany(item => item.Stages)
                      .Where(stage => stage.VisualId >= 0 && stage.VisualId < imported.Scene.Blocks.Count))
             Require(imported.Scene.Blocks[stage.VisualId]);
+        var acquisitionRequired = imported.Scene.Blocks
+            .SelectMany(block => block.RaycastTextureReferences())
+            .ToHashSet();
         var textures = new Dictionary<int, Texture2D>();
         var sources = new Dictionary<int, DynamixSceneTexture>();
         foreach (var id in _importedContent.Ids("resource").Where(id =>
@@ -232,11 +235,13 @@ public sealed partial class ConquerorGame
                      id.Contains(":TEX", StringComparison.OrdinalIgnoreCase)))
         {
             var decoded = _importedContent.DecodeSceneTexture(id);
-            if (decoded is null || !required.Contains(decoded.Index) || textures.ContainsKey(decoded.Index)) continue;
+            if (decoded is null || sources.ContainsKey(decoded.Index)
+                || !required.Contains(decoded.Index) && !acquisitionRequired.Contains(decoded.Index)) continue;
+            sources.Add(decoded.Index, decoded);
+            if (!required.Contains(decoded.Index)) continue;
             var texture = new Texture2D(GraphicsDevice, decoded.Width, decoded.Height, false, SurfaceFormat.Color);
             texture.SetData(IndexedScenePixels.ToRgba(decoded.Indices, palette.Rgb));
             textures.Add(decoded.Index, texture);
-            sources.Add(decoded.Index, decoded);
         }
         Texture2D? backdrop = null;
         if (imported.Backdrop is { } decodedBackdrop)

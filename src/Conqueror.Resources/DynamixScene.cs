@@ -87,6 +87,21 @@ public sealed record DynamixSceneBlock(
         foreach (var texture in new[] { Surface0, Surface1, Surface2, Surface3 })
             yield return texture;
     }
+
+    public IEnumerable<int> RaycastTextureReferences()
+    {
+        if (Kind != 4)
+            return TextureReferences().Where(texture => texture >= 0).Distinct();
+        if (Surface0 < 0) return [];
+
+        // 0x46E3B-0x46F23 selects a billboard sector from the full byte-turn.
+        // Acquisition performs the same selection, so retaining only Surface0
+        // is insufficient even when a frame is not currently being rendered.
+        return Enumerable.Range(0, 256)
+            .Select(heading => TextureForBillboardHeading(heading).TextureIndex)
+            .Where(texture => texture >= 0)
+            .Distinct();
+    }
 }
 
 public sealed class DynamixScene
