@@ -28,7 +28,7 @@ public sealed partial class ResourceAndDefinitionTests
 
         Assert.Equal(0x00, OriginalStrategicMovement.ActiveOffset);
         Assert.Equal(0x0C, OriginalStrategicMovement.PathCompleteOffset);
-        Assert.Equal(0x14, OriginalStrategicMovement.TargetLocationOffset);
+        Assert.Equal(0x14, OriginalStrategicMovement.TargetMovementSlotOffset);
         Assert.Equal(0x18, OriginalStrategicMovement.WaypointCountOffset);
         Assert.Equal(0x1C, OriginalStrategicMovement.SwordsmenOffset);
         Assert.Equal(0x20, OriginalStrategicMovement.HalberdiersOffset);
@@ -51,6 +51,9 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(0xFFFF, OriginalStrategicMovement.CompletedSignal);
         Assert.Equal(6, OriginalStrategicMovement.WaypointCoordinateTolerance);
         Assert.Equal(50, OriginalStrategicMovement.MaximumRoutedStep);
+        Assert.Equal(0x4F97, OriginalStrategicMovement.DirectTerrainScaleAddress);
+        Assert.Equal(0.9, OriginalStrategicMovement.DirectTerrainScale);
+        Assert.Equal(0x7389, OriginalStrategicMovement.RoutedHorizontalLimitAddress);
         Assert.Equal(300, OriginalStrategicMovement.RetargetFieldArmyRange);
         Assert.Equal(30, OriginalStrategicMovement.TerrainKindCount);
         Assert.Equal(0xAF78, OriginalStrategicMovement.TerrainTileKindTableAddress);

@@ -24,7 +24,7 @@ public static partial class OriginalStrategicMovement
 
     public const int ActiveOffset = 0x00;
     public const int PathCompleteOffset = 0x0C;
-    public const int TargetLocationOffset = 0x14;
+    public const int TargetMovementSlotOffset = 0x14;
     public const int WaypointCountOffset = 0x18;
     public const int SwordsmenOffset = 0x1C;
     public const int HalberdiersOffset = 0x20;
@@ -48,6 +48,9 @@ public static partial class OriginalStrategicMovement
     public const int CompletedSignal = 0xFFFF;
     public const int WaypointCoordinateTolerance = 6;
     public const int MaximumRoutedStep = 50;
+    public const int DirectTerrainScaleAddress = 0x4F97;
+    public const double DirectTerrainScale = 0.9;
+    public const int RoutedHorizontalLimitAddress = 0x7389;
     public const int RetargetFieldArmyRange = 300;
     public const int TerrainKindCount = 30;
     public const int TerrainTileKindTableAddress = 0xAF78;

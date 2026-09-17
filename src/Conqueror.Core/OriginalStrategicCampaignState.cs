@@ -168,7 +168,6 @@ public sealed class OriginalStrategicMovementSlot
     public int Slot { get; set; }
     public bool Active { get; set; }
     public bool PathComplete { get; set; }
-    public int TargetLocation { get; set; } = -1;
     public int TargetMovementSlot { get; set; } = -1;
     public int WaypointCount { get; set; }
     public int WaypointIndex { get; set; }

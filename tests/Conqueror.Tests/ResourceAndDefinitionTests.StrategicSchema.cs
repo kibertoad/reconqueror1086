@@ -70,7 +70,7 @@ public sealed partial class ResourceAndDefinitionTests
         var movement = strategic.MovementSlots[2];
         movement.Active = true;
         movement.PathComplete = false;
-        movement.TargetLocation = 17;
+        movement.TargetMovementSlot = 3;
         movement.WaypointCount = 23;
         movement.WaypointIndex = 7;
         movement.Swordsmen = 4;
@@ -102,8 +102,8 @@ public sealed partial class ResourceAndDefinitionTests
              roundTripped.TerrainProfile));
         Assert.Equal(new OriginalStrategicTerrainMutation(199, 399, 0xA5C3_0123),
             Assert.Single(roundTripped.TerrainMutations));
-        Assert.Equal((true, 17, 23, 7, 4, 5, 6, 0, 13, 2, "sc_0.rat"),
-            (restoredMovement.Active, restoredMovement.TargetLocation,
+        Assert.Equal((true, 3, 23, 7, 4, 5, 6, 0, 13, 2, "sc_0.rat"),
+            (restoredMovement.Active, restoredMovement.TargetMovementSlot,
              restoredMovement.WaypointCount, restoredMovement.WaypointIndex,
              restoredMovement.Swordsmen, restoredMovement.Halberdiers,
              restoredMovement.Knights, restoredMovement.OriginProperty,
