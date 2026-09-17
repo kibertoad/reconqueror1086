@@ -181,10 +181,10 @@ public sealed partial class ConquerorGame
         DrawText("SPACE JOUST   I SPEAK   K SKIRMISH   ENTER LEAVE", 190, 610, Color.LightGreen, 2);
     }
 
-    private void ActivateSiegeVisuals(ImportedSiegeScene? imported)
+    private SiegeVisuals ActivateSiegeVisuals(ImportedSiegeScene imported)
     {
         ClearSiegeVisuals();
-        if (imported is null || _importedContent is null) return;
+        ArgumentNullException.ThrowIfNull(imported);
         var palette = ImportedSiegeLayouts.LoadCombatPalette(_importedContent);
         var colorMaps = imported.ColorMaps is null ? null :
             DynamixSceneColorMapGenerator.RegenerateFirstFamily(
@@ -246,9 +246,11 @@ public sealed partial class ConquerorGame
             backdrop.SetData(IndexedScenePixels.ToRgba(
                 decodedBackdrop.Indices, palette.Rgb, transparentZero: false));
         }
-        _siegeVisuals = new SiegeVisuals(
+        var visuals = new SiegeVisuals(
             imported.Scene, imported.SourceOriginX, imported.SourceOriginY,
             textures, sources, palette.Rgb, colorMaps, backdrop);
+        _siegeVisuals = visuals;
+        return visuals;
     }
 
     private Texture2D? SceneWallTexture(SiegeRayHit hit)
@@ -334,15 +336,17 @@ public sealed partial class ConquerorGame
         }
     }
 
-    private void ConfigureSiegeActorRaycast()
+    private void ActivateSiege(ImportedSiegeScene imported, SiegeSession siege)
     {
-        if (_siege is null || _siegeVisuals is null)
-            throw new InvalidOperationException("Original siege assets must be active before actor acquisition is configured.");
-        _siege.ConfigureActorRaycast((source, target) => OriginalSiegeActorAcquisition.CastToward(
-            _siege, _siegeVisuals.Scene,
-            _siegeVisuals.SourceOriginX, _siegeVisuals.SourceOriginY,
+        ArgumentNullException.ThrowIfNull(imported);
+        ArgumentNullException.ThrowIfNull(siege);
+        var visuals = ActivateSiegeVisuals(imported);
+        _siege = siege;
+        siege.ConfigureActorRaycast((source, target) => OriginalSiegeActorAcquisition.CastToward(
+            siege, visuals.Scene,
+            visuals.SourceOriginX, visuals.SourceOriginY,
             source, target, (x, y) => SceneProjectionBlockAt(x, y, includePlayer: true),
-            _siegeVisuals.SourceFor));
+            visuals.SourceFor));
     }
 
     private Rectangle SiegeWallBounds(SiegeRayHit hit, Rectangle viewport)

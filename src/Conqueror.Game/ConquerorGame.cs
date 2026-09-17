@@ -590,18 +590,16 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
                 _activePracticeCombat = PracticeCombatKind.Melee;
                 var meleeSeed = Environment.TickCount;
                 var meleeScene = ImportedSiegeLayouts.ForPracticeMelee(_importedContent, new Random(meleeSeed).Next(3));
-                ActivateSiegeVisuals(meleeScene);
-                _siege = PracticeCombatDefinitions.CreateMelee(meleeSeed, meleeScene.Layout);
-                ConfigureSiegeActorRaycast();
+                ActivateSiege(meleeScene,
+                    PracticeCombatDefinitions.CreateMelee(meleeSeed, meleeScene.Layout));
                 _screen = Screen.Siege;
                 _notice = "MELEE PRACTICE";
                 break;
             case PracticeAction.CastleSkirmish:
                 _activePracticeCombat = PracticeCombatKind.CastleSkirmish;
                 var castleScene = ImportedSiegeLayouts.ForPracticeCastleSkirmish(_importedContent);
-                ActivateSiegeVisuals(castleScene);
-                _siege = PracticeCombatDefinitions.CreateCastleSkirmish(Environment.TickCount, castleScene.Layout);
-                ConfigureSiegeActorRaycast();
+                ActivateSiege(castleScene,
+                    PracticeCombatDefinitions.CreateCastleSkirmish(Environment.TickCount, castleScene.Layout));
                 _screen = Screen.Siege;
                 _notice = "CASTLE SKIRMISH PRACTICE";
                 break;
