@@ -131,8 +131,18 @@ internal static class LinearExecutableCodeReferences
         const int primarySpeedOffset = 0xB614;
         const int reducedSpeedOffset = 0xB68C;
         const int profilePointerOffset = 0xB704;
+        const int monthProfileOffset = 0xB720;
+        const int seasonMovieOffset = 0xB750;
+        const int seasonAtlasOffset = 0xB760;
+        const int startingPersonOffset = 0xB8C8;
+        const int personTableOffset = 0xBA50;
+        const int startingSelectorOffset = 0xC9D0;
+        const int startingRouteOffset = 0xCA98;
         const int terrainKindCount = 30;
         const int profileCount = 4;
+        const int monthCount = 12;
+        const int startingRouteCount = 7;
+        const int personRecordSize = 0x12;
 
         var bytes = File.ReadAllBytes(path);
         var header = FindHeader(bytes);
@@ -146,18 +156,32 @@ internal static class LinearExecutableCodeReferences
         var virtualSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor, 4));
         var pageIndex = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor + 12, 4));
         var objectOffset = checked((int)(dataPages + (pageIndex - 1) * pageSize));
-        if (profilePointerOffset + profileCount * sizeof(int) > virtualSize ||
+        if (startingRouteOffset + startingRouteCount * sizeof(int) > virtualSize ||
+            profilePointerOffset + profileCount * sizeof(int) > virtualSize ||
             reducedSpeedOffset + terrainKindCount * sizeof(float) > virtualSize)
             throw new InvalidDataException("Strategic terrain tables are outside the data object.");
 
         int ReadInt32(int offset) => BinaryPrimitives.ReadInt32LittleEndian(
             bytes.AsSpan(checked(objectOffset + offset), sizeof(int)));
+        ushort ReadUInt16(int offset) => BinaryPrimitives.ReadUInt16LittleEndian(
+            bytes.AsSpan(checked(objectOffset + offset), sizeof(ushort)));
+        byte ReadByte(int offset) => bytes[checked(objectOffset + offset)];
         double ReadDouble(int offset) => BinaryPrimitives.ReadDoubleLittleEndian(
             bytes.AsSpan(checked(objectOffset + offset), sizeof(double)));
         float ReadSingle(int offset) => BinaryPrimitives.ReadSingleLittleEndian(
             bytes.AsSpan(checked(objectOffset + offset), sizeof(float)));
+        string ReadAscii(int offset)
+        {
+            if (offset < 0 || offset >= virtualSize)
+                throw new InvalidDataException($"Strategic string pointer 0x{offset:X} is outside the data object.");
+            var end = offset;
+            while (end < virtualSize && end - offset < 128 && ReadByte(end) != 0) end++;
+            if (end >= virtualSize || end - offset == 128)
+                throw new InvalidDataException($"Strategic string at 0x{offset:X} is not bounded.");
+            return Encoding.ASCII.GetString(bytes, objectOffset + offset, end - offset);
+        }
 
-        var report = new StringBuilder("# Strategic terrain movement metadata (derived numeric metadata; original bytes omitted)\n");
+        var report = new StringBuilder("# Strategic movement metadata (derived values; original bytes omitted)\n");
         report.AppendLine($"# terrain-kind lookup object2+0x{terrainKindOffset:X}; 30 speed entries per table");
         report.AppendLine($"horizontal-application-limit {ReadDouble(limitOffset).ToString("R", CultureInfo.InvariantCulture)}");
         report.AppendLine($"initial-profile {ReadInt32(selectedProfileOffset)}");
@@ -166,6 +190,24 @@ internal static class LinearExecutableCodeReferences
         foreach (var (name, offset) in new[] { ("primary", primarySpeedOffset), ("reduced", reducedSpeedOffset) })
             report.AppendLine(name + " " + string.Join(' ', Enumerable.Range(0, terrainKindCount)
                 .Select(index => ReadSingle(offset + index * sizeof(float)).ToString("R", CultureInfo.InvariantCulture))));
+        report.AppendLine("month-profiles " + string.Join(' ', Enumerable.Range(0, monthCount)
+            .Select(index => ReadInt32(monthProfileOffset + index * sizeof(int)))));
+        for (var profile = 0; profile < profileCount; profile++)
+            report.AppendLine($"profile {profile} movie {ReadAscii(ReadInt32(seasonMovieOffset + profile * sizeof(int)))} " +
+                $"atlas {ReadAscii(ReadInt32(seasonAtlasOffset + profile * sizeof(int)))}");
+
+        report.AppendLine($"initial-starting-route-selector {ReadInt32(startingSelectorOffset)}");
+        for (var selector = 0; selector < startingRouteCount; selector++)
+        {
+            var person = ReadInt32(startingPersonOffset + selector * sizeof(int));
+            var personOffset = checked(personTableOffset + person * personRecordSize);
+            if (person < 0 || personOffset + personRecordSize > virtualSize)
+                throw new InvalidDataException($"Starting person index {person} is invalid.");
+            report.AppendLine($"starting-route {selector} person {person} " +
+                $"name {ReadAscii(ReadInt32(personOffset))} group {ReadByte(personOffset + 4)} " +
+                $"assignment {ReadByte(personOffset + 7)} xy {ReadUInt16(personOffset + 8)},{ReadUInt16(personOffset + 10)} " +
+                $"resource {ReadAscii(ReadInt32(startingRouteOffset + selector * sizeof(int)))}");
+        }
         return report.ToString();
     }
 

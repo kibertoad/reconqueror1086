@@ -51,6 +51,14 @@ public static class OriginalStrategicMovement
     public const int ReducedTerrainProfile = 2;
     public const int ImpassableTerrainKind = 9;
 
+    public const int StartingRouteSelectorAddress = 0xC9D0;
+    public const int StartingPersonIndexTableAddress = 0xB8C8;
+    public const int StartingRouteTableAddress = 0xCA98;
+    public const int StartingRouteCount = 7;
+    public const int MonthProfileTableAddress = 0xB720;
+    public const int SeasonMovieTableAddress = 0xB750;
+    public const int SeasonAtlasTableAddress = 0xB760;
+
     public const int PropertyTableAddress = 0xB8EC;
     public const int PropertyCount = 14;
     public const int PropertyRecordSize = 0x0F;
@@ -127,6 +135,34 @@ public static class OriginalStrategicMovement
 
     private static readonly OriginalStrategicRoute[] PropertyRouteResourceRows = BuildPropertyRouteResources();
 
+    private static readonly OriginalStrategicStartingRoute[] StartingRouteRows =
+    [
+        new(0, 17, "Scott's Keep", 0, 1, 94, 40, "sc_0.rat"),
+        new(1, 18, "Anne's Castle", 0, 1, 129, 23, "sc_1.rat"),
+        new(2, 24, "Stonetree Castle", 1, 2, 142, 82, "sc_2.rat"),
+        new(3, 29, "MacGibbon on the Hill", 1, 2, 120, 100, "sc_3.rat"),
+        new(4, 86, "Leecastle", 4, 6, 125, 152, "sc_4.rat"),
+        new(5, 144, "Damron Castle", 12, 13, 110, 264, "sc_5.rat"),
+        new(6, 166, "Sabine's Keep", 13, 14, 27, 306, "sc_6.rat")
+    ];
+
+    private static readonly StrategicTerrainProfile[] MonthProfileRows =
+    [
+        StrategicTerrainProfile.Winter, StrategicTerrainProfile.Winter,
+        StrategicTerrainProfile.Spring, StrategicTerrainProfile.Spring, StrategicTerrainProfile.Spring,
+        StrategicTerrainProfile.Summer, StrategicTerrainProfile.Summer, StrategicTerrainProfile.Summer,
+        StrategicTerrainProfile.Autumn, StrategicTerrainProfile.Autumn, StrategicTerrainProfile.Autumn,
+        StrategicTerrainProfile.Winter
+    ];
+
+    private static readonly OriginalStrategicTerrainProfileDefinition[] TerrainProfileRows =
+    [
+        new(StrategicTerrainProfile.Summer, "tran4.smk", "ics.csf"),
+        new(StrategicTerrainProfile.Autumn, "tran2.smk", "ica.csf"),
+        new(StrategicTerrainProfile.Winter, "tran3.smk", "icw.csf"),
+        new(StrategicTerrainProfile.Spring, "tran1.smk", "ics.csf")
+    ];
+
     private static readonly float[] PrimaryTerrainSpeeds =
     [
         1f, 0.2f, 1f, 0.5f, 1f, 0.5f, 0.8f, 0.8f, 1f, 5f,
@@ -150,6 +186,29 @@ public static class OriginalStrategicMovement
     public static IReadOnlyList<StrategicContactProbe> ContactProbes => ContactProbeRows;
 
     public static IReadOnlyList<OriginalStrategicRoute> PropertyRouteResources => PropertyRouteResourceRows;
+
+    public static IReadOnlyList<OriginalStrategicStartingRoute> StartingRoutes => StartingRouteRows;
+
+    public static IReadOnlyList<StrategicTerrainProfile> MonthProfiles => MonthProfileRows;
+
+    public static IReadOnlyList<OriginalStrategicTerrainProfileDefinition> TerrainProfiles => TerrainProfileRows;
+
+    public static StrategicTerrainProfile TerrainProfileForMonth(int zeroBasedMonth)
+    {
+        if (zeroBasedMonth is < 0 or >= 12) throw new ArgumentOutOfRangeException(nameof(zeroBasedMonth));
+        return MonthProfileRows[zeroBasedMonth];
+    }
+
+    public static bool TryGetStartingRoute(int selector, out OriginalStrategicStartingRoute route)
+    {
+        if (selector is < 0 or >= StartingRouteCount)
+        {
+            route = default;
+            return false;
+        }
+        route = StartingRouteRows[selector];
+        return true;
+    }
 
     public static StrategicGenerationClockAdvance AdvanceGenerationClock(
         int accumulatorMilliseconds,
@@ -432,6 +491,32 @@ public readonly record struct OriginalStrategicPropertyIdentity(
     byte LordRating);
 
 public readonly record struct OriginalStrategicPropertyGenerationState(byte OwnerOrState, byte State13);
+
+public readonly record struct OriginalStrategicStartingRoute(
+    int Selector,
+    int Person,
+    string Name,
+    byte OriginProperty,
+    byte InitialAssignment,
+    ushort GridX,
+    ushort GridY,
+    string ResourceName);
+
+public enum StrategicTerrainProfile
+{
+    Summer = 0,
+    Autumn = 1,
+    Winter = 2,
+    Spring = 3
+}
+
+public readonly record struct OriginalStrategicTerrainProfileDefinition(
+    StrategicTerrainProfile Profile,
+    string TransitionMovieResource,
+    string AtlasResource)
+{
+    public bool UsesReducedTerrainSpeeds => Profile == StrategicTerrainProfile.Winter;
+}
 
 public readonly record struct StrategicGenerationClockAdvance(
     int AccumulatorMilliseconds,

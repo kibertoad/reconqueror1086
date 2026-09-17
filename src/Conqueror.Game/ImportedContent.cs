@@ -195,6 +195,8 @@ public sealed class ImportedContentCatalog
             .Concat(Enumerable.Range(0, 30).Select(number => ("resource", $":dilem{number}.dat")))
             .Concat(OriginalStrategicMovement.PropertyRouteResources.Select(route =>
                 ("resource", $":{route.ResourceName}")))
+            .Concat(OriginalStrategicMovement.StartingRoutes.Select(route =>
+                ("resource", $":{route.ResourceName}")))
             .Append(("resource", ":weapons.dat"))
             .ToArray();
         var missing = required.FirstOrDefault(item => catalog.FindId(item.Item1, item.Item2) is null);

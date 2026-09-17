@@ -162,6 +162,75 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void OriginalStrategicTerrainProfilesFollowTheCalendarAndSeasonResources()
+    {
+        Assert.Equal(0xB720, OriginalStrategicMovement.MonthProfileTableAddress);
+        Assert.Equal(0xB750, OriginalStrategicMovement.SeasonMovieTableAddress);
+        Assert.Equal(0xB760, OriginalStrategicMovement.SeasonAtlasTableAddress);
+        Assert.Equal(
+            [
+                StrategicTerrainProfile.Winter, StrategicTerrainProfile.Winter,
+                StrategicTerrainProfile.Spring, StrategicTerrainProfile.Spring, StrategicTerrainProfile.Spring,
+                StrategicTerrainProfile.Summer, StrategicTerrainProfile.Summer, StrategicTerrainProfile.Summer,
+                StrategicTerrainProfile.Autumn, StrategicTerrainProfile.Autumn, StrategicTerrainProfile.Autumn,
+                StrategicTerrainProfile.Winter
+            ],
+            OriginalStrategicMovement.MonthProfiles);
+        Assert.Equal(
+            [
+                new OriginalStrategicTerrainProfileDefinition(
+                    StrategicTerrainProfile.Summer, "tran4.smk", "ics.csf"),
+                new OriginalStrategicTerrainProfileDefinition(
+                    StrategicTerrainProfile.Autumn, "tran2.smk", "ica.csf"),
+                new OriginalStrategicTerrainProfileDefinition(
+                    StrategicTerrainProfile.Winter, "tran3.smk", "icw.csf"),
+                new OriginalStrategicTerrainProfileDefinition(
+                    StrategicTerrainProfile.Spring, "tran1.smk", "ics.csf")
+            ],
+            OriginalStrategicMovement.TerrainProfiles);
+        Assert.Equal([false, false, true, false],
+            OriginalStrategicMovement.TerrainProfiles
+                .Select(profile => profile.UsesReducedTerrainSpeeds));
+        for (var month = 0; month < 12; month++)
+            Assert.Equal(OriginalStrategicMovement.MonthProfiles[month],
+                OriginalStrategicMovement.TerrainProfileForMonth(month));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            OriginalStrategicMovement.TerrainProfileForMonth(-1));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            OriginalStrategicMovement.TerrainProfileForMonth(12));
+    }
+
+    [Fact]
+    public void OriginalStrategicAlternateRoutesBindTheSevenStartingCastles()
+    {
+        Assert.Equal(0xC9D0, OriginalStrategicMovement.StartingRouteSelectorAddress);
+        Assert.Equal(0xB8C8, OriginalStrategicMovement.StartingPersonIndexTableAddress);
+        Assert.Equal(0xCA98, OriginalStrategicMovement.StartingRouteTableAddress);
+        Assert.Equal(7, OriginalStrategicMovement.StartingRouteCount);
+
+        OriginalStrategicStartingRoute[] expected =
+        [
+            new(0, 17, "Scott's Keep", 0, 1, 94, 40, "sc_0.rat"),
+            new(1, 18, "Anne's Castle", 0, 1, 129, 23, "sc_1.rat"),
+            new(2, 24, "Stonetree Castle", 1, 2, 142, 82, "sc_2.rat"),
+            new(3, 29, "MacGibbon on the Hill", 1, 2, 120, 100, "sc_3.rat"),
+            new(4, 86, "Leecastle", 4, 6, 125, 152, "sc_4.rat"),
+            new(5, 144, "Damron Castle", 12, 13, 110, 264, "sc_5.rat"),
+            new(6, 166, "Sabine's Keep", 13, 14, 27, 306, "sc_6.rat")
+        ];
+        Assert.Equal(expected, OriginalStrategicMovement.StartingRoutes);
+        Assert.Equal(7, OriginalStrategicMovement.StartingRoutes
+            .Select(route => route.ResourceName).Distinct(StringComparer.OrdinalIgnoreCase).Count());
+        for (var selector = 0; selector < expected.Length; selector++)
+        {
+            Assert.True(OriginalStrategicMovement.TryGetStartingRoute(selector, out var route));
+            Assert.Equal(expected[selector], route);
+        }
+        Assert.False(OriginalStrategicMovement.TryGetStartingRoute(-1, out _));
+        Assert.False(OriginalStrategicMovement.TryGetStartingRoute(7, out _));
+    }
+
+    [Fact]
     public void OriginalStrategicPropertyLayoutAndRowsMatchExecutableTable()
     {
         Assert.Equal(0xB8EC, OriginalStrategicMovement.PropertyTableAddress);
