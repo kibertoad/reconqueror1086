@@ -13,6 +13,11 @@ public static class OriginalStrategicMovement
     public const int GenerationRollLimit = 0x64;
     public const int GenerationStartThreshold = 0x60;
     public const int GenerationPropertyEligibilityValue = 1;
+    public const int ReactiveSpecialProperty = 7;
+    public const int ReactiveSpecialPropertyDelay = 0x3E8;
+    public const int ReactiveExistingPursuitDelay = 0x32;
+    public const int ReactiveSpawnRollLimit = 6;
+    public const int ReactiveSpawnRollExclusiveMaximum = 2;
 
     public const int ActiveOffset = 0x00;
     public const int PathCompleteOffset = 0x0C;
@@ -41,6 +46,10 @@ public static class OriginalStrategicMovement
     public const int WaypointCoordinateTolerance = 6;
     public const int MaximumRoutedStep = 50;
     public const int RetargetFieldArmyRange = 300;
+    public const int TerrainKindCount = 30;
+    public const int TerrainProfileCount = 4;
+    public const int ReducedTerrainProfile = 2;
+    public const int ImpassableTerrainKind = 9;
 
     public const int PropertyTableAddress = 0xB8EC;
     public const int PropertyCount = 14;
@@ -118,6 +127,20 @@ public static class OriginalStrategicMovement
 
     private static readonly OriginalStrategicRoute[] PropertyRouteResourceRows = BuildPropertyRouteResources();
 
+    private static readonly float[] PrimaryTerrainSpeeds =
+    [
+        1f, 0.2f, 1f, 0.5f, 1f, 0.5f, 0.8f, 0.8f, 1f, 5f,
+        0.3f, 0.6f, 0.8f, 0.8f, 2f, 2f, 2f, 1f, 0.2f, 0.5f,
+        0.5f, 0.5f, 0.5f, 3f, 1f, 1f, 0.5f, 0.5f, 0.5f, 0.2f
+    ];
+
+    private static readonly float[] ReducedTerrainSpeeds =
+    [
+        0.8f, 0.2f, 0.8f, 0.5f, 0.8f, 0.5f, 0.6f, 0.6f, 0.8f, 5f,
+        0.2f, 0.4f, 0.5f, 0.5f, 1.5f, 1.5f, 1.5f, 0.8f, 0.1f, 0.4f,
+        0.4f, 0.4f, 0.4f, 2f, 1f, 1f, 0.5f, 0.5f, 0.5f, 0.6f
+    ];
+
     public static IReadOnlyList<OriginalStrategicPropertyDefinition> Properties => PropertyRows;
 
     public static IReadOnlyList<int> InitialActiveHouseholdCounts => InitialHouseholdCounts;
@@ -127,6 +150,147 @@ public static class OriginalStrategicMovement
     public static IReadOnlyList<StrategicContactProbe> ContactProbes => ContactProbeRows;
 
     public static IReadOnlyList<OriginalStrategicRoute> PropertyRouteResources => PropertyRouteResourceRows;
+
+    public static StrategicGenerationClockAdvance AdvanceGenerationClock(
+        int accumulatorMilliseconds,
+        int elapsedMilliseconds,
+        int activeMovementCount,
+        int? roll)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(accumulatorMilliseconds);
+        ArgumentOutOfRangeException.ThrowIfNegative(elapsedMilliseconds);
+        ArgumentOutOfRangeException.ThrowIfNegative(activeMovementCount);
+
+        if (accumulatorMilliseconds < GenerationIntervalMilliseconds)
+            return new(checked(accumulatorMilliseconds + elapsedMilliseconds), BoundaryReached: false,
+                RollConsumed: false, StartGeneration: false);
+
+        if (activeMovementCount >= SlotCount)
+            return new(0, BoundaryReached: true, RollConsumed: false, StartGeneration: false);
+
+        if (roll is null)
+            throw new ArgumentNullException(nameof(roll), "A generation roll is required at an eligible boundary.");
+        if (roll < 0 || roll >= GenerationRollLimit)
+            throw new ArgumentOutOfRangeException(nameof(roll));
+
+        return new(0, BoundaryReached: true, RollConsumed: true,
+            StartGeneration: roll > GenerationStartThreshold);
+    }
+
+    public static bool CanAttemptReactivePursuit(
+        int property,
+        int movementSlot,
+        int playerMovementSlot,
+        int callsSinceReactiveSuccess,
+        bool hasExistingPursuer)
+    {
+        ValidateProperty(property);
+        ValidateSlot(movementSlot, nameof(movementSlot));
+        ValidateSlot(playerMovementSlot, nameof(playerMovementSlot));
+        ArgumentOutOfRangeException.ThrowIfNegative(callsSinceReactiveSuccess);
+
+        if (property == ReactiveSpecialProperty &&
+            callsSinceReactiveSuccess < ReactiveSpecialPropertyDelay &&
+            movementSlot != playerMovementSlot)
+            return false;
+
+        return !hasExistingPursuer ||
+            movementSlot == playerMovementSlot && callsSinceReactiveSuccess > ReactiveExistingPursuitDelay;
+    }
+
+    public static bool HasLivePursuer(
+        IReadOnlyList<StrategicMovementPursuitState> movements,
+        int targetSlot)
+    {
+        ArgumentNullException.ThrowIfNull(movements);
+        ValidateSlot(targetSlot, nameof(targetSlot));
+        if (movements.Count != SlotCount)
+            throw new ArgumentException($"Pursuit inspection requires exactly {SlotCount} movement states.", nameof(movements));
+
+        return movements.Any(movement =>
+            movement.Active && movement.Mode == PursuitMode && movement.TargetSlot == targetSlot);
+    }
+
+    public static bool ShouldAttemptReactiveSpawn(int roll, int activeMovementCount)
+    {
+        if (roll < 0 || roll >= ReactiveSpawnRollLimit)
+            throw new ArgumentOutOfRangeException(nameof(roll));
+        ArgumentOutOfRangeException.ThrowIfNegative(activeMovementCount);
+        return roll < ReactiveSpawnRollExclusiveMaximum && activeMovementCount < SlotCount;
+    }
+
+    public static int FirstFreeSlot(IReadOnlyList<bool> activeSlots)
+    {
+        ArgumentNullException.ThrowIfNull(activeSlots);
+        if (activeSlots.Count != SlotCount)
+            throw new ArgumentException($"Slot selection requires exactly {SlotCount} states.", nameof(activeSlots));
+        for (var index = 0; index < activeSlots.Count; index++)
+            if (!activeSlots[index]) return index;
+        return -1;
+    }
+
+    public static IReadOnlyList<int> ActiveMovementSlots(IReadOnlyList<bool> activeSlots)
+    {
+        ArgumentNullException.ThrowIfNull(activeSlots);
+        if (activeSlots.Count != SlotCount)
+            throw new ArgumentException($"Slot selection requires exactly {SlotCount} states.", nameof(activeSlots));
+        return activeSlots.Select((active, index) => (active, index))
+            .Where(entry => entry.active).Select(entry => entry.index).ToArray();
+    }
+
+    public static IReadOnlyList<StrategicMovementConstructionAttempt> ConstructionFallback(
+        int originProperty,
+        StrategicRouteSelection routeSelection)
+    {
+        ValidateProperty(originProperty);
+        return
+        [
+            new(originProperty, RoutedMode, routeSelection),
+            new(originProperty, DirectPropertyMode, routeSelection)
+        ];
+    }
+
+    public static IReadOnlyList<StrategicMovementConstructionAttempt> TimedConstructionFallback(
+        bool propertyListPresent,
+        int globalOriginProperty,
+        int selectedProperty)
+    {
+        if (!propertyListPresent)
+            return ConstructionFallback(globalOriginProperty, StrategicRouteSelection.AlternateAuthoredRoute);
+        if (selectedProperty < 0) return [];
+        return ConstructionFallback(selectedProperty, StrategicRouteSelection.CanonicalPropertyPair);
+    }
+
+    public static float TerrainSpeed(int profile, int terrainKind)
+    {
+        if (profile < 0 || profile >= TerrainProfileCount)
+            throw new ArgumentOutOfRangeException(nameof(profile));
+        if (terrainKind < 0 || terrainKind >= TerrainKindCount)
+            throw new ArgumentOutOfRangeException(nameof(terrainKind));
+        return (profile == ReducedTerrainProfile ? ReducedTerrainSpeeds : PrimaryTerrainSpeeds)[terrainKind];
+    }
+
+    public static StrategicRoutedStep CalculateRoutedStep(
+        float normalizedDirectionX,
+        float normalizedDirectionY,
+        int elapsedMilliseconds,
+        int profile,
+        int terrainKind)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(elapsedMilliseconds);
+        if (terrainKind == ImpassableTerrainKind)
+            return new(0, 0, StrategicRoutedStepOutcome.DeactivateForImpassableTerrain);
+
+        var speed = TerrainSpeed(profile, terrainKind);
+        var deltaX = (double)normalizedDirectionX * speed * elapsedMilliseconds;
+        var deltaY = (double)normalizedDirectionY * speed * elapsedMilliseconds;
+        return new(
+            (float)deltaX,
+            (float)deltaY,
+            Math.Abs(deltaX) < MaximumRoutedStep
+                ? StrategicRoutedStepOutcome.Apply
+                : StrategicRoutedStepOutcome.HoldForHorizontalLimit);
+    }
 
     public static IReadOnlyList<int> GenerationPropertyCandidates(
         IReadOnlyList<OriginalStrategicPropertyGenerationState> properties)
@@ -216,6 +380,17 @@ public static class OriginalStrategicMovement
         return checked(dx * dx + dy * dy);
     }
 
+    private static void ValidateProperty(int property)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(property);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(property, PropertyCount);
+    }
+
+    private static void ValidateSlot(int slot, string parameterName)
+    {
+        if (slot < 0 || slot >= SlotCount) throw new ArgumentOutOfRangeException(parameterName);
+    }
+
     private static OriginalStrategicRoute[] BuildPropertyRouteResources()
     {
         var routes = new List<OriginalStrategicRoute>();
@@ -257,6 +432,34 @@ public readonly record struct OriginalStrategicPropertyIdentity(
     byte LordRating);
 
 public readonly record struct OriginalStrategicPropertyGenerationState(byte OwnerOrState, byte State13);
+
+public readonly record struct StrategicGenerationClockAdvance(
+    int AccumulatorMilliseconds,
+    bool BoundaryReached,
+    bool RollConsumed,
+    bool StartGeneration);
+
+public readonly record struct StrategicMovementPursuitState(bool Active, int Mode, int TargetSlot);
+
+public readonly record struct StrategicMovementConstructionAttempt(
+    int OriginProperty,
+    int Mode,
+    StrategicRouteSelection RouteSelection);
+
+public enum StrategicRouteSelection
+{
+    AlternateAuthoredRoute = 0,
+    CanonicalPropertyPair = 1
+}
+
+public readonly record struct StrategicRoutedStep(float DeltaX, float DeltaY, StrategicRoutedStepOutcome Outcome);
+
+public enum StrategicRoutedStepOutcome
+{
+    Apply,
+    HoldForHorizontalLimit,
+    DeactivateForImpassableTerrain
+}
 
 public readonly record struct StrategicContactProbe(int X, int Y);
 

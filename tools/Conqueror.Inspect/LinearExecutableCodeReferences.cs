@@ -1,6 +1,7 @@
 using Conqueror.Resources;
 using Iced.Intel;
 using System.Buffers.Binary;
+using System.Globalization;
 using System.Text;
 
 internal static class LinearExecutableCodeReferences
@@ -119,6 +120,52 @@ internal static class LinearExecutableCodeReferences
                 bytes.AsSpan(checked((int)fileOffset + (row * columns + column) * sizeof(int)), sizeof(int))));
             report.AppendLine($"{row,2}  {string.Join(' ', values)}");
         }
+        return report.ToString();
+    }
+
+    public static string ReadStrategicTerrainMovement(string path)
+    {
+        const int limitOffset = 0x7389;
+        const int terrainKindOffset = 0xAF78;
+        const int selectedProfileOffset = 0xB610;
+        const int primarySpeedOffset = 0xB614;
+        const int reducedSpeedOffset = 0xB68C;
+        const int profilePointerOffset = 0xB704;
+        const int terrainKindCount = 30;
+        const int profileCount = 4;
+
+        var bytes = File.ReadAllBytes(path);
+        var header = FindHeader(bytes);
+        var module = FindModuleStart(bytes, header);
+        var pageSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x28, 4));
+        var objectTable = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x40, 4));
+        var objectCount = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x44, 4));
+        if (objectCount < 2) throw new InvalidDataException("Linear Executable has no data object.");
+        var dataPages = checked((uint)module + BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x80, 4)));
+        var descriptor = checked(header + (int)objectTable + 24);
+        var virtualSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor, 4));
+        var pageIndex = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor + 12, 4));
+        var objectOffset = checked((int)(dataPages + (pageIndex - 1) * pageSize));
+        if (profilePointerOffset + profileCount * sizeof(int) > virtualSize ||
+            reducedSpeedOffset + terrainKindCount * sizeof(float) > virtualSize)
+            throw new InvalidDataException("Strategic terrain tables are outside the data object.");
+
+        int ReadInt32(int offset) => BinaryPrimitives.ReadInt32LittleEndian(
+            bytes.AsSpan(checked(objectOffset + offset), sizeof(int)));
+        double ReadDouble(int offset) => BinaryPrimitives.ReadDoubleLittleEndian(
+            bytes.AsSpan(checked(objectOffset + offset), sizeof(double)));
+        float ReadSingle(int offset) => BinaryPrimitives.ReadSingleLittleEndian(
+            bytes.AsSpan(checked(objectOffset + offset), sizeof(float)));
+
+        var report = new StringBuilder("# Strategic terrain movement metadata (derived numeric metadata; original bytes omitted)\n");
+        report.AppendLine($"# terrain-kind lookup object2+0x{terrainKindOffset:X}; 30 speed entries per table");
+        report.AppendLine($"horizontal-application-limit {ReadDouble(limitOffset).ToString("R", CultureInfo.InvariantCulture)}");
+        report.AppendLine($"initial-profile {ReadInt32(selectedProfileOffset)}");
+        report.AppendLine("profile-pointers " + string.Join(' ', Enumerable.Range(0, profileCount)
+            .Select(index => $"0x{ReadInt32(profilePointerOffset + index * sizeof(int)):X}")));
+        foreach (var (name, offset) in new[] { ("primary", primarySpeedOffset), ("reduced", reducedSpeedOffset) })
+            report.AppendLine(name + " " + string.Join(' ', Enumerable.Range(0, terrainKindCount)
+                .Select(index => ReadSingle(offset + index * sizeof(float)).ToString("R", CultureInfo.InvariantCulture))));
         return report.ToString();
     }
 

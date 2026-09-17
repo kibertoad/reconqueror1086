@@ -54,6 +54,7 @@ var xrefDataOffsets = OptionValue(inspectionOptions, "--xref-data=");
 var xrefCodeAddresses = OptionValue(inspectionOptions, "--xref-code=");
 var xrefBlockFlags = OptionValue(inspectionOptions, "--xref-block-flags=");
 var reportWeaponCombatTable = inspectionOptions.Contains("--weapon-combat-table", StringComparer.OrdinalIgnoreCase);
+var reportStrategicTerrainTable = inspectionOptions.Contains("--strategic-terrain-table", StringComparer.OrdinalIgnoreCase);
 var fixupSourceAddresses = OptionValue(inspectionOptions, "--fixup-source=");
 var conversationNodeIds = OptionValue(inspectionOptions, "--conversation-nodes=");
 var conversationTextIds = OptionValue(inspectionOptions, "--conversation-text=");
@@ -94,6 +95,12 @@ if (reportWeaponCombatTable)
 {
     var executable = Directory.EnumerateFiles(artifactRoot, "CONQUER.EXE", SearchOption.AllDirectories).Single();
     File.WriteAllText(Path.Combine(output, "weapon-combat-table-report.txt"), LinearExecutableCodeReferences.ReadDataTable(executable, 0xCE14, 25, 7));
+}
+if (reportStrategicTerrainTable)
+{
+    var executable = Directory.EnumerateFiles(artifactRoot, "CONQUER.EXE", SearchOption.AllDirectories).Single();
+    File.WriteAllText(Path.Combine(output, "strategic-terrain-table-report.txt"),
+        LinearExecutableCodeReferences.ReadStrategicTerrainMovement(executable));
 }
 if (fixupSourceAddresses is not null)
 {

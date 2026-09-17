@@ -17,6 +17,9 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(0x64, OriginalStrategicMovement.GenerationRollLimit);
         Assert.Equal(0x60, OriginalStrategicMovement.GenerationStartThreshold);
         Assert.Equal(1, OriginalStrategicMovement.GenerationPropertyEligibilityValue);
+        Assert.Equal(7, OriginalStrategicMovement.ReactiveSpecialProperty);
+        Assert.Equal(0x3E8, OriginalStrategicMovement.ReactiveSpecialPropertyDelay);
+        Assert.Equal(0x32, OriginalStrategicMovement.ReactiveExistingPursuitDelay);
 
         Assert.Equal(0x00, OriginalStrategicMovement.ActiveOffset);
         Assert.Equal(0x0C, OriginalStrategicMovement.PathCompleteOffset);
@@ -44,6 +47,118 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(6, OriginalStrategicMovement.WaypointCoordinateTolerance);
         Assert.Equal(50, OriginalStrategicMovement.MaximumRoutedStep);
         Assert.Equal(300, OriginalStrategicMovement.RetargetFieldArmyRange);
+        Assert.Equal(30, OriginalStrategicMovement.TerrainKindCount);
+        Assert.Equal(4, OriginalStrategicMovement.TerrainProfileCount);
+        Assert.Equal(2, OriginalStrategicMovement.ReducedTerrainProfile);
+        Assert.Equal(9, OriginalStrategicMovement.ImpassableTerrainKind);
+    }
+
+    [Fact]
+    public void OriginalStrategicGenerationChecksThePriorAccumulatorAndConsumesRollOnlyWhenEligible()
+    {
+        Assert.Equal(new StrategicGenerationClockAdvance(5_001, false, false, false),
+            OriginalStrategicMovement.AdvanceGenerationClock(4_999, 2, 0, null));
+        Assert.Equal(new StrategicGenerationClockAdvance(0, true, false, false),
+            OriginalStrategicMovement.AdvanceGenerationClock(5_001, 10, 5, null));
+        Assert.Equal(new StrategicGenerationClockAdvance(0, true, true, false),
+            OriginalStrategicMovement.AdvanceGenerationClock(5_001, 10, 4, 96));
+        Assert.Equal(new StrategicGenerationClockAdvance(0, true, true, true),
+            OriginalStrategicMovement.AdvanceGenerationClock(5_001, 10, 4, 97));
+        Assert.Throws<ArgumentNullException>(() =>
+            OriginalStrategicMovement.AdvanceGenerationClock(5_000, 0, 4, null));
+    }
+
+    [Fact]
+    public void OriginalStrategicReactivePursuitPreservesSpecialPropertyAndRepeatDelays()
+    {
+        Assert.False(OriginalStrategicMovement.CanAttemptReactivePursuit(
+            property: 7, movementSlot: 2, playerMovementSlot: 1, callsSinceReactiveSuccess: 999,
+            hasExistingPursuer: false));
+        Assert.True(OriginalStrategicMovement.CanAttemptReactivePursuit(
+            property: 7, movementSlot: 2, playerMovementSlot: 1, callsSinceReactiveSuccess: 1_000,
+            hasExistingPursuer: false));
+        Assert.False(OriginalStrategicMovement.CanAttemptReactivePursuit(
+            property: 3, movementSlot: 2, playerMovementSlot: 1, callsSinceReactiveSuccess: 1_000,
+            hasExistingPursuer: true));
+        Assert.False(OriginalStrategicMovement.CanAttemptReactivePursuit(
+            property: 3, movementSlot: 1, playerMovementSlot: 1, callsSinceReactiveSuccess: 50,
+            hasExistingPursuer: true));
+        Assert.True(OriginalStrategicMovement.CanAttemptReactivePursuit(
+            property: 3, movementSlot: 1, playerMovementSlot: 1, callsSinceReactiveSuccess: 51,
+            hasExistingPursuer: true));
+
+        StrategicMovementPursuitState[] movements =
+        [
+            new(true, 2, 3),
+            new(true, 3, 2),
+            new(false, 3, 1),
+            new(true, 1, 2),
+            new(false, 0, 0)
+        ];
+        Assert.True(OriginalStrategicMovement.HasLivePursuer(movements, 2));
+        Assert.False(OriginalStrategicMovement.HasLivePursuer(movements, 1));
+        Assert.True(OriginalStrategicMovement.ShouldAttemptReactiveSpawn(1, 4));
+        Assert.False(OriginalStrategicMovement.ShouldAttemptReactiveSpawn(2, 4));
+        Assert.False(OriginalStrategicMovement.ShouldAttemptReactiveSpawn(1, 5));
+    }
+
+    [Fact]
+    public void OriginalStrategicConstructionUsesFirstFreeSlotAndExactRouteFlagFallbacks()
+    {
+        Assert.Equal(2, OriginalStrategicMovement.FirstFreeSlot([true, true, false, false, true]));
+        Assert.Equal(-1, OriginalStrategicMovement.FirstFreeSlot([true, true, true, true, true]));
+        Assert.Equal([0, 2, 4], OriginalStrategicMovement.ActiveMovementSlots([true, false, true, false, true]));
+
+        Assert.Equal(
+            [
+                new StrategicMovementConstructionAttempt(4, 2, StrategicRouteSelection.AlternateAuthoredRoute),
+                new StrategicMovementConstructionAttempt(4, 1, StrategicRouteSelection.AlternateAuthoredRoute)
+            ],
+            OriginalStrategicMovement.TimedConstructionFallback(
+                propertyListPresent: false, globalOriginProperty: 4, selectedProperty: -1));
+        Assert.Equal(
+            [
+                new StrategicMovementConstructionAttempt(8, 2, StrategicRouteSelection.CanonicalPropertyPair),
+                new StrategicMovementConstructionAttempt(8, 1, StrategicRouteSelection.CanonicalPropertyPair)
+            ],
+            OriginalStrategicMovement.TimedConstructionFallback(
+                propertyListPresent: true, globalOriginProperty: 4, selectedProperty: 8));
+        Assert.Empty(OriginalStrategicMovement.TimedConstructionFallback(
+            propertyListPresent: true, globalOriginProperty: 4, selectedProperty: -1));
+    }
+
+    [Fact]
+    public void OriginalStrategicRoutedStepUsesExecutableTerrainProfilesAndStrictHorizontalLimit()
+    {
+        float[] primary =
+        [
+            1f, 0.2f, 1f, 0.5f, 1f, 0.5f, 0.8f, 0.8f, 1f, 5f,
+            0.3f, 0.6f, 0.8f, 0.8f, 2f, 2f, 2f, 1f, 0.2f, 0.5f,
+            0.5f, 0.5f, 0.5f, 3f, 1f, 1f, 0.5f, 0.5f, 0.5f, 0.2f
+        ];
+        float[] reduced =
+        [
+            0.8f, 0.2f, 0.8f, 0.5f, 0.8f, 0.5f, 0.6f, 0.6f, 0.8f, 5f,
+            0.2f, 0.4f, 0.5f, 0.5f, 1.5f, 1.5f, 1.5f, 0.8f, 0.1f, 0.4f,
+            0.4f, 0.4f, 0.4f, 2f, 1f, 1f, 0.5f, 0.5f, 0.5f, 0.6f
+        ];
+        Assert.Equal(primary, Enumerable.Range(0, 30)
+            .Select(kind => OriginalStrategicMovement.TerrainSpeed(0, kind)));
+        Assert.Equal(primary, Enumerable.Range(0, 30)
+            .Select(kind => OriginalStrategicMovement.TerrainSpeed(1, kind)));
+        Assert.Equal(reduced, Enumerable.Range(0, 30)
+            .Select(kind => OriginalStrategicMovement.TerrainSpeed(2, kind)));
+        Assert.Equal(primary, Enumerable.Range(0, 30)
+            .Select(kind => OriginalStrategicMovement.TerrainSpeed(3, kind)));
+
+        Assert.Equal(new StrategicRoutedStep(6f, 8f, StrategicRoutedStepOutcome.Apply),
+            OriginalStrategicMovement.CalculateRoutedStep(0.6f, 0.8f, 10, 1, 0));
+        Assert.Equal(StrategicRoutedStepOutcome.HoldForHorizontalLimit,
+            OriginalStrategicMovement.CalculateRoutedStep(1f, 0f, 50, 1, 0).Outcome);
+        Assert.Equal(new StrategicRoutedStep(0f, 100f, StrategicRoutedStepOutcome.Apply),
+            OriginalStrategicMovement.CalculateRoutedStep(0f, 1f, 100, 1, 0));
+        Assert.Equal(StrategicRoutedStepOutcome.DeactivateForImpassableTerrain,
+            OriginalStrategicMovement.CalculateRoutedStep(1f, 0f, 1, 1, 9).Outcome);
     }
 
     [Fact]
