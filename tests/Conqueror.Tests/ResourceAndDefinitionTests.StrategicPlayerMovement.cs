@@ -149,6 +149,59 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void PlayerJoinAndLeaveExchangeDistinguishedArmyAndAvatarState()
+    {
+        var state = OriginalStrategicCampaignState.CreateForNewGame(
+            new DateTime(1086, 3, 1), startingRouteSelector: 2);
+        var army = state.PlayerMovementSlots[3];
+        army.CurrentX = 4_321.5f;
+        army.CurrentY = 987.25f;
+        army.GridX = 53;
+        army.GridY = 48;
+
+        OriginalStrategicMovement.JoinPlayerArmy(state, 3);
+
+        Assert.Equal((3, 3, true, false),
+            (state.EngagedPlayerMovementSlot, state.SelectedPlayerMovementSlot,
+             army.Active, state.PlayerMovementSlots[5].Active));
+
+        Assert.True(OriginalStrategicMovement.LeavePlayerArmy(state, 3));
+        var avatar = state.PlayerMovementSlots[5];
+        Assert.Equal((5, 5, true, true, 0, 0, 0),
+            (state.EngagedPlayerMovementSlot, state.SelectedPlayerMovementSlot,
+             avatar.Active, avatar.PathComplete, avatar.TargetHandle,
+             avatar.WaypointCount, avatar.WaypointIndex));
+        Assert.Equal((4_321.5f, 987.25f, 53, 48),
+            (avatar.CurrentX, avatar.CurrentY, avatar.GridX, avatar.GridY));
+        Assert.True(army.Active);
+        Assert.False(state.PlayerRouteInputActive);
+        Assert.False(OriginalStrategicMovement.LeavePlayerArmy(state, 3));
+    }
+
+    [Fact]
+    public void CampaignMembershipKeepsOriginalDistinguishedRecordInSync()
+    {
+        var campaignState = Campaign.NewFromTemplate(0);
+        campaignState.SchemaVersion = 1;
+        campaignState.OriginalStrategicState = OriginalStrategicCampaignState.CreateForNewGame(
+            campaignState.Date, startingRouteSelector: 0);
+        campaignState.Player.JoinedArmyIndex = null;
+        campaignState.Player.ArmyAt(2).Units[UnitType.Swordsmen] = 100;
+        campaignState.Player.SetArmyFieldState(2, fielded: true, location: 0);
+        var campaign = new Campaign(campaignState);
+
+        Assert.True(campaign.ToggleArmyMembership(2));
+        Assert.Equal(2, campaign.State.Player.JoinedArmyIndex);
+        Assert.Equal(2, campaignState.OriginalStrategicState.EngagedPlayerMovementSlot);
+        Assert.False(campaignState.OriginalStrategicState.PlayerMovementSlots[5].Active);
+
+        Assert.True(campaign.ToggleArmyMembership(2));
+        Assert.Null(campaign.State.Player.JoinedArmyIndex);
+        Assert.Equal(5, campaignState.OriginalStrategicState.EngagedPlayerMovementSlot);
+        Assert.True(campaignState.OriginalStrategicState.PlayerMovementSlots[5].Active);
+    }
+
+    [Fact]
     public void PlayerRouteCommandClearsTargetPrimesFirstPointAndRetainsStalePairs()
     {
         var state = RuntimeState();

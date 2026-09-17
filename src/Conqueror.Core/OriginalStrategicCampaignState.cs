@@ -117,6 +117,7 @@ public sealed class OriginalStrategicCampaignState
         {
             var starting = OriginalStrategicMovement.StartingRoutes[startingRouteSelector];
             state.Persons[starting.Person].Assignment = 0;
+            foreach (var player in state.PlayerMovementSlots) player.PathComplete = true;
             var avatar = state.PlayerMovementSlots[OriginalStrategicMovement.PlayerAvatarMovementSlot];
             var currentX = checked(80 * (starting.GridX + 1));
             var currentY = checked(20 * (starting.GridY + 1));

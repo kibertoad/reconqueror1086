@@ -18,6 +18,51 @@ public readonly record struct OriginalStrategicPlayerMapHit(
 
 public static partial class OriginalStrategicMovement
 {
+    public static void JoinPlayerArmy(
+        OriginalStrategicCampaignState state,
+        int armySlot)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        state.Validate();
+        if (armySlot is < 0 or >= PlayerArmyMovementCount)
+            throw new ArgumentOutOfRangeException(nameof(armySlot));
+
+        var army = state.PlayerMovementSlots.Single(slot => slot.Slot == armySlot);
+        var avatar = state.PlayerMovementSlots.Single(slot => slot.Slot == PlayerAvatarMovementSlot);
+        state.EngagedPlayerMovementSlot = armySlot;
+        army.Active = true;
+        state.SelectedPlayerMovementSlot = armySlot;
+        avatar.Active = false;
+    }
+
+    public static bool LeavePlayerArmy(
+        OriginalStrategicCampaignState state,
+        int armySlot)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        state.Validate();
+        if (armySlot is < 0 or >= PlayerArmyMovementCount)
+            throw new ArgumentOutOfRangeException(nameof(armySlot));
+
+        var avatar = state.PlayerMovementSlots.Single(slot => slot.Slot == PlayerAvatarMovementSlot);
+        if (avatar.Active) return false;
+        var army = state.PlayerMovementSlots.Single(slot => slot.Slot == armySlot);
+
+        state.EngagedPlayerMovementSlot = PlayerAvatarMovementSlot;
+        avatar.CurrentX = army.CurrentX;
+        avatar.CurrentY = army.CurrentY;
+        avatar.GridX = army.GridX;
+        avatar.GridY = army.GridY;
+        avatar.TargetHandle = 0;
+        avatar.WaypointCount = 0;
+        avatar.WaypointIndex = 0;
+        avatar.PathComplete = true;
+        avatar.Active = true;
+        state.PlayerRouteInputActive = false;
+        state.SelectedPlayerMovementSlot = PlayerAvatarMovementSlot;
+        return true;
+    }
+
     public static OriginalStrategicPlayerCommandResult DispatchPlayerMapCommand(
         OriginalStrategicCampaignState state,
         IOriginalStrategicResources resources,

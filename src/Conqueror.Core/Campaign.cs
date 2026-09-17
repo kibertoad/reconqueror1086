@@ -201,7 +201,17 @@ public sealed partial class Campaign
         if (player.ArmyAt(armyIndex).Total == 0 || !player.ArmyIsFielded(armyIndex)
             || player.ArmyLocationAt(armyIndex) != State.CurrentLocation
             || State.ArmyOrders.ContainsKey(armyIndex)) return false;
-        player.JoinedArmyIndex = player.JoinedArmyIndex == armyIndex ? null : armyIndex;
+        var leaving = player.JoinedArmyIndex == armyIndex;
+        if (State.OriginalStrategicState is { } strategic)
+        {
+            if (leaving)
+            {
+                if (!OriginalStrategicMovement.LeavePlayerArmy(strategic, armyIndex)) return false;
+            }
+            else
+                OriginalStrategicMovement.JoinPlayerArmy(strategic, armyIndex);
+        }
+        player.JoinedArmyIndex = leaving ? null : armyIndex;
         Log(player.JoinedArmyIndex is null ? "You leave the selected army." : $"You join {player.ArmyNameAt(armyIndex)}.");
         return true;
     }
