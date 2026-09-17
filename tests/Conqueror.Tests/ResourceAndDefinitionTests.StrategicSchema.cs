@@ -23,6 +23,8 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.All(state.MovementSlots, slot => Assert.False(slot.Active));
         Assert.All(state.PlayerMovementSlots.Take(5), slot => Assert.False(slot.Active));
         var starting = OriginalStrategicMovement.StartingRoutes[4];
+        Assert.Equal((starting.GridX, starting.GridY, 0),
+            (state.PlayerHomeGridX, state.PlayerHomeGridY, state.ActivePlayerRecordCount));
         var avatar = state.PlayerMovementSlots[5];
         Assert.Equal((true, true, 5, starting.GridX, starting.GridY,
                 80 * (starting.GridX + 1), 20 * (starting.GridY + 1)),
@@ -102,8 +104,12 @@ public sealed partial class ResourceAndDefinitionTests
         strategic.SelectedPlayerMovementSlot = 4;
         strategic.EngagedPlayerMovementSlot = 3;
         strategic.PlayerRouteInputActive = true;
+        strategic.PlayerHomeGridX = 17;
+        strategic.PlayerHomeGridY = 23;
+        strategic.ActivePlayerRecordCount = 4;
         var playerMovement = strategic.PlayerMovementSlots[4];
         playerMovement.Active = true;
+        playerMovement.State8 = 13;
         playerMovement.WaypointCount = 2;
         playerMovement.WaypointIndex = 1;
         playerMovement.DestinationX = 4_000;
@@ -142,9 +148,12 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal((7_438.5f, 2_801.25f, 0.75f, -0.25f),
             (restoredMovement.CurrentX, restoredMovement.CurrentY,
              restoredMovement.DirectionX, restoredMovement.DirectionY));
-        Assert.Equal((4, 3, true, true, 2, 1, 19, 3),
-            (roundTripped.SelectedPlayerMovementSlot, roundTripped.EngagedPlayerMovementSlot,
+        Assert.Equal((17, 23, 4, 4, 3, true, true, 13, 2, 1, 19, 3),
+            (roundTripped.PlayerHomeGridX, roundTripped.PlayerHomeGridY,
+             roundTripped.ActivePlayerRecordCount,
+             roundTripped.SelectedPlayerMovementSlot, roundTripped.EngagedPlayerMovementSlot,
              roundTripped.PlayerRouteInputActive, restoredPlayerMovement.Active,
+             restoredPlayerMovement.State8,
              restoredPlayerMovement.WaypointCount,
              restoredPlayerMovement.WaypointIndex, restoredPlayerMovement.CollisionCooldown,
              restoredPlayerMovement.TerrainKind));

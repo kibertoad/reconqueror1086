@@ -18,6 +18,101 @@ public readonly record struct OriginalStrategicPlayerMapHit(
 
 public static partial class OriginalStrategicMovement
 {
+    private static readonly StrategicPoint[] PlayerFormationOffsetRows =
+    [
+        new(-20, -30),
+        new(20, -30),
+        new(-30, 0),
+        new(30, 0),
+        new(0, 30),
+        new(0, 0)
+    ];
+
+    public static IReadOnlyList<StrategicPoint> PlayerFormationOffsets =>
+        Array.AsReadOnly(PlayerFormationOffsetRows);
+
+    public static bool ConstructPlayerMovementRecord(
+        OriginalStrategicCampaignState state,
+        int playerSlot)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        state.Validate();
+        if (playerSlot is < 0 or >= PlayerMovementRecordCount)
+            throw new ArgumentOutOfRangeException(nameof(playerSlot));
+        // 0x12CB6 tests > 5, so the sixth successful construction is retained.
+        if (state.ActivePlayerRecordCount > PlayerArmyMovementCount) return false;
+
+        var selected = SelectedPlayerSlot(state);
+        var record = state.PlayerMovementSlots.Single(slot => slot.Slot == playerSlot);
+        var offset = PlayerFormationOffsetRows[playerSlot];
+        var anchorX = checked(80 * (state.PlayerHomeGridX + 1));
+        var anchorY = checked(20 * (state.PlayerHomeGridY + 1));
+        var currentX = checked(anchorX + offset.X);
+        var currentY = checked(anchorY + offset.Y);
+
+        state.ActivePlayerRecordCount++;
+        record.DestinationX = currentX;
+        record.DestinationY = currentY;
+        record.State8 = 0;
+        record.CollisionCooldown = 0;
+        record.GridX = state.PlayerHomeGridX;
+        record.GridY = state.PlayerHomeGridY;
+        record.Active = true;
+        record.PathComplete = true;
+        record.CurrentX = currentX;
+        record.CurrentY = currentY;
+
+        // The executable clears command fields on the formerly selected record,
+        // not on the record being constructed. Stale fields on a reused record survive.
+        selected.TargetHandle = 0;
+        selected.WaypointCount = 0;
+        selected.WaypointIndex = 0;
+        state.SelectedPlayerMovementSlot = playerSlot;
+        return true;
+    }
+
+    public static bool RemovePlayerMovementRecord(
+        OriginalStrategicCampaignState state,
+        int playerSlot)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        state.Validate();
+        if (playerSlot is < 0 or >= PlayerMovementRecordCount)
+            throw new ArgumentOutOfRangeException(nameof(playerSlot));
+        if (state.ActivePlayerRecordCount <= 0) return false;
+
+        var records = state.PlayerMovementSlots.OrderBy(slot => slot.Slot).ToArray();
+        var removed = records[playerSlot];
+        var selectedSlot = state.SelectedPlayerMovementSlot;
+        if (selectedSlot == playerSlot)
+        {
+            var replacement = records.FirstOrDefault(record =>
+                record.Active && record.Slot != playerSlot);
+            if (replacement is not null) selectedSlot = replacement.Slot;
+        }
+
+        if (state.EngagedPlayerMovementSlot == playerSlot)
+        {
+            state.EngagedPlayerMovementSlot = PlayerAvatarMovementSlot;
+            var avatar = records[PlayerAvatarMovementSlot];
+            avatar.CurrentX = removed.CurrentX;
+            avatar.CurrentY = removed.CurrentY;
+            avatar.GridX = removed.GridX;
+            avatar.GridY = removed.GridY;
+            avatar.Active = true;
+            avatar.PathComplete = true;
+            selectedSlot = PlayerAvatarMovementSlot;
+        }
+
+        removed.CollisionCooldown = 0;
+        removed.Active = false;
+        removed.State8 = 0;
+        removed.PathComplete = true;
+        state.ActivePlayerRecordCount--;
+        state.SelectedPlayerMovementSlot = selectedSlot;
+        return true;
+    }
+
     public static void JoinPlayerArmy(
         OriginalStrategicCampaignState state,
         int armySlot)

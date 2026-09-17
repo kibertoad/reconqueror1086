@@ -215,7 +215,7 @@ public sealed partial class ConquerorGame
         }
         var visuals = new SiegeVisuals(
             imported.Scene, imported.SourceOriginX, imported.SourceOriginY,
-            textures, sources, palette.Rgb, colorMaps, backdrop);
+            textures, sources, palette.Rgb, colorMaps, imported.Backdrop, backdrop);
         _siegeVisuals = visuals;
         return visuals;
     }
@@ -426,9 +426,18 @@ public sealed partial class ConquerorGame
         var backdrop = _siegeVisuals?.Backdrop ?? throw new InvalidOperationException(
             "Imported siege backdrop must be active before rendering.");
 
-        var source = SiegeCombatPresentation.BackdropSource(facing, backdrop.Width, backdrop.Height);
-        _batch.Draw(backdrop, viewport,
-            new Rectangle(source.X, source.Y, source.Width, source.Height), Color.White);
+        var decoded = _siegeVisuals?.DecodedBackdrop ?? throw new InvalidOperationException(
+            "Imported siege backdrop metadata must be active before rendering.");
+        var slice = SiegeCombatPresentation.BackdropSlice(
+            facing, backdrop.Width, backdrop.Height, decoded.Horizon, decoded.Mode);
+        var destination = new Rectangle(
+            viewport.X + slice.Destination.X * viewport.Width / SiegeCombatPresentation.Viewport.Width,
+            viewport.Y + slice.Destination.Y * viewport.Height / SiegeCombatPresentation.Viewport.Height,
+            slice.Destination.Width * viewport.Width / SiegeCombatPresentation.Viewport.Width,
+            slice.Destination.Height * viewport.Height / SiegeCombatPresentation.Viewport.Height);
+        _batch.Draw(backdrop, destination,
+            new Rectangle(slice.Source.X, slice.Source.Y, slice.Source.Width, slice.Source.Height),
+            Color.White);
     }
 
     private void DrawSiege()

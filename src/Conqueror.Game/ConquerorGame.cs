@@ -17,6 +17,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         IReadOnlyDictionary<int, DynamixSceneTexture> sources,
         byte[] palette,
         DynamixSceneColorMaps? colorMaps,
+        DynamixSceneBackdrop? decodedBackdrop,
         Texture2D? backdrop) : IDisposable
     {
         private readonly Dictionary<(int Texture, int ColorMap), Texture2D> _mappedTextures = [];
@@ -24,6 +25,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         public int SourceOriginX { get; } = sourceOriginX;
         public int SourceOriginY { get; } = sourceOriginY;
         public IReadOnlyDictionary<int, Texture2D> Textures { get; } = textures;
+        public DynamixSceneBackdrop? DecodedBackdrop { get; } = decodedBackdrop;
         public Texture2D? Backdrop { get; } = backdrop;
         public DynamixSceneTexture? SourceFor(int textureIndex) =>
             sources.GetValueOrDefault(textureIndex);

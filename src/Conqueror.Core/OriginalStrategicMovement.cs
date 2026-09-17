@@ -13,9 +13,13 @@ public static partial class OriginalStrategicMovement
     public const int PlayerMovementRecordCount = 6;
     public const int PlayerArmyMovementCount = 5;
     public const int PlayerAvatarMovementSlot = 5;
+    public const int ActivePlayerRecordCountAddress = 0xAE5C;
     public const int SelectedPlayerMovementSlotAddress = 0xAE64;
     public const int EngagedPlayerMovementSlotAddress = 0xAE6C;
     public const int PlayerRouteInputActiveAddress = 0xAE58;
+    public const int PlayerHomeGridYAddress = 0x1B0D0;
+    public const int PlayerHomeGridXAddress = 0x1B0D4;
+    public const int PlayerState8Offset = 0x08;
     public const int PlayerSelectedOffset = 0x04;
     public const int PlayerTargetHandleOffset = 0x14;
     public const int PlayerWaypointCountOffset = 0x18;
@@ -32,6 +36,8 @@ public static partial class OriginalStrategicMovement
     public const double PlayerBlockedProbeDistance = 50;
     public const double PlayerEnemyContactDistance = 30;
     public const int PlayerAvatarCollisionCooldown = 120;
+    public const int MaximumActivePlayerRecordCount = 6;
+    public const int PlayerFormationOffsetTableAddress = 0xA564;
     public const int GenerationIntervalUnits = 0x1388;
     public const int InitialSpeedMultiplier = 1;
     public const int MinimumSpeedMultiplier = 1;

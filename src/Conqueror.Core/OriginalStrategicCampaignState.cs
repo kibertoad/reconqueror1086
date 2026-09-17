@@ -18,6 +18,9 @@ public sealed class OriginalStrategicCampaignState
     public StrategicTerrainProfile TerrainProfile { get; set; }
     public byte PropertyListHead { get; set; } = 0xFF;
     public byte PersonListHead { get; set; } = 0xFF;
+    public int PlayerHomeGridX { get; set; }
+    public int PlayerHomeGridY { get; set; }
+    public int ActivePlayerRecordCount { get; set; }
     public int SelectedPlayerMovementSlot { get; set; }
     public int EngagedPlayerMovementSlot { get; set; }
     public bool PlayerRouteInputActive { get; set; }
@@ -52,6 +55,10 @@ public sealed class OriginalStrategicCampaignState
             throw new InvalidDataException("Strategic state contains an invalid generator counter.");
         if (CameraRow is < 0 or >= WorldRowCount || CameraColumn is < 0 or >= WorldColumnCount)
             throw new InvalidDataException("Strategic state contains an invalid camera position.");
+        if (PlayerHomeGridX is < 0 or >= WorldRowCount
+            || PlayerHomeGridY is < 0 or >= WorldColumnCount
+            || ActivePlayerRecordCount is < 0 or > OriginalStrategicMovement.MaximumActivePlayerRecordCount)
+            throw new InvalidDataException("Strategic state contains invalid player-record globals.");
         if (!Enum.IsDefined(TerrainProfile))
             throw new InvalidDataException("Strategic state contains an invalid terrain profile.");
         if (Properties is null || Properties.Count != OriginalStrategicMovement.PropertyCount)
@@ -117,6 +124,8 @@ public sealed class OriginalStrategicCampaignState
         {
             var starting = OriginalStrategicMovement.StartingRoutes[startingRouteSelector];
             state.Persons[starting.Person].Assignment = 0;
+            state.PlayerHomeGridX = starting.GridX;
+            state.PlayerHomeGridY = starting.GridY;
             foreach (var player in state.PlayerMovementSlots) player.PathComplete = true;
             var avatar = state.PlayerMovementSlots[OriginalStrategicMovement.PlayerAvatarMovementSlot];
             var currentX = checked(80 * (starting.GridX + 1));

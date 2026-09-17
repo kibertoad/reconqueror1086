@@ -18,6 +18,8 @@ public readonly record struct SiegeFrameRun(int Start, int Count, bool Descendin
 
 public readonly record struct SiegeRetainerCommandButton(SiegeRetainerCommand Command, UiBounds Bounds);
 
+public readonly record struct SiegeBackdropSlice(UiBounds Source, UiBounds Destination);
+
 public static class SiegeCombatPresentation
 {
     private static readonly int[] ForegroundBasesByCombatRow =
@@ -106,17 +108,24 @@ public static class SiegeCombatPresentation
 
     public static SiegeFrameRun BloodFramesFor(bool fatal) => fatal ? FatalHitBlood : WoundingHitBlood;
 
-    public static UiBounds BackdropSource(Facing facing, int width, int height)
+    public static SiegeBackdropSlice BackdropSlice(
+        Facing facing, int width, int height, int imageHorizon, int headingScale)
     {
-        var panoramaRemainder = width - OriginalWidth;
-        if (panoramaRemainder < 0 || panoramaRemainder % 3 != 0 || height < OriginalHeight)
-            throw new InvalidDataException("The combat backdrop does not contain four overlapping screen views.");
-        var facingStride = panoramaRemainder / 3;
-        return new UiBounds(
-            (int)facing * facingStride + Viewport.X,
-            Viewport.Y,
-            Viewport.Width,
-            Viewport.Height);
+        if (width < Viewport.Width || height <= 0 || imageHorizon < 0 || imageHorizon >= height
+            || headingScale <= 0)
+            throw new InvalidDataException("The combat backdrop geometry is invalid.");
+        var viewportHorizon = Viewport.Height / 2;
+        var sourceX = ((int)facing << 6) * headingScale;
+        if (sourceX > width) sourceX -= width;
+        var sourceY = Math.Max(0, imageHorizon - viewportHorizon);
+        var destinationY = Math.Max(0, viewportHorizon - imageHorizon);
+        var copyWidth = Math.Min(Viewport.Width, width - sourceX);
+        var copyHeight = Math.Min(Viewport.Height - destinationY, height - sourceY);
+        if (copyWidth <= 0 || copyHeight <= 0)
+            throw new InvalidDataException("The combat backdrop does not intersect the viewport.");
+        return new(
+            new UiBounds(sourceX, sourceY, copyWidth, copyHeight),
+            new UiBounds(0, destinationY, copyWidth, copyHeight));
     }
 
     public static SiegeRetainerCommand? RetainerCommandAt(int x, int y)

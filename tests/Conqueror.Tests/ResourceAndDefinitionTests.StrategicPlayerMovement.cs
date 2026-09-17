@@ -179,6 +179,102 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void PlayerRecordConstructorUsesHomeFormationAndFormerSelectionClearing()
+    {
+        var state = OriginalStrategicCampaignState.CreateForNewGame(
+            new DateTime(1086, 3, 1), startingRouteSelector: 2);
+        var formerlySelected = state.PlayerMovementSlots[5];
+        formerlySelected.TargetHandle = OriginalStrategicMovement.PlayerEnemyTargetFlag | 3;
+        formerlySelected.WaypointCount = 2;
+        formerlySelected.WaypointIndex = 1;
+        formerlySelected.Waypoints.AddRange([new(1, 2), new(3, 4)]);
+        var constructed = state.PlayerMovementSlots[2];
+        constructed.State8 = 7;
+        constructed.CollisionCooldown = 9;
+        constructed.TargetHandle = OriginalStrategicMovement.PlayerDivisionTargetFlag | 1;
+        constructed.WaypointCount = 1;
+        constructed.WaypointIndex = 1;
+        constructed.Waypoints.Add(new(99, 101));
+
+        Assert.True(OriginalStrategicMovement.ConstructPlayerMovementRecord(state, 2));
+
+        var offset = OriginalStrategicMovement.PlayerFormationOffsets[2];
+        var expectedX = 80 * (state.PlayerHomeGridX + 1) + offset.X;
+        var expectedY = 20 * (state.PlayerHomeGridY + 1) + offset.Y;
+        Assert.Equal((1, 2),
+            (state.ActivePlayerRecordCount, state.SelectedPlayerMovementSlot));
+        Assert.Equal((true, true, 0, 0, state.PlayerHomeGridX, state.PlayerHomeGridY,
+                expectedX, expectedY, (float)expectedX, (float)expectedY),
+            (constructed.Active, constructed.PathComplete, constructed.State8,
+                constructed.CollisionCooldown, constructed.GridX, constructed.GridY,
+                constructed.DestinationX, constructed.DestinationY,
+                constructed.CurrentX, constructed.CurrentY));
+        Assert.Equal((OriginalStrategicMovement.PlayerDivisionTargetFlag | 1, 1, 1),
+            (constructed.TargetHandle, constructed.WaypointCount, constructed.WaypointIndex));
+        Assert.Equal((0, 0, 0),
+            (formerlySelected.TargetHandle, formerlySelected.WaypointCount,
+                formerlySelected.WaypointIndex));
+    }
+
+    [Fact]
+    public void PlayerRecordConstructorAcceptsSixRecordsThenRejectsTheSeventh()
+    {
+        var state = OriginalStrategicCampaignState.CreateForNewGame(
+            new DateTime(1086, 3, 1), startingRouteSelector: 0);
+
+        for (var slot = 0; slot < OriginalStrategicMovement.PlayerMovementRecordCount; slot++)
+            Assert.True(OriginalStrategicMovement.ConstructPlayerMovementRecord(state, slot));
+
+        Assert.Equal(OriginalStrategicMovement.MaximumActivePlayerRecordCount,
+            state.ActivePlayerRecordCount);
+        Assert.False(OriginalStrategicMovement.ConstructPlayerMovementRecord(state, 0));
+    }
+
+    [Fact]
+    public void PlayerRecordRemovalSelectsFirstActiveRecordAndRestoresEngagedAvatar()
+    {
+        var state = OriginalStrategicCampaignState.CreateForNewGame(
+            new DateTime(1086, 3, 1), startingRouteSelector: 1);
+        Assert.True(OriginalStrategicMovement.ConstructPlayerMovementRecord(state, 0));
+        Assert.True(OriginalStrategicMovement.ConstructPlayerMovementRecord(state, 2));
+        var removed = state.PlayerMovementSlots[2];
+        removed.CurrentX = 4_321.5f;
+        removed.CurrentY = 987.25f;
+        removed.GridX = 53;
+        removed.GridY = 48;
+        removed.State8 = 12;
+        removed.CollisionCooldown = 19;
+        OriginalStrategicMovement.JoinPlayerArmy(state, 2);
+
+        Assert.True(OriginalStrategicMovement.RemovePlayerMovementRecord(state, 2));
+
+        var avatar = state.PlayerMovementSlots[5];
+        Assert.Equal((1, 5, 5),
+            (state.ActivePlayerRecordCount, state.SelectedPlayerMovementSlot,
+                state.EngagedPlayerMovementSlot));
+        Assert.Equal((false, true, 0, 0),
+            (removed.Active, removed.PathComplete, removed.State8, removed.CollisionCooldown));
+        Assert.Equal((true, true, 4_321.5f, 987.25f, 53, 48),
+            (avatar.Active, avatar.PathComplete, avatar.CurrentX, avatar.CurrentY,
+                avatar.GridX, avatar.GridY));
+    }
+
+    [Fact]
+    public void PlayerRecordRemovalUsesFirstActivePhysicalReplacement()
+    {
+        var state = OriginalStrategicCampaignState.CreateForNewGame(
+            new DateTime(1086, 3, 1), startingRouteSelector: 1);
+        Assert.True(OriginalStrategicMovement.ConstructPlayerMovementRecord(state, 3));
+        Assert.True(OriginalStrategicMovement.ConstructPlayerMovementRecord(state, 1));
+        Assert.True(OriginalStrategicMovement.ConstructPlayerMovementRecord(state, 3));
+
+        Assert.True(OriginalStrategicMovement.RemovePlayerMovementRecord(state, 3));
+
+        Assert.Equal(1, state.SelectedPlayerMovementSlot);
+        Assert.Equal(2, state.ActivePlayerRecordCount);
+    }
+
+    [Fact]
     public void CampaignMembershipKeepsOriginalDistinguishedRecordInSync()
     {
         var campaignState = Campaign.NewFromTemplate(0);

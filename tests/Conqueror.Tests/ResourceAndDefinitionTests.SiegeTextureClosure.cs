@@ -55,15 +55,18 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Theory]
-    [InlineData(Facing.North, 26)]
-    [InlineData(Facing.East, 282)]
-    [InlineData(Facing.South, 538)]
-    [InlineData(Facing.West, 794)]
-    public void CombatBackdropSelectsTheViewportFromFourOverlappingScreenViews(
+    [InlineData(Facing.North, 0)]
+    [InlineData(Facing.East, 192)]
+    [InlineData(Facing.South, 384)]
+    [InlineData(Facing.West, 576)]
+    public void CombatBackdropAlignsItsStoredHorizonAndUsesHeadingScaledPanorama(
         Facing facing, int expectedX)
     {
-        Assert.Equal(new UiBounds(expectedX, 24, 167, 117),
-            SiegeCombatPresentation.BackdropSource(facing, 1088, 200));
+        Assert.Equal(
+            new SiegeBackdropSlice(
+                new UiBounds(expectedX, 141, 167, 59),
+                new UiBounds(0, 0, 167, 59)),
+            SiegeCombatPresentation.BackdropSlice(facing, 1088, 200, 199, 3));
     }
 
     [Fact]

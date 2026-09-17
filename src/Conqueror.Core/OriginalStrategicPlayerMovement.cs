@@ -9,6 +9,7 @@ public sealed class OriginalStrategicPlayerMovementSlot
 {
     public int Slot { get; set; }
     public bool Active { get; set; }
+    public int State8 { get; set; }
     public bool PathComplete { get; set; }
     public int TargetHandle { get; set; }
     public int WaypointCount { get; set; }
@@ -35,6 +36,7 @@ public sealed class OriginalStrategicPlayerMovementSlot
             & (OriginalStrategicMovement.PlayerEnemyTargetFlag
                 | OriginalStrategicMovement.PlayerDivisionTargetFlag);
         if (Slot is < 0 or >= OriginalStrategicMovement.PlayerMovementRecordCount
+            || State8 < 0
             || TargetHandle < 0
             || (TargetHandle != 0
                 && (targetKind is not OriginalStrategicMovement.PlayerEnemyTargetFlag
@@ -52,6 +54,7 @@ public sealed class OriginalStrategicPlayerMovementSlot
         if (Active && !PathComplete && TargetHandle == 0 && WaypointIndex >= Waypoints.Count)
             throw new InvalidDataException("Active player strategic movement record has no route or target.");
     }
+
 }
 
 public readonly record struct OriginalStrategicPlayerTarget(
