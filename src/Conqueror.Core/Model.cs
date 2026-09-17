@@ -258,6 +258,9 @@ public sealed class CampaignState
     public bool DrogoDefeated { get; set; }
     public Dictionary<int, StrategicArmyOrder> ArmyOrders { get; init; } = [];
     public List<StrategicEnemyMovement> EnemyMovements { get; init; } = [];
+    [System.Text.Json.Serialization.JsonIgnore(
+        Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public OriginalStrategicCampaignState? OriginalStrategicState { get; set; }
     public StrategicSpyReport? LatestSpyReport { get; set; }
     public int TournamentToken { get; set; } = -1;
     public int JoustsThisTournament { get; set; }
