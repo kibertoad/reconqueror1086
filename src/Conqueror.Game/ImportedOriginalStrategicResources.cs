@@ -55,6 +55,16 @@ public sealed class ImportedOriginalStrategicResources : IOriginalStrategicResou
         return reverse ? route.Reverse : route.Forward;
     }
 
+    public bool TryGridCell(int row, int column, out OriginalStrategicTerrainCell cell)
+    {
+        cell = default;
+        if (row is < 0 or >= StrategicWorldGridDecoder.RowCount
+            || column is < 0 or >= StrategicWorldGridDecoder.ColumnCount)
+            return false;
+        cell = new OriginalStrategicTerrainCell(row, column, _world[row, column].RawValue);
+        return true;
+    }
+
     public bool TryTerrainCell(
         int worldX,
         int worldY,

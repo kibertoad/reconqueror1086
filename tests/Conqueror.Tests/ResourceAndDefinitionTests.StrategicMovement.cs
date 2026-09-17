@@ -715,6 +715,9 @@ public sealed partial class ResourceAndDefinitionTests
             Assert.Equal((7, 11, 0xA123_002Au, (ushort)42, (byte)0x23, (byte)0xA1),
                 (cell.Row, cell.Column, cell.RawValue, cell.TileId, cell.Auxiliary, cell.UpperByte));
             Assert.False(resources.TryTerrainCell(0, 0, 0, 0, out _));
+            Assert.True(resources.TryGridCell(7, 11, out var directCell));
+            Assert.Equal(cell, directCell);
+            Assert.False(resources.TryGridCell(-1, 11, out _));
 
             var campaign = new Campaign();
             campaign.ConfigureOriginalStrategicResources(resources);
@@ -815,10 +818,11 @@ public sealed partial class ResourceAndDefinitionTests
     [Theory]
     [InlineData(0, 0, 0, 0, 1)]
     [InlineData(0, 3, 0, 0, 1)]
-    [InlineData(0, 4, 1, 1, 1)]
-    [InlineData(7, 11, 9, 9, 9)]
-    [InlineData(2, 255, 65, 65, 65)]
-    public void OriginalStrategicMovementUsesLordQuarterAndActiveHousehold(
+    [InlineData(0, 11, 0, 0, 1)]
+    [InlineData(0, 12, 1, 1, 1)]
+    [InlineData(7, 11, 7, 7, 7)]
+    [InlineData(2, 255, 23, 23, 23)]
+    public void OriginalStrategicMovementDistributesTheLordQuarterAcrossThreeEqualTypes(
         int household, int lordRating, int swordsmen, int halberdiers, int knights)
     {
         var force = OriginalStrategicMovement.InitialForces(household, lordRating);

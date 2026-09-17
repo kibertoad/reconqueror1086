@@ -26,19 +26,28 @@ public static partial class OriginalStrategicMovement
         {
             var slot = slots[index];
             if (!slot.Active) continue;
-            var modeBefore = slot.Mode;
-            var completionSignal = slot.Mode switch
-            {
-                DirectPropertyMode => AdvanceDirect(slot, state, resources),
-                RoutedMode => AdvanceRouted(slot, state, resources),
-                PursuitMode => AdvancePursuit(slot, state, resources, pursuitTargets),
-                _ => throw new InvalidDataException(
-                    $"Strategic movement slot {slot.Slot} has unsupported mode {slot.Mode}.")
-            };
-            advances.Add(new OriginalStrategicSlotAdvance(
-                slot.Slot, modeBefore, slot.Mode, completionSignal, slot.Active));
+            advances.Add(AdvanceMovementSlot(slot, state, resources, pursuitTargets));
         }
         return advances;
+    }
+
+    private static OriginalStrategicSlotAdvance AdvanceMovementSlot(
+        OriginalStrategicMovementSlot slot,
+        OriginalStrategicCampaignState state,
+        IOriginalStrategicResources resources,
+        IReadOnlyList<OriginalStrategicPursuitTarget> pursuitTargets)
+    {
+        var modeBefore = slot.Mode;
+        var completionSignal = slot.Mode switch
+        {
+            DirectPropertyMode => AdvanceDirect(slot, state, resources),
+            RoutedMode => AdvanceRouted(slot, state, resources),
+            PursuitMode => AdvancePursuit(slot, state, resources, pursuitTargets),
+            _ => throw new InvalidDataException(
+                $"Strategic movement slot {slot.Slot} has unsupported mode {slot.Mode}.")
+        };
+        return new OriginalStrategicSlotAdvance(
+            slot.Slot, modeBefore, slot.Mode, completionSignal, slot.Active);
     }
 
     private static bool AdvanceDirect(
@@ -267,7 +276,15 @@ public static partial class OriginalStrategicMovement
 public readonly record struct OriginalStrategicPursuitTarget(
     bool Active,
     float CurrentX,
-    float CurrentY);
+    float CurrentY,
+    int GridX = 0,
+    int GridY = 0,
+    int Swordsmen = 0,
+    int Halberdiers = 0,
+    int Knights = 0)
+{
+    public int Total => checked(Swordsmen + Halberdiers + Knights);
+}
 
 public readonly record struct OriginalStrategicSlotAdvance(
     int Slot,

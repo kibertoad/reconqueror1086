@@ -31,6 +31,8 @@ public interface IOriginalStrategicResources
 {
     IReadOnlyList<OriginalStrategicRoutePoint> Route(string resourceName, bool reverse);
 
+    bool TryGridCell(int row, int column, out OriginalStrategicTerrainCell cell);
+
     bool TryTerrainCell(
         int worldX,
         int worldY,

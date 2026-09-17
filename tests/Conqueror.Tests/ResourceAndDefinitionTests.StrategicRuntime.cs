@@ -210,11 +210,16 @@ public sealed partial class ResourceAndDefinitionTests
 
         public int TerrainLookups { get; private set; }
 
+        public Dictionary<(int Row, int Column), OriginalStrategicTerrainCell> GridCells { get; } = [];
+
         public IReadOnlyList<OriginalStrategicRoutePoint> Route(string resourceName, bool reverse)
         {
             var route = Routes[resourceName];
             return reverse ? route.Reverse().ToArray() : route;
         }
+
+        public bool TryGridCell(int row, int column, out OriginalStrategicTerrainCell cell) =>
+            GridCells.TryGetValue((row, column), out cell);
 
         public bool TryTerrainCell(
             int worldX,

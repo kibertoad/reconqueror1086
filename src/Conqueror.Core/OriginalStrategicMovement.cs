@@ -505,7 +505,7 @@ public static partial class OriginalStrategicMovement
         ArgumentOutOfRangeException.ThrowIfNegative(activeHouseholdCount);
         ArgumentOutOfRangeException.ThrowIfNegative(lordRating);
 
-        var each = checked(activeHouseholdCount + lordRating / 4);
+        var each = checked(activeHouseholdCount + (lordRating / 4) / 3);
         return each == 0
             ? new StrategicTroopCounts(0, 0, 1)
             : new StrategicTroopCounts(each, each, each);
