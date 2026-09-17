@@ -19,7 +19,8 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(6, OriginalStrategicMovement.PlayerMovementRecordCount);
         Assert.Equal(5, OriginalStrategicMovement.PlayerArmyMovementCount);
         Assert.Equal(5, OriginalStrategicMovement.PlayerAvatarMovementSlot);
-        Assert.Equal(0xAE6C, OriginalStrategicMovement.CurrentPlayerMovementSlotAddress);
+        Assert.Equal(0xAE64, OriginalStrategicMovement.SelectedPlayerMovementSlotAddress);
+        Assert.Equal(0xAE6C, OriginalStrategicMovement.EngagedPlayerMovementSlotAddress);
         Assert.Equal(0x1388, OriginalStrategicMovement.GenerationIntervalUnits);
         Assert.Equal(1, OriginalStrategicMovement.InitialSpeedMultiplier);
         Assert.Equal(1, OriginalStrategicMovement.MinimumSpeedMultiplier);

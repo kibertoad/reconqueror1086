@@ -18,7 +18,9 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(OriginalStrategicMovement.PropertyCount, state.Properties.Count);
         Assert.Equal(OriginalStrategicMovement.PersonCount, state.Persons.Count);
         Assert.Equal([0, 1, 2, 3, 4], state.MovementSlots.Select(slot => slot.Slot));
+        Assert.Equal([0, 1, 2, 3, 4, 5], state.PlayerMovementSlots.Select(slot => slot.Slot));
         Assert.All(state.MovementSlots, slot => Assert.False(slot.Active));
+        Assert.All(state.PlayerMovementSlots, slot => Assert.False(slot.Active));
         Assert.Empty(state.TerrainMutations);
 
         for (var index = 0; index < state.Properties.Count; index++)
@@ -89,12 +91,32 @@ public sealed partial class ResourceAndDefinitionTests
         movement.DirectionY = -0.25f;
         movement.RouteResource = "sc_0.rat";
         movement.RouteReversed = false;
+        strategic.SelectedPlayerMovementSlot = 4;
+        strategic.EngagedPlayerMovementSlot = 3;
+        var playerMovement = strategic.PlayerMovementSlots[4];
+        playerMovement.Active = true;
+        playerMovement.WaypointCount = 2;
+        playerMovement.WaypointIndex = 1;
+        playerMovement.DestinationX = 4_000;
+        playerMovement.DestinationY = 800;
+        playerMovement.GridX = 49;
+        playerMovement.GridY = 39;
+        playerMovement.CollisionCooldown = 19;
+        playerMovement.TerrainKind = 3;
+        playerMovement.CurrentX = 3_999.5f;
+        playerMovement.CurrentY = 799.25f;
+        playerMovement.DirectionX = 0.8f;
+        playerMovement.DirectionY = -0.6f;
+        playerMovement.Waypoints.AddRange([
+            new OriginalStrategicRoutePoint(3_900, 900),
+            new OriginalStrategicRoutePoint(4_000, 800)]);
         strategic.Validate();
 
         var restored = JsonSerializer.Deserialize<CampaignState>(JsonSerializer.Serialize(campaign));
         var roundTripped = Assert.IsType<OriginalStrategicCampaignState>(restored!.OriginalStrategicState);
         roundTripped.Validate();
         var restoredMovement = roundTripped.MovementSlots[2];
+        var restoredPlayerMovement = roundTripped.PlayerMovementSlots[4];
         Assert.Equal((6, 7, 199, 399, 4_999, 51, StrategicTerrainProfile.Autumn),
             (roundTripped.StartingRouteSelector, roundTripped.SpeedMultiplier,
              roundTripped.CameraRow, roundTripped.CameraColumn,
@@ -111,6 +133,15 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal((7_438.5f, 2_801.25f, 0.75f, -0.25f),
             (restoredMovement.CurrentX, restoredMovement.CurrentY,
              restoredMovement.DirectionX, restoredMovement.DirectionY));
+        Assert.Equal((4, 3, true, 2, 1, 19, 3),
+            (roundTripped.SelectedPlayerMovementSlot, roundTripped.EngagedPlayerMovementSlot,
+             restoredPlayerMovement.Active, restoredPlayerMovement.WaypointCount,
+             restoredPlayerMovement.WaypointIndex, restoredPlayerMovement.CollisionCooldown,
+             restoredPlayerMovement.TerrainKind));
+        Assert.Equal(playerMovement.Waypoints, restoredPlayerMovement.Waypoints);
+        Assert.Equal((3_999.5f, 799.25f, 0.8f, -0.6f),
+            (restoredPlayerMovement.CurrentX, restoredPlayerMovement.CurrentY,
+             restoredPlayerMovement.DirectionX, restoredPlayerMovement.DirectionY));
     }
 
     [Fact]
@@ -161,6 +192,9 @@ public sealed partial class ResourceAndDefinitionTests
         state.MovementSlots[4].Slot = 3;
         Assert.Throws<InvalidDataException>(state.Validate);
         state.MovementSlots[4].Slot = 4;
+        state.PlayerMovementSlots[5].Slot = 4;
+        Assert.Throws<InvalidDataException>(state.Validate);
+        state.PlayerMovementSlots[5].Slot = 5;
         var routed = state.MovementSlots[4];
         routed.Active = true;
         routed.Mode = OriginalStrategicMovement.RoutedMode;

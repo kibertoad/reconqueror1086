@@ -18,8 +18,11 @@ public sealed class OriginalStrategicCampaignState
     public StrategicTerrainProfile TerrainProfile { get; set; }
     public byte PropertyListHead { get; set; } = 0xFF;
     public byte PersonListHead { get; set; } = 0xFF;
+    public int SelectedPlayerMovementSlot { get; set; }
+    public int EngagedPlayerMovementSlot { get; set; }
     public List<OriginalStrategicPropertyState> Properties { get; init; } = [];
     public List<OriginalStrategicPersonState> Persons { get; init; } = [];
+    public List<OriginalStrategicPlayerMovementSlot> PlayerMovementSlots { get; init; } = [];
     public List<OriginalStrategicMovementSlot> MovementSlots { get; init; } = [];
     public List<OriginalStrategicTerrainMutation> TerrainMutations { get; init; } = [];
 
@@ -58,6 +61,15 @@ public sealed class OriginalStrategicCampaignState
             || MovementSlots.Select(slot => slot.Slot).Distinct().Count() != OriginalStrategicMovement.SlotCount
             || MovementSlots.Any(slot => slot.Slot is < 0 or >= OriginalStrategicMovement.SlotCount))
             throw new InvalidDataException("Strategic state must contain the five original movement slots.");
+        if (SelectedPlayerMovementSlot is < 0 or >= OriginalStrategicMovement.PlayerMovementRecordCount
+            || EngagedPlayerMovementSlot is < 0 or >= OriginalStrategicMovement.PlayerArmyMovementCount
+            || PlayerMovementSlots is null
+            || PlayerMovementSlots.Count != OriginalStrategicMovement.PlayerMovementRecordCount
+            || PlayerMovementSlots.Select(slot => slot.Slot).Distinct().Count()
+                != OriginalStrategicMovement.PlayerMovementRecordCount
+            || PlayerMovementSlots.Any(slot => slot.Slot is < 0
+                or >= OriginalStrategicMovement.PlayerMovementRecordCount))
+            throw new InvalidDataException("Strategic state must contain all six player movement records.");
         if (TerrainMutations is null || TerrainMutations.Any(mutation =>
                 mutation.Row is < 0 or >= WorldRowCount
                 || mutation.Column is < 0 or >= WorldColumnCount)
@@ -69,6 +81,7 @@ public sealed class OriginalStrategicCampaignState
             if (property.Lord >= Persons.Count)
                 throw new InvalidDataException("Strategic property references an invalid lord.");
         foreach (var slot in MovementSlots) slot.Validate();
+        foreach (var slot in PlayerMovementSlots) slot.Validate();
     }
 
     private static OriginalStrategicCampaignState Create(
@@ -94,6 +107,9 @@ public sealed class OriginalStrategicCampaignState
             OriginalStrategicPersonState.FromDefinition));
         state.MovementSlots.AddRange(Enumerable.Range(0, OriginalStrategicMovement.SlotCount)
             .Select(slot => new OriginalStrategicMovementSlot { Slot = slot }));
+        state.PlayerMovementSlots.AddRange(Enumerable.Range(
+                0, OriginalStrategicMovement.PlayerMovementRecordCount)
+            .Select(slot => new OriginalStrategicPlayerMovementSlot { Slot = slot }));
         state.Validate();
         return state;
     }
