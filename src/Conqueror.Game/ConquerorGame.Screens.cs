@@ -185,9 +185,7 @@ public sealed partial class ConquerorGame
     {
         ClearSiegeVisuals();
         if (imported is null || _importedContent is null) return;
-        var paletteId = _importedContent.FindId("resource", ":skirmish.pal");
-        var palette = paletteId is null ? null : _importedContent.DecodePalette(paletteId);
-        if (palette is null) return;
+        var palette = ImportedSiegeLayouts.LoadCombatPalette(_importedContent);
         var colorMaps = imported.ColorMaps is null ? null :
             DynamixSceneColorMapGenerator.RegenerateFirstFamily(
                 imported.ColorMaps, palette.Rgb, imported.Scene.ColorMapping);

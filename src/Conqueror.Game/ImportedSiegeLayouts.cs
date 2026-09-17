@@ -9,6 +9,8 @@ public sealed record ImportedSiegeScene(
 
 public static class ImportedSiegeLayouts
 {
+    public const string CombatPaletteSuffix = ":SKIRMISH.PAL";
+
     // CONQUER.EXE registers campaign dispatcher 0x21EEC at engine callback
     // slot +0xB0 (0x21E09 -> 0x59C24); slot 128 reaches the literal
     // MELEE0.RES load at 0x22226. The same scene serves every campaign siege.
@@ -34,6 +36,15 @@ public static class ImportedSiegeLayouts
     public static ImportedSiegeScene ForPracticeMelee(ImportedContentCatalog catalog, int variant) =>
         Load(catalog, SceneNameForPracticeMelee(variant));
     public static ImportedSiegeScene ForPracticeCastleSkirmish(ImportedContentCatalog catalog) => Load(catalog, "DEFEND0.RES");
+
+    public static IndexedPalette LoadCombatPalette(ImportedContentCatalog catalog)
+    {
+        ArgumentNullException.ThrowIfNull(catalog);
+        var id = catalog.FindId("palette", CombatPaletteSuffix) ?? throw new InvalidDataException(
+            $"Required original combat palette '{CombatPaletteSuffix}' is missing.");
+        return catalog.DecodePalette(id) ?? throw new InvalidDataException(
+            $"Required original combat palette '{CombatPaletteSuffix}' could not be decoded.");
+    }
 
     public static SiegeLayout Convert(DynamixScene scene) => ConvertWithOrigin(scene).Layout;
 

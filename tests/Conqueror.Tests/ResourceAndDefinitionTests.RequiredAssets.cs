@@ -7,6 +7,32 @@ namespace Conqueror.Tests;
 public sealed partial class ResourceAndDefinitionTests
 {
     [Fact]
+    public void SiegeVisualsResolveTheImportedCombatPaletteByItsDecodedKind()
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"conqueror-combat-palette-{Guid.NewGuid():N}");
+        try
+        {
+            var relative = Path.Combine("Decoded", "SKIRMISH.RES", "0012-SKIRMISH.PAL");
+            var path = Path.Combine(root, relative);
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            var bytes = Enumerable.Range(0, IndexedPalette.ByteSize).Select(value => (byte)value).ToArray();
+            File.WriteAllBytes(path, bytes);
+            var asset = new ImportedAsset(
+                "CONQUER/SKIRMISH.RES#12:SKIRMISH.PAL", relative, "palette",
+                bytes.Length, ResourceHash.Sha256(path));
+            new ImportManifest(1, new string('a', 64), [asset]).Write(Path.Combine(root, "manifest.json"));
+            var catalog = Assert.IsType<ImportedContentCatalog>(ImportedContentCatalog.Discover(root));
+
+            Assert.Equal(bytes, ImportedSiegeLayouts.LoadCombatPalette(catalog).Rgb);
+            Assert.Null(catalog.FindId("resource", ImportedSiegeLayouts.CombatPaletteSuffix));
+        }
+        finally
+        {
+            if (Directory.Exists(root)) Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
     public void RuntimeRequiresACompleteSupportedOriginalAssetImport()
     {
         var root = Path.Combine(Path.GetTempPath(), $"conqueror-required-assets-{Guid.NewGuid():N}");
