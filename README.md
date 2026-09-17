@@ -48,6 +48,10 @@ If the Releases page does not yet contain an installer:
    the folder path as its first argument.
 5. Double-click `Start Conqueror 1086.bat` whenever you want to play.
 
+The source launcher performs a clean project compilation before starting. This
+prevents an older `bin` assembly from being reused when an archive extraction,
+Git update, or branch change restores source files with earlier timestamps.
+
 Imported resources are stored in the local `UserContent` folder and are never
 uploaded. The game intentionally does not provide an assetless or placeholder
 mode.
