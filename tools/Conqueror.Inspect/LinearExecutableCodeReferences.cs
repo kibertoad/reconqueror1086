@@ -144,6 +144,7 @@ internal static class LinearExecutableCodeReferences
         const int profileCount = 4;
         const int monthCount = 12;
         const int startingRouteCount = 7;
+        const int personCount = 176;
         const int personRecordSize = 0x12;
 
         var bytes = File.ReadAllBytes(path);
@@ -213,6 +214,13 @@ internal static class LinearExecutableCodeReferences
                 $"name {ReadAscii(ReadInt32(personOffset))} group {ReadByte(personOffset + 4)} " +
                 $"assignment {ReadByte(personOffset + 7)} xy {ReadUInt16(personOffset + 8)},{ReadUInt16(personOffset + 10)} " +
                 $"resource {ReadAscii(ReadInt32(startingRouteOffset + selector * sizeof(int)))}");
+        }
+        report.AppendLine("person-fields index name-address group state5 flags assignment x y rating list-next state14 state15 state16 state17");
+        for (var person = 0; person < personCount; person++)
+        {
+            var personOffset = checked(personTableOffset + person * personRecordSize);
+            report.AppendLine(FormattableString.Invariant(
+                $"person {person} 0x{ReadInt32(personOffset):X} {ReadByte(personOffset + 4)} {ReadByte(personOffset + 5)} {ReadByte(personOffset + 6)} {ReadByte(personOffset + 7)} {ReadUInt16(personOffset + 8)} {ReadUInt16(personOffset + 10)} {ReadByte(personOffset + 12)} {ReadByte(personOffset + 13)} {ReadByte(personOffset + 14)} {ReadByte(personOffset + 15)} {ReadByte(personOffset + 16)} {ReadByte(personOffset + 17)}"));
         }
         return report.ToString();
     }

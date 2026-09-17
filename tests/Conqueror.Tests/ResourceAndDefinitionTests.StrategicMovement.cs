@@ -2,6 +2,8 @@ using Conqueror.Core;
 using Conqueror.Game;
 using Conqueror.Resources;
 using System.Buffers.Binary;
+using System.Security.Cryptography;
+using System.Text;
 using Xunit;
 
 namespace Conqueror.Tests;
@@ -290,15 +292,68 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(0x12, OriginalStrategicMovement.PersonRecordSize);
         Assert.Equal(0x00, OriginalStrategicMovement.PersonNameAddressOffset);
         Assert.Equal(0x04, OriginalStrategicMovement.PersonGroupOffset);
+        Assert.Equal(0x05, OriginalStrategicMovement.PersonState5Offset);
         Assert.Equal(0x06, OriginalStrategicMovement.PersonFlagsOffset);
         Assert.Equal(0x07, OriginalStrategicMovement.PersonAssignmentOffset);
         Assert.Equal(0x08, OriginalStrategicMovement.PersonXOffset);
         Assert.Equal(0x0A, OriginalStrategicMovement.PersonYOffset);
         Assert.Equal(0x0C, OriginalStrategicMovement.PersonLordRatingOffset);
         Assert.Equal(0x0D, OriginalStrategicMovement.PersonListNextOffset);
+        Assert.Equal(0x0E, OriginalStrategicMovement.PersonState14Offset);
+        Assert.Equal(0x0F, OriginalStrategicMovement.PersonState15Offset);
+        Assert.Equal(0x10, OriginalStrategicMovement.PersonState16Offset);
+        Assert.Equal(0x11, OriginalStrategicMovement.PersonState17Offset);
         Assert.Equal(0x01, OriginalStrategicMovement.HouseholdEligibleFlag);
         Assert.Equal([4, 6, 7, 5, 2, 2, 4, 3, 3, 1, 9, 3, 3, 6],
             OriginalStrategicMovement.InitialActiveHouseholdCounts);
+    }
+
+    [Fact]
+    public void OriginalStrategicPersonPopulationMatchesTheCompleteExecutableCensus()
+    {
+        Assert.Equal(OriginalStrategicMovement.PersonCount, OriginalStrategicMovement.Persons.Count);
+
+        var census = string.Join("\n", OriginalStrategicMovement.Persons.Select((person, index) =>
+            FormattableString.Invariant(
+                $"person {index} 0x{person.NameAddress:X} {person.Group} {person.State5} {person.Flags} {person.Assignment} {person.X} {person.Y} {person.LordRating} {person.ListNext} {person.State14} {person.State15} {person.State16} {person.State17}")));
+        Assert.Equal(
+            "ec3a31ce97eb367cf3a39e033e2d9b6dccdfd72769d590a0ce9a839169754b4f",
+            Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(census))).ToLowerInvariant());
+
+        var eligibleByGroup = OriginalStrategicMovement.Persons
+            .Where(person => person.Assignment != 0 &&
+                (person.Flags & OriginalStrategicMovement.HouseholdEligibleFlag) != 0)
+            .GroupBy(person => person.Group)
+            .OrderBy(group => group.Key)
+            .Select(group => group.Count());
+        Assert.Equal(OriginalStrategicMovement.InitialActiveHouseholdCounts, eligibleByGroup);
+    }
+
+    [Fact]
+    public void OriginalStrategicLordsAndStartingCastlesResolveToTheirExactPersonRows()
+    {
+        for (var propertyIndex = 0; propertyIndex < OriginalStrategicMovement.PropertyCount; propertyIndex++)
+        {
+            var property = OriginalStrategicMovement.Properties[propertyIndex];
+            var identity = OriginalStrategicMovement.PropertyIdentities[propertyIndex];
+            var lord = OriginalStrategicMovement.Persons[property.Lord];
+
+            Assert.Equal(identity.NameAddress, lord.NameAddress);
+            Assert.Equal(identity.PersonGroup, lord.Group);
+            Assert.Equal(identity.InitialAssignment, lord.Assignment);
+            Assert.Equal(identity.LordRating, lord.LordRating);
+            Assert.Equal(property.GridX, lord.X);
+            Assert.Equal(property.GridY, lord.Y);
+        }
+
+        foreach (var route in OriginalStrategicMovement.StartingRoutes)
+        {
+            var person = OriginalStrategicMovement.Persons[route.Person];
+            Assert.Equal(route.OriginProperty, person.Group);
+            Assert.Equal(route.InitialAssignment, person.Assignment);
+            Assert.Equal(route.GridX, person.X);
+            Assert.Equal(route.GridY, person.Y);
+        }
     }
 
     [Fact]

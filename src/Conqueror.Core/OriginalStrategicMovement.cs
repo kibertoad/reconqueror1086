@@ -5,7 +5,7 @@ namespace Conqueror.Core;
 /// Route and lord adapters remain separate because the current campaign model does not
 /// yet identify the original property records with its named destinations.
 /// </summary>
-public static class OriginalStrategicMovement
+public static partial class OriginalStrategicMovement
 {
     public const int SlotCount = 5;
     public const int RecordSize = 0x118;
@@ -83,12 +83,17 @@ public static class OriginalStrategicMovement
     public const int PersonRecordSize = 0x12;
     public const int PersonNameAddressOffset = 0x00;
     public const int PersonGroupOffset = 0x04;
+    public const int PersonState5Offset = 0x05;
     public const int PersonFlagsOffset = 0x06;
     public const int PersonAssignmentOffset = 0x07;
     public const int PersonXOffset = 0x08;
     public const int PersonYOffset = 0x0A;
     public const int PersonLordRatingOffset = 0x0C;
     public const int PersonListNextOffset = 0x0D;
+    public const int PersonState14Offset = 0x0E;
+    public const int PersonState15Offset = 0x0F;
+    public const int PersonState16Offset = 0x10;
+    public const int PersonState17Offset = 0x11;
     public const int HouseholdEligibleFlag = 0x01;
 
     private static readonly OriginalStrategicPropertyDefinition[] PropertyRows =
@@ -522,6 +527,21 @@ public readonly record struct OriginalStrategicPropertyIdentity(
     byte PersonGroup,
     byte InitialAssignment,
     byte LordRating);
+
+public readonly record struct OriginalStrategicPersonDefinition(
+    int NameAddress,
+    byte Group,
+    byte State5,
+    byte Flags,
+    byte Assignment,
+    ushort X,
+    ushort Y,
+    byte LordRating,
+    byte ListNext,
+    byte State14,
+    byte State15,
+    byte State16,
+    byte State17);
 
 public readonly record struct OriginalStrategicPropertyGenerationState(byte OwnerOrState, byte State13);
 
