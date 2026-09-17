@@ -492,6 +492,82 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicWorldProjectionMatchesTheExecutableCellAnchorAndKnownRoutePoint()
+    {
+        Assert.Equal(new StrategicRoutePoint(0x2A30, 0x04B0),
+            StrategicWorldProjection.CellAnchor(134, 59));
+
+        foreach (var camera in new[]
+                 {
+                     new StrategicWorldCellPosition(0, 0),
+                     new StrategicWorldCellPosition(100, 200),
+                     new StrategicWorldCellPosition(199, 399)
+                 })
+        {
+            Assert.True(StrategicWorldProjection.TryWorldToCell(
+                0x2A30, 0x04B0, camera.Row, camera.Column, out var cell));
+            Assert.Equal(new StrategicWorldCellPosition(134, 59), cell);
+        }
+    }
+
+    [Theory]
+    [InlineData(0, 0)]
+    [InlineData(1, 1)]
+    [InlineData(134, 59)]
+    [InlineData(199, 399)]
+    public void StrategicWorldProjectionRoundTripsDiamondCentersAcrossCameraPositions(int row, int column)
+    {
+        var center = StrategicWorldProjection.CellCenter(row, column);
+        foreach (var camera in new[]
+                 {
+                     new StrategicWorldCellPosition(0, 0),
+                     new StrategicWorldCellPosition(row, column),
+                     new StrategicWorldCellPosition(199, 399)
+                 })
+        {
+            Assert.True(StrategicWorldProjection.TryWorldToCell(
+                center.X, center.Y, camera.Row, camera.Column, out var actual));
+            Assert.Equal(new StrategicWorldCellPosition(row, column), actual);
+        }
+    }
+
+    [Fact]
+    public void StrategicWorldProjectionUsesInclusiveRasterEdgesAndOriginalScanPrecedence()
+    {
+        var center = StrategicWorldProjection.CellCenter(10, 20);
+
+        Assert.True(StrategicWorldProjection.TryWorldToCell(
+            center.X + 40, center.Y, 0, 0, out var sharedEdge));
+        Assert.Equal(new StrategicWorldCellPosition(10, 19), sharedEdge);
+
+        Assert.True(StrategicWorldProjection.TryWorldToCell(
+            center.X + 41, center.Y, 0, 0, out var neighboringInterior));
+        Assert.Equal(new StrategicWorldCellPosition(11, 20), neighboringInterior);
+    }
+
+    [Fact]
+    public void StrategicWorldProjectionRetainsCameraOrderedOwnershipAtAnOwnedRouteVertex()
+    {
+        Assert.True(StrategicWorldProjection.TryWorldToCell(
+            9040, 3740, 0, 0, out var originCamera));
+        Assert.True(StrategicWorldProjection.TryWorldToCell(
+            9040, 3740, 199, 399, out var oppositeCamera));
+
+        Assert.Equal(new StrategicWorldCellPosition(112, 185), originCamera);
+        Assert.Equal(new StrategicWorldCellPosition(112, 186), oppositeCamera);
+    }
+
+    [Fact]
+    public void StrategicWorldProjectionRejectsPointsOutsideTheOriginalRoutePlane()
+    {
+        Assert.False(StrategicWorldProjection.TryWorldToCell(0, 0, 0, 0, out _));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            StrategicWorldProjection.TryWorldToCell(80, 20, -1, 0, out _));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            StrategicWorldProjection.CellAnchor(200, 0));
+    }
+
+    [Fact]
     public void ImportedContentCatalogDecodesStrategicRoutesWithoutExposingMalformedData()
     {
         var root = Path.Combine(Path.GetTempPath(), $"conqueror-strategic-route-{Guid.NewGuid():N}");
