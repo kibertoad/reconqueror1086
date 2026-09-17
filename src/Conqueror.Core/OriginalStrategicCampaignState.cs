@@ -63,7 +63,7 @@ public sealed class OriginalStrategicCampaignState
             || MovementSlots.Any(slot => slot.Slot is < 0 or >= OriginalStrategicMovement.SlotCount))
             throw new InvalidDataException("Strategic state must contain the five original movement slots.");
         if (SelectedPlayerMovementSlot is < 0 or >= OriginalStrategicMovement.PlayerMovementRecordCount
-            || EngagedPlayerMovementSlot is < 0 or >= OriginalStrategicMovement.PlayerArmyMovementCount
+            || EngagedPlayerMovementSlot is < 0 or >= OriginalStrategicMovement.PlayerMovementRecordCount
             || PlayerMovementSlots is null
             || PlayerMovementSlots.Count != OriginalStrategicMovement.PlayerMovementRecordCount
             || PlayerMovementSlots.Select(slot => slot.Slot).Distinct().Count()
@@ -100,6 +100,8 @@ public sealed class OriginalStrategicCampaignState
         {
             StartingRouteSelector = startingRouteSelector,
             SpeedMultiplier = speedMultiplier,
+            SelectedPlayerMovementSlot = OriginalStrategicMovement.PlayerAvatarMovementSlot,
+            EngagedPlayerMovementSlot = OriginalStrategicMovement.PlayerAvatarMovementSlot,
             TerrainProfile = OriginalStrategicMovement.TerrainProfileForMonth(date.Month - 1)
         };
         state.Properties.AddRange(OriginalStrategicMovement.Properties.Select(
@@ -111,6 +113,22 @@ public sealed class OriginalStrategicCampaignState
         state.PlayerMovementSlots.AddRange(Enumerable.Range(
                 0, OriginalStrategicMovement.PlayerMovementRecordCount)
             .Select(slot => new OriginalStrategicPlayerMovementSlot { Slot = slot }));
+        if (startingRouteSelector >= 0)
+        {
+            var starting = OriginalStrategicMovement.StartingRoutes[startingRouteSelector];
+            state.Persons[starting.Person].Assignment = 0;
+            var avatar = state.PlayerMovementSlots[OriginalStrategicMovement.PlayerAvatarMovementSlot];
+            var currentX = checked(80 * (starting.GridX + 1));
+            var currentY = checked(20 * (starting.GridY + 1));
+            avatar.Active = true;
+            avatar.PathComplete = true;
+            avatar.DestinationX = currentX;
+            avatar.DestinationY = currentY;
+            avatar.GridX = starting.GridX;
+            avatar.GridY = starting.GridY;
+            avatar.CurrentX = currentX;
+            avatar.CurrentY = currentY;
+        }
         state.Validate();
         return state;
     }

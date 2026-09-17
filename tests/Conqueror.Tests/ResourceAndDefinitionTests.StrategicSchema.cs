@@ -12,15 +12,22 @@ public sealed partial class ResourceAndDefinitionTests
         var state = OriginalStrategicCampaignState.CreateForNewGame(
             new DateTime(1086, 1, 1), startingRouteSelector: 4, speedMultiplier: 15);
 
-        Assert.Equal((4, 15, StrategicTerrainProfile.Winter, 0, 0, 0xFF, 0xFF),
+        Assert.Equal((4, 15, StrategicTerrainProfile.Winter, 0, 0, 0xFF, 0xFF, 5, 5),
             (state.StartingRouteSelector, state.SpeedMultiplier, state.TerrainProfile,
-             state.CameraRow, state.CameraColumn, state.PropertyListHead, state.PersonListHead));
+             state.CameraRow, state.CameraColumn, state.PropertyListHead, state.PersonListHead,
+             state.SelectedPlayerMovementSlot, state.EngagedPlayerMovementSlot));
         Assert.Equal(OriginalStrategicMovement.PropertyCount, state.Properties.Count);
         Assert.Equal(OriginalStrategicMovement.PersonCount, state.Persons.Count);
         Assert.Equal([0, 1, 2, 3, 4], state.MovementSlots.Select(slot => slot.Slot));
         Assert.Equal([0, 1, 2, 3, 4, 5], state.PlayerMovementSlots.Select(slot => slot.Slot));
         Assert.All(state.MovementSlots, slot => Assert.False(slot.Active));
-        Assert.All(state.PlayerMovementSlots, slot => Assert.False(slot.Active));
+        Assert.All(state.PlayerMovementSlots.Take(5), slot => Assert.False(slot.Active));
+        var starting = OriginalStrategicMovement.StartingRoutes[4];
+        var avatar = state.PlayerMovementSlots[5];
+        Assert.Equal((true, true, 5, starting.GridX, starting.GridY,
+                80 * (starting.GridX + 1), 20 * (starting.GridY + 1)),
+            (avatar.Active, avatar.PathComplete, avatar.Slot, avatar.GridX, avatar.GridY,
+             (int)avatar.CurrentX, (int)avatar.CurrentY));
         Assert.Empty(state.TerrainMutations);
 
         for (var index = 0; index < state.Properties.Count; index++)
@@ -38,8 +45,9 @@ public sealed partial class ResourceAndDefinitionTests
         {
             var definition = OriginalStrategicMovement.Persons[index];
             var person = state.Persons[index];
+            var expectedAssignment = index == starting.Person ? (byte)0 : definition.Assignment;
             Assert.Equal((definition.NameAddress, definition.Group, definition.State5,
-                definition.Flags, definition.Assignment, definition.X, definition.Y,
+                definition.Flags, expectedAssignment, definition.X, definition.Y,
                 definition.LordRating, definition.ListNext, definition.State14,
                 definition.State15, definition.State16, definition.State17),
                 (person.NameAddress, person.Group, person.State5, person.Flags,
@@ -167,8 +175,10 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Empty(state.EnemyMovements);
         Assert.Equal(1, state.SchemaVersion);
         var strategic = Assert.IsType<OriginalStrategicCampaignState>(state.OriginalStrategicState);
-        Assert.Equal((-1, 15, StrategicTerrainProfile.Autumn),
-            (strategic.StartingRouteSelector, strategic.SpeedMultiplier, strategic.TerrainProfile));
+        Assert.Equal((-1, 15, StrategicTerrainProfile.Autumn, 5, 5),
+            (strategic.StartingRouteSelector, strategic.SpeedMultiplier, strategic.TerrainProfile,
+             strategic.SelectedPlayerMovementSlot, strategic.EngagedPlayerMovementSlot));
+        Assert.All(strategic.PlayerMovementSlots, slot => Assert.False(slot.Active));
         Assert.Contains("slot 1 (6 troops)", state.Journal[^2], StringComparison.Ordinal);
         Assert.Contains("origin is no longer hostile", state.Journal[^2], StringComparison.Ordinal);
         Assert.Contains("slot 3 (9 troops)", state.Journal[^1], StringComparison.Ordinal);

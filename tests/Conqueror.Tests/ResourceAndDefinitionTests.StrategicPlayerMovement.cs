@@ -32,6 +32,7 @@ public sealed partial class ResourceAndDefinitionTests
     public void PlayerRouteUsesStrictSixUnitArrivalAndAdvancesOnlyOneWaypoint()
     {
         var state = RuntimeState();
+        state.SelectedPlayerMovementSlot = 0;
         var slot = state.PlayerMovementSlots[0];
         var terrainKind = OriginalStrategicMovement.TerrainKindForTile(18);
         ActivatePlayerRoute(slot, terrainKind,
@@ -151,6 +152,7 @@ public sealed partial class ResourceAndDefinitionTests
     public void PlayerRouteCommandClearsTargetPrimesFirstPointAndRetainsStalePairs()
     {
         var state = RuntimeState();
+        state.SelectedPlayerMovementSlot = 0;
         var slot = state.PlayerMovementSlots[0];
         slot.Active = true;
         slot.TargetHandle = OriginalStrategicMovement.PlayerEnemyTargetFlag | 2;
@@ -183,6 +185,7 @@ public sealed partial class ResourceAndDefinitionTests
     public void PlayerRouteInputStopsAtTwentyDespiteTwentyOnePairRecordCapacity()
     {
         var state = RuntimeState();
+        state.SelectedPlayerMovementSlot = 0;
         var slot = state.PlayerMovementSlots[0];
         slot.Active = true;
         slot.PathComplete = true;
