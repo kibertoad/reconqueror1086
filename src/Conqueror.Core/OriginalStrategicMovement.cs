@@ -39,6 +39,7 @@ public static class OriginalStrategicMovement
     public const int CompletedSignal = 0xFFFF;
     public const int WaypointCoordinateTolerance = 6;
     public const int MaximumRoutedStep = 50;
+    public const int RetargetFieldArmyRange = 300;
 
     public const int PropertyTableAddress = 0xB8EC;
     public const int PropertyCount = 14;
@@ -135,6 +136,53 @@ public static class OriginalStrategicMovement
             : StrategicContactOutcome.Retarget;
     }
 
+    public static bool TryGetPropertyRoute(int fromProperty, int toProperty, out OriginalStrategicRoute route)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(fromProperty);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(fromProperty, PropertyCount);
+        ArgumentOutOfRangeException.ThrowIfNegative(toProperty);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(toProperty, PropertyCount);
+
+        if (fromProperty == toProperty ||
+            (Math.Min(fromProperty, toProperty) == 0 && Math.Max(fromProperty, toProperty) == 12))
+        {
+            route = default;
+            return false;
+        }
+
+        route = new OriginalStrategicRoute(
+            $"rt_{Math.Min(fromProperty, toProperty) + 1}_{Math.Max(fromProperty, toProperty) + 1}.rat",
+            Reverse: fromProperty > toProperty);
+        return true;
+    }
+
+    public static StrategicRetargetSelection SelectRetarget(
+        StrategicPoint current,
+        IReadOnlyList<StrategicRetargetCandidate> fieldArmies,
+        StrategicPoint player,
+        StrategicPoint originProperty)
+    {
+        ArgumentNullException.ThrowIfNull(fieldArmies);
+        var rangeSquared = RetargetFieldArmyRange * RetargetFieldArmyRange;
+        for (var index = 0; index < fieldArmies.Count; index++)
+        {
+            var candidate = fieldArmies[index];
+            if (candidate.Active && DistanceSquared(current, candidate.Position) < rangeSquared)
+                return new StrategicRetargetSelection(StrategicRetargetKind.FieldArmy, index);
+        }
+
+        return DistanceSquared(current, player) <= DistanceSquared(current, originProperty)
+            ? new StrategicRetargetSelection(StrategicRetargetKind.Player, -1)
+            : new StrategicRetargetSelection(StrategicRetargetKind.OriginProperty, -1);
+    }
+
+    private static long DistanceSquared(StrategicPoint first, StrategicPoint second)
+    {
+        var dx = (long)first.X - second.X;
+        var dy = (long)first.Y - second.Y;
+        return checked(dx * dx + dy * dy);
+    }
+
     public static StrategicTroopCounts InitialForces(int activeHouseholdCount, int lordRating)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(activeHouseholdCount);
@@ -173,6 +221,21 @@ public enum StrategicContactOutcome
     Encounter,
     ReinforceOriginAndDeactivate,
     Retarget
+}
+
+public readonly record struct OriginalStrategicRoute(string ResourceName, bool Reverse);
+
+public readonly record struct StrategicPoint(int X, int Y);
+
+public readonly record struct StrategicRetargetCandidate(bool Active, StrategicPoint Position);
+
+public readonly record struct StrategicRetargetSelection(StrategicRetargetKind Kind, int CandidateIndex);
+
+public enum StrategicRetargetKind
+{
+    FieldArmy,
+    Player,
+    OriginProperty
 }
 
 public readonly record struct StrategicTroopCounts(int Swordsmen, int Halberdiers, int Knights)

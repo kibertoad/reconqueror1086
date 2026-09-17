@@ -39,6 +39,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(0xFFFF, OriginalStrategicMovement.CompletedSignal);
         Assert.Equal(6, OriginalStrategicMovement.WaypointCoordinateTolerance);
         Assert.Equal(50, OriginalStrategicMovement.MaximumRoutedStep);
+        Assert.Equal(300, OriginalStrategicMovement.RetargetFieldArmyRange);
     }
 
     [Fact]
@@ -142,6 +143,48 @@ public sealed partial class ResourceAndDefinitionTests
             OriginalStrategicMovement.ResolveCompletedContact(4, 3, contactedPersonEligible: true));
         Assert.Equal(StrategicContactOutcome.Retarget,
             OriginalStrategicMovement.ResolveCompletedContact(0, null, contactedPersonEligible: true));
+    }
+
+    [Fact]
+    public void OriginalStrategicPropertyRoutesUseCanonicalFilesAndReverseOnlyWhenRequired()
+    {
+        Assert.True(OriginalStrategicMovement.TryGetPropertyRoute(0, 1, out var yorkToLincoln));
+        Assert.Equal(new OriginalStrategicRoute("rt_1_2.rat", Reverse: false), yorkToLincoln);
+
+        Assert.True(OriginalStrategicMovement.TryGetPropertyRoute(13, 2, out var okehamptonToChester));
+        Assert.Equal(new OriginalStrategicRoute("rt_3_14.rat", Reverse: true), okehamptonToChester);
+
+        Assert.False(OriginalStrategicMovement.TryGetPropertyRoute(4, 4, out _));
+        Assert.False(OriginalStrategicMovement.TryGetPropertyRoute(0, 12, out _));
+        Assert.False(OriginalStrategicMovement.TryGetPropertyRoute(12, 0, out _));
+
+        var supported = 0;
+        for (var from = 0; from < OriginalStrategicMovement.PropertyCount; from++)
+        for (var to = 0; to < OriginalStrategicMovement.PropertyCount; to++)
+            if (OriginalStrategicMovement.TryGetPropertyRoute(from, to, out _)) supported++;
+
+        Assert.Equal(180, supported);
+    }
+
+    [Fact]
+    public void OriginalStrategicRetargetUsesFirstCloseArmyThenNearestPlayerOrOrigin()
+    {
+        StrategicRetargetCandidate[] armies =
+        [
+            new(false, new(1, 1)),
+            new(true, new(299, 0)),
+            new(true, new(2, 0))
+        ];
+
+        Assert.Equal(new StrategicRetargetSelection(StrategicRetargetKind.FieldArmy, 1),
+            OriginalStrategicMovement.SelectRetarget(new(0, 0), armies, new(500, 0), new(600, 0)));
+
+        armies[1] = new(true, new(300, 0));
+        armies[2] = new(false, new(2, 0));
+        Assert.Equal(new StrategicRetargetSelection(StrategicRetargetKind.OriginProperty, -1),
+            OriginalStrategicMovement.SelectRetarget(new(0, 0), armies, new(500, 0), new(400, 0)));
+        Assert.Equal(new StrategicRetargetSelection(StrategicRetargetKind.Player, -1),
+            OriginalStrategicMovement.SelectRetarget(new(0, 0), [], new(400, 0), new(400, 0)));
     }
 
     [Theory]
