@@ -20,7 +20,8 @@ public static partial class OriginalStrategicMovement
         ValidateSchedulerInput(state, input);
 
         var constructions = new List<OriginalStrategicConstruction>();
-        AdvanceGeneration(state, resources, input, random, constructions);
+        var propertyAlerts = new List<OriginalStrategicPropertyAlert>();
+        AdvanceGeneration(state, resources, input, random, constructions, propertyAlerts);
 
         var slots = state.MovementSlots.ToDictionary(slot => slot.Slot);
         var advances = new List<OriginalStrategicSlotAdvance>();
@@ -59,7 +60,8 @@ public static partial class OriginalStrategicMovement
         }
 
         return new OriginalStrategicSchedulerResult(
-            constructions.AsReadOnly(), advances.AsReadOnly(), completions.AsReadOnly(), encounter);
+            constructions.AsReadOnly(), advances.AsReadOnly(), completions.AsReadOnly(),
+            propertyAlerts.AsReadOnly(), encounter);
     }
 
     private static void AdvanceGeneration(
@@ -67,10 +69,13 @@ public static partial class OriginalStrategicMovement
         IOriginalStrategicResources resources,
         OriginalStrategicSchedulerInput input,
         IOriginalStrategicRandom random,
-        List<OriginalStrategicConstruction> constructions)
+        List<OriginalStrategicConstruction> constructions,
+        List<OriginalStrategicPropertyAlert> propertyAlerts)
     {
         state.CallsSinceReactiveSuccess = checked(state.CallsSinceReactiveSuccess + 1);
-        if (input.ReactiveDetection is { } detected
+        var reactiveDetection = input.ReactiveDetection
+            ?? FindReactiveDetection(state, resources, input.PursuitTargets, propertyAlerts);
+        if (reactiveDetection is { } detected
             && CanAttemptReactivePursuit(
                 detected.Property,
                 detected.TargetMovementSlot,
@@ -111,7 +116,7 @@ public static partial class OriginalStrategicMovement
         // though 0x3BB4C does not initialize either out pointer on failure. The
         // original result is stale stack data. The clean-room scheduler admits
         // this branch only when this pass supplied a real detection.
-        if (propertyListPresent && input.ReactiveDetection is { } timedDetected
+        if (propertyListPresent && reactiveDetection is { } timedDetected
             && state.Properties[timedDetected.Property].State13 != 0)
         {
             for (var targetSlot = 0; targetSlot < SlotCount; targetSlot++)
@@ -310,6 +315,61 @@ public static partial class OriginalStrategicMovement
         return candidates.Count == 0 ? -1 : candidates[Next(random, candidates.Count)];
     }
 
+    private static OriginalStrategicReactiveDetection? FindReactiveDetection(
+        OriginalStrategicCampaignState state,
+        IOriginalStrategicResources resources,
+        IReadOnlyList<OriginalStrategicPursuitTarget> targets,
+        List<OriginalStrategicPropertyAlert> propertyAlerts)
+    {
+        for (var propertyIndex = 0; propertyIndex < PropertyCount; propertyIndex++)
+        {
+            var property = state.Properties[propertyIndex];
+            if (property.OwnerOrState == 0) continue;
+
+            for (var targetSlot = 0; targetSlot < SlotCount; targetSlot++)
+            {
+                var target = targets[targetSlot];
+                if (!target.Active) continue;
+
+                var currentX = Truncate(target.CurrentX);
+                var currentY = Truncate(target.CurrentY);
+                var deltaX = Math.Abs((long)currentX - property.MapX8);
+                var deltaY = Math.Abs((long)currentY - property.MapY8);
+                var special = propertyIndex == ReactiveSpecialProperty;
+                var inSpecialBounds = special && IsInsideReactiveSpecialBounds(currentX, currentY);
+                var contactPerson = PersonAtGrid(state, resources, target.GridX, target.GridY);
+                var lordContact = contactPerson == property.Lord;
+                var nearDistance = special ? ReactiveSpecialNearDistance : ReactiveNearDistance;
+
+                if ((deltaX < nearDistance && deltaY < nearDistance)
+                    || inSpecialBounds || lordContact)
+                {
+                    property.State13 = 1;
+                    if (property.Garrison > 0)
+                        return new OriginalStrategicReactiveDetection(propertyIndex, targetSlot);
+                    break;
+                }
+
+                var approachDistance = special
+                    ? ReactiveSpecialApproachDistance
+                    : ReactiveApproachDistance;
+                if (deltaX >= approachDistance || deltaY >= approachDistance
+                    || property.State14 != 0)
+                    continue;
+
+                property.State14 = 1;
+                propertyAlerts.Add(new OriginalStrategicPropertyAlert(propertyIndex, targetSlot));
+            }
+        }
+        return null;
+    }
+
+    private static bool IsInsideReactiveSpecialBounds(int x, int y) =>
+        x >= ReactiveSpecialBoundsX
+        && x < ReactiveSpecialBoundsX + ReactiveSpecialBoundsWidth
+        && y >= ReactiveSpecialBoundsY
+        && y < ReactiveSpecialBoundsY + ReactiveSpecialBoundsHeight;
+
     private static int? FindContactPerson(
         OriginalStrategicCampaignState state,
         IOriginalStrategicResources resources,
@@ -318,15 +378,23 @@ public static partial class OriginalStrategicMovement
     {
         foreach (var probe in ContactProbeRows)
         {
-            if (!resources.TryGridCell(
-                    checked(row + probe.X), checked(column + probe.Y), out var cell))
-                continue;
-            var mutation = state.TerrainMutations.FirstOrDefault(candidate =>
-                candidate.Row == cell.Row && candidate.Column == cell.Column);
-            var person = (mutation is null ? cell : cell with { RawValue = mutation.CellValue }).Auxiliary;
+            var person = PersonAtGrid(
+                state, resources, checked(row + probe.X), checked(column + probe.Y));
             if (person > 0 && person < state.Persons.Count) return person;
         }
         return null;
+    }
+
+    private static int PersonAtGrid(
+        OriginalStrategicCampaignState state,
+        IOriginalStrategicResources resources,
+        int row,
+        int column)
+    {
+        if (!resources.TryGridCell(row, column, out var cell)) return 0;
+        var mutation = state.TerrainMutations.FirstOrDefault(candidate =>
+            candidate.Row == cell.Row && candidate.Column == cell.Column);
+        return (mutation is null ? cell : cell with { RawValue = mutation.CellValue }).Auxiliary;
     }
 
     private static void Retarget(
@@ -471,8 +539,11 @@ public readonly record struct OriginalStrategicCompletion(
 
 public readonly record struct OriginalStrategicEncounter(int Slot, int Person);
 
+public readonly record struct OriginalStrategicPropertyAlert(int Property, int TargetMovementSlot);
+
 public sealed record OriginalStrategicSchedulerResult(
     IReadOnlyList<OriginalStrategicConstruction> Constructions,
     IReadOnlyList<OriginalStrategicSlotAdvance> Advances,
     IReadOnlyList<OriginalStrategicCompletion> Completions,
+    IReadOnlyList<OriginalStrategicPropertyAlert> PropertyAlerts,
     OriginalStrategicEncounter? Encounter);

@@ -9,6 +9,11 @@ public static partial class OriginalStrategicMovement
 {
     public const int SlotCount = 5;
     public const int RecordSize = 0x118;
+    public const int PlayerMovementTableAddress = 0x1A4B8;
+    public const int PlayerMovementRecordCount = 6;
+    public const int PlayerArmyMovementCount = 5;
+    public const int PlayerAvatarMovementSlot = 5;
+    public const int CurrentPlayerMovementSlotAddress = 0xAE6C;
     public const int GenerationIntervalUnits = 0x1388;
     public const int InitialSpeedMultiplier = 1;
     public const int MinimumSpeedMultiplier = 1;
@@ -21,6 +26,14 @@ public static partial class OriginalStrategicMovement
     public const int ReactiveExistingPursuitDelay = 0x32;
     public const int ReactiveSpawnRollLimit = 6;
     public const int ReactiveSpawnRollExclusiveMaximum = 2;
+    public const int ReactiveNearDistance = 30;
+    public const int ReactiveApproachDistance = 250;
+    public const int ReactiveSpecialNearDistance = 40;
+    public const int ReactiveSpecialApproachDistance = 200;
+    public const int ReactiveSpecialBoundsX = 700;
+    public const int ReactiveSpecialBoundsY = 600;
+    public const int ReactiveSpecialBoundsWidth = 0x2EA4;
+    public const int ReactiveSpecialBoundsHeight = 0x0F78;
 
     public const int ActiveOffset = 0x00;
     public const int PathCompleteOffset = 0x0C;

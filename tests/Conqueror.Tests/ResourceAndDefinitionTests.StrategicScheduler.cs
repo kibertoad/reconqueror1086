@@ -63,6 +63,127 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void ReactiveFinderUsesStrictNearAndApproachGatesAndAlertsOnlyOnce()
+    {
+        var state = RuntimeState();
+        for (var index = 1; index < state.Properties.Count; index++)
+            state.Properties[index].OwnerOrState = 0;
+        var property = state.Properties[0];
+        var targets = SchedulerTargets();
+        targets[0] = new OriginalStrategicPursuitTarget(
+            true, property.MapX8 + OriginalStrategicMovement.ReactiveNearDistance,
+            property.MapY8, 10, 20, Swordsmen: 1);
+        var resources = new StubStrategicResources();
+
+        var approach = OriginalStrategicMovement.AdvanceSchedulerPass(
+            state, resources, SchedulerInput(targets), new QueueStrategicRandom());
+
+        Assert.Empty(approach.Constructions);
+        Assert.Equal(new OriginalStrategicPropertyAlert(0, 0), Assert.Single(approach.PropertyAlerts));
+        Assert.Equal((0, 1), (property.State13, property.State14));
+
+        var repeated = OriginalStrategicMovement.AdvanceSchedulerPass(
+            state, resources, SchedulerInput(targets), new QueueStrategicRandom());
+        Assert.Empty(repeated.PropertyAlerts);
+
+        var approachEdgeState = RuntimeState();
+        for (var index = 1; index < approachEdgeState.Properties.Count; index++)
+            approachEdgeState.Properties[index].OwnerOrState = 0;
+        var approachEdgeProperty = approachEdgeState.Properties[0];
+        var approachEdgeTargets = SchedulerTargets();
+        approachEdgeTargets[0] = targets[0] with
+        {
+            CurrentX = approachEdgeProperty.MapX8
+                + OriginalStrategicMovement.ReactiveApproachDistance
+        };
+        var approachEdge = OriginalStrategicMovement.AdvanceSchedulerPass(
+            approachEdgeState, resources, SchedulerInput(approachEdgeTargets),
+            new QueueStrategicRandom());
+        Assert.Empty(approachEdge.PropertyAlerts);
+
+        targets[0] = targets[0] with { CurrentX = property.MapX8 + 29 };
+        var near = OriginalStrategicMovement.AdvanceSchedulerPass(
+            state, resources, SchedulerInput(targets), new QueueStrategicRandom(2));
+
+        Assert.Equal(0, Assert.Single(near.Constructions).OriginProperty);
+        Assert.Equal(1, property.State13);
+    }
+
+    [Fact]
+    public void ReactiveFinderUsesAuthoredPropertyThenPlayerSlotOrder()
+    {
+        var state = RuntimeState();
+        for (var index = 2; index < state.Properties.Count; index++)
+            state.Properties[index].OwnerOrState = 0;
+        state.Properties[1].MapX8 = state.Properties[0].MapX8;
+        state.Properties[1].MapY8 = state.Properties[0].MapY8;
+        var targets = SchedulerTargets();
+        targets[1] = new OriginalStrategicPursuitTarget(
+            true, state.Properties[0].MapX8, state.Properties[0].MapY8, 1, 1, Swordsmen: 1);
+        targets[0] = targets[1] with { CurrentX = state.Properties[0].MapX8 + 10 };
+
+        var result = OriginalStrategicMovement.AdvanceSchedulerPass(
+            state, new StubStrategicResources(), SchedulerInput(targets), new QueueStrategicRandom(2));
+
+        var construction = Assert.Single(result.Constructions);
+        Assert.Equal((0, 0), (construction.OriginProperty, construction.TargetMovementSlot));
+        Assert.Equal(0, state.Properties[1].State13);
+    }
+
+    [Fact]
+    public void ReactiveFinderAcceptsLordCellIdentityAndMarksEmptyPropertiesWithoutConstruction()
+    {
+        var state = RuntimeState();
+        for (var index = 1; index < state.Properties.Count; index++)
+            state.Properties[index].OwnerOrState = 0;
+        var property = state.Properties[0];
+        property.Garrison = 0;
+        var targets = SchedulerTargets();
+        targets[0] = new OriginalStrategicPursuitTarget(
+            true, 60_000, 60_000, 10, 20, Swordsmen: 1);
+        var resources = new StubStrategicResources();
+        resources.GridCells[(10, 20)] = new OriginalStrategicTerrainCell(
+            10, 20, ((uint)property.Lord << 16) | 18u);
+
+        var result = OriginalStrategicMovement.AdvanceSchedulerPass(
+            state, resources, SchedulerInput(targets), new QueueStrategicRandom());
+
+        Assert.Empty(result.Constructions);
+        Assert.Equal(1, property.State13);
+    }
+
+    [Fact]
+    public void ReactiveFinderUsesTheStrictLondonRectangle()
+    {
+        var insideState = RuntimeState();
+        var insideTargets = SchedulerTargets();
+        insideTargets[0] = new OriginalStrategicPursuitTarget(
+            true,
+            OriginalStrategicMovement.ReactiveSpecialBoundsX,
+            OriginalStrategicMovement.ReactiveSpecialBoundsY,
+            1, 1, Swordsmen: 1);
+
+        var inside = OriginalStrategicMovement.AdvanceSchedulerPass(
+            insideState, new StubStrategicResources(), SchedulerInput(insideTargets),
+            new QueueStrategicRandom(2));
+        Assert.Equal(OriginalStrategicMovement.ReactiveSpecialProperty,
+            Assert.Single(inside.Constructions).OriginProperty);
+
+        var outsideState = RuntimeState();
+        var outsideTargets = SchedulerTargets();
+        outsideTargets[0] = insideTargets[0] with
+        {
+            CurrentX = OriginalStrategicMovement.ReactiveSpecialBoundsX
+                + OriginalStrategicMovement.ReactiveSpecialBoundsWidth
+        };
+        var outside = OriginalStrategicMovement.AdvanceSchedulerPass(
+            outsideState, new StubStrategicResources(), SchedulerInput(outsideTargets),
+            new QueueStrategicRandom());
+        Assert.Empty(outside.Constructions);
+        Assert.Equal(0, outsideState.Properties[OriginalStrategicMovement.ReactiveSpecialProperty].State13);
+    }
+
+    [Fact]
     public void CompletionProbeReinforcesMatchingOriginAndDeactivatesTheSlot()
     {
         var state = RuntimeState();
