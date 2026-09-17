@@ -142,6 +142,7 @@ if (File.Exists(gobPath))
         directory.AppendLine($"{entry.Index,5}  {entry.Flags,5}  {entry.StoredSize,10}  {entry.ExpandedSize,10}  0x{entry.Offset:X8}  {entry.Name}");
     File.WriteAllText(Path.Combine(output, "gob-directory.txt"), directory.ToString());
 
+    File.WriteAllText(Path.Combine(output, "strategic-world-grid-report.txt"), StrategicWorldGridReport.Build(gob));
     if (integerResourceName is not null)
     {
         var integerEntry = gob.Entries.FirstOrDefault(x => x.Name.Equals(integerResourceName, StringComparison.OrdinalIgnoreCase))

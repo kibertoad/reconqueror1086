@@ -13,7 +13,10 @@ public sealed partial class ResourceAndDefinitionTests
     {
         Assert.Equal(5, OriginalStrategicMovement.SlotCount);
         Assert.Equal(0x118, OriginalStrategicMovement.RecordSize);
-        Assert.Equal(0x1388, OriginalStrategicMovement.GenerationIntervalMilliseconds);
+        Assert.Equal(0x1388, OriginalStrategicMovement.GenerationIntervalUnits);
+        Assert.Equal(1, OriginalStrategicMovement.InitialSpeedMultiplier);
+        Assert.Equal(1, OriginalStrategicMovement.MinimumSpeedMultiplier);
+        Assert.Equal(15, OriginalStrategicMovement.MaximumSpeedMultiplier);
         Assert.Equal(0x64, OriginalStrategicMovement.GenerationRollLimit);
         Assert.Equal(0x60, OriginalStrategicMovement.GenerationStartThreshold);
         Assert.Equal(1, OriginalStrategicMovement.GenerationPropertyEligibilityValue);
@@ -48,6 +51,8 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(50, OriginalStrategicMovement.MaximumRoutedStep);
         Assert.Equal(300, OriginalStrategicMovement.RetargetFieldArmyRange);
         Assert.Equal(30, OriginalStrategicMovement.TerrainKindCount);
+        Assert.Equal(0xAF78, OriginalStrategicMovement.TerrainTileKindTableAddress);
+        Assert.Equal(331, OriginalStrategicMovement.TerrainTileKindCount);
         Assert.Equal(4, OriginalStrategicMovement.TerrainProfileCount);
         Assert.Equal(2, OriginalStrategicMovement.ReducedTerrainProfile);
         Assert.Equal(9, OriginalStrategicMovement.ImpassableTerrainKind);
@@ -65,7 +70,11 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(new StrategicGenerationClockAdvance(0, true, true, true),
             OriginalStrategicMovement.AdvanceGenerationClock(5_001, 10, 4, 97));
         Assert.Throws<ArgumentNullException>(() =>
-            OriginalStrategicMovement.AdvanceGenerationClock(5_000, 0, 4, null));
+            OriginalStrategicMovement.AdvanceGenerationClock(5_000, 1, 4, null));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            OriginalStrategicMovement.AdvanceGenerationClock(0, 0, 0, null));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            OriginalStrategicMovement.AdvanceGenerationClock(0, 16, 0, null));
     }
 
     [Fact]
@@ -154,11 +163,16 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(new StrategicRoutedStep(6f, 8f, StrategicRoutedStepOutcome.Apply),
             OriginalStrategicMovement.CalculateRoutedStep(0.6f, 0.8f, 10, 1, 0));
         Assert.Equal(StrategicRoutedStepOutcome.HoldForHorizontalLimit,
-            OriginalStrategicMovement.CalculateRoutedStep(1f, 0f, 50, 1, 0).Outcome);
-        Assert.Equal(new StrategicRoutedStep(0f, 100f, StrategicRoutedStepOutcome.Apply),
-            OriginalStrategicMovement.CalculateRoutedStep(0f, 1f, 100, 1, 0));
+            OriginalStrategicMovement.CalculateRoutedStep(2.5f, 0f, 10, 1, 14).Outcome);
+        Assert.Equal(new StrategicRoutedStep(0f, 15f, StrategicRoutedStepOutcome.Apply),
+            OriginalStrategicMovement.CalculateRoutedStep(0f, 1f, 15, 1, 0));
         Assert.Equal(StrategicRoutedStepOutcome.DeactivateForImpassableTerrain,
             OriginalStrategicMovement.CalculateRoutedStep(1f, 0f, 1, 1, 9).Outcome);
+        Assert.Equal(9, OriginalStrategicMovement.TerrainKindForTile(0));
+        Assert.Equal(0, OriginalStrategicMovement.TerrainKindForTile(18));
+        Assert.Equal(1, OriginalStrategicMovement.TerrainKindForTile(330));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            OriginalStrategicMovement.TerrainKindForTile(331));
     }
 
     [Fact]
@@ -438,6 +452,46 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicWorldGridDecoderRestoresColumnMajorCellsToRowFirstAddressing()
+    {
+        var data = new byte[StrategicWorldGridDecoder.EncodedLength];
+        BinaryPrimitives.WriteInt32LittleEndian(data, StrategicWorldGridDecoder.CellWidth);
+        BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(4), StrategicWorldGridDecoder.CellHeight);
+        BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(8), StrategicWorldGridDecoder.RowCount);
+        BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(12), StrategicWorldGridDecoder.ColumnCount);
+        WriteWorldCell(data, row: 0, column: 0, 0x1234_0012);
+        WriteWorldCell(data, row: 1, column: 0, 0xAB56_014A);
+        WriteWorldCell(data, row: 0, column: 1, 0xCD78_002A);
+
+        var grid = StrategicWorldGridDecoder.Decode(data);
+
+        Assert.Equal(80, grid.CellWidth);
+        Assert.Equal(80, grid.CellHeight);
+        Assert.Equal(200, grid.RowCount);
+        Assert.Equal(400, grid.ColumnCount);
+        Assert.Equal(new StrategicWorldCell(0x1234_0012), grid[0, 0]);
+        Assert.Equal((ushort)0x014A, grid[1, 0].TileId);
+        Assert.Equal((byte)0x56, grid[1, 0].Auxiliary);
+        Assert.Equal((byte)0xAB, grid[1, 0].UpperByte);
+        Assert.Equal(new StrategicWorldCell(0xCD78_002A), grid[0, 1]);
+    }
+
+    [Fact]
+    public void StrategicWorldGridDecoderRejectsWrongDimensionsAndLength()
+    {
+        Assert.Throws<InvalidDataException>(() => StrategicWorldGridDecoder.Decode([]));
+        var data = new byte[StrategicWorldGridDecoder.EncodedLength];
+        BinaryPrimitives.WriteInt32LittleEndian(data, StrategicWorldGridDecoder.CellWidth);
+        BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(4), StrategicWorldGridDecoder.CellHeight);
+        BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(8), StrategicWorldGridDecoder.RowCount);
+        BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(12), StrategicWorldGridDecoder.ColumnCount - 1);
+        Assert.Throws<InvalidDataException>(() => StrategicWorldGridDecoder.Decode(data));
+
+        BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(12), StrategicWorldGridDecoder.ColumnCount);
+        Assert.Throws<InvalidDataException>(() => StrategicWorldGridDecoder.Decode(data.AsSpan(0, data.Length - 1)));
+    }
+
+    [Fact]
     public void ImportedContentCatalogDecodesStrategicRoutesWithoutExposingMalformedData()
     {
         var root = Path.Combine(Path.GetTempPath(), $"conqueror-strategic-route-{Guid.NewGuid():N}");
@@ -468,6 +522,46 @@ public sealed partial class ResourceAndDefinitionTests
         {
             if (Directory.Exists(root)) Directory.Delete(root, recursive: true);
         }
+    }
+
+    [Fact]
+    public void ImportedContentCatalogDecodesStrategicWorldWithoutExposingMalformedData()
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"conqueror-strategic-world-{Guid.NewGuid():N}");
+        try
+        {
+            var relative = Path.Combine("Decoded", "icon.jp");
+            var path = Path.Combine(root, relative);
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            var data = new byte[StrategicWorldGridDecoder.EncodedLength];
+            BinaryPrimitives.WriteInt32LittleEndian(data, StrategicWorldGridDecoder.CellWidth);
+            BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(4), StrategicWorldGridDecoder.CellHeight);
+            BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(8), StrategicWorldGridDecoder.RowCount);
+            BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(12), StrategicWorldGridDecoder.ColumnCount);
+            WriteWorldCell(data, row: 7, column: 11, 0x0123_002A);
+            File.WriteAllBytes(path, data);
+            var asset = new ImportedAsset(
+                "C1086.GOB#292:icon.jp", relative, "resource", data.Length, ResourceHash.Sha256(path));
+            new ImportManifest(1, new string('a', 64), [asset]).Write(Path.Combine(root, "manifest.json"));
+
+            var catalog = Assert.IsType<ImportedContentCatalog>(ImportedContentCatalog.Discover(root));
+            Assert.Equal((ushort)42,
+                Assert.IsType<StrategicWorldGrid>(catalog.DecodeStrategicWorldGrid(asset.Id))[7, 11].TileId);
+
+            File.WriteAllBytes(path, [1, 2, 3]);
+            Assert.Null(catalog.DecodeStrategicWorldGrid(asset.Id));
+        }
+        finally
+        {
+            if (Directory.Exists(root)) Directory.Delete(root, recursive: true);
+        }
+    }
+
+    private static void WriteWorldCell(byte[] data, int row, int column, uint value)
+    {
+        var offset = StrategicWorldGridDecoder.HeaderSize +
+            checked((column * StrategicWorldGridDecoder.RowCount + row) * StrategicWorldGridDecoder.CellSize);
+        BinaryPrimitives.WriteUInt32LittleEndian(data.AsSpan(offset), value);
     }
 
     [Theory]

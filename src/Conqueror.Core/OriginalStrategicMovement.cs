@@ -9,7 +9,10 @@ public static class OriginalStrategicMovement
 {
     public const int SlotCount = 5;
     public const int RecordSize = 0x118;
-    public const int GenerationIntervalMilliseconds = 0x1388;
+    public const int GenerationIntervalUnits = 0x1388;
+    public const int InitialSpeedMultiplier = 1;
+    public const int MinimumSpeedMultiplier = 1;
+    public const int MaximumSpeedMultiplier = 15;
     public const int GenerationRollLimit = 0x64;
     public const int GenerationStartThreshold = 0x60;
     public const int GenerationPropertyEligibilityValue = 1;
@@ -47,6 +50,8 @@ public static class OriginalStrategicMovement
     public const int MaximumRoutedStep = 50;
     public const int RetargetFieldArmyRange = 300;
     public const int TerrainKindCount = 30;
+    public const int TerrainTileKindTableAddress = 0xAF78;
+    public const int TerrainTileKindCount = 331;
     public const int TerrainProfileCount = 4;
     public const int ReducedTerrainProfile = 2;
     public const int ImpassableTerrainKind = 9;
@@ -177,6 +182,21 @@ public static class OriginalStrategicMovement
         0.4f, 0.4f, 0.4f, 2f, 1f, 1f, 0.5f, 0.5f, 0.5f, 0.6f
     ];
 
+    private static readonly byte[] TerrainKindsByTile =
+    [
+        9,9,23,23,23,23,23,23,23,23,23,23,23,23,23,23,24,25,0,22,22,22,22,22,26,27,28,28,9,23,23,23,
+        23,23,23,23,23,23,23,23,23,23,23,24,25,0,22,22,22,22,22,22,22,22,22,22,22,22,22,22,14,14,14,14,
+        23,22,22,23,22,22,23,21,21,9,9,9,22,22,22,22,22,22,22,22,22,22,21,20,20,21,21,21,21,21,21,21,
+        21,21,21,21,19,19,17,17,17,17,17,17,17,17,17,18,18,18,18,18,18,18,18,18,17,17,17,17,29,29,29,29,
+        29,29,19,19,17,17,17,17,17,17,17,17,17,18,18,18,18,18,18,18,18,18,17,17,17,17,29,29,29,29,29,29,
+        9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+        9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,15,15,15,15,15,15,15,14,9,9,9,9,
+        9,9,9,9,9,9,9,9,9,9,9,9,15,15,15,15,15,15,15,14,15,15,15,14,15,15,15,29,29,10,11,12,
+        13,29,16,16,16,16,16,16,14,14,16,16,16,16,16,16,16,15,15,15,14,15,15,15,29,29,10,11,12,13,29,8,
+        7,6,5,4,3,2,2,2,2,2,9,9,9,9,9,9,9,9,9,8,7,6,5,4,3,2,2,2,2,1,1,1,
+        1,1,1,1,1,1,1,1,1,1,1
+    ];
+
     public static IReadOnlyList<OriginalStrategicPropertyDefinition> Properties => PropertyRows;
 
     public static IReadOnlyList<int> InitialActiveHouseholdCounts => InitialHouseholdCounts;
@@ -211,17 +231,17 @@ public static class OriginalStrategicMovement
     }
 
     public static StrategicGenerationClockAdvance AdvanceGenerationClock(
-        int accumulatorMilliseconds,
-        int elapsedMilliseconds,
+        int accumulatorUnits,
+        int speedMultiplier,
         int activeMovementCount,
         int? roll)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative(accumulatorMilliseconds);
-        ArgumentOutOfRangeException.ThrowIfNegative(elapsedMilliseconds);
+        ArgumentOutOfRangeException.ThrowIfNegative(accumulatorUnits);
+        ValidateSpeedMultiplier(speedMultiplier);
         ArgumentOutOfRangeException.ThrowIfNegative(activeMovementCount);
 
-        if (accumulatorMilliseconds < GenerationIntervalMilliseconds)
-            return new(checked(accumulatorMilliseconds + elapsedMilliseconds), BoundaryReached: false,
+        if (accumulatorUnits < GenerationIntervalUnits)
+            return new(checked(accumulatorUnits + speedMultiplier), BoundaryReached: false,
                 RollConsumed: false, StartGeneration: false);
 
         if (activeMovementCount >= SlotCount)
@@ -329,20 +349,27 @@ public static class OriginalStrategicMovement
         return (profile == ReducedTerrainProfile ? ReducedTerrainSpeeds : PrimaryTerrainSpeeds)[terrainKind];
     }
 
+    public static int TerrainKindForTile(int tileId)
+    {
+        if (tileId < 0 || tileId >= TerrainKindsByTile.Length)
+            throw new ArgumentOutOfRangeException(nameof(tileId));
+        return TerrainKindsByTile[tileId];
+    }
+
     public static StrategicRoutedStep CalculateRoutedStep(
         float normalizedDirectionX,
         float normalizedDirectionY,
-        int elapsedMilliseconds,
+        int speedMultiplier,
         int profile,
         int terrainKind)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative(elapsedMilliseconds);
+        ValidateSpeedMultiplier(speedMultiplier);
         if (terrainKind == ImpassableTerrainKind)
             return new(0, 0, StrategicRoutedStepOutcome.DeactivateForImpassableTerrain);
 
         var speed = TerrainSpeed(profile, terrainKind);
-        var deltaX = (double)normalizedDirectionX * speed * elapsedMilliseconds;
-        var deltaY = (double)normalizedDirectionY * speed * elapsedMilliseconds;
+        var deltaX = (double)normalizedDirectionX * speed * speedMultiplier;
+        var deltaY = (double)normalizedDirectionY * speed * speedMultiplier;
         return new(
             (float)deltaX,
             (float)deltaY,
@@ -450,6 +477,12 @@ public static class OriginalStrategicMovement
         if (slot < 0 || slot >= SlotCount) throw new ArgumentOutOfRangeException(parameterName);
     }
 
+    private static void ValidateSpeedMultiplier(int speedMultiplier)
+    {
+        if (speedMultiplier is < MinimumSpeedMultiplier or > MaximumSpeedMultiplier)
+            throw new ArgumentOutOfRangeException(nameof(speedMultiplier));
+    }
+
     private static OriginalStrategicRoute[] BuildPropertyRouteResources()
     {
         var routes = new List<OriginalStrategicRoute>();
@@ -519,7 +552,7 @@ public readonly record struct OriginalStrategicTerrainProfileDefinition(
 }
 
 public readonly record struct StrategicGenerationClockAdvance(
-    int AccumulatorMilliseconds,
+    int AccumulatorUnits,
     bool BoundaryReached,
     bool RollConsumed,
     bool StartGeneration);

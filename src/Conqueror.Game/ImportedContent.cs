@@ -197,6 +197,7 @@ public sealed class ImportedContentCatalog
                 ("resource", $":{route.ResourceName}")))
             .Concat(OriginalStrategicMovement.StartingRoutes.Select(route =>
                 ("resource", $":{route.ResourceName}")))
+            .Append(("resource", ":icon.jp"))
             .Append(("resource", ":weapons.dat"))
             .ToArray();
         var missing = required.FirstOrDefault(item => catalog.FindId(item.Item1, item.Item2) is null);
@@ -345,6 +346,22 @@ public sealed class ImportedContentCatalog
             using var memory = new MemoryStream();
             stream.CopyTo(memory);
             return StrategicRouteDecoder.Decode(memory.ToArray());
+        }
+        catch (InvalidDataException)
+        {
+            return null;
+        }
+    }
+
+    public StrategicWorldGrid? DecodeStrategicWorldGrid(string id)
+    {
+        using var stream = Open(id);
+        if (stream is null) return null;
+        try
+        {
+            using var memory = new MemoryStream();
+            stream.CopyTo(memory);
+            return StrategicWorldGridDecoder.Decode(memory.ToArray());
         }
         catch (InvalidDataException)
         {

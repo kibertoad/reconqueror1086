@@ -127,6 +127,8 @@ internal static class LinearExecutableCodeReferences
     {
         const int limitOffset = 0x7389;
         const int terrainKindOffset = 0xAF78;
+        const int terrainTileKindCount = 331;
+        const int strategicGridScratchNameOffset = 0x5CBC;
         const int selectedProfileOffset = 0xB610;
         const int primarySpeedOffset = 0xB614;
         const int reducedSpeedOffset = 0xB68C;
@@ -183,6 +185,10 @@ internal static class LinearExecutableCodeReferences
 
         var report = new StringBuilder("# Strategic movement metadata (derived values; original bytes omitted)\n");
         report.AppendLine($"# terrain-kind lookup object2+0x{terrainKindOffset:X}; 30 speed entries per table");
+        report.AppendLine($"strategic-grid-scratch {ReadAscii(strategicGridScratchNameOffset)}");
+        report.AppendLine("strategic-grid-layout cell 80x80 rows 200 columns 400 column-major-dwords");
+        report.AppendLine("terrain-kinds-by-tile " + string.Join(' ', Enumerable.Range(0, terrainTileKindCount)
+            .Select(index => ReadByte(terrainKindOffset + index))));
         report.AppendLine($"horizontal-application-limit {ReadDouble(limitOffset).ToString("R", CultureInfo.InvariantCulture)}");
         report.AppendLine($"initial-profile {ReadInt32(selectedProfileOffset)}");
         report.AppendLine("profile-pointers " + string.Join(' ', Enumerable.Range(0, profileCount)
