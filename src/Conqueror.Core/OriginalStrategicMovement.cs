@@ -177,7 +177,7 @@ public static class OriginalStrategicMovement
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(toProperty, PropertyCount);
 
         if (fromProperty == toProperty ||
-            (Math.Min(fromProperty, toProperty) == 0 && Math.Max(fromProperty, toProperty) == 12))
+            (Math.Min(fromProperty, toProperty) == 6 && Math.Max(fromProperty, toProperty) == 12))
         {
             route = default;
             return false;

@@ -182,8 +182,10 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(new OriginalStrategicRoute("rt_3_14.rat", Reverse: true), okehamptonToChester);
 
         Assert.False(OriginalStrategicMovement.TryGetPropertyRoute(4, 4, out _));
-        Assert.False(OriginalStrategicMovement.TryGetPropertyRoute(0, 12, out _));
-        Assert.False(OriginalStrategicMovement.TryGetPropertyRoute(12, 0, out _));
+        Assert.True(OriginalStrategicMovement.TryGetPropertyRoute(0, 12, out var yorkToDunster));
+        Assert.Equal(new OriginalStrategicRoute("rt_1_13.rat", Reverse: false), yorkToDunster);
+        Assert.False(OriginalStrategicMovement.TryGetPropertyRoute(6, 12, out _));
+        Assert.False(OriginalStrategicMovement.TryGetPropertyRoute(12, 6, out _));
 
         var supported = 0;
         for (var from = 0; from < OriginalStrategicMovement.PropertyCount; from++)
