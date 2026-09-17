@@ -15,17 +15,30 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(0x60, OriginalStrategicMovement.GenerationStartThreshold);
 
         Assert.Equal(0x00, OriginalStrategicMovement.ActiveOffset);
+        Assert.Equal(0x0C, OriginalStrategicMovement.PathCompleteOffset);
         Assert.Equal(0x14, OriginalStrategicMovement.TargetLocationOffset);
+        Assert.Equal(0x18, OriginalStrategicMovement.WaypointCountOffset);
         Assert.Equal(0x1C, OriginalStrategicMovement.SwordsmenOffset);
         Assert.Equal(0x20, OriginalStrategicMovement.HalberdiersOffset);
         Assert.Equal(0x24, OriginalStrategicMovement.KnightsOffset);
         Assert.Equal(0x28, OriginalStrategicMovement.OriginLocationOffset);
         Assert.Equal(0x2C, OriginalStrategicMovement.LordOffset);
         Assert.Equal(0x34, OriginalStrategicMovement.ModeOffset);
+        Assert.Equal(0x3C, OriginalStrategicMovement.DestinationXOffset);
+        Assert.Equal(0x40, OriginalStrategicMovement.DestinationYOffset);
+        Assert.Equal(0x44, OriginalStrategicMovement.GridXOffset);
+        Assert.Equal(0x48, OriginalStrategicMovement.GridYOffset);
         Assert.Equal(0x5C, OriginalStrategicMovement.CurrentXOffset);
         Assert.Equal(0x60, OriginalStrategicMovement.CurrentYOffset);
         Assert.Equal(0x64, OriginalStrategicMovement.DirectionXOffset);
         Assert.Equal(0x68, OriginalStrategicMovement.DirectionYOffset);
+        Assert.Equal(0x6C, OriginalStrategicMovement.RoutePointerOffset);
+        Assert.Equal(1, OriginalStrategicMovement.DirectPropertyMode);
+        Assert.Equal(2, OriginalStrategicMovement.RoutedMode);
+        Assert.Equal(3, OriginalStrategicMovement.PursuitMode);
+        Assert.Equal(0xFFFF, OriginalStrategicMovement.CompletedSignal);
+        Assert.Equal(6, OriginalStrategicMovement.WaypointCoordinateTolerance);
+        Assert.Equal(50, OriginalStrategicMovement.MaximumRoutedStep);
     }
 
     [Fact]
@@ -110,6 +123,25 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(
             OriginalStrategicMovement.Properties.Select(property => (int)property.Lord),
             [13, 20, 35, 59, 73, 88, 96, 100, 1, 113, 119, 143, 155, 171]);
+    }
+
+    [Fact]
+    public void OriginalStrategicCompletionUsesFixedProbeOrderAndContactPrecedence()
+    {
+        Assert.Equal(
+            [new(0, 0), new(0, -2), new(1, 0), new(-1, -1), new(0, 1)],
+            OriginalStrategicMovement.ContactProbes);
+
+        Assert.Equal(StrategicContactOutcome.Encounter,
+            OriginalStrategicMovement.ResolveCompletedContact(4, 0, contactedPersonEligible: true));
+        Assert.Equal(StrategicContactOutcome.Retarget,
+            OriginalStrategicMovement.ResolveCompletedContact(4, 0, contactedPersonEligible: false));
+        Assert.Equal(StrategicContactOutcome.ReinforceOriginAndDeactivate,
+            OriginalStrategicMovement.ResolveCompletedContact(4, 4, contactedPersonEligible: true));
+        Assert.Equal(StrategicContactOutcome.Retarget,
+            OriginalStrategicMovement.ResolveCompletedContact(4, 3, contactedPersonEligible: true));
+        Assert.Equal(StrategicContactOutcome.Retarget,
+            OriginalStrategicMovement.ResolveCompletedContact(0, null, contactedPersonEligible: true));
     }
 
     [Theory]

@@ -14,17 +14,31 @@ public static class OriginalStrategicMovement
     public const int GenerationStartThreshold = 0x60;
 
     public const int ActiveOffset = 0x00;
+    public const int PathCompleteOffset = 0x0C;
     public const int TargetLocationOffset = 0x14;
+    public const int WaypointCountOffset = 0x18;
     public const int SwordsmenOffset = 0x1C;
     public const int HalberdiersOffset = 0x20;
     public const int KnightsOffset = 0x24;
     public const int OriginLocationOffset = 0x28;
     public const int LordOffset = 0x2C;
     public const int ModeOffset = 0x34;
+    public const int DestinationXOffset = 0x3C;
+    public const int DestinationYOffset = 0x40;
+    public const int GridXOffset = 0x44;
+    public const int GridYOffset = 0x48;
     public const int CurrentXOffset = 0x5C;
     public const int CurrentYOffset = 0x60;
     public const int DirectionXOffset = 0x64;
     public const int DirectionYOffset = 0x68;
+    public const int RoutePointerOffset = 0x6C;
+
+    public const int DirectPropertyMode = 1;
+    public const int RoutedMode = 2;
+    public const int PursuitMode = 3;
+    public const int CompletedSignal = 0xFFFF;
+    public const int WaypointCoordinateTolerance = 6;
+    public const int MaximumRoutedStep = 50;
 
     public const int PropertyTableAddress = 0xB8EC;
     public const int PropertyCount = 14;
@@ -91,11 +105,35 @@ public static class OriginalStrategicMovement
         new("Okehampton", 0x6D80, 13, 14, 24)
     ];
 
+    private static readonly StrategicContactProbe[] ContactProbeRows =
+    [
+        new(0, 0),
+        new(0, -2),
+        new(1, 0),
+        new(-1, -1),
+        new(0, 1)
+    ];
+
     public static IReadOnlyList<OriginalStrategicPropertyDefinition> Properties => PropertyRows;
 
     public static IReadOnlyList<int> InitialActiveHouseholdCounts => InitialHouseholdCounts;
 
     public static IReadOnlyList<OriginalStrategicPropertyIdentity> PropertyIdentities => PropertyIdentityRows;
+
+    public static IReadOnlyList<StrategicContactProbe> ContactProbes => ContactProbeRows;
+
+    public static StrategicContactOutcome ResolveCompletedContact(
+        int originOwnerOrState,
+        int? contactedAssignment,
+        bool contactedPersonEligible)
+    {
+        if (contactedAssignment is 0 && contactedPersonEligible)
+            return StrategicContactOutcome.Encounter;
+
+        return contactedAssignment == originOwnerOrState
+            ? StrategicContactOutcome.ReinforceOriginAndDeactivate
+            : StrategicContactOutcome.Retarget;
+    }
 
     public static StrategicTroopCounts InitialForces(int activeHouseholdCount, int lordRating)
     {
@@ -127,6 +165,15 @@ public readonly record struct OriginalStrategicPropertyIdentity(
     byte PersonGroup,
     byte InitialAssignment,
     byte LordRating);
+
+public readonly record struct StrategicContactProbe(int X, int Y);
+
+public enum StrategicContactOutcome
+{
+    Encounter,
+    ReinforceOriginAndDeactivate,
+    Retarget
+}
 
 public readonly record struct StrategicTroopCounts(int Swordsmen, int Halberdiers, int Knights)
 {
