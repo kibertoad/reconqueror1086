@@ -115,6 +115,8 @@ public static class OriginalStrategicMovement
         new(0, 1)
     ];
 
+    private static readonly OriginalStrategicRoute[] PropertyRouteResourceRows = BuildPropertyRouteResources();
+
     public static IReadOnlyList<OriginalStrategicPropertyDefinition> Properties => PropertyRows;
 
     public static IReadOnlyList<int> InitialActiveHouseholdCounts => InitialHouseholdCounts;
@@ -122,6 +124,8 @@ public static class OriginalStrategicMovement
     public static IReadOnlyList<OriginalStrategicPropertyIdentity> PropertyIdentities => PropertyIdentityRows;
 
     public static IReadOnlyList<StrategicContactProbe> ContactProbes => ContactProbeRows;
+
+    public static IReadOnlyList<OriginalStrategicRoute> PropertyRouteResources => PropertyRouteResourceRows;
 
     public static StrategicContactOutcome ResolveCompletedContact(
         int originOwnerOrState,
@@ -181,6 +185,15 @@ public static class OriginalStrategicMovement
         var dx = (long)first.X - second.X;
         var dy = (long)first.Y - second.Y;
         return checked(dx * dx + dy * dy);
+    }
+
+    private static OriginalStrategicRoute[] BuildPropertyRouteResources()
+    {
+        var routes = new List<OriginalStrategicRoute>();
+        for (var from = 0; from < PropertyCount; from++)
+        for (var to = from + 1; to < PropertyCount; to++)
+            if (TryGetPropertyRoute(from, to, out var route)) routes.Add(route);
+        return [.. routes];
     }
 
     public static StrategicTroopCounts InitialForces(int activeHouseholdCount, int lordRating)

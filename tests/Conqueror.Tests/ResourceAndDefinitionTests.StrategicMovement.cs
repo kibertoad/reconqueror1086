@@ -1,4 +1,7 @@
 using Conqueror.Core;
+using Conqueror.Game;
+using Conqueror.Resources;
+using System.Buffers.Binary;
 using Xunit;
 
 namespace Conqueror.Tests;
@@ -164,6 +167,9 @@ public sealed partial class ResourceAndDefinitionTests
             if (OriginalStrategicMovement.TryGetPropertyRoute(from, to, out _)) supported++;
 
         Assert.Equal(180, supported);
+        Assert.Equal(90, OriginalStrategicMovement.PropertyRouteResources.Count);
+        Assert.Equal(90, OriginalStrategicMovement.PropertyRouteResources
+            .Select(route => route.ResourceName).Distinct(StringComparer.OrdinalIgnoreCase).Count());
     }
 
     [Fact]
@@ -185,6 +191,73 @@ public sealed partial class ResourceAndDefinitionTests
             OriginalStrategicMovement.SelectRetarget(new(0, 0), armies, new(500, 0), new(400, 0)));
         Assert.Equal(new StrategicRetargetSelection(StrategicRetargetKind.Player, -1),
             OriginalStrategicMovement.SelectRetarget(new(0, 0), [], new(400, 0), new(400, 0)));
+    }
+
+    [Fact]
+    public void StrategicRouteDecoderReadsExactSignedCoordinatePairs()
+    {
+        var data = new byte[4 + 3 * StrategicRouteDecoder.PointSize];
+        BinaryPrimitives.WriteInt32LittleEndian(data, 3);
+        BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(4), 0x2A30);
+        BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(8), 0x04B0);
+        BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(12), -7);
+        BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(16), 9);
+        BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(20), int.MinValue);
+        BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(24), int.MaxValue);
+
+        var route = StrategicRouteDecoder.Decode(data);
+
+        Assert.Equal(
+            [new StrategicRoutePoint(0x2A30, 0x04B0), new(-7, 9), new(int.MinValue, int.MaxValue)],
+            route.Points);
+    }
+
+    [Fact]
+    public void StrategicRouteDecoderRejectsInvalidCountsAndTrailingData()
+    {
+        Assert.Throws<InvalidDataException>(() => StrategicRouteDecoder.Decode([]));
+        Assert.Throws<InvalidDataException>(() => StrategicRouteDecoder.Decode([0, 0, 0, 0]));
+
+        var oversized = new byte[4];
+        BinaryPrimitives.WriteInt32LittleEndian(oversized, StrategicRouteDecoder.MaximumPointCount + 1);
+        Assert.Throws<InvalidDataException>(() => StrategicRouteDecoder.Decode(oversized));
+
+        var trailing = new byte[13];
+        BinaryPrimitives.WriteInt32LittleEndian(trailing, 1);
+        Assert.Throws<InvalidDataException>(() => StrategicRouteDecoder.Decode(trailing));
+    }
+
+    [Fact]
+    public void ImportedContentCatalogDecodesStrategicRoutesWithoutExposingMalformedData()
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"conqueror-strategic-route-{Guid.NewGuid():N}");
+        try
+        {
+            var relative = Path.Combine("Decoded", "route.rat");
+            var path = Path.Combine(root, relative);
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            var data = new byte[4 + StrategicRouteDecoder.PointSize];
+            BinaryPrimitives.WriteInt32LittleEndian(data, 1);
+            BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(4), 123);
+            BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(8), -456);
+            File.WriteAllBytes(path, data);
+            var asset = new ImportedAsset(
+                "C1086.GOB#67:rt_1_2.rat", relative, "resource", data.Length, ResourceHash.Sha256(path));
+            new ImportManifest(1, new string('a', 64), [asset]).Write(Path.Combine(root, "manifest.json"));
+
+            var catalog = Assert.IsType<ImportedContentCatalog>(ImportedContentCatalog.Discover(root));
+            Assert.Equal(
+                new StrategicRoutePoint(123, -456),
+                Assert.Single(Assert.IsType<StrategicRouteResource>(
+                    catalog.DecodeStrategicRoute(asset.Id)).Points));
+
+            File.WriteAllBytes(path, [1, 0, 0, 0]);
+            Assert.Null(catalog.DecodeStrategicRoute(asset.Id));
+        }
+        finally
+        {
+            if (Directory.Exists(root)) Directory.Delete(root, recursive: true);
+        }
     }
 
     [Theory]

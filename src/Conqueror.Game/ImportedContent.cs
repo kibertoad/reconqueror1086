@@ -193,6 +193,8 @@ public sealed class ImportedContentCatalog
                 ("resource", ":all.vtb")
             })
             .Concat(Enumerable.Range(0, 30).Select(number => ("resource", $":dilem{number}.dat")))
+            .Concat(OriginalStrategicMovement.PropertyRouteResources.Select(route =>
+                ("resource", $":{route.ResourceName}")))
             .Append(("resource", ":weapons.dat"))
             .ToArray();
         var missing = required.FirstOrDefault(item => catalog.FindId(item.Item1, item.Item2) is null);
@@ -325,6 +327,22 @@ public sealed class ImportedContentCatalog
             using var memory = new MemoryStream();
             stream.CopyTo(memory);
             return WeaponStoreDecoder.Decode(memory.ToArray());
+        }
+        catch (InvalidDataException)
+        {
+            return null;
+        }
+    }
+
+    public StrategicRouteResource? DecodeStrategicRoute(string id)
+    {
+        using var stream = Open(id);
+        if (stream is null) return null;
+        try
+        {
+            using var memory = new MemoryStream();
+            stream.CopyTo(memory);
+            return StrategicRouteDecoder.Decode(memory.ToArray());
         }
         catch (InvalidDataException)
         {
