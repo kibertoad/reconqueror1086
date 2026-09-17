@@ -4,7 +4,8 @@ cd /d "%~dp0"
 set "SOURCE=%~1"
 if "%SOURCE%"=="" set "SOURCE=C:\GOG Games\Conqueror AD1086"
 set "DOTNET_EXE="
-for %%D in (dotnet.exe) do set "DOTNET_EXE=%%~$PATH:D"
+if exist "%USERPROFILE%\.dotnet\dotnet.exe" set "DOTNET_EXE=%USERPROFILE%\.dotnet\dotnet.exe"
+if not defined DOTNET_EXE for %%D in (dotnet.exe) do set "DOTNET_EXE=%%~$PATH:D"
 if not defined DOTNET_EXE (
     echo The .NET 10 SDK is required.
     pause
