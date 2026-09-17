@@ -597,10 +597,13 @@ public sealed partial class ConquerorGame
                 .Where(item => item.Enemy.Health > 0 || item.Enemy.VisualState == SiegeEnemyVisualState.Dying)
                 .OrderBy(item => item.ForwardDistance)
                 .ToArray();
-        var x = projections.Length == 0
-            ? SiegeCombatPresentation.Viewport.Width / 2
-            : (int)Math.Round(projections[0].ScreenPosition * SiegeCombatPresentation.Viewport.Width);
-        return (x, SiegeCombatPresentation.Viewport.Height / 2);
+        if (projections.Length == 0 || _siegeVisuals is null)
+            return (SiegeCombatPresentation.Viewport.Width / 2,
+                SiegeCombatPresentation.Viewport.Height / 2);
+        var target = projections[0];
+        var layout = SiegeViewProjection.ActorLayout(target, SceneActorBlock(target.Enemy),
+            SiegeCombatPresentation.Viewport.Width, SiegeCombatPresentation.Viewport.Height);
+        return (layout.Left + layout.Width / 2, layout.Top + layout.Height / 2);
     }
 
     private (int X, int Y)? SiegePointerTarget(MouseState mouse)

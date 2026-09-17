@@ -140,6 +140,9 @@ public sealed partial class ResourceAndDefinitionTests
     public void SceneColorMapsRemapRgbWithoutTurningMappedBlackTransparent()
     {
         var palette = new byte[IndexedPalette.ByteSize];
+        palette[0] = 200;
+        palette[1] = 201;
+        palette[2] = 202;
         palette[3] = 10;
         palette[4] = 11;
         palette[5] = 12;
@@ -148,7 +151,7 @@ public sealed partial class ResourceAndDefinitionTests
         palette[8] = 22;
         var colorMap = Enumerable.Range(0, DynamixSceneColorMaps.EntryCount).Select(value => (byte)value).ToArray();
         colorMap[1] = 2;
-        colorMap[2] = 0;
+        colorMap[2] = 3;
 
         var rgba = IndexedScenePixels.ToRgba([0, 1, 2], palette, colorMap: colorMap);
 

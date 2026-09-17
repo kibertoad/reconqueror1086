@@ -19,10 +19,20 @@ public static class IndexedScenePixels
             var mapped = colorMap.IsEmpty ? sourceIndex : colorMap[sourceIndex];
             var paletteOffset = mapped * 3;
             var target = pixel * 4;
+            if (transparentZero && sourceIndex == 0)
+            {
+                // MonoGame's default AlphaBlend expects premultiplied color.
+                // Keeping palette RGB beside alpha zero produces a bright box.
+                rgba[target] = 0;
+                rgba[target + 1] = 0;
+                rgba[target + 2] = 0;
+                rgba[target + 3] = 0;
+                continue;
+            }
             rgba[target] = palette[paletteOffset];
             rgba[target + 1] = palette[paletteOffset + 1];
             rgba[target + 2] = palette[paletteOffset + 2];
-            rgba[target + 3] = transparentZero && sourceIndex == 0 ? (byte)0 : (byte)255;
+            rgba[target + 3] = 255;
         }
         return rgba;
     }

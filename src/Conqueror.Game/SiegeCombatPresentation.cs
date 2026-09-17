@@ -106,6 +106,19 @@ public static class SiegeCombatPresentation
 
     public static SiegeFrameRun BloodFramesFor(bool fatal) => fatal ? FatalHitBlood : WoundingHitBlood;
 
+    public static UiBounds BackdropSource(Facing facing, int width, int height)
+    {
+        var panoramaRemainder = width - OriginalWidth;
+        if (panoramaRemainder < 0 || panoramaRemainder % 3 != 0 || height < OriginalHeight)
+            throw new InvalidDataException("The combat backdrop does not contain four overlapping screen views.");
+        var facingStride = panoramaRemainder / 3;
+        return new UiBounds(
+            (int)facing * facingStride + Viewport.X,
+            Viewport.Y,
+            Viewport.Width,
+            Viewport.Height);
+    }
+
     public static SiegeRetainerCommand? RetainerCommandAt(int x, int y)
     {
         foreach (var button in RetainerCommandButtons)

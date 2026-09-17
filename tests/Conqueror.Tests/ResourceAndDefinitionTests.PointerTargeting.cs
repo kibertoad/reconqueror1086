@@ -28,6 +28,18 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void ImportedActorLayoutUsesExecutableWidthDepthAndElevationProjection()
+    {
+        var source = SyntheticScene();
+        var scene = DynamixSceneDecoder.Decode(source.Viewer, source.Scenario, source.Map, source.Blocks);
+        var block = scene.Blocks[0] with { LowerElevation = 0, Height = 256 };
+        var actor = new SiegeEnemyProjection(0.75, 2, new SiegeEnemy());
+
+        Assert.Equal(new SiegeBillboardLayout(50, 15, 50, 51),
+            SiegeViewProjection.ActorLayout(actor, block, 100, 80));
+    }
+
+    [Fact]
     public void PrimaryPointerRequiresAProjectedBlockRatherThanInventingAFloorPlane()
     {
         var tiles = new SiegeTile[12, 12];

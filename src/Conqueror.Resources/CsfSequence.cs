@@ -16,10 +16,11 @@ public sealed record CsfFrame(int Width, int Height, byte[] Indices, byte[] Alph
         {
             var palette = Indices[pixel] * 3;
             var target = pixel * 4;
-            rgba[target] = paletteRgb[palette];
-            rgba[target + 1] = paletteRgb[palette + 1];
-            rgba[target + 2] = paletteRgb[palette + 2];
-            rgba[target + 3] = Alpha[pixel];
+            var alpha = Alpha[pixel];
+            rgba[target] = (byte)(paletteRgb[palette] * alpha / 255);
+            rgba[target + 1] = (byte)(paletteRgb[palette + 1] * alpha / 255);
+            rgba[target + 2] = (byte)(paletteRgb[palette + 2] * alpha / 255);
+            rgba[target + 3] = alpha;
         }
         return rgba;
     }

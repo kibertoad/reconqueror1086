@@ -1,4 +1,5 @@
 using Conqueror.Core;
+using Conqueror.Resources;
 
 namespace Conqueror.Game;
 
@@ -24,7 +25,6 @@ public readonly record struct SiegeBillboardLayout(int Left, int Top, int Width,
 
 public static class SiegeViewProjection
 {
-    public const double FieldOfView = Math.PI / 3.0;
     public const double MaximumDistance = 48.0;
     private const int OriginalCameraHeight8 = 0x80;
     private const int OriginalRayForward14 = 0x4000;
@@ -146,7 +146,9 @@ public static class SiegeViewProjection
             var forward = dx * forwardX + dy * forwardY;
             if (forward <= 0.05 || forward > MaximumDistance) continue;
             var lateral = dx * rightX + dy * rightY;
-            var screen = 0.5 + lateral / (forward * 2.0 * Math.Tan(FieldOfView / 2.0));
+            // Viewer setup 0x5421F-0x542E4 uses forward basis 0x4000 and
+            // one viewport-width of lateral basis. This is its inverse.
+            var screen = 0.5 + lateral / forward;
             if (screen is < -0.25 or > 1.25) continue;
             result.Add(new SiegeEnemyProjection(screen, forward, enemy));
         }
@@ -168,7 +170,7 @@ public static class SiegeViewProjection
             var forward = dx * forwardX + dy * forwardY;
             if (forward <= 0.05 || forward > MaximumDistance) continue;
             var lateral = dx * rightX + dy * rightY;
-            var screen = 0.5 + lateral / (forward * 2.0 * Math.Tan(FieldOfView / 2.0));
+            var screen = 0.5 + lateral / forward;
             if (screen is < -0.25 or > 1.25) continue;
             result.Add(new SiegeObjectProjection(screen, forward, item));
         }
@@ -190,6 +192,23 @@ public static class SiegeViewProjection
             ? Math.Max(10, height / 2)
             : Math.Max(10, height * textureWidth.Value / textureHeight!.Value);
         return BillboardLayout(projection.ScreenPosition, wallHeight, width, height, viewportWidth, viewportHeight);
+    }
+
+    public static SiegeBillboardLayout ActorLayout(
+        SiegeEnemyProjection projection, DynamixSceneBlock block,
+        int viewportWidth, int viewportHeight)
+    {
+        ArgumentNullException.ThrowIfNull(block);
+        if (viewportWidth <= 0) throw new ArgumentOutOfRangeException(nameof(viewportWidth));
+        if (viewportHeight <= 0) throw new ArgumentOutOfRangeException(nameof(viewportHeight));
+        var depth8 = Math.Max(0x10, (int)Math.Round(projection.ForwardDistance * 256));
+        var center = (int)Math.Round(projection.ScreenPosition * viewportWidth);
+        var width = Math.Max(1, viewportWidth * 256 / depth8);
+        var horizon = viewportHeight / 2;
+        var top = horizon - (block.UpperElevation - OriginalCameraHeight8) * viewportWidth / depth8;
+        var bottom = horizon + (OriginalCameraHeight8 - block.LowerElevation) * viewportWidth / depth8;
+        return new SiegeBillboardLayout(
+            center - width / 2, top, width, Math.Max(1, bottom - top + 1));
     }
 
     public static SiegeBillboardLayout ObjectLayout(

@@ -190,55 +190,17 @@ public sealed partial class ConquerorGame
             DynamixSceneColorMapGenerator.RegenerateFirstFamily(
                 imported.ColorMaps, palette.Rgb, imported.Scene.ColorMapping);
 
-        var required = new HashSet<int>();
-        void Require(DynamixSceneBlock block)
-        {
-            foreach (var index in block.TextureReferences())
-                if (index >= 0) required.Add(index);
-        }
+        var required = SiegeTextureDependencies.RenderTextures(
+            imported.Scene, imported.Layout, imported.SourceOriginX, imported.SourceOriginY,
+            _campaign.State.Player.HeraldicColor);
+        var acquisitionRequired = SiegeTextureDependencies.AcquisitionTextures(imported.Scene);
+        var sources = ImportedSiegeLayouts.LoadCombatTextureSources(
+            _importedContent, imported.ArchiveId, required.Concat(acquisitionRequired));
 
-        var layoutTiles = imported.Layout.CopyTiles();
-        for (var x = 0; x < layoutTiles.GetLength(0); x++)
-        for (var y = 0; y < layoutTiles.GetLength(1); y++)
-        {
-            var block = imported.Scene.BlockAt(x + imported.SourceOriginX, y + imported.SourceOriginY);
-            Require(block);
-        }
-        foreach (var spawn in imported.Layout.Enemies.Where(spawn => spawn.VisualId >= 0 &&
-                     spawn.VisualId < imported.Scene.Blocks.Count))
-        {
-            var block = imported.Scene.Blocks[spawn.VisualId];
-            if (block.Kind != 4 || block.Surface0 < 0) continue;
-            for (var frame = 0; frame < 15 && block.Surface0 + frame < imported.Scene.TextureCount; frame++)
-                required.Add(block.Surface0 + frame);
-            foreach (var (stateOffset, frameCount) in new[] { (1, 9), (2, 3), (3, 8) })
-            {
-                var stateIndex = block.Index + stateOffset;
-                if (stateIndex >= imported.Scene.Blocks.Count) continue;
-                var state = imported.Scene.Blocks[stateIndex];
-                if (state.Kind != 4 || !state.Name.Equals(block.Name, StringComparison.OrdinalIgnoreCase) ||
-                    state.Surface0 < 0) continue;
-                for (var frame = 0; frame < frameCount && state.Surface0 + frame < imported.Scene.TextureCount; frame++)
-                    required.Add(state.Surface0 + frame);
-            }
-        }
-        foreach (var stage in imported.Layout.Objects.SelectMany(item => item.Stages)
-                     .Where(stage => stage.VisualId >= 0 && stage.VisualId < imported.Scene.Blocks.Count))
-            Require(imported.Scene.Blocks[stage.VisualId]);
-        var acquisitionRequired = imported.Scene.Blocks
-            .SelectMany(block => block.RaycastTextureReferences())
-            .ToHashSet();
         var textures = new Dictionary<int, Texture2D>();
-        var sources = new Dictionary<int, DynamixSceneTexture>();
-        foreach (var id in _importedContent.Ids("resource").Where(id =>
-                     id.StartsWith(imported.ArchiveId + "#", StringComparison.OrdinalIgnoreCase) &&
-                     id.Contains(":TEX", StringComparison.OrdinalIgnoreCase)))
+        foreach (var index in required)
         {
-            var decoded = _importedContent.DecodeSceneTexture(id);
-            if (decoded is null || sources.ContainsKey(decoded.Index)
-                || !required.Contains(decoded.Index) && !acquisitionRequired.Contains(decoded.Index)) continue;
-            sources.Add(decoded.Index, decoded);
-            if (!required.Contains(decoded.Index)) continue;
+            var decoded = sources[index];
             var texture = new Texture2D(GraphicsDevice, decoded.Width, decoded.Height, false, SurfaceFormat.Color);
             texture.SetData(IndexedScenePixels.ToRgba(decoded.Indices, palette.Rgb));
             textures.Add(decoded.Index, texture);
@@ -258,9 +220,12 @@ public sealed partial class ConquerorGame
         return visuals;
     }
 
-    private Texture2D? SceneWallTexture(SiegeRayHit hit)
+    private Texture2D SceneWallTexture(SiegeRayHit hit)
     {
-        if (_siegeVisuals is null || SceneBlockForHit(hit) is not { } block) return null;
+        var visuals = _siegeVisuals ?? throw new InvalidOperationException(
+            "Imported siege visuals must be active before rendering.");
+        var block = SceneBlockForHit(hit) ?? throw new InvalidDataException(
+            "The imported siege ray contacted a block outside the active scene.");
         var face = hit.Face switch
         {
             SiegeWallFace.North => DynamixSceneFace.North,
@@ -270,7 +235,9 @@ public sealed partial class ConquerorGame
         };
         var colorMapIndex = SiegeColorMapping.WallDistanceMap(
             hit.Distance, _siegeVisuals.Scene.ColorMapping, block.ColorMapOffset);
-        return _siegeVisuals.TextureFor(block.TextureForFace(face), colorMapIndex);
+        var textureIndex = block.TextureForFace(face);
+        return visuals.TextureFor(textureIndex, colorMapIndex) ?? throw new InvalidDataException(
+            $"The imported siege wall references unavailable texture {textureIndex}.");
     }
 
     private DynamixSceneBlock? SceneBlockForHit(SiegeRayHit hit)
@@ -366,20 +333,19 @@ public sealed partial class ConquerorGame
         return new Rectangle(viewport.X, top, viewport.Width, Math.Max(1, bottom - top + 1));
     }
 
-    private (Texture2D? Texture, bool Flip) SceneEnemyTexture(
+    private (Texture2D Texture, bool Flip) SceneEnemyTexture(
         SiegeEnemy enemy, bool friendly, double distance)
     {
-        if (_siegeVisuals is null || enemy.VisualId < 0 || enemy.VisualId >= _siegeVisuals.Scene.Blocks.Count)
-            return (null, false);
-        var block = _siegeVisuals.Scene.Blocks[enemy.VisualId];
+        var visuals = _siegeVisuals ?? throw new InvalidOperationException(
+            "Imported siege visuals must be active before rendering.");
+        if (enemy.VisualId < 0 || enemy.VisualId >= visuals.Scene.Blocks.Count)
+            throw new InvalidDataException($"Siege actor references invalid visual block {enemy.VisualId}.");
+        var block = visuals.Scene.Blocks[enemy.VisualId];
         var colors = SiegeActorColorMapping.Normalize(
             _campaign.State.Player.HeraldicColor, friendly, block.Flags, block.Surface0);
-        var frame = _siege is null
-            ? new SiegeEnemyFrame(4, false)
-            : SiegeViewProjection.FrameFor(enemy, _siege.PlayerX, _siege.PlayerY);
-        var relativeHeading = frame.FlipHorizontally
-            ? (256 - frame.DirectionOffset * 32) & 0xff
-            : frame.DirectionOffset * 32;
+        var actorHeading = enemy.OriginalHeading8 ?? (int)enemy.Facing << 6;
+        var viewerHeading = _siege is null ? 0 : (int)_siege.Facing << 6;
+        var relativeHeading = (actorHeading - viewerHeading) & 0xff;
         var selectedBlock = block;
         if (enemy.VisualState == SiegeEnemyVisualState.Attack)
             selectedBlock = ActorStateBlock(block, 1);
@@ -399,8 +365,9 @@ public sealed partial class ConquerorGame
             textureIndex += enemy.WalkFrame * stride;
         }
         var colorMapIndex = SiegeActorColorMapping.DistanceMapIndex(
-            colors, distance, _siegeVisuals.Scene.ColorMapping, selectedBlock.ColorMapOffset);
-        return (_siegeVisuals.TextureFor(textureIndex, colorMapIndex) ?? FirstSceneTexture(selectedBlock),
+            colors, distance, visuals.Scene.ColorMapping, selectedBlock.ColorMapOffset);
+        return (visuals.TextureFor(textureIndex, colorMapIndex) ?? throw new InvalidDataException(
+                $"Siege actor block {enemy.VisualId} references unavailable texture {textureIndex}."),
             selected.FlipHorizontally);
     }
 
@@ -413,12 +380,29 @@ public sealed partial class ConquerorGame
             : initial;
     }
 
-    private Texture2D? FirstSceneTexture(DynamixSceneBlock block)
+    private DynamixSceneBlock SceneActorBlock(SiegeEnemy enemy)
     {
-        if (_siegeVisuals is null) return null;
+        var visuals = _siegeVisuals ?? throw new InvalidOperationException(
+            "Imported siege visuals must be active before rendering.");
+        if (enemy.VisualId < 0 || enemy.VisualId >= visuals.Scene.Blocks.Count)
+            throw new InvalidDataException($"Siege actor references invalid visual block {enemy.VisualId}.");
+        var initial = visuals.Scene.Blocks[enemy.VisualId];
+        return enemy.VisualState switch
+        {
+            SiegeEnemyVisualState.Attack => ActorStateBlock(initial, 1),
+            SiegeEnemyVisualState.Hit => ActorStateBlock(initial, 2),
+            SiegeEnemyVisualState.Dying => ActorStateBlock(initial, 3),
+            _ => initial
+        };
+    }
+
+    private Texture2D FirstSceneTexture(DynamixSceneBlock block)
+    {
+        var visuals = _siegeVisuals ?? throw new InvalidOperationException(
+            "Imported siege visuals must be active before rendering.");
         foreach (var index in block.TextureReferences())
-            if (_siegeVisuals.TextureFor(index) is { } texture) return texture;
-        return null;
+            if (visuals.TextureFor(index) is { } texture) return texture;
+        throw new InvalidDataException($"Siege block {block.Index} has no available render texture.");
     }
 
     private void ClearSiegeVisuals()
@@ -439,37 +423,22 @@ public sealed partial class ConquerorGame
 
     private void DrawSiegeBackdrop(Rectangle viewport, Facing facing)
     {
-        if (_siegeVisuals?.Backdrop is not { } backdrop)
-        {
-            Fill(new Rectangle(viewport.X, viewport.Y, viewport.Width, viewport.Height / 2), new Color(32, 31, 34));
-            Fill(new Rectangle(viewport.X, viewport.Center.Y, viewport.Width, viewport.Height / 2), new Color(42, 35, 29));
-            return;
-        }
+        var backdrop = _siegeVisuals?.Backdrop ?? throw new InvalidOperationException(
+            "Imported siege backdrop must be active before rendering.");
 
-        var sourceWidth = Math.Min(640, backdrop.Width);
-        var sourceX = (int)facing * backdrop.Width / 4 % backdrop.Width;
-        var firstWidth = Math.Min(sourceWidth, backdrop.Width - sourceX);
-        var firstDestinationWidth = firstWidth * viewport.Width / sourceWidth;
-        _batch.Draw(backdrop, new Rectangle(viewport.X, viewport.Y, firstDestinationWidth, viewport.Height),
-            new Rectangle(sourceX, 0, firstWidth, backdrop.Height), Color.White);
-        if (firstWidth < sourceWidth)
-        {
-            var remaining = sourceWidth - firstWidth;
-            _batch.Draw(backdrop,
-                new Rectangle(viewport.X + firstDestinationWidth, viewport.Y,
-                    viewport.Width - firstDestinationWidth, viewport.Height),
-                new Rectangle(0, 0, remaining, backdrop.Height), Color.White);
-        }
+        var source = SiegeCombatPresentation.BackdropSource(facing, backdrop.Width, backdrop.Height);
+        _batch.Draw(backdrop, viewport,
+            new Rectangle(source.X, source.Y, source.Width, source.Height), Color.White);
     }
 
     private void DrawSiege()
     {
         if (_siege is null) return;
-        var originalShell = DrawOriginal("Combat.Shell", new Rectangle(0, 0, 1024, 768));
-        var viewport = originalShell
-            ? ScaleSiegeBounds(SiegeCombatPresentation.Viewport)
-            : new Rectangle(0, 85, 1024, 520);
-        if (!originalShell) Fill(new Rectangle(0, 0, 1024, 768), new Color(22, 19, 18));
+        if (_siegeVisuals is null)
+            throw new InvalidOperationException("A siege session cannot render without imported scene visuals.");
+        if (!DrawOriginal("Combat.Shell", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidDataException("The required original combat shell is unavailable.");
+        var viewport = ScaleSiegeBounds(SiegeCombatPresentation.Viewport);
         DrawSiegeBackdrop(viewport, _siege.Facing);
         var depths = new double[viewport.Width];
         for (var column = 0; column < viewport.Width; column++)
@@ -477,24 +446,10 @@ public sealed partial class ConquerorGame
             var hit = SiegeViewProjection.CastColumn(_siege, column, viewport.Width);
             depths[column] = hit.Distance;
             var wall = SiegeWallBounds(hit, viewport);
-            var baseColor = hit.Tile switch
-            {
-                SiegeTile.Door => new Color(126, 83, 48),
-                SiegeTile.SecretDoor => new Color(76, 73, 68),
-                SiegeTile.Exit => new Color(86, 74, 58),
-                _ => new Color(128, 126, 120)
-            };
-            var distanceShade = Math.Clamp(1.05f - (float)hit.Distance / 32f, 0.22f, 1f);
-            if (SceneWallTexture(hit) is { } wallTexture)
-            {
-                var sourceX = Math.Clamp((int)(hit.TextureOffset * wallTexture.Width), 0, wallTexture.Width - 1);
-                _batch.Draw(wallTexture, new Rectangle(viewport.X + column, wall.Y, 1, wall.Height),
-                    new Rectangle(sourceX, 0, 1, wallTexture.Height), Color.White);
-            }
-            else
-            {
-                Fill(new Rectangle(viewport.X + column, wall.Y, 1, wall.Height), baseColor * distanceShade);
-            }
+            var wallTexture = SceneWallTexture(hit);
+            var sourceX = Math.Clamp((int)(hit.TextureOffset * wallTexture.Width), 0, wallTexture.Width - 1);
+            _batch.Draw(wallTexture, new Rectangle(viewport.X + column, wall.Y, 1, wall.Height),
+                new Rectangle(sourceX, 0, 1, wallTexture.Height), Color.White);
         }
         var actors = SiegeViewProjection.ProjectEnemies(_siege)
             .Select(projection => (Projection: projection, Friendly: false))
@@ -516,17 +471,8 @@ public sealed partial class ConquerorGame
             var actor = actors[actorIndex++];
             DrawSiegeActor(actor.Projection, actor.Friendly, viewport, depths);
         }
-        DrawSiegeForeground(viewport, originalShell);
-        if (originalShell)
-            DrawOriginalSiegeStatus();
-        else
-        {
-            DrawText($"HEALTH {_siege.Health}/{_siege.MaxHealth}  ENEMIES {_siege.Enemies.Count(enemy => enemy.Health > 0)}  ALLIES {_siege.AlliesAlive}", 25, 25, Color.White, 2);
-            DrawText($"FACING {_siege.Facing}  ARMOR {_siege.ArmorRating()}  GOLD FOUND {_siege.GoldFound}", 25, 55, Color.Wheat, 2);
-            if (_showRadar) DrawRadar(_siege);
-            DrawText("W/S MOVE  A/D TURN  E OPEN  SPACE SWING  X CROSSBOW", 130, 655, Color.Gold, 2);
-            DrawText("1 ATTACK  2 DEFEND  3 FOLLOW  4/R RETAINERS", 210, 685, Color.Gold, 2);
-        }
+        DrawSiegeForeground(viewport, originalScale: true);
+        DrawOriginalSiegeStatus();
     }
 
     private void DrawOriginalSiegeStatus()
@@ -709,12 +655,14 @@ public sealed partial class ConquerorGame
 
     private void DrawSiegeObject(SiegeObjectProjection projection, Rectangle viewport, double[] depths)
     {
-        Texture2D? texture = null;
-        if (_siegeVisuals is not null && projection.Object.VisualId >= 0 &&
-            projection.Object.VisualId < _siegeVisuals.Scene.Blocks.Count)
-            texture = FirstSceneTexture(_siegeVisuals.Scene.Blocks[projection.Object.VisualId]);
+        var visuals = _siegeVisuals ?? throw new InvalidOperationException(
+            "Imported siege visuals must be active before rendering.");
+        if (projection.Object.VisualId < 0 || projection.Object.VisualId >= visuals.Scene.Blocks.Count)
+            throw new InvalidDataException(
+                $"Siege object references invalid visual block {projection.Object.VisualId}.");
+        var texture = FirstSceneTexture(visuals.Scene.Blocks[projection.Object.VisualId]);
         var layout = SiegeViewProjection.ObjectLayout(projection, viewport.Width, viewport.Height,
-            texture?.Width, texture?.Height);
+            texture.Width, texture.Height);
         var left = viewport.X + layout.Left;
         var top = viewport.Y + layout.Top;
         var width = layout.Width;
@@ -722,11 +670,6 @@ public sealed partial class ConquerorGame
         for (var x = Math.Max(viewport.Left, left); x < Math.Min(viewport.Right, left + width); x++)
         {
             if (projection.ForwardDistance >= depths[x - viewport.X]) continue;
-            if (texture is null)
-            {
-                Fill(new Rectangle(x, top, 1, height), Color.SaddleBrown);
-                continue;
-            }
             var sourceX = Math.Clamp((x - left) * texture.Width / width, 0, texture.Width - 1);
             _batch.Draw(texture, new Rectangle(x, top, 1, height),
                 new Rectangle(sourceX, 0, 1, texture.Height), Color.White);
@@ -738,28 +681,25 @@ public sealed partial class ConquerorGame
     {
         var (texture, flip) = SceneEnemyTexture(
             projection.Enemy, friendly, projection.ForwardDistance);
-        var layout = SiegeViewProjection.ActorLayout(projection, viewport.Width, viewport.Height,
-            texture?.Width, texture?.Height);
+        var layout = SiegeViewProjection.ActorLayout(
+            projection, SceneActorBlock(projection.Enemy), viewport.Width, viewport.Height);
         var left = viewport.X + layout.Left;
         var top = viewport.Y + layout.Top;
         var width = layout.Width;
         var height = layout.Height;
-        var body = friendly ? Color.RoyalBlue : projection.Enemy.Champion ? Color.DarkRed : new Color(120, 75, 50);
+        var visibleTop = Math.Max(viewport.Top, top);
+        var visibleBottom = Math.Min(viewport.Bottom, top + height);
+        if (visibleBottom <= visibleTop) return;
+        var sourceY = Math.Clamp((visibleTop - top) * texture.Height / height, 0, texture.Height - 1);
+        var sourceHeight = Math.Max(1,
+            Math.Min(texture.Height - sourceY, (visibleBottom - visibleTop) * texture.Height / height));
         for (var x = Math.Max(viewport.Left, left); x < Math.Min(viewport.Right, left + width); x++)
         {
             if (projection.ForwardDistance >= depths[x - viewport.X]) continue;
-            if (texture is not null)
-            {
-                var sourceX = Math.Clamp((x - left) * texture.Width / width, 0, texture.Width - 1);
-                if (flip) sourceX = texture.Width - 1 - sourceX;
-                _batch.Draw(texture, new Rectangle(x, top, 1, height),
-                    new Rectangle(sourceX, 0, 1, texture.Height), Color.White);
-            }
-            else
-            {
-                Fill(new Rectangle(x, top + height / 4, 1, height * 3 / 4), body);
-                Fill(new Rectangle(x, top, 1, height / 4), Color.Gray);
-            }
+            var sourceX = Math.Clamp((x - left) * texture.Width / width, 0, texture.Width - 1);
+            if (flip) sourceX = texture.Width - 1 - sourceX;
+            _batch.Draw(texture, new Rectangle(x, visibleTop, 1, visibleBottom - visibleTop),
+                new Rectangle(sourceX, sourceY, 1, sourceHeight), Color.White);
         }
     }
 

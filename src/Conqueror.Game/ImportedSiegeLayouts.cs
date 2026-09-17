@@ -10,6 +10,11 @@ public sealed record ImportedSiegeScene(
 public static class ImportedSiegeLayouts
 {
     public const string CombatPaletteSuffix = ":SKIRMISH.PAL";
+    // The executable's actor-color loader writes global walk-family slots
+    // 64/96/128 into live blocks. DEFEND2.RES is the supported high-resolution
+    // combat archive that owns the complete 64..138 actor atlas population;
+    // individual scene archives contain only the slots they override.
+    public const string CombatActorAtlasArchiveId = "CONQUER/DEFEND2.RES";
 
     // CONQUER.EXE registers campaign dispatcher 0x21EEC at engine callback
     // slot +0xB0 (0x21E09 -> 0x59C24); slot 128 reaches the literal
@@ -44,6 +49,39 @@ public static class ImportedSiegeLayouts
             $"Required original combat palette '{CombatPaletteSuffix}' is missing.");
         return catalog.DecodePalette(id) ?? throw new InvalidDataException(
             $"Required original combat palette '{CombatPaletteSuffix}' could not be decoded.");
+    }
+
+    public static IReadOnlyDictionary<int, DynamixSceneTexture> LoadCombatTextureSources(
+        ImportedContentCatalog catalog,
+        string sceneArchiveId,
+        IEnumerable<int> requiredTextures)
+    {
+        ArgumentNullException.ThrowIfNull(catalog);
+        ArgumentException.ThrowIfNullOrWhiteSpace(sceneArchiveId);
+        ArgumentNullException.ThrowIfNull(requiredTextures);
+        var required = requiredTextures.Where(index => index >= 0).ToHashSet();
+        var sources = new Dictionary<int, DynamixSceneTexture>();
+        Load(sceneArchiveId, onlyMissing: false);
+        Load(CombatActorAtlasArchiveId, onlyMissing: true);
+
+        var missing = required.Where(index => !sources.ContainsKey(index)).Order().ToArray();
+        if (missing.Length > 0)
+            throw new InvalidDataException(
+                $"Imported scene '{sceneArchiveId}' is missing required texture {missing[0]}.");
+        return sources;
+
+        void Load(string archiveId, bool onlyMissing)
+        {
+            foreach (var id in catalog.Ids("resource").Where(id =>
+                         id.StartsWith(archiveId + "#", StringComparison.OrdinalIgnoreCase)
+                         && id.Contains(":TEX", StringComparison.OrdinalIgnoreCase)))
+            {
+                var decoded = catalog.DecodeSceneTexture(id);
+                if (decoded is null || !required.Contains(decoded.Index)
+                    || onlyMissing && sources.ContainsKey(decoded.Index)) continue;
+                sources[decoded.Index] = decoded;
+            }
+        }
     }
 
     public static SiegeLayout Convert(DynamixScene scene) => ConvertWithOrigin(scene).Layout;
