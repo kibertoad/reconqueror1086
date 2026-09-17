@@ -572,7 +572,28 @@ Further tracing maps these **Confirmed** movement-record fields; unnamed bytes r
 
 Mode-1 constructor `0x3AC5C` resolves the location's lord, initializes current and destination positions through the map-coordinate helpers, and normalizes `(destination - current)` into `+0x64/+0x68`. Force initializer `0x38A8C` counts that lord's active resolvable household records through `0x43004`, adds `floor(unsigned lord byte / 4)` from `0x43794`, and writes the result equally to all three troop fields. If the sum is below one, it leaves swordsmen/halberdiers at zero and writes one knight. Location 7 uses the separate `176 - 0x43558()` household source. The ordinary-location formula is **Confirmed**; the semantic name of the lord byte and the special location-7 population are **Provisional**.
 
-Generator `0x3BE58` checks its accumulator against `0x1388` (5,000 ms) before adding the current elapsed delta, so a crossing is acted on only by a later call. At the boundary it resets the accumulator, requires fewer than five live records, and accepts only a random result strictly greater than `0x60` from a `0x64`-sized roll. Movement update `0x3C088` advances live records in slot order and probes a completed record's map contact at current `(x,y)`, `(x,y-2)`, `(x+1,y)`, `(x-1,y-1)`, then `(x,y+1)`. Resolution either enters the encounter path or transfers all three troop fields and destroys/retargets the record; it is not a dated travel arrival. `OriginalStrategicMovement` preserves the confirmed constants, layout, and ordinary force formula with focused regression coverage. The current runtime's daily generation checkpoint, aggregate-garrison source/destination adapter, and dated arrival remain **Provisional** and must be replaced when the original lord/location records and route states are represented.
+The supporting property table is 14 records of 15 bytes at object-2 `+0xB8EC`. Helpers `0x438C8` and `0x438F8` return unsigned coordinate pairs from `+0x01/+0x03` and `+0x05/+0x07`; `0x4377C` returns the person/lord byte at `+0x09`; and `0x43640`/`0x43658` get/set the garrison byte at `+0x0C`. `+0x0A` is the 16-bit property-list link manipulated by `0x43164/0x431D0` and initially equals `0x00FF`. The initial numeric rows are:
+
+| Row | `+00` | grid x/y | map x/y (8.8) | lord | link | garrison | `+0D/+0E` |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 | 1 | 134 / 59 | `2A80` / `049C` | 13 | `00FF` | 18 | 0 / 0 |
+| 1 | 2 | 143 / 100 | `2D00` / `07E4` | 20 | `00FF` | 22 | 0 / 0 |
+| 2 | 3 | 90 / 115 | `1C70` / `0910` | 35 | `00FF` | 24 | 0 / 0 |
+| 3 | 4 | 112 / 187 | `2300` / `0EB0` | 59 | `00FF` | 28 | 0 / 0 |
+| 4 | 5 | 118 / 159 | `2580` / `0C6C` | 73 | `00FF` | 18 | 0 / 0 |
+| 5 | 6 | 126 / 187 | `27B0` / `0ED8` | 88 | `00FF` | 25 | 0 / 0 |
+| 6 | 7 | 161 / 167 | `32A0` / `0D20` | 96 | `00FF` | 18 | 0 / 0 |
+| 7 | 8 | 157 / 213 | `3160` / `10A4` | 100 | `00FF` | 90 | 0 / 0 |
+| 8 | 9 | 181 / 137 | `38E0` / `0AF0` | 1 | `00FF` | 24 | 0 / 0 |
+| 9 | 10 | 177 / 183 | `37A0` / `0E60` | 113 | `00FF` | 22 | 0 / 0 |
+| 10 | 11 | 146 / 252 | `2DA0` / `13D8` | 119 | `00FF` | 18 | 0 / 0 |
+| 11 | 12 | 146 / 216 | `2DA0` / `1108` | 143 | `00FF` | 24 | 0 / 0 |
+| 12 | 13 | 75 / 239 | `17C0` / `12C0` | 155 | `00FF` | 15 | 0 / 0 |
+| 13 | 14 | 68 / 266 | `1590` / `14DC` | 171 | `00FF` | 20 | 0 / 0 |
+
+The person table at object-2 `+0xBA50` contains 176 records of 18 bytes. Household counter `0x43004` scans indices 0-175 and calls predicate `0x437EC`; index 0 is rejected, while indices 1-175 are eligible only when flags `+0x06` has bit `0x01` set. The counter additionally requires the requested group at `+0x04` and a nonzero assignment at `+0x07`. The initialized eligible-and-assigned counts for groups 0-13 are `4, 6, 7, 5, 2, 2, 4, 3, 3, 1, 9, 3, 3, 6`. Person coordinates occupy `+0x08/+0x0A`, the force formula's unsigned byte is `+0x0C`, and the person-list link is `+0x0D`. `default.dat` persistence at `0x42E4C`-`0x43000` transfers the dynamic person slices and the complete 14-by-15-byte property table; these tables are executable-initialized state as well as persisted state. Field offsets, initial numeric values, filters, and counts are **Confirmed**. The meanings of property `+0x00/+0x0D/+0x0E`, the semantic labels of person group/assignment/rating, and property-to-world-name identities remain **Provisional**.
+
+Generator `0x3BE58` checks its accumulator against `0x1388` (5,000 ms) before adding the current elapsed delta, so a crossing is acted on only by a later call. At the boundary it resets the accumulator, requires fewer than five live records, and accepts only a random result strictly greater than `0x60` from a `0x64`-sized roll. Movement update `0x3C088` advances live records in slot order and probes a completed record's map contact at current `(x,y)`, `(x,y-2)`, `(x+1,y)`, `(x-1,y-1)`, then `(x,y+1)`. Resolution either enters the encounter path or transfers all three troop fields and destroys/retargets the record; it is not a dated travel arrival. `OriginalStrategicMovement` preserves the confirmed movement, property, and person layouts, exact property rows, initial household counts, and ordinary force formula with focused regression coverage. The current runtime's daily generation checkpoint, named-location adapter, aggregate-garrison source/destination choice, and dated arrival remain **Provisional** and must be replaced after property identities and route states are recovered.
 
 ## Open questions
 
