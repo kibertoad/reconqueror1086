@@ -555,6 +555,25 @@ Kind-1 friendly recovery is now **Confirmed** through the remaining dynamic edge
 
 War Planning spy state is separate from persistent intelligence locations. Action handler `0x36720`-`0x367D4` requires temporary wealth at object-2 `+0x1A090` to be at least `0x50`, subtracts exactly 80 through helper `0x37340`, and increments the screen-local pending count at `+0x1A0EC`. Initializer `0x36E87` clears that pending count whenever War Planning opens. OK handler `0x36AFC` applies the transactional army edits, then calls `0x38C68` once per pending assignment; that helper admits only the first by setting single live-spy flag object-2 `+0xAE68`, and rejects later attempts while it remains set. The manual's description of a spy traveling until he observes troop movement is corroborated by strategic update `0x3C290`, which calls report routine `0x38C84` immediately before the movement update at `0x3C088`. The report scans five movement records from object-2 `+0x1AB48` at stride `0x118` in slot order; active flag `+0x00`, three unit counts `+0x1C/+0x20/+0x24`, and location key `+0x28` feed the `Spy Report` dialog. If no record is active, the live-spy flag remains set. Considering the first active record consumes it; a resolvable location produces the report. Movement update `0x3C088` dispatches state 1 to `0x38D78`, state 3 to `0x3908C`, and other states through `0x4A300`. Generator `0x3BE58` enforces the five-record cap and contains a strict random result `> 0x60` gate after its `0x1388` accumulator boundary. Cost, capacity, lifetime, scan population/order, and the pre-movement trigger are **Confirmed**. `Campaign.AssignSpy`, `StrategicEnemyMovement`, and `StrategicSpyReport` now preserve that report boundary; the former monthly unknown-garrison proxy is **Disproved** and removed. The runtime's processor-independent daily generation checkpoint, source/destination choice, equal three-way detachment, and arrival reinforcement remain **Provisional** pending exact strategic-clock, route, and lord-record recovery.
 
+Further tracing maps these **Confirmed** movement-record fields; unnamed bytes remain deliberately uninterpreted:
+
+| Record offset | Size | Meaning |
+| --- | ---: | --- |
+| `+0x00` | 4 | active flag (`1` means live) |
+| `+0x14` | 4 | target location used by mode 3 |
+| `+0x1C/+0x20/+0x24` | 4 each | swordsmen, halberdiers, knights |
+| `+0x28` | 4 | origin/current strategic location key reported by the spy |
+| `+0x2C` | 4 | lord/person key returned by location helper `0x4377C` |
+| `+0x34` | 4 | movement mode; 1 dispatches to `0x38D78`, 3 to `0x3908C`, other values to `0x4A300` |
+| `+0x3C/+0x40` | 4 each | integer destination coordinates |
+| `+0x44/+0x48` | 4 each | current map-grid coordinates |
+| `+0x5C/+0x60` | 4 each | current single-precision x/y position |
+| `+0x64/+0x68` | 4 each | normalized single-precision x/y direction |
+
+Mode-1 constructor `0x3AC5C` resolves the location's lord, initializes current and destination positions through the map-coordinate helpers, and normalizes `(destination - current)` into `+0x64/+0x68`. Force initializer `0x38A8C` counts that lord's active resolvable household records through `0x43004`, adds `floor(unsigned lord byte / 4)` from `0x43794`, and writes the result equally to all three troop fields. If the sum is below one, it leaves swordsmen/halberdiers at zero and writes one knight. Location 7 uses the separate `176 - 0x43558()` household source. The ordinary-location formula is **Confirmed**; the semantic name of the lord byte and the special location-7 population are **Provisional**.
+
+Generator `0x3BE58` checks its accumulator against `0x1388` (5,000 ms) before adding the current elapsed delta, so a crossing is acted on only by a later call. At the boundary it resets the accumulator, requires fewer than five live records, and accepts only a random result strictly greater than `0x60` from a `0x64`-sized roll. Movement update `0x3C088` advances live records in slot order and probes a completed record's map contact at current `(x,y)`, `(x,y-2)`, `(x+1,y)`, `(x-1,y-1)`, then `(x,y+1)`. Resolution either enters the encounter path or transfers all three troop fields and destroys/retargets the record; it is not a dated travel arrival. `OriginalStrategicMovement` preserves the confirmed constants, layout, and ordinary force formula with focused regression coverage. The current runtime's daily generation checkpoint, aggregate-garrison source/destination adapter, and dated arrival remain **Provisional** and must be replaced when the original lord/location records and route states are represented.
+
 ## Open questions
 
 1. Recover the semantic meaning of directory field `0x24` and test whether data extents may alias or overlap.

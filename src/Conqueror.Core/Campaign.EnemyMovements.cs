@@ -2,9 +2,9 @@ namespace Conqueror.Core;
 
 public sealed partial class Campaign
 {
-    private const int OriginalEnemyMovementSlotCount = 5;
-    private const int EnemyMovementRollLimit = 100;
-    private const int EnemyMovementStartThreshold = 96;
+    private const int OriginalEnemyMovementSlotCount = OriginalStrategicMovement.SlotCount;
+    private const int EnemyMovementRollLimit = OriginalStrategicMovement.GenerationRollLimit;
+    private const int EnemyMovementStartThreshold = OriginalStrategicMovement.GenerationStartThreshold;
 
     private void ResolveSpyReportFromEnemyMovement()
     {
