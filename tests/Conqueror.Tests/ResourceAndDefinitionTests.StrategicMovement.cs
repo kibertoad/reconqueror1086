@@ -688,6 +688,120 @@ public sealed partial class ResourceAndDefinitionTests
         }
     }
 
+    [Fact]
+    public void ImportedStrategicResourcesEagerlyBindCanonicalRoutesAndProjectedWorldCells()
+    {
+        var (root, catalog) = CreateStrategicResourceCatalog();
+        try
+        {
+            var resources = new ImportedOriginalStrategicResources(catalog);
+            var resourceName = OriginalStrategicMovement.PropertyRouteResources[0].ResourceName;
+
+            Assert.Equal(
+                [new OriginalStrategicRoutePoint(123, -456),
+                    new OriginalStrategicRoutePoint(789, 321)],
+                resources.Route(resourceName, reverse: false));
+            Assert.Equal(
+                [new OriginalStrategicRoutePoint(789, 321),
+                    new OriginalStrategicRoutePoint(123, -456)],
+                resources.Route(resourceName, reverse: true));
+            Assert.Throws<InvalidDataException>(() => resources.Route("not-a-route.rat", false));
+
+            var center = StrategicWorldProjection.CellCenter(7, 11);
+            Assert.True(resources.TryTerrainCell(center.X, center.Y, 0, 0, out var cell));
+            Assert.Equal((7, 11, 0xA123_002Au, (ushort)42, (byte)0x23, (byte)0xA1),
+                (cell.Row, cell.Column, cell.RawValue, cell.TileId, cell.Auxiliary, cell.UpperByte));
+            Assert.False(resources.TryTerrainCell(0, 0, 0, 0, out _));
+
+            var campaign = new Campaign();
+            campaign.ConfigureOriginalStrategicResources(resources);
+            Assert.True(campaign.HasOriginalStrategicResources);
+
+            var state = Campaign.NewFromTemplate(0);
+            state.OriginalStrategicState = OriginalStrategicCampaignState.CreateForSchemaOneMigration(
+                state.Date, OriginalStrategicMovement.InitialSpeedMultiplier);
+            var slot = state.OriginalStrategicState.MovementSlots[0];
+            slot.Active = true;
+            slot.Mode = OriginalStrategicMovement.RoutedMode;
+            slot.OriginProperty = 0;
+            slot.Lord = 0;
+            slot.Knights = 1;
+            slot.RouteResource = resourceName;
+            slot.WaypointCount = 1;
+            var mismatched = new Campaign(state);
+            Assert.Throws<InvalidDataException>(() =>
+                mismatched.ConfigureOriginalStrategicResources(resources));
+            Assert.False(mismatched.HasOriginalStrategicResources);
+        }
+        finally
+        {
+            if (Directory.Exists(root)) Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void ImportedStrategicResourcesRejectOneMalformedRequiredRouteAtStartup()
+    {
+        var malformed = OriginalStrategicMovement.PropertyRouteResources[0].ResourceName;
+        var (root, catalog) = CreateStrategicResourceCatalog(malformed);
+        try
+        {
+            var error = Assert.Throws<InvalidDataException>(() =>
+                new ImportedOriginalStrategicResources(catalog));
+            Assert.Contains(malformed, error.Message, StringComparison.OrdinalIgnoreCase);
+        }
+        finally
+        {
+            if (Directory.Exists(root)) Directory.Delete(root, recursive: true);
+        }
+    }
+
+    private static (string Root, ImportedContentCatalog Catalog) CreateStrategicResourceCatalog(
+        string? malformedRoute = null)
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"conqueror-strategic-provider-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(root);
+        var assets = new List<ImportedAsset>();
+        var routeNames = OriginalStrategicMovement.PropertyRouteResources
+            .Select(route => route.ResourceName)
+            .Concat(OriginalStrategicMovement.StartingRoutes.Select(route => route.ResourceName))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+        for (var index = 0; index < routeNames.Length; index++)
+        {
+            var routeName = routeNames[index];
+            var data = new byte[4 + 2 * StrategicRouteDecoder.PointSize];
+            BinaryPrimitives.WriteInt32LittleEndian(data, 2);
+            BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(4), 123);
+            BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(8), -456);
+            BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(12), 789);
+            BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(16), 321);
+            if (routeName.Equals(malformedRoute, StringComparison.OrdinalIgnoreCase))
+                data = [1, 0, 0, 0];
+            Add($"C1086.GOB#{index}:{routeName}", $"route-{index}.bin", data);
+        }
+
+        var world = new byte[StrategicWorldGridDecoder.EncodedLength];
+        BinaryPrimitives.WriteInt32LittleEndian(world, StrategicWorldGridDecoder.CellWidth);
+        BinaryPrimitives.WriteInt32LittleEndian(world.AsSpan(4), StrategicWorldGridDecoder.CellHeight);
+        BinaryPrimitives.WriteInt32LittleEndian(world.AsSpan(8), StrategicWorldGridDecoder.RowCount);
+        BinaryPrimitives.WriteInt32LittleEndian(world.AsSpan(12), StrategicWorldGridDecoder.ColumnCount);
+        WriteWorldCell(world, row: 7, column: 11, 0xA123_002A);
+        Add("C1086.GOB#292:icon.jp", "icon.jp", world);
+
+        new ImportManifest(1, new string('a', 64), assets.ToArray())
+            .Write(Path.Combine(root, "manifest.json"));
+        return (root, Assert.IsType<ImportedContentCatalog>(ImportedContentCatalog.Discover(root)));
+
+        void Add(string id, string relativePath, byte[] data)
+        {
+            var path = Path.Combine(root, relativePath);
+            File.WriteAllBytes(path, data);
+            assets.Add(new ImportedAsset(
+                id, relativePath, "resource", data.Length, ResourceHash.Sha256(path)));
+        }
+    }
+
     private static void WriteWorldCell(byte[] data, int row, int column, uint value)
     {
         var offset = StrategicWorldGridDecoder.HeaderSize +

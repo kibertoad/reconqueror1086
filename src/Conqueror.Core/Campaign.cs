@@ -9,12 +9,44 @@ public sealed partial class Campaign
 
     public CampaignState State { get; private set; }
     private readonly Random _random;
+    private IOriginalStrategicResources? _originalStrategicResources;
 
     public Campaign(CampaignState? state = null, int seed = 1086)
     {
         State = state ?? NewFromTemplate(1);
         _random = new Random(seed);
         EnsureStrategicState();
+    }
+
+    public bool HasOriginalStrategicResources => _originalStrategicResources is not null;
+
+    /// <summary>
+    /// Binds verified imported route/grid data at the application boundary.
+    /// Schema-1 campaigns retain their dated compatibility model, while any
+    /// prepared replacement state is checked against the exact route lengths
+    /// before the provider becomes observable by the simulation.
+    /// </summary>
+    public void ConfigureOriginalStrategicResources(IOriginalStrategicResources resources)
+    {
+        ArgumentNullException.ThrowIfNull(resources);
+        if (State.OriginalStrategicState is { } strategic)
+        {
+            strategic.Validate();
+            if (strategic.StartingRouteSelector >= 0)
+            {
+                var starting = OriginalStrategicMovement.StartingRoutes[strategic.StartingRouteSelector];
+                _ = resources.Route(starting.ResourceName, reverse: false);
+            }
+            foreach (var slot in strategic.MovementSlots.Where(slot =>
+                         slot.Active && slot.Mode == OriginalStrategicMovement.RoutedMode))
+            {
+                var points = resources.Route(slot.RouteResource!, slot.RouteReversed);
+                if (slot.WaypointCount != points.Count)
+                    throw new InvalidDataException(
+                        $"Strategic movement slot {slot.Slot} route length does not match '{slot.RouteResource}'.");
+            }
+        }
+        _originalStrategicResources = resources;
     }
 
     public static CampaignState NewFromTemplate(int index)

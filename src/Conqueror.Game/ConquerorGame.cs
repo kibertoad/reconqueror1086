@@ -56,7 +56,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private SpriteBatch _batch = null!;
     private Texture2D _pixel = null!;
     private RenderTarget2D _canvas = null!;
-    private Campaign _campaign = new();
+    private Campaign _campaign;
     private Screen _screen = Screen.Title;
     private KeyboardState _last;
     private GamePadState _lastGamePad;
@@ -120,6 +120,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private int _ladyIndex = 1;
     private int _tournamentOpponent = 2;
     private readonly ImportedContentCatalog _importedContent;
+    private readonly ImportedOriginalStrategicResources _originalStrategicResources;
     private ImportedSoundLibrary? _importedSoundLibrary;
     private ImportedDialogueRepository? _importedDialogue;
     private ImportedConversationSession? _conversationSession;
@@ -158,6 +159,8 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     public ConquerorGame(ImportedContentCatalog importedContent, string? stateRoot = null)
     {
         _importedContent = importedContent ?? throw new ArgumentNullException(nameof(importedContent));
+        _originalStrategicResources = new ImportedOriginalStrategicResources(_importedContent);
+        _campaign = BindStrategicResources(new Campaign());
         var writableStateRoot = stateRoot ?? AppContext.BaseDirectory;
         _saveSlots = new CampaignSaveSlots(Path.Combine(writableStateRoot, "saves"));
         _settingsStore = new GameSettingsStore(Path.Combine(writableStateRoot, "settings.json"));
@@ -178,6 +181,12 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         TargetElapsedTime = TimeSpan.FromSeconds(1d / 60d);
         IsMouseVisible = true;
         Window.Title = "ReConqueror A.D. 1086";
+    }
+
+    private Campaign BindStrategicResources(Campaign campaign)
+    {
+        campaign.ConfigureOriginalStrategicResources(_originalStrategicResources);
+        return campaign;
     }
 
     protected override void LoadContent()
@@ -756,7 +765,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void ApplyLoadedCampaign(Campaign campaign)
     {
-        _campaign = campaign;
+        _campaign = BindStrategicResources(campaign);
         _presentedEndReason = CampaignEndReason.None;
         ResetConversationSession();
         _fiefCheckpoint = null;
@@ -810,7 +819,9 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
                 break;
             case CharacterCreationAction.GenerateNew:
                 var seed = Environment.TickCount;
-                _campaign = new Campaign(Campaign.NewCustom(NormalizedCharacterName(), seed, _heraldicColors[_heraldicColor].Name), seed);
+                _campaign = BindStrategicResources(new Campaign(
+                    Campaign.NewCustom(NormalizedCharacterName(), seed,
+                        _heraldicColors[_heraldicColor].Name), seed));
                 _presentedEndReason = CampaignEndReason.None;
                 ResetConversationSession();
                 _hasActiveCampaign = true;
@@ -847,7 +858,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void StartPregeneratedCharacter(int index)
     {
-        _campaign = new Campaign(Campaign.NewFromTemplate(index));
+        _campaign = BindStrategicResources(new Campaign(Campaign.NewFromTemplate(index)));
         _presentedEndReason = CampaignEndReason.None;
         ResetConversationSession();
         _hasActiveCampaign = true;
