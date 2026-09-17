@@ -12,6 +12,7 @@ public static class OriginalStrategicMovement
     public const int GenerationIntervalMilliseconds = 0x1388;
     public const int GenerationRollLimit = 0x64;
     public const int GenerationStartThreshold = 0x60;
+    public const int GenerationPropertyEligibilityValue = 1;
 
     public const int ActiveOffset = 0x00;
     public const int PathCompleteOffset = 0x0C;
@@ -127,6 +128,34 @@ public static class OriginalStrategicMovement
 
     public static IReadOnlyList<OriginalStrategicRoute> PropertyRouteResources => PropertyRouteResourceRows;
 
+    public static IReadOnlyList<int> GenerationPropertyCandidates(
+        IReadOnlyList<OriginalStrategicPropertyGenerationState> properties)
+    {
+        ArgumentNullException.ThrowIfNull(properties);
+        if (properties.Count != PropertyCount)
+            throw new ArgumentException($"Generation requires exactly {PropertyCount} property states.", nameof(properties));
+
+        var candidates = new List<int>();
+        for (var index = 0; index < properties.Count; index++)
+        {
+            var property = properties[index];
+            if (property.OwnerOrState != 0 && property.State13 == GenerationPropertyEligibilityValue)
+                candidates.Add(index);
+        }
+        return candidates;
+    }
+
+    public static int SelectGenerationProperty(
+        IReadOnlyList<OriginalStrategicPropertyGenerationState> properties,
+        int candidateOrdinal)
+    {
+        var candidates = GenerationPropertyCandidates(properties);
+        if (candidates.Count == 0) return -1;
+        ArgumentOutOfRangeException.ThrowIfNegative(candidateOrdinal);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(candidateOrdinal, candidates.Count);
+        return candidates[candidateOrdinal];
+    }
+
     public static StrategicContactOutcome ResolveCompletedContact(
         int originOwnerOrState,
         int? contactedAssignment,
@@ -226,6 +255,8 @@ public readonly record struct OriginalStrategicPropertyIdentity(
     byte PersonGroup,
     byte InitialAssignment,
     byte LordRating);
+
+public readonly record struct OriginalStrategicPropertyGenerationState(byte OwnerOrState, byte State13);
 
 public readonly record struct StrategicContactProbe(int X, int Y);
 

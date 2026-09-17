@@ -16,6 +16,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(0x1388, OriginalStrategicMovement.GenerationIntervalMilliseconds);
         Assert.Equal(0x64, OriginalStrategicMovement.GenerationRollLimit);
         Assert.Equal(0x60, OriginalStrategicMovement.GenerationStartThreshold);
+        Assert.Equal(1, OriginalStrategicMovement.GenerationPropertyEligibilityValue);
 
         Assert.Equal(0x00, OriginalStrategicMovement.ActiveOffset);
         Assert.Equal(0x0C, OriginalStrategicMovement.PathCompleteOffset);
@@ -127,6 +128,29 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(
             OriginalStrategicMovement.Properties.Select(property => (int)property.Lord),
             [13, 20, 35, 59, 73, 88, 96, 100, 1, 113, 119, 143, 155, 171]);
+    }
+
+    [Fact]
+    public void OriginalStrategicGenerationCompactsEligiblePropertiesInAuthoredOrder()
+    {
+        var properties = Enumerable.Repeat(new OriginalStrategicPropertyGenerationState(1, 0),
+            OriginalStrategicMovement.PropertyCount).ToArray();
+        properties[1] = new(0, 1);
+        properties[3] = new(4, 1);
+        properties[8] = new(9, 1);
+        properties[12] = new(13, 2);
+
+        Assert.Equal([3, 8], OriginalStrategicMovement.GenerationPropertyCandidates(properties));
+        Assert.Equal(3, OriginalStrategicMovement.SelectGenerationProperty(properties, 0));
+        Assert.Equal(8, OriginalStrategicMovement.SelectGenerationProperty(properties, 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            OriginalStrategicMovement.SelectGenerationProperty(properties, 2));
+
+        properties[3] = new(4, 0);
+        properties[8] = new(9, 0);
+        Assert.Equal(-1, OriginalStrategicMovement.SelectGenerationProperty(properties, 0));
+        Assert.Throws<ArgumentException>(() =>
+            OriginalStrategicMovement.GenerationPropertyCandidates(properties[..^1]));
     }
 
     [Fact]

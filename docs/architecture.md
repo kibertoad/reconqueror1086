@@ -24,7 +24,7 @@ Gameplay content is described in typed definition records in `Balance.cs` and in
 | `FieldBattleDefinition` | battlefield size, counter bonus, morale and withdrawal pressure | `FieldBattleSession` |
 | `StrategicDefinition` | spy cost, interception chance and minimum field force | campaign travel and reconnaissance |
 | `StrategicEnemyMovement` / `StrategicSpyReport` | persisted five-slot hostile movement and the one-shot report captured before movement advances | `Campaign.AdvanceDays` / enemy movement partial |
-| `OriginalStrategicMovement` | executable movement/person/property layouts, all 14 named initial property rows, linked lord inputs, household eligibility/counts, generation gate, force initializer, and the 90 canonical property-route identities | strategic movement recovery boundary |
+| `OriginalStrategicMovement` | executable movement/person/property layouts, all 14 named initial property rows, linked lord inputs, household eligibility/counts, generation gate and ordered property filter, force initializer, and the 90 canonical property-route identities | strategic movement recovery boundary |
 | `StrategicRouteDecoder` | bounded little-endian count plus signed 32-bit x/y pair decoding for imported `rt_*.rat` resources | `ImportedContentCatalog.DecodeStrategicRoute`; live movement integration remains pending |
 | `TournamentOpponentDefinition` | wager, joust tolerance and eight-man melee composition | joust and tournament skirmish settlement |
 
