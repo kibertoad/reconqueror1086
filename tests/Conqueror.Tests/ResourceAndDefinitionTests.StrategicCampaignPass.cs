@@ -96,6 +96,29 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveViewportUsesSourceOrderedEdgeBandsAndStrictContentLimits()
+    {
+        var viewport = new OriginalStrategicInteractiveEncounterViewport(
+            viewportWidth: 100, viewportHeight: 200,
+            contentWidth: 300, contentHeight: 500,
+            horizontalOffset: 10, verticalOffset: 10);
+
+        Assert.True(viewport.ApplyMappedEdgeScroll(pointerX: 5, pointerY: 5));
+        Assert.Equal((0, 0), (viewport.HorizontalOffset, viewport.VerticalOffset));
+        Assert.False(viewport.ApplyMappedEdgeScroll(pointerX: 6, pointerY: 6));
+
+        Assert.True(viewport.ApplyMappedEdgeScroll(pointerX: 95, pointerY: 195));
+        Assert.Equal((10, 10), (viewport.HorizontalOffset, viewport.VerticalOffset));
+
+        var atStrictLimits = new OriginalStrategicInteractiveEncounterViewport(
+            viewportWidth: 100, viewportHeight: 200,
+            contentWidth: 300, contentHeight: 500,
+            horizontalOffset: 190, verticalOffset: 250);
+        Assert.False(atStrictLimits.ApplyMappedEdgeScroll(pointerX: 95, pointerY: 195));
+        Assert.Equal((190, 250), (atStrictLimits.HorizontalOffset, atStrictLimits.VerticalOffset));
+    }
+
+    [Fact]
     public void StrategicInteractiveEncounterGeometryUsesPositiveStrengthBoundsAndFirstExclusiveRectangleHit()
     {
         var units = OriginalStrategicInteractiveEncounter.Materialize(
