@@ -47,6 +47,7 @@ foreach (var path in Directory.EnumerateFiles(artifactRoot, "*", SearchOption.Al
 File.WriteAllText(Path.Combine(output, "artifact-hashes.txt"), report.ToString());
 var inspectionOptions = args.Skip(2).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
 var renderCsfName = OptionValue(inspectionOptions, "--render-csf=");
+var renderPcxName = OptionValue(inspectionOptions, "--render-pcx=");
 var renderSmkName = OptionValue(inspectionOptions, "--render-smk=");
 var palettePcxName = OptionValue(inspectionOptions, "--palette-pcx=");
 var disassembleAddresses = OptionValue(inspectionOptions, "--disassemble=");
@@ -206,6 +207,17 @@ if (File.Exists(gobPath))
         }
     }
     File.WriteAllText(Path.Combine(output, "stored-image-report.txt"), imageReport.ToString());
+
+    if (renderPcxName is not null)
+    {
+        var previewPath = PcxPreview.Render(gob, renderPcxName, artifactRoot);
+        if (inspectionOptions.Contains("--preview-only", StringComparer.OrdinalIgnoreCase)
+            && renderCsfName is null && palettePcxName is null)
+        {
+            Console.WriteLine($"Rendered bounded PCX preview to {previewPath}.");
+            return 0;
+        }
+    }
 
     var csfReport = new StringBuilder("# Storage  Chunks  Minimum  Maximum  Payload bytes  Segments literal/skip/fill  Frame-sequence SHA-256  Dimension headers  Name\n");
     foreach (var entry in gob.Entries.Where(x => DynamixArchive.CanDecode(x) && Path.GetExtension(x.Name).Equals(".CSF", StringComparison.OrdinalIgnoreCase)))
@@ -644,7 +656,7 @@ foreach (var file in files.Where(x => Path.GetExtension(x.Path).Equals(".SMK", S
             {
                 var renderRoot = Path.Combine(artifactRoot, "smacker");
                 Directory.CreateDirectory(renderRoot);
-                WriteIndexedPpm(Path.Combine(renderRoot,
+                PcxPreview.WriteIndexedPpm(Path.Combine(renderRoot,
                         $"{SafeName(Path.GetFileNameWithoutExtension(file.Path))}-{index:D5}.ppm"),
                     movie.Width, movie.Height, indices, palette);
             }
@@ -911,24 +923,6 @@ static void WritePpm(string path, CsfFrame frame, byte[] palette, int scale)
             bytes[target++] = palette[color + 1];
             bytes[target++] = palette[color + 2];
         }
-    }
-    File.WriteAllBytes(path, bytes);
-}
-
-static void WriteIndexedPpm(string path, int width, int height, ReadOnlySpan<byte> indices, ReadOnlySpan<byte> palette)
-{
-    if (width <= 0 || height <= 0 || indices.Length != checked(width * height) || palette.Length != 768)
-        throw new InvalidDataException("Indexed image buffers are inconsistent.");
-    var header = Encoding.ASCII.GetBytes($"P6\n{width} {height}\n255\n");
-    var bytes = new byte[checked(header.Length + indices.Length * 3)];
-    header.CopyTo(bytes, 0);
-    var target = header.Length;
-    foreach (var index in indices)
-    {
-        var color = index * 3;
-        bytes[target++] = palette[color];
-        bytes[target++] = palette[color + 1];
-        bytes[target++] = palette[color + 2];
     }
     File.WriteAllBytes(path, bytes);
 }
