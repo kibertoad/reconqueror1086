@@ -80,6 +80,30 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveMenuCodeThreePreservesItsCategorySplitAndRawEnemyLayoutChoice()
+    {
+        var units = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(5, 2, 1),
+            new OriginalStrategicEncounterForces(2, 1, 1));
+
+        OriginalStrategicInteractiveEncounter.ApplyMappedMenuCodeThreeFormation(
+            units, horizontalSpan: 640, verticalSpan: 180, new QueueEncounterRandom(0));
+
+        Assert.Equal([
+            (240, 30), (240, 90), (240, 480), (240, 540), (240, 600),
+            (120, 30), (120, 90), (120, 150),
+        ], units.Take(8).Select(unit => (unit.PositionX, unit.PositionY)));
+        Assert.Equal([(580, 30), (580, 90), (580, 150), (520, 30)],
+            units.Skip(8).Select(unit => (unit.PositionX, unit.PositionY)));
+
+        OriginalStrategicInteractiveEncounter.ApplyMappedMenuCodeThreeFormation(
+            units, horizontalSpan: 640, verticalSpan: 180, new QueueEncounterRandom(1));
+
+        Assert.Equal([(520, 30), (520, 90), (520, 150), (580, 30)],
+            units.Skip(8).Select(unit => (unit.PositionX, unit.PositionY)));
+    }
+
+    [Fact]
     public void NewCampaignStrategicBootstrapPersistsTheRandomlySelectedStartingRoute()
     {
         const int seed = 37;

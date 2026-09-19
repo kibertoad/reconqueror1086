@@ -97,8 +97,8 @@ public static class OriginalStrategicInteractiveEncounter
 
     /// <summary>
     /// Applies the mapped player-prefix formation paths in <c>0x2904B</c>,
-    /// <c>0x290BA</c>, and <c>0x29132</c>. Code 3 uses a distinct path and is
-    /// intentionally rejected until its complete geometry is represented.
+    /// <c>0x290BA</c>, and <c>0x29132</c>. Menu code 3 has its own method
+    /// because its exact path also consumes a raw draw and the viewport width.
     /// </summary>
     public static void ApplyMappedMenuFormation(
         IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
@@ -145,6 +145,83 @@ public static class OriginalStrategicInteractiveEncounter
         }
     }
 
+    /// <summary>
+    /// Applies menu code 3's complete formation path at <c>0x29209-0x29643</c>.
+    /// It divides the player swordsmen into two four-unit rows, then places
+    /// the other player categories and one of two reachable hostile grids.
+    /// The executable takes one signed remainder by two from its raw generator;
+    /// this replacement requires a non-negative raw source and preserves the
+    /// two resulting layouts without exposing the source's dead switch cases.
+    /// </summary>
+    public static void ApplyMappedMenuCodeThreeFormation(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
+        int horizontalSpan,
+        int verticalSpan,
+        IOriginalStrategicEncounterRandom random)
+    {
+        ArgumentNullException.ThrowIfNull(units);
+        ArgumentNullException.ThrowIfNull(random);
+        if (horizontalSpan <= 0)
+            throw new ArgumentOutOfRangeException(nameof(horizontalSpan));
+        var rows = verticalSpan / FormationGridStep;
+        if (rows <= 0)
+            throw new ArgumentOutOfRangeException(nameof(verticalSpan));
+
+        var playerCount = ValidateOriginalPlayerFirstOrder(units);
+        var playerSwordsmen = 0;
+        while (playerSwordsmen < playerCount
+            && units[playerSwordsmen].Category == OriginalStrategicInteractiveEncounterCategory.Swordsmen)
+            playerSwordsmen++;
+        for (var index = playerSwordsmen; index < playerCount; index++)
+        {
+            if (units[index].Category == OriginalStrategicInteractiveEncounterCategory.Swordsmen)
+                throw new ArgumentException("Player units must retain the original category order.", nameof(units));
+        }
+
+        var halfSwordsmen = playerSwordsmen / 2;
+        var otherPlayerUnits = checked(playerCount - playerSwordsmen);
+        var swordBaseX = checked((halfSwordsmen / 4 + 1) * FormationGridStep);
+        var playerColumnBaseX = checked(swordBaseX
+            + otherPlayerUnits / rows * FormationGridStep);
+
+        for (var index = 0; index < halfSwordsmen; index++)
+        {
+            units[index].PositionX = checked(playerColumnBaseX - index / 4 * FormationGridStep + 120);
+            units[index].PositionY = checked(index % 4 * FormationGridStep + FormationGridInset);
+        }
+
+        var latterSwordsmen = checked(playerSwordsmen - halfSwordsmen);
+        for (var index = 0; index < latterSwordsmen; index++)
+        {
+            var unit = units[halfSwordsmen + index];
+            unit.PositionX = checked(playerColumnBaseX - index / 4 * FormationGridStep + 120);
+            unit.PositionY = checked(index % 4 * FormationGridStep + 480);
+        }
+
+        for (var index = 0; index < otherPlayerUnits; index++)
+        {
+            var unit = units[playerSwordsmen + index];
+            unit.PositionX = checked(playerColumnBaseX - index / rows * FormationGridStep);
+            unit.PositionY = checked(index % rows * FormationGridStep + FormationGridInset);
+        }
+
+        var enemyCount = checked(units.Count - playerCount);
+        var raw = random.NextRaw();
+        if (raw < 0)
+            throw new InvalidOperationException("Encounter random source returned a negative raw value.");
+        var mirroredEnemyColumns = raw % 2 == 0;
+        var enemyColumnBaseX = checked(horizontalSpan
+            - (enemyCount / rows * FormationGridStep + FormationGridStep));
+        for (var index = 0; index < enemyCount; index++)
+        {
+            var unit = units[playerCount + index];
+            unit.PositionX = mirroredEnemyColumns
+                ? checked(horizontalSpan - (index / rows * FormationGridStep + FormationGridStep))
+                : checked(enemyColumnBaseX + index / rows * FormationGridStep);
+            unit.PositionY = checked(index % rows * FormationGridStep + FormationGridInset);
+        }
+    }
+
     private static void ApplyMenuCodeTwoTriangle(
         IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
         int playerCount,
@@ -173,6 +250,28 @@ public static class OriginalStrategicInteractiveEncounter
             x = checked(x - 45);
             rowY = checked(rowY - FormationGridInset);
         }
+    }
+
+    private static int ValidateOriginalPlayerFirstOrder(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units)
+    {
+        var playerCount = 0;
+        var enemySeen = false;
+        foreach (var unit in units)
+        {
+            ArgumentNullException.ThrowIfNull(unit);
+            if (unit.Side == OriginalStrategicInteractiveEncounterSide.Enemy)
+            {
+                enemySeen = true;
+                continue;
+            }
+            if (enemySeen)
+                throw new ArgumentException("Interactive units must retain the original player-first order.",
+                    nameof(units));
+            playerCount++;
+        }
+
+        return playerCount;
     }
 
     /// <summary>
