@@ -25,8 +25,8 @@ public enum OriginalStrategicInteractiveEncounterCategory
 /// <summary>
 /// One live unit materialized by resolver <c>0x28C38</c>. The original
 /// terminal write-back reads only <see cref="RemainingStrength"/> and the
-/// immutable category/side fields; later tactical simulation may update its
-/// remaining strength without losing that classification.
+/// category/side fields while strength is positive. The mapped knight-death
+/// completion mutates its category column only after zeroing strength.
 /// </summary>
 public sealed class OriginalStrategicInteractiveEncounterUnit
 {
@@ -43,7 +43,7 @@ public sealed class OriginalStrategicInteractiveEncounterUnit
     }
 
     public OriginalStrategicInteractiveEncounterSide Side { get; }
-    public OriginalStrategicInteractiveEncounterCategory Category { get; }
+    public OriginalStrategicInteractiveEncounterCategory Category { get; private set; }
 
     /// <summary>
     /// Original record <c>+0x14</c>: 3 for player entries and 7 for enemy
@@ -69,6 +69,13 @@ public sealed class OriginalStrategicInteractiveEncounterUnit
     /// </summary>
     public int PositionX { get; set; }
     public int PositionY { get; set; }
+
+    internal void CompleteMappedDeathAnimation()
+    {
+        RemainingStrength = 0;
+        if (Category == OriginalStrategicInteractiveEncounterCategory.Knights)
+            Category = OriginalStrategicInteractiveEncounterCategory.Halberdiers;
+    }
 }
 
 /// <summary>
@@ -93,6 +100,18 @@ public static class OriginalStrategicInteractiveEncounter
         Append(units, OriginalStrategicInteractiveEncounterSide.Player, playerForces);
         Append(units, OriginalStrategicInteractiveEncounterSide.Enemy, enemyForces);
         return units;
+    }
+
+    /// <summary>
+    /// Mirrors the record mutations at <c>0x26D29-0x26D46</c> after a unit's
+    /// death animation has completed. Timing and target selection remain in
+    /// the not-yet-modeled tactical loop; this method deliberately represents
+    /// only the completed-record effect.
+    /// </summary>
+    public static void CompleteMappedDeathAnimation(OriginalStrategicInteractiveEncounterUnit unit)
+    {
+        ArgumentNullException.ThrowIfNull(unit);
+        unit.CompleteMappedDeathAnimation();
     }
 
     /// <summary>

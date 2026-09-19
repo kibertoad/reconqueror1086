@@ -53,6 +53,23 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveKnightDeathCompletionZeroesStrengthAndDowngradesItsLiveCategory()
+    {
+        var units = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(0, 0, 1),
+            new OriginalStrategicEncounterForces(0, 1, 0));
+
+        OriginalStrategicInteractiveEncounter.CompleteMappedDeathAnimation(units[0]);
+
+        Assert.Equal(0, units[0].RemainingStrength);
+        Assert.Equal(OriginalStrategicInteractiveEncounterCategory.Halberdiers, units[0].Category);
+        Assert.Equal(new OriginalStrategicEncounterForces(0, 0, 0),
+            OriginalStrategicInteractiveEncounter.CountSurvivors(
+                units, OriginalStrategicInteractiveEncounterSide.Player));
+        Assert.Equal(OriginalStrategicInteractiveEncounterCategory.Halberdiers, units[1].Category);
+    }
+
+    [Fact]
     public void StrategicInteractiveMenuCodesZeroAndOneUseTheirExactPlayerPrefixGridLayouts()
     {
         var units = OriginalStrategicInteractiveEncounter.Materialize(
