@@ -427,6 +427,81 @@ public static class OriginalStrategicInteractiveEncounter
     }
 
     /// <summary>
+    /// Mirrors state-zero's automatic no-target/no-destination branch at
+    /// <c>0x27CE7-0x27E16</c>. A living control-code-one source runs it only
+    /// while both original lane counters remain positive. It scans the record
+    /// table in order, excludes itself and its own lane, and keeps a candidate
+    /// only when its positive-strength truncated Euclidean distance is
+    /// strictly smaller than the initial <c>0x7FFF</c> bound. Thus authored
+    /// table order breaks equal distances.
+    ///
+    /// The selected record normally supplies its live X/Y coordinates as the
+    /// source's paired destination. If its stored X destination exists and
+    /// differs from the source's live X, the source instead writes its own X
+    /// into that selected record and still adopts the selected Y destination
+    /// when present. The executable's invalid global-count/no-candidate path
+    /// would index stale register state; this clean-room boundary safely
+    /// reports no assignment rather than reproducing that clear fault.
+    /// </summary>
+    public static bool TryAssignMappedAutomaticDestination(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
+        int unitIndex,
+        int playerLaneCount,
+        int enemyLaneCount)
+    {
+        ArgumentNullException.ThrowIfNull(units);
+        if ((uint)unitIndex >= (uint)units.Count)
+            throw new ArgumentOutOfRangeException(nameof(unitIndex));
+        if (playerLaneCount < 0)
+            throw new ArgumentOutOfRangeException(nameof(playerLaneCount));
+        if (enemyLaneCount < 0)
+            throw new ArgumentOutOfRangeException(nameof(enemyLaneCount));
+
+        var source = units[unitIndex];
+        ArgumentNullException.ThrowIfNull(source);
+        if (source.StateCode != 0
+            || source.TargetUnitIndex != -1
+            || source.AuxiliaryX != -1
+            || source.AuxiliaryY != -1
+            || source.ControlCode != 1
+            || source.RemainingStrength <= 0
+            || playerLaneCount == 0
+            || enemyLaneCount == 0)
+            return false;
+
+        var chosenIndex = -1;
+        var chosenDistance = 0x7FFF;
+        for (var index = 0; index < units.Count; index++)
+        {
+            if (index == unitIndex)
+                continue;
+            var candidate = units[index];
+            ArgumentNullException.ThrowIfNull(candidate);
+            if (candidate.Side == source.Side || candidate.RemainingStrength <= 0)
+                continue;
+
+            var distance = CalculateMappedTruncatedDistance(source, candidate);
+            if (distance >= chosenDistance)
+                continue;
+            chosenIndex = index;
+            chosenDistance = distance;
+        }
+
+        if (chosenIndex < 0)
+            return false;
+
+        var chosen = units[chosenIndex];
+        if (chosen.AuxiliaryX == -1 || chosen.AuxiliaryX == source.PositionX)
+            source.AuxiliaryX = chosen.PositionX;
+        else
+            chosen.AuxiliaryX = source.PositionX;
+        source.AuxiliaryY = chosen.AuxiliaryY == -1
+            ? chosen.PositionY
+            : chosen.AuxiliaryY;
+        return true;
+    }
+
+    /// <summary>
     /// Applies the mapped player-prefix formation paths in <c>0x2904B</c>,
     /// <c>0x290BA</c>, and <c>0x29132</c>. Menu code 3 has its own method
     /// because its exact path also consumes a raw draw and the viewport width.
@@ -642,6 +717,16 @@ public static class OriginalStrategicInteractiveEncounter
             unit.AuxiliaryY = value;
         else
             unit.AuxiliaryX = value;
+    }
+
+    private static int CalculateMappedTruncatedDistance(
+        OriginalStrategicInteractiveEncounterUnit source,
+        OriginalStrategicInteractiveEncounterUnit candidate)
+    {
+        var deltaX = checked(source.PositionX - candidate.PositionX);
+        var deltaY = checked(source.PositionY - candidate.PositionY);
+        var squaredDistance = checked((long)deltaX * deltaX + (long)deltaY * deltaY);
+        return checked((int)Math.Truncate(Math.Sqrt(squaredDistance)));
     }
 
     private static void ApplyMenuCodeTwoTriangle(

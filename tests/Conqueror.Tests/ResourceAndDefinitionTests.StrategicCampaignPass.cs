@@ -508,6 +508,11 @@ public sealed partial class ResourceAndDefinitionTests
             session.Units[1].ControlCode));
         Assert.Equal(new OriginalStrategicInteractiveEncounterRectangle(45, 70, 25, 30),
             session.RenderRectangles()[1]);
+        Assert.Equal((2, 1), (session.PlayerLaneCount, session.EnemyLaneCount));
+        Assert.True(session.TryAssignAutomaticDestination(2));
+        Assert.Equal((60, 30), (session.Units[2].AuxiliaryX, session.Units[2].AuxiliaryY));
+        session.CompleteDeathAnimation(0);
+        Assert.Equal((1, 1), (session.PlayerLaneCount, session.EnemyLaneCount));
         Assert.False(session.Timing.TryBeginPass(TimeSpan.FromMilliseconds(200)));
         Assert.True(session.Timing.TryBeginPass(TimeSpan.FromMilliseconds(201)));
     }

@@ -9,6 +9,8 @@ public sealed class OriginalStrategicInteractiveEncounterSession
 {
     private readonly List<OriginalStrategicInteractiveEncounterUnit> _units;
     private readonly List<int> _selectedUnitIndices = [];
+    private int _playerLaneCount;
+    private int _enemyLaneCount;
     private bool _firstControlConfirmationArmed;
 
     private OriginalStrategicInteractiveEncounterSession(
@@ -16,12 +18,16 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         TimeSpan initialTime)
     {
         _units = units;
+        _playerLaneCount = units.Count(unit => unit.Side == OriginalStrategicInteractiveEncounterSide.Player);
+        _enemyLaneCount = units.Count(unit => unit.Side == OriginalStrategicInteractiveEncounterSide.Enemy);
         Timing = new OriginalStrategicInteractiveEncounterTiming(initialTime);
     }
 
     public IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> Units => _units;
     public IReadOnlyList<int> SelectedUnitIndices => _selectedUnitIndices;
     public OriginalStrategicInteractiveEncounterTiming Timing { get; }
+    public int PlayerLaneCount => _playerLaneCount;
+    public int EnemyLaneCount => _enemyLaneCount;
 
     /// <summary>
     /// Mirrors the inverted timing gate <c>19C7C</c>: the first control-strip
@@ -155,6 +161,15 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     public bool AdvanceTargetHeading(int unitIndex) =>
         OriginalStrategicInteractiveEncounter.AdvanceMappedTargetHeading(_units, unitIndex);
 
+    /// <summary>
+    /// Runs the state-zero automatic destination assignment against the live
+    /// lane counters, which the session decrements only at the mapped
+    /// death-animation completion boundary.
+    /// </summary>
+    public bool TryAssignAutomaticDestination(int unitIndex) =>
+        OriginalStrategicInteractiveEncounter.TryAssignMappedAutomaticDestination(
+            _units, unitIndex, _playerLaneCount, _enemyLaneCount);
+
     public void ApplyDestinationOrder(
         int localX,
         int localY,
@@ -176,6 +191,14 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     {
         if ((uint)unitIndex >= (uint)_units.Count)
             throw new ArgumentOutOfRangeException(nameof(unitIndex));
-        OriginalStrategicInteractiveEncounter.CompleteMappedDeathAnimation(_units[unitIndex]);
+        var unit = _units[unitIndex];
+        var wasLiving = unit.RemainingStrength > 0;
+        OriginalStrategicInteractiveEncounter.CompleteMappedDeathAnimation(unit);
+        if (!wasLiving)
+            return;
+        if (unit.Side == OriginalStrategicInteractiveEncounterSide.Player)
+            _playerLaneCount--;
+        else
+            _enemyLaneCount--;
     }
 }
