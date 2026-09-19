@@ -79,6 +79,8 @@ Player hit selection is likewise mapped as an append-only source operation. Afte
 
 The control-strip coordinate is intentionally independent from battlefield scroll. Resolver setup stores the resolution margin at `19C74` (`0`, `0x50`, or `0xA0` on its recovered paths) and adds it to the three fixed control X positions; dispatcher code 3 consumes raw pointer coordinates against those rectangles. Player selection and destination orders instead add scroll globals `19CA8/19CAC`. `OriginalStrategicInteractiveEncounterViewport.ControlStripMargin` retains this split, and `AdvanceMappedFrame` resolves the control strip after edge scrolling without allowing that scrolling to change its hit geometry.
 
+`OriginalStrategicInteractiveEncounterPresentation.FrameFor` maps the renderer's source frame address independently of the unfinished screen binding: lane + category + `5 *` heading + phase remainder + state selects ordinary `MEN8` frame 0-719, while source frames 720/721/722 are respectively the selected-index overlay, armed-first-control overlay, and initialized control strip. Frame identity is therefore confirmed; the painter's ordering and semantic UI labels remain provisional.
+
 ## Validation
 
 The executable specifications reject duplicate equipment and courtship names, duplicate win rewards, mismatched building keys, and dragon requirements that cannot be earned from a defined reward ladder. Full campaign behavior tests then exercise the same generic interpreters used by the game.
