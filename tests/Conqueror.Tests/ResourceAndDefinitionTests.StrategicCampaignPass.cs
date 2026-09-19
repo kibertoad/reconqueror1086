@@ -70,6 +70,22 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveEncounterTimingUsesStrictTwoHundredMillisecondSamplesWithoutCatchUp()
+    {
+        var timing = new OriginalStrategicInteractiveEncounterTiming(TimeSpan.Zero);
+
+        Assert.False(timing.TryBeginPass(TimeSpan.FromMilliseconds(200)));
+        Assert.True(timing.TryBeginPass(TimeSpan.FromMilliseconds(201)));
+        Assert.Equal(TimeSpan.FromMilliseconds(201), timing.LastSample);
+        Assert.False(timing.TryBeginPass(TimeSpan.FromMilliseconds(401)));
+        Assert.True(timing.TryBeginPass(TimeSpan.FromMilliseconds(402)));
+
+        Assert.True(timing.TryBeginPass(TimeSpan.FromSeconds(2)));
+        Assert.Equal(TimeSpan.FromSeconds(2), timing.LastSample);
+        Assert.False(timing.TryBeginPass(TimeSpan.FromMilliseconds(2200)));
+    }
+
+    [Fact]
     public void StrategicInteractiveMenuCodesZeroAndOneUseTheirExactPlayerPrefixGridLayouts()
     {
         var units = OriginalStrategicInteractiveEncounter.Materialize(
