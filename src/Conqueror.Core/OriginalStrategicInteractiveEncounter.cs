@@ -33,12 +33,12 @@ public sealed class OriginalStrategicInteractiveEncounterUnit
     internal OriginalStrategicInteractiveEncounterUnit(
         OriginalStrategicInteractiveEncounterSide side,
         OriginalStrategicInteractiveEncounterCategory category,
-        int combatTypeCode,
+        int initialHeadingOctant,
         int categoryValue)
     {
         Side = side;
         Category = category;
-        CombatTypeCode = combatTypeCode;
+        HeadingOctant = initialHeadingOctant;
         CategoryValue = categoryValue;
     }
 
@@ -46,10 +46,12 @@ public sealed class OriginalStrategicInteractiveEncounterUnit
     public OriginalStrategicInteractiveEncounterCategory Category { get; private set; }
 
     /// <summary>
-    /// Original record <c>+0x14</c>: 3 for player entries and 7 for enemy
-    /// entries. Its tactical meaning has not yet been assigned a name.
+    /// Original record <c>+0x14</c>: an eight-way heading, initialized to
+    /// three for player entries and seven for enemy entries. Helper
+    /// <c>0x296B4</c> turns this field one octant at a time toward a stored
+    /// target and enters contact state when it already faces that target.
     /// </summary>
-    public int CombatTypeCode { get; }
+    public int HeadingOctant { get; internal set; }
 
     /// <summary>
     /// Original record <c>+0x24</c>: 10, 20, or 40 by category. Its tactical
@@ -248,6 +250,69 @@ public static class OriginalStrategicInteractiveEncounter
             if (unit.RemainingStrength > 0)
                 unit.ControlCode = 1;
         }
+    }
+
+    /// <summary>
+    /// Returns the source-compatible octant chosen by <c>0x2964C</c> for a
+    /// unit at <paramref name="sourceX"/>, <paramref name="sourceY"/> toward
+    /// a target coordinate. A target coordinate of minus one follows the
+    /// helper's axis fallback rather than being treated as an absent order.
+    /// </summary>
+    public static int DetermineMappedHeadingOctant(
+        int sourceX,
+        int sourceY,
+        int targetX,
+        int targetY)
+    {
+        if (sourceX == targetX || targetX == -1)
+            return sourceY < targetY ? 1 : 5;
+        if (sourceY == targetY || targetY == -1)
+            return sourceX < targetX ? 3 : 7;
+        if (sourceY > targetY)
+            return sourceX < targetX ? 4 : 6;
+        return sourceX < targetX ? 2 : 0;
+    }
+
+    /// <summary>
+    /// Mirrors target-turn helper <c>0x296B4</c>. It reads the indexed
+    /// target's live coordinates from record <c>+0x30</c>, rotates record
+    /// <c>+0x14</c> through the shorter cyclic route (ties decrement), and
+    /// enters state <c>0x28</c> with phase zero only when it already faces the
+    /// target at the start of this call.
+    /// </summary>
+    public static bool AdvanceMappedTargetHeading(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
+        int unitIndex)
+    {
+        ArgumentNullException.ThrowIfNull(units);
+        if ((uint)unitIndex >= (uint)units.Count)
+            throw new ArgumentOutOfRangeException(nameof(unitIndex));
+
+        var unit = units[unitIndex];
+        ArgumentNullException.ThrowIfNull(unit);
+        var targetIndex = unit.TargetUnitIndex;
+        if ((uint)targetIndex >= (uint)units.Count)
+            throw new InvalidOperationException("Mapped target turn requires a target record index.");
+        var target = units[targetIndex];
+        ArgumentNullException.ThrowIfNull(target);
+        if (unit.HeadingOctant is < 0 or > 7)
+            throw new InvalidOperationException("Mapped target turn requires an octant heading from zero through seven.");
+
+        var desiredHeading = DetermineMappedHeadingOctant(
+            unit.PositionX, unit.PositionY, target.PositionX, target.PositionY);
+        if (unit.HeadingOctant == desiredHeading)
+        {
+            unit.PhaseCounter = 0;
+            unit.StateCode = OriginalStrategicInteractiveEncounterCombat.ContactStateCode;
+            return true;
+        }
+
+        var incrementDistance = Math.Abs(desiredHeading - (unit.HeadingOctant + 1)) % 8;
+        var decrementDistance = Math.Abs(desiredHeading - (unit.HeadingOctant - 1)) % 8;
+        unit.HeadingOctant = incrementDistance < decrementDistance
+            ? (unit.HeadingOctant + 1) % 8
+            : unit.HeadingOctant == 0 ? 7 : unit.HeadingOctant - 1;
+        return false;
     }
 
     /// <summary>
@@ -486,10 +551,10 @@ public static class OriginalStrategicInteractiveEncounter
         int count,
         int categoryValue)
     {
-        var combatTypeCode = side == OriginalStrategicInteractiveEncounterSide.Player ? 3 : 7;
+        var initialHeadingOctant = side == OriginalStrategicInteractiveEncounterSide.Player ? 3 : 7;
         for (var index = 0; index < count; index++)
         {
-            var unit = new OriginalStrategicInteractiveEncounterUnit(side, category, combatTypeCode, categoryValue)
+            var unit = new OriginalStrategicInteractiveEncounterUnit(side, category, initialHeadingOctant, categoryValue)
             {
                 ControlCode = side == OriginalStrategicInteractiveEncounterSide.Player ? 0 : 1,
             };

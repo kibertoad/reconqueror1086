@@ -81,6 +81,14 @@ public sealed class OriginalStrategicInteractiveEncounterSession
             _units[attackerIndex], probeResult);
     }
 
+    /// <summary>
+    /// Advances one source-compatible turn toward this unit's already-stored
+    /// target. Target acquisition and movement/collision probes remain caller
+    /// responsibilities.
+    /// </summary>
+    public bool AdvanceTargetHeading(int unitIndex) =>
+        OriginalStrategicInteractiveEncounter.AdvanceMappedTargetHeading(_units, unitIndex);
+
     public void ApplyDestinationOrder(
         int localX,
         int localY,

@@ -38,7 +38,7 @@ public sealed partial class ResourceAndDefinitionTests
             (OriginalStrategicInteractiveEncounterSide.Enemy, OriginalStrategicInteractiveEncounterCategory.Halberdiers, 7, 20),
             (OriginalStrategicInteractiveEncounterSide.Enemy, OriginalStrategicInteractiveEncounterCategory.Knights, 7, 40),
             (OriginalStrategicInteractiveEncounterSide.Enemy, OriginalStrategicInteractiveEncounterCategory.Knights, 7, 40),
-        ], units.Select(unit => (unit.Side, unit.Category, unit.CombatTypeCode, unit.CategoryValue)));
+        ], units.Select(unit => (unit.Side, unit.Category, unit.HeadingOctant, unit.CategoryValue)));
         Assert.All(units, unit =>
         {
             Assert.Equal(-1, unit.AuxiliaryX);
@@ -198,6 +198,38 @@ public sealed partial class ResourceAndDefinitionTests
         units[2].ControlCode = 0;
         OriginalStrategicInteractiveEncounter.SetMappedControlCodeOneForLivingRecords(units);
         Assert.Equal([1, 0, 1], units.Select(unit => unit.ControlCode));
+    }
+
+    [Fact]
+    public void StrategicInteractiveTargetHeadingUsesExactOctantsAndTieBreaking()
+    {
+        Assert.Equal([0, 1, 2, 3, 4, 5, 6, 7], [
+            OriginalStrategicInteractiveEncounter.DetermineMappedHeadingOctant(10, 10, 0, 20),
+            OriginalStrategicInteractiveEncounter.DetermineMappedHeadingOctant(10, 10, 10, 20),
+            OriginalStrategicInteractiveEncounter.DetermineMappedHeadingOctant(10, 10, 20, 20),
+            OriginalStrategicInteractiveEncounter.DetermineMappedHeadingOctant(10, 10, 20, 10),
+            OriginalStrategicInteractiveEncounter.DetermineMappedHeadingOctant(10, 10, 20, 0),
+            OriginalStrategicInteractiveEncounter.DetermineMappedHeadingOctant(10, 10, 10, 0),
+            OriginalStrategicInteractiveEncounter.DetermineMappedHeadingOctant(10, 10, 0, 0),
+            OriginalStrategicInteractiveEncounter.DetermineMappedHeadingOctant(10, 10, 0, 10),
+        ]);
+        Assert.Equal(1, OriginalStrategicInteractiveEncounter.DetermineMappedHeadingOctant(10, 10, -1, 20));
+        Assert.Equal(3, OriginalStrategicInteractiveEncounter.DetermineMappedHeadingOctant(10, 10, 20, -1));
+
+        var units = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0));
+        units[0].PositionX = 100;
+        units[0].PositionY = 100;
+        units[0].TargetUnitIndex = 1;
+        units[1].PositionX = 120;
+        units[1].PositionY = 120;
+
+        Assert.False(OriginalStrategicInteractiveEncounter.AdvanceMappedTargetHeading(units, 0));
+        Assert.Equal(2, units[0].HeadingOctant);
+        Assert.True(OriginalStrategicInteractiveEncounter.AdvanceMappedTargetHeading(units, 0));
+        Assert.Equal((2, OriginalStrategicInteractiveEncounterCombat.ContactStateCode, 0),
+            (units[0].HeadingOctant, units[0].StateCode, units[0].PhaseCounter));
     }
 
     [Fact]
