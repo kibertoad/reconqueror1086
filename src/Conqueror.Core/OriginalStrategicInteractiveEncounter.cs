@@ -366,12 +366,64 @@ public static class OriginalStrategicInteractiveEncounter
             return true;
         }
 
-        var incrementDistance = Math.Abs(desiredHeading - (unit.HeadingOctant + 1)) % 8;
-        var decrementDistance = Math.Abs(desiredHeading - (unit.HeadingOctant - 1)) % 8;
-        unit.HeadingOctant = incrementDistance < decrementDistance
-            ? (unit.HeadingOctant + 1) % 8
-            : unit.HeadingOctant == 0 ? 7 : unit.HeadingOctant - 1;
+        TurnMappedHeadingOneOctant(unit, desiredHeading);
         return false;
+    }
+
+    /// <summary>
+    /// Mirrors the no-target destination path at <c>0x27479-0x27C59</c>.
+    /// A state-zero unit without a table target first turns toward its paired
+    /// <c>+0x0C/+0x10</c> destination. Once aligned, it processes vertical
+    /// movement before horizontal movement in that same tactical pass. Knights
+    /// probe and move ten units per axis; the other categories use five. Each
+    /// step retains <c>0x28408</c>'s ordered contact semantics through the
+    /// supplied pre-pass selector table: an opposing contact updates the live
+    /// coordinate and turns toward its selected record, while a same-lane
+    /// contact switches control code to one and reverses the stored axis
+    /// destination by five with the original 90-pixel boundary reset.
+    ///
+    /// This is intentionally the source's narrow state-zero/no-target branch,
+    /// not a replacement tactical loop: the caller supplies the immutable
+    /// selector table built at the start of that source pass, and automatic
+    /// behavior after both destination axes are absent remains unmapped.
+    /// </summary>
+    public static bool AdvanceMappedDestinationOrder(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
+        IReadOnlyList<OriginalStrategicInteractiveEncounterRectangle> rectangles,
+        int unitIndex,
+        int contentWidth,
+        int contentHeight)
+    {
+        ArgumentNullException.ThrowIfNull(units);
+        ArgumentNullException.ThrowIfNull(rectangles);
+        if ((uint)unitIndex >= (uint)units.Count)
+            throw new ArgumentOutOfRangeException(nameof(unitIndex));
+        if (rectangles.Count != units.Count)
+            throw new ArgumentException("Mapped selector rectangles must match the unit record count.",
+                nameof(rectangles));
+
+        var unit = units[unitIndex];
+        ArgumentNullException.ThrowIfNull(unit);
+        if (unit.StateCode != 0 || unit.TargetUnitIndex != -1)
+            return false;
+        if (unit.AuxiliaryX == -1 && unit.AuxiliaryY == -1)
+            return false;
+        if (unit.HeadingOctant is < 0 or > 7)
+            throw new InvalidOperationException("Mapped destination movement requires an octant heading from zero through seven.");
+
+        var desiredHeading = DetermineMappedHeadingOctant(
+            unit.PositionX, unit.PositionY, unit.AuxiliaryX, unit.AuxiliaryY);
+        if (unit.HeadingOctant != desiredHeading)
+        {
+            TurnMappedHeadingOneOctant(unit, desiredHeading);
+            return true;
+        }
+
+        AdvanceMappedDestinationAxis(units, rectangles, unitIndex, vertical: true,
+            contentWidth: contentWidth, contentHeight: contentHeight);
+        AdvanceMappedDestinationAxis(units, rectangles, unitIndex, vertical: false,
+            contentWidth: contentWidth, contentHeight: contentHeight);
+        return true;
     }
 
     /// <summary>
@@ -499,6 +551,97 @@ public static class OriginalStrategicInteractiveEncounter
                 : checked(enemyColumnBaseX + index / rows * FormationGridStep);
             unit.PositionY = checked(index % rows * FormationGridStep + FormationGridInset);
         }
+    }
+
+    private static void AdvanceMappedDestinationAxis(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
+        IReadOnlyList<OriginalStrategicInteractiveEncounterRectangle> rectangles,
+        int unitIndex,
+        bool vertical,
+        int contentWidth,
+        int contentHeight)
+    {
+        var unit = units[unitIndex];
+        var target = vertical ? unit.AuxiliaryY : unit.AuxiliaryX;
+        if (target == -1)
+            return;
+
+        var current = vertical ? unit.PositionY : unit.PositionX;
+        var difference = checked(target - current);
+        var step = unit.Category == OriginalStrategicInteractiveEncounterCategory.Knights ? 10 : 5;
+        var direction = difference >= 0 ? 1 : -1;
+        var distance = Math.Abs(difference);
+        var advance = distance < 10 ? difference : checked(direction * step);
+        var targetUnitIndex = unit.TargetUnitIndex;
+        var contact = OriginalStrategicInteractiveEncounterGeometry.ProbeMappedNeighborContact(
+            units, rectangles, unitIndex,
+            vertical ? 0 : advance,
+            vertical ? advance : 0,
+            contentWidth, contentHeight,
+            ref targetUnitIndex);
+        unit.TargetUnitIndex = targetUnitIndex;
+
+        if (contact == 1)
+        {
+            unit.ControlCode = 1;
+            if (distance < 10)
+            {
+                SetMappedAxisTarget(unit, vertical, -1);
+                return;
+            }
+
+            var boundary = checked((vertical ? contentHeight : contentWidth) - 90);
+            var reversedTarget = checked(target - direction * 5);
+            SetMappedAxisTarget(unit, vertical,
+                direction > 0
+                    ? reversedTarget < 0 ? boundary : reversedTarget
+                    : reversedTarget >= boundary ? 90 : reversedTarget);
+            return;
+        }
+
+        IncrementMappedPhase(unit);
+        SetMappedAxisPosition(unit, vertical, checked(current + advance));
+        if (distance < 10 && contact == 0)
+            SetMappedAxisTarget(unit, vertical, -1);
+
+        if (contact == 2)
+            AdvanceMappedTargetHeading(units, unitIndex);
+    }
+
+    private static void TurnMappedHeadingOneOctant(
+        OriginalStrategicInteractiveEncounterUnit unit,
+        int desiredHeading)
+    {
+        var incrementDistance = Math.Abs(desiredHeading - (unit.HeadingOctant + 1)) % 8;
+        var decrementDistance = Math.Abs(desiredHeading - (unit.HeadingOctant - 1)) % 8;
+        unit.HeadingOctant = incrementDistance < decrementDistance
+            ? (unit.HeadingOctant + 1) % 8
+            : unit.HeadingOctant == 0 ? 7 : unit.HeadingOctant - 1;
+    }
+
+    private static void IncrementMappedPhase(OriginalStrategicInteractiveEncounterUnit unit) =>
+        unit.PhaseCounter = (unit.PhaseCounter + 1) % 5;
+
+    private static void SetMappedAxisPosition(
+        OriginalStrategicInteractiveEncounterUnit unit,
+        bool vertical,
+        int value)
+    {
+        if (vertical)
+            unit.PositionY = value;
+        else
+            unit.PositionX = value;
+    }
+
+    private static void SetMappedAxisTarget(
+        OriginalStrategicInteractiveEncounterUnit unit,
+        bool vertical,
+        int value)
+    {
+        if (vertical)
+            unit.AuxiliaryY = value;
+        else
+            unit.AuxiliaryX = value;
     }
 
     private static void ApplyMenuCodeTwoTriangle(

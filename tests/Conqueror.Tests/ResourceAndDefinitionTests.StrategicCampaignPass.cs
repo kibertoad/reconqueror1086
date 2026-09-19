@@ -353,6 +353,64 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveStateZeroDestinationWalksAxesAndPreservesCollisionBranches()
+    {
+        var ordered = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(0, 0, 0));
+        var walker = ordered[0];
+        walker.PositionX = 100;
+        walker.PositionY = 100;
+        walker.AuxiliaryX = 106;
+        walker.AuxiliaryY = 108;
+
+        Assert.True(OriginalStrategicInteractiveEncounter.AdvanceMappedDestinationOrder(
+            ordered, ordered.Select(OriginalStrategicInteractiveEncounterGeometry.RenderRectangleFor).ToArray(),
+            0, 640, 480));
+        Assert.Equal((100, 100, 2, 0),
+            (walker.PositionX, walker.PositionY, walker.HeadingOctant, walker.PhaseCounter));
+        Assert.True(OriginalStrategicInteractiveEncounter.AdvanceMappedDestinationOrder(
+            ordered, ordered.Select(OriginalStrategicInteractiveEncounterGeometry.RenderRectangleFor).ToArray(),
+            0, 640, 480));
+        Assert.Equal((106, 108, -1, -1, 2),
+            (walker.PositionX, walker.PositionY, walker.AuxiliaryX, walker.AuxiliaryY, walker.PhaseCounter));
+
+        var opposing = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0));
+        opposing[0].PositionX = 100;
+        opposing[0].PositionY = 100;
+        opposing[0].AuxiliaryX = 200;
+        opposing[0].AuxiliaryY = -1;
+        opposing[1].PositionX = 120;
+        opposing[1].PositionY = 100;
+
+        Assert.True(OriginalStrategicInteractiveEncounter.AdvanceMappedDestinationOrder(
+            opposing, opposing.Select(OriginalStrategicInteractiveEncounterGeometry.RenderRectangleFor).ToArray(),
+            0, 640, 480));
+        Assert.Equal((105, 0, OriginalStrategicInteractiveEncounterCombat.ContactStateCode, 1),
+            (opposing[0].PositionX, opposing[0].PhaseCounter, opposing[0].StateCode,
+                opposing[0].TargetUnitIndex));
+
+        var sameLane = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(2, 0, 0),
+            new OriginalStrategicEncounterForces(0, 0, 0));
+        sameLane[0].PositionX = 100;
+        sameLane[0].PositionY = 100;
+        sameLane[0].AuxiliaryX = 200;
+        sameLane[0].AuxiliaryY = -1;
+        sameLane[1].PositionX = 120;
+        sameLane[1].PositionY = 100;
+
+        Assert.True(OriginalStrategicInteractiveEncounter.AdvanceMappedDestinationOrder(
+            sameLane, sameLane.Select(OriginalStrategicInteractiveEncounterGeometry.RenderRectangleFor).ToArray(),
+            0, 640, 480));
+        Assert.Equal((100, 195, 1, 0, 1),
+            (sameLane[0].PositionX, sameLane[0].AuxiliaryX, sameLane[0].ControlCode,
+                sameLane[0].PhaseCounter, sameLane[0].TargetUnitIndex));
+    }
+
+    [Fact]
     public void StrategicInteractiveResolvedContactPreservesCounterDamageBonusAndDeathCleanup()
     {
         var units = OriginalStrategicInteractiveEncounter.Materialize(
