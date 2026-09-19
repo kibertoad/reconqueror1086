@@ -264,6 +264,8 @@ public sealed partial class ResourceAndDefinitionTests
     {
         Assert.Equal(new SiegeFrameRun(43, 4), SiegeCombatPresentation.BloodFramesFor(true));
         Assert.Equal(new SiegeFrameRun(48, 4), SiegeCombatPresentation.BloodFramesFor(false));
+        Assert.Equal(SiegeHitEffect.CompatibilityStepSeconds,
+            SiegeCombatPresentation.CompatibilityStepSeconds);
     }
 
     [Fact]

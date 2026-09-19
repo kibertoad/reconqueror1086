@@ -740,9 +740,9 @@ public sealed partial class ConquerorGame
             return;
         }
         elapsed += elapsedSeconds;
-        while (elapsed >= SiegeCombatPresentation.ProvisionalStepSeconds && frame >= 0)
+        while (elapsed >= SiegeCombatPresentation.CompatibilityStepSeconds && frame >= 0)
         {
-            elapsed -= SiegeCombatPresentation.ProvisionalStepSeconds;
+            elapsed -= SiegeCombatPresentation.CompatibilityStepSeconds;
             frame = run.Next(frame);
         }
     }
