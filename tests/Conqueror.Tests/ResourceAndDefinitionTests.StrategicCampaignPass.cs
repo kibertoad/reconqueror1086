@@ -183,6 +183,24 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveControlCodeOnePathsPreserveTheirDistinctRecordFilters()
+    {
+        var units = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(2, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0));
+        units[1].RemainingStrength = 0;
+
+        OriginalStrategicInteractiveEncounter.SetMappedControlCodeOneForSelectedRecords(units, [1, 2]);
+        Assert.Equal([0, 1, 1], units.Select(unit => unit.ControlCode));
+
+        units[0].ControlCode = 0;
+        units[1].ControlCode = 0;
+        units[2].ControlCode = 0;
+        OriginalStrategicInteractiveEncounter.SetMappedControlCodeOneForLivingRecords(units);
+        Assert.Equal([1, 0, 1], units.Select(unit => unit.ControlCode));
+    }
+
+    [Fact]
     public void StrategicInteractiveSessionCombinesMappedFormationPlayerControlGeometryAndCadence()
     {
         var session = OriginalStrategicInteractiveEncounterSession.Create(

@@ -214,6 +214,43 @@ public static class OriginalStrategicInteractiveEncounter
     }
 
     /// <summary>
+    /// Writes control code one to every record named by the current selected
+    /// list, matching <c>0x26918-0x26966</c>. The source does not recheck
+    /// strength or side while processing the already-populated list.
+    /// </summary>
+    public static void SetMappedControlCodeOneForSelectedRecords(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
+        IReadOnlyList<int> selectedUnitIndices)
+    {
+        ArgumentNullException.ThrowIfNull(units);
+        ArgumentNullException.ThrowIfNull(selectedUnitIndices);
+        foreach (var index in selectedUnitIndices)
+        {
+            if ((uint)index >= (uint)units.Count)
+                throw new ArgumentOutOfRangeException(nameof(selectedUnitIndices));
+            var unit = units[index];
+            ArgumentNullException.ThrowIfNull(unit);
+            unit.ControlCode = 1;
+        }
+    }
+
+    /// <summary>
+    /// Writes control code one to every positive-strength record, matching
+    /// <c>0x26968-0x26999</c>. This source path does not filter by side.
+    /// </summary>
+    public static void SetMappedControlCodeOneForLivingRecords(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units)
+    {
+        ArgumentNullException.ThrowIfNull(units);
+        foreach (var unit in units)
+        {
+            ArgumentNullException.ThrowIfNull(unit);
+            if (unit.RemainingStrength > 0)
+                unit.ControlCode = 1;
+        }
+    }
+
+    /// <summary>
     /// Applies the mapped player-prefix formation paths in <c>0x2904B</c>,
     /// <c>0x290BA</c>, and <c>0x29132</c>. Menu code 3 has its own method
     /// because its exact path also consumes a raw draw and the viewport width.

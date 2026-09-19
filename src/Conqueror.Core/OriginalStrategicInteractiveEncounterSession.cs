@@ -52,6 +52,13 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         OriginalStrategicInteractiveEncounter.TryAppendMappedPlayerSelection(
             _units, _selectedUnitIndices, unitIndex);
 
+    public void SetMappedControlCodeOneForSelection() =>
+        OriginalStrategicInteractiveEncounter.SetMappedControlCodeOneForSelectedRecords(
+            _units, _selectedUnitIndices);
+
+    public void SetMappedControlCodeOneForLivingUnits() =>
+        OriginalStrategicInteractiveEncounter.SetMappedControlCodeOneForLivingRecords(_units);
+
     public void ApplyDestinationOrder(
         int localX,
         int localY,
