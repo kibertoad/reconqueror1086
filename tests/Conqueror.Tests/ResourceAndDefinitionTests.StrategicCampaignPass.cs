@@ -242,6 +242,36 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicEncounterStagingUsesTheOriginalCategoryDivisorsAndReservedPlayerForces()
+    {
+        var preparation = OriginalStrategicEncounterStaging.Prepare(
+            new OriginalStrategicEncounterForces(10, 30, 62),
+            new OriginalStrategicEncounterForces(1, 1, 100));
+
+        Assert.Equal(new OriginalStrategicEncounterForces(10, 9, 41),
+            preparation.PlayerResolverForces);
+        Assert.Equal(new OriginalStrategicEncounterForces(0, 21, 21),
+            preparation.PlayerReservedForces);
+        Assert.Equal(new OriginalStrategicEncounterForces(1, 1, 86),
+            preparation.EnemyResolverForces);
+    }
+
+    [Fact]
+    public void StrategicEncounterStagingPreservesTheStrictReductionPlusOneBoundary()
+    {
+        var preparation = OriginalStrategicEncounterStaging.Prepare(
+            new OriginalStrategicEncounterForces(22, 22, 22),
+            new OriginalStrategicEncounterForces(3, 3, 60));
+
+        Assert.Equal(new OriginalStrategicEncounterForces(20, 20, 20),
+            preparation.PlayerResolverForces);
+        Assert.Equal(new OriginalStrategicEncounterForces(2, 2, 2),
+            preparation.PlayerReservedForces);
+        Assert.Equal(new OriginalStrategicEncounterForces(3, 3, 58),
+            preparation.EnemyResolverForces);
+    }
+
+    [Fact]
     public void FieldingAnArmyConstructsItsMatchingOriginalMovementRecord()
     {
         var state = Campaign.NewFromTemplate(0);

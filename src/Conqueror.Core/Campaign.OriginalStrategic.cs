@@ -49,6 +49,67 @@ public readonly record struct OriginalStrategicEncounterForces(
 }
 
 /// <summary>
+/// The exact force staging performed immediately before resolver <c>0x258FC</c>.
+/// Player reserves are deliberately held outside the resolver and added back
+/// after it returns; hostile values are resolver-owned write-back counters.
+/// </summary>
+public readonly record struct OriginalStrategicEncounterPreparation(
+    OriginalStrategicEncounterForces PlayerResolverForces,
+    OriginalStrategicEncounterForces PlayerReservedForces,
+    OriginalStrategicEncounterForces EnemyResolverForces);
+
+public static class OriginalStrategicEncounterStaging
+{
+    public const int ResolverForceThreshold = 60;
+    public const int PlayerLargeCategoryThreshold = 20;
+
+    /// <summary>
+    /// Maps wrapper <c>0x35924</c>'s pre-resolver counter reductions. Its
+    /// original integer divisions and strict <c>reduction + 1 &lt; count</c>
+    /// tests are retained rather than treating either side as an aggregate.
+    /// </summary>
+    public static OriginalStrategicEncounterPreparation Prepare(
+        OriginalStrategicEncounterForces playerForces,
+        OriginalStrategicEncounterForces enemyForces)
+    {
+        playerForces.Validate(nameof(playerForces));
+        enemyForces.Validate(nameof(enemyForces));
+
+        var enemyReduction = enemyForces.Total > ResolverForceThreshold
+            ? (enemyForces.Total - ResolverForceThreshold) / 3
+            : 0;
+        var enemyResolver = ReduceEveryCategory(enemyForces, enemyReduction);
+
+        var playerDivisor = CountLargePlayerCategories(playerForces);
+        var playerReduction = playerForces.Total > ResolverForceThreshold && playerDivisor > 0
+            ? (playerForces.Total - ResolverForceThreshold) / playerDivisor
+            : 0;
+        var playerResolver = ReduceEveryCategory(playerForces, playerReduction);
+        var playerReserved = new OriginalStrategicEncounterForces(
+            checked(playerForces.Swordsmen - playerResolver.Swordsmen),
+            checked(playerForces.Halberdiers - playerResolver.Halberdiers),
+            checked(playerForces.Knights - playerResolver.Knights));
+        return new(playerResolver, playerReserved, enemyResolver);
+    }
+
+    private static int CountLargePlayerCategories(OriginalStrategicEncounterForces forces) =>
+        (forces.Swordsmen >= PlayerLargeCategoryThreshold ? 1 : 0)
+        + (forces.Halberdiers >= PlayerLargeCategoryThreshold ? 1 : 0)
+        + (forces.Knights >= PlayerLargeCategoryThreshold ? 1 : 0);
+
+    private static OriginalStrategicEncounterForces ReduceEveryCategory(
+        OriginalStrategicEncounterForces forces,
+        int reduction) => new(
+            ReduceCategory(forces.Swordsmen, reduction),
+            ReduceCategory(forces.Halberdiers, reduction),
+            ReduceCategory(forces.Knights, reduction));
+
+    private static int ReduceCategory(int count, int reduction) => reduction + 1 < count
+        ? checked(count - reduction)
+        : count;
+}
+
+/// <summary>
 /// Immutable capture of the original six-counter player/enemy encounter
 /// boundary. This is a handoff payload only: it does not select a tactical
 /// engine or infer any casualty/result rule.
@@ -59,6 +120,9 @@ public sealed record OriginalStrategicPlayerEnemyEncounter(
     OriginalStrategicEncounterForces PlayerForces,
     OriginalStrategicEncounterForces EnemyForces)
 {
+    public OriginalStrategicEncounterPreparation Preparation =>
+        OriginalStrategicEncounterStaging.Prepare(PlayerForces, EnemyForces);
+
     internal static OriginalStrategicPlayerEnemyEncounter Capture(
         OriginalStrategicCampaignState strategic,
         Player player,
