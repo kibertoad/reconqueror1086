@@ -57,6 +57,8 @@ The first exact interactive-loop record mutation is also mapped. At `0x26B88`, e
 
 Interactive resolver loop `0x26B88` is timed by helper `0x18420`, which returns interrupt counter `A688` shifted left two. Timer callback `0x183C1` increments that counter; the loop skips a tactical pass while `currentClock <= lastSample + 0xC8`, then samples the clock again and replaces `lastSample` before visiting units. It consequently accepts the strict post-200-ms boundary once and does not run catch-up passes after a late frame. `OriginalStrategicInteractiveEncounterTiming` represents that invariant against a monotonic absolute `TimeSpan`, rather than letting host frame rate or CPU throughput choose tactical cadence.
 
+The interactive neighbor path now has its exact geometry primitive. Selector `0x6FF10` scans the temporary eight-byte rectangle array in increasing table order, returns its first hit as a one-based index (zero for no hit), and delegates to `0x64164`'s `left <= x < left + width`, `top <= y < top + height` predicate. The `0x26B88` loop emits `(PositionX - 15, PositionY - 20, 25, 30)` only for positive-strength units and a zero rectangle otherwise. `OriginalStrategicInteractiveEncounterGeometry` preserves this ordered, half-open selector and its source-compatible result values; the higher-level neighbor probe chain remains intentionally unmapped rather than approximated.
+
 ## Validation
 
 The executable specifications reject duplicate equipment and courtship names, duplicate win rewards, mismatched building keys, and dragon requirements that cannot be earned from a defined reward ladder. Full campaign behavior tests then exercise the same generic interpreters used by the game.

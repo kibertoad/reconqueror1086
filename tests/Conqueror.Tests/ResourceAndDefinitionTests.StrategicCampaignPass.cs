@@ -86,6 +86,32 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveEncounterGeometryUsesPositiveStrengthBoundsAndFirstExclusiveRectangleHit()
+    {
+        var units = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0));
+        units[0].PositionX = 100;
+        units[0].PositionY = 200;
+        units[1].PositionX = 100;
+        units[1].PositionY = 200;
+        units[1].RemainingStrength = 0;
+
+        var playerBounds = OriginalStrategicInteractiveEncounterGeometry.RenderRectangleFor(units[0]);
+        var enemyBounds = OriginalStrategicInteractiveEncounterGeometry.RenderRectangleFor(units[1]);
+
+        Assert.Equal(new OriginalStrategicInteractiveEncounterRectangle(85, 180, 25, 30), playerBounds);
+        Assert.Equal(default, enemyBounds);
+        Assert.True(playerBounds.Contains(85, 180));
+        Assert.False(playerBounds.Contains(110, 180));
+        Assert.False(playerBounds.Contains(85, 210));
+        Assert.Equal(1, OriginalStrategicInteractiveEncounterGeometry.FindFirstContainingOneBased(
+            [playerBounds, new OriginalStrategicInteractiveEncounterRectangle(80, 175, 40, 40)], 90, 190));
+        Assert.Equal(0, OriginalStrategicInteractiveEncounterGeometry.FindFirstContainingOneBased(
+            [playerBounds, enemyBounds], 110, 210));
+    }
+
+    [Fact]
     public void StrategicInteractiveMenuCodesZeroAndOneUseTheirExactPlayerPrefixGridLayouts()
     {
         var units = OriginalStrategicInteractiveEncounter.Materialize(
