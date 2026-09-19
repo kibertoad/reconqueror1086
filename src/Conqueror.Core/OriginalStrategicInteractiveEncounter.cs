@@ -96,17 +96,17 @@ public static class OriginalStrategicInteractiveEncounter
     }
 
     /// <summary>
-    /// Applies the two simple player-prefix formation paths in <c>0x2904B</c>
-    /// and <c>0x290BA</c>. Codes 2 and 3 use distinct denser paths and are
-    /// intentionally rejected until their complete geometry is represented.
+    /// Applies the mapped player-prefix formation paths in <c>0x2904B</c>,
+    /// <c>0x290BA</c>, and <c>0x29132</c>. Code 3 uses a distinct path and is
+    /// intentionally rejected until its complete geometry is represented.
     /// </summary>
-    public static void ApplyMenuCodeZeroOrOneFormation(
+    public static void ApplyMappedMenuFormation(
         IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
         int menuCode,
         int verticalSpan)
     {
         ArgumentNullException.ThrowIfNull(units);
-        if (menuCode is not (0 or 1))
+        if (menuCode is < 0 or > 2)
             throw new ArgumentOutOfRangeException(nameof(menuCode));
         var rows = verticalSpan / FormationGridStep;
         if (rows <= 0)
@@ -128,6 +128,12 @@ public static class OriginalStrategicInteractiveEncounter
             playerCount++;
         }
 
+        if (menuCode == 2)
+        {
+            ApplyMenuCodeTwoTriangle(units, playerCount, verticalSpan);
+            return;
+        }
+
         for (var index = 0; index < playerCount; index++)
         {
             var column = index / rows;
@@ -136,6 +142,36 @@ public static class OriginalStrategicInteractiveEncounter
                 : checked((playerCount / rows) * FormationGridStep + FormationGridStep
                     - column * FormationGridStep);
             units[index].PositionY = checked((index % rows) * FormationGridStep + FormationGridInset);
+        }
+    }
+
+    private static void ApplyMenuCodeTwoTriangle(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
+        int playerCount,
+        int verticalSpan)
+    {
+        if (playerCount == 0)
+            return;
+
+        var rowLength = 1;
+        while (checked(rowLength * (rowLength + 1) / 2) < playerCount)
+            rowLength++;
+
+        var x = checked(rowLength * 45);
+        var rowY = verticalSpan / 2;
+        var index = 0;
+        for (var count = 1; index < playerCount; count++)
+        {
+            var y = rowY;
+            for (var column = 0; column < count && index < playerCount; column++, index++)
+            {
+                units[index].PositionX = x;
+                units[index].PositionY = y;
+                y = checked(y + FormationGridStep);
+            }
+
+            x = checked(x - 45);
+            rowY = checked(rowY - FormationGridInset);
         }
     }
 
