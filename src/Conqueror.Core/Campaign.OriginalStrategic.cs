@@ -25,7 +25,74 @@ public sealed record OriginalStrategicCampaignPassInput(
 public sealed record OriginalStrategicCampaignPassResult(
     StrategicSpyReport? SpyReport,
     OriginalStrategicPlayerPassResult PlayerPass,
+    IReadOnlyList<OriginalStrategicPlayerEnemyEncounter> Encounters,
     OriginalStrategicSchedulerResult? SchedulerPass);
+
+/// <summary>
+/// The three typed force counters staged for one side of the original
+/// strategic encounter resolver. They deliberately remain distinct from an
+/// aggregate strength so the later resolver boundary can return each
+/// category independently.
+/// </summary>
+public readonly record struct OriginalStrategicEncounterForces(
+    int Swordsmen,
+    int Halberdiers,
+    int Knights)
+{
+    public int Total => checked(Swordsmen + Halberdiers + Knights);
+
+    internal void Validate(string parameterName)
+    {
+        if (Swordsmen < 0 || Halberdiers < 0 || Knights < 0)
+            throw new ArgumentOutOfRangeException(parameterName);
+    }
+}
+
+/// <summary>
+/// Immutable capture of the original six-counter player/enemy encounter
+/// boundary. This is a handoff payload only: it does not select a tactical
+/// engine or infer any casualty/result rule.
+/// </summary>
+public sealed record OriginalStrategicPlayerEnemyEncounter(
+    int PlayerMovementSlot,
+    int EnemyMovementSlot,
+    OriginalStrategicEncounterForces PlayerForces,
+    OriginalStrategicEncounterForces EnemyForces)
+{
+    internal static OriginalStrategicPlayerEnemyEncounter Capture(
+        OriginalStrategicCampaignState strategic,
+        Player player,
+        int playerMovementSlot,
+        int enemyMovementSlot)
+    {
+        ArgumentNullException.ThrowIfNull(strategic);
+        ArgumentNullException.ThrowIfNull(player);
+        strategic.Validate();
+        if (playerMovementSlot is < 0 or >= OriginalStrategicMovement.PlayerArmyMovementCount)
+            throw new ArgumentOutOfRangeException(nameof(playerMovementSlot));
+        if (enemyMovementSlot is < 0 or >= OriginalStrategicMovement.SlotCount)
+            throw new ArgumentOutOfRangeException(nameof(enemyMovementSlot));
+
+        var playerRecord = strategic.PlayerMovementSlots.Single(slot => slot.Slot == playerMovementSlot);
+        var enemyRecord = strategic.MovementSlots.Single(slot => slot.Slot == enemyMovementSlot);
+        if (!playerRecord.Active || !enemyRecord.Active)
+            throw new InvalidOperationException("Strategic encounter requires active player and enemy records.");
+
+        player.EnsureArmyRoster();
+        var army = player.ArmyAt(playerMovementSlot);
+        var playerForces = new OriginalStrategicEncounterForces(
+            army.Units[UnitType.Swordsmen],
+            army.Units[UnitType.Halberdiers],
+            army.Units[UnitType.Knights]);
+        var enemyForces = new OriginalStrategicEncounterForces(
+            enemyRecord.Swordsmen,
+            enemyRecord.Halberdiers,
+            enemyRecord.Knights);
+        playerForces.Validate(nameof(player));
+        enemyForces.Validate(nameof(strategic));
+        return new(playerMovementSlot, enemyMovementSlot, playerForces, enemyForces);
+    }
+}
 
 public sealed partial class Campaign
 {
@@ -75,6 +142,9 @@ public sealed partial class Campaign
         var playerPass = OriginalStrategicMovement.AdvancePlayerPass(
             strategic, _originalStrategicResources, input.DivisionTargets,
             input.PlayerEncounterHandoffActive);
+        var encounters = playerPass.Contacts.Select(contact =>
+            OriginalStrategicPlayerEnemyEncounter.Capture(
+                strategic, State.Player, contact.PlayerSlot, contact.EnemySlot)).ToArray();
         var pursuitTargets = PlayerArmyPursuitTargets(strategic);
         var engaged = strategic.PlayerMovementSlots.Single(slot =>
             slot.Slot == strategic.EngagedPlayerMovementSlot);
@@ -91,7 +161,7 @@ public sealed partial class Campaign
                     pursuitTargets,
                     input.SpecialPropertyHouseholdCount),
                 random);
-        return new(report, playerPass, schedulerPass);
+        return new(report, playerPass, encounters, schedulerPass);
     }
 
     private StrategicSpyReport? CaptureOriginalStrategicSpyReport(

@@ -177,9 +177,68 @@ public sealed partial class ResourceAndDefinitionTests
             new QueueStrategicRandom());
 
         Assert.Empty(result.PlayerPass.Contacts);
+        Assert.Empty(result.Encounters);
         Assert.Equal(0, strategic.SelectedPlayerMovementSlot);
         Assert.NotNull(result.SchedulerPass);
         Assert.True(hostile.CurrentX > 1_000);
+    }
+
+    [Fact]
+    public void OriginalStrategicPassCapturesTheContactSixCounterHandoffBeforeTheScheduler()
+    {
+        var state = Campaign.NewFromTemplate(0);
+        state.OriginalStrategicState = OriginalStrategicCampaignState.CreateForNewGame(
+            state.Date, startingRouteSelector: 0);
+        var strategic = state.OriginalStrategicState;
+        var army = state.Player.ArmyAt(0);
+        army.Units[UnitType.Swordsmen] = 11;
+        army.Units[UnitType.Halberdiers] = 12;
+        army.Units[UnitType.Knights] = 13;
+        state.Player.SetArmyFieldState(0, fielded: true, location: 0);
+        var player = strategic.PlayerMovementSlots[0];
+        player.Active = true;
+        player.PathComplete = true;
+        player.CurrentX = 1_000;
+        player.CurrentY = 2_000;
+        player.GridX = 7;
+        player.GridY = 11;
+        var hostile = strategic.MovementSlots[3];
+        hostile.Active = true;
+        hostile.Mode = OriginalStrategicMovement.DirectPropertyMode;
+        hostile.OriginProperty = 0;
+        hostile.Lord = strategic.Properties[0].Lord;
+        hostile.Swordsmen = 21;
+        hostile.Halberdiers = 22;
+        hostile.Knights = 23;
+        hostile.CurrentX = 1_000;
+        hostile.CurrentY = 2_000;
+        hostile.DestinationX = 2_000;
+        hostile.DestinationY = 2_000;
+        hostile.DirectionX = 1;
+
+        var resources = new StubStrategicResources();
+        resources.Routes["sc_0.rat"] = [new OriginalStrategicRoutePoint(0, 0)];
+        var campaign = new Campaign(state);
+        campaign.ConfigureOriginalStrategicResources(resources);
+
+        var result = campaign.AdvanceOriginalStrategicPass(
+            new OriginalStrategicCampaignPassInput(
+                17,
+                0,
+                [
+                    new OriginalStrategicPlayerTarget(false, 0, 0),
+                    new OriginalStrategicPlayerTarget(false, 0, 0),
+                    new OriginalStrategicPlayerTarget(false, 0, 0)],
+                76),
+            new QueueStrategicRandom());
+
+        Assert.Equal(new OriginalStrategicPlayerEnemyEncounter(
+                0,
+                3,
+                new OriginalStrategicEncounterForces(11, 12, 13),
+                new OriginalStrategicEncounterForces(21, 22, 23)),
+            Assert.Single(result.Encounters));
+        Assert.NotNull(result.SchedulerPass);
     }
 
     [Fact]
