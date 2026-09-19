@@ -85,4 +85,135 @@ public static class OriginalStrategicInteractiveEncounterGeometry
 
         return 0;
     }
+
+    /// <summary>
+    /// Mirrors neighbor helper <c>0x28408</c>. The source rectangle is
+    /// temporarily replaced by a one-by-one offscreen rectangle, then its
+    /// offset corners are probed in top-left, bottom-left, top-right,
+    /// bottom-right order. A living hit returns one for the source lane or
+    /// two for the other lane; every nonzero hit writes its zero-based record
+    /// index to <paramref name="targetUnitIndex"/> before the living test.
+    ///
+    /// If the first corner hits a dead record, a miss at any later corner
+    /// stops immediately. If the first corner misses, later misses instead
+    /// continue to the next corner. This intentionally preserves the source
+    /// branch asymmetry rather than substituting overlap or nearest-unit
+    /// selection.
+    /// </summary>
+    public static int ProbeMappedNeighborContact(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
+        int sourceUnitIndex,
+        int deltaX,
+        int deltaY,
+        int contentWidth,
+        int contentHeight,
+        ref int targetUnitIndex)
+    {
+        ArgumentNullException.ThrowIfNull(units);
+        return ProbeMappedNeighborContact(
+            units,
+            units.Select(RenderRectangleFor).ToArray(),
+            sourceUnitIndex,
+            deltaX,
+            deltaY,
+            contentWidth,
+            contentHeight,
+            ref targetUnitIndex);
+    }
+
+    /// <summary>
+    /// Runs <see cref="ProbeMappedNeighborContact(IReadOnlyList{OriginalStrategicInteractiveEncounterUnit}, int, int, int, int, int, ref int)"/>
+    /// against the supplied live selector table. The table is a distinct
+    /// source artifact: callers retain it when a tactical pass deliberately
+    /// observes a non-positive record before its geometry is rebuilt.
+    /// </summary>
+    public static int ProbeMappedNeighborContact(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
+        IReadOnlyList<OriginalStrategicInteractiveEncounterRectangle> rectangles,
+        int sourceUnitIndex,
+        int deltaX,
+        int deltaY,
+        int contentWidth,
+        int contentHeight,
+        ref int targetUnitIndex)
+    {
+        ArgumentNullException.ThrowIfNull(units);
+        ArgumentNullException.ThrowIfNull(rectangles);
+        if ((uint)sourceUnitIndex >= (uint)units.Count)
+            throw new ArgumentOutOfRangeException(nameof(sourceUnitIndex));
+        if (rectangles.Count != units.Count)
+            throw new ArgumentException("Mapped selector rectangles must match the unit record count.",
+                nameof(rectangles));
+
+        var source = units[sourceUnitIndex];
+        ArgumentNullException.ThrowIfNull(source);
+        var sourceRectangle = rectangles[sourceUnitIndex];
+        var probeRectangles = rectangles.ToArray();
+        probeRectangles[sourceUnitIndex] = new(
+            unchecked((short)(contentWidth + 1)),
+            unchecked((short)(contentHeight + 1)),
+            1,
+            1);
+
+        var corners = new[]
+        {
+            (X: checked(sourceRectangle.X + deltaX), Y: checked(sourceRectangle.Y + deltaY)),
+            (X: checked(sourceRectangle.X + deltaX),
+                Y: checked(sourceRectangle.Y + sourceRectangle.Height + deltaY)),
+            (X: checked(sourceRectangle.X + sourceRectangle.Width + deltaX),
+                Y: checked(sourceRectangle.Y + deltaY)),
+            (X: checked(sourceRectangle.X + sourceRectangle.Width + deltaX),
+                Y: checked(sourceRectangle.Y + sourceRectangle.Height + deltaY)),
+        };
+
+        var firstHit = FindFirstContainingOneBased(probeRectangles, corners[0].X, corners[0].Y);
+        if (firstHit != 0)
+        {
+            if (TryReturnLivingContact(units, source, firstHit, ref targetUnitIndex, out var relation))
+                return relation;
+
+            for (var corner = 1; corner < corners.Length; corner++)
+            {
+                var hit = FindFirstContainingOneBased(probeRectangles, corners[corner].X, corners[corner].Y);
+                if (hit == 0)
+                    return 0;
+                if (TryReturnLivingContact(units, source, hit, ref targetUnitIndex, out relation))
+                    return relation;
+            }
+
+            return 0;
+        }
+
+        for (var corner = 1; corner < corners.Length; corner++)
+        {
+            var hit = FindFirstContainingOneBased(probeRectangles, corners[corner].X, corners[corner].Y);
+            if (hit == 0)
+                continue;
+            if (TryReturnLivingContact(units, source, hit, ref targetUnitIndex, out var relation))
+                return relation;
+        }
+
+        return 0;
+    }
+
+    private static bool TryReturnLivingContact(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
+        OriginalStrategicInteractiveEncounterUnit source,
+        int oneBasedHit,
+        ref int targetUnitIndex,
+        out int relation)
+    {
+        var hitIndex = checked(oneBasedHit - 1);
+        var candidate = units[hitIndex];
+        ArgumentNullException.ThrowIfNull(candidate);
+        targetUnitIndex = hitIndex;
+        if (candidate.RemainingStrength <= 0)
+        {
+            relation = 0;
+            return false;
+        }
+
+        relation = candidate.Side == source.Side ? 1 : 2;
+        return true;
+    }
 }

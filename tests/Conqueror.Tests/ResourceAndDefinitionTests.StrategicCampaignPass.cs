@@ -194,6 +194,52 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveNeighborProbeUsesOrderedCornersAndItsDeadFirstHitAsymmetry()
+    {
+        var units = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(3, 0, 0));
+        units[0].PositionX = 100;
+        units[0].PositionY = 100;
+        units[1].PositionX = 100;
+        units[1].PositionY = 100;
+        units[2].PositionX = 125;
+        units[2].PositionY = 100;
+        units[3].PositionX = 125;
+        units[3].PositionY = 130;
+        var rectangles = units.Select(OriginalStrategicInteractiveEncounterGeometry.RenderRectangleFor).ToArray();
+
+        var target = -1;
+        Assert.Equal(2, OriginalStrategicInteractiveEncounterGeometry.ProbeMappedNeighborContact(
+            units, rectangles, sourceUnitIndex: 0, deltaX: 0, deltaY: 0,
+            contentWidth: 640, contentHeight: 480, ref target));
+        Assert.Equal(1, target);
+
+        units[1].RemainingStrength = 0;
+        target = -1;
+        Assert.Equal(0, OriginalStrategicInteractiveEncounterGeometry.ProbeMappedNeighborContact(
+            units, rectangles, sourceUnitIndex: 0, deltaX: 0, deltaY: 0,
+            contentWidth: 640, contentHeight: 480, ref target));
+        Assert.Equal(1, target);
+
+        units[1].PositionX = 200;
+        units[1].PositionY = 200;
+        rectangles[1] = new OriginalStrategicInteractiveEncounterRectangle(185, 180, 25, 30);
+        target = -1;
+        Assert.Equal(2, OriginalStrategicInteractiveEncounterGeometry.ProbeMappedNeighborContact(
+            units, rectangles, sourceUnitIndex: 0, deltaX: 0, deltaY: 0,
+            contentWidth: 640, contentHeight: 480, ref target));
+        Assert.Equal(2, target);
+
+        units[2].RemainingStrength = 0;
+        target = -1;
+        Assert.Equal(2, OriginalStrategicInteractiveEncounterGeometry.ProbeMappedNeighborContact(
+            units, rectangles, sourceUnitIndex: 0, deltaX: 0, deltaY: 0,
+            contentWidth: 640, contentHeight: 480, ref target));
+        Assert.Equal(3, target);
+    }
+
+    [Fact]
     public void StrategicInteractiveDestinationOrderClampsOnlyYAndWritesSelectedLiveRecordsInOrder()
     {
         var units = OriginalStrategicInteractiveEncounter.Materialize(

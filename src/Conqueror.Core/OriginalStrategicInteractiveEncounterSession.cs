@@ -132,6 +132,22 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     }
 
     /// <summary>
+    /// Runs the exact rectangle-corner contact primitive used by the tactical
+    /// loop. This does not choose which offset to request or advance a unit's
+    /// state; those remain responsibilities of the still-unmapped loop shell.
+    /// </summary>
+    public int ProbeMappedNeighborContact(
+        int sourceUnitIndex,
+        int deltaX,
+        int deltaY,
+        int contentWidth,
+        int contentHeight,
+        ref int targetUnitIndex) =>
+        OriginalStrategicInteractiveEncounterGeometry.ProbeMappedNeighborContact(
+            _units, sourceUnitIndex, deltaX, deltaY, contentWidth, contentHeight,
+            ref targetUnitIndex);
+
+    /// <summary>
     /// Advances one source-compatible turn toward this unit's already-stored
     /// target. Target acquisition and movement/collision probes remain caller
     /// responsibilities.
