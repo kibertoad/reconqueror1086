@@ -4,7 +4,8 @@ namespace Conqueror.Core;
 /// Scroll offsets used by the interactive encounter input path at
 /// <c>0x264F8</c>. The original moves an offset by ten while the pointer is
 /// in a five-pixel edge band; the horizontal and vertical content limits are
-/// intentionally asymmetric.
+/// intentionally asymmetric. The control-strip margin is separate: setup
+/// stores it at <c>19C74</c>, while scrolling uses <c>19CA8/19CAC</c>.
 /// </summary>
 public sealed class OriginalStrategicInteractiveEncounterViewport
 {
@@ -18,7 +19,8 @@ public sealed class OriginalStrategicInteractiveEncounterViewport
         int contentWidth,
         int contentHeight,
         int horizontalOffset = 0,
-        int verticalOffset = 0)
+        int verticalOffset = 0,
+        int controlStripMargin = 0)
     {
         if (viewportWidth <= 0)
             throw new ArgumentOutOfRangeException(nameof(viewportWidth));
@@ -32,6 +34,8 @@ public sealed class OriginalStrategicInteractiveEncounterViewport
             throw new ArgumentOutOfRangeException(nameof(horizontalOffset));
         if (verticalOffset < 0)
             throw new ArgumentOutOfRangeException(nameof(verticalOffset));
+        if (controlStripMargin < 0)
+            throw new ArgumentOutOfRangeException(nameof(controlStripMargin));
 
         ViewportWidth = viewportWidth;
         ViewportHeight = viewportHeight;
@@ -39,6 +43,7 @@ public sealed class OriginalStrategicInteractiveEncounterViewport
         ContentHeight = contentHeight;
         HorizontalOffset = horizontalOffset;
         VerticalOffset = verticalOffset;
+        ControlStripMargin = controlStripMargin;
     }
 
     public int ViewportWidth { get; }
@@ -47,6 +52,7 @@ public sealed class OriginalStrategicInteractiveEncounterViewport
     public int ContentHeight { get; }
     public int HorizontalOffset { get; private set; }
     public int VerticalOffset { get; private set; }
+    public int ControlStripMargin { get; }
 
     /// <summary>
     /// Applies the four source-ordered edge checks. The right and bottom

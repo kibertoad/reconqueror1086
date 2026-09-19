@@ -36,16 +36,16 @@ public static class OriginalStrategicInteractiveEncounterGeometry
     /// latter two are the two mapped control-code-one mutations.
     /// </summary>
     public static IReadOnlyList<OriginalStrategicInteractiveEncounterRectangle>
-        CreateMappedControlStripRectangles(int horizontalOffset, int verticalSpan)
+        CreateMappedControlStripRectangles(int controlStripMargin, int verticalSpan)
     {
         if (verticalSpan < 34)
             throw new ArgumentOutOfRangeException(nameof(verticalSpan));
 
         var top = checked(verticalSpan - 34);
         return [
-            new(checked(horizontalOffset + 400), top, 84, 31),
-            new(checked(horizontalOffset + 524), top, 41, 31),
-            new(checked(horizontalOffset + 566), top, 41, 31),
+            new(checked(controlStripMargin + 400), top, 84, 31),
+            new(checked(controlStripMargin + 524), top, 41, 31),
+            new(checked(controlStripMargin + 566), top, 41, 31),
         ];
     }
 

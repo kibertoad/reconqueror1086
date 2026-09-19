@@ -55,7 +55,8 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         int localY,
         int horizontalOffset,
         int verticalOffset,
-        int verticalSpan)
+        int verticalSpan,
+        int controlStripMargin = 0)
     {
         var route = RouteInputCode(inputCode);
         switch (route)
@@ -65,7 +66,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
                 break;
 
             case OriginalStrategicInteractiveEncounterInputRoute.ControlStrip:
-                switch (RouteControlStripHit(localX, localY, horizontalOffset, verticalSpan))
+                switch (RouteControlStripHit(localX, localY, controlStripMargin, verticalSpan))
                 {
                     case OriginalStrategicInteractiveEncounterControlStripRoute.UnitSelectionFallback:
                         TryAppendMappedPlayerSelectionAt(localX, localY, horizontalOffset, verticalOffset);
@@ -115,7 +116,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         var viewportScrolled = viewport.ApplyMappedEdgeScroll(localX, localY);
         var inputRoute = RouteInputCode(inputCode);
         var controlRoute = inputRoute == OriginalStrategicInteractiveEncounterInputRoute.ControlStrip
-            ? RouteControlStripHit(localX, localY, viewport.HorizontalOffset, viewport.ViewportHeight)
+            ? RouteControlStripHit(localX, localY, viewport.ControlStripMargin, viewport.ViewportHeight)
             : OriginalStrategicInteractiveEncounterControlStripRoute.UnitSelectionFallback;
 
         if (controlRoute == OriginalStrategicInteractiveEncounterControlStripRoute.UnresolvedFirstControl
@@ -130,7 +131,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         else
         {
             ApplyMappedInput(inputCode, localX, localY, viewport.HorizontalOffset,
-                viewport.VerticalOffset, viewport.ViewportHeight);
+                viewport.VerticalOffset, viewport.ViewportHeight, viewport.ControlStripMargin);
         }
 
         if (_firstControlConfirmationArmed || !Timing.TryBeginPass(currentTime))
@@ -144,12 +145,12 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     public OriginalStrategicInteractiveEncounterControlStripRoute RouteControlStripHit(
         int localX,
         int localY,
-        int horizontalOffset,
+        int controlStripMargin,
         int verticalSpan) =>
         OriginalStrategicInteractiveEncounter.RouteMappedControlStripHit(
             OriginalStrategicInteractiveEncounterGeometry.FindFirstContainingOneBased(
                 OriginalStrategicInteractiveEncounterGeometry.CreateMappedControlStripRectangles(
-                    horizontalOffset, verticalSpan),
+                    controlStripMargin, verticalSpan),
                 localX,
                 localY));
 

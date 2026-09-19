@@ -161,7 +161,7 @@ public sealed partial class ResourceAndDefinitionTests
         ], Enumerable.Range(0, 9).Select(OriginalStrategicInteractiveEncounter.RouteMappedInputCode));
 
         var rectangles = OriginalStrategicInteractiveEncounterGeometry.CreateMappedControlStripRectangles(
-            horizontalOffset: 10, verticalSpan: 480);
+            controlStripMargin: 10, verticalSpan: 480);
         Assert.Equal([
             new OriginalStrategicInteractiveEncounterRectangle(410, 446, 84, 31),
             new OriginalStrategicInteractiveEncounterRectangle(534, 446, 41, 31),
@@ -181,9 +181,9 @@ public sealed partial class ResourceAndDefinitionTests
             new OriginalStrategicEncounterForces(1, 0, 0),
             menuCode: 0, horizontalSpan: 640, verticalSpan: 180, initialTime: TimeSpan.Zero);
         Assert.Equal(OriginalStrategicInteractiveEncounterControlStripRoute.SetControlCodeOneForSelectedRecords,
-            session.RouteControlStripHit(534, 446, horizontalOffset: 10, verticalSpan: 480));
+            session.RouteControlStripHit(534, 446, controlStripMargin: 10, verticalSpan: 480));
         Assert.Equal(OriginalStrategicInteractiveEncounterControlStripRoute.UnitSelectionFallback,
-            session.RouteControlStripHit(494, 446, horizontalOffset: 10, verticalSpan: 480));
+            session.RouteControlStripHit(494, 446, controlStripMargin: 10, verticalSpan: 480));
 
         Assert.False(session.IsTacticalAdvancementSuspendedForFirstControlConfirmation);
         session.ArmMappedFirstControlConfirmation();

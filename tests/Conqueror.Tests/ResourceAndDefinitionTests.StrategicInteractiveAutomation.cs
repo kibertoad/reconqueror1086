@@ -211,4 +211,25 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Throws<ArgumentOutOfRangeException>(() =>
             new OriginalStrategicInteractiveEncounterTiming(TimeSpan.Zero, TimeSpan.Zero));
     }
+
+    [Fact]
+    public void StrategicInteractiveControlStripDoesNotMoveWithTheScrolledBattlefield()
+    {
+        var session = OriginalStrategicInteractiveEncounterSession.Create(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            menuCode: 0, horizontalSpan: 1024, verticalSpan: 728, TimeSpan.Zero);
+        var viewport = new OriginalStrategicInteractiveEncounterViewport(
+            viewportWidth: 640, viewportHeight: 480, contentWidth: 1024, contentHeight: 728,
+            controlStripMargin: 50);
+
+        var frame = session.AdvanceMappedFrame(
+            TimeSpan.FromMilliseconds(201), inputCode: 3, localX: 635, localY: 450,
+            viewport, playerScoreModifier: 0, contactSideFilter: 0,
+            new QueueEncounterRandom(0));
+
+        Assert.True(frame.ViewportScrolled);
+        Assert.Equal(10, viewport.HorizontalOffset);
+        Assert.All(session.Units, unit => Assert.Equal(1, unit.ControlCode));
+    }
 }
