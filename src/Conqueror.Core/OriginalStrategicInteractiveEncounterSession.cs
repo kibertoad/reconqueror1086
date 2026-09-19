@@ -90,6 +90,56 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         return route;
     }
 
+    /// <summary>
+    /// Advances the recovered outer ordering of resolver <c>0x26B88</c>:
+    /// edge scrolling, input dispatch, the first-control confirmation branch,
+    /// its tactical-suspension flag, then the strict 200-ms tactical gate.
+    /// A false response to an already armed first control deliberately falls
+    /// through to ordinary selection and leaves the suspension armed.
+    /// </summary>
+    public OriginalStrategicInteractiveEncounterFrameResult AdvanceMappedFrame(
+        TimeSpan currentTime,
+        int inputCode,
+        int localX,
+        int localY,
+        OriginalStrategicInteractiveEncounterViewport viewport,
+        int playerScoreModifier,
+        int contactSideFilter,
+        IOriginalStrategicEncounterRandom random,
+        bool firstControlConfirmationAccepted = false)
+    {
+        ArgumentNullException.ThrowIfNull(viewport);
+        ArgumentNullException.ThrowIfNull(random);
+
+        var viewportScrolled = viewport.ApplyMappedEdgeScroll(localX, localY);
+        var inputRoute = RouteInputCode(inputCode);
+        var controlRoute = inputRoute == OriginalStrategicInteractiveEncounterInputRoute.ControlStrip
+            ? RouteControlStripHit(localX, localY, viewport.HorizontalOffset, viewport.ViewportHeight)
+            : OriginalStrategicInteractiveEncounterControlStripRoute.UnitSelectionFallback;
+
+        if (controlRoute == OriginalStrategicInteractiveEncounterControlStripRoute.UnresolvedFirstControl
+            && _firstControlConfirmationArmed)
+        {
+            if (firstControlConfirmationAccepted)
+                return new(inputRoute, viewportScrolled, TacticalPassAdvanced: false, ResolverEnded: true);
+
+            TryAppendMappedPlayerSelectionAt(
+                localX, localY, viewport.HorizontalOffset, viewport.VerticalOffset);
+        }
+        else
+        {
+            ApplyMappedInput(inputCode, localX, localY, viewport.HorizontalOffset,
+                viewport.VerticalOffset, viewport.ViewportHeight);
+        }
+
+        if (_firstControlConfirmationArmed || !Timing.TryBeginPass(currentTime))
+            return new(inputRoute, viewportScrolled, TacticalPassAdvanced: false, ResolverEnded: false);
+
+        AdvanceMappedTacticalPass(viewport.ContentWidth, viewport.ContentHeight,
+            playerScoreModifier, contactSideFilter, random);
+        return new(inputRoute, viewportScrolled, TacticalPassAdvanced: true, ResolverEnded: false);
+    }
+
     public OriginalStrategicInteractiveEncounterControlStripRoute RouteControlStripHit(
         int localX,
         int localY,

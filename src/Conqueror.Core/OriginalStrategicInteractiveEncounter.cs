@@ -49,6 +49,17 @@ public enum OriginalStrategicInteractiveEncounterControlStripRoute
 }
 
 /// <summary>
+/// Observable result of one explicit interactive-resolver frame. The result
+/// keeps input, terminal dialog, and fixed tactical cadence distinct so hosts
+/// do not accidentally make simulation rate depend on rendering throughput.
+/// </summary>
+public readonly record struct OriginalStrategicInteractiveEncounterFrameResult(
+    OriginalStrategicInteractiveEncounterInputRoute InputRoute,
+    bool ViewportScrolled,
+    bool TacticalPassAdvanced,
+    bool ResolverEnded);
+
+/// <summary>
 /// One live unit materialized by resolver <c>0x28C38</c>. The original
 /// terminal write-back reads only <see cref="RemainingStrength"/> and the
 /// category/side fields while strength is positive. The mapped knight-death

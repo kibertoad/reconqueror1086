@@ -136,4 +136,65 @@ public sealed partial class ResourceAndDefinitionTests
             session.ApplyMappedInput(3, 410, 150, 0, 0, 180));
         Assert.True(session.IsTacticalAdvancementSuspendedForFirstControlConfirmation);
     }
+
+    [Fact]
+    public void StrategicInteractiveFrameScrollsAndDispatchesBeforeItsStrictTacticalGate()
+    {
+        var session = OriginalStrategicInteractiveEncounterSession.Create(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            menuCode: 0, horizontalSpan: 640, verticalSpan: 180, initialTime: TimeSpan.Zero);
+        session.Units[0].PositionX = 5;
+        session.Units[0].PositionY = 30;
+        session.Units[1].PositionX = 120;
+        session.Units[1].PositionY = 100;
+        var viewport = new OriginalStrategicInteractiveEncounterViewport(640, 180, 640, 480,
+            horizontalOffset: 10);
+        var random = new QueueEncounterRandom(6, 0);
+
+        var equality = session.AdvanceMappedFrame(TimeSpan.FromMilliseconds(200), 2, 5, 20,
+            viewport, playerScoreModifier: 0, contactSideFilter: 0, random);
+        Assert.Equal((OriginalStrategicInteractiveEncounterInputRoute.PlayerSelection, true, false, false),
+            (equality.InputRoute, equality.ViewportScrolled, equality.TacticalPassAdvanced, equality.ResolverEnded));
+        Assert.Equal((0, 0), (viewport.HorizontalOffset, session.Units[0].StateCode));
+        Assert.Equal([0], session.SelectedUnitIndices);
+
+        session.Units[0].PositionX = 100;
+        session.Units[0].PositionY = 100;
+        var accepted = session.AdvanceMappedFrame(TimeSpan.FromMilliseconds(201), 0, 100, 100,
+            viewport, playerScoreModifier: 0, contactSideFilter: 0, random);
+        Assert.True(accepted.TacticalPassAdvanced);
+        Assert.Equal(OriginalStrategicInteractiveEncounterCombat.ContactStateCode, session.Units[0].StateCode);
+    }
+
+    [Fact]
+    public void StrategicInteractiveFrameKeepsFirstControlArmedAfterFalseDialogAndEndsOnTrue()
+    {
+        var session = OriginalStrategicInteractiveEncounterSession.Create(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            menuCode: 0, horizontalSpan: 640, verticalSpan: 180, initialTime: TimeSpan.Zero);
+        session.Units[0].PositionX = 410;
+        session.Units[0].PositionY = 150;
+        var viewport = new OriginalStrategicInteractiveEncounterViewport(640, 180, 640, 480);
+        var random = new QueueEncounterRandom(6, 0);
+
+        var armed = session.AdvanceMappedFrame(TimeSpan.FromMilliseconds(201), 3, 410, 150,
+            viewport, playerScoreModifier: 0, contactSideFilter: 0, random);
+        Assert.True(session.IsTacticalAdvancementSuspendedForFirstControlConfirmation);
+        Assert.False(armed.TacticalPassAdvanced);
+
+        var declined = session.AdvanceMappedFrame(TimeSpan.FromMilliseconds(402), 3, 410, 150,
+            viewport, playerScoreModifier: 0, contactSideFilter: 0, random,
+            firstControlConfirmationAccepted: false);
+        Assert.False(declined.ResolverEnded);
+        Assert.Equal([0], session.SelectedUnitIndices);
+        Assert.True(session.IsTacticalAdvancementSuspendedForFirstControlConfirmation);
+
+        var ended = session.AdvanceMappedFrame(TimeSpan.FromMilliseconds(603), 3, 410, 150,
+            viewport, playerScoreModifier: 0, contactSideFilter: 0, random,
+            firstControlConfirmationAccepted: true);
+        Assert.True(ended.ResolverEnded);
+        Assert.False(ended.TacticalPassAdvanced);
+    }
 }
