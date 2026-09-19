@@ -41,6 +41,55 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     public OriginalStrategicInteractiveEncounterInputRoute RouteInputCode(int inputCode) =>
         OriginalStrategicInteractiveEncounter.RouteMappedInputCode(inputCode);
 
+    /// <summary>
+    /// Mirrors the mutation-bearing input routes from dispatcher
+    /// <c>0x267A4-0x26B67</c>. Coordinates remain caller-owned outputs of the
+    /// unrecovered event producer: selection offsets its point through the
+    /// viewport, the control strip uses its absolute rectangles, and codes
+    /// six/seven issue the mapped selected-unit destination order.
+    /// </summary>
+    public OriginalStrategicInteractiveEncounterInputRoute ApplyMappedInput(
+        int inputCode,
+        int localX,
+        int localY,
+        int horizontalOffset,
+        int verticalOffset,
+        int verticalSpan)
+    {
+        var route = RouteInputCode(inputCode);
+        switch (route)
+        {
+            case OriginalStrategicInteractiveEncounterInputRoute.PlayerSelection:
+                TryAppendMappedPlayerSelectionAt(localX, localY, horizontalOffset, verticalOffset);
+                break;
+
+            case OriginalStrategicInteractiveEncounterInputRoute.ControlStrip:
+                switch (RouteControlStripHit(localX, localY, horizontalOffset, verticalSpan))
+                {
+                    case OriginalStrategicInteractiveEncounterControlStripRoute.UnitSelectionFallback:
+                        TryAppendMappedPlayerSelectionAt(localX, localY, horizontalOffset, verticalOffset);
+                        break;
+                    case OriginalStrategicInteractiveEncounterControlStripRoute.UnresolvedFirstControl:
+                        if (!_firstControlConfirmationArmed)
+                            ArmMappedFirstControlConfirmation();
+                        break;
+                    case OriginalStrategicInteractiveEncounterControlStripRoute.SetControlCodeOneForSelectedRecords:
+                        SetMappedControlCodeOneForSelection();
+                        break;
+                    case OriginalStrategicInteractiveEncounterControlStripRoute.SetControlCodeOneForLivingRecords:
+                        SetMappedControlCodeOneForLivingUnits();
+                        break;
+                }
+                break;
+
+            case OriginalStrategicInteractiveEncounterInputRoute.DestinationOrder:
+                ApplyDestinationOrder(localX, localY, horizontalOffset, verticalOffset, verticalSpan);
+                break;
+        }
+
+        return route;
+    }
+
     public OriginalStrategicInteractiveEncounterControlStripRoute RouteControlStripHit(
         int localX,
         int localY,
@@ -107,6 +156,24 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     public bool TryAppendPlayerSelection(int unitIndex) =>
         OriginalStrategicInteractiveEncounter.TryAppendMappedPlayerSelection(
             _units, _selectedUnitIndices, unitIndex);
+
+    /// <summary>
+    /// Mirrors selection's viewport-adjusted selector at
+    /// <c>0x26999-0x26A77</c>. A selector miss or an ineligible player record
+    /// leaves the append-only selection list unchanged.
+    /// </summary>
+    public bool TryAppendMappedPlayerSelectionAt(
+        int localX,
+        int localY,
+        int horizontalOffset,
+        int verticalOffset)
+    {
+        var oneBased = OriginalStrategicInteractiveEncounterGeometry.FindFirstContainingOneBased(
+            RenderRectangles(),
+            checked(localX + horizontalOffset),
+            checked(localY + verticalOffset));
+        return oneBased != 0 && TryAppendPlayerSelection(checked(oneBased - 1));
+    }
 
     public void SetMappedControlCodeOneForSelection() =>
         OriginalStrategicInteractiveEncounter.SetMappedControlCodeOneForSelectedRecords(

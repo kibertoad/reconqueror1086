@@ -110,4 +110,30 @@ public sealed partial class ResourceAndDefinitionTests
             (session.Units[1].RemainingStrength, session.Units[1].PhaseCounter,
                 session.PlayerLaneCount, session.EnemyLaneCount));
     }
+
+    [Fact]
+    public void StrategicInteractiveDispatcherAppliesSelectionControlAndDestinationRoutes()
+    {
+        var session = OriginalStrategicInteractiveEncounterSession.Create(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            menuCode: 0, horizontalSpan: 640, verticalSpan: 180, initialTime: TimeSpan.Zero);
+
+        Assert.Equal(OriginalStrategicInteractiveEncounterInputRoute.PlayerSelection,
+            session.ApplyMappedInput(2, 60, 30, 0, 0, 180));
+        Assert.Equal([0], session.SelectedUnitIndices);
+
+        Assert.Equal(OriginalStrategicInteractiveEncounterInputRoute.ControlStrip,
+            session.ApplyMappedInput(3, 530, 150, 0, 0, 180));
+        Assert.Equal(1, session.Units[0].ControlCode);
+
+        Assert.Equal(OriginalStrategicInteractiveEncounterInputRoute.DestinationOrder,
+            session.ApplyMappedInput(6, 40, 20, 10, 20, 180));
+        Assert.Equal((50, 65, 0),
+            (session.Units[0].AuxiliaryX, session.Units[0].AuxiliaryY, session.Units[0].ControlCode));
+
+        Assert.Equal(OriginalStrategicInteractiveEncounterInputRoute.ControlStrip,
+            session.ApplyMappedInput(3, 410, 150, 0, 0, 180));
+        Assert.True(session.IsTacticalAdvancementSuspendedForFirstControlConfirmation);
+    }
 }
