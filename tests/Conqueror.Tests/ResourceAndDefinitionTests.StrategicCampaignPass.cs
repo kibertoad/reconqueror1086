@@ -6,6 +6,34 @@ namespace Conqueror.Tests;
 public sealed partial class ResourceAndDefinitionTests
 {
     [Fact]
+    public void NewCampaignStrategicBootstrapPersistsTheRandomlySelectedStartingRoute()
+    {
+        const int seed = 37;
+        var campaign = new Campaign(Campaign.NewFromTemplate(0), seed);
+
+        var strategic = campaign.InitializeOriginalStrategicNewGame();
+
+        Assert.Same(strategic, campaign.State.OriginalStrategicState);
+        Assert.Equal(new Random(seed).Next(OriginalStrategicMovement.StartingRouteCount),
+            strategic.StartingRouteSelector);
+        Assert.True(strategic.PlayerMovementSlots[OriginalStrategicMovement.PlayerAvatarMovementSlot]
+            .Active);
+        Assert.Throws<InvalidOperationException>(campaign.InitializeOriginalStrategicNewGame);
+    }
+
+    [Fact]
+    public void NewCampaignStrategicBootstrapRejectsAnUnsettledDatedMovementRoster()
+    {
+        var state = Campaign.NewFromTemplate(0);
+        state.EnemyMovements.Add(new StrategicEnemyMovement(
+            0, 1, 2, state.Date, state.Date.AddDays(1), 1, 1, 1));
+        var campaign = new Campaign(state);
+
+        Assert.Throws<InvalidOperationException>(campaign.InitializeOriginalStrategicNewGame);
+        Assert.Null(campaign.State.OriginalStrategicState);
+    }
+
+    [Fact]
     public void OriginalStrategicPassReportsTheFirstLiveSlotBeforeAdvancingBothRecordFamilies()
     {
         var state = Campaign.NewFromTemplate(0);

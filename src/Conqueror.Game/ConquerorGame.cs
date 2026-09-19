@@ -821,9 +821,11 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
                 break;
             case CharacterCreationAction.GenerateNew:
                 var seed = Environment.TickCount;
-                _campaign = BindStrategicResources(new Campaign(
+                var generatedCampaign = new Campaign(
                     Campaign.NewCustom(NormalizedCharacterName(), seed,
-                        _heraldicColors[_heraldicColor].Name), seed));
+                        _heraldicColors[_heraldicColor].Name), seed);
+                generatedCampaign.InitializeOriginalStrategicNewGame();
+                _campaign = BindStrategicResources(generatedCampaign);
                 _presentedEndReason = CampaignEndReason.None;
                 ResetConversationSession();
                 _hasActiveCampaign = true;
@@ -860,7 +862,10 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void StartPregeneratedCharacter(int index)
     {
-        _campaign = BindStrategicResources(new Campaign(Campaign.NewFromTemplate(index)));
+        var seed = Environment.TickCount;
+        var pregeneratedCampaign = new Campaign(Campaign.NewFromTemplate(index), seed);
+        pregeneratedCampaign.InitializeOriginalStrategicNewGame();
+        _campaign = BindStrategicResources(pregeneratedCampaign);
         _presentedEndReason = CampaignEndReason.None;
         ResetConversationSession();
         _hasActiveCampaign = true;

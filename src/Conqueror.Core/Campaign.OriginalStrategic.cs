@@ -30,6 +30,25 @@ public sealed record OriginalStrategicCampaignPassResult(
 public sealed partial class Campaign
 {
     /// <summary>
+    /// Creates the exact six-record strategic bootstrap for a newly created
+    /// campaign. Existing saves deliberately use the schema-one migration
+    /// path instead, because they have no recoverable starting-route choice.
+    /// </summary>
+    public OriginalStrategicCampaignState InitializeOriginalStrategicNewGame()
+    {
+        if (State.OriginalStrategicState is not null)
+            throw new InvalidOperationException("Campaign already has original strategic state.");
+        if (State.EnemyMovements.Count != 0)
+            throw new InvalidOperationException(
+                "A dated enemy movement roster must be settled before strategic initialization.");
+
+        var selector = _random.Next(OriginalStrategicMovement.StartingRouteCount);
+        var strategic = OriginalStrategicCampaignState.CreateForNewGame(State.Date, selector);
+        State.OriginalStrategicState = strategic;
+        return strategic;
+    }
+
+    /// <summary>
     /// Advances the imported strategic movement records once. This is an
     /// intentionally explicit fixed-update boundary: callers choose their
     /// stable simulation cadence instead of inheriting the original main
