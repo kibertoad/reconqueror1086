@@ -10,8 +10,6 @@ namespace Conqueror.Core;
 /// independent `ADC0` guard.
 /// </summary>
 public sealed record OriginalStrategicCampaignPassInput(
-    int GlobalTargetPerson,
-    int GlobalOriginProperty,
     IReadOnlyList<OriginalStrategicPlayerTarget> DivisionTargets,
     bool PlayerEncounterHandoffActive = false,
     bool SchedulerBlockedByModal = false);
@@ -297,16 +295,22 @@ public sealed partial class Campaign
             slot.Slot == strategic.EngagedPlayerMovementSlot);
         OriginalStrategicSchedulerResult? schedulerPass = null;
         if (!input.SchedulerBlockedByModal)
+        {
+            if (strategic.SchedulerFallbackTargetPerson < 0
+                || strategic.SchedulerFallbackOriginProperty < 0)
+                throw new InvalidOperationException(
+                    "Strategic scheduler fallback globals are unavailable for this migrated save.");
             schedulerPass = OriginalStrategicMovement.AdvanceSchedulerPass(
                 strategic,
                 _originalStrategicResources,
                 new OriginalStrategicSchedulerInput(
-                    input.GlobalTargetPerson,
-                    input.GlobalOriginProperty,
+                    strategic.SchedulerFallbackTargetPerson,
+                    strategic.SchedulerFallbackOriginProperty,
                     strategic.EngagedPlayerMovementSlot,
                     new StrategicPoint(Truncate(engaged.CurrentX), Truncate(engaged.CurrentY)),
                     pursuitTargets),
                 random);
+        }
         return new(report, playerPass, encounters, schedulerPass);
     }
 

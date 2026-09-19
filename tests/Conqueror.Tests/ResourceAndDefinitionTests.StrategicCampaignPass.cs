@@ -512,6 +512,23 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void MigratedStrategicStateDoesNotInventUnavailableSchedulerFallbackGlobals()
+    {
+        var state = Campaign.NewFromTemplate(0);
+        state.OriginalStrategicState = OriginalStrategicCampaignState.CreateForSchemaOneMigration(
+            state.Date, OriginalStrategicMovement.InitialSpeedMultiplier);
+        var campaign = new Campaign(state);
+        campaign.ConfigureOriginalStrategicResources(new StubStrategicResources());
+
+        Assert.Throws<InvalidOperationException>(() => campaign.AdvanceOriginalStrategicPass(
+            new OriginalStrategicCampaignPassInput([
+                new OriginalStrategicPlayerTarget(false, 0, 0),
+                new OriginalStrategicPlayerTarget(false, 0, 0),
+                new OriginalStrategicPlayerTarget(false, 0, 0)]),
+            new QueueStrategicRandom()));
+    }
+
+    [Fact]
     public void OriginalStrategicPassReportsTheFirstLiveSlotBeforeAdvancingBothRecordFamilies()
     {
         var state = Campaign.NewFromTemplate(0);
@@ -550,8 +567,6 @@ public sealed partial class ResourceAndDefinitionTests
         campaign.ConfigureOriginalStrategicResources(resources);
         var result = campaign.AdvanceOriginalStrategicPass(
             new OriginalStrategicCampaignPassInput(
-                GlobalTargetPerson: 17,
-                GlobalOriginProperty: 0,
                 DivisionTargets: [
                     new OriginalStrategicPlayerTarget(false, 0, 0),
                     new OriginalStrategicPlayerTarget(false, 0, 0),
@@ -594,8 +609,6 @@ public sealed partial class ResourceAndDefinitionTests
         campaign.ConfigureOriginalStrategicResources(resources);
         var result = campaign.AdvanceOriginalStrategicPass(
             new OriginalStrategicCampaignPassInput(
-                17,
-                0,
                 [
                     new OriginalStrategicPlayerTarget(false, 0, 0),
                     new OriginalStrategicPlayerTarget(false, 0, 0),
@@ -643,8 +656,6 @@ public sealed partial class ResourceAndDefinitionTests
         campaign.ConfigureOriginalStrategicResources(resources);
         var result = campaign.AdvanceOriginalStrategicPass(
             new OriginalStrategicCampaignPassInput(
-                17,
-                0,
                 [
                     new OriginalStrategicPlayerTarget(false, 0, 0),
                     new OriginalStrategicPlayerTarget(false, 0, 0),
@@ -699,8 +710,6 @@ public sealed partial class ResourceAndDefinitionTests
 
         var result = campaign.AdvanceOriginalStrategicPass(
             new OriginalStrategicCampaignPassInput(
-                17,
-                0,
                 [
                     new OriginalStrategicPlayerTarget(false, 0, 0),
                     new OriginalStrategicPlayerTarget(false, 0, 0),
