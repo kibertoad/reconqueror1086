@@ -240,6 +240,31 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveStateZeroTargetAcquisitionUsesItsOwnCornerAndLaneRules()
+    {
+        var units = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(2, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0));
+        units[0].PositionX = units[1].PositionX = 100;
+        units[0].PositionY = units[1].PositionY = 100;
+        units[2].PositionX = 125;
+        units[2].PositionY = 100;
+        var rectangles = units.Select(OriginalStrategicInteractiveEncounterGeometry.RenderRectangleFor).ToArray();
+
+        var target = -1;
+        Assert.False(OriginalStrategicInteractiveEncounterGeometry.TryAcquireMappedOpposingTarget(
+            units, rectangles, sourceUnitIndex: 0, contentWidth: 640, contentHeight: 480, ref target));
+        Assert.Equal(-1, target);
+
+        units[1].PositionX = 200;
+        units[1].PositionY = 200;
+        rectangles[1] = OriginalStrategicInteractiveEncounterGeometry.RenderRectangleFor(units[1]);
+        Assert.True(OriginalStrategicInteractiveEncounterGeometry.TryAcquireMappedOpposingTarget(
+            units, rectangles, sourceUnitIndex: 0, contentWidth: 640, contentHeight: 480, ref target));
+        Assert.Equal(2, target);
+    }
+
+    [Fact]
     public void StrategicInteractiveDestinationOrderClampsOnlyYAndWritesSelectedLiveRecordsInOrder()
     {
         var units = OriginalStrategicInteractiveEncounter.Materialize(

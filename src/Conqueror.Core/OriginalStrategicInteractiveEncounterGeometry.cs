@@ -196,6 +196,70 @@ public static class OriginalStrategicInteractiveEncounterGeometry
         return 0;
     }
 
+    /// <summary>
+    /// Mirrors state-zero acquisition at <c>0x270CB-0x27474</c>. It hides the
+    /// source selector rectangle, then checks its four corners in top-left,
+    /// bottom-left, top-right, bottom-right order. Unlike <c>0x28408</c>, a
+    /// selector hit is useful only for a living unit in the opposite lane and
+    /// only that accepted hit writes <paramref name="targetUnitIndex"/>.
+    ///
+    /// The source has the same material first-corner split: after an initial
+    /// hit (even a same-lane or dead one), a later selector miss ends the
+    /// search; after an initial miss, later misses continue through remaining
+    /// corners. This intentionally is not a generic overlap query.
+    /// </summary>
+    public static bool TryAcquireMappedOpposingTarget(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
+        IReadOnlyList<OriginalStrategicInteractiveEncounterRectangle> rectangles,
+        int sourceUnitIndex,
+        int contentWidth,
+        int contentHeight,
+        ref int targetUnitIndex)
+    {
+        ArgumentNullException.ThrowIfNull(units);
+        ArgumentNullException.ThrowIfNull(rectangles);
+        if ((uint)sourceUnitIndex >= (uint)units.Count)
+            throw new ArgumentOutOfRangeException(nameof(sourceUnitIndex));
+        if (rectangles.Count != units.Count)
+            throw new ArgumentException("Mapped selector rectangles must match the unit record count.",
+                nameof(rectangles));
+
+        var source = units[sourceUnitIndex];
+        ArgumentNullException.ThrowIfNull(source);
+        var rectangle = rectangles[sourceUnitIndex];
+        var selector = rectangles.ToArray();
+        selector[sourceUnitIndex] = new(
+            unchecked((short)(contentWidth + 1)),
+            unchecked((short)(contentHeight + 1)), 1, 1);
+        var corners = new[]
+        {
+            (rectangle.X, rectangle.Y),
+            (rectangle.X, checked(rectangle.Y + rectangle.Height)),
+            (checked(rectangle.X + rectangle.Width), rectangle.Y),
+            (checked(rectangle.X + rectangle.Width), checked(rectangle.Y + rectangle.Height)),
+        };
+
+        var firstHit = FindFirstContainingOneBased(selector, corners[0].Item1, corners[0].Item2);
+        if (firstHit != 0)
+        {
+            if (TryAcceptOpposingTarget(units, source, firstHit, ref targetUnitIndex)) return true;
+            for (var corner = 1; corner < corners.Length; corner++)
+            {
+                var hit = FindFirstContainingOneBased(selector, corners[corner].Item1, corners[corner].Item2);
+                if (hit == 0) return false;
+                if (TryAcceptOpposingTarget(units, source, hit, ref targetUnitIndex)) return true;
+            }
+            return false;
+        }
+
+        for (var corner = 1; corner < corners.Length; corner++)
+        {
+            var hit = FindFirstContainingOneBased(selector, corners[corner].Item1, corners[corner].Item2);
+            if (hit != 0 && TryAcceptOpposingTarget(units, source, hit, ref targetUnitIndex)) return true;
+        }
+        return false;
+    }
+
     private static bool TryReturnLivingContact(
         IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
         OriginalStrategicInteractiveEncounterUnit source,
@@ -214,6 +278,20 @@ public static class OriginalStrategicInteractiveEncounterGeometry
         }
 
         relation = candidate.Side == source.Side ? 1 : 2;
+        return true;
+    }
+
+    private static bool TryAcceptOpposingTarget(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
+        OriginalStrategicInteractiveEncounterUnit source,
+        int oneBasedHit,
+        ref int targetUnitIndex)
+    {
+        var hitIndex = checked(oneBasedHit - 1);
+        var candidate = units[hitIndex];
+        ArgumentNullException.ThrowIfNull(candidate);
+        if (candidate.Side == source.Side || candidate.RemainingStrength <= 0) return false;
+        targetUnitIndex = hitIndex;
         return true;
     }
 }
