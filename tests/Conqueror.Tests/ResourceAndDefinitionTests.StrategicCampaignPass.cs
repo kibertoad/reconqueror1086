@@ -255,6 +255,32 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveContactProbeUsesOnlySourceValuesOtherThanZeroAndOne()
+    {
+        var units = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0));
+        var attacker = units[0];
+        attacker.StateCode = OriginalStrategicInteractiveEncounterCombat.ContactStateCode;
+        attacker.TargetUnitIndex = 1;
+
+        Assert.Equal(new OriginalStrategicInteractiveEncounterContactProbeResult(true, false),
+            OriginalStrategicInteractiveEncounterCombat.ApplyMappedContactProbeResult(attacker, probeResult: 2));
+        Assert.Equal(1, attacker.PhaseCounter);
+        Assert.Equal(new OriginalStrategicInteractiveEncounterContactProbeResult(true, true),
+            OriginalStrategicInteractiveEncounterCombat.ApplyMappedContactProbeResult(attacker, probeResult: -3));
+        Assert.Equal(2, attacker.PhaseCounter);
+
+        attacker.ControlCode = 1;
+        attacker.AuxiliaryX = 10;
+        attacker.AuxiliaryY = 20;
+        Assert.Equal(default, OriginalStrategicInteractiveEncounterCombat.ApplyMappedContactProbeResult(
+            attacker, probeResult: 1));
+        Assert.Equal((0, -1, -1, -1),
+            (attacker.StateCode, attacker.TargetUnitIndex, attacker.AuxiliaryX, attacker.AuxiliaryY));
+    }
+
+    [Fact]
     public void StrategicInteractiveSessionCombinesMappedFormationPlayerControlGeometryAndCadence()
     {
         var session = OriginalStrategicInteractiveEncounterSession.Create(

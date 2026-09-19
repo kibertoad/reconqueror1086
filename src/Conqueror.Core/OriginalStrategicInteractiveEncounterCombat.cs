@@ -12,6 +12,14 @@ public readonly record struct OriginalStrategicInteractiveEncounterContactResult
     bool AttackerTargetCleared);
 
 /// <summary>
+/// Outcome of the state-<c>0x28</c> neighbor-probe branch before its possible
+/// contact arithmetic. Probe values retain their source representation.
+/// </summary>
+public readonly record struct OriginalStrategicInteractiveEncounterContactProbeResult(
+    bool RetainedContactState,
+    bool ContactDue);
+
+/// <summary>
 /// Exact contact arithmetic for the interactive strategic encounter. This
 /// preserves the original category triangle and record mutations but does not
 /// name the surrounding tactical action while its controls remain unmapped.
@@ -21,6 +29,36 @@ public static class OriginalStrategicInteractiveEncounterCombat
     public const int ContactStateCode = 0x28;
     public const int DeathAnimationStateCode = 0x50;
     public const int LowHealthDeathThreshold = 20;
+
+    /// <summary>
+    /// Applies <c>0x26D4B-0x26DC5</c> after the caller has supplied the
+    /// original neighbor helper's return value. Values zero and one clear the
+    /// current contact; every other value advances the phase modulo five and
+    /// makes a resolved contact due only at phase two.
+    /// </summary>
+    public static OriginalStrategicInteractiveEncounterContactProbeResult ApplyMappedContactProbeResult(
+        OriginalStrategicInteractiveEncounterUnit attacker,
+        int probeResult)
+    {
+        ArgumentNullException.ThrowIfNull(attacker);
+        if (attacker.StateCode != ContactStateCode)
+            throw new InvalidOperationException("Mapped contact probe requires state 0x28.");
+
+        if (probeResult is 0 or 1)
+        {
+            attacker.StateCode = 0;
+            attacker.TargetUnitIndex = -1;
+            if (attacker.ControlCode == 1)
+            {
+                attacker.AuxiliaryX = -1;
+                attacker.AuxiliaryY = -1;
+            }
+            return default;
+        }
+
+        attacker.PhaseCounter = (attacker.PhaseCounter + 1) % 5;
+        return new(true, attacker.PhaseCounter == 2);
+    }
 
     /// <summary>
     /// Applies a contact after the source's neighbor query has selected the

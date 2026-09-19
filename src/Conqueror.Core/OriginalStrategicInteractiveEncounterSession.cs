@@ -71,6 +71,16 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         OriginalStrategicInteractiveEncounterCombat.ApplyMappedResolvedContact(
             _units, attackerIndex, playerScoreModifier, contactSideFilter, random);
 
+    public OriginalStrategicInteractiveEncounterContactProbeResult ApplyContactProbeResult(
+        int attackerIndex,
+        int probeResult)
+    {
+        if ((uint)attackerIndex >= (uint)_units.Count)
+            throw new ArgumentOutOfRangeException(nameof(attackerIndex));
+        return OriginalStrategicInteractiveEncounterCombat.ApplyMappedContactProbeResult(
+            _units[attackerIndex], probeResult);
+    }
+
     public void ApplyDestinationOrder(
         int localX,
         int localY,
