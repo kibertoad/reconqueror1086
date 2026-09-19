@@ -23,6 +23,36 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveEncounterPreservesSixCategoryUnitOrderAndPositiveStrengthWriteBack()
+    {
+        var units = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(2, 1, 1),
+            new OriginalStrategicEncounterForces(1, 1, 2));
+
+        Assert.Equal([
+            (OriginalStrategicInteractiveEncounterSide.Player, OriginalStrategicInteractiveEncounterCategory.Swordsmen, 3, 10),
+            (OriginalStrategicInteractiveEncounterSide.Player, OriginalStrategicInteractiveEncounterCategory.Swordsmen, 3, 10),
+            (OriginalStrategicInteractiveEncounterSide.Player, OriginalStrategicInteractiveEncounterCategory.Halberdiers, 3, 20),
+            (OriginalStrategicInteractiveEncounterSide.Player, OriginalStrategicInteractiveEncounterCategory.Knights, 3, 40),
+            (OriginalStrategicInteractiveEncounterSide.Enemy, OriginalStrategicInteractiveEncounterCategory.Swordsmen, 7, 10),
+            (OriginalStrategicInteractiveEncounterSide.Enemy, OriginalStrategicInteractiveEncounterCategory.Halberdiers, 7, 20),
+            (OriginalStrategicInteractiveEncounterSide.Enemy, OriginalStrategicInteractiveEncounterCategory.Knights, 7, 40),
+            (OriginalStrategicInteractiveEncounterSide.Enemy, OriginalStrategicInteractiveEncounterCategory.Knights, 7, 40),
+        ], units.Select(unit => (unit.Side, unit.Category, unit.CombatTypeCode, unit.CategoryValue)));
+
+        units[0].RemainingStrength = 0;
+        units[3].RemainingStrength = -1;
+        units[5].RemainingStrength = 0;
+
+        Assert.Equal(new OriginalStrategicEncounterForces(1, 1, 0),
+            OriginalStrategicInteractiveEncounter.CountSurvivors(
+                units, OriginalStrategicInteractiveEncounterSide.Player));
+        Assert.Equal(new OriginalStrategicEncounterForces(1, 0, 2),
+            OriginalStrategicInteractiveEncounter.CountSurvivors(
+                units, OriginalStrategicInteractiveEncounterSide.Enemy));
+    }
+
+    [Fact]
     public void NewCampaignStrategicBootstrapPersistsTheRandomlySelectedStartingRoute()
     {
         const int seed = 37;
