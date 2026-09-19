@@ -9,6 +9,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
 {
     private readonly List<OriginalStrategicInteractiveEncounterUnit> _units;
     private readonly List<int> _selectedUnitIndices = [];
+    private bool _firstControlConfirmationArmed;
 
     private OriginalStrategicInteractiveEncounterSession(
         List<OriginalStrategicInteractiveEncounterUnit> units,
@@ -21,6 +22,15 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     public IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> Units => _units;
     public IReadOnlyList<int> SelectedUnitIndices => _selectedUnitIndices;
     public OriginalStrategicInteractiveEncounterTiming Timing { get; }
+
+    /// <summary>
+    /// Mirrors the inverted timing gate <c>19C7C</c>: the first control-strip
+    /// button sets that word to zero while its confirmation state is armed,
+    /// so regular tactical advancement is skipped even if input dispatch
+    /// continues to run.
+    /// </summary>
+    public bool IsTacticalAdvancementSuspendedForFirstControlConfirmation =>
+        _firstControlConfirmationArmed;
 
     public OriginalStrategicInteractiveEncounterInputRoute RouteInputCode(int inputCode) =>
         OriginalStrategicInteractiveEncounter.RouteMappedInputCode(inputCode);
@@ -36,6 +46,31 @@ public sealed class OriginalStrategicInteractiveEncounterSession
                     horizontalOffset, verticalSpan),
                 localX,
                 localY));
+
+    /// <summary>
+    /// Mirrors the first control-strip hit when global <c>19C8C</c> is zero:
+    /// the source marks its confirmation state and renders the pending path.
+    /// The user-facing button and dialog text remain deliberately unnamed.
+    /// </summary>
+    public void ArmMappedFirstControlConfirmation()
+    {
+        if (_firstControlConfirmationArmed)
+            throw new InvalidOperationException("Mapped first-control confirmation is already armed.");
+        _firstControlConfirmationArmed = true;
+    }
+
+    /// <summary>
+    /// Mirrors the already-armed first-control branch at
+    /// <c>0x26832-0x2685B</c>. A true dialog result exits the resolver;
+    /// a false result falls through to ordinary unit selection and does not
+    /// clear the confirmation state or resume tactical advancement.
+    /// </summary>
+    public bool ResolveMappedFirstControlConfirmation(bool accepted)
+    {
+        if (!_firstControlConfirmationArmed)
+            throw new InvalidOperationException("Mapped first-control confirmation is not armed.");
+        return accepted;
+    }
 
     /// <summary>
     /// Materializes all six counters and applies the original menu layout.

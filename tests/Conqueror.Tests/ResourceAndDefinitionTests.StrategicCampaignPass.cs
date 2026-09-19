@@ -183,6 +183,14 @@ public sealed partial class ResourceAndDefinitionTests
             session.RouteControlStripHit(534, 446, horizontalOffset: 10, verticalSpan: 480));
         Assert.Equal(OriginalStrategicInteractiveEncounterControlStripRoute.UnitSelectionFallback,
             session.RouteControlStripHit(494, 446, horizontalOffset: 10, verticalSpan: 480));
+
+        Assert.False(session.IsTacticalAdvancementSuspendedForFirstControlConfirmation);
+        session.ArmMappedFirstControlConfirmation();
+        Assert.True(session.IsTacticalAdvancementSuspendedForFirstControlConfirmation);
+        Assert.False(session.ResolveMappedFirstControlConfirmation(accepted: false));
+        Assert.True(session.IsTacticalAdvancementSuspendedForFirstControlConfirmation);
+        Assert.True(session.ResolveMappedFirstControlConfirmation(accepted: true));
+        Assert.Throws<InvalidOperationException>(session.ArmMappedFirstControlConfirmation);
     }
 
     [Fact]
