@@ -53,6 +53,28 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveMenuCodesZeroAndOneUseTheirExactPlayerPrefixGridLayouts()
+    {
+        var units = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(2, 1, 1),
+            new OriginalStrategicEncounterForces(1, 0, 0));
+
+        OriginalStrategicInteractiveEncounter.ApplyMenuCodeZeroOrOneFormation(units, menuCode: 0,
+            verticalSpan: 180);
+        Assert.Equal([(60, 30), (60, 90), (60, 150), (120, 30)],
+            units.Take(4).Select(unit => (unit.PositionX, unit.PositionY)));
+        Assert.All(units.Skip(4), unit => Assert.Equal((0, 0), (unit.PositionX, unit.PositionY)));
+
+        OriginalStrategicInteractiveEncounter.ApplyMenuCodeZeroOrOneFormation(units, menuCode: 1,
+            verticalSpan: 180);
+        Assert.Equal([(120, 30), (120, 90), (120, 150), (60, 30)],
+            units.Take(4).Select(unit => (unit.PositionX, unit.PositionY)));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            OriginalStrategicInteractiveEncounter.ApplyMenuCodeZeroOrOneFormation(units, menuCode: 2,
+                verticalSpan: 180));
+    }
+
+    [Fact]
     public void NewCampaignStrategicBootstrapPersistsTheRandomlySelectedStartingRoute()
     {
         const int seed = 37;

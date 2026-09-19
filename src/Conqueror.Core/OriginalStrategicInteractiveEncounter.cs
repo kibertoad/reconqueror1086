@@ -62,6 +62,13 @@ public sealed class OriginalStrategicInteractiveEncounterUnit
     /// this unit only while the value is strictly positive.
     /// </summary>
     public int RemainingStrength { get; set; } = 100;
+
+    /// <summary>
+    /// Mutable original record <c>+0x04/+0x08</c> formation coordinates.
+    /// They are assigned after materialization by the selected menu layout.
+    /// </summary>
+    public int PositionX { get; set; }
+    public int PositionY { get; set; }
 }
 
 /// <summary>
@@ -71,6 +78,9 @@ public sealed class OriginalStrategicInteractiveEncounterUnit
 /// </summary>
 public static class OriginalStrategicInteractiveEncounter
 {
+    public const int FormationGridStep = 60;
+    public const int FormationGridInset = 30;
+
     public static IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> Materialize(
         OriginalStrategicEncounterForces playerForces,
         OriginalStrategicEncounterForces enemyForces)
@@ -83,6 +93,50 @@ public static class OriginalStrategicInteractiveEncounter
         Append(units, OriginalStrategicInteractiveEncounterSide.Player, playerForces);
         Append(units, OriginalStrategicInteractiveEncounterSide.Enemy, enemyForces);
         return units;
+    }
+
+    /// <summary>
+    /// Applies the two simple player-prefix formation paths in <c>0x2904B</c>
+    /// and <c>0x290BA</c>. Codes 2 and 3 use distinct denser paths and are
+    /// intentionally rejected until their complete geometry is represented.
+    /// </summary>
+    public static void ApplyMenuCodeZeroOrOneFormation(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
+        int menuCode,
+        int verticalSpan)
+    {
+        ArgumentNullException.ThrowIfNull(units);
+        if (menuCode is not (0 or 1))
+            throw new ArgumentOutOfRangeException(nameof(menuCode));
+        var rows = verticalSpan / FormationGridStep;
+        if (rows <= 0)
+            throw new ArgumentOutOfRangeException(nameof(verticalSpan));
+
+        var playerCount = 0;
+        var enemySeen = false;
+        foreach (var unit in units)
+        {
+            ArgumentNullException.ThrowIfNull(unit);
+            if (unit.Side == OriginalStrategicInteractiveEncounterSide.Enemy)
+            {
+                enemySeen = true;
+                continue;
+            }
+            if (enemySeen)
+                throw new ArgumentException("Interactive units must retain the original player-first order.",
+                    nameof(units));
+            playerCount++;
+        }
+
+        for (var index = 0; index < playerCount; index++)
+        {
+            var column = index / rows;
+            units[index].PositionX = menuCode == 0
+                ? checked(column * FormationGridStep + FormationGridStep)
+                : checked((playerCount / rows) * FormationGridStep + FormationGridStep
+                    - column * FormationGridStep);
+            units[index].PositionY = checked((index % rows) * FormationGridStep + FormationGridInset);
+        }
     }
 
     /// <summary>
