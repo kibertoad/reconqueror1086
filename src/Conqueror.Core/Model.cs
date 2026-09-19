@@ -111,7 +111,8 @@ public sealed record StrategicSpyReport(
     int Location,
     int Swordsmen,
     int Halberdiers,
-    int Knights);
+    int Knights,
+    string? LocationName = null);
 
 public sealed class Fief
 {

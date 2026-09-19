@@ -188,6 +188,9 @@ public sealed partial class Campaign
         var player = State.Player;
         player.EnsureArmyRoster();
         if (player.ArmyAt(armyIndex).Total == 0 || player.ArmyLocationAt(armyIndex) != 0) return false;
+        if (State.OriginalStrategicState is { } strategic
+            && (strategic.PlayerMovementSlots[armyIndex].Active
+                || !OriginalStrategicMovement.ConstructPlayerMovementRecord(strategic, armyIndex))) return false;
         player.SetArmyFieldState(armyIndex, true, 0);
         Log($"{player.ArmyNameAt(armyIndex)} is fielded.");
         return true;

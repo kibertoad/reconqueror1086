@@ -483,7 +483,7 @@ public static partial class OriginalStrategicMovement
         if (input.GlobalTargetPerson is < 0 or >= PersonCount)
             throw new ArgumentOutOfRangeException(nameof(input.GlobalTargetPerson));
         ValidateProperty(input.GlobalOriginProperty);
-        ValidateSlot(input.PlayerMovementSlot, nameof(input.PlayerMovementSlot));
+        ValidatePlayerMovementSlot(input.PlayerMovementSlot, nameof(input.PlayerMovementSlot));
         if (input.PursuitTargets is null || input.PursuitTargets.Count != SlotCount)
             throw new ArgumentException($"Scheduler requires exactly {SlotCount} player movement targets.",
                 nameof(input.PursuitTargets));

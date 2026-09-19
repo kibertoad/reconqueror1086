@@ -116,7 +116,8 @@ public sealed partial class ConquerorGame
     {
         var report = _campaign.State.LatestSpyReport;
         if (report is null || report == previousReport) return;
-        _notice = $"SPY REPORT—{World.Locations[report.Location].Name.ToUpperInvariant()}: " +
+        var location = report.LocationName ?? World.Locations[report.Location].Name;
+        _notice = $"SPY REPORT—{location.ToUpperInvariant()}: " +
             $"{report.Swordsmen} SWORDSMEN, {report.Halberdiers} HALBERDIERS, {report.Knights} KNIGHTS MOVING";
     }
 

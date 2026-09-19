@@ -310,7 +310,7 @@ public static partial class OriginalStrategicMovement
     {
         ValidateProperty(property);
         ValidateSlot(movementSlot, nameof(movementSlot));
-        ValidateSlot(playerMovementSlot, nameof(playerMovementSlot));
+        ValidatePlayerMovementSlot(playerMovementSlot, nameof(playerMovementSlot));
         ArgumentOutOfRangeException.ThrowIfNegative(callsSinceReactiveSuccess);
 
         if (property == ReactiveSpecialProperty &&
@@ -520,6 +520,12 @@ public static partial class OriginalStrategicMovement
     private static void ValidateSlot(int slot, string parameterName)
     {
         if (slot < 0 || slot >= SlotCount) throw new ArgumentOutOfRangeException(parameterName);
+    }
+
+    private static void ValidatePlayerMovementSlot(int slot, string parameterName)
+    {
+        if (slot < 0 || slot >= PlayerMovementRecordCount)
+            throw new ArgumentOutOfRangeException(parameterName);
     }
 
     private static void ValidateSpeedMultiplier(int speedMultiplier)
