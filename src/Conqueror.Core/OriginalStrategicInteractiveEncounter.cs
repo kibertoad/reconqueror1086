@@ -150,6 +150,44 @@ public static class OriginalStrategicInteractiveEncounter
     }
 
     /// <summary>
+    /// Mirrors the selected-record destination write at <c>0x26A7F-0x26B64</c>.
+    /// The source clamps only the local y input to <c>[45, verticalSpan - 85]</c>,
+    /// adds the live viewport offsets, clears record <c>+0x28</c>, and writes
+    /// the paired <c>+0x0C/+0x10</c> fields in selected-list order.
+    /// </summary>
+    public static void ApplyMappedDestinationOrder(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
+        IReadOnlyList<int> selectedUnitIndices,
+        int localX,
+        int localY,
+        int horizontalOffset,
+        int verticalOffset,
+        int verticalSpan)
+    {
+        ArgumentNullException.ThrowIfNull(units);
+        ArgumentNullException.ThrowIfNull(selectedUnitIndices);
+        if (verticalSpan <= 0)
+            throw new ArgumentOutOfRangeException(nameof(verticalSpan));
+
+        var boundedY = localY < 45 ? 45 : localY;
+        var maximumY = checked(verticalSpan - 85);
+        if (maximumY < boundedY)
+            boundedY = maximumY;
+        var targetX = checked(localX + horizontalOffset);
+        var targetY = checked(boundedY + verticalOffset);
+        foreach (var index in selectedUnitIndices)
+        {
+            if ((uint)index >= (uint)units.Count)
+                throw new ArgumentOutOfRangeException(nameof(selectedUnitIndices));
+            var unit = units[index];
+            ArgumentNullException.ThrowIfNull(unit);
+            unit.ControlCode = 0;
+            unit.AuxiliaryX = targetX;
+            unit.AuxiliaryY = targetY;
+        }
+    }
+
+    /// <summary>
     /// Applies the mapped player-prefix formation paths in <c>0x2904B</c>,
     /// <c>0x290BA</c>, and <c>0x29132</c>. Menu code 3 has its own method
     /// because its exact path also consumes a raw draw and the viewport width.

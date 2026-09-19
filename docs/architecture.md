@@ -61,6 +61,8 @@ The interactive neighbor path now has its exact geometry primitive. Selector `0x
 
 The live interactive unit model now retains the constructor's remaining state fields from `0x28C38`: `+0x0C/+0x10 = -1`, `+0x18/+0x1C = 0`, `+0x28 = 0/1` for player/enemy, and `+0x30 = -1`. `+0x0C/+0x10` are later written together by the control path, `+0x18` is a modulo-five phase counter, `+0x1C` reaches the confirmed death state `0x50`, and `+0x30` is later consumed as a table-relative unit index. `+0x28` is intentionally exposed as `ControlCode`, not falsely named a permanent side flag, because the control path overwrites it. `OriginalStrategicInteractiveEncounterUnit` preserves these fields with source-offset comments and initialization tests while their remaining semantics stay Provisional.
 
+The first player-control operation is now executable rather than inferred from a generic tactical model. For each selected unit index, `0x26A7F-0x26B64` clears `ControlCode`, writes `AuxiliaryX = localX + horizontalOffset` and `AuxiliaryY = clampedLocalY + verticalOffset`, where local Y is first raised to 45 and then lowered to `verticalSpan - 85`; X is not clamped. `ApplyMappedDestinationOrder` preserves the original selected-list order, paired destination writes, and this asymmetric boundary rule. It deliberately has no claim about the display event that creates the selected list or the downstream state transition.
+
 ## Validation
 
 The executable specifications reject duplicate equipment and courtship names, duplicate win rewards, mismatched building keys, and dragon requirements that cannot be earned from a defined reward ladder. Full campaign behavior tests then exercise the same generic interpreters used by the game.

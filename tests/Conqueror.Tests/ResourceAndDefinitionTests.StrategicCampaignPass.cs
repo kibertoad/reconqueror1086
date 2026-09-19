@@ -122,6 +122,28 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveDestinationOrderClampsOnlyYAndWritesSelectedLiveRecordsInOrder()
+    {
+        var units = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(2, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0));
+
+        OriginalStrategicInteractiveEncounter.ApplyMappedDestinationOrder(
+            units, [2, 0], localX: 20, localY: 10, horizontalOffset: 100, verticalOffset: 200,
+            verticalSpan: 480);
+
+        Assert.Equal((120, 245, 0), (units[0].AuxiliaryX, units[0].AuxiliaryY, units[0].ControlCode));
+        Assert.Equal((-1, -1, 0), (units[1].AuxiliaryX, units[1].AuxiliaryY, units[1].ControlCode));
+        Assert.Equal((120, 245, 0), (units[2].AuxiliaryX, units[2].AuxiliaryY, units[2].ControlCode));
+
+        OriginalStrategicInteractiveEncounter.ApplyMappedDestinationOrder(
+            units, [1], localX: 40, localY: 900, horizontalOffset: 0, verticalOffset: 0,
+            verticalSpan: 480);
+
+        Assert.Equal((40, 395, 0), (units[1].AuxiliaryX, units[1].AuxiliaryY, units[1].ControlCode));
+    }
+
+    [Fact]
     public void StrategicInteractiveMenuCodesZeroAndOneUseTheirExactPlayerPrefixGridLayouts()
     {
         var units = OriginalStrategicInteractiveEncounter.Materialize(
