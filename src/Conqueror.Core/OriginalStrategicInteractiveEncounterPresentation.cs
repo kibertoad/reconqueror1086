@@ -6,6 +6,10 @@ namespace Conqueror.Core;
 /// </summary>
 public static class OriginalStrategicInteractiveEncounterPresentation
 {
+    public const int UnitSpriteWidth = 90;
+    public const int UnitSpriteHeight = 90;
+    public const int UnitSpriteHalfWidth = UnitSpriteWidth / 2;
+    public const int UnitSpriteHalfHeight = UnitSpriteHeight / 2;
     public const int UnitFrameCount = 720;
     public const int SelectionOverlayFrame = 720;
     public const int PendingFirstControlFrame = 721;
@@ -29,5 +33,26 @@ public static class OriginalStrategicInteractiveEncounterPresentation
         if ((uint)frame >= UnitFrameCount)
             throw new ArgumentOutOfRangeException(nameof(unit), "Mapped unit frame is outside MEN8's ordinary frame range.");
         return frame;
+    }
+
+    /// <summary>
+    /// Mirrors the draw coordinates at <c>0x28B20-0x28B3F</c>. The source
+    /// centers the 90-by-90 frame on record <c>+0x04/+0x08</c> after applying
+    /// its horizontal and vertical scroll globals. Painter ordering is owned
+    /// by the unresolved comparator passed through <c>0x28A48</c>.
+    /// </summary>
+    public static (int X, int Y) DrawPositionFor(
+        OriginalStrategicInteractiveEncounterUnit unit,
+        int horizontalScrollOffset,
+        int verticalScrollOffset)
+    {
+        ArgumentNullException.ThrowIfNull(unit);
+        if (horizontalScrollOffset < 0)
+            throw new ArgumentOutOfRangeException(nameof(horizontalScrollOffset));
+        if (verticalScrollOffset < 0)
+            throw new ArgumentOutOfRangeException(nameof(verticalScrollOffset));
+        return (
+            checked(unit.PositionX - horizontalScrollOffset - UnitSpriteHalfWidth),
+            checked(unit.PositionY - verticalScrollOffset - UnitSpriteHalfHeight));
     }
 }

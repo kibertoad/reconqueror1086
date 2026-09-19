@@ -32,5 +32,10 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(720, OriginalStrategicInteractiveEncounterPresentation.SelectionOverlayFrame);
         Assert.Equal(721, OriginalStrategicInteractiveEncounterPresentation.PendingFirstControlFrame);
         Assert.Equal(722, OriginalStrategicInteractiveEncounterPresentation.ControlStripFrame);
+
+        units[0].PositionX = 300;
+        units[0].PositionY = 200;
+        Assert.Equal((215, 115), OriginalStrategicInteractiveEncounterPresentation.DrawPositionFor(
+            units[0], horizontalScrollOffset: 40, verticalScrollOffset: 40));
     }
 }
