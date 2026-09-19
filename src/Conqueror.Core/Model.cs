@@ -70,7 +70,31 @@ public sealed class Inventory
 public sealed class Army
 {
     public Dictionary<UnitType, int> Units { get; init; } = Enum.GetValues<UnitType>().ToDictionary(x => x, _ => 0);
+    // Object-1 player record fields written by 0x29DE0/0x29D24 after a strategic encounter.
+    // They are intentionally separate from the force counters above: the executable clears
+    // these three per-unit transient words after every resolver return.
+    public int OriginalStrategicEncounterCount { get; set; }
+    public Dictionary<UnitType, int> OriginalStrategicEncounterStates { get; init; } =
+        Enum.GetValues<UnitType>().ToDictionary(x => x, _ => 0);
     public int Total => Units.Values.Sum();
+
+    public void RecordOriginalStrategicEncounterResolution()
+    {
+        OriginalStrategicEncounterCount = unchecked(OriginalStrategicEncounterCount + 1);
+        ClearOriginalStrategicEncounterStates();
+    }
+
+    public void ResetOriginalStrategicEncounterState()
+    {
+        OriginalStrategicEncounterCount = 0;
+        ClearOriginalStrategicEncounterStates();
+    }
+
+    private void ClearOriginalStrategicEncounterStates()
+    {
+        foreach (var unit in Enum.GetValues<UnitType>())
+            OriginalStrategicEncounterStates[unit] = 0;
+    }
 
     public void RemoveUnits(int count)
     {

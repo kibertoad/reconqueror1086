@@ -315,6 +315,10 @@ public sealed partial class ResourceAndDefinitionTests
         state.Player.ArmyAt(0).Units[UnitType.Swordsmen] = 1;
         state.Player.ArmyAt(0).Units[UnitType.Halberdiers] = 1;
         state.Player.ArmyAt(0).Units[UnitType.Knights] = 1;
+        state.Player.ArmyAt(0).OriginalStrategicEncounterCount = 17;
+        state.Player.ArmyAt(0).OriginalStrategicEncounterStates[UnitType.Swordsmen] = 4;
+        state.Player.ArmyAt(0).OriginalStrategicEncounterStates[UnitType.Halberdiers] = 5;
+        state.Player.ArmyAt(0).OriginalStrategicEncounterStates[UnitType.Knights] = 6;
         var player = strategic.PlayerMovementSlots[0];
         player.Active = true;
         player.PathComplete = true;
@@ -345,6 +349,9 @@ public sealed partial class ResourceAndDefinitionTests
             state.Player.ArmyAt(0).Units[UnitType.Halberdiers],
             state.Player.ArmyAt(0).Units[UnitType.Knights]));
         Assert.Equal((2, 3, 4), (hostile.Swordsmen, hostile.Halberdiers, hostile.Knights));
+        Assert.Equal(0, state.Player.ArmyAt(0).OriginalStrategicEncounterCount);
+        Assert.All(state.Player.ArmyAt(0).OriginalStrategicEncounterStates.Values,
+            stateValue => Assert.Equal(0, stateValue));
     }
 
     [Fact]
@@ -356,6 +363,8 @@ public sealed partial class ResourceAndDefinitionTests
         var strategic = state.OriginalStrategicState;
         strategic.EngagedPlayerMovementSlot = 0;
         state.Player.ArmyAt(0).Units[UnitType.Swordsmen] = 1;
+        state.Player.ArmyAt(0).OriginalStrategicEncounterCount = 7;
+        state.Player.ArmyAt(0).OriginalStrategicEncounterStates[UnitType.Swordsmen] = 3;
         var player = strategic.PlayerMovementSlots[0];
         player.Active = true;
         player.PathComplete = true;
@@ -379,6 +388,9 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.True(applied.DistinguishedPlayerLossRequiresModal);
         Assert.True(player.Active);
         Assert.Equal(1, strategic.ActivePlayerRecordCount);
+        Assert.Equal(8, state.Player.ArmyAt(0).OriginalStrategicEncounterCount);
+        Assert.All(state.Player.ArmyAt(0).OriginalStrategicEncounterStates.Values,
+            stateValue => Assert.Equal(0, stateValue));
     }
 
     private sealed class QueueEncounterRandom(params int[] values) : IOriginalStrategicEncounterRandom

@@ -125,6 +125,10 @@ public sealed partial class ResourceAndDefinitionTests
         playerMovement.Waypoints.AddRange([
             new OriginalStrategicRoutePoint(3_900, 900),
             new OriginalStrategicRoutePoint(4_000, 800)]);
+        campaign.Player.ArmyAt(4).OriginalStrategicEncounterCount = 23;
+        campaign.Player.ArmyAt(4).OriginalStrategicEncounterStates[UnitType.Swordsmen] = 7;
+        campaign.Player.ArmyAt(4).OriginalStrategicEncounterStates[UnitType.Halberdiers] = 8;
+        campaign.Player.ArmyAt(4).OriginalStrategicEncounterStates[UnitType.Knights] = 9;
         strategic.Validate();
 
         var restored = JsonSerializer.Deserialize<CampaignState>(JsonSerializer.Serialize(campaign));
@@ -158,6 +162,11 @@ public sealed partial class ResourceAndDefinitionTests
              restoredPlayerMovement.WaypointIndex, restoredPlayerMovement.CollisionCooldown,
              restoredPlayerMovement.TerrainKind));
         Assert.Equal(playerMovement.Waypoints, restoredPlayerMovement.Waypoints);
+        Assert.Equal(23, restored.Player.ArmyAt(4).OriginalStrategicEncounterCount);
+        Assert.Equal((7, 8, 9), (
+            restored.Player.ArmyAt(4).OriginalStrategicEncounterStates[UnitType.Swordsmen],
+            restored.Player.ArmyAt(4).OriginalStrategicEncounterStates[UnitType.Halberdiers],
+            restored.Player.ArmyAt(4).OriginalStrategicEncounterStates[UnitType.Knights]));
         Assert.Equal((3_999.5f, 799.25f, 0.8f, -0.6f),
             (restoredPlayerMovement.CurrentX, restoredPlayerMovement.CurrentY,
              restoredPlayerMovement.DirectionX, restoredPlayerMovement.DirectionY));

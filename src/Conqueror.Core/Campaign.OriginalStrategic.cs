@@ -338,6 +338,7 @@ public sealed partial class Campaign
         army.Units[UnitType.Swordsmen] = resolverResult.PlayerFinalForces.Swordsmen;
         army.Units[UnitType.Halberdiers] = resolverResult.PlayerFinalForces.Halberdiers;
         army.Units[UnitType.Knights] = resolverResult.PlayerFinalForces.Knights;
+        army.RecordOriginalStrategicEncounterResolution();
         var enemy = strategic.MovementSlots.Single(slot => slot.Slot == encounter.EnemyMovementSlot);
         enemy.Swordsmen = resolverResult.EnemyFinalForces.Swordsmen;
         enemy.Halberdiers = resolverResult.EnemyFinalForces.Halberdiers;
@@ -350,8 +351,11 @@ public sealed partial class Campaign
             if (encounter.PlayerMovementSlot == strategic.EngagedPlayerMovementSlot)
                 distinguishedPlayerLossRequiresModal = true;
             else
+            {
+                army.ResetOriginalStrategicEncounterState();
                 playerFieldRecordRemoved = OriginalStrategicMovement.RemovePlayerMovementRecord(
                     strategic, encounter.PlayerMovementSlot);
+            }
         }
         return new(resolverResult, playerFieldRecordRemoved, distinguishedPlayerLossRequiresModal);
     }
