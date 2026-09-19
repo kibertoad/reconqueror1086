@@ -502,6 +502,53 @@ public static class OriginalStrategicInteractiveEncounter
     }
 
     /// <summary>
+    /// Composes state-zero record handling in the exact order reached from
+    /// <c>0x270BB</c>: first run the distinct opposing-corner acquisition,
+    /// turn immediately when a target field exists, otherwise process a
+    /// paired destination, then finally attempt control-code-one automatic
+    /// destination assignment. The caller supplies the rectangle table built
+    /// before the unit pass, just as <c>0x26B88</c> does; this method does not
+    /// create an unverified outer scheduler or input loop.
+    /// </summary>
+    public static bool AdvanceMappedStateZero(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
+        IReadOnlyList<OriginalStrategicInteractiveEncounterRectangle> rectangles,
+        int unitIndex,
+        int contentWidth,
+        int contentHeight,
+        int playerLaneCount,
+        int enemyLaneCount)
+    {
+        ArgumentNullException.ThrowIfNull(units);
+        ArgumentNullException.ThrowIfNull(rectangles);
+        if ((uint)unitIndex >= (uint)units.Count)
+            throw new ArgumentOutOfRangeException(nameof(unitIndex));
+        if (rectangles.Count != units.Count)
+            throw new ArgumentException("Mapped selector rectangles must match the unit record count.",
+                nameof(rectangles));
+
+        var unit = units[unitIndex];
+        ArgumentNullException.ThrowIfNull(unit);
+        if (unit.StateCode != 0)
+            return false;
+
+        var targetUnitIndex = unit.TargetUnitIndex;
+        OriginalStrategicInteractiveEncounterGeometry.TryAcquireMappedOpposingTarget(
+            units, rectangles, unitIndex, contentWidth, contentHeight, ref targetUnitIndex);
+        unit.TargetUnitIndex = targetUnitIndex;
+        if (unit.TargetUnitIndex != -1)
+        {
+            AdvanceMappedTargetHeading(units, unitIndex);
+            return true;
+        }
+
+        if (unit.AuxiliaryX != -1 || unit.AuxiliaryY != -1)
+            return AdvanceMappedDestinationOrder(units, rectangles, unitIndex, contentWidth, contentHeight);
+
+        return TryAssignMappedAutomaticDestination(units, unitIndex, playerLaneCount, enemyLaneCount);
+    }
+
+    /// <summary>
     /// Applies the mapped player-prefix formation paths in <c>0x2904B</c>,
     /// <c>0x290BA</c>, and <c>0x29132</c>. Menu code 3 has its own method
     /// because its exact path also consumes a raw draw and the viewport width.

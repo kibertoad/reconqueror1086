@@ -36,4 +36,46 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.False(OriginalStrategicInteractiveEncounter.TryAssignMappedAutomaticDestination(
             units, 0, playerLaneCount: 1, enemyLaneCount: 0));
     }
+
+    [Fact]
+    public void StrategicInteractiveStateZeroComposesTargetDestinationAndAutomaticBranchesInOrder()
+    {
+        var contact = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0));
+        contact[0].PositionX = 100;
+        contact[0].PositionY = 100;
+        contact[1].PositionX = 120;
+        contact[1].PositionY = 100;
+        Assert.True(OriginalStrategicInteractiveEncounter.AdvanceMappedStateZero(
+            contact, contact.Select(OriginalStrategicInteractiveEncounterGeometry.RenderRectangleFor).ToArray(),
+            0, 640, 480, playerLaneCount: 1, enemyLaneCount: 1));
+        Assert.Equal((1, OriginalStrategicInteractiveEncounterCombat.ContactStateCode),
+            (contact[0].TargetUnitIndex, contact[0].StateCode));
+
+        var destination = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(0, 0, 0));
+        destination[0].PositionX = 100;
+        destination[0].PositionY = 100;
+        destination[0].AuxiliaryX = 106;
+        destination[0].AuxiliaryY = 108;
+        Assert.True(OriginalStrategicInteractiveEncounter.AdvanceMappedStateZero(
+            destination, destination.Select(OriginalStrategicInteractiveEncounterGeometry.RenderRectangleFor).ToArray(),
+            0, 640, 480, playerLaneCount: 1, enemyLaneCount: 0));
+        Assert.Equal((2, 100, 100),
+            (destination[0].HeadingOctant, destination[0].PositionX, destination[0].PositionY));
+
+        var automatic = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0));
+        automatic[0].ControlCode = 1;
+        automatic[1].PositionX = 100;
+        automatic[1].PositionY = 100;
+        Assert.True(OriginalStrategicInteractiveEncounter.AdvanceMappedStateZero(
+            automatic, automatic.Select(OriginalStrategicInteractiveEncounterGeometry.RenderRectangleFor).ToArray(),
+            0, 640, 480, playerLaneCount: 1, enemyLaneCount: 1));
+        Assert.Equal((100, 100, -1),
+            (automatic[0].AuxiliaryX, automatic[0].AuxiliaryY, automatic[0].TargetUnitIndex));
+    }
 }

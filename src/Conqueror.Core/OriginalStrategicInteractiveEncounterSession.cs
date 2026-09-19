@@ -170,6 +170,16 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         OriginalStrategicInteractiveEncounter.TryAssignMappedAutomaticDestination(
             _units, unitIndex, _playerLaneCount, _enemyLaneCount);
 
+    /// <summary>
+    /// Advances one state-zero record with a fresh caller-visible rectangle
+    /// snapshot. A complete tactical pass must instead retain one snapshot
+    /// for every unit, matching <c>0x26B88</c>'s pre-pass construction.
+    /// </summary>
+    public bool AdvanceStateZero(int unitIndex, int contentWidth, int contentHeight) =>
+        OriginalStrategicInteractiveEncounter.AdvanceMappedStateZero(
+            _units, RenderRectangles(), unitIndex, contentWidth, contentHeight,
+            _playerLaneCount, _enemyLaneCount);
+
     public void ApplyDestinationOrder(
         int localX,
         int localY,
