@@ -39,6 +39,16 @@ public sealed partial class ResourceAndDefinitionTests
             (OriginalStrategicInteractiveEncounterSide.Enemy, OriginalStrategicInteractiveEncounterCategory.Knights, 7, 40),
             (OriginalStrategicInteractiveEncounterSide.Enemy, OriginalStrategicInteractiveEncounterCategory.Knights, 7, 40),
         ], units.Select(unit => (unit.Side, unit.Category, unit.CombatTypeCode, unit.CategoryValue)));
+        Assert.All(units, unit =>
+        {
+            Assert.Equal(-1, unit.AuxiliaryX);
+            Assert.Equal(-1, unit.AuxiliaryY);
+            Assert.Equal(0, unit.PhaseCounter);
+            Assert.Equal(0, unit.StateCode);
+            Assert.Equal(-1, unit.TargetUnitIndex);
+        });
+        Assert.All(units.Take(4), unit => Assert.Equal(0, unit.ControlCode));
+        Assert.All(units.Skip(4), unit => Assert.Equal(1, unit.ControlCode));
 
         units[0].RemainingStrength = 0;
         units[3].RemainingStrength = -1;

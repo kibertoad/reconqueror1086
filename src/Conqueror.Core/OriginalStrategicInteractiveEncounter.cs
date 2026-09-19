@@ -70,6 +70,41 @@ public sealed class OriginalStrategicInteractiveEncounterUnit
     public int PositionX { get; set; }
     public int PositionY { get; set; }
 
+    /// <summary>
+    /// Original record <c>+0x0C/+0x10</c>. Constructor <c>0x28C38</c>
+    /// initializes both fields to -1; the interactive input path later writes
+    /// them as a paired transient destination. Their presentation name is not
+    /// yet established.
+    /// </summary>
+    public int AuxiliaryX { get; set; } = -1;
+    public int AuxiliaryY { get; set; } = -1;
+
+    /// <summary>
+    /// Original record <c>+0x18</c>, initialized to zero and advanced modulo
+    /// five by the mapped death-completion path.
+    /// </summary>
+    public int PhaseCounter { get; set; }
+
+    /// <summary>
+    /// Original record <c>+0x1C</c>, initialized to zero. State code
+    /// <c>0x50</c> is the confirmed completed-death state; the remaining code
+    /// meanings await the tactical-loop trace.
+    /// </summary>
+    public int StateCode { get; set; }
+
+    /// <summary>
+    /// Original record <c>+0x28</c>. It initializes to zero for player entries
+    /// and one for enemy entries, then is overwritten by interactive control
+    /// paths; its semantic label remains deliberately unresolved.
+    /// </summary>
+    public int ControlCode { get; set; }
+
+    /// <summary>
+    /// Original record <c>+0x30</c>, initialized to -1 and later used as a
+    /// table-relative unit index by the tactical loop.
+    /// </summary>
+    public int TargetUnitIndex { get; set; } = -1;
+
     internal void CompleteMappedDeathAnimation()
     {
         RemainingStrength = 0;
@@ -352,6 +387,12 @@ public static class OriginalStrategicInteractiveEncounter
     {
         var combatTypeCode = side == OriginalStrategicInteractiveEncounterSide.Player ? 3 : 7;
         for (var index = 0; index < count; index++)
-            units.Add(new(side, category, combatTypeCode, categoryValue));
+        {
+            var unit = new OriginalStrategicInteractiveEncounterUnit(side, category, combatTypeCode, categoryValue)
+            {
+                ControlCode = side == OriginalStrategicInteractiveEncounterSide.Player ? 0 : 1,
+            };
+            units.Add(unit);
+        }
     }
 }
