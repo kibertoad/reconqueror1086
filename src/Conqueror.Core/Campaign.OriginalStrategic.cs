@@ -6,12 +6,15 @@ namespace Conqueror.Core;
 /// handles; they are deliberately supplied at the application boundary rather
 /// than guessed from the incompatible dated campaign map. A modal blocks only
 /// the hostile scheduler, after the report and player pass, as at `0x3C290`.
+/// Player-contact handoff has its own active state, matching `0x39428`'s
+/// independent `ADC0` guard.
 /// </summary>
 public sealed record OriginalStrategicCampaignPassInput(
     int GlobalTargetPerson,
     int GlobalOriginProperty,
     IReadOnlyList<OriginalStrategicPlayerTarget> DivisionTargets,
     int SpecialPropertyHouseholdCount,
+    bool PlayerEncounterHandoffActive = false,
     bool SchedulerBlockedByModal = false);
 
 /// <summary>
@@ -51,7 +54,8 @@ public sealed partial class Campaign
         strategic.Validate();
         var report = CaptureOriginalStrategicSpyReport(strategic);
         var playerPass = OriginalStrategicMovement.AdvancePlayerPass(
-            strategic, _originalStrategicResources, input.DivisionTargets);
+            strategic, _originalStrategicResources, input.DivisionTargets,
+            input.PlayerEncounterHandoffActive);
         var pursuitTargets = PlayerArmyPursuitTargets(strategic);
         var engaged = strategic.PlayerMovementSlots.Single(slot =>
             slot.Slot == strategic.EngagedPlayerMovementSlot);

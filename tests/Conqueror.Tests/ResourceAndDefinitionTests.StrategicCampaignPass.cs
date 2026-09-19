@@ -105,6 +105,56 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void ActivePlayerEncounterHandoffSuppressesOnlyTheContactOutput()
+    {
+        var state = Campaign.NewFromTemplate(0);
+        state.OriginalStrategicState = OriginalStrategicCampaignState.CreateForNewGame(
+            state.Date, startingRouteSelector: 0);
+        var strategic = state.OriginalStrategicState;
+        state.Player.ArmyAt(0).Units[UnitType.Swordsmen] = 3;
+        state.Player.SetArmyFieldState(0, fielded: true, location: 0);
+        var player = strategic.PlayerMovementSlots[0];
+        player.Active = true;
+        player.PathComplete = true;
+        player.CurrentX = 1_000;
+        player.CurrentY = 2_000;
+        player.GridX = 7;
+        player.GridY = 11;
+        var hostile = strategic.MovementSlots[0];
+        hostile.Active = true;
+        hostile.Mode = OriginalStrategicMovement.DirectPropertyMode;
+        hostile.OriginProperty = 0;
+        hostile.Lord = strategic.Properties[0].Lord;
+        hostile.Swordsmen = 5;
+        hostile.CurrentX = 1_000;
+        hostile.CurrentY = 2_000;
+        hostile.DestinationX = 2_000;
+        hostile.DestinationY = 2_000;
+        hostile.DirectionX = 1;
+
+        var resources = new StubStrategicResources();
+        resources.Routes["sc_0.rat"] = [new OriginalStrategicRoutePoint(0, 0)];
+        var campaign = new Campaign(state);
+        campaign.ConfigureOriginalStrategicResources(resources);
+        var result = campaign.AdvanceOriginalStrategicPass(
+            new OriginalStrategicCampaignPassInput(
+                17,
+                0,
+                [
+                    new OriginalStrategicPlayerTarget(false, 0, 0),
+                    new OriginalStrategicPlayerTarget(false, 0, 0),
+                    new OriginalStrategicPlayerTarget(false, 0, 0)],
+                76,
+                PlayerEncounterHandoffActive: true),
+            new QueueStrategicRandom());
+
+        Assert.Empty(result.PlayerPass.Contacts);
+        Assert.Equal(0, strategic.SelectedPlayerMovementSlot);
+        Assert.NotNull(result.SchedulerPass);
+        Assert.True(hostile.CurrentX > 1_000);
+    }
+
+    [Fact]
     public void FieldingAnArmyConstructsItsMatchingOriginalMovementRecord()
     {
         var state = Campaign.NewFromTemplate(0);
