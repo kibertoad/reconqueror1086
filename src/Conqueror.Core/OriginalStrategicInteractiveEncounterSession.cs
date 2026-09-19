@@ -59,6 +59,18 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     public void SetMappedControlCodeOneForLivingUnits() =>
         OriginalStrategicInteractiveEncounter.SetMappedControlCodeOneForLivingRecords(_units);
 
+    /// <summary>
+    /// Applies only a contact whose source target acquisition has already
+    /// resolved. It does not synthesize a target or advance tactical phases.
+    /// </summary>
+    public OriginalStrategicInteractiveEncounterContactResult ApplyResolvedContact(
+        int attackerIndex,
+        int playerScoreModifier,
+        int contactSideFilter,
+        IOriginalStrategicEncounterRandom random) =>
+        OriginalStrategicInteractiveEncounterCombat.ApplyMappedResolvedContact(
+            _units, attackerIndex, playerScoreModifier, contactSideFilter, random);
+
     public void ApplyDestinationOrder(
         int localX,
         int localY,

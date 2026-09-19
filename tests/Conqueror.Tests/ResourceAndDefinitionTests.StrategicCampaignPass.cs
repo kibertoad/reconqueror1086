@@ -201,6 +201,60 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveResolvedContactPreservesCounterDamageBonusAndDeathCleanup()
+    {
+        var units = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(1, 0, 1),
+            new OriginalStrategicEncounterForces(0, 1, 0));
+        var knight = units[1];
+        var enemyHalberdier = units[2];
+        knight.TargetUnitIndex = 2;
+
+        var counter = OriginalStrategicInteractiveEncounterCombat.ApplyMappedResolvedContact(
+            units, attackerIndex: 1, playerScoreModifier: 8, contactSideFilter: 0,
+            new QueueEncounterRandom(19));
+        Assert.Equal((true, 11, false, false, 89),
+            (counter.Applied, counter.Damage, counter.DeathAnimationStarted,
+                counter.AttackerTargetCleared, enemyHalberdier.RemainingStrength));
+
+        enemyHalberdier.RemainingStrength = 25;
+        var threshold = OriginalStrategicInteractiveEncounterCombat.ApplyMappedResolvedContact(
+            units, attackerIndex: 1, playerScoreModifier: 0, contactSideFilter: 0,
+            new QueueEncounterRandom(9));
+        Assert.True(threshold.DeathAnimationStarted);
+        Assert.Equal((16, OriginalStrategicInteractiveEncounterCombat.DeathAnimationStateCode, 0),
+            (enemyHalberdier.RemainingStrength, enemyHalberdier.StateCode, enemyHalberdier.PhaseCounter));
+
+        enemyHalberdier.RemainingStrength = 5;
+        knight.ControlCode = 1;
+        knight.AuxiliaryX = 20;
+        knight.AuxiliaryY = 30;
+        var defeated = OriginalStrategicInteractiveEncounterCombat.ApplyMappedResolvedContact(
+            units, attackerIndex: 1, playerScoreModifier: 0, contactSideFilter: 0,
+            new QueueEncounterRandom(9));
+        Assert.True(defeated.AttackerTargetCleared);
+        Assert.Equal((-4, -1, 0, -1, -1),
+            (enemyHalberdier.RemainingStrength, knight.TargetUnitIndex, knight.StateCode,
+                knight.AuxiliaryX, knight.AuxiliaryY));
+    }
+
+    [Fact]
+    public void StrategicInteractiveResolvedContactSkipsTheFilteredLaneBeforeDrawingRandom()
+    {
+        var units = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0));
+        units[1].TargetUnitIndex = 0;
+        var random = new QueueEncounterRandom(6);
+
+        var result = OriginalStrategicInteractiveEncounterCombat.ApplyMappedResolvedContact(
+            units, attackerIndex: 1, playerScoreModifier: 99, contactSideFilter: 1, random);
+        Assert.False(result.Applied);
+        Assert.Equal(100, units[0].RemainingStrength);
+        Assert.Equal(6, random.NextRaw());
+    }
+
+    [Fact]
     public void StrategicInteractiveSessionCombinesMappedFormationPlayerControlGeometryAndCadence()
     {
         var session = OriginalStrategicInteractiveEncounterSession.Create(
