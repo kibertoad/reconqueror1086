@@ -6,6 +6,23 @@ namespace Conqueror.Tests;
 public sealed partial class ResourceAndDefinitionTests
 {
     [Fact]
+    public void StrategicEncounterMenuPreservesExecutableRegionOrderAndSelectionCodes()
+    {
+        var entries = OriginalStrategicEncounterMenu.Entries;
+
+        Assert.Equal(5, entries.Count);
+        Assert.Equal(new OriginalStrategicEncounterMenuEntry(0, 30, 30, 215, 185, 2), entries[0]);
+        Assert.Equal(new OriginalStrategicEncounterMenuEntry(1, 400, 30, 205, 200, 3), entries[1]);
+        Assert.Equal(new OriginalStrategicEncounterMenuEntry(2, 25, 250, 185, 185, 1), entries[2]);
+        Assert.Equal(new OriginalStrategicEncounterMenuEntry(3, 375, 250, 185, 185, 0), entries[3]);
+        Assert.Equal(new OriginalStrategicEncounterMenuEntry(4, 220, 417, 148, 38, null), entries[4]);
+        Assert.Equal(OriginalStrategicEncounterMenu.ExitRegionIndex, entries[4].RegionIndex);
+        Assert.True(entries[4].ExitsToAutomaticFallback);
+        Assert.All(entries.Take(OriginalStrategicEncounterMenu.InteractiveSelectionCount),
+            entry => Assert.False(entry.ExitsToAutomaticFallback));
+    }
+
+    [Fact]
     public void NewCampaignStrategicBootstrapPersistsTheRandomlySelectedStartingRoute()
     {
         const int seed = 37;
