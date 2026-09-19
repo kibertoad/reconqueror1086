@@ -305,6 +305,82 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(preparation.EnemyResolverForces, result.EnemyFinalForces);
     }
 
+    [Fact]
+    public void AutomaticStrategicEncounterWritesTheResolvedCountersAndRemovesAnEmptyOrdinaryFieldRecord()
+    {
+        var state = Campaign.NewFromTemplate(0);
+        state.OriginalStrategicState = OriginalStrategicCampaignState.CreateForNewGame(
+            state.Date, startingRouteSelector: 0);
+        var strategic = state.OriginalStrategicState;
+        state.Player.ArmyAt(0).Units[UnitType.Swordsmen] = 1;
+        state.Player.ArmyAt(0).Units[UnitType.Halberdiers] = 1;
+        state.Player.ArmyAt(0).Units[UnitType.Knights] = 1;
+        var player = strategic.PlayerMovementSlots[0];
+        player.Active = true;
+        player.PathComplete = true;
+        strategic.ActivePlayerRecordCount = 1;
+        var hostile = strategic.MovementSlots[3];
+        hostile.Active = true;
+        hostile.Mode = OriginalStrategicMovement.DirectPropertyMode;
+        hostile.OriginProperty = 0;
+        hostile.Lord = strategic.Properties[0].Lord;
+        hostile.Swordsmen = 2;
+        hostile.Halberdiers = 3;
+        hostile.Knights = 4;
+        var campaign = new Campaign(state);
+        var encounter = new OriginalStrategicPlayerEnemyEncounter(
+            0, 3,
+            new OriginalStrategicEncounterForces(1, 1, 1),
+            new OriginalStrategicEncounterForces(2, 3, 4));
+
+        var applied = campaign.ResolveAutomaticOriginalStrategicEncounter(
+            encounter, playerScoreModifier: 0, new QueueEncounterRandom());
+
+        Assert.True(applied.PlayerFieldRecordRemoved);
+        Assert.False(applied.DistinguishedPlayerLossRequiresModal);
+        Assert.False(player.Active);
+        Assert.Equal(0, strategic.ActivePlayerRecordCount);
+        Assert.Equal((0, 0, 0), (
+            state.Player.ArmyAt(0).Units[UnitType.Swordsmen],
+            state.Player.ArmyAt(0).Units[UnitType.Halberdiers],
+            state.Player.ArmyAt(0).Units[UnitType.Knights]));
+        Assert.Equal((2, 3, 4), (hostile.Swordsmen, hostile.Halberdiers, hostile.Knights));
+    }
+
+    [Fact]
+    public void AutomaticStrategicEncounterLeavesTheEmptyDistinguishedRecordForItsLossModal()
+    {
+        var state = Campaign.NewFromTemplate(0);
+        state.OriginalStrategicState = OriginalStrategicCampaignState.CreateForNewGame(
+            state.Date, startingRouteSelector: 0);
+        var strategic = state.OriginalStrategicState;
+        strategic.EngagedPlayerMovementSlot = 0;
+        state.Player.ArmyAt(0).Units[UnitType.Swordsmen] = 1;
+        var player = strategic.PlayerMovementSlots[0];
+        player.Active = true;
+        player.PathComplete = true;
+        strategic.ActivePlayerRecordCount = 1;
+        var hostile = strategic.MovementSlots[0];
+        hostile.Active = true;
+        hostile.Mode = OriginalStrategicMovement.DirectPropertyMode;
+        hostile.OriginProperty = 0;
+        hostile.Lord = strategic.Properties[0].Lord;
+        hostile.Swordsmen = 2;
+        var campaign = new Campaign(state);
+        var encounter = new OriginalStrategicPlayerEnemyEncounter(
+            0, 0,
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(2, 0, 0));
+
+        var applied = campaign.ResolveAutomaticOriginalStrategicEncounter(
+            encounter, playerScoreModifier: 0, new QueueEncounterRandom());
+
+        Assert.False(applied.PlayerFieldRecordRemoved);
+        Assert.True(applied.DistinguishedPlayerLossRequiresModal);
+        Assert.True(player.Active);
+        Assert.Equal(1, strategic.ActivePlayerRecordCount);
+    }
+
     private sealed class QueueEncounterRandom(params int[] values) : IOriginalStrategicEncounterRandom
     {
         private readonly Queue<int> _values = new(values);

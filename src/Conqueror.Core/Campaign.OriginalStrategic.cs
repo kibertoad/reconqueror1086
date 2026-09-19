@@ -232,6 +232,16 @@ public sealed record OriginalStrategicPlayerEnemyEncounter(
     }
 }
 
+/// <summary>
+/// Applied result of the recovered automatic strategic encounter path. A
+/// distinguished-player loss must be presented by the application; an empty
+/// ordinary field record is removed through the original record helper.
+/// </summary>
+public sealed record OriginalStrategicAutomaticEncounterApplication(
+    OriginalStrategicAutomaticEncounterResult ResolverResult,
+    bool PlayerFieldRecordRemoved,
+    bool DistinguishedPlayerLossRequiresModal);
+
 public sealed partial class Campaign
 {
     /// <summary>
@@ -300,6 +310,50 @@ public sealed partial class Campaign
                     input.SpecialPropertyHouseholdCount),
                 random);
         return new(report, playerPass, encounters, schedulerPass);
+    }
+
+    /// <summary>
+    /// Applies only resolver <c>0x258FC</c>'s automatic-exit result to the
+    /// six-counter strategic handoff. The interactive resolver intentionally
+    /// remains outside this path.
+    /// </summary>
+    public OriginalStrategicAutomaticEncounterApplication ResolveAutomaticOriginalStrategicEncounter(
+        OriginalStrategicPlayerEnemyEncounter encounter,
+        int playerScoreModifier,
+        IOriginalStrategicEncounterRandom random)
+    {
+        ArgumentNullException.ThrowIfNull(encounter);
+        ArgumentNullException.ThrowIfNull(random);
+        if (State.OriginalStrategicState is not { } strategic)
+            throw new InvalidOperationException("Campaign has no original strategic movement state.");
+
+        var current = OriginalStrategicPlayerEnemyEncounter.Capture(
+            strategic, State.Player, encounter.PlayerMovementSlot, encounter.EnemyMovementSlot);
+        if (current != encounter)
+            throw new InvalidOperationException("Strategic encounter counters changed before automatic resolution.");
+
+        var resolverResult = OriginalStrategicEncounterStaging.ResolveAutomatic(
+            encounter.Preparation, playerScoreModifier, enemyScoreModifier: 0, random);
+        var army = State.Player.ArmyAt(encounter.PlayerMovementSlot);
+        army.Units[UnitType.Swordsmen] = resolverResult.PlayerFinalForces.Swordsmen;
+        army.Units[UnitType.Halberdiers] = resolverResult.PlayerFinalForces.Halberdiers;
+        army.Units[UnitType.Knights] = resolverResult.PlayerFinalForces.Knights;
+        var enemy = strategic.MovementSlots.Single(slot => slot.Slot == encounter.EnemyMovementSlot);
+        enemy.Swordsmen = resolverResult.EnemyFinalForces.Swordsmen;
+        enemy.Halberdiers = resolverResult.EnemyFinalForces.Halberdiers;
+        enemy.Knights = resolverResult.EnemyFinalForces.Knights;
+
+        var playerFieldRecordRemoved = false;
+        var distinguishedPlayerLossRequiresModal = false;
+        if (resolverResult.PlayerFinalForces.Total == 0)
+        {
+            if (encounter.PlayerMovementSlot == strategic.EngagedPlayerMovementSlot)
+                distinguishedPlayerLossRequiresModal = true;
+            else
+                playerFieldRecordRemoved = OriginalStrategicMovement.RemovePlayerMovementRecord(
+                    strategic, encounter.PlayerMovementSlot);
+        }
+        return new(resolverResult, playerFieldRecordRemoved, distinguishedPlayerLossRequiresModal);
     }
 
     private StrategicSpyReport? CaptureOriginalStrategicSpyReport(
