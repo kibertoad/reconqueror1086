@@ -222,7 +222,7 @@ public static partial class OriginalStrategicMovement
             slot.RouteReversed = reverse;
             slot.WaypointCount = route!.Count;
         }
-        SetOrdinaryForces(slot, state, input.SpecialPropertyHouseholdCount);
+        SetOrdinaryForces(slot, state);
         construction = new OriginalStrategicConstruction(
             slotIndex, mode, originProperty, targetPerson, -1, routeName, reverse);
         return true;
@@ -257,7 +257,7 @@ public static partial class OriginalStrategicMovement
         SetNormalizedDirection(
             slot, slot.DestinationX - Truncate(slot.CurrentX),
             slot.DestinationY - Truncate(slot.CurrentY));
-        SetPursuitForces(slot, state, input.SpecialPropertyHouseholdCount, target.Total);
+        SetPursuitForces(slot, state, target.Total);
         construction = new OriginalStrategicConstruction(
             slotIndex, PursuitMode, originProperty, -1, targetSlot, null, false);
         return true;
@@ -265,10 +265,9 @@ public static partial class OriginalStrategicMovement
 
     private static void SetOrdinaryForces(
         OriginalStrategicMovementSlot slot,
-        OriginalStrategicCampaignState state,
-        int specialPropertyHouseholdCount)
+        OriginalStrategicCampaignState state)
     {
-        var household = HouseholdCount(state, slot.OriginProperty, specialPropertyHouseholdCount);
+        var household = HouseholdCount(state, slot.OriginProperty);
         var forces = InitialForces(household, state.Persons[slot.Lord].LordRating);
         slot.Swordsmen = forces.Swordsmen;
         slot.Halberdiers = forces.Halberdiers;
@@ -278,14 +277,13 @@ public static partial class OriginalStrategicMovement
     private static void SetPursuitForces(
         OriginalStrategicMovementSlot slot,
         OriginalStrategicCampaignState state,
-        int specialPropertyHouseholdCount,
         int targetTotal)
     {
         var origin = state.Properties[slot.OriginProperty];
         var detached = Math.Min(origin.Garrison, checked(targetTotal + 3));
         var household = detached == 0
             ? 1
-            : Math.Min(HouseholdCount(state, slot.OriginProperty, specialPropertyHouseholdCount), 30);
+            : Math.Min(HouseholdCount(state, slot.OriginProperty), 30);
         var total = checked(detached + household);
         if (total <= 3)
             slot.Swordsmen = 3;
@@ -296,14 +294,30 @@ public static partial class OriginalStrategicMovement
 
     private static int HouseholdCount(
         OriginalStrategicCampaignState state,
-        int property,
-        int specialPropertyHouseholdCount)
+        int property)
     {
-        if (property == ReactiveSpecialProperty) return specialPropertyHouseholdCount;
+        if (property == ReactiveSpecialProperty)
+            return PersonCount - CountPersonListEntries(state);
         var group = state.Persons[state.Properties[property].Lord].Group;
         return state.Persons.Skip(1).Count(person =>
             person.Group == group && person.Assignment != 0
             && (person.Flags & HouseholdEligibleFlag) != 0);
+    }
+
+    // 0x38A8C/0x38B40 special-case property 7: 0xB0 minus 0x43558's
+    // linked PersonListHead count, not a screen-provided population value.
+    private static int CountPersonListEntries(OriginalStrategicCampaignState state)
+    {
+        var count = 0;
+        var index = state.PersonListHead;
+        while (index != byte.MaxValue)
+        {
+            if (index >= state.Persons.Count || count >= state.Persons.Count)
+                throw new InvalidDataException("Strategic person list is malformed.");
+            count++;
+            index = state.Persons[index].ListNext;
+        }
+        return count;
     }
 
     private static int SelectRandomGenerationProperty(
@@ -487,8 +501,6 @@ public static partial class OriginalStrategicMovement
         if (input.PursuitTargets is null || input.PursuitTargets.Count != SlotCount)
             throw new ArgumentException($"Scheduler requires exactly {SlotCount} player movement targets.",
                 nameof(input.PursuitTargets));
-        if (input.SpecialPropertyHouseholdCount is < 0 or > PersonCount)
-            throw new ArgumentOutOfRangeException(nameof(input.SpecialPropertyHouseholdCount));
         foreach (var target in input.PursuitTargets)
         {
             if (!float.IsFinite(target.CurrentX) || !float.IsFinite(target.CurrentY)
@@ -516,7 +528,6 @@ public sealed record OriginalStrategicSchedulerInput(
     int PlayerMovementSlot,
     StrategicPoint PlayerPosition,
     IReadOnlyList<OriginalStrategicPursuitTarget> PursuitTargets,
-    int SpecialPropertyHouseholdCount,
     OriginalStrategicReactiveDetection? ReactiveDetection = null);
 
 public readonly record struct OriginalStrategicReactiveDetection(

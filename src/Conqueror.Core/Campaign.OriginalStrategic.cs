@@ -13,7 +13,6 @@ public sealed record OriginalStrategicCampaignPassInput(
     int GlobalTargetPerson,
     int GlobalOriginProperty,
     IReadOnlyList<OriginalStrategicPlayerTarget> DivisionTargets,
-    int SpecialPropertyHouseholdCount,
     bool PlayerEncounterHandoffActive = false,
     bool SchedulerBlockedByModal = false);
 
@@ -306,8 +305,7 @@ public sealed partial class Campaign
                     input.GlobalOriginProperty,
                     strategic.EngagedPlayerMovementSlot,
                     new StrategicPoint(Truncate(engaged.CurrentX), Truncate(engaged.CurrentY)),
-                    pursuitTargets,
-                    input.SpecialPropertyHouseholdCount),
+                    pursuitTargets),
                 random);
         return new(report, playerPass, encounters, schedulerPass);
     }

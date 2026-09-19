@@ -292,8 +292,7 @@ public sealed partial class ResourceAndDefinitionTests
             GlobalOriginProperty: 0,
             PlayerMovementSlot: 0,
             PlayerPosition: new StrategicPoint(30_000, 3_000),
-            PursuitTargets: targets ?? SchedulerTargets(),
-            SpecialPropertyHouseholdCount: 76);
+            PursuitTargets: targets ?? SchedulerTargets());
 
     private static OriginalStrategicPursuitTarget[] SchedulerTargets() =>
         Enumerable.Repeat(new OriginalStrategicPursuitTarget(false, 0, 0),

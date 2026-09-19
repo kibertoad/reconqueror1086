@@ -491,6 +491,9 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Same(strategic, campaign.State.OriginalStrategicState);
         Assert.Equal(new Random(seed).Next(OriginalStrategicMovement.StartingRouteCount),
             strategic.StartingRouteSelector);
+        var starting = OriginalStrategicMovement.StartingRoutes[strategic.StartingRouteSelector];
+        Assert.Equal(starting.Person, strategic.SchedulerFallbackTargetPerson);
+        Assert.Equal(starting.OriginProperty, strategic.SchedulerFallbackOriginProperty);
         Assert.True(strategic.PlayerMovementSlots[OriginalStrategicMovement.PlayerAvatarMovementSlot]
             .Active);
         Assert.Throws<InvalidOperationException>(campaign.InitializeOriginalStrategicNewGame);
@@ -553,7 +556,7 @@ public sealed partial class ResourceAndDefinitionTests
                     new OriginalStrategicPlayerTarget(false, 0, 0),
                     new OriginalStrategicPlayerTarget(false, 0, 0),
                     new OriginalStrategicPlayerTarget(false, 0, 0)],
-                SpecialPropertyHouseholdCount: 76),
+                SchedulerBlockedByModal: false),
             new QueueStrategicRandom());
 
         Assert.Equal(new StrategicSpyReport(state.Date, 3, -1, 5, 6, 7, "York"), result.SpyReport);
@@ -597,7 +600,6 @@ public sealed partial class ResourceAndDefinitionTests
                     new OriginalStrategicPlayerTarget(false, 0, 0),
                     new OriginalStrategicPlayerTarget(false, 0, 0),
                     new OriginalStrategicPlayerTarget(false, 0, 0)],
-                76,
                 SchedulerBlockedByModal: true),
             new QueueStrategicRandom());
 
@@ -647,7 +649,6 @@ public sealed partial class ResourceAndDefinitionTests
                     new OriginalStrategicPlayerTarget(false, 0, 0),
                     new OriginalStrategicPlayerTarget(false, 0, 0),
                     new OriginalStrategicPlayerTarget(false, 0, 0)],
-                76,
                 PlayerEncounterHandoffActive: true),
             new QueueStrategicRandom());
 
@@ -704,7 +705,7 @@ public sealed partial class ResourceAndDefinitionTests
                     new OriginalStrategicPlayerTarget(false, 0, 0),
                     new OriginalStrategicPlayerTarget(false, 0, 0),
                     new OriginalStrategicPlayerTarget(false, 0, 0)],
-                76),
+                SchedulerBlockedByModal: false),
             new QueueStrategicRandom());
 
         Assert.Equal(new OriginalStrategicPlayerEnemyEncounter(

@@ -10,6 +10,12 @@ public sealed class OriginalStrategicCampaignState
     public const int WorldColumnCount = 400;
 
     public int StartingRouteSelector { get; set; } = -1;
+    // Object-2 +0x1B0C4/+0x1B0CC. New-game initializer 0x110E8 writes the
+    // selected home person, then its resolved fallback origin property here.
+    // These values can be changed by later original UI/save paths, so they
+    // are persisted state rather than recomputed from the selector on demand.
+    public int SchedulerFallbackTargetPerson { get; set; } = -1;
+    public int SchedulerFallbackOriginProperty { get; set; } = -1;
     public int SpeedMultiplier { get; set; } = OriginalStrategicMovement.InitialSpeedMultiplier;
     public int GenerationAccumulator { get; set; }
     public int CallsSinceReactiveSuccess { get; set; }
@@ -48,6 +54,9 @@ public sealed class OriginalStrategicCampaignState
     {
         if (StartingRouteSelector is < -1 or >= OriginalStrategicMovement.StartingRouteCount)
             throw new InvalidDataException("Strategic state contains an invalid starting-route selector.");
+        if (SchedulerFallbackTargetPerson is < -1 or >= OriginalStrategicMovement.PersonCount
+            || SchedulerFallbackOriginProperty is < -1 or >= OriginalStrategicMovement.PropertyCount)
+            throw new InvalidDataException("Strategic state contains invalid scheduler fallback globals.");
         if (SpeedMultiplier is < OriginalStrategicMovement.MinimumSpeedMultiplier
             or > OriginalStrategicMovement.MaximumSpeedMultiplier)
             throw new InvalidDataException("Strategic state contains an invalid speed multiplier.");
@@ -123,6 +132,8 @@ public sealed class OriginalStrategicCampaignState
         if (startingRouteSelector >= 0)
         {
             var starting = OriginalStrategicMovement.StartingRoutes[startingRouteSelector];
+            state.SchedulerFallbackTargetPerson = starting.Person;
+            state.SchedulerFallbackOriginProperty = starting.OriginProperty;
             state.Persons[starting.Person].Assignment = 0;
             state.PlayerHomeGridX = starting.GridX;
             state.PlayerHomeGridY = starting.GridY;
