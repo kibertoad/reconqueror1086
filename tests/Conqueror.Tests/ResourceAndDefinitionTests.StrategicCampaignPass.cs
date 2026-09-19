@@ -145,6 +145,47 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveDispatcherUsesExactCodesAndControlStripRectangleOrder()
+    {
+        Assert.Equal([
+            OriginalStrategicInteractiveEncounterInputRoute.Ignored,
+            OriginalStrategicInteractiveEncounterInputRoute.Ignored,
+            OriginalStrategicInteractiveEncounterInputRoute.PlayerSelection,
+            OriginalStrategicInteractiveEncounterInputRoute.ControlStrip,
+            OriginalStrategicInteractiveEncounterInputRoute.Ignored,
+            OriginalStrategicInteractiveEncounterInputRoute.Ignored,
+            OriginalStrategicInteractiveEncounterInputRoute.DestinationOrder,
+            OriginalStrategicInteractiveEncounterInputRoute.DestinationOrder,
+            OriginalStrategicInteractiveEncounterInputRoute.Ignored,
+        ], Enumerable.Range(0, 9).Select(OriginalStrategicInteractiveEncounter.RouteMappedInputCode));
+
+        var rectangles = OriginalStrategicInteractiveEncounterGeometry.CreateMappedControlStripRectangles(
+            horizontalOffset: 10, verticalSpan: 480);
+        Assert.Equal([
+            new OriginalStrategicInteractiveEncounterRectangle(410, 446, 84, 31),
+            new OriginalStrategicInteractiveEncounterRectangle(534, 446, 41, 31),
+            new OriginalStrategicInteractiveEncounterRectangle(576, 446, 41, 31),
+        ], rectangles);
+        Assert.Equal([
+            OriginalStrategicInteractiveEncounterControlStripRoute.UnitSelectionFallback,
+            OriginalStrategicInteractiveEncounterControlStripRoute.UnresolvedFirstControl,
+            OriginalStrategicInteractiveEncounterControlStripRoute.SetControlCodeOneForSelectedRecords,
+            OriginalStrategicInteractiveEncounterControlStripRoute.SetControlCodeOneForLivingRecords,
+        ], Enumerable.Range(0, 4).Select(OriginalStrategicInteractiveEncounter.RouteMappedControlStripHit));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            OriginalStrategicInteractiveEncounter.RouteMappedControlStripHit(4));
+
+        var session = OriginalStrategicInteractiveEncounterSession.Create(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            menuCode: 0, horizontalSpan: 640, verticalSpan: 180, initialTime: TimeSpan.Zero);
+        Assert.Equal(OriginalStrategicInteractiveEncounterControlStripRoute.SetControlCodeOneForSelectedRecords,
+            session.RouteControlStripHit(534, 446, horizontalOffset: 10, verticalSpan: 480));
+        Assert.Equal(OriginalStrategicInteractiveEncounterControlStripRoute.UnitSelectionFallback,
+            session.RouteControlStripHit(494, 446, horizontalOffset: 10, verticalSpan: 480));
+    }
+
+    [Fact]
     public void StrategicInteractiveDestinationOrderClampsOnlyYAndWritesSelectedLiveRecordsInOrder()
     {
         var units = OriginalStrategicInteractiveEncounter.Materialize(

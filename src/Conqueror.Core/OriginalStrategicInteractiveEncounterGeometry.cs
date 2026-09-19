@@ -30,6 +30,26 @@ public static class OriginalStrategicInteractiveEncounterGeometry
     public const int RenderHeight = 30;
 
     /// <summary>
+    /// Builds the three control-strip rectangles appended directly after the
+    /// live unit rectangle table by setup routine <c>0x258FC</c>. They retain
+    /// their selector order: the first path is still unresolved, while the
+    /// latter two are the two mapped control-code-one mutations.
+    /// </summary>
+    public static IReadOnlyList<OriginalStrategicInteractiveEncounterRectangle>
+        CreateMappedControlStripRectangles(int horizontalOffset, int verticalSpan)
+    {
+        if (verticalSpan < 34)
+            throw new ArgumentOutOfRangeException(nameof(verticalSpan));
+
+        var top = checked(verticalSpan - 34);
+        return [
+            new(checked(horizontalOffset + 400), top, 84, 31),
+            new(checked(horizontalOffset + 524), top, 41, 31),
+            new(checked(horizontalOffset + 566), top, 41, 31),
+        ];
+    }
+
+    /// <summary>
     /// Mirrors <c>0x26BAF-0x26BFC</c>. A non-positive unit emits the zero
     /// rectangle; a positive unit maps its live formation coordinates to the
     /// rectangle consumed by the later selector.

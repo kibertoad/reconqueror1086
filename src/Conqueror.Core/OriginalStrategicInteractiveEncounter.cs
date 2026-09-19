@@ -23,6 +23,32 @@ public enum OriginalStrategicInteractiveEncounterCategory
 }
 
 /// <summary>
+/// The observable input-code branches in interactive dispatcher
+/// <c>0x264F8</c>. The original event producer has not yet been recovered, so
+/// these describe dispatch destinations rather than semantic user actions.
+/// </summary>
+public enum OriginalStrategicInteractiveEncounterInputRoute
+{
+    Ignored,
+    PlayerSelection,
+    ControlStrip,
+    DestinationOrder,
+}
+
+/// <summary>
+/// The outcome of the control-strip selector that dispatcher <c>0x264F8</c>
+/// runs only for input code three. The first control's special path has no
+/// inferred gameplay label until its dialog flow is mapped.
+/// </summary>
+public enum OriginalStrategicInteractiveEncounterControlStripRoute
+{
+    UnitSelectionFallback,
+    UnresolvedFirstControl,
+    SetControlCodeOneForSelectedRecords,
+    SetControlCodeOneForLivingRecords,
+}
+
+/// <summary>
 /// One live unit materialized by resolver <c>0x28C38</c>. The original
 /// terminal write-back reads only <see cref="RemainingStrength"/> and the
 /// category/side fields while strength is positive. The mapped knight-death
@@ -124,6 +150,39 @@ public static class OriginalStrategicInteractiveEncounter
 {
     public const int FormationGridStep = 60;
     public const int FormationGridInset = 30;
+
+    /// <summary>
+    /// Mirrors the input-code comparisons at <c>0x267A4-0x267D8</c> and
+    /// <c>0x26A7F</c>. Code two reaches player selection, code three reaches
+    /// the control strip, and codes six and seven share destination ordering;
+    /// every other code returns to the loop without a mapped record mutation.
+    /// </summary>
+    public static OriginalStrategicInteractiveEncounterInputRoute RouteMappedInputCode(int inputCode) =>
+        inputCode switch
+        {
+            2 => OriginalStrategicInteractiveEncounterInputRoute.PlayerSelection,
+            3 => OriginalStrategicInteractiveEncounterInputRoute.ControlStrip,
+            6 or 7 => OriginalStrategicInteractiveEncounterInputRoute.DestinationOrder,
+            _ => OriginalStrategicInteractiveEncounterInputRoute.Ignored,
+        };
+
+    /// <summary>
+    /// Mirrors the zero-based branch after the three-rectangle selector at
+    /// <c>0x267D8-0x26999</c>. A selector miss falls through to player-unit
+    /// selection; the first hit takes a separately unresolved path; hits two
+    /// and three perform the literal control-code mutations represented by
+    /// the final two route values.
+    /// </summary>
+    public static OriginalStrategicInteractiveEncounterControlStripRoute RouteMappedControlStripHit(
+        int oneBasedHit) =>
+        oneBasedHit switch
+        {
+            0 => OriginalStrategicInteractiveEncounterControlStripRoute.UnitSelectionFallback,
+            1 => OriginalStrategicInteractiveEncounterControlStripRoute.UnresolvedFirstControl,
+            2 => OriginalStrategicInteractiveEncounterControlStripRoute.SetControlCodeOneForSelectedRecords,
+            3 => OriginalStrategicInteractiveEncounterControlStripRoute.SetControlCodeOneForLivingRecords,
+            _ => throw new ArgumentOutOfRangeException(nameof(oneBasedHit)),
+        };
 
     public static IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> Materialize(
         OriginalStrategicEncounterForces playerForces,

@@ -22,6 +22,21 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     public IReadOnlyList<int> SelectedUnitIndices => _selectedUnitIndices;
     public OriginalStrategicInteractiveEncounterTiming Timing { get; }
 
+    public OriginalStrategicInteractiveEncounterInputRoute RouteInputCode(int inputCode) =>
+        OriginalStrategicInteractiveEncounter.RouteMappedInputCode(inputCode);
+
+    public OriginalStrategicInteractiveEncounterControlStripRoute RouteControlStripHit(
+        int localX,
+        int localY,
+        int horizontalOffset,
+        int verticalSpan) =>
+        OriginalStrategicInteractiveEncounter.RouteMappedControlStripHit(
+            OriginalStrategicInteractiveEncounterGeometry.FindFirstContainingOneBased(
+                OriginalStrategicInteractiveEncounterGeometry.CreateMappedControlStripRectangles(
+                    horizontalOffset, verticalSpan),
+                localX,
+                localY));
+
     /// <summary>
     /// Materializes all six counters and applies the original menu layout.
     /// Code 3 alone consumes one raw encounter draw; the remaining choices do
