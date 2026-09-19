@@ -188,6 +188,32 @@ public static class OriginalStrategicInteractiveEncounter
     }
 
     /// <summary>
+    /// Mirrors the player-hit selection append at <c>0x26999-0x26A77</c>.
+    /// The original accepts only a living player-lane unit, searches the
+    /// existing byte-indexed list, and appends the unit only when absent; it
+    /// does not toggle an existing entry.
+    /// </summary>
+    public static bool TryAppendMappedPlayerSelection(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
+        IList<int> selectedUnitIndices,
+        int unitIndex)
+    {
+        ArgumentNullException.ThrowIfNull(units);
+        ArgumentNullException.ThrowIfNull(selectedUnitIndices);
+        if ((uint)unitIndex >= (uint)units.Count)
+            throw new ArgumentOutOfRangeException(nameof(unitIndex));
+        var unit = units[unitIndex];
+        ArgumentNullException.ThrowIfNull(unit);
+        if (unit.Side != OriginalStrategicInteractiveEncounterSide.Player
+            || unit.RemainingStrength <= 0
+            || selectedUnitIndices.Contains(unitIndex))
+            return false;
+
+        selectedUnitIndices.Add(unitIndex);
+        return true;
+    }
+
+    /// <summary>
     /// Applies the mapped player-prefix formation paths in <c>0x2904B</c>,
     /// <c>0x290BA</c>, and <c>0x29132</c>. Menu code 3 has its own method
     /// because its exact path also consumes a raw draw and the viewport width.

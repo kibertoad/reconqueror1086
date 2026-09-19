@@ -144,6 +144,22 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractivePlayerSelectionAppendsOnlyLivingPlayerUnitsWithoutToggle()
+    {
+        var units = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(2, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0));
+        var selected = new List<int>();
+
+        Assert.False(OriginalStrategicInteractiveEncounter.TryAppendMappedPlayerSelection(units, selected, 2));
+        Assert.True(OriginalStrategicInteractiveEncounter.TryAppendMappedPlayerSelection(units, selected, 0));
+        Assert.False(OriginalStrategicInteractiveEncounter.TryAppendMappedPlayerSelection(units, selected, 0));
+        units[1].RemainingStrength = 0;
+        Assert.False(OriginalStrategicInteractiveEncounter.TryAppendMappedPlayerSelection(units, selected, 1));
+        Assert.Equal([0], selected);
+    }
+
+    [Fact]
     public void StrategicInteractiveMenuCodesZeroAndOneUseTheirExactPlayerPrefixGridLayouts()
     {
         var units = OriginalStrategicInteractiveEncounter.Materialize(

@@ -63,6 +63,8 @@ The live interactive unit model now retains the constructor's remaining state fi
 
 The first player-control operation is now executable rather than inferred from a generic tactical model. For each selected unit index, `0x26A7F-0x26B64` clears `ControlCode`, writes `AuxiliaryX = localX + horizontalOffset` and `AuxiliaryY = clampedLocalY + verticalOffset`, where local Y is first raised to 45 and then lowered to `verticalSpan - 85`; X is not clamped. `ApplyMappedDestinationOrder` preserves the original selected-list order, paired destination writes, and this asymmetric boundary rule. It deliberately has no claim about the display event that creates the selected list or the downstream state transition.
 
+Player hit selection is likewise mapped as an append-only source operation. After the ordered rectangle selector finds a unit, `0x26999-0x26A77` accepts it only when its lane is player and strength is positive, scans the existing selected-index list, and appends it only when absent. It does not toggle a prior selection. `TryAppendMappedPlayerSelection` preserves those exact eligibility and duplicate rules; deselection/control buttons remain separate, still-unresolved paths rather than being folded into a generic click toggle.
+
 ## Validation
 
 The executable specifications reject duplicate equipment and courtship names, duplicate win rewards, mismatched building keys, and dragon requirements that cannot be earned from a defined reward ladder. Full campaign behavior tests then exercise the same generic interpreters used by the game.
