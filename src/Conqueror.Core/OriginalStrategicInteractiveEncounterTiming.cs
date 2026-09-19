@@ -2,18 +2,29 @@ namespace Conqueror.Core;
 
 /// <summary>
 /// Stable elapsed-time boundary for interactive resolver loop <c>0x26B88</c>.
-/// The original compares its scaled timer strictly against the previous sample
-/// plus 200 and replaces the previous sample with the current value after one
-/// pass; it does not catch up several tactical passes after a long frame.
+/// The executable compares its scaled timer strictly against the prior sample
+/// plus <c>0xC8</c>, then records a fresh sample after one accepted pass. Its
+/// interrupt frequency is unrecovered, so the host cadence is explicit rather
+/// than being presented as an original wall-clock measurement.
 /// </summary>
 public sealed class OriginalStrategicInteractiveEncounterTiming
 {
-    public static readonly TimeSpan Cadence = TimeSpan.FromMilliseconds(200);
+    /// <summary>
+    /// Deterministic replacement policy for callers that have no measured
+    /// timer calibration. This is not a claim about the original interrupt
+    /// frequency.
+    /// </summary>
+    public static readonly TimeSpan DefaultCompatibilityCadence = TimeSpan.FromMilliseconds(200);
 
-    public OriginalStrategicInteractiveEncounterTiming(TimeSpan initialSample)
+    public OriginalStrategicInteractiveEncounterTiming(
+        TimeSpan initialSample,
+        TimeSpan? cadence = null)
     {
         if (initialSample < TimeSpan.Zero)
             throw new ArgumentOutOfRangeException(nameof(initialSample));
+        Cadence = cadence ?? DefaultCompatibilityCadence;
+        if (Cadence <= TimeSpan.Zero)
+            throw new ArgumentOutOfRangeException(nameof(cadence));
         LastSample = initialSample;
     }
 
@@ -23,9 +34,15 @@ public sealed class OriginalStrategicInteractiveEncounterTiming
     public TimeSpan LastSample { get; private set; }
 
     /// <summary>
+    /// Stable host duration corresponding to the source's strict <c>0xC8</c>
+    /// timer-unit threshold.
+    /// </summary>
+    public TimeSpan Cadence { get; }
+
+    /// <summary>
     /// Returns true only once the current absolute time is strictly beyond the
-    /// prior sample plus 200 ms. A late update becomes the new baseline rather
-    /// than producing synthetic catch-up passes.
+    /// prior sample plus the configured stable cadence. A late update becomes
+    /// the new baseline rather than producing synthetic catch-up passes.
     /// </summary>
     public bool TryBeginPass(TimeSpan currentTime)
     {

@@ -15,12 +15,13 @@ public sealed class OriginalStrategicInteractiveEncounterSession
 
     private OriginalStrategicInteractiveEncounterSession(
         List<OriginalStrategicInteractiveEncounterUnit> units,
-        TimeSpan initialTime)
+        TimeSpan initialTime,
+        TimeSpan? tacticalCadence)
     {
         _units = units;
         _playerLaneCount = units.Count(unit => unit.Side == OriginalStrategicInteractiveEncounterSide.Player);
         _enemyLaneCount = units.Count(unit => unit.Side == OriginalStrategicInteractiveEncounterSide.Enemy);
-        Timing = new OriginalStrategicInteractiveEncounterTiming(initialTime);
+        Timing = new OriginalStrategicInteractiveEncounterTiming(initialTime, tacticalCadence);
     }
 
     public IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> Units => _units;
@@ -93,7 +94,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     /// <summary>
     /// Advances the recovered outer ordering of resolver <c>0x26B88</c>:
     /// edge scrolling, input dispatch, the first-control confirmation branch,
-    /// its tactical-suspension flag, then the strict 200-ms tactical gate.
+    /// its tactical-suspension flag, then the configured stable tactical gate.
     /// A false response to an already armed first control deliberately falls
     /// through to ordinary selection and leaves the suspension armed.
     /// </summary>
@@ -189,7 +190,8 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         int horizontalSpan,
         int verticalSpan,
         TimeSpan initialTime,
-        IOriginalStrategicEncounterRandom? random = null)
+        IOriginalStrategicEncounterRandom? random = null,
+        TimeSpan? tacticalCadence = null)
     {
         var units = OriginalStrategicInteractiveEncounter.Materialize(playerForces, enemyForces).ToList();
         if (menuCode is >= 0 and <= 2)
@@ -200,7 +202,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
                 random ?? throw new ArgumentNullException(nameof(random)));
         else
             throw new ArgumentOutOfRangeException(nameof(menuCode));
-        return new(units, initialTime);
+        return new(units, initialTime, tacticalCadence);
     }
 
     public bool TryAppendPlayerSelection(int unitIndex) =>

@@ -80,10 +80,11 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
-    public void StrategicInteractiveEncounterTimingUsesStrictTwoHundredMillisecondSamplesWithoutCatchUp()
+    public void StrategicInteractiveEncounterTimingUsesItsStrictCompatibilityCadenceWithoutCatchUp()
     {
         var timing = new OriginalStrategicInteractiveEncounterTiming(TimeSpan.Zero);
 
+        Assert.Equal(OriginalStrategicInteractiveEncounterTiming.DefaultCompatibilityCadence, timing.Cadence);
         Assert.False(timing.TryBeginPass(TimeSpan.FromMilliseconds(200)));
         Assert.True(timing.TryBeginPass(TimeSpan.FromMilliseconds(201)));
         Assert.Equal(TimeSpan.FromMilliseconds(201), timing.LastSample);

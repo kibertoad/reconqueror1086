@@ -197,4 +197,18 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.True(ended.ResolverEnded);
         Assert.False(ended.TacticalPassAdvanced);
     }
+
+    [Fact]
+    public void StrategicInteractiveTimingAcceptsAnExplicitStableHostCalibration()
+    {
+        var timing = new OriginalStrategicInteractiveEncounterTiming(
+            TimeSpan.Zero, TimeSpan.FromMilliseconds(50));
+
+        Assert.False(timing.TryBeginPass(TimeSpan.FromMilliseconds(50)));
+        Assert.True(timing.TryBeginPass(TimeSpan.FromMilliseconds(51)));
+        Assert.False(timing.TryBeginPass(TimeSpan.FromMilliseconds(101)));
+        Assert.True(timing.TryBeginPass(TimeSpan.FromMilliseconds(102)));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            new OriginalStrategicInteractiveEncounterTiming(TimeSpan.Zero, TimeSpan.Zero));
+    }
 }
