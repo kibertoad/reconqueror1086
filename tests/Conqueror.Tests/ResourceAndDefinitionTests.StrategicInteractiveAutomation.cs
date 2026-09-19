@@ -78,4 +78,36 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal((100, 100, -1),
             (automatic[0].AuxiliaryX, automatic[0].AuxiliaryY, automatic[0].TargetUnitIndex));
     }
+
+    [Fact]
+    public void StrategicInteractiveTacticalPassUsesOneSnapshotAndReentersStateZeroOnlyAfterContactClears()
+    {
+        var session = OriginalStrategicInteractiveEncounterSession.Create(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            menuCode: 0, horizontalSpan: 640, verticalSpan: 180, initialTime: TimeSpan.Zero);
+        session.Units[0].PositionX = 100;
+        session.Units[0].PositionY = 100;
+        session.Units[1].PositionX = 120;
+        session.Units[1].PositionY = 100;
+        var random = new QueueEncounterRandom(6, 0);
+
+        session.AdvanceMappedTacticalPass(640, 480, playerScoreModifier: 0, contactSideFilter: 0, random);
+        Assert.Equal((OriginalStrategicInteractiveEncounterCombat.ContactStateCode, 0, 1),
+            (session.Units[0].StateCode, session.Units[0].PhaseCounter, session.Units[0].TargetUnitIndex));
+
+        session.AdvanceMappedTacticalPass(640, 480, playerScoreModifier: 0, contactSideFilter: 0, random);
+        Assert.Equal((OriginalStrategicInteractiveEncounterCombat.ContactStateCode, 1, 100),
+            (session.Units[0].StateCode, session.Units[0].PhaseCounter, session.Units[1].RemainingStrength));
+        session.AdvanceMappedTacticalPass(640, 480, playerScoreModifier: 0, contactSideFilter: 0, random);
+        Assert.Equal((2, 94), (session.Units[0].PhaseCounter, session.Units[1].RemainingStrength));
+
+        session.Units[1].StateCode = OriginalStrategicInteractiveEncounterCombat.DeathAnimationStateCode;
+        session.Units[1].PhaseCounter = 3;
+        session.Units[1].RemainingStrength = 10;
+        session.AdvanceMappedTacticalPass(640, 480, playerScoreModifier: 0, contactSideFilter: 0, random);
+        Assert.Equal((0, 4, 1, 0),
+            (session.Units[1].RemainingStrength, session.Units[1].PhaseCounter,
+                session.PlayerLaneCount, session.EnemyLaneCount));
+    }
 }

@@ -180,6 +180,55 @@ public sealed class OriginalStrategicInteractiveEncounterSession
             _units, RenderRectangles(), unitIndex, contentWidth, contentHeight,
             _playerLaneCount, _enemyLaneCount);
 
+    /// <summary>
+    /// Advances one already-authorized tactical pass from <c>0x26C81-0x27E16</c>.
+    /// It builds one rectangle snapshot, visits records in table order, advances
+    /// death state, applies the state-<c>0x28</c> zero-offset neighbor probe and
+    /// due contact, then enters state zero only when the resulting state is
+    /// zero. The caller owns the monotonic timing gate and input dispatch; this
+    /// avoids reproducing the original processor-dependent loop frequency.
+    /// </summary>
+    public void AdvanceMappedTacticalPass(
+        int contentWidth,
+        int contentHeight,
+        int playerScoreModifier,
+        int contactSideFilter,
+        IOriginalStrategicEncounterRandom random)
+    {
+        ArgumentNullException.ThrowIfNull(random);
+        if (playerScoreModifier < 0)
+            throw new ArgumentOutOfRangeException(nameof(playerScoreModifier));
+
+        var rectangles = RenderRectangles();
+        for (var index = 0; index < _units.Count; index++)
+        {
+            var unit = _units[index];
+            if (unit.StateCode == OriginalStrategicInteractiveEncounterCombat.DeathAnimationStateCode)
+            {
+                AdvanceMappedDeathAnimationState(unit);
+                continue;
+            }
+
+            if (unit.StateCode == OriginalStrategicInteractiveEncounterCombat.ContactStateCode)
+            {
+                var targetUnitIndex = unit.TargetUnitIndex;
+                var probeResult = OriginalStrategicInteractiveEncounterGeometry.ProbeMappedNeighborContact(
+                    _units, rectangles, index, 0, 0, contentWidth, contentHeight, ref targetUnitIndex);
+                unit.TargetUnitIndex = targetUnitIndex;
+                var probe = OriginalStrategicInteractiveEncounterCombat.ApplyMappedContactProbeResult(
+                    unit, probeResult);
+                if (probe.ContactDue)
+                    OriginalStrategicInteractiveEncounterCombat.ApplyMappedResolvedContact(
+                        _units, index, playerScoreModifier, contactSideFilter, random);
+            }
+
+            if (unit.StateCode == 0)
+                OriginalStrategicInteractiveEncounter.AdvanceMappedStateZero(
+                    _units, rectangles, index, contentWidth, contentHeight,
+                    _playerLaneCount, _enemyLaneCount);
+        }
+    }
+
     public void ApplyDestinationOrder(
         int localX,
         int localY,
@@ -202,6 +251,24 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         if ((uint)unitIndex >= (uint)_units.Count)
             throw new ArgumentOutOfRangeException(nameof(unitIndex));
         var unit = _units[unitIndex];
+        var wasLiving = unit.RemainingStrength > 0;
+        OriginalStrategicInteractiveEncounter.CompleteMappedDeathAnimation(unit);
+        if (!wasLiving)
+            return;
+        if (unit.Side == OriginalStrategicInteractiveEncounterSide.Player)
+            _playerLaneCount--;
+        else
+            _enemyLaneCount--;
+    }
+
+    private void AdvanceMappedDeathAnimationState(OriginalStrategicInteractiveEncounterUnit unit)
+    {
+        if (unit.PhaseCounter == 4)
+            return;
+        unit.PhaseCounter = (unit.PhaseCounter + 1) % 5;
+        if (unit.PhaseCounter != 4)
+            return;
+
         var wasLiving = unit.RemainingStrength > 0;
         OriginalStrategicInteractiveEncounter.CompleteMappedDeathAnimation(unit);
         if (!wasLiving)
