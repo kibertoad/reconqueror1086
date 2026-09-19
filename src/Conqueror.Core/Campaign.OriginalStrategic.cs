@@ -4,13 +4,15 @@ namespace Conqueror.Core;
 /// Explicit fixed-update input for the recovered strategic-map scheduler.
 /// The three transient targets mirror the original division-force target
 /// handles; they are deliberately supplied at the application boundary rather
-/// than guessed from the incompatible dated campaign map.
+/// than guessed from the incompatible dated campaign map. A modal blocks only
+/// the hostile scheduler, after the report and player pass, as at `0x3C290`.
 /// </summary>
 public sealed record OriginalStrategicCampaignPassInput(
     int GlobalTargetPerson,
     int GlobalOriginProperty,
     IReadOnlyList<OriginalStrategicPlayerTarget> DivisionTargets,
-    int SpecialPropertyHouseholdCount);
+    int SpecialPropertyHouseholdCount,
+    bool SchedulerBlockedByModal = false);
 
 /// <summary>
 /// Typed output from one recovered strategic-map pass. A spy report is taken
@@ -20,7 +22,7 @@ public sealed record OriginalStrategicCampaignPassInput(
 public sealed record OriginalStrategicCampaignPassResult(
     StrategicSpyReport? SpyReport,
     OriginalStrategicPlayerPassResult PlayerPass,
-    OriginalStrategicSchedulerResult SchedulerPass);
+    OriginalStrategicSchedulerResult? SchedulerPass);
 
 public sealed partial class Campaign
 {
@@ -53,17 +55,19 @@ public sealed partial class Campaign
         var pursuitTargets = PlayerArmyPursuitTargets(strategic);
         var engaged = strategic.PlayerMovementSlots.Single(slot =>
             slot.Slot == strategic.EngagedPlayerMovementSlot);
-        var schedulerPass = OriginalStrategicMovement.AdvanceSchedulerPass(
-            strategic,
-            _originalStrategicResources,
-            new OriginalStrategicSchedulerInput(
-                input.GlobalTargetPerson,
-                input.GlobalOriginProperty,
-                strategic.EngagedPlayerMovementSlot,
-                new StrategicPoint(Truncate(engaged.CurrentX), Truncate(engaged.CurrentY)),
-                pursuitTargets,
-                input.SpecialPropertyHouseholdCount),
-            random);
+        OriginalStrategicSchedulerResult? schedulerPass = null;
+        if (!input.SchedulerBlockedByModal)
+            schedulerPass = OriginalStrategicMovement.AdvanceSchedulerPass(
+                strategic,
+                _originalStrategicResources,
+                new OriginalStrategicSchedulerInput(
+                    input.GlobalTargetPerson,
+                    input.GlobalOriginProperty,
+                    strategic.EngagedPlayerMovementSlot,
+                    new StrategicPoint(Truncate(engaged.CurrentX), Truncate(engaged.CurrentY)),
+                    pursuitTargets,
+                    input.SpecialPropertyHouseholdCount),
+                random);
         return new(report, playerPass, schedulerPass);
     }
 

@@ -58,8 +58,50 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(0, campaign.State.Player.ActiveSpies);
         Assert.Equal([0, OriginalStrategicMovement.PlayerAvatarMovementSlot],
             result.PlayerPass.Advances.Select(advance => advance.Slot));
-        Assert.Equal([3], result.SchedulerPass.Advances.Select(advance => advance.Slot));
+        Assert.Equal([3], result.SchedulerPass!.Advances.Select(advance => advance.Slot));
         Assert.True(hostile.CurrentX > 100);
+    }
+
+    [Fact]
+    public void ModalStrategicPassReportsAndAdvancesPlayersButDoesNotAdvanceHostiles()
+    {
+        var state = Campaign.NewFromTemplate(0);
+        state.OriginalStrategicState = OriginalStrategicCampaignState.CreateForNewGame(
+            state.Date, startingRouteSelector: 0);
+        var strategic = state.OriginalStrategicState;
+        state.Player.ActiveSpies = 1;
+        var hostile = strategic.MovementSlots[0];
+        hostile.Active = true;
+        hostile.Mode = OriginalStrategicMovement.DirectPropertyMode;
+        hostile.OriginProperty = 0;
+        hostile.Lord = strategic.Properties[0].Lord;
+        hostile.Swordsmen = 5;
+        hostile.CurrentX = 100;
+        hostile.CurrentY = 100;
+        hostile.DestinationX = 1_000;
+        hostile.DestinationY = 100;
+        hostile.DirectionX = 1;
+
+        var resources = new StubStrategicResources();
+        resources.Routes["sc_0.rat"] = [new OriginalStrategicRoutePoint(0, 0)];
+        var campaign = new Campaign(state);
+        campaign.ConfigureOriginalStrategicResources(resources);
+        var result = campaign.AdvanceOriginalStrategicPass(
+            new OriginalStrategicCampaignPassInput(
+                17,
+                0,
+                [
+                    new OriginalStrategicPlayerTarget(false, 0, 0),
+                    new OriginalStrategicPlayerTarget(false, 0, 0),
+                    new OriginalStrategicPlayerTarget(false, 0, 0)],
+                76,
+                SchedulerBlockedByModal: true),
+            new QueueStrategicRandom());
+
+        Assert.NotNull(result.SpyReport);
+        Assert.NotEmpty(result.PlayerPass.Advances);
+        Assert.Null(result.SchedulerPass);
+        Assert.Equal(100, hostile.CurrentX);
     }
 
     [Fact]
