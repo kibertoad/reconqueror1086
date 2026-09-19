@@ -58,6 +58,26 @@ public readonly record struct OriginalStrategicEncounterPreparation(
     OriginalStrategicEncounterForces PlayerReservedForces,
     OriginalStrategicEncounterForces EnemyResolverForces);
 
+/// <summary>
+/// Raw random-source boundary for the original automatic encounter fallback.
+/// The executable takes the signed remainder of one raw draw per player
+/// category, rather than asking for a directly bounded gameplay roll.
+/// </summary>
+public interface IOriginalStrategicEncounterRandom
+{
+    int NextRaw();
+}
+
+/// <summary>
+/// Result of resolver <c>0x258FC</c>'s non-interactive fallback. The player
+/// totals include the staging reserves restored by wrapper <c>0x35924</c>.
+/// </summary>
+public readonly record struct OriginalStrategicAutomaticEncounterResult(
+    bool PlayerWon,
+    OriginalStrategicEncounterForces PlayerResolverSurvivors,
+    OriginalStrategicEncounterForces PlayerFinalForces,
+    OriginalStrategicEncounterForces EnemyFinalForces);
+
 public static class OriginalStrategicEncounterStaging
 {
     public const int ResolverForceThreshold = 60;
@@ -92,6 +112,52 @@ public static class OriginalStrategicEncounterStaging
         return new(playerResolver, playerReserved, enemyResolver);
     }
 
+    /// <summary>
+    /// Reproduces <c>0x258FC:0x259D0-0x25A88</c>, the automatic branch used
+    /// when its prior interactive choice dialog returns zero. The caller owns
+    /// the two explicit score modifiers because wrapper <c>0x35924</c>
+    /// constructs them outside this resolver.
+    /// </summary>
+    public static OriginalStrategicAutomaticEncounterResult ResolveAutomatic(
+        OriginalStrategicEncounterPreparation preparation,
+        int playerScoreModifier,
+        int enemyScoreModifier,
+        IOriginalStrategicEncounterRandom random)
+    {
+        ArgumentNullException.ThrowIfNull(random);
+        preparation.PlayerResolverForces.Validate(nameof(preparation));
+        preparation.PlayerReservedForces.Validate(nameof(preparation));
+        preparation.EnemyResolverForces.Validate(nameof(preparation));
+        if (playerScoreModifier < 0) throw new ArgumentOutOfRangeException(nameof(playerScoreModifier));
+        if (enemyScoreModifier < 0) throw new ArgumentOutOfRangeException(nameof(enemyScoreModifier));
+
+        var playerScore = checked(preparation.PlayerResolverForces.Total + playerScoreModifier / 3);
+        var enemyScore = checked(preparation.EnemyResolverForces.Total + enemyScoreModifier / 3);
+        if (playerScore <= enemyScore)
+        {
+            var zero = new OriginalStrategicEncounterForces(0, 0, 0);
+            return new(false, zero, preparation.PlayerReservedForces, preparation.EnemyResolverForces);
+        }
+
+        var remainingEnemyStrength = preparation.EnemyResolverForces.Total;
+        if (remainingEnemyStrength <= 0)
+            throw new InvalidOperationException("Automatic victory requires a positive hostile force total.");
+        var player = preparation.PlayerResolverForces;
+        var swordsmenLoss = NextRemainder(random, remainingEnemyStrength);
+        player = player with { Swordsmen = Math.Max(0, checked(player.Swordsmen - swordsmenLoss)) };
+        remainingEnemyStrength = checked(remainingEnemyStrength - swordsmenLoss);
+        var halberdierLoss = NextRemainder(random, remainingEnemyStrength);
+        player = player with { Halberdiers = Math.Max(0, checked(player.Halberdiers - halberdierLoss)) };
+        remainingEnemyStrength = checked(remainingEnemyStrength - halberdierLoss);
+        var knightLoss = NextRemainder(random, remainingEnemyStrength);
+        player = player with { Knights = Math.Max(0, checked(player.Knights - knightLoss)) };
+        var finalPlayer = new OriginalStrategicEncounterForces(
+            checked(player.Swordsmen + preparation.PlayerReservedForces.Swordsmen),
+            checked(player.Halberdiers + preparation.PlayerReservedForces.Halberdiers),
+            checked(player.Knights + preparation.PlayerReservedForces.Knights));
+        return new(true, player, finalPlayer, preparation.EnemyResolverForces);
+    }
+
     private static int CountLargePlayerCategories(OriginalStrategicEncounterForces forces) =>
         (forces.Swordsmen >= PlayerLargeCategoryThreshold ? 1 : 0)
         + (forces.Halberdiers >= PlayerLargeCategoryThreshold ? 1 : 0)
@@ -107,6 +173,14 @@ public static class OriginalStrategicEncounterStaging
     private static int ReduceCategory(int count, int reduction) => reduction + 1 < count
         ? checked(count - reduction)
         : count;
+
+    private static int NextRemainder(IOriginalStrategicEncounterRandom random, int divisor)
+    {
+        if (divisor <= 0) throw new InvalidOperationException("Encounter loss divisor must remain positive.");
+        var raw = random.NextRaw();
+        if (raw < 0) throw new InvalidOperationException("Encounter random source returned a negative raw value.");
+        return raw % divisor;
+    }
 }
 
 /// <summary>

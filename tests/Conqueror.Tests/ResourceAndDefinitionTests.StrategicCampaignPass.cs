@@ -272,6 +272,49 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicEncounterAutomaticFallbackEliminatesOnlyTheStagedPlayerOnAScoreLoss()
+    {
+        var preparation = OriginalStrategicEncounterStaging.Prepare(
+            new OriginalStrategicEncounterForces(10, 30, 62),
+            new OriginalStrategicEncounterForces(1, 1, 100));
+
+        var result = OriginalStrategicEncounterStaging.ResolveAutomatic(
+            preparation, playerScoreModifier: 0, enemyScoreModifier: 0,
+            new QueueEncounterRandom());
+
+        Assert.False(result.PlayerWon);
+        Assert.Equal(new OriginalStrategicEncounterForces(0, 0, 0), result.PlayerResolverSurvivors);
+        Assert.Equal(new OriginalStrategicEncounterForces(0, 21, 21), result.PlayerFinalForces);
+        Assert.Equal(preparation.EnemyResolverForces, result.EnemyFinalForces);
+    }
+
+    [Fact]
+    public void StrategicEncounterAutomaticFallbackUsesOrderedRawRemaindersForPlayerLosses()
+    {
+        var preparation = OriginalStrategicEncounterStaging.Prepare(
+            new OriginalStrategicEncounterForces(100, 100, 100),
+            new OriginalStrategicEncounterForces(2, 3, 4));
+
+        var result = OriginalStrategicEncounterStaging.ResolveAutomatic(
+            preparation, playerScoreModifier: 0, enemyScoreModifier: 0,
+            new QueueEncounterRandom(8, 3, 5));
+
+        Assert.True(result.PlayerWon);
+        Assert.Equal(new OriginalStrategicEncounterForces(12, 20, 20), result.PlayerResolverSurvivors);
+        Assert.Equal(new OriginalStrategicEncounterForces(92, 100, 100), result.PlayerFinalForces);
+        Assert.Equal(preparation.EnemyResolverForces, result.EnemyFinalForces);
+    }
+
+    private sealed class QueueEncounterRandom(params int[] values) : IOriginalStrategicEncounterRandom
+    {
+        private readonly Queue<int> _values = new(values);
+
+        public int NextRaw() => _values.Count > 0
+            ? _values.Dequeue()
+            : throw new InvalidOperationException("No queued encounter random value remains.");
+    }
+
+    [Fact]
     public void FieldingAnArmyConstructsItsMatchingOriginalMovementRecord()
     {
         var state = Campaign.NewFromTemplate(0);
