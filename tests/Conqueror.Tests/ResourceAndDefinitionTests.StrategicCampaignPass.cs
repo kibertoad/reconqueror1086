@@ -160,6 +160,28 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveSessionCombinesMappedFormationPlayerControlGeometryAndCadence()
+    {
+        var session = OriginalStrategicInteractiveEncounterSession.Create(
+            new OriginalStrategicEncounterForces(2, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            menuCode: 0, horizontalSpan: 640, verticalSpan: 180, initialTime: TimeSpan.Zero,
+            random: new QueueEncounterRandom());
+
+        Assert.Equal([(60, 30), (60, 90), (0, 0)],
+            session.Units.Select(unit => (unit.PositionX, unit.PositionY)));
+        Assert.True(session.TryAppendPlayerSelection(1));
+        session.ApplyDestinationOrder(40, 20, horizontalOffset: 10, verticalOffset: 20, verticalSpan: 480);
+        Assert.Equal([1], session.SelectedUnitIndices);
+        Assert.Equal((50, 65, 0), (session.Units[1].AuxiliaryX, session.Units[1].AuxiliaryY,
+            session.Units[1].ControlCode));
+        Assert.Equal(new OriginalStrategicInteractiveEncounterRectangle(45, 70, 25, 30),
+            session.RenderRectangles()[1]);
+        Assert.False(session.Timing.TryBeginPass(TimeSpan.FromMilliseconds(200)));
+        Assert.True(session.Timing.TryBeginPass(TimeSpan.FromMilliseconds(201)));
+    }
+
+    [Fact]
     public void StrategicInteractiveMenuCodesZeroAndOneUseTheirExactPlayerPrefixGridLayouts()
     {
         var units = OriginalStrategicInteractiveEncounter.Materialize(

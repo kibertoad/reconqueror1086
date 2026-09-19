@@ -65,6 +65,8 @@ The first player-control operation is now executable rather than inferred from a
 
 Player hit selection is likewise mapped as an append-only source operation. After the ordered rectangle selector finds a unit, `0x26999-0x26A77` accepts it only when its lane is player and strength is positive, scans the existing selected-index list, and appends it only when absent. It does not toggle a prior selection. `TryAppendMappedPlayerSelection` preserves those exact eligibility and duplicate rules; deselection/control buttons remain separate, still-unresolved paths rather than being folded into a generic click toggle.
 
+`OriginalStrategicInteractiveEncounterSession` now composes the evidence-backed unit table, all four formation paths, player selection append, destination ordering, render rectangles, and strict timing into one application-facing state boundary. Code 3 alone receives the raw random provider it needs; codes 0-2 do not consume one. The session deliberately exposes post-animation death completion as a narrow operation and has no invented combat resolution, target acquisition, or UI button interpretation until the remaining `0x26B88` state machine is fully recovered.
+
 ## Validation
 
 The executable specifications reject duplicate equipment and courtship names, duplicate win rewards, mismatched building keys, and dragon requirements that cannot be earned from a defined reward ladder. Full campaign behavior tests then exercise the same generic interpreters used by the game.
