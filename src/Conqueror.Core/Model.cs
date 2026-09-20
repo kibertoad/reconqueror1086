@@ -194,6 +194,8 @@ public sealed class Player
     public const int ArmyDivisionLimit = 5;
     public string Name { get; set; } = "Sir Ronald DeMille";
     public string HeraldicColor { get; set; } = "Green";
+    public int OriginalStrategicCharacterColor { get; set; } =
+        global::Conqueror.Core.OriginalStrategicCharacterColor.Green;
     public CharacterStats Stats { get; set; } = new(9, 8, 8, 10, 10);
     public int Wealth { get; set; } = 490;
     public int Age { get; set; } = 18;

@@ -67,6 +67,10 @@ Use `--weapon-combat-table` to emit the 25 seven-dword combat rows at data-objec
 
 Use `--xref-code=0xADDRESS,...` to find direct branch/call references and internal LE relocations to code addresses. The latter expose callback registrations whose targets never appear in a direct call instruction. Its ignored output is `executable-code-xrefs.txt`.
 
+Use `--xref-call-context=0xADDRESS` to write the three preceding decoded instructions for every direct call to one code address in ignored `executable-call-context-report.txt`. It is useful for identifying literal setter arguments without retaining executable bytes.
+
+That report resolves the character-options color path: initializer `0x14230` writes zero to `CHARACTR.DAT` row 0 field 19, and the region dispatcher at `0x145A4-0x1464A` writes Red/Green/Blue values `0/3/5`. The marker initializer later multiplies this field by eight for each player-record frame base. These are executable-derived numeric facts; source text remains local and ignored.
+
 Use `--resource-strings=NAME` to emit printable strings from one named decoded GOB entry into ignored `resource-string-report.txt`. The option rejects resources larger than 64 KiB; use its offsets as local analysis leads and record only reviewed, compact facts in documentation because the report can contain source text.
 
 That workflow found a reference to data offset `0x8020` (`TITLE.HAT`) in code at virtual address `0x4FF4F`. The surrounding routine copies the name and calls the common resource loader. The 64-byte `TITLE.HAT` record identifies `FFTITLE.PCX` and a 640x480 presentation. Resource inspection then distinguishes the static title from the first interactive `CHAR_OPS.PCX` screen. `CGOPTS.HAT` and `PREGEN.HAT` now confirm the clickable geometry; exact navigation timing and region-action dispatch still require further executable tracing.

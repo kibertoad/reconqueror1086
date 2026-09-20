@@ -25,6 +25,13 @@ public static class OriginalStrategicMapMarkerPresentation
         return checked(characterColor * CharacterColorFrameStride);
     }
 
+    /// <summary>Creates the common source <c>+0x38</c> base for all six player records.</summary>
+    public static IReadOnlyList<int> FrameBasesForCharacterColor(int characterColor)
+    {
+        var frameBase = FrameBaseForCharacterColor(characterColor);
+        return Enumerable.Repeat(frameBase, OriginalStrategicMovement.PlayerMovementRecordCount).ToArray();
+    }
+
     /// <summary>
     /// Enumerates the active source marker inputs in the physical record order
     /// used by <c>0x12F28</c>. Coordinates are deliberately left in route

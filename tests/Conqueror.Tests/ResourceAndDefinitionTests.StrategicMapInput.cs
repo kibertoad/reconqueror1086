@@ -214,6 +214,37 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void CharacterOptionsPreserveTheConfirmedSourceMarkerColor()
+    {
+        var expected = new[]
+        {
+            ("Red", OriginalStrategicCharacterColor.Red),
+            ("Green", OriginalStrategicCharacterColor.Green),
+            ("Blue", OriginalStrategicCharacterColor.Blue)
+        };
+
+        Assert.Equal(expected.Select(row => row.Item1), CharacterCreationDefinitions.HeraldicColors.Select(color => color.Name));
+        Assert.Equal(expected.Select(row => row.Item2), CharacterCreationDefinitions.HeraldicColors.Select(color => color.OriginalStrategicCharacterColor));
+        foreach (var (name, sourceColor) in expected)
+        {
+            var custom = Campaign.NewCustom("Sir Test", 42, name, sourceColor);
+            var pregenerated = Campaign.NewFromTemplate(0, name, sourceColor);
+
+            Assert.Equal(sourceColor, OriginalStrategicCharacterColor.ForHeraldicColor(name));
+            Assert.Equal(sourceColor, custom.Player.OriginalStrategicCharacterColor);
+            Assert.Equal(sourceColor, pregenerated.Player.OriginalStrategicCharacterColor);
+            var restored = System.Text.Json.JsonSerializer.Deserialize<CampaignState>(
+                System.Text.Json.JsonSerializer.Serialize(custom));
+            Assert.Equal(sourceColor, Assert.IsType<CampaignState>(restored).Player.OriginalStrategicCharacterColor);
+            Assert.All(OriginalStrategicMapMarkerPresentation.FrameBasesForCharacterColor(sourceColor),
+                frameBase => Assert.Equal(sourceColor * 8, frameBase));
+        }
+        Assert.Equal(OriginalStrategicCharacterColor.Green,
+            Campaign.NewFromTemplate(0).Player.OriginalStrategicCharacterColor);
+        Assert.Throws<ArgumentOutOfRangeException>(() => OriginalStrategicCharacterColor.ForHeraldicColor("Gold"));
+    }
+
+    [Fact]
     public void StrategicMapMarkerDrawPlanUsesPhysicalOrderAndSourceTruncation()
     {
         var state = OriginalStrategicCampaignState.CreateForNewGame(new DateTime(1086, 3, 1), 0);

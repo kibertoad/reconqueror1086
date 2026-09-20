@@ -49,6 +49,47 @@ internal static class LinearExecutableCodeReferences
         return report.ToString();
     }
 
+    public static string FindCallContexts(string path, uint target)
+    {
+        var bytes = File.ReadAllBytes(path);
+        var header = FindHeader(bytes);
+        var module = FindModuleStart(bytes, header);
+        var pageSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x28, 4));
+        var objectTable = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x40, 4));
+        var dataPages = checked((uint)module + BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x80, 4)));
+        var descriptor = checked(header + (int)objectTable);
+        var virtualSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor, 4));
+        var baseAddress = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor + 4, 4));
+        var pageIndex = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor + 12, 4));
+        var fileOffset = checked(dataPages + (pageIndex - 1) * pageSize);
+        var available = Math.Min(checked((int)virtualSize), bytes.Length - checked((int)fileOffset));
+        var decoder = Iced.Intel.Decoder.Create(32,
+            new ByteArrayCodeReader(bytes.AsSpan(checked((int)fileOffset), available).ToArray()));
+        decoder.IP = baseAddress;
+        var formatter = new IntelFormatter();
+        var previous = new Queue<string>();
+        var report = new StringBuilder("# Direct-call contexts (derived instruction metadata; original bytes omitted)\n");
+        report.AppendLine($"# requested target: 0x{target:X}");
+        while (decoder.IP < baseAddress + (uint)available)
+        {
+            decoder.Decode(out var instruction);
+            if (instruction.IsInvalid) continue;
+            var formatted = new StringOutput();
+            formatter.Format(instruction, formatted);
+            var line = $"0x{instruction.IP:X8}  {formatted}";
+            if (instruction.FlowControl == FlowControl.Call && instruction.NearBranchTarget == target)
+            {
+                foreach (var prior in previous) report.AppendLine($"  {prior}");
+                report.AppendLine($"* {line}");
+                previous.Clear();
+                continue;
+            }
+            previous.Enqueue(line);
+            if (previous.Count > 3) previous.Dequeue();
+        }
+        return report.ToString();
+    }
+
     public static string FindBlockFlags(string path, IReadOnlyList<uint> flags)
     {
         if (flags.Count == 0 || flags.Any(flag => flag is 0 or > byte.MaxValue))

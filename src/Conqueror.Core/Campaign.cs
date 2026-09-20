@@ -49,17 +49,42 @@ public sealed partial class Campaign
         _originalStrategicResources = resources;
     }
 
-    public static CampaignState NewFromTemplate(int index)
+    public static CampaignState NewFromTemplate(int index, string heraldicColor = "Green",
+        int? originalStrategicCharacterColor = null)
     {
         var template = Balance.Templates[Math.Clamp(index, 0, Balance.Templates.Length - 1)];
-        return new CampaignState { Player = new Player { Name = "Sir " + template.Name, Stats = template.Stats, Wealth = template.Wealth } };
+        return new CampaignState
+        {
+            Player = new Player
+            {
+                Name = "Sir " + template.Name,
+                HeraldicColor = heraldicColor,
+                OriginalStrategicCharacterColor = originalStrategicCharacterColor
+                    ?? OriginalStrategicCharacterColor.ForHeraldicColor(heraldicColor),
+                Stats = template.Stats,
+                Wealth = template.Wealth
+            }
+        };
     }
 
-    public static CampaignState NewCustom(string name, int seed, string heraldicColor = "Green")
+    public static CampaignState NewCustom(string name, int seed, string heraldicColor = "Green",
+        int? originalStrategicCharacterColor = null)
     {
         var r = new Random(seed);
         int Roll() => r.Next(2, 13);
-        return new CampaignState { Player = new Player { Name = name, HeraldicColor = heraldicColor, Age = Youth.OriginalPool.FirstAge, Stats = new(Roll(), Roll(), Roll(), Roll(), Roll(), Roll()), Wealth = Balance.StartingCustomWealth } };
+        return new CampaignState
+        {
+            Player = new Player
+            {
+                Name = name,
+                HeraldicColor = heraldicColor,
+                OriginalStrategicCharacterColor = originalStrategicCharacterColor
+                    ?? OriginalStrategicCharacterColor.ForHeraldicColor(heraldicColor),
+                Age = Youth.OriginalPool.FirstAge,
+                Stats = new(Roll(), Roll(), Roll(), Roll(), Roll(), Roll()),
+                Wealth = Balance.StartingCustomWealth
+            }
+        };
     }
 
     public int CurrentYouthDilemmaNumber

@@ -1,3 +1,4 @@
+using Conqueror.Core;
 using Conqueror.Resources;
 
 namespace Conqueror.Game;
@@ -21,7 +22,11 @@ public sealed record CharacterCreationOption(
     UiBounds OriginalBounds,
     int? HatRegionId);
 
-public sealed record HeraldicColorOption(string Name, UiBounds OriginalBounds, int HatRegionId);
+public sealed record HeraldicColorOption(
+    string Name,
+    UiBounds OriginalBounds,
+    int HatRegionId,
+    int OriginalStrategicCharacterColor);
 
 /// <summary>Original 640x480 character-options screen hotspots, kept as data rather than rendering branches.</summary>
 public static class CharacterCreationDefinitions
@@ -44,9 +49,9 @@ public static class CharacterCreationDefinitions
 
     public static IReadOnlyList<HeraldicColorOption> HeraldicColors { get; } =
     [
-        new("Red", new(501, 102, 34, 39), 3),
-        new("Green", new(552, 102, 34, 39), 4),
-        new("Blue", new(525, 150, 34, 39), 5)
+        new("Red", new(501, 102, 34, 39), 3, OriginalStrategicCharacterColor.Red),
+        new("Green", new(552, 102, 34, 39), 4, OriginalStrategicCharacterColor.Green),
+        new("Blue", new(525, 150, 34, 39), 5, OriginalStrategicCharacterColor.Blue)
     ];
 
     public static IReadOnlyList<CharacterCreationOption> OptionsFrom(HatLayout? layout) => Options

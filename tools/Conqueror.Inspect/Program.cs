@@ -53,6 +53,7 @@ var palettePcxName = OptionValue(inspectionOptions, "--palette-pcx=");
 var disassembleAddresses = OptionValue(inspectionOptions, "--disassemble=");
 var xrefDataOffsets = OptionValue(inspectionOptions, "--xref-data=");
 var xrefCodeAddresses = OptionValue(inspectionOptions, "--xref-code=");
+var callContextAddress = OptionValue(inspectionOptions, "--xref-call-context=");
 var xrefBlockFlags = OptionValue(inspectionOptions, "--xref-block-flags=");
 var reportWeaponCombatTable = inspectionOptions.Contains("--weapon-combat-table", StringComparer.OrdinalIgnoreCase);
 var reportStrategicTerrainTable = inspectionOptions.Contains("--strategic-terrain-table", StringComparer.OrdinalIgnoreCase);
@@ -84,6 +85,12 @@ if (xrefCodeAddresses is not null)
     var addresses = xrefCodeAddresses.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
         .Select(ParseAddress).ToArray();
     File.WriteAllText(Path.Combine(output, "executable-code-xrefs.txt"), LinearExecutableCodeReferences.Find(executable, addresses));
+}
+if (callContextAddress is not null)
+{
+    var executable = Directory.EnumerateFiles(artifactRoot, "CONQUER.EXE", SearchOption.AllDirectories).Single();
+    File.WriteAllText(Path.Combine(output, "executable-call-context-report.txt"),
+        LinearExecutableCodeReferences.FindCallContexts(executable, ParseAddress(callContextAddress)));
 }
 if (xrefBlockFlags is not null)
 {
