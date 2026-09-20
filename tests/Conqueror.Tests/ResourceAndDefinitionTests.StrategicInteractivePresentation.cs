@@ -6,6 +6,25 @@ namespace Conqueror.Tests;
 public sealed partial class ResourceAndDefinitionTests
 {
     [Fact]
+    public void StrategicInteractiveResolvedDisplayWidthSelectsOnlyTheMappedControlMargins()
+    {
+        Assert.Equal(0, OriginalStrategicInteractiveEncounterViewport
+            .MappedControlStripMarginForResolvedHorizontalSpan(640));
+        Assert.Equal(80, OriginalStrategicInteractiveEncounterViewport
+            .MappedControlStripMarginForResolvedHorizontalSpan(800));
+        Assert.Equal(160, OriginalStrategicInteractiveEncounterViewport
+            .MappedControlStripMarginForResolvedHorizontalSpan(1024));
+        Assert.Equal(0, OriginalStrategicInteractiveEncounterViewport
+            .MappedControlStripMarginForResolvedHorizontalSpan(1280));
+        Assert.Throws<ArgumentOutOfRangeException>(() => OriginalStrategicInteractiveEncounterViewport
+            .MappedControlStripMarginForResolvedHorizontalSpan(0));
+
+        var viewport = OriginalStrategicInteractiveEncounterViewport.ForResolvedDisplay(
+            viewportWidth: 1024, viewportHeight: 768, contentWidth: 1024, contentHeight: 728);
+        Assert.Equal(160, viewport.ControlStripMargin);
+    }
+
+    [Fact]
     public void StrategicInteractiveHoverStatusPanelUsesItsOwnMarginAndLowerAnchor()
     {
         Assert.Equal(new OriginalStrategicInteractiveEncounterRectangle(170, 455, 83, 20),

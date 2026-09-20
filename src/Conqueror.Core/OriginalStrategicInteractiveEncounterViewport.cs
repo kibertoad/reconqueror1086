@@ -12,6 +12,10 @@ public sealed class OriginalStrategicInteractiveEncounterViewport
     public const int EdgeBand = 5;
     public const int ScrollStep = 10;
     public const int BottomContentReserve = 50;
+    public const int MediumResolvedHorizontalSpan = 800;
+    public const int WideResolvedHorizontalSpan = 1024;
+    public const int MediumControlStripMargin = 80;
+    public const int WideControlStripMargin = 160;
 
     public OriginalStrategicInteractiveEncounterViewport(
         int viewportWidth,
@@ -53,6 +57,44 @@ public sealed class OriginalStrategicInteractiveEncounterViewport
     public int HorizontalOffset { get; private set; }
     public int VerticalOffset { get; private set; }
     public int ControlStripMargin { get; }
+
+    /// <summary>
+    /// Reproduces resolver setup <c>0x25F08-0x25F36</c>'s mapping from its
+    /// already-resolved display-width global (<c>19CC8</c>) to the separate
+    /// control-strip margin global (<c>19C74</c>). The preceding
+    /// <c>WAR_MODE</c> display-selection and capability probes are deliberately
+    /// not modeled here: the source only makes these two nonzero assignments
+    /// after a successful display-mode change.
+    /// </summary>
+    public static int MappedControlStripMarginForResolvedHorizontalSpan(int horizontalSpan)
+    {
+        if (horizontalSpan <= 0)
+            throw new ArgumentOutOfRangeException(nameof(horizontalSpan));
+
+        return horizontalSpan switch
+        {
+            MediumResolvedHorizontalSpan => MediumControlStripMargin,
+            WideResolvedHorizontalSpan => WideControlStripMargin,
+            _ => 0,
+        };
+    }
+
+    /// <summary>
+    /// Creates a viewport using the resolver's confirmed control-strip margin
+    /// for a display span that the host has already selected. Content size and
+    /// viewport height remain explicit because this setup path does not prove
+    /// a portable backdrop-scaling policy.
+    /// </summary>
+    public static OriginalStrategicInteractiveEncounterViewport ForResolvedDisplay(
+        int viewportWidth,
+        int viewportHeight,
+        int contentWidth,
+        int contentHeight,
+        int horizontalOffset = 0,
+        int verticalOffset = 0) =>
+        new(viewportWidth, viewportHeight, contentWidth, contentHeight,
+            horizontalOffset, verticalOffset,
+            MappedControlStripMarginForResolvedHorizontalSpan(viewportWidth));
 
     /// <summary>
     /// Applies the four source-ordered edge checks. The right and bottom
