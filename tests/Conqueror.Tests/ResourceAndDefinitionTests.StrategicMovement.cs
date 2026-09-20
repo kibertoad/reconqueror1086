@@ -668,6 +668,24 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicMapPointerUsesTheOriginalRawPointerToRouteSpaceOffset()
+    {
+        var state = Campaign.NewFromTemplate(0);
+        state.OriginalStrategicState = OriginalStrategicCampaignState.CreateForNewGame(state.Date, 0);
+        var strategic = state.OriginalStrategicState;
+        strategic.CameraRow = 10;
+        strategic.CameraColumn = 2;
+
+        Assert.Equal(new OriginalStrategicRoutePoint(880, 60),
+            OriginalStrategicMapPointer.ToMappedRoutePoint(strategic, 40, 0));
+
+        strategic.CameraRow = 192;
+        strategic.CameraColumn = 300;
+        Assert.Equal(new OriginalStrategicRoutePoint(15_405, 6_139),
+            OriginalStrategicMapPointer.ToMappedRoutePoint(strategic, 5, 119));
+    }
+
+    [Fact]
     public void ImportedContentCatalogDecodesStrategicRoutesWithoutExposingMalformedData()
     {
         var root = Path.Combine(Path.GetTempPath(), $"conqueror-strategic-route-{Guid.NewGuid():N}");
