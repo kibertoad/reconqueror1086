@@ -104,6 +104,38 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(new OriginalStrategicRoutePoint(840, 60), player.Waypoints[0]);
     }
 
+    [Fact]
+    public void StrategicMapTerrainDrawPlanPreservesSourceViewportOrderAndWrapping()
+    {
+        var state = OriginalStrategicCampaignState.CreateForNewGame(new DateTime(1086, 3, 1), 0);
+        state.CameraRow = 199;
+        state.CameraColumn = 399;
+
+        var draws = OriginalStrategicMapTerrainRendering.BuildDraws(state);
+
+        Assert.Equal(126, draws.Count);
+        Assert.Equal(new OriginalStrategicMapTerrainDraw(199, 399, 20, -53), draws[0]);
+        Assert.Equal(new OriginalStrategicMapTerrainDraw(0, 399, 100, -53), draws[1]);
+        Assert.Equal(new OriginalStrategicMapTerrainDraw(199, 0, -20, -33), draws[5]);
+        Assert.Equal(new OriginalStrategicMapTerrainDraw(3, 0, 300, -33), draws[9]);
+        Assert.Equal(new OriginalStrategicMapTerrainDraw(3, 21, 340, 387), draws[^1]);
+    }
+
+    [Fact]
+    public void StrategicMapTerrainDrawPlanAlternatesThePartialLeftTileByCameraParity()
+    {
+        var state = OriginalStrategicCampaignState.CreateForNewGame(new DateTime(1086, 3, 1), 0);
+        state.CameraRow = 10;
+        state.CameraColumn = 2;
+
+        var draws = OriginalStrategicMapTerrainRendering.BuildDraws(state);
+
+        Assert.Equal(127, draws.Count);
+        Assert.Equal(new OriginalStrategicMapTerrainDraw(10, 2, -20, -53), draws[0]);
+        Assert.Equal(new OriginalStrategicMapTerrainDraw(10, 3, 20, -33), draws[6]);
+        Assert.Equal(new OriginalStrategicMapTerrainDraw(15, 24, 380, 387), draws[^1]);
+    }
+
     private sealed class MapInputResources : IOriginalStrategicResources
     {
         public IReadOnlyList<OriginalStrategicRoutePoint> Route(string resourceName, bool reverse) => [];
