@@ -30,8 +30,12 @@ public sealed partial class ResourceAndDefinitionTests
         var encounter = new OriginalStrategicPlayerEnemyEncounter(0, 0,
             new OriginalStrategicEncounterForces(10, 30, 62),
             new OriginalStrategicEncounterForces(1, 1, 1));
-        var session = OriginalStrategicInteractiveEncounterSession.Create(
-            encounter.Preparation,
+        hostile.Knights++;
+        Assert.Throws<InvalidOperationException>(() => campaign.BeginInteractiveOriginalStrategicEncounter(
+            encounter, menuCode: 0, horizontalSpan: 640, verticalSpan: 180, initialTime: TimeSpan.Zero));
+        hostile.Knights--;
+        var session = campaign.BeginInteractiveOriginalStrategicEncounter(
+            encounter,
             menuCode: 0, horizontalSpan: 640, verticalSpan: 180, initialTime: TimeSpan.Zero);
         Assert.Equal(60, session.Units.Count(unit =>
             unit.Side == OriginalStrategicInteractiveEncounterSide.Player));

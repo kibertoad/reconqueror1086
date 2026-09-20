@@ -372,6 +372,32 @@ public sealed partial class Campaign
     }
 
     /// <summary>
+    /// Opens the interactive resolver through the recovered six-counter
+    /// handoff. The encounter snapshot must still name the live player and
+    /// hostile records, so a presentation host cannot start a stale resolver
+    /// after a later strategic pass has changed either force pool.
+    /// </summary>
+    public OriginalStrategicInteractiveEncounterSession BeginInteractiveOriginalStrategicEncounter(
+        OriginalStrategicPlayerEnemyEncounter encounter,
+        int menuCode,
+        int horizontalSpan,
+        int verticalSpan,
+        TimeSpan initialTime,
+        IOriginalStrategicEncounterRandom? random = null,
+        TimeSpan? tacticalCadence = null)
+    {
+        ArgumentNullException.ThrowIfNull(encounter);
+        if (State.OriginalStrategicState is not { } strategic)
+            throw new InvalidOperationException("Campaign has no original strategic movement state.");
+        var current = OriginalStrategicPlayerEnemyEncounter.Capture(
+            strategic, State.Player, encounter.PlayerMovementSlot, encounter.EnemyMovementSlot);
+        if (current != encounter)
+            throw new InvalidOperationException("Strategic encounter counters changed before interactive resolution.");
+        return OriginalStrategicInteractiveEncounterSession.Create(
+            encounter.Preparation, menuCode, horizontalSpan, verticalSpan, initialTime, random, tacticalCadence);
+    }
+
+    /// <summary>
     /// Applies the completed interactive resolver's survivor counters through
     /// wrapper <c>0x35924</c>'s same reserve-restoration and field-record path.
     /// </summary>
