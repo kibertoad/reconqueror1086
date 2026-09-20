@@ -950,6 +950,9 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private void EnterCampaignMap()
     {
         _selectedLocation = _campaign.State.CurrentLocation;
+        if (_campaign.State.OriginalStrategicState is { } strategic)
+            OriginalStrategicMapCamera.FocusOnGridCell(
+                strategic, strategic.PlayerHomeGridX, strategic.PlayerHomeGridY);
         _notice = "YOUR CAMPAIGN BEGINS";
         _screen = Screen.Map;
         Autosave();

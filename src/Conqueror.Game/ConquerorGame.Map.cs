@@ -7,6 +7,7 @@ public sealed partial class ConquerorGame
 {
     private void UpdateMap(Func<Keys, bool> press, MouseState mouse, bool click)
     {
+        if (UpdateOriginalStrategicMapInput(mouse, click)) return;
         if (_campaign.State.PendingDrogoEncounter)
         {
             _screen = Screen.DrogoDemand;
@@ -75,6 +76,37 @@ public sealed partial class ConquerorGame
         }
         var control = _estateLayout.Controls.FirstOrDefault(item => item.Bounds.Contains(x, y));
         if (control is not null) ActivateEstateControl(control.Action);
+    }
+
+    /// <summary>
+    /// Keeps the executable-mapped map camera and pointer path ahead of the
+    /// dated destination adapter. MonoGame's fixed update is the explicit,
+    /// processor-independent cadence for edge scrolling; the original's
+    /// unrestricted main-loop frequency is not reproduced.
+    /// </summary>
+    private bool UpdateOriginalStrategicMapInput(MouseState mouse, bool click)
+    {
+        if (_campaign.State.OriginalStrategicState is not { } strategic) return false;
+
+        var (x, y) = OriginalPoint(mouse);
+        OriginalStrategicMapCamera.ApplyMappedEdgeScroll(strategic, x, y);
+        if (!click || x < OriginalStrategicMapTerrainRendering.ViewportLeft
+            || x > OriginalStrategicMapTerrainRendering.ViewportRight
+            || y < OriginalStrategicMapTerrainRendering.ViewportTop
+            || y > OriginalStrategicMapTerrainRendering.ViewportBottom)
+            return false;
+
+        var noDivisionTargets = Enumerable.Repeat(
+            new OriginalStrategicPlayerTarget(false, 0, 0),
+            OriginalStrategicMovement.PlayerDivisionTargetCount).ToArray();
+        var result = OriginalStrategicMapCommands.DispatchRawPointer(
+            strategic, _originalStrategicResources, noDivisionTargets, x, y,
+            targetConfirmed: false);
+        if (result.Hit.EnemySlot is not null || result.Hit.DivisionSlot is not null)
+            _notice = "TARGET CONFIRMATION IS NOT YET AVAILABLE";
+        else if (result.Command.RouteLimitReached)
+            _notice = "ROUTE LIMIT REACHED";
+        return true;
     }
 
     private void SelectMapLocation(int direction)
