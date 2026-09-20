@@ -27,12 +27,7 @@ public static class OriginalStrategicEncounterMenu
     public const int InteractiveSelectionCount = 4;
     public const int ExitRegionIndex = 4;
 
-    /// <summary>
-    /// Regions are in original input-table order. The input helper's exact
-    /// edge-inclusion behavior remains an application-input concern, so this
-    /// definition intentionally exposes geometry without inventing a click
-    /// containment rule.
-    /// </summary>
+    /// <summary>Regions are in original input-table order.</summary>
     public static IReadOnlyList<OriginalStrategicEncounterMenuEntry> Entries { get; } =
         Array.AsReadOnly<OriginalStrategicEncounterMenuEntry>([
             new(0, 30, 30, 215, 185, 2),
@@ -41,4 +36,23 @@ public static class OriginalStrategicEncounterMenu
             new(3, 375, 250, 185, 185, 0),
             new(4, 220, 417, 148, 38, null),
         ]);
+
+    /// <summary>
+    /// Mirrors the <c>0x6FF10</c> call at <c>0x257E5-0x2588B</c>: scan the
+    /// five original regions in table order and accept a left/top edge while
+    /// excluding the right/bottom edge. A null result is a missed dialog
+    /// click; a returned entry with a null selection code is the fifth
+    /// region's distinct automatic-fallback exit.
+    /// </summary>
+    public static OriginalStrategicEncounterMenuEntry? FindMappedEntryAt(int x, int y)
+    {
+        foreach (var entry in Entries)
+        {
+            if (x >= entry.X && x < checked(entry.X + entry.Width)
+                && y >= entry.Y && y < checked(entry.Y + entry.Height))
+                return entry;
+        }
+
+        return null;
+    }
 }

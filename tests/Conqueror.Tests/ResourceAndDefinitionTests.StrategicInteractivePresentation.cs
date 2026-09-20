@@ -6,6 +6,22 @@ namespace Conqueror.Tests;
 public sealed partial class ResourceAndDefinitionTests
 {
     [Fact]
+    public void StrategicEncounterMenuUsesTheSharedHalfOpenFirstMatchSelector()
+    {
+        Assert.Equal(2, OriginalStrategicEncounterMenu.FindMappedEntryAt(30, 30)
+            ?.InteractiveSelectionCode);
+        Assert.Null(OriginalStrategicEncounterMenu.FindMappedEntryAt(245, 30));
+        Assert.Equal(3, OriginalStrategicEncounterMenu.FindMappedEntryAt(400, 229)
+            ?.InteractiveSelectionCode);
+        Assert.Null(OriginalStrategicEncounterMenu.FindMappedEntryAt(400, 230));
+
+        var automatic = OriginalStrategicEncounterMenu.FindMappedEntryAt(220, 417);
+        Assert.True(automatic?.ExitsToAutomaticFallback);
+        Assert.Null(OriginalStrategicEncounterMenu.FindMappedEntryAt(220, 455));
+        Assert.Null(OriginalStrategicEncounterMenu.FindMappedEntryAt(0, 0));
+    }
+
+    [Fact]
     public void StrategicInteractiveResolvedDisplayWidthSelectsOnlyTheMappedControlMargins()
     {
         Assert.Equal(0, OriginalStrategicInteractiveEncounterViewport
