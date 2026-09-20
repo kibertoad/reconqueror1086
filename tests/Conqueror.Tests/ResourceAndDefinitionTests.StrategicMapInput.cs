@@ -136,13 +136,27 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(new OriginalStrategicMapTerrainDraw(15, 24, 380, 387), draws[^1]);
     }
 
+    [Fact]
+    public void StrategicMapTerrainTileDrawsUseOnlyTheSourceCellLowWord()
+    {
+        var state = OriginalStrategicCampaignState.CreateForNewGame(new DateTime(1086, 3, 1), 0);
+        state.CameraRow = 10;
+        state.CameraColumn = 2;
+        var resources = new MapInputResources();
+
+        var draws = OriginalStrategicMapTerrainRendering.BuildTileDraws(state, resources);
+
+        Assert.Equal(new OriginalStrategicMapTerrainTileDraw(10, 2, -20, -53, 2), draws[0]);
+        Assert.Equal(new OriginalStrategicMapTerrainTileDraw(10, 3, 20, -33, 3), draws[6]);
+    }
+
     private sealed class MapInputResources : IOriginalStrategicResources
     {
         public IReadOnlyList<OriginalStrategicRoutePoint> Route(string resourceName, bool reverse) => [];
 
         public bool TryGridCell(int row, int column, out OriginalStrategicTerrainCell cell)
         {
-            cell = new(row, column, 0);
+            cell = new(row, column, ((uint)row << 16) | (uint)column);
             return true;
         }
 

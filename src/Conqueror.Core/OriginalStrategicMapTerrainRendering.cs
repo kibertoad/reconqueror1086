@@ -11,6 +11,18 @@ public readonly record struct OriginalStrategicMapTerrainDraw(
     int Y);
 
 /// <summary>
+/// A terrain draw with the exact low-word tile selector consumed by the
+/// original blitter. Other source cell fields remain available to callers
+/// through <see cref="OriginalStrategicTerrainCell"/>.
+/// </summary>
+public readonly record struct OriginalStrategicMapTerrainTileDraw(
+    int Row,
+    int Column,
+    int X,
+    int Y,
+    ushort TileId);
+
+/// <summary>
 /// Reproduces the resource-neutral viewport traversal at <c>0x3C770</c>.
 /// It deliberately exposes draw order and placement rather than choosing a
 /// host renderer, texture atlas, or scaling policy.
@@ -53,6 +65,29 @@ public static class OriginalStrategicMapTerrainRendering
 
             column = (column + 1) % OriginalStrategicCampaignState.WorldColumnCount;
             y += ScanlineStep;
+        }
+        return draws;
+    }
+
+    /// <summary>
+    /// Resolves each draw's frame selector through the source grid. This
+    /// mirrors <c>0x3C838-0x3C843</c>, which masks the cell to its low word
+    /// immediately before its tile-blitter call.
+    /// </summary>
+    public static IReadOnlyList<OriginalStrategicMapTerrainTileDraw> BuildTileDraws(
+        OriginalStrategicCampaignState state,
+        IOriginalStrategicResources resources)
+    {
+        ArgumentNullException.ThrowIfNull(resources);
+        var positions = BuildDraws(state);
+        var draws = new OriginalStrategicMapTerrainTileDraw[positions.Count];
+        for (var index = 0; index < positions.Count; index++)
+        {
+            var position = positions[index];
+            if (!resources.TryGridCell(position.Row, position.Column, out var cell)
+                || cell.Row != position.Row || cell.Column != position.Column)
+                throw new InvalidDataException("Strategic terrain draw requires its exact source grid cell.");
+            draws[index] = new(position.Row, position.Column, position.X, position.Y, cell.TileId);
         }
         return draws;
     }
