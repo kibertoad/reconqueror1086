@@ -7,6 +7,7 @@ public sealed partial class ConquerorGame
 {
     private void UpdateMap(Func<Keys, bool> press, MouseState mouse, bool click)
     {
+        UpdateOriginalStrategicMapRuntime();
         if (UpdateOriginalStrategicMapInput(mouse, click)) return;
         if (_campaign.State.PendingDrogoEncounter)
         {
@@ -76,6 +77,21 @@ public sealed partial class ConquerorGame
         }
         var control = _estateLayout.Controls.FirstOrDefault(item => item.Bounds.Contains(x, y));
         if (control is not null) ActivateEstateControl(control.Action);
+    }
+
+    /// <summary>
+    /// Advances the source-shaped strategic state at the same explicit fixed
+    /// cadence used by the MonoGame host. This replaces the original map
+    /// loop's processor-rate scheduler without tying simulation work to
+    /// drawing or pointer frequency.
+    /// </summary>
+    private void UpdateOriginalStrategicMapRuntime()
+    {
+        var previousReport = _campaign.State.LatestSpyReport;
+        var pass = OriginalStrategicHostRuntime.AdvanceFixedPass(_campaign);
+        if (pass?.SpyReport is not null) ShowNewSpyReport(previousReport);
+        if (pass?.Encounters.Count > 0)
+            _notice = "STRATEGIC CONTACT HANDOFF IS NOT YET AVAILABLE";
     }
 
     /// <summary>

@@ -180,7 +180,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         };
         Content.RootDirectory = "Content";
         IsFixedTimeStep = true;
-        TargetElapsedTime = TimeSpan.FromSeconds(1d / 60d);
+        TargetElapsedTime = OriginalStrategicHostRuntime.FixedCadence;
         IsMouseVisible = true;
         Window.Title = "ReConqueror A.D. 1086";
     }

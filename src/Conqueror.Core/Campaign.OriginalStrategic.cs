@@ -251,6 +251,15 @@ public sealed record OriginalStrategicInteractiveEncounterApplication(
 public sealed partial class Campaign
 {
     /// <summary>
+    /// Uses this campaign's seeded random stream for the host-owned fixed
+    /// strategic pass. The explicit-random overload remains available to
+    /// deterministic tests and non-host integrations.
+    /// </summary>
+    public OriginalStrategicCampaignPassResult AdvanceOriginalStrategicPass(
+        OriginalStrategicCampaignPassInput input) =>
+        AdvanceOriginalStrategicPass(input, new CampaignStrategicRandom(_random));
+
+    /// <summary>
     /// Creates the exact six-record strategic bootstrap for a newly created
     /// campaign. Existing saves deliberately use the schema-one migration
     /// path instead, because they have no recoverable starting-route choice.
@@ -321,6 +330,11 @@ public sealed partial class Campaign
                 random);
         }
         return new(report, playerPass, encounters, schedulerPass);
+    }
+
+    private sealed class CampaignStrategicRandom(Random random) : IOriginalStrategicRandom
+    {
+        public int Next(int exclusiveMaximum) => random.Next(exclusiveMaximum);
     }
 
     /// <summary>
