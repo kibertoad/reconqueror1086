@@ -49,6 +49,20 @@ public enum OriginalStrategicInteractiveEncounterControlStripRoute
 }
 
 /// <summary>
+/// The terminal result returned by interactive resolver <c>0x26B88</c> to
+/// its caller. The original returns one for either a dispatcher exit or an
+/// exhausted player lane and two for an exhausted enemy lane; its caller
+/// separates the two return-one cases by inspecting the player count.
+/// </summary>
+public enum OriginalStrategicInteractiveEncounterOutcome
+{
+    InProgress,
+    PlayerWithdrew,
+    PlayerDefeated,
+    EnemyDefeated,
+}
+
+/// <summary>
 /// The short source-owned status line chosen before the resolver dispatches
 /// input at <c>0x264F8-0x26787</c>. A blank point shows the aggregate result
 /// only for the one pass immediately following a unit hover.
@@ -92,6 +106,7 @@ public readonly record struct OriginalStrategicInteractiveEncounterFrameResult(
     bool ResolverEnded)
 {
     public OriginalStrategicInteractiveEncounterHoverPresentation HoverPresentation { get; init; }
+    public OriginalStrategicInteractiveEncounterOutcome Outcome { get; init; }
 }
 
 /// <summary>

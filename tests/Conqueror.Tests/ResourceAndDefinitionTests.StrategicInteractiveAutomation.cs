@@ -198,6 +198,47 @@ public sealed partial class ResourceAndDefinitionTests
             firstControlConfirmationAccepted: true);
         Assert.True(ended.ResolverEnded);
         Assert.False(ended.TacticalPassAdvanced);
+        Assert.Equal(OriginalStrategicInteractiveEncounterOutcome.PlayerWithdrew, ended.Outcome);
+        Assert.Equal(OriginalStrategicInteractiveEncounterOutcome.PlayerWithdrew, session.Outcome);
+    }
+
+    [Fact]
+    public void StrategicInteractiveFrameReturnsMappedLaneOutcomesInSourceOrder()
+    {
+        var viewport = new OriginalStrategicInteractiveEncounterViewport(640, 180, 640, 480);
+        var victory = OriginalStrategicInteractiveEncounterSession.Create(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            menuCode: 0, horizontalSpan: 640, verticalSpan: 180, initialTime: TimeSpan.Zero);
+        victory.CompleteDeathAnimation(1);
+
+        var victoryFrame = victory.AdvanceMappedFrame(TimeSpan.Zero, 0, 0, 0, viewport,
+            playerScoreModifier: 0, contactSideFilter: 0, new QueueEncounterRandom(0));
+        Assert.Equal((true, false, OriginalStrategicInteractiveEncounterOutcome.EnemyDefeated),
+            (victoryFrame.ResolverEnded, victoryFrame.TacticalPassAdvanced, victoryFrame.Outcome));
+
+        var defeat = OriginalStrategicInteractiveEncounterSession.Create(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            menuCode: 0, horizontalSpan: 640, verticalSpan: 180, initialTime: TimeSpan.Zero);
+        defeat.CompleteDeathAnimation(0);
+
+        Assert.Equal(OriginalStrategicInteractiveEncounterOutcome.PlayerDefeated,
+            defeat.AdvanceMappedFrame(TimeSpan.Zero, 0, 0, 0,
+                new OriginalStrategicInteractiveEncounterViewport(640, 180, 640, 480),
+                playerScoreModifier: 0, contactSideFilter: 0, new QueueEncounterRandom(0)).Outcome);
+
+        var simultaneous = OriginalStrategicInteractiveEncounterSession.Create(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            menuCode: 0, horizontalSpan: 640, verticalSpan: 180, initialTime: TimeSpan.Zero);
+        simultaneous.CompleteDeathAnimation(0);
+        simultaneous.CompleteDeathAnimation(1);
+
+        Assert.Equal(OriginalStrategicInteractiveEncounterOutcome.EnemyDefeated,
+            simultaneous.AdvanceMappedFrame(TimeSpan.Zero, 0, 0, 0,
+                new OriginalStrategicInteractiveEncounterViewport(640, 180, 640, 480),
+                playerScoreModifier: 0, contactSideFilter: 0, new QueueEncounterRandom(0)).Outcome);
     }
 
     [Fact]

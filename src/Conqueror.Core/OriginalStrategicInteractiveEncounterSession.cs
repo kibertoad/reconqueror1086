@@ -30,6 +30,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     public OriginalStrategicInteractiveEncounterTiming Timing { get; }
     public int PlayerLaneCount => _playerLaneCount;
     public int EnemyLaneCount => _enemyLaneCount;
+    public OriginalStrategicInteractiveEncounterOutcome Outcome { get; private set; }
 
     /// <summary>
     /// Mirrors the inverted timing gate <c>19C7C</c>: the retreat control-strip
@@ -114,6 +115,13 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         ArgumentNullException.ThrowIfNull(viewport);
         ArgumentNullException.ThrowIfNull(random);
 
+        if (Outcome != OriginalStrategicInteractiveEncounterOutcome.InProgress)
+            return new(OriginalStrategicInteractiveEncounterInputRoute.Ignored,
+                ViewportScrolled: false, TacticalPassAdvanced: false, ResolverEnded: true)
+            {
+                Outcome = Outcome,
+            };
+
         var viewportScrolled = viewport.ApplyMappedEdgeScroll(localX, localY);
         var hover = CaptureMappedHoverPresentation(
             localX, localY, viewport.HorizontalOffset, viewport.VerticalOffset);
@@ -126,10 +134,9 @@ public sealed class OriginalStrategicInteractiveEncounterSession
             && _retreatConfirmationArmed)
         {
             if (firstControlConfirmationAccepted)
-                return new(inputRoute, viewportScrolled, TacticalPassAdvanced: false, ResolverEnded: true)
-                {
-                    HoverPresentation = hover,
-                };
+                return FinishMappedResolver(
+                    OriginalStrategicInteractiveEncounterOutcome.PlayerWithdrew,
+                    inputRoute, viewportScrolled, hover);
 
             TryAppendMappedPlayerSelectionAt(
                 localX, localY, viewport.HorizontalOffset, viewport.VerticalOffset);
@@ -139,6 +146,10 @@ public sealed class OriginalStrategicInteractiveEncounterSession
             ApplyMappedInput(inputCode, localX, localY, viewport.HorizontalOffset,
                 viewport.VerticalOffset, viewport.ViewportHeight, viewport.ControlStripMargin);
         }
+
+        var terminalOutcome = MappedLaneTerminalOutcome();
+        if (terminalOutcome != OriginalStrategicInteractiveEncounterOutcome.InProgress)
+            return FinishMappedResolver(terminalOutcome, inputRoute, viewportScrolled, hover);
 
         if (_retreatConfirmationArmed || !Timing.TryBeginPass(currentTime))
             return new(inputRoute, viewportScrolled, TacticalPassAdvanced: false, ResolverEnded: false)
@@ -453,5 +464,30 @@ public sealed class OriginalStrategicInteractiveEncounterSession
             _playerLaneCount--;
         else
             _enemyLaneCount--;
+    }
+
+    private OriginalStrategicInteractiveEncounterOutcome MappedLaneTerminalOutcome()
+    {
+        // 0x2808E tests 19C94 first, then 0x283E2 tests 19C70. Counts are
+        // maintained as non-negative lane totals, so equality is intentional.
+        if (_enemyLaneCount == 0)
+            return OriginalStrategicInteractiveEncounterOutcome.EnemyDefeated;
+        if (_playerLaneCount == 0)
+            return OriginalStrategicInteractiveEncounterOutcome.PlayerDefeated;
+        return OriginalStrategicInteractiveEncounterOutcome.InProgress;
+    }
+
+    private OriginalStrategicInteractiveEncounterFrameResult FinishMappedResolver(
+        OriginalStrategicInteractiveEncounterOutcome outcome,
+        OriginalStrategicInteractiveEncounterInputRoute inputRoute,
+        bool viewportScrolled,
+        OriginalStrategicInteractiveEncounterHoverPresentation hover)
+    {
+        Outcome = outcome;
+        return new(inputRoute, viewportScrolled, TacticalPassAdvanced: false, ResolverEnded: true)
+        {
+            HoverPresentation = hover,
+            Outcome = outcome,
+        };
     }
 }
