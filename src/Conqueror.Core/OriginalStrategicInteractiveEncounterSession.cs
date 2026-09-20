@@ -31,6 +31,8 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     public OriginalStrategicInteractiveEncounterTiming Timing { get; }
     public int PlayerLaneCount => _playerLaneCount;
     public int EnemyLaneCount => _enemyLaneCount;
+    /// <summary>Source global <c>19C98</c>, initialized to zero by <c>0x258FC</c>.</summary>
+    public int MappedContactSideFilter { get; private set; }
     public OriginalStrategicInteractiveEncounterOutcome Outcome { get; private set; }
 
     /// <summary>
@@ -162,6 +164,22 @@ public sealed class OriginalStrategicInteractiveEncounterSession
             HoverPresentation = hover,
         };
     }
+
+    /// <summary>
+    /// Advances one frame using the source-owned contact-side filter, including
+    /// any applied raw-input mutation.
+    /// </summary>
+    public OriginalStrategicInteractiveEncounterFrameResult AdvanceMappedFrame(
+        TimeSpan currentTime,
+        int inputCode,
+        int localX,
+        int localY,
+        OriginalStrategicInteractiveEncounterViewport viewport,
+        int playerScoreModifier,
+        IOriginalStrategicEncounterRandom random,
+        bool firstControlConfirmationAccepted = false) =>
+        AdvanceMappedFrame(currentTime, inputCode, localX, localY, viewport,
+            playerScoreModifier, MappedContactSideFilter, random, firstControlConfirmationAccepted);
 
     public OriginalStrategicInteractiveEncounterControlStripRoute RouteControlStripHit(
         int localX,
@@ -303,6 +321,39 @@ public sealed class OriginalStrategicInteractiveEncounterSession
             case 0x41:
                 SetMappedControlCodeOneForLivingUnits();
                 return true;
+            default:
+                return false;
+        }
+    }
+
+    /// <summary>
+    /// Applies the two externally gated raw-input families from
+    /// <c>0x27ED2-0x2814A</c>. The three gate bytes deliberately retain their
+    /// object-2 offsets because their higher-level meanings are not recovered.
+    /// </summary>
+    public bool ApplyMappedRawContactFilterInput(
+        int rawInputCode,
+        OriginalStrategicInteractiveEncounterRawInputGates gates)
+    {
+        if (!gates.AllEnabled)
+            return false;
+
+        switch (rawInputCode)
+        {
+            case 0x57:
+            case 0x111:
+                foreach (var unit in _units)
+                    if (unit.Side == OriginalStrategicInteractiveEncounterSide.Enemy
+                        && unit.RemainingStrength > 0)
+                        unit.RemainingStrength = 20;
+                MappedContactSideFilter = 1;
+                return true;
+
+            case 0x0C:
+            case 0x4C:
+                MappedContactSideFilter = -1;
+                return true;
+
             default:
                 return false;
         }
@@ -469,6 +520,17 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         }
     }
 
+    /// <summary>
+    /// Advances one tactical pass using the source-owned contact-side filter.
+    /// </summary>
+    public void AdvanceMappedTacticalPass(
+        int contentWidth,
+        int contentHeight,
+        int playerScoreModifier,
+        IOriginalStrategicEncounterRandom random) =>
+        AdvanceMappedTacticalPass(contentWidth, contentHeight, playerScoreModifier,
+            MappedContactSideFilter, random);
+
     public void ApplyDestinationOrder(
         int localX,
         int localY,
@@ -548,4 +610,16 @@ public sealed class OriginalStrategicInteractiveEncounterSession
             Outcome = outcome,
         };
     }
+}
+
+/// <summary>
+/// Exact gate bytes read by the raw resolver-input branches. Their semantic
+/// ownership remains unrecovered, so callers supply them without interpretation.
+/// </summary>
+public readonly record struct OriginalStrategicInteractiveEncounterRawInputGates(
+    bool Gate20C36,
+    bool Gate20C2A,
+    bool Gate20C38)
+{
+    public bool AllEnabled => Gate20C36 && Gate20C2A && Gate20C38;
 }

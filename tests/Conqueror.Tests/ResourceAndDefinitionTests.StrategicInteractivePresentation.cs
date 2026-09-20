@@ -126,6 +126,33 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveGatedRawContactInputsRetainTheirSourceFiltersAndEnemyReset()
+    {
+        var session = OriginalStrategicInteractiveEncounterSession.Create(
+            new OriginalStrategicEncounterForces(1, 0, 0), new OriginalStrategicEncounterForces(2, 0, 0),
+            menuCode: 0, horizontalSpan: 640, verticalSpan: 180, initialTime: TimeSpan.Zero);
+        var enabled = new OriginalStrategicInteractiveEncounterRawInputGates(true, true, true);
+
+        session.Units[1].RemainingStrength = 9;
+        session.Units[2].RemainingStrength = 3;
+        Assert.True(session.ApplyMappedRawContactFilterInput(0x57, enabled));
+        Assert.Equal(1, session.MappedContactSideFilter);
+        Assert.Equal((20, 20), (session.Units[1].RemainingStrength, session.Units[2].RemainingStrength));
+
+        session.Units[1].RemainingStrength = 7;
+        Assert.True(session.ApplyMappedRawContactFilterInput(0x111, enabled));
+        Assert.Equal((1, 20), (session.MappedContactSideFilter, session.Units[1].RemainingStrength));
+
+        Assert.True(session.ApplyMappedRawContactFilterInput(0x0C, enabled));
+        Assert.Equal(-1, session.MappedContactSideFilter);
+        Assert.True(session.ApplyMappedRawContactFilterInput(0x4C, enabled));
+        Assert.Equal(-1, session.MappedContactSideFilter);
+        Assert.False(session.ApplyMappedRawContactFilterInput(0x111,
+            new OriginalStrategicInteractiveEncounterRawInputGates(true, false, true)));
+        Assert.Equal(-1, session.MappedContactSideFilter);
+    }
+
+    [Fact]
     public void StrategicInteractiveHoverUsesSourceLabelsAndOnePassAggregateStatus()
     {
         var session = OriginalStrategicInteractiveEncounterSession.Create(
