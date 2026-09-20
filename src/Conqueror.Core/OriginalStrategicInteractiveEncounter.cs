@@ -321,6 +321,35 @@ public static class OriginalStrategicInteractiveEncounter
     }
 
     /// <summary>
+    /// Mirrors the three player-category selection loops at
+    /// <c>0x2814F-0x283CC</c>. Each loop scans the whole table in authored
+    /// order, accepts only living player-lane entries with its immutable
+    /// category value, and appends entries absent from the current selection
+    /// without clearing the entries already there.
+    /// </summary>
+    public static int AppendMappedPlayerCategorySelection(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
+        IList<int> selectedUnitIndices,
+        OriginalStrategicInteractiveEncounterCategory category)
+    {
+        ArgumentNullException.ThrowIfNull(units);
+        ArgumentNullException.ThrowIfNull(selectedUnitIndices);
+        if (!Enum.IsDefined(category))
+            throw new ArgumentOutOfRangeException(nameof(category));
+
+        var appended = 0;
+        for (var index = 0; index < units.Count; index++)
+        {
+            var unit = units[index] ?? throw new ArgumentException("Unit list cannot contain null.", nameof(units));
+            if (unit.Category != category)
+                continue;
+            if (TryAppendMappedPlayerSelection(units, selectedUnitIndices, index))
+                appended++;
+        }
+        return appended;
+    }
+
+    /// <summary>
     /// Writes control code one to every record named by the current selected
     /// list, matching <c>0x26918-0x26966</c>. The source does not recheck
     /// strength or side while processing the already-populated list.

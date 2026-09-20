@@ -257,6 +257,16 @@ public sealed class OriginalStrategicInteractiveEncounterSession
             _units, _selectedUnitIndices, unitIndex);
 
     /// <summary>
+    /// Appends the source-selected living player category to the existing
+    /// selection list. This preserves the tactical loop's authored table
+    /// order rather than sorting by screen position.
+    /// </summary>
+    public int AppendMappedPlayerCategorySelection(
+        OriginalStrategicInteractiveEncounterCategory category) =>
+        OriginalStrategicInteractiveEncounter.AppendMappedPlayerCategorySelection(
+            _units, _selectedUnitIndices, category);
+
+    /// <summary>
     /// Mirrors selection's viewport-adjusted selector at
     /// <c>0x26999-0x26A77</c>. A selector miss or an ineligible player record
     /// leaves the append-only selection list unchanged.

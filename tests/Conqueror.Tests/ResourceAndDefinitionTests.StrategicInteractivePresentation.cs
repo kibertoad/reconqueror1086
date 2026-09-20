@@ -17,6 +17,26 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveCategorySelectionAppendsOnlyLivingPlayerUnitsInAuthoredOrder()
+    {
+        var session = OriginalStrategicInteractiveEncounterSession.Create(
+            new OriginalStrategicEncounterForces(4, 1, 1),
+            new OriginalStrategicEncounterForces(2, 1, 1),
+            menuCode: 0, horizontalSpan: 640, verticalSpan: 180, initialTime: TimeSpan.Zero);
+        session.Units[3].RemainingStrength = 0;
+        Assert.True(session.TryAppendPlayerSelection(1));
+
+        Assert.Equal(2, session.AppendMappedPlayerCategorySelection(
+            OriginalStrategicInteractiveEncounterCategory.Swordsmen));
+        Assert.Equal([1, 0, 2], session.SelectedUnitIndices);
+        Assert.Equal(1, session.AppendMappedPlayerCategorySelection(
+            OriginalStrategicInteractiveEncounterCategory.Halberdiers));
+        Assert.Equal(1, session.AppendMappedPlayerCategorySelection(
+            OriginalStrategicInteractiveEncounterCategory.Knights));
+        Assert.Equal([1, 0, 2, 4, 5], session.SelectedUnitIndices);
+    }
+
+    [Fact]
     public void StrategicInteractiveHoverUsesSourceLabelsAndOnePassAggregateStatus()
     {
         var session = OriginalStrategicInteractiveEncounterSession.Create(
