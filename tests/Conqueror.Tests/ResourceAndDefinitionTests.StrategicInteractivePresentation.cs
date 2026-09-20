@@ -66,6 +66,26 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveRawControlCodeInputsPreserveTheirDistinctFilters()
+    {
+        var session = OriginalStrategicInteractiveEncounterSession.Create(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            menuCode: 0, horizontalSpan: 640, verticalSpan: 180, initialTime: TimeSpan.Zero);
+        Assert.True(session.TryAppendPlayerSelection(0));
+
+        Assert.True(session.ApplyMappedRawControlCodeOneInput(0x61));
+        Assert.Equal([1, 1], session.Units.Select(unit => unit.ControlCode));
+
+        session.Units[0].ControlCode = 0;
+        session.Units[1].ControlCode = 0;
+        session.Units[1].RemainingStrength = 0;
+        Assert.True(session.ApplyMappedRawControlCodeOneInput(0x41));
+        Assert.Equal([1, 0], session.Units.Select(unit => unit.ControlCode));
+        Assert.False(session.ApplyMappedRawControlCodeOneInput(0x42));
+    }
+
+    [Fact]
     public void StrategicInteractiveHoverUsesSourceLabelsAndOnePassAggregateStatus()
     {
         var session = OriginalStrategicInteractiveEncounterSession.Create(

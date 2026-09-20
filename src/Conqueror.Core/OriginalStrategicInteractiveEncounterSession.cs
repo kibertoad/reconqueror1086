@@ -292,6 +292,25 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     }
 
     /// <summary>
+    /// Applies the two raw <c>0x27ED2</c> branches that write control code one:
+    /// <c>0x61</c> affects the selected list and <c>0x41</c> all living records.
+    /// </summary>
+    public bool ApplyMappedRawControlCodeOneInput(int rawInputCode)
+    {
+        switch (rawInputCode)
+        {
+            case 0x61:
+                SetMappedControlCodeOneForSelection();
+                return true;
+            case 0x41:
+                SetMappedControlCodeOneForLivingUnits();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /// <summary>
     /// Mirrors selection's viewport-adjusted selector at
     /// <c>0x26999-0x26A77</c>. A selector miss or an ineligible player record
     /// leaves the append-only selection list unchanged.
