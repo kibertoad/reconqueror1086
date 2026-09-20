@@ -15,6 +15,33 @@ public static class OriginalStrategicMapCamera
     public const int LeftOrTopThreshold = 8;
     public const int RightThreshold = 0x274;
     public const int BottomThreshold = 0x1DA;
+    public const int FocusRowLead = 2;
+    public const int FocusColumnLead = 11;
+
+    /// <summary>
+    /// Maps focus adapter <c>0x130E4</c> and helper <c>0x3C6E0</c>. The
+    /// helper first wraps the requested grid row minus two in the 200-row
+    /// world and subtracts eleven from the grid column. The caller then
+    /// clamps the resulting render camera rather than trying to center an
+    /// unavailable edge location.
+    /// </summary>
+    public static void FocusOnGridCell(
+        OriginalStrategicCampaignState state,
+        int gridRow,
+        int gridColumn)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        state.Validate();
+        if (gridRow is < 0 or >= OriginalStrategicCampaignState.WorldRowCount)
+            throw new ArgumentOutOfRangeException(nameof(gridRow));
+        if (gridColumn is < 0 or >= OriginalStrategicCampaignState.WorldColumnCount)
+            throw new ArgumentOutOfRangeException(nameof(gridColumn));
+
+        var wrappedRow = gridRow - FocusRowLead;
+        if (wrappedRow < 0) wrappedRow += OriginalStrategicCampaignState.WorldRowCount;
+        state.CameraRow = Math.Clamp(wrappedRow, MinimumRow, MaximumRow);
+        state.CameraColumn = Math.Clamp(gridColumn - FocusColumnLead, MinimumColumn, MaximumColumn);
+    }
 
     /// <summary>
     /// Moves at most one row and one column. Right/bottom edges are strict

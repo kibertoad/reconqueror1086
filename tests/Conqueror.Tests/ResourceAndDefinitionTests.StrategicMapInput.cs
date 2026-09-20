@@ -122,6 +122,25 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicMapFocusUsesTheWrappedLeadThenTheSourceCameraClamp()
+    {
+        var state = OriginalStrategicCampaignState.CreateForNewGame(new DateTime(1086, 3, 1), 0);
+
+        OriginalStrategicMapCamera.FocusOnGridCell(state, gridRow: 112, gridColumn: 187);
+        Assert.Equal((110, 176), (state.CameraRow, state.CameraColumn));
+
+        OriginalStrategicMapCamera.FocusOnGridCell(state, gridRow: 0, gridColumn: 0);
+        Assert.Equal((192, 2), (state.CameraRow, state.CameraColumn));
+
+        OriginalStrategicMapCamera.FocusOnGridCell(state, gridRow: 199, gridColumn: 399);
+        Assert.Equal((192, 300), (state.CameraRow, state.CameraColumn));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            OriginalStrategicMapCamera.FocusOnGridCell(state, -1, 0));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            OriginalStrategicMapCamera.FocusOnGridCell(state, 0, 400));
+    }
+
+    [Fact]
     public void StrategicMapTerrainDrawPlanAlternatesThePartialLeftTileByCameraParity()
     {
         var state = OriginalStrategicCampaignState.CreateForNewGame(new DateTime(1086, 3, 1), 0);
