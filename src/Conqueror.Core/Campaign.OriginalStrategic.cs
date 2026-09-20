@@ -239,6 +239,15 @@ public sealed record OriginalStrategicAutomaticEncounterApplication(
     bool PlayerFieldRecordRemoved,
     bool DistinguishedPlayerLossRequiresModal);
 
+/// <summary>Applied terminal result from the interactive six-counter resolver.</summary>
+public sealed record OriginalStrategicInteractiveEncounterApplication(
+    OriginalStrategicInteractiveEncounterOutcome Outcome,
+    OriginalStrategicEncounterForces PlayerResolverSurvivors,
+    OriginalStrategicEncounterForces PlayerFinalForces,
+    OriginalStrategicEncounterForces EnemyFinalForces,
+    bool PlayerFieldRecordRemoved,
+    bool DistinguishedPlayerLossRequiresModal);
+
 public sealed partial class Campaign
 {
     /// <summary>
@@ -360,6 +369,60 @@ public sealed partial class Campaign
             }
         }
         return new(resolverResult, playerFieldRecordRemoved, distinguishedPlayerLossRequiresModal);
+    }
+
+    /// <summary>
+    /// Applies the completed interactive resolver's survivor counters through
+    /// wrapper <c>0x35924</c>'s same reserve-restoration and field-record path.
+    /// </summary>
+    public OriginalStrategicInteractiveEncounterApplication ResolveInteractiveOriginalStrategicEncounter(
+        OriginalStrategicPlayerEnemyEncounter encounter,
+        OriginalStrategicInteractiveEncounterSession session)
+    {
+        ArgumentNullException.ThrowIfNull(encounter);
+        ArgumentNullException.ThrowIfNull(session);
+        if (session.Outcome == OriginalStrategicInteractiveEncounterOutcome.InProgress)
+            throw new InvalidOperationException("Interactive strategic encounter has not ended.");
+        if (State.OriginalStrategicState is not { } strategic)
+            throw new InvalidOperationException("Campaign has no original strategic movement state.");
+        var current = OriginalStrategicPlayerEnemyEncounter.Capture(
+            strategic, State.Player, encounter.PlayerMovementSlot, encounter.EnemyMovementSlot);
+        if (current != encounter)
+            throw new InvalidOperationException("Strategic encounter counters changed before interactive resolution.");
+
+        var playerResolverSurvivors = OriginalStrategicInteractiveEncounter.CountSurvivors(
+            session.Units, OriginalStrategicInteractiveEncounterSide.Player);
+        var enemyFinalForces = OriginalStrategicInteractiveEncounter.CountSurvivors(
+            session.Units, OriginalStrategicInteractiveEncounterSide.Enemy);
+        var reserves = encounter.Preparation.PlayerReservedForces;
+        var playerFinalForces = new OriginalStrategicEncounterForces(
+            checked(playerResolverSurvivors.Swordsmen + reserves.Swordsmen),
+            checked(playerResolverSurvivors.Halberdiers + reserves.Halberdiers),
+            checked(playerResolverSurvivors.Knights + reserves.Knights));
+        var army = State.Player.ArmyAt(encounter.PlayerMovementSlot);
+        army.Units[UnitType.Swordsmen] = playerFinalForces.Swordsmen;
+        army.Units[UnitType.Halberdiers] = playerFinalForces.Halberdiers;
+        army.Units[UnitType.Knights] = playerFinalForces.Knights;
+        army.RecordOriginalStrategicEncounterResolution();
+        var enemy = strategic.MovementSlots.Single(slot => slot.Slot == encounter.EnemyMovementSlot);
+        enemy.Swordsmen = enemyFinalForces.Swordsmen;
+        enemy.Halberdiers = enemyFinalForces.Halberdiers;
+        enemy.Knights = enemyFinalForces.Knights;
+        var removed = false;
+        var requiresModal = false;
+        if (playerFinalForces.Total == 0)
+        {
+            if (encounter.PlayerMovementSlot == strategic.EngagedPlayerMovementSlot)
+                requiresModal = true;
+            else
+            {
+                army.ResetOriginalStrategicEncounterState();
+                removed = OriginalStrategicMovement.RemovePlayerMovementRecord(
+                    strategic, encounter.PlayerMovementSlot);
+            }
+        }
+        return new(session.Outcome, playerResolverSurvivors, playerFinalForces, enemyFinalForces,
+            removed, requiresModal);
     }
 
     private StrategicSpyReport? CaptureOriginalStrategicSpyReport(

@@ -94,10 +94,10 @@ public sealed class OriginalStrategicInteractiveEncounterSession
 
     /// <summary>
     /// Advances the recovered outer ordering of resolver <c>0x26B88</c>:
-    /// edge scrolling, input dispatch, the retreat-confirmation branch,
-    /// its tactical-suspension flag, then the configured stable tactical gate.
-    /// A false response to an already armed first control deliberately falls
-    /// through to ordinary selection and leaves the suspension armed.
+    /// edge scrolling, input dispatch, the first-control activation or later
+    /// retreat-confirmation branch, then the configured stable tactical gate.
+    /// A false response to an already activated first control deliberately
+    /// falls through to ordinary selection and leaves tactical passes enabled.
     /// </summary>
     public OriginalStrategicInteractiveEncounterFrameResult AdvanceMappedFrame(
         TimeSpan currentTime,
