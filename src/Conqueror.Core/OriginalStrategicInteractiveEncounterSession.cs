@@ -133,7 +133,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         {
             if (firstControlConfirmationAccepted)
                 return FinishMappedResolver(
-                    OriginalStrategicInteractiveEncounterOutcome.PlayerWithdrew,
+                    MappedRawResolverExitOutcome(),
                     inputRoute, viewportScrolled, hover);
 
             TryAppendMappedPlayerSelectionAt(
@@ -317,13 +317,16 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         return true;
     }
 
-    /// <summary>Maps raw <c>0x12D/0x16B</c> resolver exits to the caller's withdrawal result.</summary>
+    /// <summary>
+    /// Maps raw <c>0x12D/0x16B</c> resolver exits through the caller's
+    /// surviving-player check.
+    /// </summary>
     public bool ResolveMappedRawResolverExit(int rawInputCode)
     {
         if (Outcome != OriginalStrategicInteractiveEncounterOutcome.InProgress
             || (rawInputCode is not 0x12D and not 0x16B))
             return false;
-        Outcome = OriginalStrategicInteractiveEncounterOutcome.PlayerWithdrew;
+        Outcome = MappedRawResolverExitOutcome();
         return true;
     }
 
@@ -526,6 +529,11 @@ public sealed class OriginalStrategicInteractiveEncounterSession
             return OriginalStrategicInteractiveEncounterOutcome.PlayerDefeated;
         return OriginalStrategicInteractiveEncounterOutcome.InProgress;
     }
+
+    private OriginalStrategicInteractiveEncounterOutcome MappedRawResolverExitOutcome() =>
+        _playerLaneCount == 0
+            ? OriginalStrategicInteractiveEncounterOutcome.PlayerDefeated
+            : OriginalStrategicInteractiveEncounterOutcome.PlayerWithdrew;
 
     private OriginalStrategicInteractiveEncounterFrameResult FinishMappedResolver(
         OriginalStrategicInteractiveEncounterOutcome outcome,

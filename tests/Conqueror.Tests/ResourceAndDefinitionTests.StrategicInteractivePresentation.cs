@@ -114,6 +114,18 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveRawExitReportsDefeatWhenThePlayerLaneIsEmpty()
+    {
+        var session = OriginalStrategicInteractiveEncounterSession.Create(
+            new OriginalStrategicEncounterForces(1, 0, 0), new OriginalStrategicEncounterForces(1, 0, 0),
+            menuCode: 0, horizontalSpan: 640, verticalSpan: 180, initialTime: TimeSpan.Zero);
+        session.CompleteDeathAnimation(0);
+
+        Assert.True(session.ResolveMappedRawResolverExit(0x16B));
+        Assert.Equal(OriginalStrategicInteractiveEncounterOutcome.PlayerDefeated, session.Outcome);
+    }
+
+    [Fact]
     public void StrategicInteractiveHoverUsesSourceLabelsAndOnePassAggregateStatus()
     {
         var session = OriginalStrategicInteractiveEncounterSession.Create(
