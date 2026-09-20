@@ -12,6 +12,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     private int _playerLaneCount;
     private int _enemyLaneCount;
     private bool _firstControlActivated;
+    private bool _tacticalAdvancementPaused = true;
     private bool _hoveredUnitInPreviousFrame;
 
     private OriginalStrategicInteractiveEncounterSession(
@@ -36,7 +37,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     /// Source <c>19C7C</c> starts nonzero and skips tactical passes. The first
     /// control sets it to zero and enables them; later hits enter retreat confirmation.
     /// </summary>
-    public bool IsMappedTacticalAdvancementEnabled => _firstControlActivated;
+    public bool IsMappedTacticalAdvancementEnabled => !_tacticalAdvancementPaused;
 
     public OriginalStrategicInteractiveEncounterInputRoute RouteInputCode(int inputCode) =>
         OriginalStrategicInteractiveEncounter.RouteMappedInputCode(inputCode);
@@ -148,7 +149,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         if (terminalOutcome != OriginalStrategicInteractiveEncounterOutcome.InProgress)
             return FinishMappedResolver(terminalOutcome, inputRoute, viewportScrolled, hover);
 
-        if (!_firstControlActivated || !Timing.TryBeginPass(currentTime))
+        if (_tacticalAdvancementPaused || !Timing.TryBeginPass(currentTime))
             return new(inputRoute, viewportScrolled, TacticalPassAdvanced: false, ResolverEnded: false)
             {
                 HoverPresentation = hover,
@@ -183,6 +184,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         if (_firstControlActivated)
             throw new InvalidOperationException("Mapped first control is already activated.");
         _firstControlActivated = true;
+        _tacticalAdvancementPaused = false;
     }
 
     /// <summary>
@@ -304,6 +306,15 @@ public sealed class OriginalStrategicInteractiveEncounterSession
             default:
                 return false;
         }
+    }
+
+    /// <summary>Mirrors raw <c>0x50/0x70</c>: after activation, toggles <c>19C7C</c>.</summary>
+    public bool ToggleMappedTacticalAdvancementForInputCode(int rawInputCode)
+    {
+        if (!_firstControlActivated || (rawInputCode is not 0x50 and not 0x70))
+            return false;
+        _tacticalAdvancementPaused = !_tacticalAdvancementPaused;
+        return true;
     }
 
     /// <summary>

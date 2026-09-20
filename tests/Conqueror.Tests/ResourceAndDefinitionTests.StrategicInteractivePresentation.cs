@@ -86,6 +86,22 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveRawPauseInputsToggleOnlyAfterFirstControlActivation()
+    {
+        var session = OriginalStrategicInteractiveEncounterSession.Create(
+            new OriginalStrategicEncounterForces(1, 0, 0), new OriginalStrategicEncounterForces(1, 0, 0),
+            menuCode: 0, horizontalSpan: 640, verticalSpan: 180, initialTime: TimeSpan.Zero);
+        Assert.False(session.IsMappedTacticalAdvancementEnabled);
+        Assert.False(session.ToggleMappedTacticalAdvancementForInputCode(0x50));
+        session.ActivateMappedFirstControl();
+        Assert.True(session.IsMappedTacticalAdvancementEnabled);
+        Assert.True(session.ToggleMappedTacticalAdvancementForInputCode(0x70));
+        Assert.False(session.IsMappedTacticalAdvancementEnabled);
+        Assert.True(session.ToggleMappedTacticalAdvancementForInputCode(0x50));
+        Assert.True(session.IsMappedTacticalAdvancementEnabled);
+    }
+
+    [Fact]
     public void StrategicInteractiveHoverUsesSourceLabelsAndOnePassAggregateStatus()
     {
         var session = OriginalStrategicInteractiveEncounterSession.Create(
