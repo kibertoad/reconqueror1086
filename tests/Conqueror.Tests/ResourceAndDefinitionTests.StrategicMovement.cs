@@ -632,6 +632,42 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicMapCameraUsesStrictEdgesAndCanPanBothAxesInOnePass()
+    {
+        var state = Campaign.NewFromTemplate(0);
+        state.OriginalStrategicState = OriginalStrategicCampaignState.CreateForNewGame(state.Date, 0);
+        var strategic = state.OriginalStrategicState;
+        strategic.CameraRow = 20;
+        strategic.CameraColumn = 20;
+
+        Assert.True(OriginalStrategicMapCamera.ApplyMappedEdgeScroll(strategic, 629, 475));
+        Assert.Equal((21, 21), (strategic.CameraRow, strategic.CameraColumn));
+
+        Assert.False(OriginalStrategicMapCamera.ApplyMappedEdgeScroll(strategic, 628, 474));
+        Assert.Equal((21, 21), (strategic.CameraRow, strategic.CameraColumn));
+
+        Assert.True(OriginalStrategicMapCamera.ApplyMappedEdgeScroll(strategic, 7, 7));
+        Assert.Equal((20, 20), (strategic.CameraRow, strategic.CameraColumn));
+    }
+
+    [Fact]
+    public void StrategicMapCameraPreservesTheOriginalPresentationBounds()
+    {
+        var state = Campaign.NewFromTemplate(0);
+        state.OriginalStrategicState = OriginalStrategicCampaignState.CreateForNewGame(state.Date, 0);
+        var strategic = state.OriginalStrategicState;
+
+        strategic.CameraRow = OriginalStrategicMapCamera.MaximumRow;
+        strategic.CameraColumn = OriginalStrategicMapCamera.MaximumColumn;
+        Assert.False(OriginalStrategicMapCamera.ApplyMappedEdgeScroll(strategic, 629, 475));
+
+        strategic.CameraRow = OriginalStrategicMapCamera.MinimumRow;
+        strategic.CameraColumn = OriginalStrategicMapCamera.MinimumColumn;
+        Assert.False(OriginalStrategicMapCamera.ApplyMappedEdgeScroll(strategic, 7, 7));
+        Assert.Equal((10, 2), (strategic.CameraRow, strategic.CameraColumn));
+    }
+
+    [Fact]
     public void ImportedContentCatalogDecodesStrategicRoutesWithoutExposingMalformedData()
     {
         var root = Path.Combine(Path.GetTempPath(), $"conqueror-strategic-route-{Guid.NewGuid():N}");
