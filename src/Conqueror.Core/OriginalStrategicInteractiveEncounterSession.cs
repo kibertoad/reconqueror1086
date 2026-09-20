@@ -11,7 +11,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     private readonly List<int> _selectedUnitIndices = [];
     private int _playerLaneCount;
     private int _enemyLaneCount;
-    private bool _retreatConfirmationArmed;
+    private bool _firstControlActivated;
     private bool _hoveredUnitInPreviousFrame;
 
     private OriginalStrategicInteractiveEncounterSession(
@@ -33,13 +33,10 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     public OriginalStrategicInteractiveEncounterOutcome Outcome { get; private set; }
 
     /// <summary>
-    /// Mirrors the inverted timing gate <c>19C7C</c>: the retreat control-strip
-    /// button sets that word to zero while its confirmation state is armed,
-    /// so regular tactical advancement is skipped even if input dispatch
-    /// continues to run.
+    /// Source <c>19C7C</c> starts nonzero and skips tactical passes. The first
+    /// control sets it to zero and enables them; later hits enter retreat confirmation.
     /// </summary>
-    public bool IsTacticalAdvancementSuspendedForRetreatConfirmation =>
-        _retreatConfirmationArmed;
+    public bool IsMappedTacticalAdvancementEnabled => _firstControlActivated;
 
     public OriginalStrategicInteractiveEncounterInputRoute RouteInputCode(int inputCode) =>
         OriginalStrategicInteractiveEncounter.RouteMappedInputCode(inputCode);
@@ -74,8 +71,8 @@ public sealed class OriginalStrategicInteractiveEncounterSession
                         TryAppendMappedPlayerSelectionAt(localX, localY, horizontalOffset, verticalOffset);
                         break;
                     case OriginalStrategicInteractiveEncounterControlStripRoute.RetreatConfirmation:
-                        if (!_retreatConfirmationArmed)
-                            ArmMappedRetreatConfirmation();
+                        if (!_firstControlActivated)
+                            ActivateMappedFirstControl();
                         break;
                     case OriginalStrategicInteractiveEncounterControlStripRoute.SetControlCodeOneForSelectedRecords:
                         SetMappedControlCodeOneForSelection();
@@ -131,7 +128,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
             : OriginalStrategicInteractiveEncounterControlStripRoute.UnitSelectionFallback;
 
         if (controlRoute == OriginalStrategicInteractiveEncounterControlStripRoute.RetreatConfirmation
-            && _retreatConfirmationArmed)
+            && _firstControlActivated)
         {
             if (firstControlConfirmationAccepted)
                 return FinishMappedResolver(
@@ -151,7 +148,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         if (terminalOutcome != OriginalStrategicInteractiveEncounterOutcome.InProgress)
             return FinishMappedResolver(terminalOutcome, inputRoute, viewportScrolled, hover);
 
-        if (_retreatConfirmationArmed || !Timing.TryBeginPass(currentTime))
+        if (!_firstControlActivated || !Timing.TryBeginPass(currentTime))
             return new(inputRoute, viewportScrolled, TacticalPassAdvanced: false, ResolverEnded: false)
             {
                 HoverPresentation = hover,
@@ -178,27 +175,26 @@ public sealed class OriginalStrategicInteractiveEncounterSession
                 localY));
 
     /// <summary>
-    /// Mirrors the retreat control-strip hit when global <c>19C8C</c> is zero:
-    /// the source marks its confirmation state and renders the pending path.
-    /// Its subsequent dialog asks whether the player wants to retreat.
+    /// Mirrors the first control hit when <c>19C8C</c> is zero: it records the
+    /// activated state and clears <c>19C7C</c>, enabling tactical passes.
     /// </summary>
-    public void ArmMappedRetreatConfirmation()
+    public void ActivateMappedFirstControl()
     {
-        if (_retreatConfirmationArmed)
-            throw new InvalidOperationException("Mapped retreat confirmation is already armed.");
-        _retreatConfirmationArmed = true;
+        if (_firstControlActivated)
+            throw new InvalidOperationException("Mapped first control is already activated.");
+        _firstControlActivated = true;
     }
 
     /// <summary>
-    /// Mirrors the already-armed retreat-control branch at
+    /// Mirrors the already-activated retreat-control branch at
     /// <c>0x26832-0x2685B</c>. A true dialog result exits the resolver;
     /// a false result falls through to ordinary unit selection and does not
-    /// clear the confirmation state or resume tactical advancement.
+    /// clear the activated state or pause tactical advancement.
     /// </summary>
     public bool ResolveMappedRetreatConfirmation(bool accepted)
     {
-        if (!_retreatConfirmationArmed)
-            throw new InvalidOperationException("Mapped retreat confirmation is not armed.");
+        if (!_firstControlActivated)
+            throw new InvalidOperationException("Mapped first control is not activated.");
         return accepted;
     }
 

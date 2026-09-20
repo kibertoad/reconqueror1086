@@ -185,13 +185,13 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(OriginalStrategicInteractiveEncounterControlStripRoute.UnitSelectionFallback,
             session.RouteControlStripHit(494, 446, controlStripMargin: 10, verticalSpan: 480));
 
-        Assert.False(session.IsTacticalAdvancementSuspendedForRetreatConfirmation);
-        session.ArmMappedRetreatConfirmation();
-        Assert.True(session.IsTacticalAdvancementSuspendedForRetreatConfirmation);
+        Assert.False(session.IsMappedTacticalAdvancementEnabled);
+        session.ActivateMappedFirstControl();
+        Assert.True(session.IsMappedTacticalAdvancementEnabled);
         Assert.False(session.ResolveMappedRetreatConfirmation(accepted: false));
-        Assert.True(session.IsTacticalAdvancementSuspendedForRetreatConfirmation);
+        Assert.True(session.IsMappedTacticalAdvancementEnabled);
         Assert.True(session.ResolveMappedRetreatConfirmation(accepted: true));
-        Assert.Throws<InvalidOperationException>(session.ArmMappedRetreatConfirmation);
+        Assert.Throws<InvalidOperationException>(session.ActivateMappedFirstControl);
     }
 
     [Fact]

@@ -134,7 +134,7 @@ public sealed partial class ResourceAndDefinitionTests
 
         Assert.Equal(OriginalStrategicInteractiveEncounterInputRoute.ControlStrip,
             session.ApplyMappedInput(3, 410, 150, 0, 0, 180));
-        Assert.True(session.IsTacticalAdvancementSuspendedForRetreatConfirmation);
+        Assert.True(session.IsMappedTacticalAdvancementEnabled);
     }
 
     [Fact]
@@ -163,6 +163,7 @@ public sealed partial class ResourceAndDefinitionTests
 
         session.Units[0].PositionX = 100;
         session.Units[0].PositionY = 100;
+        session.ActivateMappedFirstControl();
         var accepted = session.AdvanceMappedFrame(TimeSpan.FromMilliseconds(201), 0, 100, 100,
             viewport, playerScoreModifier: 0, contactSideFilter: 0, random);
         Assert.True(accepted.TacticalPassAdvanced);
@@ -170,7 +171,7 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
-    public void StrategicInteractiveFrameKeepsRetreatConfirmationArmedAfterFalseDialogAndEndsOnTrue()
+    public void StrategicInteractiveFirstControlEnablesPassesAndLaterHitConfirmsRetreat()
     {
         var session = OriginalStrategicInteractiveEncounterSession.Create(
             new OriginalStrategicEncounterForces(1, 0, 0),
@@ -183,15 +184,15 @@ public sealed partial class ResourceAndDefinitionTests
 
         var armed = session.AdvanceMappedFrame(TimeSpan.FromMilliseconds(201), 3, 410, 150,
             viewport, playerScoreModifier: 0, contactSideFilter: 0, random);
-        Assert.True(session.IsTacticalAdvancementSuspendedForRetreatConfirmation);
-        Assert.False(armed.TacticalPassAdvanced);
+        Assert.True(session.IsMappedTacticalAdvancementEnabled);
+        Assert.True(armed.TacticalPassAdvanced);
 
         var declined = session.AdvanceMappedFrame(TimeSpan.FromMilliseconds(402), 3, 410, 150,
             viewport, playerScoreModifier: 0, contactSideFilter: 0, random,
             firstControlConfirmationAccepted: false);
         Assert.False(declined.ResolverEnded);
         Assert.Equal([0], session.SelectedUnitIndices);
-        Assert.True(session.IsTacticalAdvancementSuspendedForRetreatConfirmation);
+        Assert.True(session.IsMappedTacticalAdvancementEnabled);
 
         var ended = session.AdvanceMappedFrame(TimeSpan.FromMilliseconds(603), 3, 410, 150,
             viewport, playerScoreModifier: 0, contactSideFilter: 0, random,
