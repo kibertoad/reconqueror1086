@@ -23,6 +23,10 @@ public static class OriginalStrategicInteractiveEncounterPresentation
     public const int UnitSpriteHalfHeight = UnitSpriteHeight / 2;
     public const int SelectionOverlayOffsetX = 5;
     public const int SelectionOverlayOffsetY = 7;
+    public const int PendingFirstControlOffsetX = 15;
+    public const int PendingFirstControlOffsetY = 6;
+    public const int ControlStripOffsetX = 20;
+    public const int ControlStripOffsetY = 6;
     public const int UnitFrameCount = 720;
     public const int SelectionOverlayFrame = 720;
     public const int PendingFirstControlFrame = 721;
@@ -119,4 +123,40 @@ public static class OriginalStrategicInteractiveEncounterPresentation
 
         return draws;
     }
+
+    /// <summary>
+    /// Mirrors the armed branch at <c>0x268C8-0x268E4</c>. It draws frame
+    /// 721 against the first mapped control-strip rectangle, with the source
+    /// offsets rather than treating this 39-by-13 frame as a centered sprite.
+    /// </summary>
+    public static (int X, int Y) PendingFirstControlDrawPositionFor(
+        int controlStripMargin,
+        int verticalSpan)
+    {
+        var rectangle = FirstMappedControlStripRectangle(controlStripMargin, verticalSpan);
+        return (
+            checked(rectangle.X + PendingFirstControlOffsetX),
+            checked(rectangle.Y + PendingFirstControlOffsetY));
+    }
+
+    /// <summary>
+    /// Mirrors setup's frame-722 draw at <c>0x25FCD-0x26000</c>. Its 57-by-14
+    /// control-strip image is placed against the same first control rectangle
+    /// but has a distinct horizontal source offset from the armed frame.
+    /// </summary>
+    public static (int X, int Y) ControlStripDrawPositionFor(
+        int controlStripMargin,
+        int verticalSpan)
+    {
+        var rectangle = FirstMappedControlStripRectangle(controlStripMargin, verticalSpan);
+        return (
+            checked(rectangle.X + ControlStripOffsetX),
+            checked(rectangle.Y + ControlStripOffsetY));
+    }
+
+    private static OriginalStrategicInteractiveEncounterRectangle FirstMappedControlStripRectangle(
+        int controlStripMargin,
+        int verticalSpan) =>
+        OriginalStrategicInteractiveEncounterGeometry.CreateMappedControlStripRectangles(
+            controlStripMargin, verticalSpan)[0];
 }

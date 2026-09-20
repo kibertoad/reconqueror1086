@@ -46,5 +46,12 @@ public sealed partial class ResourceAndDefinitionTests
             new OriginalStrategicInteractiveEncounterOverlayDraw(1, 720, 135, 63),
             new OriginalStrategicInteractiveEncounterOverlayDraw(0, 720, 255, 153),
         ], overlays);
+
+        Assert.Equal((415, 452), OriginalStrategicInteractiveEncounterPresentation
+            .PendingFirstControlDrawPositionFor(controlStripMargin: 0, verticalSpan: 480));
+        Assert.Equal((420, 452), OriginalStrategicInteractiveEncounterPresentation
+            .ControlStripDrawPositionFor(controlStripMargin: 0, verticalSpan: 480));
+        Assert.Equal((495, 552), OriginalStrategicInteractiveEncounterPresentation
+            .PendingFirstControlDrawPositionFor(controlStripMargin: 80, verticalSpan: 580));
     }
 }
