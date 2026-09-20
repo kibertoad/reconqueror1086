@@ -134,7 +134,7 @@ public sealed partial class ResourceAndDefinitionTests
 
         Assert.Equal(OriginalStrategicInteractiveEncounterInputRoute.ControlStrip,
             session.ApplyMappedInput(3, 410, 150, 0, 0, 180));
-        Assert.True(session.IsTacticalAdvancementSuspendedForFirstControlConfirmation);
+        Assert.True(session.IsTacticalAdvancementSuspendedForRetreatConfirmation);
     }
 
     [Fact]
@@ -156,6 +156,8 @@ public sealed partial class ResourceAndDefinitionTests
             viewport, playerScoreModifier: 0, contactSideFilter: 0, random);
         Assert.Equal((OriginalStrategicInteractiveEncounterInputRoute.PlayerSelection, true, false, false),
             (equality.InputRoute, equality.ViewportScrolled, equality.TacticalPassAdvanced, equality.ResolverEnded));
+        Assert.Equal(OriginalStrategicInteractiveEncounterHoverKind.PlayerStrength,
+            equality.HoverPresentation.Kind);
         Assert.Equal((0, 0), (viewport.HorizontalOffset, session.Units[0].StateCode));
         Assert.Equal([0], session.SelectedUnitIndices);
 
@@ -168,7 +170,7 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
-    public void StrategicInteractiveFrameKeepsFirstControlArmedAfterFalseDialogAndEndsOnTrue()
+    public void StrategicInteractiveFrameKeepsRetreatConfirmationArmedAfterFalseDialogAndEndsOnTrue()
     {
         var session = OriginalStrategicInteractiveEncounterSession.Create(
             new OriginalStrategicEncounterForces(1, 0, 0),
@@ -181,7 +183,7 @@ public sealed partial class ResourceAndDefinitionTests
 
         var armed = session.AdvanceMappedFrame(TimeSpan.FromMilliseconds(201), 3, 410, 150,
             viewport, playerScoreModifier: 0, contactSideFilter: 0, random);
-        Assert.True(session.IsTacticalAdvancementSuspendedForFirstControlConfirmation);
+        Assert.True(session.IsTacticalAdvancementSuspendedForRetreatConfirmation);
         Assert.False(armed.TacticalPassAdvanced);
 
         var declined = session.AdvanceMappedFrame(TimeSpan.FromMilliseconds(402), 3, 410, 150,
@@ -189,7 +191,7 @@ public sealed partial class ResourceAndDefinitionTests
             firstControlConfirmationAccepted: false);
         Assert.False(declined.ResolverEnded);
         Assert.Equal([0], session.SelectedUnitIndices);
-        Assert.True(session.IsTacticalAdvancementSuspendedForFirstControlConfirmation);
+        Assert.True(session.IsTacticalAdvancementSuspendedForRetreatConfirmation);
 
         var ended = session.AdvanceMappedFrame(TimeSpan.FromMilliseconds(603), 3, 410, 150,
             viewport, playerScoreModifier: 0, contactSideFilter: 0, random,

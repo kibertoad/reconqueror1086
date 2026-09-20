@@ -37,15 +37,47 @@ public enum OriginalStrategicInteractiveEncounterInputRoute
 
 /// <summary>
 /// The outcome of the control-strip selector that dispatcher <c>0x264F8</c>
-/// runs only for input code three. The first control's special path has no
-/// inferred gameplay label until its dialog flow is mapped.
+/// runs only for input code three. Its first control arms the mapped retreat
+/// confirmation; the other controls retain their literal record mutations.
 /// </summary>
 public enum OriginalStrategicInteractiveEncounterControlStripRoute
 {
     UnitSelectionFallback,
-    UnresolvedFirstControl,
+    RetreatConfirmation,
     SetControlCodeOneForSelectedRecords,
     SetControlCodeOneForLivingRecords,
+}
+
+/// <summary>
+/// The short source-owned status line chosen before the resolver dispatches
+/// input at <c>0x264F8-0x26787</c>. A blank point shows the aggregate result
+/// only for the one pass immediately following a unit hover.
+/// </summary>
+public enum OriginalStrategicInteractiveEncounterHoverKind
+{
+    None,
+    PlayerStrength,
+    Foe,
+    Winning,
+    Losing,
+}
+
+/// <summary>
+/// One source status-line selection. <see cref="Strength"/> is meaningful
+/// only for <see cref="OriginalStrategicInteractiveEncounterHoverKind.PlayerStrength"/>.
+/// </summary>
+public readonly record struct OriginalStrategicInteractiveEncounterHoverPresentation(
+    OriginalStrategicInteractiveEncounterHoverKind Kind,
+    int Strength = 0)
+{
+    public string Text => Kind switch
+    {
+        OriginalStrategicInteractiveEncounterHoverKind.PlayerStrength => $"OUR {Strength,3}%",
+        OriginalStrategicInteractiveEncounterHoverKind.Foe => "FOE",
+        OriginalStrategicInteractiveEncounterHoverKind.Winning => "WINNING",
+        OriginalStrategicInteractiveEncounterHoverKind.Losing => "LOSING",
+        _ => string.Empty,
+    };
 }
 
 /// <summary>
@@ -57,7 +89,10 @@ public readonly record struct OriginalStrategicInteractiveEncounterFrameResult(
     OriginalStrategicInteractiveEncounterInputRoute InputRoute,
     bool ViewportScrolled,
     bool TacticalPassAdvanced,
-    bool ResolverEnded);
+    bool ResolverEnded)
+{
+    public OriginalStrategicInteractiveEncounterHoverPresentation HoverPresentation { get; init; }
+}
 
 /// <summary>
 /// One live unit materialized by resolver <c>0x28C38</c>. The original
@@ -189,7 +224,7 @@ public static class OriginalStrategicInteractiveEncounter
         oneBasedHit switch
         {
             0 => OriginalStrategicInteractiveEncounterControlStripRoute.UnitSelectionFallback,
-            1 => OriginalStrategicInteractiveEncounterControlStripRoute.UnresolvedFirstControl,
+            1 => OriginalStrategicInteractiveEncounterControlStripRoute.RetreatConfirmation,
             2 => OriginalStrategicInteractiveEncounterControlStripRoute.SetControlCodeOneForSelectedRecords,
             3 => OriginalStrategicInteractiveEncounterControlStripRoute.SetControlCodeOneForLivingRecords,
             _ => throw new ArgumentOutOfRangeException(nameof(oneBasedHit)),

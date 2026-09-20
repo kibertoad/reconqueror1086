@@ -37,6 +37,10 @@ public static class OriginalStrategicInteractiveEncounterPresentation
     public const int PendingFirstControlOffsetY = 6;
     public const int ControlStripOffsetX = 20;
     public const int ControlStripOffsetY = 6;
+    public const int HoverStatusPanelOffsetX = 160;
+    public const int HoverStatusPanelBottomOffset = 25;
+    public const int HoverStatusPanelWidth = 83;
+    public const int HoverStatusPanelHeight = 20;
     public const int UnitFrameCount = 720;
     public const int SelectionOverlayFrame = 720;
     public const int PendingFirstControlFrame = 721;
@@ -207,6 +211,26 @@ public static class OriginalStrategicInteractiveEncounterPresentation
         return (
             checked(rectangle.X + ControlStripOffsetX),
             checked(rectangle.Y + ControlStripOffsetY));
+    }
+
+    /// <summary>
+    /// Mirrors the status-panel placement at <c>0x2665E-0x2667D</c> and
+    /// <c>0x2670E-0x2672D</c>. Hover labels use the same resolution margin as
+    /// the control strip, but a separate fixed lower status-panel anchor.
+    /// </summary>
+    public static OriginalStrategicInteractiveEncounterRectangle HoverStatusPanelBoundsFor(
+        int controlStripMargin,
+        int verticalSpan)
+    {
+        if (controlStripMargin < 0)
+            throw new ArgumentOutOfRangeException(nameof(controlStripMargin));
+        if (verticalSpan < HoverStatusPanelBottomOffset)
+            throw new ArgumentOutOfRangeException(nameof(verticalSpan));
+        return new(
+            checked(controlStripMargin + HoverStatusPanelOffsetX),
+            checked(verticalSpan - HoverStatusPanelBottomOffset),
+            HoverStatusPanelWidth,
+            HoverStatusPanelHeight);
     }
 
     private static OriginalStrategicInteractiveEncounterRectangle FirstMappedControlStripRectangle(

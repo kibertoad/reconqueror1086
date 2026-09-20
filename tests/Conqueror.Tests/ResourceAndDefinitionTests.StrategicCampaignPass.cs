@@ -169,7 +169,7 @@ public sealed partial class ResourceAndDefinitionTests
         ], rectangles);
         Assert.Equal([
             OriginalStrategicInteractiveEncounterControlStripRoute.UnitSelectionFallback,
-            OriginalStrategicInteractiveEncounterControlStripRoute.UnresolvedFirstControl,
+            OriginalStrategicInteractiveEncounterControlStripRoute.RetreatConfirmation,
             OriginalStrategicInteractiveEncounterControlStripRoute.SetControlCodeOneForSelectedRecords,
             OriginalStrategicInteractiveEncounterControlStripRoute.SetControlCodeOneForLivingRecords,
         ], Enumerable.Range(0, 4).Select(OriginalStrategicInteractiveEncounter.RouteMappedControlStripHit));
@@ -185,13 +185,13 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(OriginalStrategicInteractiveEncounterControlStripRoute.UnitSelectionFallback,
             session.RouteControlStripHit(494, 446, controlStripMargin: 10, verticalSpan: 480));
 
-        Assert.False(session.IsTacticalAdvancementSuspendedForFirstControlConfirmation);
-        session.ArmMappedFirstControlConfirmation();
-        Assert.True(session.IsTacticalAdvancementSuspendedForFirstControlConfirmation);
-        Assert.False(session.ResolveMappedFirstControlConfirmation(accepted: false));
-        Assert.True(session.IsTacticalAdvancementSuspendedForFirstControlConfirmation);
-        Assert.True(session.ResolveMappedFirstControlConfirmation(accepted: true));
-        Assert.Throws<InvalidOperationException>(session.ArmMappedFirstControlConfirmation);
+        Assert.False(session.IsTacticalAdvancementSuspendedForRetreatConfirmation);
+        session.ArmMappedRetreatConfirmation();
+        Assert.True(session.IsTacticalAdvancementSuspendedForRetreatConfirmation);
+        Assert.False(session.ResolveMappedRetreatConfirmation(accepted: false));
+        Assert.True(session.IsTacticalAdvancementSuspendedForRetreatConfirmation);
+        Assert.True(session.ResolveMappedRetreatConfirmation(accepted: true));
+        Assert.Throws<InvalidOperationException>(session.ArmMappedRetreatConfirmation);
     }
 
     [Fact]

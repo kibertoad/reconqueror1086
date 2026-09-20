@@ -11,7 +11,8 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     private readonly List<int> _selectedUnitIndices = [];
     private int _playerLaneCount;
     private int _enemyLaneCount;
-    private bool _firstControlConfirmationArmed;
+    private bool _retreatConfirmationArmed;
+    private bool _hoveredUnitInPreviousFrame;
 
     private OriginalStrategicInteractiveEncounterSession(
         List<OriginalStrategicInteractiveEncounterUnit> units,
@@ -31,13 +32,13 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     public int EnemyLaneCount => _enemyLaneCount;
 
     /// <summary>
-    /// Mirrors the inverted timing gate <c>19C7C</c>: the first control-strip
+    /// Mirrors the inverted timing gate <c>19C7C</c>: the retreat control-strip
     /// button sets that word to zero while its confirmation state is armed,
     /// so regular tactical advancement is skipped even if input dispatch
     /// continues to run.
     /// </summary>
-    public bool IsTacticalAdvancementSuspendedForFirstControlConfirmation =>
-        _firstControlConfirmationArmed;
+    public bool IsTacticalAdvancementSuspendedForRetreatConfirmation =>
+        _retreatConfirmationArmed;
 
     public OriginalStrategicInteractiveEncounterInputRoute RouteInputCode(int inputCode) =>
         OriginalStrategicInteractiveEncounter.RouteMappedInputCode(inputCode);
@@ -71,9 +72,9 @@ public sealed class OriginalStrategicInteractiveEncounterSession
                     case OriginalStrategicInteractiveEncounterControlStripRoute.UnitSelectionFallback:
                         TryAppendMappedPlayerSelectionAt(localX, localY, horizontalOffset, verticalOffset);
                         break;
-                    case OriginalStrategicInteractiveEncounterControlStripRoute.UnresolvedFirstControl:
-                        if (!_firstControlConfirmationArmed)
-                            ArmMappedFirstControlConfirmation();
+                    case OriginalStrategicInteractiveEncounterControlStripRoute.RetreatConfirmation:
+                        if (!_retreatConfirmationArmed)
+                            ArmMappedRetreatConfirmation();
                         break;
                     case OriginalStrategicInteractiveEncounterControlStripRoute.SetControlCodeOneForSelectedRecords:
                         SetMappedControlCodeOneForSelection();
@@ -94,7 +95,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
 
     /// <summary>
     /// Advances the recovered outer ordering of resolver <c>0x26B88</c>:
-    /// edge scrolling, input dispatch, the first-control confirmation branch,
+    /// edge scrolling, input dispatch, the retreat-confirmation branch,
     /// its tactical-suspension flag, then the configured stable tactical gate.
     /// A false response to an already armed first control deliberately falls
     /// through to ordinary selection and leaves the suspension armed.
@@ -114,16 +115,21 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         ArgumentNullException.ThrowIfNull(random);
 
         var viewportScrolled = viewport.ApplyMappedEdgeScroll(localX, localY);
+        var hover = CaptureMappedHoverPresentation(
+            localX, localY, viewport.HorizontalOffset, viewport.VerticalOffset);
         var inputRoute = RouteInputCode(inputCode);
         var controlRoute = inputRoute == OriginalStrategicInteractiveEncounterInputRoute.ControlStrip
             ? RouteControlStripHit(localX, localY, viewport.ControlStripMargin, viewport.ViewportHeight)
             : OriginalStrategicInteractiveEncounterControlStripRoute.UnitSelectionFallback;
 
-        if (controlRoute == OriginalStrategicInteractiveEncounterControlStripRoute.UnresolvedFirstControl
-            && _firstControlConfirmationArmed)
+        if (controlRoute == OriginalStrategicInteractiveEncounterControlStripRoute.RetreatConfirmation
+            && _retreatConfirmationArmed)
         {
             if (firstControlConfirmationAccepted)
-                return new(inputRoute, viewportScrolled, TacticalPassAdvanced: false, ResolverEnded: true);
+                return new(inputRoute, viewportScrolled, TacticalPassAdvanced: false, ResolverEnded: true)
+                {
+                    HoverPresentation = hover,
+                };
 
             TryAppendMappedPlayerSelectionAt(
                 localX, localY, viewport.HorizontalOffset, viewport.VerticalOffset);
@@ -134,12 +140,18 @@ public sealed class OriginalStrategicInteractiveEncounterSession
                 viewport.VerticalOffset, viewport.ViewportHeight, viewport.ControlStripMargin);
         }
 
-        if (_firstControlConfirmationArmed || !Timing.TryBeginPass(currentTime))
-            return new(inputRoute, viewportScrolled, TacticalPassAdvanced: false, ResolverEnded: false);
+        if (_retreatConfirmationArmed || !Timing.TryBeginPass(currentTime))
+            return new(inputRoute, viewportScrolled, TacticalPassAdvanced: false, ResolverEnded: false)
+            {
+                HoverPresentation = hover,
+            };
 
         AdvanceMappedTacticalPass(viewport.ContentWidth, viewport.ContentHeight,
             playerScoreModifier, contactSideFilter, random);
-        return new(inputRoute, viewportScrolled, TacticalPassAdvanced: true, ResolverEnded: false);
+        return new(inputRoute, viewportScrolled, TacticalPassAdvanced: true, ResolverEnded: false)
+        {
+            HoverPresentation = hover,
+        };
     }
 
     public OriginalStrategicInteractiveEncounterControlStripRoute RouteControlStripHit(
@@ -155,28 +167,62 @@ public sealed class OriginalStrategicInteractiveEncounterSession
                 localY));
 
     /// <summary>
-    /// Mirrors the first control-strip hit when global <c>19C8C</c> is zero:
+    /// Mirrors the retreat control-strip hit when global <c>19C8C</c> is zero:
     /// the source marks its confirmation state and renders the pending path.
-    /// The user-facing button and dialog text remain deliberately unnamed.
+    /// Its subsequent dialog asks whether the player wants to retreat.
     /// </summary>
-    public void ArmMappedFirstControlConfirmation()
+    public void ArmMappedRetreatConfirmation()
     {
-        if (_firstControlConfirmationArmed)
-            throw new InvalidOperationException("Mapped first-control confirmation is already armed.");
-        _firstControlConfirmationArmed = true;
+        if (_retreatConfirmationArmed)
+            throw new InvalidOperationException("Mapped retreat confirmation is already armed.");
+        _retreatConfirmationArmed = true;
     }
 
     /// <summary>
-    /// Mirrors the already-armed first-control branch at
+    /// Mirrors the already-armed retreat-control branch at
     /// <c>0x26832-0x2685B</c>. A true dialog result exits the resolver;
     /// a false result falls through to ordinary unit selection and does not
     /// clear the confirmation state or resume tactical advancement.
     /// </summary>
-    public bool ResolveMappedFirstControlConfirmation(bool accepted)
+    public bool ResolveMappedRetreatConfirmation(bool accepted)
     {
-        if (!_firstControlConfirmationArmed)
-            throw new InvalidOperationException("Mapped first-control confirmation is not armed.");
+        if (!_retreatConfirmationArmed)
+            throw new InvalidOperationException("Mapped retreat confirmation is not armed.");
         return accepted;
+    }
+
+    /// <summary>
+    /// Mirrors the source status branch before input dispatch at
+    /// <c>0x265CC-0x26787</c>. The rectangle selector receives the scroll-
+    /// adjusted point. A player record formats its current strength; an enemy
+    /// record prints the foe label. The first blank pass after either hover
+    /// instead compares the live enemy and player lane counts, then clears
+    /// the source's one-pass hover flag.
+    /// </summary>
+    public OriginalStrategicInteractiveEncounterHoverPresentation CaptureMappedHoverPresentation(
+        int localX,
+        int localY,
+        int horizontalOffset,
+        int verticalOffset)
+    {
+        var oneBased = OriginalStrategicInteractiveEncounterGeometry.FindFirstContainingOneBased(
+            RenderRectangles(), checked(localX + horizontalOffset), checked(localY + verticalOffset));
+        if (oneBased != 0)
+        {
+            _hoveredUnitInPreviousFrame = true;
+            var unit = _units[checked(oneBased - 1)];
+            return unit.Side == OriginalStrategicInteractiveEncounterSide.Player
+                ? new(OriginalStrategicInteractiveEncounterHoverKind.PlayerStrength, unit.RemainingStrength)
+                : new(OriginalStrategicInteractiveEncounterHoverKind.Foe);
+        }
+
+        if (!_hoveredUnitInPreviousFrame)
+            return default;
+
+        _hoveredUnitInPreviousFrame = false;
+        return _enemyLaneCount <= _playerLaneCount
+            ? new(OriginalStrategicInteractiveEncounterHoverKind.Winning)
+            : new(OriginalStrategicInteractiveEncounterHoverKind.Losing);
     }
 
     /// <summary>
