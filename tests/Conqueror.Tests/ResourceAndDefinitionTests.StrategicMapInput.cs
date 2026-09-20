@@ -1,4 +1,5 @@
 using Conqueror.Core;
+using Conqueror.Game;
 using Xunit;
 
 namespace Conqueror.Tests;
@@ -167,6 +168,33 @@ public sealed partial class ResourceAndDefinitionTests
 
         Assert.Equal(new OriginalStrategicMapTerrainTileDraw(10, 2, -20, -53, 2), draws[0]);
         Assert.Equal(new OriginalStrategicMapTerrainTileDraw(10, 3, 20, -33, 3), draws[6]);
+    }
+
+    [Fact]
+    public void StrategicTerrainPresentationClipsTheOriginalAtlasPassBeforeScaling()
+    {
+        var state = OriginalStrategicCampaignState.CreateForNewGame(new DateTime(1086, 3, 1), 0);
+        state.CameraRow = 10;
+        state.CameraColumn = 2;
+        var resources = new MapInputResources();
+
+        var blits = OriginalStrategicTerrainPresentation.BuildBlits(state, resources, frameCount: 337);
+
+        Assert.Equal(127, blits.Count);
+        Assert.Equal(new OriginalStrategicTerrainBlit(2,
+            new UiBounds(20, 7, 40, 20), new UiBounds(40, 60, 40, 20)), blits[0]);
+        Assert.Equal(new OriginalStrategicTerrainBlit(3,
+            new UiBounds(20, 7, 80, 40), new UiBounds(0, 40, 80, 40)), blits[6]);
+        Assert.Equal("Estate.Tiles.SpringSummer",
+            OriginalStrategicTerrainPresentation.AtlasRoleFor(StrategicTerrainProfile.Spring));
+        Assert.Equal("Estate.Tiles.SpringSummer",
+            OriginalStrategicTerrainPresentation.AtlasRoleFor(StrategicTerrainProfile.Summer));
+        Assert.Equal("Estate.Tiles.Autumn",
+            OriginalStrategicTerrainPresentation.AtlasRoleFor(StrategicTerrainProfile.Autumn));
+        Assert.Equal("Estate.Tiles.Winter",
+            OriginalStrategicTerrainPresentation.AtlasRoleFor(StrategicTerrainProfile.Winter));
+        Assert.Throws<InvalidDataException>(() =>
+            OriginalStrategicTerrainPresentation.BuildBlits(state, resources, frameCount: 2));
     }
 
     [Fact]

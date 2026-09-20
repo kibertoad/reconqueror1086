@@ -444,6 +444,30 @@ public sealed partial class ConquerorGame
 
     private void DrawEstateTerrain()
     {
+        if (_campaign.State.OriginalStrategicState is { } strategic
+            && DrawOriginalStrategicTerrain(strategic))
+            return;
+
+        DrawLegacyEstateTerrain();
+    }
+
+    private bool DrawOriginalStrategicTerrain(OriginalStrategicCampaignState strategic)
+    {
+        var role = OriginalStrategicTerrainPresentation.AtlasRoleFor(strategic.TerrainProfile);
+        if (!_originalAnimations.TryGetValue(role, out var atlas)) return false;
+
+        foreach (var blit in OriginalStrategicTerrainPresentation.BuildBlits(
+                     strategic, _originalStrategicResources, atlas.Frames.Count))
+        {
+            _batch.Draw(atlas.Frames[blit.FrameIndex], ScaleBounds(blit.Destination),
+                new Rectangle(blit.Source.X, blit.Source.Y, blit.Source.Width, blit.Source.Height),
+                Color.White);
+        }
+        return true;
+    }
+
+    private void DrawLegacyEstateTerrain()
+    {
         var viewport = ScaleBounds(_estateLayout.MainViewport);
         Fill(viewport, new Color(113, 107, 72));
         var terrain = EstatePresentationDefinitions.TerrainFor(_campaign.State.Player.Home);
