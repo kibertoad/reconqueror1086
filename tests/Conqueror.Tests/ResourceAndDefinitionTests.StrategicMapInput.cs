@@ -200,14 +200,17 @@ public sealed partial class ResourceAndDefinitionTests
     [Fact]
     public void StrategicMapMarkerFramesRetainSelectedDistinguishedAndAvatarOffsets()
     {
-        const int frameBase = 40;
+        var frameBase = OriginalStrategicMapMarkerPresentation.FrameBaseForCharacterColor(5);
 
+        Assert.Equal(40, frameBase);
         Assert.Equal(41, OriginalStrategicMapMarkerPresentation.FrameFor(0, false, 2, frameBase));
         Assert.Equal(46, OriginalStrategicMapMarkerPresentation.FrameFor(0, true, 2, frameBase));
         Assert.Equal(45, OriginalStrategicMapMarkerPresentation.FrameFor(2, false, 2, frameBase));
         Assert.Equal(40, OriginalStrategicMapMarkerPresentation.FrameFor(2, true, 2, frameBase));
         Assert.Equal(42, OriginalStrategicMapMarkerPresentation.FrameFor(5, false, 5, frameBase));
         Assert.Equal(47, OriginalStrategicMapMarkerPresentation.FrameFor(5, true, 5, frameBase));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            OriginalStrategicMapMarkerPresentation.FrameBaseForCharacterColor(-1));
     }
 
     [Fact]

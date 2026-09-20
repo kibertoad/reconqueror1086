@@ -62,6 +62,7 @@ var conversationTextIds = OptionValue(inspectionOptions, "--conversation-text=")
 var integerResourceName = OptionValue(inspectionOptions, "--resource-integers=");
 var actionGroupIds = OptionValue(inspectionOptions, "--action-groups=");
 var weaponTextIds = OptionValue(inspectionOptions, "--weapon-text=");
+var resourceStringsName = OptionValue(inspectionOptions, "--resource-strings=");
 var reportSceneBlocks = inspectionOptions.Contains("--scene-blocks", StringComparer.OrdinalIgnoreCase);
 if (disassembleAddresses is not null)
 {
@@ -117,7 +118,7 @@ if (terms.Length > 0)
     var scanTargets = Directory.EnumerateFiles(artifactRoot, "CONQUER.EXE", SearchOption.AllDirectories)
         .Concat([Path.Combine(install, "C1086.GOB")]).Where(File.Exists);
     foreach (var target in scanTargets)
-        foreach (var (offset, value) in PrintableStrings(target).Where(x => terms.Any(term => x.Value.Contains(term, StringComparison.OrdinalIgnoreCase))))
+        foreach (var (offset, value) in ResourceStringInspection.PrintableStrings(target).Where(x => terms.Any(term => x.Value.Contains(term, StringComparison.OrdinalIgnoreCase))))
             hits.AppendLine($"0x{offset:X8}  {Path.GetFileName(target)}  {value}");
     File.WriteAllText(Path.Combine(output, "string-hits.txt"), hits.ToString());
 }
@@ -158,6 +159,21 @@ if (File.Exists(gobPath))
             integerReport.AppendLine($"{offset / 4,7}  0x{offset:X4}  {value,11}  0x{unchecked((uint)value):X8}");
         }
         File.WriteAllText(Path.Combine(output, "resource-integer-report.txt"), integerReport.ToString());
+    }
+    if (resourceStringsName is not null)
+    {
+        var stringsEntry = gob.Entries.FirstOrDefault(entry =>
+                entry.Name.Equals(resourceStringsName, StringComparison.OrdinalIgnoreCase))
+            ?? throw new ArgumentException($"GOB resource '{resourceStringsName}' was not found.");
+        var stringsBytes = gob.ReadDecoded(stringsEntry);
+        const int maximumStringResourceBytes = 64 * 1024;
+        if (stringsBytes.Length > maximumStringResourceBytes)
+            throw new InvalidDataException(
+                $"Printable-string report is limited to {maximumStringResourceBytes} decoded bytes.");
+        var stringsReport = new StringBuilder("# Offset  Printable string (derived; do not redistribute source text)\n");
+        foreach (var (offset, value) in ResourceStringInspection.PrintableStrings(stringsBytes))
+            stringsReport.AppendLine($"0x{offset:X8}  {value}");
+        File.WriteAllText(Path.Combine(output, "resource-string-report.txt"), stringsReport.ToString());
     }
 
     var compressionReport = new StringBuilder("# Index  Kind  Blocks  Compressed  Stored  Result  Name\n");
@@ -969,26 +985,4 @@ static string FormatValue(DynamixActionTreeDatabase database, int offset, HashSe
         _ => "?"
     };
     return value.Invert ? $"NOT({text})" : text;
-}
-
-static IEnumerable<(long Offset, string Value)> PrintableStrings(string path)
-{
-    using var stream = File.OpenRead(path);
-    var bytes = new List<byte>();
-    long start = 0;
-    for (long offset = 0; offset < stream.Length; offset++)
-    {
-        var value = stream.ReadByte();
-        if (value is >= 32 and <= 126)
-        {
-            if (bytes.Count == 0) start = offset;
-            bytes.Add((byte)value);
-        }
-        else
-        {
-            if (bytes.Count >= 4) yield return (start, Encoding.ASCII.GetString(bytes.ToArray()));
-            bytes.Clear();
-        }
-    }
-    if (bytes.Count >= 4) yield return (start, Encoding.ASCII.GetString(bytes.ToArray()));
 }

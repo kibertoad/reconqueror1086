@@ -36,7 +36,7 @@ Runtime conversation entry also covers all six named tournament-lady selector ro
 3. Walks the ISO-9660 directory tree without mounting or modifying the image.
 4. Writes a complete CD manifest and SHA-256 provenance hashes.
 5. Locally extracts small executable/configuration artifacts useful for inspection.
-6. Searches printable strings in `CONQUER.EXE` and the installed `C1086.GOB`, recording byte offsets for follow-up analysis.
+6. Searches printable strings in `CONQUER.EXE` and the installed `C1086.GOB`, recording byte offsets for follow-up analysis; it can also emit a 64 KiB-bounded local printable-string report for one explicitly named decoded GOB entry.
 7. Parses the bounded top-level Dynamix archive directory and reports names, flags, sizes, and offsets. For kind-1 entries it validates every two-byte-length-prefixed block and expected 16 KiB output slice; for kind 2 it applies the executable-confirmed MSB-first 9-to-14-bit LZW stream. It validates `.666` resources as bounded rate-tagged sample banks and records metadata without exporting audio. The end-user importer writes every supported decoded entry through one centralized codec registry.
 
 `gob-compression-report.txt` is a generated local report. On the hashed build, all 471 kind-1 GOB entries divide exactly into 2,963 expected 16 KiB output slices: 2,940 compressed-marker blocks and 23 verbatim blocks. The 99-container `.RES`/`.LOW` scene report adds 29,118 compressed-marker and eight verbatim blocks. All 32,089 blocks decode to their exact expected sizes with the bounded LZ/RLE decoder. The five unequal-size kind-2 entries also decode exactly with the separately bounded adaptive LZW decoder. The reports contain names and structural results, not extracted payloads. The shared resource library retains a distinct LSB-first LZW decoder for documented inner chunk streams; real-data probes disproved both that codec and classic LH1 as interpretations of outer kind 1.
@@ -66,6 +66,8 @@ Use `--xref-block-flags=0x20` to inventory comparisons and bit operations agains
 Use `--weapon-combat-table` to emit the 25 seven-dword combat rows at data-object offset `0xCE14` into ignored `weapon-combat-table-report.txt`. Column 4 begins at `0xCE24` and supplies contact distance. This preserves the original numeric row values as reproducible local evidence without exporting executable bytes.
 
 Use `--xref-code=0xADDRESS,...` to find direct branch/call references and internal LE relocations to code addresses. The latter expose callback registrations whose targets never appear in a direct call instruction. Its ignored output is `executable-code-xrefs.txt`.
+
+Use `--resource-strings=NAME` to emit printable strings from one named decoded GOB entry into ignored `resource-string-report.txt`. The option rejects resources larger than 64 KiB; use its offsets as local analysis leads and record only reviewed, compact facts in documentation because the report can contain source text.
 
 That workflow found a reference to data offset `0x8020` (`TITLE.HAT`) in code at virtual address `0x4FF4F`. The surrounding routine copies the name and calls the common resource loader. The 64-byte `TITLE.HAT` record identifies `FFTITLE.PCX` and a 640x480 presentation. Resource inspection then distinguishes the static title from the first interactive `CHAR_OPS.PCX` screen. `CGOPTS.HAT` and `PREGEN.HAT` now confirm the clickable geometry; exact navigation timing and region-action dispatch still require further executable tracing.
 

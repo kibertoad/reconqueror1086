@@ -2,8 +2,8 @@ namespace Conqueror.Core;
 
 /// <summary>
 /// Selects the strategic-map marker frame from the active player record's
-/// opaque source frame base. Asset identity and marker placement remain
-/// separate presentation concerns.
+/// source frame base. Asset identity and marker placement remain separate
+/// presentation concerns.
 /// </summary>
 public static class OriginalStrategicMapMarkerPresentation
 {
@@ -12,6 +12,18 @@ public static class OriginalStrategicMapMarkerPresentation
     public const int DistinguishedUnselectedOffset = 5;
     public const int OrdinarySelectedOffset = 6;
     public const int AvatarSelectedOffset = 7;
+    public const int CharacterColorFrameStride = 8;
+
+    /// <summary>
+    /// Recreates initializer <c>0x12A77-0x12AA5</c>'s frame-base assignment:
+    /// the character configuration's zero-based <c>COLOR</c> field is scaled
+    /// by eight before being stored at each player record's <c>+0x38</c>.
+    /// </summary>
+    public static int FrameBaseForCharacterColor(int characterColor)
+    {
+        if (characterColor < 0) throw new ArgumentOutOfRangeException(nameof(characterColor));
+        return checked(characterColor * CharacterColorFrameStride);
+    }
 
     /// <summary>
     /// Enumerates the active source marker inputs in the physical record order
