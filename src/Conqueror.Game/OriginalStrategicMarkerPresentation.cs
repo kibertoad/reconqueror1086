@@ -33,6 +33,36 @@ public static class OriginalStrategicMarkerPresentation
         var frameBases = OriginalStrategicMapMarkerPresentation
             .FrameBasesForCharacterColor(characterColor);
         var draws = OriginalStrategicMapMarkerPresentation.BuildDraws(state, frameBases);
+        return BuildBlits(state, draws, frameCount, frameWidth, frameHeight);
+    }
+
+    /// <summary>
+    /// Converts the independent five-record movement-marker pass at
+    /// <c>0x3A63C</c>. The source calls this after player markers and passes
+    /// each active record's direct <c>+0x38</c> frame to the same blitter.
+    /// </summary>
+    public static IReadOnlyList<OriginalStrategicMarkerBlit> BuildMovementBlits(
+        OriginalStrategicCampaignState state,
+        int frameCount,
+        int frameWidth,
+        int frameHeight)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        if (frameCount <= 0) throw new ArgumentOutOfRangeException(nameof(frameCount));
+        if (frameWidth <= 0) throw new ArgumentOutOfRangeException(nameof(frameWidth));
+        if (frameHeight <= 0) throw new ArgumentOutOfRangeException(nameof(frameHeight));
+
+        return BuildBlits(state, OriginalStrategicMapMarkerPresentation.BuildMovementDraws(state),
+            frameCount, frameWidth, frameHeight);
+    }
+
+    private static IReadOnlyList<OriginalStrategicMarkerBlit> BuildBlits(
+        OriginalStrategicCampaignState state,
+        IReadOnlyList<OriginalStrategicMapMarkerDraw> draws,
+        int frameCount,
+        int frameWidth,
+        int frameHeight)
+    {
         var viewport = new UiBounds(
             OriginalStrategicMapTerrainRendering.ViewportLeft,
             OriginalStrategicMapTerrainRendering.ViewportTop,

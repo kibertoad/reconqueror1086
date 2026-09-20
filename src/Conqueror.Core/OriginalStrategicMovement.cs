@@ -38,6 +38,7 @@ public static partial class OriginalStrategicMovement
     public const int PlayerAvatarCollisionCooldown = 120;
     public const int MaximumActivePlayerRecordCount = 6;
     public const int PlayerFormationOffsetTableAddress = 0xA564;
+    public const int MovementMarkerFrameTableAddress = 0xAE88;
     public const int GenerationIntervalUnits = 0x1388;
     public const int InitialSpeedMultiplier = 1;
     public const int MinimumSpeedMultiplier = 1;
@@ -69,6 +70,7 @@ public static partial class OriginalStrategicMovement
     public const int OriginLocationOffset = 0x28;
     public const int LordOffset = 0x2C;
     public const int ModeOffset = 0x34;
+    public const int MarkerFrameOffset = 0x38;
     public const int DestinationXOffset = 0x3C;
     public const int DestinationYOffset = 0x40;
     public const int GridXOffset = 0x44;
@@ -95,6 +97,24 @@ public static partial class OriginalStrategicMovement
     public const int TerrainProfileCount = 4;
     public const int ReducedTerrainProfile = 2;
     public const int ImpassableTerrainKind = 9;
+
+    // Object-2 +0xAE88 stores the property-keyed selector which 0x3A764 and
+    // 0x3AC5C shift left three places into each live movement record +0x38.
+    // Only the first fourteen entries are reachable through the 0..13
+    // strategic property domain.
+    private static readonly int[] MovementMarkerFrameBases =
+        [88, 8, 16, 72, 32, 56, 48, 56, 64, 72, 80, 88, 96, 64];
+
+    /// <summary>
+    /// Returns the direct <c>icon_men.CSF</c> frame stored at a constructed
+    /// movement record's <c>+0x38</c> for its origin property.
+    /// </summary>
+    public static int MovementMarkerFrameForOriginProperty(int property)
+    {
+        if (property is < 0 or >= PropertyCount)
+            throw new ArgumentOutOfRangeException(nameof(property));
+        return MovementMarkerFrameBases[property];
+    }
 
     public const int StartingRouteSelectorAddress = 0xC9D0;
     public const int StartingPersonIndexTableAddress = 0xB8C8;

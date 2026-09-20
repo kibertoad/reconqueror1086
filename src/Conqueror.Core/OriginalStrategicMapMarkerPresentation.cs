@@ -66,6 +66,37 @@ public static class OriginalStrategicMapMarkerPresentation
     }
 
     /// <summary>
+    /// Enumerates the five movement records in the physical order used
+    /// by <c>0x3A63C</c>. Unlike player markers, their already-stored
+    /// <c>+0x38</c> value is a direct frame index: there is no selection
+    /// offset. A zero value on an old replacement save is recovered from the
+    /// confirmed origin-property table, because no supported source property
+    /// uses frame zero.
+    /// </summary>
+    public static IReadOnlyList<OriginalStrategicMapMarkerDraw> BuildMovementDraws(
+        OriginalStrategicCampaignState state)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        state.Validate();
+
+        var draws = new List<OriginalStrategicMapMarkerDraw>();
+        foreach (var record in state.MovementSlots.OrderBy(record => record.Slot))
+        {
+            if (!record.Active) continue;
+            var frame = record.MarkerFrame != 0
+                ? record.MarkerFrame
+                : OriginalStrategicMovement.MovementMarkerFrameForOriginProperty(
+                    record.OriginProperty);
+            draws.Add(new OriginalStrategicMapMarkerDraw(
+                record.Slot,
+                TruncateTowardZero(record.CurrentX),
+                TruncateTowardZero(record.CurrentY),
+                frame));
+        }
+        return draws;
+    }
+
+    /// <summary>
     /// Mirrors <c>0x12F32-0x130C3</c> for an already-active player record.
     /// The original stores <paramref name="frameBase"/> at record <c>+0x38</c>
     /// and selects an offset from record <c>+0x04</c>, global <c>AE6C</c>, and

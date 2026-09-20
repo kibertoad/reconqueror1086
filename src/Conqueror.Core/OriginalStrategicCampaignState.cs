@@ -233,6 +233,9 @@ public sealed class OriginalStrategicMovementSlot
     public int OriginProperty { get; set; } = -1;
     public int Lord { get; set; } = -1;
     public int Mode { get; set; }
+    // The exact direct icon_men frame held in the original movement record at
+    // +0x38. It is seeded from the origin-property table at construction.
+    public int MarkerFrame { get; set; }
     public int DestinationX { get; set; }
     public int DestinationY { get; set; }
     public int GridX { get; set; }
@@ -252,7 +255,8 @@ public sealed class OriginalStrategicMovementSlot
             || Swordsmen < 0 || Halberdiers < 0 || Knights < 0
             || WaypointCount < 0 || WaypointIndex < 0 || WaypointIndex > WaypointCount
             || !float.IsFinite(CurrentX) || !float.IsFinite(CurrentY)
-            || !float.IsFinite(DirectionX) || !float.IsFinite(DirectionY))
+            || !float.IsFinite(DirectionX) || !float.IsFinite(DirectionY)
+            || MarkerFrame < 0)
             throw new InvalidDataException("Strategic movement slot contains invalid persisted fields.");
         if (!Active) return;
         if (Mode is < OriginalStrategicMovement.DirectPropertyMode

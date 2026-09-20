@@ -205,6 +205,7 @@ public static partial class OriginalStrategicMovement
         slot.OriginProperty = originProperty;
         slot.Lord = origin.Lord;
         slot.Mode = mode;
+        slot.MarkerFrame = MovementMarkerFrameForOriginProperty(originProperty);
         slot.GridX = origin.GridX;
         slot.GridY = origin.GridY;
         (slot.CurrentX, slot.CurrentY) = RouteAnchor(origin.GridX, origin.GridY);
@@ -249,6 +250,7 @@ public static partial class OriginalStrategicMovement
         slot.OriginProperty = originProperty;
         slot.Lord = origin.Lord;
         slot.Mode = PursuitMode;
+        slot.MarkerFrame = MovementMarkerFrameForOriginProperty(originProperty);
         slot.DestinationX = Truncate(target.CurrentX);
         slot.DestinationY = Truncate(target.CurrentY);
         slot.GridX = target.GridX;
@@ -461,6 +463,7 @@ public static partial class OriginalStrategicMovement
         slot.OriginProperty = -1;
         slot.Lord = -1;
         slot.Mode = 0;
+        slot.MarkerFrame = 0;
         slot.DestinationX = 0;
         slot.DestinationY = 0;
         slot.GridX = 0;

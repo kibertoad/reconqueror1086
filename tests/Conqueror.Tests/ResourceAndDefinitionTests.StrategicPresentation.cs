@@ -54,6 +54,44 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicMovementMarkersUseTheirStoredFramesInPhysicalPassOrder()
+    {
+        var state = OriginalStrategicCampaignState.CreateForNewGame(new DateTime(1086, 3, 1), 0);
+        state.CameraRow = 10;
+        state.CameraColumn = 2;
+        ActivateMovementMarker(state, slotIndex: 0, originProperty: 0, sourceX: 1107, sourceY: 200);
+        ActivateMovementMarker(state, slotIndex: 2, originProperty: 2, sourceX: 1067, sourceY: 100);
+
+        var blits = OriginalStrategicMarkerPresentation.BuildMovementBlits(
+            state, frameCount: 128, frameWidth: 27, frameHeight: 35);
+
+        Assert.Equal([
+            new OriginalStrategicMarkerBlit(0, 88, new UiBounds(40, 112, 27, 35),
+                new UiBounds(0, 0, 27, 35)),
+            new OriginalStrategicMarkerBlit(2, 16, new UiBounds(20, 12, 7, 35),
+                new UiBounds(20, 0, 7, 35))
+        ], blits);
+    }
+
+    private static void ActivateMovementMarker(
+        OriginalStrategicCampaignState state,
+        int slotIndex,
+        int originProperty,
+        float sourceX,
+        float sourceY)
+    {
+        var slot = state.MovementSlots[slotIndex];
+        slot.Active = true;
+        slot.OriginProperty = originProperty;
+        slot.Lord = state.Properties[originProperty].Lord;
+        slot.Mode = OriginalStrategicMovement.DirectPropertyMode;
+        slot.Swordsmen = 1;
+        slot.CurrentX = sourceX;
+        slot.CurrentY = sourceY;
+        slot.MarkerFrame = OriginalStrategicMovement.MovementMarkerFrameForOriginProperty(originProperty);
+    }
+
+    [Fact]
     public void StrategicInteractivePresentationUsesTheResolverFrameIndexFormula()
     {
         var units = OriginalStrategicInteractiveEncounter.Materialize(

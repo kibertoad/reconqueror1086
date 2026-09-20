@@ -32,6 +32,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal((0, OriginalStrategicMovement.RoutedMode), (advance.Slot, advance.ModeBefore));
         Assert.Equal(1, state.MovementSlots[0].WaypointIndex);
         Assert.True(state.MovementSlots[0].CurrentX > 10_800);
+        Assert.Equal(88, state.MovementSlots[0].MarkerFrame);
     }
 
     [Fact]
@@ -58,6 +59,7 @@ public sealed partial class ResourceAndDefinitionTests
             (state.MovementSlots[0].Swordsmen,
                 state.MovementSlots[0].Halberdiers,
                 state.MovementSlots[0].Knights));
+        Assert.Equal(88, state.MovementSlots[0].MarkerFrame);
         Assert.Equal(0, state.CallsSinceReactiveSuccess);
         Assert.Equal(1, state.GenerationAccumulator);
     }

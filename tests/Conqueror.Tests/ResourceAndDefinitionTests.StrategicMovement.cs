@@ -42,6 +42,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(0x28, OriginalStrategicMovement.OriginLocationOffset);
         Assert.Equal(0x2C, OriginalStrategicMovement.LordOffset);
         Assert.Equal(0x34, OriginalStrategicMovement.ModeOffset);
+        Assert.Equal(0x38, OriginalStrategicMovement.MarkerFrameOffset);
         Assert.Equal(0x3C, OriginalStrategicMovement.DestinationXOffset);
         Assert.Equal(0x40, OriginalStrategicMovement.DestinationYOffset);
         Assert.Equal(0x44, OriginalStrategicMovement.GridXOffset);
@@ -67,6 +68,15 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(4, OriginalStrategicMovement.TerrainProfileCount);
         Assert.Equal(2, OriginalStrategicMovement.ReducedTerrainProfile);
         Assert.Equal(9, OriginalStrategicMovement.ImpassableTerrainKind);
+        Assert.Equal(0xAE88, OriginalStrategicMovement.MovementMarkerFrameTableAddress);
+        Assert.Equal([88, 8, 16, 72, 32, 56, 48, 56, 64, 72, 80, 88, 96, 64],
+            Enumerable.Range(0, OriginalStrategicMovement.PropertyCount)
+                .Select(OriginalStrategicMovement.MovementMarkerFrameForOriginProperty));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            OriginalStrategicMovement.MovementMarkerFrameForOriginProperty(-1));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            OriginalStrategicMovement.MovementMarkerFrameForOriginProperty(
+                OriginalStrategicMovement.PropertyCount));
     }
 
     [Fact]

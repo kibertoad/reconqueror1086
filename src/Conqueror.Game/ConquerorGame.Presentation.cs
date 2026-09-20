@@ -488,6 +488,14 @@ public sealed partial class ConquerorGame
                 new Rectangle(blit.Source.X, blit.Source.Y, blit.Source.Width, blit.Source.Height),
                 Color.White);
         }
+
+        foreach (var blit in OriginalStrategicMarkerPresentation.BuildMovementBlits(
+                     strategic, markers.Frames.Count, firstFrame.Width, firstFrame.Height))
+        {
+            _batch.Draw(markers.Frames[blit.FrameIndex], ScaleBounds(blit.Destination),
+                new Rectangle(blit.Source.X, blit.Source.Y, blit.Source.Width, blit.Source.Height),
+                Color.White);
+        }
     }
 
     private void DrawLegacyEstateTerrain()
