@@ -85,6 +85,11 @@ public static class ImportedAnimations
         new("Shop.Items", ":swords.csf", "Shop.Inventory"),
         new("Shop.Controls", ":buysell.csf", "Shop.Inventory"),
         new("Interface.Cursor", ":ffmouse.csf", "Estate.Shell"),
+        // `0x12A4C` confirms the two CSF names. The strategic map's active
+        // palette at this load site is not yet recovered, so retain the
+        // campaign shell palette as a separately documented corroboration.
+        new("Strategic.Map.Markers", ":icon_men.csf", "Estate.Shell"),
+        new("Strategic.Map.MarkerOverlay", ":marker.csf", "Estate.Shell"),
         new("Combat.FirstPerson", ":skirmish.csf", "", ":SKIRMISH.PAL"),
         new("Encounter.Strategic.Units", ":men8.csf", "Encounter.Strategic.Background"),
         new("Dragon.Lance", ":lance1.csf", "Dragon.Background"),

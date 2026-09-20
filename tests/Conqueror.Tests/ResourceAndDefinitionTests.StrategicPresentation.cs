@@ -14,6 +14,12 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Contains(new ImportedAnimationDefinition("Encounter.Strategic.Units", ":men8.csf",
                 "Encounter.Strategic.Background"),
             ImportedAnimations.Definitions);
+        Assert.Contains(new ImportedAnimationDefinition("Strategic.Map.Markers", ":icon_men.csf",
+                "Estate.Shell"),
+            ImportedAnimations.Definitions);
+        Assert.Contains(new ImportedAnimationDefinition("Strategic.Map.MarkerOverlay", ":marker.csf",
+                "Estate.Shell"),
+            ImportedAnimations.Definitions);
     }
 
     [Fact]
