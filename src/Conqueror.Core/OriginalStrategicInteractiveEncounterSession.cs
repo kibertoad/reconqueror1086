@@ -317,6 +317,16 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         return true;
     }
 
+    /// <summary>Maps raw <c>0x12D/0x16B</c> resolver exits to the caller's withdrawal result.</summary>
+    public bool ResolveMappedRawResolverExit(int rawInputCode)
+    {
+        if (Outcome != OriginalStrategicInteractiveEncounterOutcome.InProgress
+            || (rawInputCode is not 0x12D and not 0x16B))
+            return false;
+        Outcome = OriginalStrategicInteractiveEncounterOutcome.PlayerWithdrew;
+        return true;
+    }
+
     /// <summary>
     /// Mirrors selection's viewport-adjusted selector at
     /// <c>0x26999-0x26A77</c>. A selector miss or an ineligible player record

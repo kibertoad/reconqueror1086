@@ -102,6 +102,18 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveRawExitInputsLatchTheWithdrawalOutcome()
+    {
+        var session = OriginalStrategicInteractiveEncounterSession.Create(
+            new OriginalStrategicEncounterForces(1, 0, 0), new OriginalStrategicEncounterForces(1, 0, 0),
+            menuCode: 0, horizontalSpan: 640, verticalSpan: 180, initialTime: TimeSpan.Zero);
+        Assert.False(session.ResolveMappedRawResolverExit(0x12C));
+        Assert.True(session.ResolveMappedRawResolverExit(0x12D));
+        Assert.Equal(OriginalStrategicInteractiveEncounterOutcome.PlayerWithdrew, session.Outcome);
+        Assert.False(session.ResolveMappedRawResolverExit(0x16B));
+    }
+
+    [Fact]
     public void StrategicInteractiveHoverUsesSourceLabelsAndOnePassAggregateStatus()
     {
         var session = OriginalStrategicInteractiveEncounterSession.Create(
