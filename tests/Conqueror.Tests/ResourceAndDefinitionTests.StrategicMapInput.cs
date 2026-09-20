@@ -163,6 +163,36 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(47, OriginalStrategicMapMarkerPresentation.FrameFor(5, true, 5, frameBase));
     }
 
+    [Fact]
+    public void StrategicMapMarkerDrawPlanUsesPhysicalOrderAndSourceTruncation()
+    {
+        var state = OriginalStrategicCampaignState.CreateForNewGame(new DateTime(1086, 3, 1), 0);
+        state.SelectedPlayerMovementSlot = 0;
+        state.EngagedPlayerMovementSlot = 2;
+        var ordinary = state.PlayerMovementSlots[0];
+        ordinary.Active = true;
+        ordinary.CurrentX = -23.9f;
+        ordinary.CurrentY = 101.9f;
+        var distinguished = state.PlayerMovementSlots[2];
+        distinguished.Active = true;
+        distinguished.CurrentX = 33.9f;
+        distinguished.CurrentY = -44.9f;
+        var avatar = state.PlayerMovementSlots[5];
+        avatar.CurrentX = 55.9f;
+        avatar.CurrentY = 66.9f;
+
+        var draws = OriginalStrategicMapMarkerPresentation.BuildDraws(
+            state, [10, 20, 30, 40, 50, 60]);
+
+        Assert.Equal([
+            new OriginalStrategicMapMarkerDraw(0, -23, 101, 16),
+            new OriginalStrategicMapMarkerDraw(2, 33, -44, 35),
+            new OriginalStrategicMapMarkerDraw(5, 55, 66, 62)
+        ], draws);
+        Assert.Throws<ArgumentException>(() => OriginalStrategicMapMarkerPresentation.BuildDraws(
+            state, [10, 20]));
+    }
+
     private sealed class MapInputResources : IOriginalStrategicResources
     {
         public IReadOnlyList<OriginalStrategicRoutePoint> Route(string resourceName, bool reverse) => [];

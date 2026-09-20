@@ -14,6 +14,39 @@ public static class OriginalStrategicMapMarkerPresentation
     public const int AvatarSelectedOffset = 7;
 
     /// <summary>
+    /// Enumerates the active source marker inputs in the physical record order
+    /// used by <c>0x12F28</c>. Coordinates are deliberately left in route
+    /// space: the subsequent <c>0x3F0A0</c> clipping projection still belongs
+    /// to the presentation boundary.
+    /// </summary>
+    public static IReadOnlyList<OriginalStrategicMapMarkerDraw> BuildDraws(
+        OriginalStrategicCampaignState state,
+        IReadOnlyList<int> frameBasesBySlot)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        ArgumentNullException.ThrowIfNull(frameBasesBySlot);
+        if (frameBasesBySlot.Count != OriginalStrategicMovement.PlayerMovementRecordCount)
+            throw new ArgumentException(
+                $"Strategic marker drawing requires exactly {OriginalStrategicMovement.PlayerMovementRecordCount} frame bases.",
+                nameof(frameBasesBySlot));
+        state.Validate();
+
+        var draws = new List<OriginalStrategicMapMarkerDraw>();
+        foreach (var record in state.PlayerMovementSlots.OrderBy(record => record.Slot))
+        {
+            if (!record.Active) continue;
+            var selected = record.Slot == state.SelectedPlayerMovementSlot;
+            draws.Add(new OriginalStrategicMapMarkerDraw(
+                record.Slot,
+                TruncateTowardZero(record.CurrentX),
+                TruncateTowardZero(record.CurrentY),
+                FrameFor(record.Slot, selected, state.EngagedPlayerMovementSlot,
+                    frameBasesBySlot[record.Slot])));
+        }
+        return draws;
+    }
+
+    /// <summary>
     /// Mirrors <c>0x12F32-0x130C3</c> for an already-active player record.
     /// The original stores <paramref name="frameBase"/> at record <c>+0x38</c>
     /// and selects an offset from record <c>+0x04</c>, global <c>AE6C</c>, and
@@ -39,4 +72,17 @@ public static class OriginalStrategicMapMarkerPresentation
                 : selected ? OrdinarySelectedOffset : OrdinaryUnselectedOffset;
         return checked(frameBase + offset);
     }
+
+    private static int TruncateTowardZero(float value) => checked((int)Math.Truncate(value));
 }
+
+/// <summary>
+/// One active player marker immediately before the original map blitter's
+/// viewport projection. <see cref="SourceX"/> and <see cref="SourceY"/> are
+/// the x87 toward-zero integer conversions made by <c>0x12F28</c>.
+/// </summary>
+public readonly record struct OriginalStrategicMapMarkerDraw(
+    int Slot,
+    int SourceX,
+    int SourceY,
+    int Frame);
