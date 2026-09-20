@@ -31,8 +31,12 @@ public sealed partial class ResourceAndDefinitionTests
             new OriginalStrategicEncounterForces(10, 30, 62),
             new OriginalStrategicEncounterForces(1, 1, 1));
         var session = OriginalStrategicInteractiveEncounterSession.Create(
-            encounter.Preparation.PlayerResolverForces, encounter.Preparation.EnemyResolverForces,
+            encounter.Preparation,
             menuCode: 0, horizontalSpan: 640, verticalSpan: 180, initialTime: TimeSpan.Zero);
+        Assert.Equal(60, session.Units.Count(unit =>
+            unit.Side == OriginalStrategicInteractiveEncounterSide.Player));
+        Assert.Equal(3, session.Units.Count(unit =>
+            unit.Side == OriginalStrategicInteractiveEncounterSide.Enemy));
         session.CompleteDeathAnimation(session.Units.Count - 1);
         session.CompleteDeathAnimation(session.Units.Count - 2);
         session.CompleteDeathAnimation(session.Units.Count - 3);

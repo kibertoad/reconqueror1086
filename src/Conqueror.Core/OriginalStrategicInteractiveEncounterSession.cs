@@ -279,6 +279,24 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         return new(units, initialTime, tacticalCadence);
     }
 
+    /// <summary>
+    /// Creates the interactive resolver from wrapper <c>0x35924</c>'s staged
+    /// counters. Player reserves are intentionally absent from the live unit
+    /// table and are restored only by the caller's terminal settlement path.
+    /// This avoids treating the original six-counter handoff as a full army
+    /// materialization.
+    /// </summary>
+    public static OriginalStrategicInteractiveEncounterSession Create(
+        OriginalStrategicEncounterPreparation preparation,
+        int menuCode,
+        int horizontalSpan,
+        int verticalSpan,
+        TimeSpan initialTime,
+        IOriginalStrategicEncounterRandom? random = null,
+        TimeSpan? tacticalCadence = null) =>
+        Create(preparation.PlayerResolverForces, preparation.EnemyResolverForces,
+            menuCode, horizontalSpan, verticalSpan, initialTime, random, tacticalCadence);
+
     public bool TryAppendPlayerSelection(int unitIndex) =>
         OriginalStrategicInteractiveEncounter.TryAppendMappedPlayerSelection(
             _units, _selectedUnitIndices, unitIndex);
