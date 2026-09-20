@@ -1,0 +1,40 @@
+namespace Conqueror.Core;
+
+/// <summary>
+/// Application-facing result of one original strategic-map pointer dispatch.
+/// The caller owns only the target-confirmation response; conversion, hit
+/// precedence, and command construction remain executable-mapped.
+/// </summary>
+public readonly record struct OriginalStrategicMapDispatchResult(
+    OriginalStrategicRoutePoint RoutePoint,
+    OriginalStrategicPlayerMapHit Hit,
+    OriginalStrategicPlayerCommandResult Command);
+
+public static class OriginalStrategicMapCommands
+{
+    /// <summary>
+    /// Performs <c>0x122AC</c>'s source-order pointer path after the caller
+    /// has supplied the logical source pointer and any confirmation response
+    /// for an enemy or temporary-division target.
+    /// </summary>
+    public static OriginalStrategicMapDispatchResult DispatchRawPointer(
+        OriginalStrategicCampaignState state,
+        IOriginalStrategicResources resources,
+        IReadOnlyList<OriginalStrategicPlayerTarget> divisionTargets,
+        int rawPointerX,
+        int rawPointerY,
+        bool targetConfirmed)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        ArgumentNullException.ThrowIfNull(resources);
+        ArgumentNullException.ThrowIfNull(divisionTargets);
+
+        var routePoint = OriginalStrategicMapPointer.ToMappedRoutePoint(
+            state, rawPointerX, rawPointerY);
+        var hit = OriginalStrategicMapHitTesting.HitTest(
+            state, divisionTargets, routePoint.X, routePoint.Y);
+        var command = OriginalStrategicMovement.DispatchPlayerMapCommand(
+            state, resources, hit, routePoint.X, routePoint.Y, targetConfirmed);
+        return new(routePoint, hit, command);
+    }
+}

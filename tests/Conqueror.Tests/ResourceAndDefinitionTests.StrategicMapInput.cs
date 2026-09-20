@@ -65,4 +65,64 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Throws<ArgumentException>(() => OriginalStrategicMapHitTesting.HitTest(
             state, divisions[..2], 111, 170));
     }
+
+    [Fact]
+    public void StrategicMapCommandComposesRawPointerConversionHitPrecedenceAndRouteInput()
+    {
+        var state = OriginalStrategicCampaignState.CreateForNewGame(new DateTime(1086, 3, 1), 0);
+        state.CameraRow = 10;
+        state.CameraColumn = 2;
+        state.SelectedPlayerMovementSlot = 0;
+        var player = state.PlayerMovementSlots[0];
+        player.Active = true;
+        player.CurrentX = 100;
+        player.CurrentY = 200;
+        var divisions = new[]
+        {
+            new OriginalStrategicPlayerTarget(false, 0, 0),
+            new OriginalStrategicPlayerTarget(false, 0, 0),
+            new OriginalStrategicPlayerTarget(false, 0, 0)
+        };
+        var resources = new MapInputResources();
+
+        var selection = OriginalStrategicMapCommands.DispatchRawPointer(
+            state, resources, divisions, rawPointerX: -729, rawPointerY: 119, targetConfirmed: false);
+
+        Assert.Equal(new OriginalStrategicRoutePoint(111, 179), selection.RoutePoint);
+        Assert.Equal(new OriginalStrategicPlayerMapHit(0, null, null), selection.Hit);
+        Assert.Equal(new OriginalStrategicPlayerCommandResult(true, false, false), selection.Command);
+        Assert.True(state.PlayerRouteInputActive);
+
+        player.CurrentX = 0;
+        player.CurrentY = 0;
+        var route = OriginalStrategicMapCommands.DispatchRawPointer(
+            state, resources, divisions, rawPointerX: 0, rawPointerY: 0, targetConfirmed: false);
+
+        Assert.Equal(new OriginalStrategicRoutePoint(840, 60), route.RoutePoint);
+        Assert.Equal(default, route.Hit);
+        Assert.Equal(new OriginalStrategicPlayerCommandResult(true, false, false), route.Command);
+        Assert.Equal(new OriginalStrategicRoutePoint(840, 60), player.Waypoints[0]);
+    }
+
+    private sealed class MapInputResources : IOriginalStrategicResources
+    {
+        public IReadOnlyList<OriginalStrategicRoutePoint> Route(string resourceName, bool reverse) => [];
+
+        public bool TryGridCell(int row, int column, out OriginalStrategicTerrainCell cell)
+        {
+            cell = new(row, column, 0);
+            return true;
+        }
+
+        public bool TryTerrainCell(
+            int worldX,
+            int worldY,
+            int cameraRow,
+            int cameraColumn,
+            out OriginalStrategicTerrainCell cell)
+        {
+            cell = new(0, 0, 0);
+            return true;
+        }
+    }
 }
