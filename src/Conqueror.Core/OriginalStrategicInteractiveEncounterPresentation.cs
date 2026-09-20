@@ -12,6 +12,16 @@ public readonly record struct OriginalStrategicInteractiveEncounterOverlayDraw(
     int Y);
 
 /// <summary>
+/// One ordinary strategic-unit sprite command emitted before the selection
+/// overlay layer.
+/// </summary>
+public readonly record struct OriginalStrategicInteractiveEncounterUnitDraw(
+    int UnitIndex,
+    int Frame,
+    int X,
+    int Y);
+
+/// <summary>
 /// Frame selection owned by the interactive strategic resolver's
 /// <c>MEN8.CSF</c> presentation at <c>0x28AD8</c>.
 /// </summary>
@@ -71,6 +81,51 @@ public static class OriginalStrategicInteractiveEncounterPresentation
         return (
             checked(unit.PositionX - horizontalScrollOffset - UnitSpriteHalfWidth),
             checked(unit.PositionY - verticalScrollOffset - UnitSpriteHalfHeight));
+    }
+
+    /// <summary>
+    /// Mirrors pointer ordering at <c>0x28A48</c> and comparator
+    /// <c>0x289CC-0x28A47</c>: non-positive-strength records first, then
+    /// ascending live Y and X coordinates. The source comparator returns
+    /// zero for exact ties; authored unit order is the deterministic
+    /// compatibility tie-breaker rather than reproducing a library sort's
+    /// unspecified equal-item rearrangement.
+    /// </summary>
+    public static IReadOnlyList<int> OrderedUnitIndicesFor(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units)
+    {
+        ArgumentNullException.ThrowIfNull(units);
+        var indices = Enumerable.Range(0, units.Count).ToArray();
+        Array.Sort(indices, (leftIndex, rightIndex) =>
+        {
+            var left = units[leftIndex] ?? throw new ArgumentException("Unit list cannot contain null.", nameof(units));
+            var right = units[rightIndex] ?? throw new ArgumentException("Unit list cannot contain null.", nameof(units));
+            var comparison = CompareForRenderer(left, right);
+            return comparison != 0 ? comparison : leftIndex.CompareTo(rightIndex);
+        });
+        return indices;
+    }
+
+    /// <summary>
+    /// Produces the confirmed ordinary-sprite pass. Selection overlays must
+    /// be emitted separately afterwards through <see cref="SelectionOverlayDrawsFor"/>.
+    /// </summary>
+    public static IReadOnlyList<OriginalStrategicInteractiveEncounterUnitDraw> UnitDrawsFor(
+        IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
+        int horizontalScrollOffset,
+        int verticalScrollOffset)
+    {
+        ArgumentNullException.ThrowIfNull(units);
+        var ordered = OrderedUnitIndicesFor(units);
+        var draws = new OriginalStrategicInteractiveEncounterUnitDraw[ordered.Count];
+        for (var drawIndex = 0; drawIndex < ordered.Count; drawIndex++)
+        {
+            var unitIndex = ordered[drawIndex];
+            var unit = units[unitIndex];
+            var (x, y) = DrawPositionFor(unit, horizontalScrollOffset, verticalScrollOffset);
+            draws[drawIndex] = new(unitIndex, FrameFor(unit), x, y);
+        }
+        return draws;
     }
 
     /// <summary>
@@ -159,4 +214,16 @@ public static class OriginalStrategicInteractiveEncounterPresentation
         int verticalSpan) =>
         OriginalStrategicInteractiveEncounterGeometry.CreateMappedControlStripRectangles(
             controlStripMargin, verticalSpan)[0];
+
+    private static int CompareForRenderer(
+        OriginalStrategicInteractiveEncounterUnit left,
+        OriginalStrategicInteractiveEncounterUnit right)
+    {
+        var leftIsNonPositive = left.RemainingStrength <= 0;
+        var rightIsNonPositive = right.RemainingStrength <= 0;
+        if (leftIsNonPositive != rightIsNonPositive)
+            return leftIsNonPositive ? -1 : 1;
+        var vertical = left.PositionY.CompareTo(right.PositionY);
+        return vertical != 0 ? vertical : left.PositionX.CompareTo(right.PositionX);
+    }
 }

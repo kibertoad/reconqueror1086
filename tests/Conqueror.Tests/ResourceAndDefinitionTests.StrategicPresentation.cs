@@ -53,5 +53,25 @@ public sealed partial class ResourceAndDefinitionTests
             .ControlStripDrawPositionFor(controlStripMargin: 0, verticalSpan: 480));
         Assert.Equal((495, 552), OriginalStrategicInteractiveEncounterPresentation
             .PendingFirstControlDrawPositionFor(controlStripMargin: 80, verticalSpan: 580));
+
+        units[0].RemainingStrength = 0;
+        units[0].PositionX = 300;
+        units[0].PositionY = 300;
+        units[1].PositionX = 300;
+        units[1].PositionY = 100;
+        var third = OriginalStrategicInteractiveEncounter.Materialize(
+            new OriginalStrategicEncounterForces(1, 0, 0),
+            new OriginalStrategicEncounterForces(0, 0, 0))[0];
+        third.PositionX = 50;
+        third.PositionY = 100;
+        var orderedUnits = new[] { units[0], units[1], third };
+        Assert.Equal([0, 2, 1], OriginalStrategicInteractiveEncounterPresentation
+            .OrderedUnitIndicesFor(orderedUnits));
+        Assert.Equal([
+            new OriginalStrategicInteractiveEncounterUnitDraw(0, 56, 255, 255),
+            new OriginalStrategicInteractiveEncounterUnitDraw(2, 15, 5, 55),
+            new OriginalStrategicInteractiveEncounterUnitDraw(1, 635, 255, 55),
+        ], OriginalStrategicInteractiveEncounterPresentation.UnitDrawsFor(
+            orderedUnits, horizontalScrollOffset: 0, verticalScrollOffset: 0));
     }
 }
