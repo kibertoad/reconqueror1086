@@ -227,6 +227,17 @@ public static class OriginalStrategicInteractiveEncounter
             _ => OriginalStrategicInteractiveEncounterInputRoute.Ignored,
         };
 
+    /// <summary>Maps <c>0x27ED2</c>'s raw category routes, independently of the small pointer/control dispatcher codes.</summary>
+    public static OriginalStrategicInteractiveEncounterCategory? RouteMappedCategorySelectionInputCode(
+        int rawInputCode) =>
+        rawInputCode switch
+        {
+            0x48 or 0x68 => OriginalStrategicInteractiveEncounterCategory.Swordsmen,
+            0x4B or 0x6B => OriginalStrategicInteractiveEncounterCategory.Knights,
+            0x53 or 0x73 => OriginalStrategicInteractiveEncounterCategory.Halberdiers,
+            _ => null,
+        };
+
     /// <summary>
     /// Mirrors the zero-based branch after the three-rectangle selector at
     /// <c>0x267D8-0x26999</c>. A selector miss falls through to player-unit

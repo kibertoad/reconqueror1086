@@ -37,6 +37,35 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicInteractiveRawCategoryInputsRouteToTheirDistinctAppendLoops()
+    {
+        Assert.Equal(OriginalStrategicInteractiveEncounterCategory.Swordsmen,
+            OriginalStrategicInteractiveEncounter.RouteMappedCategorySelectionInputCode(0x48));
+        Assert.Equal(OriginalStrategicInteractiveEncounterCategory.Swordsmen,
+            OriginalStrategicInteractiveEncounter.RouteMappedCategorySelectionInputCode(0x68));
+        Assert.Equal(OriginalStrategicInteractiveEncounterCategory.Knights,
+            OriginalStrategicInteractiveEncounter.RouteMappedCategorySelectionInputCode(0x4B));
+        Assert.Equal(OriginalStrategicInteractiveEncounterCategory.Knights,
+            OriginalStrategicInteractiveEncounter.RouteMappedCategorySelectionInputCode(0x6B));
+        Assert.Equal(OriginalStrategicInteractiveEncounterCategory.Halberdiers,
+            OriginalStrategicInteractiveEncounter.RouteMappedCategorySelectionInputCode(0x53));
+        Assert.Equal(OriginalStrategicInteractiveEncounterCategory.Halberdiers,
+            OriginalStrategicInteractiveEncounter.RouteMappedCategorySelectionInputCode(0x73));
+        Assert.Null(OriginalStrategicInteractiveEncounter.RouteMappedCategorySelectionInputCode(0x4A));
+
+        var session = OriginalStrategicInteractiveEncounterSession.Create(
+            new OriginalStrategicEncounterForces(1, 1, 1),
+            new OriginalStrategicEncounterForces(1, 1, 1),
+            menuCode: 0, horizontalSpan: 640, verticalSpan: 180, initialTime: TimeSpan.Zero);
+
+        Assert.Equal(1, session.AppendMappedPlayerCategorySelectionForInputCode(0x68));
+        Assert.Equal(1, session.AppendMappedPlayerCategorySelectionForInputCode(0x4B));
+        Assert.Equal(1, session.AppendMappedPlayerCategorySelectionForInputCode(0x73));
+        Assert.Equal(0, session.AppendMappedPlayerCategorySelectionForInputCode(0x4A));
+        Assert.Equal([0, 2, 1], session.SelectedUnitIndices);
+    }
+
+    [Fact]
     public void StrategicInteractiveHoverUsesSourceLabelsAndOnePassAggregateStatus()
     {
         var session = OriginalStrategicInteractiveEncounterSession.Create(

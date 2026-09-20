@@ -278,6 +278,20 @@ public sealed class OriginalStrategicInteractiveEncounterSession
             _units, _selectedUnitIndices, category);
 
     /// <summary>
+    /// Applies only the raw category-selection key routes recovered from
+    /// <c>0x27ED2-0x283CC</c>. Unknown raw codes deliberately do nothing;
+    /// the operating-system/input-library event producer remains host-owned.
+    /// </summary>
+    public int AppendMappedPlayerCategorySelectionForInputCode(int rawInputCode)
+    {
+        var category = OriginalStrategicInteractiveEncounter
+            .RouteMappedCategorySelectionInputCode(rawInputCode);
+        return category is { } mappedCategory
+            ? AppendMappedPlayerCategorySelection(mappedCategory)
+            : 0;
+    }
+
+    /// <summary>
     /// Mirrors selection's viewport-adjusted selector at
     /// <c>0x26999-0x26A77</c>. A selector miss or an ineligible player record
     /// leaves the append-only selection list unchanged.
