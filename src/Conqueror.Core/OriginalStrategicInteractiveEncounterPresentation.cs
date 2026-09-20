@@ -1,6 +1,17 @@
 namespace Conqueror.Core;
 
 /// <summary>
+/// One selected-unit overlay command emitted by the resolver presentation.
+/// The source emits these after all ordinary unit sprites, retaining the
+/// byte-list order in which selection was appended.
+/// </summary>
+public readonly record struct OriginalStrategicInteractiveEncounterOverlayDraw(
+    int UnitIndex,
+    int Frame,
+    int X,
+    int Y);
+
+/// <summary>
 /// Frame selection owned by the interactive strategic resolver's
 /// <c>MEN8.CSF</c> presentation at <c>0x28AD8</c>.
 /// </summary>
@@ -10,6 +21,8 @@ public static class OriginalStrategicInteractiveEncounterPresentation
     public const int UnitSpriteHeight = 90;
     public const int UnitSpriteHalfWidth = UnitSpriteWidth / 2;
     public const int UnitSpriteHalfHeight = UnitSpriteHeight / 2;
+    public const int SelectionOverlayOffsetX = 5;
+    public const int SelectionOverlayOffsetY = 7;
     public const int UnitFrameCount = 720;
     public const int SelectionOverlayFrame = 720;
     public const int PendingFirstControlFrame = 721;
@@ -54,5 +67,56 @@ public static class OriginalStrategicInteractiveEncounterPresentation
         return (
             checked(unit.PositionX - horizontalScrollOffset - UnitSpriteHalfWidth),
             checked(unit.PositionY - verticalScrollOffset - UnitSpriteHalfHeight));
+    }
+
+    /// <summary>
+    /// Mirrors <c>0x28B5C-0x28B9D</c>. Frame 720 is positioned relative to
+    /// the selected unit's live coordinate, not centered within its 90-pixel
+    /// ordinary sprite. The source applies its horizontal and vertical scroll
+    /// globals before the separate five- and seven-pixel offsets.
+    /// </summary>
+    public static (int X, int Y) SelectionOverlayPositionFor(
+        OriginalStrategicInteractiveEncounterUnit unit,
+        int horizontalScrollOffset,
+        int verticalScrollOffset)
+    {
+        ArgumentNullException.ThrowIfNull(unit);
+        if (horizontalScrollOffset < 0)
+            throw new ArgumentOutOfRangeException(nameof(horizontalScrollOffset));
+        if (verticalScrollOffset < 0)
+            throw new ArgumentOutOfRangeException(nameof(verticalScrollOffset));
+        return (
+            checked(unit.PositionX - horizontalScrollOffset - SelectionOverlayOffsetX),
+            checked(unit.PositionY - verticalScrollOffset - SelectionOverlayOffsetY));
+    }
+
+    /// <summary>
+    /// Produces the post-unit selection-overlay pass from the source's
+    /// byte-indexed selected list. Ordinary unit sorting uses a separate,
+    /// not-yet-recovered comparator; this method deliberately models only
+    /// the confirmed overlay layer after that pass.
+    /// </summary>
+    public static IReadOnlyList<OriginalStrategicInteractiveEncounterOverlayDraw>
+        SelectionOverlayDrawsFor(
+            IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
+            IReadOnlyList<int> selectedUnitIndices,
+            int horizontalScrollOffset,
+            int verticalScrollOffset)
+    {
+        ArgumentNullException.ThrowIfNull(units);
+        ArgumentNullException.ThrowIfNull(selectedUnitIndices);
+
+        var draws = new OriginalStrategicInteractiveEncounterOverlayDraw[selectedUnitIndices.Count];
+        for (var drawIndex = 0; drawIndex < selectedUnitIndices.Count; drawIndex++)
+        {
+            var unitIndex = selectedUnitIndices[drawIndex];
+            if ((uint)unitIndex >= (uint)units.Count)
+                throw new ArgumentOutOfRangeException(nameof(selectedUnitIndices));
+            var unit = units[unitIndex];
+            var (x, y) = SelectionOverlayPositionFor(unit, horizontalScrollOffset, verticalScrollOffset);
+            draws[drawIndex] = new(unitIndex, SelectionOverlayFrame, x, y);
+        }
+
+        return draws;
     }
 }

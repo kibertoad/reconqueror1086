@@ -37,5 +37,14 @@ public sealed partial class ResourceAndDefinitionTests
         units[0].PositionY = 200;
         Assert.Equal((215, 115), OriginalStrategicInteractiveEncounterPresentation.DrawPositionFor(
             units[0], horizontalScrollOffset: 40, verticalScrollOffset: 40));
+
+        units[1].PositionX = 180;
+        units[1].PositionY = 110;
+        var overlays = OriginalStrategicInteractiveEncounterPresentation.SelectionOverlayDrawsFor(
+            units, [1, 0], horizontalScrollOffset: 40, verticalScrollOffset: 40);
+        Assert.Equal([
+            new OriginalStrategicInteractiveEncounterOverlayDraw(1, 720, 135, 63),
+            new OriginalStrategicInteractiveEncounterOverlayDraw(0, 720, 255, 153),
+        ], overlays);
     }
 }
