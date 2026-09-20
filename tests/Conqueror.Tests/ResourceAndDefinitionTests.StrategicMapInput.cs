@@ -193,6 +193,25 @@ public sealed partial class ResourceAndDefinitionTests
             state, [10, 20]));
     }
 
+    [Fact]
+    public void StrategicMapMarkerProjectionUsesInclusiveSourceBoundsBeforeBlitterClipping()
+    {
+        var state = OriginalStrategicCampaignState.CreateForNewGame(new DateTime(1086, 3, 1), 0);
+        state.CameraRow = 10;
+        state.CameraColumn = 2;
+
+        Assert.True(OriginalStrategicMapMarkerProjection.TryProjectBlitOrigin(
+            state, 840, 60, 35, out var topLeft));
+        Assert.Equal(new OriginalStrategicMapBlitOrigin(-227, -28), topLeft);
+        Assert.True(OriginalStrategicMapMarkerProjection.TryProjectBlitOrigin(
+            state, 1223, 534, 8, out var bottomRight));
+        Assert.Equal(new OriginalStrategicMapBlitOrigin(156, 473), bottomRight);
+        Assert.False(OriginalStrategicMapMarkerProjection.TryProjectBlitOrigin(
+            state, 839, 60, 8, out _));
+        Assert.False(OriginalStrategicMapMarkerProjection.TryProjectBlitOrigin(
+            state, 840, 535, 8, out _));
+    }
+
     private sealed class MapInputResources : IOriginalStrategicResources
     {
         public IReadOnlyList<OriginalStrategicRoutePoint> Route(string resourceName, bool reverse) => [];
