@@ -425,7 +425,9 @@ public sealed partial class ConquerorGame
 
     private void DrawEstateMap()
     {
-        DrawEstateTerrain();
+        var originalStrategicTerrain = DrawEstateTerrain();
+        if (originalStrategicTerrain && _campaign.State.OriginalStrategicState is { } strategic)
+            DrawOriginalStrategicMarkers(strategic);
         DrawEstateMarkers();
         DrawEstateInformation();
 
@@ -442,13 +444,14 @@ public sealed partial class ConquerorGame
         DrawText(World.Locations[_selectedLocation].Name.ToUpperInvariant(), footer.X + 8, footer.Y + 7, Color.Wheat, 2, footer.Width - 16);
     }
 
-    private void DrawEstateTerrain()
+    private bool DrawEstateTerrain()
     {
         if (_campaign.State.OriginalStrategicState is { } strategic
             && DrawOriginalStrategicTerrain(strategic))
-            return;
+            return true;
 
         DrawLegacyEstateTerrain();
+        return false;
     }
 
     private bool DrawOriginalStrategicTerrain(OriginalStrategicCampaignState strategic)
@@ -464,6 +467,27 @@ public sealed partial class ConquerorGame
                 Color.White);
         }
         return true;
+    }
+
+    private void DrawOriginalStrategicMarkers(OriginalStrategicCampaignState strategic)
+    {
+        if (!_originalAnimations.TryGetValue("Strategic.Map.Markers", out var markers)
+            || markers.Frames.Count == 0)
+            return;
+
+        var firstFrame = markers.Frames[0];
+        foreach (var frame in markers.Frames)
+            if (frame.Width != firstFrame.Width || frame.Height != firstFrame.Height)
+                throw new InvalidDataException("Strategic marker frames must use one source dimension.");
+
+        foreach (var blit in OriginalStrategicMarkerPresentation.BuildBlits(
+                     strategic, _campaign.State.Player.OriginalStrategicCharacterColor,
+                     markers.Frames.Count, firstFrame.Width, firstFrame.Height))
+        {
+            _batch.Draw(markers.Frames[blit.FrameIndex], ScaleBounds(blit.Destination),
+                new Rectangle(blit.Source.X, blit.Source.Y, blit.Source.Width, blit.Source.Height),
+                Color.White);
+        }
     }
 
     private void DrawLegacyEstateTerrain()

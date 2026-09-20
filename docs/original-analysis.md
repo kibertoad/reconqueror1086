@@ -69,7 +69,7 @@ Use `--xref-code=0xADDRESS,...` to find direct branch/call references and intern
 
 Use `--xref-call-context=0xADDRESS` to write the three preceding decoded instructions for every direct call to one code address in ignored `executable-call-context-report.txt`. It is useful for identifying literal setter arguments without retaining executable bytes.
 
-That report resolves the character-options color path: initializer `0x14230` writes zero to `CHARACTR.DAT` row 0 field 19, and the region dispatcher at `0x145A4-0x1464A` writes Red/Green/Blue values `0/3/5`. The marker initializer later multiplies this field by eight for each player-record frame base. These are executable-derived numeric facts; source text remains local and ignored.
+That report resolves the character-options color path: initializer `0x14230` writes zero to `CHARACTR.DAT` row 0 field 19, and the region dispatcher at `0x145A4-0x1464A` writes Red/Green/Blue values `0/3/5`. The marker initializer later multiplies this field by eight for each player-record frame base. The runtime persists those numeric values, then applies the recovered frame selection, source-coordinate truncation, pre-blit projection, and map-viewport clipping when drawing active markers. These are executable-derived numeric facts; source text remains local and ignored. The selected palette remains Corroborated pending a direct palette-install trace.
 
 Use `--resource-strings=NAME` to emit printable strings from one named decoded GOB entry into ignored `resource-string-report.txt`. The option rejects resources larger than 64 KiB; use its offsets as local analysis leads and record only reviewed, compact facts in documentation because the report can contain source text.
 

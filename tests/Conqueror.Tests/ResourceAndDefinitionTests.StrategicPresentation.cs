@@ -23,6 +23,37 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicMarkerPresentationRetainsSourceFrameOrderAndBlitterClipping()
+    {
+        var state = OriginalStrategicCampaignState.CreateForNewGame(new DateTime(1086, 3, 1), 0);
+        state.CameraRow = 10;
+        state.CameraColumn = 2;
+        state.SelectedPlayerMovementSlot = 0;
+        state.EngagedPlayerMovementSlot = 2;
+        var ordinary = state.PlayerMovementSlots[0];
+        ordinary.Active = true;
+        ordinary.CurrentX = 1107;
+        ordinary.CurrentY = 200;
+        var avatar = state.PlayerMovementSlots[5];
+        avatar.CurrentX = 1067;
+        avatar.CurrentY = 100;
+
+        var blits = OriginalStrategicMarkerPresentation.BuildBlits(
+            state, OriginalStrategicCharacterColor.Green, frameCount: 128,
+            frameWidth: 27, frameHeight: 35);
+
+        Assert.Equal([
+            new OriginalStrategicMarkerBlit(0, 30, new UiBounds(40, 112, 27, 35),
+                new UiBounds(0, 0, 27, 35)),
+            new OriginalStrategicMarkerBlit(5, 26, new UiBounds(20, 12, 7, 35),
+                new UiBounds(20, 0, 7, 35))
+        ], blits);
+        Assert.Throws<InvalidDataException>(() => OriginalStrategicMarkerPresentation.BuildBlits(
+            state, OriginalStrategicCharacterColor.Green, frameCount: 30,
+            frameWidth: 27, frameHeight: 35));
+    }
+
+    [Fact]
     public void StrategicInteractivePresentationUsesTheResolverFrameIndexFormula()
     {
         var units = OriginalStrategicInteractiveEncounter.Materialize(
