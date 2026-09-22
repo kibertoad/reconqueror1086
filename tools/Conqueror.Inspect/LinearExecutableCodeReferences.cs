@@ -164,6 +164,51 @@ internal static class LinearExecutableCodeReferences
         return report.ToString();
     }
 
+    /// <summary>
+    /// Reads the compact, executable-owned list of registered conversation
+    /// selector roots. This deliberately records only numeric metadata: it
+    /// does not infer a geographic association for the six regional priest
+    /// roots merely from their contiguous order.
+    /// </summary>
+    public static string ReadConversationSelectorPool(string path)
+    {
+        const uint selectorPoolOffset = 0xA998;
+        int[] expectedRoots = [
+            5000, 5100, 5200, 5300, 5400, 5500, 3149,
+            1900, 1100, 3200, 3500, 1600, 1400, 3000, 1698, 3300, 3600
+        ];
+        var bytes = File.ReadAllBytes(path);
+        var header = FindHeader(bytes);
+        var module = FindModuleStart(bytes, header);
+        var pageSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x28, 4));
+        var objectTable = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x40, 4));
+        var objectCount = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x44, 4));
+        if (objectCount < 2) throw new InvalidDataException("Linear executable has no data object.");
+        var dataPages = checked((uint)module + BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x80, 4)));
+        var descriptor = checked(header + (int)objectTable + 24);
+        var virtualSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor, 4));
+        var pageIndex = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor + 12, 4));
+        var length = checked(expectedRoots.Length * sizeof(int));
+        if (selectorPoolOffset > virtualSize || length > virtualSize - selectorPoolOffset)
+            throw new InvalidDataException("Conversation selector pool is outside the executable data object.");
+        var fileOffset = checked(dataPages + (pageIndex - 1) * pageSize + selectorPoolOffset);
+        if (fileOffset > bytes.Length || length > bytes.Length - fileOffset)
+            throw new InvalidDataException("Conversation selector pool is outside the executable file.");
+        var roots = Enumerable.Range(0, expectedRoots.Length).Select(index =>
+            BinaryPrimitives.ReadInt32LittleEndian(bytes.AsSpan(checked((int)fileOffset + index * sizeof(int)), sizeof(int))))
+            .ToArray();
+        if (!roots.SequenceEqual(expectedRoots))
+            throw new InvalidDataException("Conversation selector pool does not match the supported release.");
+
+        var report = new StringBuilder("# Conversation selector pool (derived numeric metadata; original bytes omitted)\n");
+        report.AppendLine("# object2+0xA998; supported hashed release");
+        report.AppendLine("regional-priest-roots " + string.Join(' ', roots.Take(6)));
+        report.AppendLine($"cambridge-parish-root {roots[6]}");
+        report.AppendLine("inn-roots " + string.Join(' ', roots.Skip(7)));
+        report.AppendLine("# Regional-priest root order is registration order only; no location mapping is asserted.");
+        return report.ToString();
+    }
+
     public static string ReadStrategicTerrainMovement(string path)
     {
         const int limitOffset = 0x7389;

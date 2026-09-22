@@ -56,7 +56,7 @@ var xrefCodeAddresses = OptionValue(inspectionOptions, "--xref-code=");
 var callContextAddress = OptionValue(inspectionOptions, "--xref-call-context=");
 var xrefBlockFlags = OptionValue(inspectionOptions, "--xref-block-flags=");
 var reportWeaponCombatTable = inspectionOptions.Contains("--weapon-combat-table", StringComparer.OrdinalIgnoreCase);
-var reportStrategicTerrainTable = inspectionOptions.Contains("--strategic-terrain-table", StringComparer.OrdinalIgnoreCase);
+var reportStrategicTerrainTable = inspectionOptions.Contains("--strategic-terrain-table", StringComparer.OrdinalIgnoreCase); var reportConversationSelectorPool = inspectionOptions.Contains("--conversation-selector-pool", StringComparer.OrdinalIgnoreCase);
 var fixupSourceAddresses = OptionValue(inspectionOptions, "--fixup-source=");
 var conversationNodeIds = OptionValue(inspectionOptions, "--conversation-nodes=");
 var conversationTextIds = OptionValue(inspectionOptions, "--conversation-text=");
@@ -111,6 +111,7 @@ if (reportStrategicTerrainTable)
     File.WriteAllText(Path.Combine(output, "strategic-terrain-table-report.txt"),
         LinearExecutableCodeReferences.ReadStrategicTerrainMovement(executable));
 }
+if (reportConversationSelectorPool) File.WriteAllText(Path.Combine(output, "conversation-selector-pool-report.txt"), LinearExecutableCodeReferences.ReadConversationSelectorPool(Directory.EnumerateFiles(artifactRoot, "CONQUER.EXE", SearchOption.AllDirectories).Single()));
 if (fixupSourceAddresses is not null)
 {
     var executable = Directory.EnumerateFiles(artifactRoot, "CONQUER.EXE", SearchOption.AllDirectories).Single();
