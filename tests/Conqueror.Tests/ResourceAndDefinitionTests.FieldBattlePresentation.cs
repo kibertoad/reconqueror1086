@@ -1,4 +1,5 @@
 using Conqueror.Core;
+using Conqueror.Game;
 using Xunit;
 
 namespace Conqueror.Tests;
@@ -8,6 +9,12 @@ public sealed partial class ResourceAndDefinitionTests
     [Fact]
     public void LegacyFieldBattlePresentationUsesTheMappedMen8FamiliesAndStableGridPlacement()
     {
+        Assert.Equal("Encounter.Strategic.Background", FieldBattlePresentation.BackgroundArtRole);
+        Assert.Equal("Encounter.Strategic.Units", FieldBattlePresentation.UnitAnimationRole);
+        Assert.Contains(new ImportedArtDefinition(FieldBattlePresentation.BackgroundArtRole, "image", ":battle.pcx"),
+            ImportedArt.Definitions);
+        Assert.Contains(new ImportedAnimationDefinition(FieldBattlePresentation.UnitAnimationRole, ":men8.csf",
+                FieldBattlePresentation.BackgroundArtRole), ImportedAnimations.Definitions);
         var squads = new[]
         {
             new BattleSquad { Type = UnitType.Swordsmen, Friendly = true, Count = 4, X = 1, Y = 2 },

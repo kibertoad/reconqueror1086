@@ -23,8 +23,11 @@ draw helpers. Its automatic exit and interactive terminal path settle only
 through the corresponding `Campaign` resolver methods; the generic
 `FieldBattleSession` is not involved. The tactical event producer, user-facing
 meanings of the four menu codes, caller-owned score modifier, and presentation
-scaling are still Provisional. The older colored-grid `FieldBattle` screen is a
-separate provisional combat mode and remains a priority presentation gap.
+scaling are still Provisional. The older `FieldBattle` screen is a separate
+provisional combat mode: it now requires and renders the same owned
+`BATTLE.PCX`/`MEN8.CSF` assets rather than falling back to generic art, while
+its grid formation mechanics and command HUD remain host-owned replacement
+policy and a priority fidelity gap.
 
 The latest sequence of commits is:
 

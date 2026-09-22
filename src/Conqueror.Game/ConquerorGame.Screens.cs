@@ -575,28 +575,27 @@ public sealed partial class ConquerorGame
     private void DrawFieldBattle()
     {
         if (_fieldBattle is null) return;
-        if (!DrawOriginal("Encounter.Strategic.Background", new Rectangle(0, 0, 1024, 728)))
-            Fill(new Rectangle(0, 0, 1024, 768), new Color(75, 95, 52));
+        if (!DrawOriginal(FieldBattlePresentation.BackgroundArtRole, new Rectangle(0, 0, 1024, 728)))
+            throw new InvalidOperationException("Field battle requires its verified original battlefield art.");
 
         var draws = FieldBattlePresentation.SpriteDrawsFor(
             _fieldBattle.Squads, _selectedUnit, _fieldBattle.TickNumber);
-        if (_originalAnimations.TryGetValue("Encounter.Strategic.Units", out var animation))
+        if (!_originalAnimations.TryGetValue(FieldBattlePresentation.UnitAnimationRole, out var animation))
+            throw new InvalidOperationException("Field battle requires its verified original unit animation.");
+        foreach (var draw in draws)
         {
-            foreach (var draw in draws)
+            if (draw.Frame >= animation.Frames.Count) continue;
+            var frame = animation.Frames[draw.Frame];
+            _batch.Draw(frame, ScaleBounds(new UiBounds(draw.X, draw.Y, frame.Width, frame.Height)), Color.White);
+            if (draw.Selected && OriginalStrategicInteractiveEncounterPresentation.SelectionOverlayFrame < animation.Frames.Count)
             {
-                if (draw.Frame >= animation.Frames.Count) continue;
-                var frame = animation.Frames[draw.Frame];
-                _batch.Draw(frame, ScaleBounds(new UiBounds(draw.X, draw.Y, frame.Width, frame.Height)), Color.White);
-                if (draw.Selected && OriginalStrategicInteractiveEncounterPresentation.SelectionOverlayFrame < animation.Frames.Count)
-                {
-                    var overlay = animation.Frames[OriginalStrategicInteractiveEncounterPresentation.SelectionOverlayFrame];
-                    _batch.Draw(overlay, ScaleBounds(new UiBounds(
-                        draw.X + OriginalStrategicInteractiveEncounterPresentation.UnitSpriteHalfWidth
-                            - OriginalStrategicInteractiveEncounterPresentation.SelectionOverlayOffsetX,
-                        draw.Y + OriginalStrategicInteractiveEncounterPresentation.UnitSpriteHalfHeight
-                            - OriginalStrategicInteractiveEncounterPresentation.SelectionOverlayOffsetY,
-                        overlay.Width, overlay.Height)), Color.White);
-                }
+                var overlay = animation.Frames[OriginalStrategicInteractiveEncounterPresentation.SelectionOverlayFrame];
+                _batch.Draw(overlay, ScaleBounds(new UiBounds(
+                    draw.X + OriginalStrategicInteractiveEncounterPresentation.UnitSpriteHalfWidth
+                        - OriginalStrategicInteractiveEncounterPresentation.SelectionOverlayOffsetX,
+                    draw.Y + OriginalStrategicInteractiveEncounterPresentation.UnitSpriteHalfHeight
+                        - OriginalStrategicInteractiveEncounterPresentation.SelectionOverlayOffsetY,
+                    overlay.Width, overlay.Height)), Color.White);
             }
         }
         foreach (var draw in draws)

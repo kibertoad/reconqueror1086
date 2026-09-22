@@ -9,6 +9,13 @@ namespace Conqueror.Core;
 /// </summary>
 public static class FieldBattlePresentation
 {
+    /// <summary>
+    /// Both assets are verified runtime requirements. The legacy adapter may
+    /// retain provisional formation mechanics, but it must never present a
+    /// generated battlefield or substitute unit art.
+    /// </summary>
+    public const string BackgroundArtRole = "Encounter.Strategic.Background";
+    public const string UnitAnimationRole = "Encounter.Strategic.Units";
     public const int LogicalWidth = 640;
     public const int BattlefieldHeight = 455;
 
