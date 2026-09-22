@@ -14,7 +14,6 @@ public sealed record EstateControl(
     int HatRegionId,
     UiBounds Bounds,
     EstatePanel? Panel = null);
-public sealed record EstateTerrainStyle(EstateTerrainKind Kind, byte Red, byte Green, byte Blue);
 public sealed record EstateTileAtlas(EstateSeason Season, string Role, string IdSuffix);
 
 public sealed record EstateLayout(
@@ -44,19 +43,6 @@ public static class EstatePresentationDefinitions
             new(EstateControlAction.Orders, "ORDERS", 16, new UiBounds(478, 164, 73, 17), EstatePanel.Orders),
             new(EstateControlAction.Help, "HELP", 17, new UiBounds(554, 163, 65, 20), EstatePanel.Help)
         ]);
-
-    public static IReadOnlyDictionary<EstateTerrainKind, EstateTerrainStyle> TerrainStyles { get; } =
-        new Dictionary<EstateTerrainKind, EstateTerrainStyle>
-        {
-            [EstateTerrainKind.Meadow] = new(EstateTerrainKind.Meadow, 91, 116, 67),
-            [EstateTerrainKind.HedgedField] = new(EstateTerrainKind.HedgedField, 45, 91, 36),
-            [EstateTerrainKind.Forest] = new(EstateTerrainKind.Forest, 32, 83, 35),
-            [EstateTerrainKind.Grain] = new(EstateTerrainKind.Grain, 190, 151, 66),
-            [EstateTerrainKind.Beans] = new(EstateTerrainKind.Beans, 86, 124, 63),
-            [EstateTerrainKind.Vegetables] = new(EstateTerrainKind.Vegetables, 134, 153, 91),
-            [EstateTerrainKind.Fruit] = new(EstateTerrainKind.Fruit, 98, 118, 49),
-            [EstateTerrainKind.Settlement] = new(EstateTerrainKind.Settlement, 139, 109, 68)
-        };
 
     public static IReadOnlyList<EstateTileAtlas> TileAtlases { get; } =
     [
@@ -122,17 +108,6 @@ public static class EstatePresentationDefinitions
             .ToArray();
         for (var index = 0; index < developed.Length; index++) result[(index * 11 + 7) % count] = developed[index];
         return result;
-    }
-
-    public static UiBounds TileBounds(UiBounds viewport, int index)
-    {
-        var column = index % Columns;
-        var row = index / Columns;
-        var width = viewport.Width / Columns + 2;
-        var height = Math.Max(18, viewport.Height / Rows + 8);
-        var x = viewport.X + column * (viewport.Width - width) / (Columns - 1);
-        var y = viewport.Y + row * (viewport.Height - height) / (Rows - 1);
-        return new UiBounds(x, y, width, height);
     }
 
     public static UiBounds TileSpriteBounds(UiBounds viewport, int index)

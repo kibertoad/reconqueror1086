@@ -525,46 +525,18 @@ public sealed partial class ConquerorGame
 
     private void DrawLegacyEstateTerrain()
     {
-        var viewport = ScaleBounds(_estateLayout.MainViewport);
-        Fill(viewport, new Color(113, 107, 72));
         var terrain = EstatePresentationDefinitions.TerrainFor(_campaign.State.Player.Home);
         var atlasDefinition = EstatePresentationDefinitions.AtlasFor(_campaign.State.Date);
-        _originalAnimations.TryGetValue(atlasDefinition.Role, out var atlas);
+        if (!_originalAnimations.TryGetValue(atlasDefinition.Role, out var atlas))
+            throw new InvalidOperationException("Estate map requires its verified original seasonal tile atlas.");
+        var highestRequiredFrame = EstatePresentationDefinitions.TileFrames.Values.Max();
+        if (atlas.Frames.Count <= highestRequiredFrame)
+            throw new InvalidOperationException("Estate map tile atlas is missing a required original frame.");
         for (var index = 0; index < terrain.Count; index++)
         {
             var frameIndex = EstatePresentationDefinitions.TileFrames[terrain[index]];
-            if (atlas is not null && frameIndex < atlas.Frames.Count)
-            {
-                _batch.Draw(atlas.Frames[frameIndex],
-                    ScaleBounds(EstatePresentationDefinitions.TileSpriteBounds(_estateLayout.MainViewport, index)), Color.White);
-                continue;
-            }
-            var style = EstatePresentationDefinitions.TerrainStyles[terrain[index]];
-            var tile = ScaleBounds(EstatePresentationDefinitions.TileBounds(_estateLayout.MainViewport, index));
-            FillDiamond(tile, new Color(40, 67, 32));
-            var inner = new Rectangle(tile.X + 3, tile.Y + 3, Math.Max(1, tile.Width - 6), Math.Max(1, tile.Height - 6));
-            FillDiamond(inner, new Color(style.Red, style.Green, style.Blue));
-            if (terrain[index] == EstateTerrainKind.Forest)
-            {
-                Fill(new Rectangle(tile.Center.X - 2, tile.Center.Y - 9, 4, 18), new Color(25, 62, 29));
-                Fill(new Rectangle(tile.Center.X - 10, tile.Center.Y - 3, 20, 5), new Color(31, 84, 35));
-            }
-            else if (terrain[index] == EstateTerrainKind.Settlement)
-            {
-                Fill(new Rectangle(tile.Center.X - 8, tile.Center.Y - 8, 16, 14), new Color(95, 72, 45));
-                Fill(new Rectangle(tile.Center.X - 11, tile.Center.Y - 10, 22, 5), new Color(64, 48, 35));
-            }
-        }
-    }
-
-    private void FillDiamond(Rectangle bounds, Color color)
-    {
-        var center = bounds.X + bounds.Width / 2;
-        for (var row = 0; row < bounds.Height; row++)
-        {
-            var distance = Math.Abs(row * 2 + 1 - bounds.Height);
-            var width = Math.Max(1, bounds.Width * (bounds.Height - distance) / bounds.Height);
-            Fill(new Rectangle(center - width / 2, bounds.Y + row, width, 1), color);
+            _batch.Draw(atlas.Frames[frameIndex],
+                ScaleBounds(EstatePresentationDefinitions.TileSpriteBounds(_estateLayout.MainViewport, index)), Color.White);
         }
     }
 

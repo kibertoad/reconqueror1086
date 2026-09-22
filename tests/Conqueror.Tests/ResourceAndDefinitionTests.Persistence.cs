@@ -21,7 +21,6 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(Enum.GetValues<EstateControlAction>().Length, layout.Controls.Count);
         Assert.Equal(layout.Controls.Count, layout.Controls.Select(control => control.Action).Distinct().Count());
         Assert.Equal(Enum.GetValues<EstatePanel>().Length, layout.Controls.Count(control => control.Panel.HasValue));
-        Assert.Equal(Enum.GetValues<EstateTerrainKind>().Length, EstatePresentationDefinitions.TerrainStyles.Count);
         Assert.Equal(Enum.GetValues<EstateTerrainKind>().Length, EstatePresentationDefinitions.TileFrames.Count);
         Assert.Equal(Enum.GetValues<EstateSeason>().Length, EstatePresentationDefinitions.TileAtlases.Count);
         Assert.All(EstatePresentationDefinitions.TileFrames.Values, frame => Assert.InRange(frame, 0, 336));
