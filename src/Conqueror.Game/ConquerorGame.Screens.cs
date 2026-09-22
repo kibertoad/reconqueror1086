@@ -142,8 +142,12 @@ public sealed partial class ConquerorGame
         }
         DrawText($"LEFT RIGHT OPPONENT: {opponent.Name}   WAGER {opponent.Wager}S", 150, 470, Color.LightGreen, 2);
         var lady = Balance.Courtships[_ladyIndex];
-        var wins = _campaign.State.Player.CourtshipWins.GetValueOrDefault(lady.Name);
-        DrawText($"UP DOWN LADY: {lady.Name}   WINS {wins}   C REQUEST COLORS", 150, 515, lady.CourtAble ? Color.Wheat : Color.Gray, 2);
+        var originalDialogueTracksCourtship = _campaign.State.ConversationVariables.Count
+            > OriginalCampaignVariables.LadyColors;
+        var courtshipLine = originalDialogueTracksCourtship
+            ? $"UP DOWN LADY: {lady.Name}   C REQUEST COLORS"
+            : $"UP DOWN LADY: {lady.Name}   WINS {_campaign.State.Player.CourtshipWins.GetValueOrDefault(lady.Name)}   C REQUEST COLORS";
+        DrawText(courtshipLine, 150, 515, lady.CourtAble ? Color.Wheat : Color.Gray, 2);
         DrawText($"COLORS: {_campaign.State.Player.LadyColors ?? "NONE"}", 150, 555, Color.Gold, 2);
         DrawText("SPACE JOUST   I SPEAK   K SKIRMISH   ENTER LEAVE", 190, 610, Color.LightGreen, 2);
     }
