@@ -105,11 +105,20 @@ public sealed partial class ResourceAndDefinitionTests
         movement.RouteReversed = false;
         var temporary = strategic.TemporaryForceSlots[1];
         temporary.Active = true;
+        temporary.PathComplete = false;
+        temporary.WaypointCount = 44;
+        temporary.WaypointIndex = 7;
         temporary.Swordsmen = 8;
         temporary.Halberdiers = 9;
         temporary.Knights = 10;
+        temporary.DestinationX = 4_480;
+        temporary.DestinationY = 900;
+        temporary.GridX = 55;
+        temporary.GridY = 44;
         temporary.CurrentX = 4_444.5f;
         temporary.CurrentY = 888.25f;
+        temporary.DirectionX = 0.7f;
+        temporary.DirectionY = -0.7f;
         strategic.SelectedPlayerMovementSlot = 4;
         strategic.EngagedPlayerMovementSlot = 3;
         strategic.PlayerRouteInputActive = true;
@@ -162,10 +171,16 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal((7_438.5f, 2_801.25f, 0.75f, -0.25f),
             (restoredMovement.CurrentX, restoredMovement.CurrentY,
              restoredMovement.DirectionX, restoredMovement.DirectionY));
-        Assert.Equal((true, 8, 9, 10, 4_444.5f, 888.25f),
-            (restoredTemporary.Active, restoredTemporary.Swordsmen,
-             restoredTemporary.Halberdiers, restoredTemporary.Knights,
-             restoredTemporary.CurrentX, restoredTemporary.CurrentY));
+        Assert.Equal((true, false, 44, 7, 8, 9, 10, 4_480, 900, 55, 44,
+                4_444.5f, 888.25f, 0.7f, -0.7f),
+            (restoredTemporary.Active, restoredTemporary.PathComplete,
+             restoredTemporary.WaypointCount, restoredTemporary.WaypointIndex,
+             restoredTemporary.Swordsmen, restoredTemporary.Halberdiers,
+             restoredTemporary.Knights, restoredTemporary.DestinationX,
+             restoredTemporary.DestinationY, restoredTemporary.GridX,
+             restoredTemporary.GridY, restoredTemporary.CurrentX,
+             restoredTemporary.CurrentY, restoredTemporary.DirectionX,
+             restoredTemporary.DirectionY));
         Assert.Equal((17, 23, 4, 4, 3, true, true, 13, 2, 1, 19, 3),
             (roundTripped.PlayerHomeGridX, roundTripped.PlayerHomeGridY,
              roundTripped.ActivePlayerRecordCount,

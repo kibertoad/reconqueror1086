@@ -16,10 +16,11 @@ public sealed record OriginalStrategicCampaignPassInput(
 
 /// <summary>
 /// Typed output from one recovered strategic-map pass. A spy report is taken
-/// before either player or hostile records advance, matching the executable
-/// caller ordering.
+/// after temporary-force patrols, and before either player or hostile records
+/// advance, matching the executable caller ordering.
 /// </summary>
 public sealed record OriginalStrategicCampaignPassResult(
+    IReadOnlyList<OriginalStrategicTemporaryForceAdvance> TemporaryForcePass,
     StrategicSpyReport? SpyReport,
     OriginalStrategicPlayerPassResult PlayerPass,
     IReadOnlyList<OriginalStrategicPlayerEnemyEncounter> Encounters,
@@ -332,9 +333,15 @@ public sealed partial class Campaign
                 nameof(input));
 
         strategic.Validate();
+        var temporaryForcePass = OriginalStrategicMovement.AdvanceTemporaryForcePass(
+            strategic, _originalStrategicResources);
         var report = CaptureOriginalStrategicSpyReport(strategic);
+        var divisionTargets = strategic.TemporaryForceSlots.Any(slot => slot.Active)
+            ? strategic.TemporaryForceSlots.OrderBy(slot => slot.Slot)
+                .Select(slot => slot.AsPlayerTarget()).ToArray()
+            : input.DivisionTargets;
         var playerPass = OriginalStrategicMovement.AdvancePlayerPass(
-            strategic, _originalStrategicResources, input.DivisionTargets,
+            strategic, _originalStrategicResources, divisionTargets,
             input.PlayerEncounterHandoffActive);
         var encounters = playerPass.Contacts.Select(contact =>
             OriginalStrategicPlayerEnemyEncounter.Capture(
@@ -360,7 +367,7 @@ public sealed partial class Campaign
                     pursuitTargets),
                 random);
         }
-        return new(report, playerPass, encounters, schedulerPass);
+        return new(temporaryForcePass, report, playerPass, encounters, schedulerPass);
     }
 
     private sealed class CampaignStrategicRandom(Random random) : IOriginalStrategicRandom

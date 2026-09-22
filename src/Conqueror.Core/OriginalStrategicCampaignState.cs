@@ -297,19 +297,33 @@ public sealed class OriginalStrategicMovementSlot
 /// <summary>
 /// Mutable counterpart of one temporary-force record at object-2
 /// <c>+0x1A150 + 0x118 * slot</c>. The source uses <c>+0x00</c> as its
-/// active flag, force counters at <c>+0x1C/+0x20/+0x24</c>, and the map
-/// target coordinates at <c>+0x5C/+0x60</c>. Its construction and expiry
-/// descriptor remain intentionally outside this narrow persisted boundary.
+/// active flag, completion at <c>+0x0C</c>, route count/cursor at
+/// <c>+0x18/+0x30</c>, force counters at <c>+0x1C/+0x20/+0x24</c>, target
+/// and grid coordinates at <c>+0x3C..+0x48</c>, and the live position and
+/// direction at <c>+0x5C..+0x68</c>. The route allocation itself is source
+/// process memory; the two recovered automatic route identities are instead
+/// bound by physical slot in <see cref="OriginalStrategicTemporaryForces"/>.
+/// Construction and expiry descriptor semantics remain outside this persisted
+/// boundary.
 /// </summary>
 public sealed class OriginalStrategicTemporaryForceSlot
 {
     public int Slot { get; set; }
     public bool Active { get; set; }
+    public bool PathComplete { get; set; }
+    public int WaypointCount { get; set; }
+    public int WaypointIndex { get; set; }
     public int Swordsmen { get; set; }
     public int Halberdiers { get; set; }
     public int Knights { get; set; }
+    public int DestinationX { get; set; }
+    public int DestinationY { get; set; }
+    public int GridX { get; set; }
+    public int GridY { get; set; }
     public float CurrentX { get; set; }
     public float CurrentY { get; set; }
+    public float DirectionX { get; set; }
+    public float DirectionY { get; set; }
 
     public OriginalStrategicPlayerTarget AsPlayerTarget() =>
         new(Active, CurrentX, CurrentY);
@@ -318,8 +332,14 @@ public sealed class OriginalStrategicTemporaryForceSlot
     {
         if (Slot is < 0 or >= OriginalStrategicMovement.PlayerDivisionTargetCount
             || Swordsmen < 0 || Halberdiers < 0 || Knights < 0
-            || !float.IsFinite(CurrentX) || !float.IsFinite(CurrentY))
+            || WaypointCount < 0 || WaypointIndex < 0 || WaypointIndex > WaypointCount
+            || !float.IsFinite(CurrentX) || !float.IsFinite(CurrentY)
+            || !float.IsFinite(DirectionX) || !float.IsFinite(DirectionY))
             throw new InvalidDataException("Temporary strategic force slot contains invalid persisted fields.");
+        if (WaypointCount != 0
+            && OriginalStrategicTemporaryForces.TryGetRoute(Slot, out var route)
+            && WaypointCount != route.PointCount)
+            throw new InvalidDataException("Temporary strategic force route count does not match its source descriptor.");
     }
 }
 

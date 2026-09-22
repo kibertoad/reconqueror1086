@@ -100,7 +100,7 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
-    public void HostFixedStrategicPassUsesPersistedTemporaryForceTargets()
+    public void HostFixedStrategicPassAdvancesTemporaryPatrolsBeforeUsingTheirTargets()
     {
         var state = Campaign.NewFromTemplate(0);
         state.OriginalStrategicState = OriginalStrategicCampaignState.CreateForNewGame(
@@ -115,20 +115,29 @@ public sealed partial class ResourceAndDefinitionTests
         var force = strategic.TemporaryForceSlots[1];
         force.Active = true;
         force.Swordsmen = 5;
-        force.CurrentX = 400.9f;
-        force.CurrentY = 600.9f;
+        force.WaypointCount = 44;
+        force.CurrentX = 0;
+        force.CurrentY = 0;
 
         var campaign = new Campaign(state, seed: 42);
         campaign.ConfigureOriginalStrategicResources(new StubStrategicResources
         {
-            Routes = { ["sc_0.rat"] = [new OriginalStrategicRoutePoint(0, 0)] }
+            Routes =
+            {
+                ["sc_0.rat"] = [new OriginalStrategicRoutePoint(0, 0)],
+                ["scot.rat"] = Enumerable.Range(0, 44)
+                    .Select(index => new OriginalStrategicRoutePoint(index * 10, 0))
+                    .ToArray()
+            }
         });
 
         var pass = OriginalStrategicHostRuntime.AdvanceFixedPass(
             campaign, schedulerBlockedByModal: true);
 
         Assert.NotNull(pass);
-        Assert.Equal((400, 600), (player.DestinationX, player.DestinationY));
-        Assert.Null(pass!.SchedulerPass);
+        Assert.Equal(1, Assert.Single(pass!.TemporaryForcePass).Slot);
+        Assert.Equal((1, 0), (player.DestinationX, player.DestinationY));
+        Assert.Equal(1f, force.CurrentX);
+        Assert.Null(pass.SchedulerPass);
     }
 }

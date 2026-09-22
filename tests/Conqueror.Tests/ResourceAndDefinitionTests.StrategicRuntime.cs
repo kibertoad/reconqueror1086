@@ -185,6 +185,57 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(OriginalStrategicMovement.PursuitMode, slot.Mode);
     }
 
+    [Fact]
+    public void TemporaryAutomaticPatrolUsesTheSourceCursorLoopAndKeepsLifecycleOwnership()
+    {
+        var state = OriginalStrategicCampaignState.CreateForSchemaOneMigration(
+            new DateTime(1086, 6, 1), speedMultiplier: 1);
+        var force = state.TemporaryForceSlots[1];
+        force.Active = true;
+        force.Swordsmen = 1;
+        force.WaypointCount = 44;
+        var resources = new StubStrategicResources
+        {
+            Routes =
+            {
+                ["scot.rat"] = Enumerable.Range(0, 44)
+                    .Select(index => new OriginalStrategicRoutePoint(index * 10, 0))
+                    .ToArray()
+            }
+        };
+
+        var first = Assert.Single(OriginalStrategicMovement.AdvanceTemporaryForcePass(state, resources));
+
+        Assert.Equal((1, false, false, true),
+            (first.Slot, first.Looped, first.CompletionSignal, first.ActiveAfter));
+        Assert.Equal((1, 10, 0, 1f, 0f, 1f, 0f, 7, 11),
+            (force.WaypointIndex, force.DestinationX, force.DestinationY,
+             force.DirectionX, force.DirectionY, force.CurrentX, force.CurrentY,
+             force.GridX, force.GridY));
+
+        force.WaypointIndex = 43;
+        force.CurrentX = 430;
+        var loop = Assert.Single(OriginalStrategicMovement.AdvanceTemporaryForcePass(state, resources));
+
+        Assert.True(loop.Looped);
+        Assert.False(loop.CompletionSignal);
+        Assert.Equal((0, 0, 0, -1f, 429f),
+            (force.WaypointIndex, force.DestinationX, force.DestinationY,
+             force.DirectionX, force.CurrentX));
+
+        force.PathComplete = false;
+        force.WaypointCount = 44;
+        force.WaypointIndex = 1;
+        force.CurrentX = 0;
+        force.DirectionX = 51;
+        var completed = Assert.Single(OriginalStrategicMovement.AdvanceTemporaryForcePass(state, resources));
+
+        Assert.True(completed.CompletionSignal);
+        Assert.True(force.Active);
+        Assert.True(force.PathComplete);
+        Assert.Equal((0, 0), (force.WaypointCount, force.WaypointIndex));
+    }
+
     private static void ActivateRuntimeSlot(OriginalStrategicMovementSlot slot, int mode)
     {
         slot.Active = true;
