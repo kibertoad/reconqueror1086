@@ -467,6 +467,20 @@ public sealed partial class Campaign
         return DrogoEncounterDefinitions.Create(State.Player, State.Date.DayOfYear + State.Date.Year);
     }
 
+    /// <summary>
+    /// Constructs the one-on-one debt encounter in an imported original scene.
+    /// Scene selection belongs at the presentation/import boundary; its outcome
+    /// and no-retainer contract remain campaign state.
+    /// </summary>
+    public SiegeSession CreateDrogoBattle(SiegeLayout layout)
+    {
+        ArgumentNullException.ThrowIfNull(layout);
+        if (!State.PendingDrogoEncounter || State.Player.Debt <= 0)
+            throw new InvalidOperationException("Drogo is not waiting to collect a debt.");
+        return new SiegeSession(State.Player, new Army(), garrison: 0,
+            State.Date.DayOfYear + State.Date.Year, layout, includeRetainers: false);
+    }
+
     public bool FinishDrogoBattle(SiegeSession battle)
     {
         ArgumentNullException.ThrowIfNull(battle);

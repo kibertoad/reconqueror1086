@@ -231,7 +231,7 @@ public sealed class ImportedContentCatalog
         if (missing != default)
             throw new InvalidDataException(
                 $"The {release} import is incomplete: required {missing.Item1} asset '{missing.Item2}' is missing. Run the resource importer again.");
-        foreach (var scene in new[] { "MELEE0.RES", "MELEE1.RES", "MELEE2.RES", "DEFEND0.RES" })
+        foreach (var scene in new[] { "MELEE0.RES", "MELEE1.RES", "MELEE2.RES", "DEFEND0.RES", ImportedSiegeLayouts.DrogoSceneName })
             if (!catalog.Ids("resource").Any(id => id.StartsWith($"CONQUER/{scene}#", StringComparison.OrdinalIgnoreCase)))
                 throw new InvalidDataException(
                     $"The {release} import is incomplete: required scene '{scene}' is missing. Run the resource importer again.");

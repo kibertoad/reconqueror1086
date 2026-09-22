@@ -10,6 +10,7 @@ public sealed record ImportedSiegeScene(
 public static class ImportedSiegeLayouts
 {
     public const string CombatPaletteSuffix = ":SKIRMISH.PAL";
+    public const string DrogoSceneName = "MONEY.RES";
     // The executable's actor-color loader writes global walk-family slots
     // 64/96/128 into live blocks. DEFEND2.RES is the supported high-resolution
     // combat archive that owns the complete 64..138 actor atlas population;
@@ -41,6 +42,7 @@ public static class ImportedSiegeLayouts
     public static ImportedSiegeScene ForPracticeMelee(ImportedContentCatalog catalog, int variant) =>
         Load(catalog, SceneNameForPracticeMelee(variant));
     public static ImportedSiegeScene ForPracticeCastleSkirmish(ImportedContentCatalog catalog) => Load(catalog, "DEFEND0.RES");
+    public static ImportedSiegeScene ForDrogo(ImportedContentCatalog catalog) => Load(catalog, DrogoSceneName);
 
     public static IndexedPalette LoadCombatPalette(ImportedContentCatalog catalog)
     {

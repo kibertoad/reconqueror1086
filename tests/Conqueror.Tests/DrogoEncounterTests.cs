@@ -1,4 +1,5 @@
 using Conqueror.Core;
+using Conqueror.Game;
 using Xunit;
 
 namespace Conqueror.Tests;
@@ -46,6 +47,30 @@ public sealed class DrogoEncounterTests
         Assert.True(campaign.State.DrogoDefeated);
         Assert.Equal(0, campaign.State.Player.Debt);
         Assert.False(campaign.Borrow(1));
+    }
+
+    [Fact]
+    public void ImportedDrogoBattleUsesTheSuppliedSceneWithoutRetainers()
+    {
+        Assert.Equal("MONEY.RES", ImportedSiegeLayouts.DrogoSceneName);
+        var campaign = new Campaign(Campaign.NewFromTemplate(2));
+        campaign.State.Player.Debt = 300;
+        campaign.State.PendingDrogoEncounter = true;
+        var tiles = new SiegeTile[4, 3];
+        for (var x = 0; x < 4; x++)
+        for (var y = 0; y < 3; y++)
+            tiles[x, y] = SiegeTile.Floor;
+        var layout = new SiegeLayout(tiles, 1, 1, Facing.North,
+            [new SiegeSpawn(3, 1, Champion: true, OriginalHealth: 20)],
+            retainers: [new SiegeSpawn(2, 1, Champion: false)]);
+
+        var battle = campaign.CreateDrogoBattle(layout);
+
+        Assert.Equal((1, 1, Facing.North), (battle.PlayerX, battle.PlayerY, battle.Facing));
+        var enemy = Assert.Single(battle.Enemies);
+        Assert.Equal((3, 1, 20), (enemy.X, enemy.Y, enemy.Health));
+        Assert.Equal(0, battle.AlliesStarted);
+        Assert.Empty(battle.Retainers);
     }
 
     [Fact]

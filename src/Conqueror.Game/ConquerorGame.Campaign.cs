@@ -573,8 +573,8 @@ public sealed partial class ConquerorGame
             if (!_campaign.State.PendingDrogoEncounter) { _screen = Screen.Map; Autosave(); }
         }
         if (!press(Keys.F)) return;
-        ClearSiegeVisuals();
-        _siege = _campaign.CreateDrogoBattle();
+        var drogoScene = ImportedSiegeLayouts.ForDrogo(_importedContent);
+        ActivateSiege(drogoScene, _campaign.CreateDrogoBattle(drogoScene.Layout));
         _drogoCombat = true;
         _showRadar = false;
         _notice = "DROGO PREPARES TO FIGHT";
