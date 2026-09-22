@@ -763,5 +763,6 @@ public sealed partial class ConquerorGame
             _ => OriginalCursorKind.Sword
         };
     }
-    private void DrawText(string text, int x, int y, Color color, int scale = 3, int wrap = 0) => PixelFont.Draw(_batch, _pixel, text, new Vector2(x, y), color, scale, wrap);
+    private void DrawText(string text, int x, int y, Color color, int scale = 3, int wrap = 0) =>
+        PixelFont.Draw(_batch, _pixel, text, new Vector2(x, y), color, scale, wrap, _originalUiFont);
 }

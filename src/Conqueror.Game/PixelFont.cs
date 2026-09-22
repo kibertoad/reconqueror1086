@@ -31,8 +31,14 @@ internal static class PixelFont
         ['!']=["00100","00100","00100","00100","00100","00000","00100"], ['?']=["01110","10001","00001","00010","00100","00000","00100"]
     };
 
-    public static void Draw(SpriteBatch batch, Texture2D pixel, string text, Vector2 pos, Color color, int scale = 3, int wrap = 0)
+    public static void Draw(SpriteBatch batch, Texture2D pixel, string text, Vector2 pos, Color color,
+        int scale = 3, int wrap = 0, OriginalUiFont? original = null)
     {
+        if (original is not null)
+        {
+            original.Draw(batch, text, pos, color, scale, wrap);
+            return;
+        }
         if (scale <= 0) throw new ArgumentOutOfRangeException(nameof(scale));
         var renderedText = wrap > 0 ? PixelTextLayout.Wrap(text, Math.Max(1, wrap / (6 * scale))) : text;
         var x = (int)pos.X; var y = (int)pos.Y; var origin = x;

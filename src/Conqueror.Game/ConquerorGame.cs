@@ -57,6 +57,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _batch = null!;
     private Texture2D _pixel = null!;
+    private OriginalUiFont? _originalUiFont;
     private RenderTarget2D _canvas = null!;
     private Campaign _campaign;
     private Screen _screen = Screen.Title;
@@ -214,6 +215,11 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         _batch = new SpriteBatch(GraphicsDevice);
         _pixel = new Texture2D(GraphicsDevice, 1, 1);
         _pixel.SetData([Color.White]);
+        var fontId = RequireId("indexed-animation", OriginalUiFontDefinition.ResourceSuffix);
+        var sourceFont = _importedContent.DecodeCsf(fontId)
+            ?? throw new InvalidDataException("Required original font.CSF could not be decoded.");
+        _originalUiFont = OriginalUiFont.Create(GraphicsDevice, sourceFont)
+            ?? throw new InvalidDataException("Required original font.CSF does not contain the expected 256 11-by-13 glyphs.");
         _canvas = new RenderTarget2D(GraphicsDevice, PresentationScaling.VirtualWidth,
             PresentationScaling.VirtualHeight, false, SurfaceFormat.Color, DepthFormat.None);
         _importedSoundLibrary = ImportedSoundLibrary.Load(_importedContent);
@@ -331,6 +337,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         foreach (var animation in _dilemmaAnimations.Values.OfType<DilemmaAnimation>())
             foreach (var texture in animation.Frames) texture.Dispose();
         DisposeOriginalSounds();
+        _originalUiFont?.Dispose();
         _canvas.Dispose();
         _pixel.Dispose();
         _batch.Dispose();

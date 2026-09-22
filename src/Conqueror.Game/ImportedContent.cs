@@ -11,6 +11,7 @@ public sealed record ImportedRawArtDefinition(
 public sealed record ImportedLayoutDefinition(string Role, string IdSuffix);
 public sealed record ImportedAnimationDefinition(
     string Role, string IdSuffix, string PaletteArtRole, string? PaletteIdSuffix = null);
+public sealed record ImportedFontDefinition(string Role, string IdSuffix);
 public sealed record ImportedSoundDefinition(string Role, string IdSuffix, int SampleIndex);
 public sealed record ImportedMovieDefinition(string Role, string IdSuffix);
 public sealed record PreparedImportedSound(string BankId, int SampleIndex, int SampleRate, byte[] Pcm16LittleEndian);
@@ -100,6 +101,16 @@ public static class ImportedAnimations
         new("Dragon.Lance", ":lance1.csf", "Dragon.Background"),
         .. EstatePresentationDefinitions.TileAtlases.Select(atlas =>
             new ImportedAnimationDefinition(atlas.Role, atlas.IdSuffix, "Estate.Shell"))
+    ];
+}
+
+public static class ImportedFonts
+{
+    public const string DefaultRole = "Interface.DefaultFont";
+
+    public static IReadOnlyList<ImportedFontDefinition> Definitions { get; } =
+    [
+        new(DefaultRole, OriginalUiFontDefinition.ResourceSuffix)
     ];
 }
 
@@ -196,6 +207,7 @@ public sealed class ImportedContentCatalog
             .Concat(ImportedAnimations.Definitions.SelectMany(item => item.PaletteIdSuffix is { } palette
                 ? new[] { ("indexed-animation", item.IdSuffix), ("palette", palette) }
                 : new[] { ("indexed-animation", item.IdSuffix) }))
+            .Concat(ImportedFonts.Definitions.Select(item => ("indexed-animation", item.IdSuffix)))
             .Concat(ImportedSounds.Definitions.Select(item => ("sound-bank", item.IdSuffix)))
             .Concat(ImportedMovies.Definitions.Select(item => ("movie", item.IdSuffix)))
             .Concat(new[]

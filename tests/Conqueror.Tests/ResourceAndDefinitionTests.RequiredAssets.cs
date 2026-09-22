@@ -7,6 +7,19 @@ namespace Conqueror.Tests;
 public sealed partial class ResourceAndDefinitionTests
 {
     [Fact]
+    public void OriginalUiFontRequiresTheObservedFixedAsciiSheet()
+    {
+        Assert.True(OriginalUiFontDefinition.IsCompatible(
+            Enumerable.Repeat(new CsfDimensionHeader(11, 13), 256).ToArray()));
+        Assert.False(OriginalUiFontDefinition.IsCompatible(
+            Enumerable.Repeat(new CsfDimensionHeader(11, 13), 255).ToArray()));
+        Assert.False(OriginalUiFontDefinition.IsCompatible(
+            Enumerable.Repeat(new CsfDimensionHeader(11, 12), 256).ToArray()));
+        Assert.Contains(ImportedFonts.Definitions, font =>
+            font.IdSuffix == OriginalUiFontDefinition.ResourceSuffix);
+    }
+
+    [Fact]
     public void SiegeVisualsResolveTheImportedCombatPaletteByItsDecodedKind()
     {
         var root = Path.Combine(Path.GetTempPath(), $"conqueror-combat-palette-{Guid.NewGuid():N}");
