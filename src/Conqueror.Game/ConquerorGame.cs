@@ -53,7 +53,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     }
     private const string OriginalCursorAnimationRole = "Interface.Cursor";
 
-    private enum Screen { Title, Movie, OptionsHub, Practice, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Briefing, Map, Home, WarPlanning, Farm, Village, Inn, InnDialogue, Blacksmith, BlacksmithDialogue, Shop, Tournament, DrogoDemand, FieldBattle, Siege, DragonBattle, Overview, Ending }
+    private enum Screen { Title, Movie, OptionsHub, Practice, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Briefing, Map, Home, WarPlanning, Farm, Village, Inn, InnDialogue, Blacksmith, BlacksmithDialogue, Shop, Tournament, DrogoDemand, FieldBattle, StrategicEncounter, Siege, DragonBattle, Overview, Ending }
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _batch = null!;
     private Texture2D _pixel = null!;
@@ -111,6 +111,9 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private SiegeHitEffect? _siegeHitEffect;
     private bool _showRadar = true;
     private FieldBattleSession? _fieldBattle;
+    private OriginalStrategicPlayerEnemyEncounter? _strategicEncounter;
+    private OriginalStrategicInteractiveEncounterSession? _strategicInteractiveEncounter;
+    private OriginalStrategicInteractiveEncounterViewport? _strategicEncounterViewport;
     private DragonBattleSession? _dragonBattle;
     private PracticeCombatKind? _activePracticeCombat;
     private bool _drogoCombat;
@@ -447,6 +450,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.Tournament: UpdateTournament(Press); break;
             case Screen.DrogoDemand: UpdateDrogoDemand(Press); break;
             case Screen.FieldBattle: UpdateFieldBattle(Press, gameTime); break;
+            case Screen.StrategicEncounter: UpdateStrategicEncounter(Press, mouse, click); break;
             case Screen.Siege: UpdateSiege(Press, mouse, click, gameTime); break;
             case Screen.DragonBattle: UpdateDragonBattle(Press, keys, gamePad, mouse, click, gameTime); break;
             case Screen.Overview: if (Press(Keys.Enter) || Press(Keys.O)) _screen = _overviewReturnScreen; break;

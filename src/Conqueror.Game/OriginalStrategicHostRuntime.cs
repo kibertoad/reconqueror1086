@@ -22,7 +22,9 @@ public static class OriginalStrategicHostRuntime
     /// their original fallback globals were unavailable and are never
     /// invented by the replacement.
     /// </summary>
-    public static OriginalStrategicCampaignPassResult? AdvanceFixedPass(Campaign campaign)
+    public static OriginalStrategicCampaignPassResult? AdvanceFixedPass(
+        Campaign campaign,
+        bool playerEncounterHandoffActive = false)
     {
         ArgumentNullException.ThrowIfNull(campaign);
         if (campaign.State.OriginalStrategicState is not { } strategic) return null;
@@ -32,6 +34,7 @@ public static class OriginalStrategicHostRuntime
         return campaign.AdvanceOriginalStrategicPass(
             new OriginalStrategicCampaignPassInput(
                 NoDivisionTargets,
-                SchedulerBlockedByModal: schedulerFallbackUnavailable));
+                PlayerEncounterHandoffActive: playerEncounterHandoffActive,
+                SchedulerBlockedByModal: schedulerFallbackUnavailable || playerEncounterHandoffActive));
     }
 }

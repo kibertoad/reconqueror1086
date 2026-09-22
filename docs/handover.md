@@ -14,6 +14,18 @@ The current strategic-movement mapping gate passes 329 xUnit cases and 146 execu
 
 ## Latest completed combat recovery
 
+Strategic player/enemy contact now reaches the recovered resolver instead of
+leaving the map with a placeholder handoff notice. `ConquerorGame.StrategicEncounter`
+holds the captured six-counter contact, blocks subsequent player/hostile
+scheduler work, uses the exact five `0x256FC` menu rectangles, and renders the
+owned `BATTLE.PCX`/`MEN8.CSF` source assets through the existing exact session
+draw helpers. Its automatic exit and interactive terminal path settle only
+through the corresponding `Campaign` resolver methods; the generic
+`FieldBattleSession` is not involved. The tactical event producer, user-facing
+meanings of the four menu codes, caller-owned score modifier, and presentation
+scaling are still Provisional. The older colored-grid `FieldBattle` screen is a
+separate provisional combat mode and remains a priority presentation gap.
+
 The latest sequence of commits is:
 
 - `6c776de` follows explicit scene state targets rather than adjacent records.

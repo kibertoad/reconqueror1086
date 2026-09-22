@@ -42,4 +42,23 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Null(migrated!.SchedulerPass);
         Assert.Equal(0, migratedState.OriginalStrategicState.GenerationAccumulator);
     }
+
+    [Fact]
+    public void HostFixedStrategicPassBlocksFurtherStrategicWorkWhileAContactIsHandedToTheResolver()
+    {
+        var state = Campaign.NewFromTemplate(0);
+        state.OriginalStrategicState = OriginalStrategicCampaignState.CreateForNewGame(
+            state.Date, startingRouteSelector: 0);
+        var campaign = new Campaign(state, seed: 42);
+        campaign.ConfigureOriginalStrategicResources(new StubStrategicResources
+        {
+            Routes = { ["sc_0.rat"] = [new OriginalStrategicRoutePoint(0, 0)] }
+        });
+
+        var pass = OriginalStrategicHostRuntime.AdvanceFixedPass(campaign, playerEncounterHandoffActive: true);
+
+        Assert.NotNull(pass);
+        Assert.Null(pass!.SchedulerPass);
+        Assert.Equal(0, state.OriginalStrategicState.GenerationAccumulator);
+    }
 }

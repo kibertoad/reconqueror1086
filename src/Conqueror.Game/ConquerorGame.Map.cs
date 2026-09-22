@@ -88,10 +88,11 @@ public sealed partial class ConquerorGame
     private void UpdateOriginalStrategicMapRuntime()
     {
         var previousReport = _campaign.State.LatestSpyReport;
-        var pass = OriginalStrategicHostRuntime.AdvanceFixedPass(_campaign);
+        var pass = OriginalStrategicHostRuntime.AdvanceFixedPass(_campaign,
+            playerEncounterHandoffActive: _strategicEncounter is not null);
         if (pass?.SpyReport is not null) ShowNewSpyReport(previousReport);
         if (pass?.Encounters.Count > 0)
-            _notice = "STRATEGIC CONTACT HANDOFF IS NOT YET AVAILABLE";
+            BeginStrategicEncounter(pass.Encounters[0]);
     }
 
     /// <summary>

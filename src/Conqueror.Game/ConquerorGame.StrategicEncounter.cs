@@ -1,0 +1,172 @@
+using Conqueror.Core;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+
+namespace Conqueror.Game;
+
+/// <summary>
+/// Host binding for the recovered strategic player/enemy resolver. The core
+/// retains source menu codes, unit records, and strict tactical timing; this
+/// layer translates only replacement mouse/keyboard events to mapped routes.
+/// </summary>
+public sealed partial class ConquerorGame
+{
+    private const int StrategicEncounterWidth = 640;
+    private const int StrategicEncounterHeight = 480;
+
+    private void BeginStrategicEncounter(OriginalStrategicPlayerEnemyEncounter encounter)
+    {
+        ArgumentNullException.ThrowIfNull(encounter);
+        _strategicEncounter = encounter;
+        _strategicInteractiveEncounter = null;
+        _strategicEncounterViewport = null;
+        _screen = Screen.StrategicEncounter;
+        _notice = "STRATEGIC ARMIES MEET";
+    }
+
+    private void UpdateStrategicEncounter(Func<Keys, bool> press, MouseState mouse, bool click)
+    {
+        if (_strategicEncounter is not { } encounter)
+        {
+            _screen = Screen.Map;
+            return;
+        }
+
+        if (_strategicInteractiveEncounter is null)
+        {
+            var entry = EncounterMenuEntryForInput(press, mouse, click);
+            if (entry is null) return;
+            if (entry.Value.ExitsToAutomaticFallback)
+            {
+                var automatic = _campaign.ResolveAutomaticOriginalStrategicEncounter(
+                    encounter, playerScoreModifier: 0, new HostEncounterRandom());
+                FinishStrategicEncounter(automatic.ResolverResult.PlayerWon ? "STRATEGIC VICTORY" : "STRATEGIC DEFEAT");
+                return;
+            }
+
+            _strategicInteractiveEncounter = _campaign.BeginInteractiveOriginalStrategicEncounter(
+                encounter, entry.Value.InteractiveSelectionCode!.Value,
+                StrategicEncounterWidth, StrategicEncounterHeight,
+                TimeSpan.FromSeconds(_presentationSeconds), new HostEncounterRandom());
+            _strategicEncounterViewport = OriginalStrategicInteractiveEncounterViewport.ForResolvedDisplay(
+                StrategicEncounterWidth, StrategicEncounterHeight,
+                StrategicEncounterWidth, StrategicEncounterHeight);
+            _notice = "SELECT UNITS, THEN ARM THE FIRST CONTROL";
+            return;
+        }
+
+        var session = _strategicInteractiveEncounter;
+        var viewport = _strategicEncounterViewport
+            ?? throw new InvalidOperationException("Strategic encounter viewport is unavailable.");
+        var (x, y) = OriginalPoint(mouse);
+        var inputCode = click ? EncounterInputCodeFor(session, viewport, x, y) : 0;
+        var result = session.AdvanceMappedFrame(TimeSpan.FromSeconds(_presentationSeconds), inputCode, x, y,
+            viewport, playerScoreModifier: 0, new HostEncounterRandom());
+        if (!result.ResolverEnded) return;
+
+        var settlement = _campaign.ResolveInteractiveOriginalStrategicEncounter(encounter, session);
+        FinishStrategicEncounter(settlement.Outcome switch
+        {
+            OriginalStrategicInteractiveEncounterOutcome.EnemyDefeated => "STRATEGIC VICTORY",
+            OriginalStrategicInteractiveEncounterOutcome.PlayerWithdrew => "STRATEGIC WITHDRAWAL",
+            _ => "STRATEGIC DEFEAT",
+        });
+    }
+
+    private OriginalStrategicEncounterMenuEntry? EncounterMenuEntryForInput(
+        Func<Keys, bool> press, MouseState mouse, bool click)
+    {
+        var index = press(Keys.D1) ? 0 : press(Keys.D2) ? 1 : press(Keys.D3) ? 2 : press(Keys.D4) ? 3 : -1;
+        if (index >= 0) return OriginalStrategicEncounterMenu.Entries[index];
+        if (!click) return null;
+        var (x, y) = OriginalPoint(mouse);
+        return OriginalStrategicEncounterMenu.FindMappedEntryAt(x, y);
+    }
+
+    private static int EncounterInputCodeFor(OriginalStrategicInteractiveEncounterSession session,
+        OriginalStrategicInteractiveEncounterViewport viewport, int x, int y)
+    {
+        if (session.RouteControlStripHit(x, y, viewport.ControlStripMargin, viewport.ViewportHeight)
+            != OriginalStrategicInteractiveEncounterControlStripRoute.UnitSelectionFallback)
+            return 3;
+        var worldX = x + viewport.HorizontalOffset;
+        var worldY = y + viewport.VerticalOffset;
+        return OriginalStrategicInteractiveEncounterGeometry.FindFirstContainingOneBased(
+            session.RenderRectangles(), worldX, worldY) != 0 ? 2 : 6;
+    }
+
+    private void FinishStrategicEncounter(string notice)
+    {
+        _strategicEncounter = null;
+        _strategicInteractiveEncounter = null;
+        _strategicEncounterViewport = null;
+        _screen = Screen.Map;
+        _notice = notice;
+        Autosave();
+    }
+
+    private void DrawStrategicEncounter()
+    {
+        DrawOriginal("Encounter.Strategic.Background", new Rectangle(0, 0, 1024, 728));
+        if (_strategicInteractiveEncounter is null)
+        {
+            DrawStrategicEncounterMenu();
+            return;
+        }
+
+        var session = _strategicInteractiveEncounter;
+        var viewport = _strategicEncounterViewport
+            ?? throw new InvalidOperationException("Strategic encounter viewport is unavailable.");
+        if (_originalAnimations.TryGetValue("Encounter.Strategic.Units", out var animation))
+        {
+            foreach (var draw in OriginalStrategicInteractiveEncounterPresentation.UnitDrawsFor(
+                         session.Units, viewport.HorizontalOffset, viewport.VerticalOffset))
+                if (draw.Frame < animation.Frames.Count)
+                    _batch.Draw(animation.Frames[draw.Frame], ScaleBounds(new UiBounds(
+                        draw.X, draw.Y, animation.Frames[draw.Frame].Width, animation.Frames[draw.Frame].Height)), Color.White);
+            foreach (var draw in OriginalStrategicInteractiveEncounterPresentation.SelectionOverlayDrawsFor(
+                         session.Units, session.SelectedUnitIndices, viewport.HorizontalOffset, viewport.VerticalOffset))
+                if (draw.Frame < animation.Frames.Count)
+                    _batch.Draw(animation.Frames[draw.Frame], ScaleBounds(new UiBounds(
+                        draw.X, draw.Y, animation.Frames[draw.Frame].Width, animation.Frames[draw.Frame].Height)), Color.White);
+
+            var controlFrame = session.IsMappedTacticalAdvancementEnabled
+                ? OriginalStrategicInteractiveEncounterPresentation.PendingFirstControlFrame
+                : OriginalStrategicInteractiveEncounterPresentation.ControlStripFrame;
+            var (controlX, controlY) = session.IsMappedTacticalAdvancementEnabled
+                ? OriginalStrategicInteractiveEncounterPresentation.PendingFirstControlDrawPositionFor(
+                    viewport.ControlStripMargin, viewport.ViewportHeight)
+                : OriginalStrategicInteractiveEncounterPresentation.ControlStripDrawPositionFor(
+                    viewport.ControlStripMargin, viewport.ViewportHeight);
+            if (controlFrame < animation.Frames.Count)
+                _batch.Draw(animation.Frames[controlFrame], ScaleBounds(new UiBounds(controlX, controlY,
+                    animation.Frames[controlFrame].Width, animation.Frames[controlFrame].Height)), Color.White);
+        }
+
+        DrawText("STRATEGIC ENCOUNTER", 32, 18, Color.Gold, 2);
+        DrawText(session.IsMappedTacticalAdvancementEnabled
+            ? "TACTICAL ORDERS ACTIVE" : "CLICK THE FIRST CONTROL TO BEGIN", 32, 46, Color.White, 2);
+    }
+
+    private void DrawStrategicEncounterMenu()
+    {
+        DrawText("STRATEGIC ENCOUNTER", 32, 18, Color.Gold, 2);
+        DrawText("CHOOSE A MAPPED DEPLOYMENT", 32, 46, Color.White, 2);
+        for (var index = 0; index < OriginalStrategicEncounterMenu.InteractiveSelectionCount; index++)
+        {
+            var entry = OriginalStrategicEncounterMenu.Entries[index];
+            var bounds = ScaleBounds(new UiBounds(entry.X, entry.Y, entry.Width, entry.Height));
+            DrawOutline(bounds, Color.Gold, 2);
+            DrawText($"{index + 1}  OPTION {index + 1}", bounds.X + 12, bounds.Y + 12, Color.White, 2);
+        }
+        var fallback = OriginalStrategicEncounterMenu.Entries[OriginalStrategicEncounterMenu.ExitRegionIndex];
+        var fallbackBounds = ScaleBounds(new UiBounds(fallback.X, fallback.Y, fallback.Width, fallback.Height));
+        DrawOutline(fallbackBounds, Color.Wheat, 2);
+        DrawText("AUTOMATIC", fallbackBounds.X + 14, fallbackBounds.Y + 12, Color.White, 2);
+    }
+
+    private sealed class HostEncounterRandom : IOriginalStrategicEncounterRandom
+    {
+        public int NextRaw() => Random.Shared.Next(int.MaxValue);
+    }
+}
