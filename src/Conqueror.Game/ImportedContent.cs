@@ -202,7 +202,8 @@ public sealed class ImportedContentCatalog
             {
                 ("resource", ":all.cbf"), ("resource", ":all.cif"),
                 ("resource", ":all.tmb"), ("resource", ":all.tmi"),
-                ("resource", ":all.vtb")
+                ("resource", ":all.vtb"), ("resource", ":village.dat"),
+                ("resource", ":tvillage.dat")
             })
             .Concat(Enumerable.Range(0, 30).Select(number => ("resource", $":dilem{number}.dat")))
             .Concat(OriginalStrategicMovement.PropertyRouteResources.Select(route =>
@@ -222,6 +223,8 @@ public sealed class ImportedContentCatalog
             if (!catalog.Ids("resource").Any(id => id.StartsWith($"CONQUER/{scene}#", StringComparison.OrdinalIgnoreCase)))
                 throw new InvalidDataException(
                     $"The {release} import is incomplete: required scene '{scene}' is missing. Run the resource importer again.");
+        catalog.ValidateVillageSceneCatalog(":village.dat");
+        catalog.ValidateVillageSceneCatalog(":tvillage.dat");
         return catalog;
     }
 
@@ -333,6 +336,30 @@ public sealed class ImportedContentCatalog
         {
             return null;
         }
+    }
+
+    public IReadOnlyList<VillageSceneDefinition>? DecodeVillageSceneCatalog(string id)
+    {
+        try
+        {
+            return VillageSceneCatalogDecoder.Decode(ReadBytes(id));
+        }
+        catch (InvalidDataException)
+        {
+            return null;
+        }
+    }
+
+    private void ValidateVillageSceneCatalog(string id)
+    {
+        var resourceId = FindId("resource", id)
+            ?? throw new InvalidDataException($"The import is incomplete: required village catalog '{id}' is missing.");
+        var scenes = DecodeVillageSceneCatalog(resourceId)
+            ?? throw new InvalidDataException($"Required original village catalog '{id}' could not be decoded.");
+        var missing = scenes.Select(scene => ":" + scene.BackgroundName)
+            .FirstOrDefault(name => FindId("image", name) is null);
+        if (missing is not null)
+            throw new InvalidDataException($"The import is incomplete: village catalog '{id}' references missing image '{missing}'.");
     }
 
     public WeaponStoreResource? DecodeWeaponStore(string id)
