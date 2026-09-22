@@ -10,7 +10,12 @@ public enum OriginalCursorKind
     Hand
 }
 
-/// <summary>Visual identities of the six ordered FFMOUSE.CSF frames.</summary>
+/// <summary>
+/// Visual identities of the six ordered <c>FFMOUSE.CSF</c> frames. Startup
+/// sequence <c>0x2A4DC</c> passes object-2 resource string <c>+0x3A70</c> to
+/// mouse initializer <c>0x72180</c>, which forwards it to resource loader
+/// <c>0x18850</c>.
+/// </summary>
 public static class OriginalCursorDefinitions
 {
     public const int FrameCount = 6;
