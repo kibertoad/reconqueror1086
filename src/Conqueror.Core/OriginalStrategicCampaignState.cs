@@ -316,6 +316,9 @@ public sealed class OriginalStrategicTemporaryForceSlot
     public int Swordsmen { get; set; }
     public int Halberdiers { get; set; }
     public int Knights { get; set; }
+    public int OriginProperty { get; set; } = -1;
+    public int Lord { get; set; } = -1;
+    public int Mode { get; set; }
     public int DestinationX { get; set; }
     public int DestinationY { get; set; }
     public int GridX { get; set; }
@@ -340,6 +343,11 @@ public sealed class OriginalStrategicTemporaryForceSlot
             && OriginalStrategicTemporaryForces.TryGetRoute(Slot, out var route)
             && WaypointCount != route.PointCount)
             throw new InvalidDataException("Temporary strategic force route count does not match its source descriptor.");
+        if (WaypointCount != 0
+            && (OriginProperty is < 0 or >= OriginalStrategicMovement.PropertyCount
+                || Lord is < 0 or >= OriginalStrategicMovement.PersonCount
+                || Mode != OriginalStrategicMovement.RoutedMode))
+            throw new InvalidDataException("Initialized temporary strategic force has invalid source movement fields.");
     }
 }
 

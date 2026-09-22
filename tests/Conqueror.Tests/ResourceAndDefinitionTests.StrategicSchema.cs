@@ -111,6 +111,9 @@ public sealed partial class ResourceAndDefinitionTests
         temporary.Swordsmen = 8;
         temporary.Halberdiers = 9;
         temporary.Knights = 10;
+        temporary.OriginProperty = 7;
+        temporary.Lord = strategic.Properties[7].Lord;
+        temporary.Mode = OriginalStrategicMovement.RoutedMode;
         temporary.DestinationX = 4_480;
         temporary.DestinationY = 900;
         temporary.GridX = 55;
@@ -171,12 +174,13 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal((7_438.5f, 2_801.25f, 0.75f, -0.25f),
             (restoredMovement.CurrentX, restoredMovement.CurrentY,
              restoredMovement.DirectionX, restoredMovement.DirectionY));
-        Assert.Equal((true, false, 44, 7, 8, 9, 10, 4_480, 900, 55, 44,
+        Assert.Equal((true, false, 44, 7, 8, 9, 10, 7, 100, 2, 4_480, 900, 55, 44,
                 4_444.5f, 888.25f, 0.7f, -0.7f),
             (restoredTemporary.Active, restoredTemporary.PathComplete,
              restoredTemporary.WaypointCount, restoredTemporary.WaypointIndex,
              restoredTemporary.Swordsmen, restoredTemporary.Halberdiers,
-             restoredTemporary.Knights, restoredTemporary.DestinationX,
+             restoredTemporary.Knights, restoredTemporary.OriginProperty,
+             restoredTemporary.Lord, restoredTemporary.Mode, restoredTemporary.DestinationX,
              restoredTemporary.DestinationY, restoredTemporary.GridX,
              restoredTemporary.GridY, restoredTemporary.CurrentX,
              restoredTemporary.CurrentY, restoredTemporary.DirectionX,

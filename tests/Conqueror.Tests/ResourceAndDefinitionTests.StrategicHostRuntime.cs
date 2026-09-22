@@ -116,6 +116,9 @@ public sealed partial class ResourceAndDefinitionTests
         force.Active = true;
         force.Swordsmen = 5;
         force.WaypointCount = 44;
+        force.OriginProperty = 7;
+        force.Lord = strategic.Properties[7].Lord;
+        force.Mode = OriginalStrategicMovement.RoutedMode;
         force.CurrentX = 0;
         force.CurrentY = 0;
 

@@ -194,6 +194,9 @@ public sealed partial class ResourceAndDefinitionTests
         force.Active = true;
         force.Swordsmen = 1;
         force.WaypointCount = 44;
+        force.OriginProperty = 7;
+        force.Lord = state.Properties[7].Lord;
+        force.Mode = OriginalStrategicMovement.RoutedMode;
         var resources = new StubStrategicResources
         {
             Routes =

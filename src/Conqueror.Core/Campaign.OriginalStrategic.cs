@@ -12,7 +12,8 @@ namespace Conqueror.Core;
 public sealed record OriginalStrategicCampaignPassInput(
     IReadOnlyList<OriginalStrategicPlayerTarget> DivisionTargets,
     bool PlayerEncounterHandoffActive = false,
-    bool SchedulerBlockedByModal = false);
+    bool SchedulerBlockedByModal = false,
+    IReadOnlyList<int>? TemporaryForceActionIds = null);
 
 /// <summary>
 /// Typed output from one recovered strategic-map pass. A spy report is taken
@@ -24,7 +25,8 @@ public sealed record OriginalStrategicCampaignPassResult(
     StrategicSpyReport? SpyReport,
     OriginalStrategicPlayerPassResult PlayerPass,
     IReadOnlyList<OriginalStrategicPlayerEnemyEncounter> Encounters,
-    OriginalStrategicSchedulerResult? SchedulerPass);
+    OriginalStrategicSchedulerResult? SchedulerPass,
+    IReadOnlyList<OriginalStrategicTemporaryForceCreation> TemporaryForceCreations);
 
 /// <summary>
 /// The three typed force counters staged for one side of the original
@@ -367,7 +369,9 @@ public sealed partial class Campaign
                     pursuitTargets),
                 random);
         }
-        return new(temporaryForcePass, report, playerPass, encounters, schedulerPass);
+        var temporaryForceCreations = OriginalStrategicMovement.ProcessTemporaryForceActions(
+            strategic, _originalStrategicResources, input.TemporaryForceActionIds, random);
+        return new(temporaryForcePass, report, playerPass, encounters, schedulerPass, temporaryForceCreations);
     }
 
     private sealed class CampaignStrategicRandom(Random random) : IOriginalStrategicRandom

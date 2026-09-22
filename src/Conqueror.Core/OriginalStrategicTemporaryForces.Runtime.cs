@@ -9,6 +9,61 @@ namespace Conqueror.Core;
 public static partial class OriginalStrategicMovement
 {
     /// <summary>
+    /// Applies source UI action identifiers after the ordinary strategic pass,
+    /// at the same post-scheduler boundary as <c>0x3C2D6</c>. This is a raw
+    /// action boundary, not a claim about the unrecovered visible controls.
+    /// </summary>
+    public static IReadOnlyList<OriginalStrategicTemporaryForceCreation> ProcessTemporaryForceActions(
+        OriginalStrategicCampaignState state,
+        IOriginalStrategicResources resources,
+        IReadOnlyList<int>? actionIds,
+        IOriginalStrategicRandom random)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        ArgumentNullException.ThrowIfNull(resources);
+        ArgumentNullException.ThrowIfNull(random);
+        state.Validate();
+        if (actionIds is null || actionIds.Count == 0) return [];
+
+        var creations = new List<OriginalStrategicTemporaryForceCreation>();
+        foreach (var creator in OriginalStrategicTemporaryForces.Creators)
+        {
+            if (!actionIds.Contains(creator.ActionId)) continue;
+            var slot = state.TemporaryForceSlots.Single(slot => slot.Slot == creator.DescriptorIndex);
+            if (slot.Active) continue;
+            if (!OriginalStrategicTemporaryForces.TryGetRoute(creator.DescriptorIndex, out var route))
+                throw new InvalidDataException($"Temporary force creator {creator.ActionId:X} has no route.");
+            var points = resources.Route(route.ResourceName, reverse: false);
+            if (points.Count != route.PointCount)
+                throw new InvalidDataException(
+                    $"Temporary strategic force route length does not match '{route.ResourceName}'.");
+
+            // Source 0x3B1A2/0x3B1B0 takes random(1), then
+            // 0x3B1B8/0x3B1CB takes random(1) + 1, leaving knights zero.
+            slot.Active = true;
+            slot.PathComplete = false;
+            slot.WaypointCount = points.Count;
+            slot.WaypointIndex = 0;
+            slot.Swordsmen = random.Next(2);
+            slot.Halberdiers = checked(random.Next(2) + 1);
+            slot.Knights = 0;
+            slot.OriginProperty = creator.OriginProperty;
+            slot.Lord = state.Properties[creator.OriginProperty].Lord;
+            slot.Mode = RoutedMode;
+            slot.CurrentX = points[0].X;
+            slot.CurrentY = points[0].Y;
+            slot.DestinationX = points[0].X;
+            slot.DestinationY = points[0].Y;
+            slot.DirectionX = 0;
+            slot.DirectionY = 0;
+            _ = ResolveTemporaryForceTerrain(
+                slot, state, resources, points[0].X, points[0].Y);
+            creations.Add(new(creator.ActionId, slot.Slot));
+        }
+        return creations;
+    }
+
+    /// <summary>
     /// Advances initialized automatic temporary-force records in physical slot
     /// order. Slot zero and records created by an unrecovered descriptor stay
     /// observable targets/markers but are not assigned a guessed route.
@@ -141,3 +196,6 @@ public readonly record struct OriginalStrategicTemporaryForceAdvance(
     bool Looped,
     bool CompletionSignal,
     bool ActiveAfter);
+
+/// <summary>One accepted source temporary-force creator action.</summary>
+public readonly record struct OriginalStrategicTemporaryForceCreation(int ActionId, int Slot);

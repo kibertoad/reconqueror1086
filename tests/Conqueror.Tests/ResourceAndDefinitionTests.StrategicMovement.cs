@@ -277,6 +277,15 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.True(OriginalStrategicTemporaryForces.TryGetRoute(2, out var wales));
         Assert.Equal("wales.rat", wales.ResourceName);
         Assert.False(OriginalStrategicTemporaryForces.TryGetRoute(0, out _));
+        Assert.Equal([
+            new OriginalStrategicTemporaryForceCreator(0x2B, 1, 7, 1, 0x7D0),
+            new OriginalStrategicTemporaryForceCreator(0x5D, 2, 7, 1, 0x7D0)
+        ], OriginalStrategicTemporaryForces.Creators);
+        Assert.True(OriginalStrategicTemporaryForces.TryGetCreatorForAction(0x2B, out var scotCreator));
+        Assert.Equal(1, scotCreator.DescriptorIndex);
+        Assert.True(OriginalStrategicTemporaryForces.TryGetCreatorForAction(0x5D, out var walesCreator));
+        Assert.Equal(2, walesCreator.DescriptorIndex);
+        Assert.False(OriginalStrategicTemporaryForces.TryGetCreatorForAction(0, out _));
     }
 
     [Fact]
