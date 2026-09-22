@@ -128,7 +128,8 @@ public sealed partial class ConquerorGame
 
     private void DrawTournament()
     {
-        DrawPanel("THE TOURNAMENT", "JOUST UP TO THREE TIMES, SKIRMISH, WAGER, AND COURT THE LADIES");
+        if (!DrawOriginal("Tournament.Background", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidOperationException("Tournament screen requires its verified original background art.");
         Fill(new Rectangle(110, 310, 800, 12), Color.DarkGoldenrod); Fill(new Rectangle(500, 275, 12, 80), Color.Gold);
         Fill(new Rectangle(110 + _joustCursor * 4, 290, 8, 52), Color.White);
         DrawText("PRESS SPACE WHEN THE LANCE MEETS THE GOLD MARK", 170, 390, Color.White, 2);

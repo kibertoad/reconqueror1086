@@ -815,6 +815,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Contains(ImportedArt.Definitions, x => x is { Role: "Village.Inn", IdSuffix: ":innpeopl.pcx" });
         Assert.Contains(ImportedArt.Definitions, x => x is { Role: "Load.Background", IdSuffix: ":loadgame.pcx" });
         Assert.Contains(ImportedArt.Definitions, x => x is { Role: "Map.England", IdSuffix: ":engmap1.pcx" });
+        Assert.Contains(ImportedArt.Definitions, x => x is { Role: "Tournament.Background", IdSuffix: ":joustmap.pcx" });
         Assert.Equal(ImportedArt.Definitions.Count, ImportedArt.Definitions.Select(x => x.Role).Distinct(StringComparer.OrdinalIgnoreCase).Count());
         Assert.Equal(ImportedAnimations.Definitions.Count,
             ImportedAnimations.Definitions.Select(x => x.Role).Distinct(StringComparer.OrdinalIgnoreCase).Count());

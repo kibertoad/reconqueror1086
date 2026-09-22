@@ -41,6 +41,7 @@ public static class ImportedArt
         new("Encounter.Drogo", "image", ":drogo.pcc"),
         new("Blacksmith.Portrait", "image", ":blacksmi.pcc"),
         new("Shop.Inventory", "image", ":swdtemp.pcx"),
+        new("Tournament.Background", "image", ":joustmap.pcx"),
         new("Tournament.Richard", "image", ":richard.pcc"),
         .. InnPresentationDefinitions.Fallback.Patrons.Select(patron =>
             new ImportedArtDefinition(patron.PortraitRole, "image", patron.PortraitSuffix))
@@ -64,7 +65,8 @@ public static class ImportedLayouts
         new("Village.Inn", ":vinn.hat"),
         .. FarmPresentationDefinitions.Layouts.Select(layout =>
             new ImportedLayoutDefinition(layout.LayoutRole, layout.LayoutSuffix)),
-        new("Blacksmith.Workshop", ":vsmith.hat")
+        new("Blacksmith.Workshop", ":vsmith.hat"),
+        new("Tournament", ":topts.hat")
     ];
 }
 
