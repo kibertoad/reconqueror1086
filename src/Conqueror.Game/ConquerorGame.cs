@@ -128,6 +128,8 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private PracticeCombatKind? _activePracticeCombat;
     private bool _drogoCombat;
     private UnitType _selectedUnit = UnitType.Swordsmen;
+    // Provisional host cadence for the legacy FieldBattleSession adapter.
+    private const double FieldBattleTickSeconds = .45;
     private double _battleTick;
     private string _notice = "";
     private int _selectedLocation;

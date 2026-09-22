@@ -793,7 +793,11 @@ public sealed partial class ConquerorGame
         if (press(Keys.C)) _fieldBattle.IssueAll(UnitOrder.Captains);
         if (press(Keys.W)) _fieldBattle.IssueAll(UnitOrder.Withdraw);
         _battleTick += gameTime.ElapsedGameTime.TotalSeconds;
-        if (_battleTick >= .45) { _battleTick = 0; _fieldBattle.Tick(); }
+        while (_battleTick >= FieldBattleTickSeconds && _fieldBattle.Outcome == FieldBattleOutcome.InProgress)
+        {
+            _battleTick -= FieldBattleTickSeconds;
+            _fieldBattle.Tick();
+        }
         _notice = _fieldBattle.LastMessage;
         if (_fieldBattle.Outcome != FieldBattleOutcome.InProgress)
         {
