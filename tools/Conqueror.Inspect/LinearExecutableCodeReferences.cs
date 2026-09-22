@@ -132,6 +132,115 @@ internal static class LinearExecutableCodeReferences
         return report.ToString();
     }
 
+    /// <summary>
+    /// Locates a bounded ASCII string in mapped LE objects and reports only its
+    /// object-relative location, relocation sites, direct code references,
+    /// and object-local pointer slots that target it. This keeps static
+    /// resource-use analysis reproducible without emitting original bytes.
+    /// </summary>
+    public static string FindStringReferences(string path, string value)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(value);
+        if (value.Length > 127 || value.Any(character => character is < ' ' or > '~'))
+            throw new ArgumentException("String queries must be printable ASCII and at most 127 characters.", nameof(value));
+
+        var needle = Encoding.ASCII.GetBytes(value);
+        var bytes = File.ReadAllBytes(path);
+        var header = FindHeader(bytes);
+        var module = FindModuleStart(bytes, header);
+        var pageSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x28, 4));
+        var objectTable = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x40, 4));
+        var objectCount = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x44, 4));
+        var dataPages = checked((uint)module + BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(header + 0x80, 4)));
+        var matches = new List<(int Object, uint Offset, uint FileOffset)>();
+        for (var objectIndex = 0; objectIndex < objectCount; objectIndex++)
+        {
+            var descriptor = checked(header + (int)objectTable + objectIndex * 24);
+            var virtualSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor, 4));
+            var pageIndex = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor + 12, 4));
+            var fileOffset = checked(dataPages + (pageIndex - 1) * pageSize);
+            var available = Math.Min(checked((int)virtualSize), bytes.Length - checked((int)fileOffset));
+            for (var offset = 0; offset <= available - needle.Length; offset++)
+            {
+                if (!bytes.AsSpan(checked((int)fileOffset + offset), needle.Length).SequenceEqual(needle)) continue;
+                var end = offset + needle.Length;
+                if (end < available && bytes[checked((int)fileOffset + end)] != 0) continue;
+                matches.Add((objectIndex + 1, checked((uint)offset), checked(fileOffset + (uint)offset)));
+            }
+        }
+
+        var report = new StringBuilder("# LE string relocation references (derived metadata; original bytes omitted)\n");
+        report.AppendLine($"# requested ASCII string: {value}");
+        if (matches.Count == 0)
+        {
+            report.AppendLine("# no null-terminated mapped occurrence");
+            return report.ToString();
+        }
+
+        var fixups = LinearExecutableFixupReader.ReadInternalFixups(bytes);
+        var pointerSlots = matches.ToDictionary(match => match.Offset, _ => new List<uint>());
+        foreach (var match in matches)
+        {
+            var descriptor = checked(header + (int)objectTable + (match.Object - 1) * 24);
+            var virtualSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor, 4));
+            var pageIndex = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(descriptor + 12, 4));
+            var fileOffset = checked(dataPages + (pageIndex - 1) * pageSize);
+            var available = Math.Min(checked((int)virtualSize), bytes.Length - checked((int)fileOffset));
+            for (var offset = 0; offset <= available - sizeof(uint); offset += sizeof(uint))
+                if (BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(checked((int)fileOffset + offset), sizeof(uint))) == match.Offset)
+                    pointerSlots[match.Offset].Add(checked((uint)offset));
+        }
+        var directReferences = matches.Select(match => match.Offset)
+            .Concat(pointerSlots.Values.SelectMany(slots => slots)).Distinct()
+            .ToDictionary(offset => offset, _ => new List<string>());
+        var codeDescriptor = checked(header + (int)objectTable);
+        var codeSize = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(codeDescriptor, 4));
+        var codeBase = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(codeDescriptor + 4, 4));
+        var codePage = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(codeDescriptor + 12, 4));
+        var codeFileOffset = checked(dataPages + (codePage - 1) * pageSize);
+        var codeLength = Math.Min(checked((int)codeSize), bytes.Length - checked((int)codeFileOffset));
+        var decoder = Iced.Intel.Decoder.Create(32,
+            new ByteArrayCodeReader(bytes.AsSpan(checked((int)codeFileOffset), codeLength).ToArray()));
+        decoder.IP = codeBase;
+        var formatter = new IntelFormatter();
+        while (decoder.IP < codeBase + (uint)codeLength)
+        {
+            decoder.Decode(out var instruction);
+            if (instruction.IsInvalid) continue;
+            for (var operand = 0; operand < instruction.OpCount; operand++)
+            {
+                var referencedValue = instruction.GetOpKind(operand) is OpKind.Immediate8 or OpKind.Immediate8_2nd or
+                    OpKind.Immediate16 or OpKind.Immediate32 or OpKind.Immediate64
+                    ? instruction.GetImmediate(operand)
+                    : instruction.MemoryBase == Register.None && instruction.MemoryIndex == Register.None
+                        ? instruction.MemoryDisplacement64 : ulong.MaxValue;
+                if (referencedValue > uint.MaxValue || !directReferences.TryGetValue((uint)referencedValue, out var references)) continue;
+                var text = new StringOutput();
+                formatter.Format(instruction, text);
+                references.Add($"0x{instruction.IP:X8}  {text}");
+            }
+        }
+        foreach (var match in matches)
+        {
+            report.AppendLine($"object{match.Object}+0x{match.Offset:X} file+0x{match.FileOffset:X}");
+            var references = fixups.Where(fixup => fixup.TargetObject == match.Object && fixup.TargetOffset == match.Offset)
+                .OrderBy(fixup => fixup.SourceAddress).ToArray();
+            if (references.Length == 0) report.AppendLine("  no relocation reference");
+            foreach (var fixup in references)
+                report.AppendLine($"  0x{fixup.SourceAddress:X8} source-type 0x{fixup.SourceType:X2}"
+                    + $"{(fixup.Additive ? " additive" : "")}{(fixup.Chained ? " chained" : "")}");
+            foreach (var direct in directReferences[match.Offset])
+                report.AppendLine($"  direct-immediate {direct}");
+            foreach (var slot in pointerSlots[match.Offset])
+            {
+                report.AppendLine($"  pointer-slot object{match.Object}+0x{slot:X}");
+                foreach (var direct in directReferences[slot])
+                    report.AppendLine($"    direct-slot-reference {direct}");
+            }
+        }
+        return report.ToString();
+    }
+
     public static string ReadDataTable(string path, uint offset, int rows, int columns)
     {
         if (rows <= 0) throw new ArgumentOutOfRangeException(nameof(rows));

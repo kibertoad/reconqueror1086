@@ -98,7 +98,6 @@ public static class ImportedAnimations
         new("Combat.FirstPerson", ":skirmish.csf", "", ":SKIRMISH.PAL"),
         new(OriginalStrategicInteractiveEncounterPresentation.UnitAnimationRole, ":men8.csf",
             OriginalStrategicInteractiveEncounterPresentation.BackgroundArtRole),
-        new("Dragon.Lance", ":lance1.csf", "Dragon.Background"),
         .. EstatePresentationDefinitions.TileAtlases.Select(atlas =>
             new ImportedAnimationDefinition(atlas.Role, atlas.IdSuffix, "Estate.Shell"))
     ];

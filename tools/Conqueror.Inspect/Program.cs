@@ -50,11 +50,8 @@ var renderCsfName = OptionValue(inspectionOptions, "--render-csf=");
 var renderPcxName = OptionValue(inspectionOptions, "--render-pcx=");
 var renderSmkName = OptionValue(inspectionOptions, "--render-smk=");
 var palettePcxName = OptionValue(inspectionOptions, "--palette-pcx=");
-var disassembleAddresses = OptionValue(inspectionOptions, "--disassemble=");
-var xrefDataOffsets = OptionValue(inspectionOptions, "--xref-data=");
-var xrefCodeAddresses = OptionValue(inspectionOptions, "--xref-code=");
-var callContextAddress = OptionValue(inspectionOptions, "--xref-call-context=");
-var xrefBlockFlags = OptionValue(inspectionOptions, "--xref-block-flags=");
+var disassembleAddresses = OptionValue(inspectionOptions, "--disassemble="); var xrefDataOffsets = OptionValue(inspectionOptions, "--xref-data="); var xrefString = OptionValue(inspectionOptions, "--xref-string="); var xrefCodeAddresses = OptionValue(inspectionOptions, "--xref-code=");
+var callContextAddress = OptionValue(inspectionOptions, "--xref-call-context="); var xrefBlockFlags = OptionValue(inspectionOptions, "--xref-block-flags=");
 var reportWeaponCombatTable = inspectionOptions.Contains("--weapon-combat-table", StringComparer.OrdinalIgnoreCase);
 var reportStrategicTerrainTable = inspectionOptions.Contains("--strategic-terrain-table", StringComparer.OrdinalIgnoreCase); var reportConversationSelectorPool = inspectionOptions.Contains("--conversation-selector-pool", StringComparer.OrdinalIgnoreCase);
 var fixupSourceAddresses = OptionValue(inspectionOptions, "--fixup-source=");
@@ -78,6 +75,12 @@ if (xrefDataOffsets is not null)
     var offsets = xrefDataOffsets.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
         .Select(ParseAddress).ToArray();
     File.WriteAllText(Path.Combine(output, "executable-data-xrefs.txt"), FindLinearExecutableDataReferences(executable, offsets));
+}
+if (xrefString is not null)
+{
+    var executable = Directory.EnumerateFiles(artifactRoot, "CONQUER.EXE", SearchOption.AllDirectories).Single();
+    File.WriteAllText(Path.Combine(output, "executable-string-xrefs.txt"),
+        LinearExecutableCodeReferences.FindStringReferences(executable, xrefString));
 }
 if (xrefCodeAddresses is not null)
 {
