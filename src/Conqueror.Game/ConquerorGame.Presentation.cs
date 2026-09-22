@@ -192,25 +192,12 @@ public sealed partial class ConquerorGame
 
     private void DrawOptionsHub()
     {
-        var original = DrawOriginal("Options.Background", new Rectangle(0, 0, 1024, 768));
-        if (!original)
-        {
-            DrawPanel("OPTIONS", "NEW GAME, LOAD, SETTINGS, OR RESUME");
-            for (var i = 0; i < _optionsHubOptions.Count; i++)
-            {
-                var option = _optionsHubOptions[i];
-                var unavailable = option.RequiresCampaign && !_hasActiveCampaign;
-                DrawText($"{i + 1,2}  {option.Label}", 110, 180 + i * 35,
-                    unavailable ? Color.Gray : i == _optionsHubOption ? Color.Gold : Color.White, 2);
-            }
-        }
-        else
-        {
-            DrawOptionsWidgets();
-            var selected = _optionsHubOptions[_optionsHubOption];
-            DrawOutline(ScaleBounds(selected.OriginalBounds),
-                selected.RequiresCampaign && !_hasActiveCampaign ? Color.Gray : Color.Gold, 3);
-        }
+        if (!DrawOriginal("Options.Background", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidOperationException("Options hub requires its verified original background art.");
+        DrawOptionsWidgets();
+        var selected = _optionsHubOptions[_optionsHubOption];
+        DrawOutline(ScaleBounds(selected.OriginalBounds),
+            selected.RequiresCampaign && !_hasActiveCampaign ? Color.Gray : Color.Gold, 3);
         if (_notice.Length > 0) DrawText(_notice, 30, 730, Color.Gold, 2, 960);
     }
 
@@ -241,16 +228,8 @@ public sealed partial class ConquerorGame
 
     private void DrawPractice()
     {
-        var original = DrawOriginal("Practice.Background", new Rectangle(0, 0, 1024, 768));
-        if (!original)
-        {
-            DrawPanel("PRACTICE", "SELECT A TRAINING EVENT");
-            for (var index = 0; index < _practiceOptions.Count; index++)
-                DrawText($"{index + 1}  {_practiceOptions[index].Label}", 220, 235 + index * 60,
-                    index == _practiceOption ? Color.Gold : Color.White, 3);
-            return;
-        }
-
+        if (!DrawOriginal("Practice.Background", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidOperationException("Practice menu requires its verified original background art.");
     }
 
     private bool SettingEnabled(OptionsHubSetting setting) => setting switch
@@ -265,12 +244,12 @@ public sealed partial class ConquerorGame
 
     private void DrawLoadGame()
     {
-        var original = DrawOriginal("Load.Background", new Rectangle(0, 0, 1024, 768));
-        if (!original) DrawPanel("LOAD GAME", "SELECT ONE OF FIVE CAMPAIGN SLOTS");
+        if (!DrawOriginal("Load.Background", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidOperationException("Load-game screen requires its verified original background art.");
 
         for (var i = 0; i < CampaignSaveSlots.SlotCount; i++)
         {
-            var bounds = original ? ScaleBounds(LoadGameDefinitions.Slots[i]) : new Rectangle(150, 190 + i * 82, 724, 55);
+            var bounds = ScaleBounds(LoadGameDefinitions.Slots[i]);
             var info = i < _saveSlotInfo.Count ? _saveSlotInfo[i] : new CampaignSaveSlot(i + 1, false, false, "EMPTY", null, null);
             var details = info.IsValid
                 ? $"{info.PlayerName}   {info.CampaignDate:dd MMM yyyy}{(info.RecoveredFromBackup ? "   BACKUP" : "")}"
@@ -279,7 +258,6 @@ public sealed partial class ConquerorGame
             if (i == _loadSlot) DrawOutline(bounds, Color.Gold, 3);
         }
 
-        if (!original) DrawText("ESC OR R  RESUME", 150, 640, Color.LightGreen, 2);
         if (_loadSlot < _saveSlotInfo.Count && !string.IsNullOrEmpty(_saveSlotInfo[_loadSlot].Error))
             DrawText(_saveSlotInfo[_loadSlot].Error!, 120, 675, Color.Orange, 2, 780);
         DrawText("ARROWS/1-5 LOAD   F8 AUTOSAVE   ESC RESUME", 190, 710, Color.Wheat, 2);
@@ -288,25 +266,17 @@ public sealed partial class ConquerorGame
 
     private void DrawCharacterOptions()
     {
-        var original = DrawOriginal("Character.Options", new Rectangle(0, 0, 1024, 768));
-        if (!original)
-        {
-            DrawPanel("CREATE YOUR CHARACTER", "CHOOSE HOW YOUR CONQUEROR WILL BEGIN");
-            for (var i = 0; i < _characterOptions.Count; i++)
-                DrawText($"{i + 1}  {_characterOptions[i].Label}", 170, 220 + i * 80, i == _characterOption ? Color.Gold : Color.White, 2);
-        }
-        else
-        {
-            DrawOutline(ScaleBounds(_characterOptions[_characterOption].OriginalBounds), Color.Gold, 3);
-            DrawOutline(ScaleBounds(_heraldicColors[_heraldicColor].OriginalBounds), Color.Gold, 2);
-        }
+        if (!DrawOriginal("Character.Options", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidOperationException("Character creation requires its verified original background art.");
+        DrawOutline(ScaleBounds(_characterOptions[_characterOption].OriginalBounds), Color.Gold, 3);
+        DrawOutline(ScaleBounds(_heraldicColors[_heraldicColor].OriginalBounds), Color.Gold, 2);
         if (!string.IsNullOrEmpty(_notice)) DrawText(_notice, 25, 700, Color.Gold, 2);
     }
 
     private void DrawCharacterName()
     {
         if (!DrawOriginal("Character.Options", new Rectangle(0, 0, 1024, 768)))
-            DrawPanel("CHOOSE CHARACTER NAME", "TYPE A NAME AND PRESS ENTER");
+            throw new InvalidOperationException("Character naming requires its verified original background art.");
         var entry = ScaleBounds(CharacterCreationDefinitions.NameEntryBounds);
         Fill(entry, new Color(10, 10, 10, 225));
         DrawOutline(entry, Color.Gold, 2);
@@ -315,19 +285,10 @@ public sealed partial class ConquerorGame
 
     private void DrawCharacter()
     {
-        if (DrawOriginal("Character.Pregenerated", new Rectangle(0, 0, 1024, 768)))
-        {
-            DrawOutline(ScaleBounds(_pregeneratedBounds[_characterTemplate]), Color.Gold, 3);
-            DrawText("1-6 OR ARROWS/ENTER   ESC BACK", 25, 735, Color.Wheat, 2);
-            return;
-        }
-        DrawPanel("CHOOSE YOUR KNIGHT", "THE ROAD FROM BOYHOOD TO LORDSHIP BEGINS");
-        for (var i = 0; i < Balance.Templates.Length; i++)
-        {
-            var t = Balance.Templates[i];
-            DrawText($"{i + 1}  {t.Name}   STR {t.Stats.Strength} DEX {t.Stats.Dexterity} PIE {t.Stats.Piety} STA {t.Stats.Stamina} HON {t.Stats.Honor}  {t.Wealth}S", 80, 180 + i * 62, i == _characterTemplate ? Color.Gold : Color.White, 2);
-        }
-        DrawText("0  CUSTOM ROLLED CHARACTER", 80, 575, Color.LightGreen, 2);
+        if (!DrawOriginal("Character.Pregenerated", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidOperationException("Pre-generated character selection requires its verified original background art.");
+        DrawOutline(ScaleBounds(_pregeneratedBounds[_characterTemplate]), Color.Gold, 3);
+        DrawText("1-6 OR ARROWS/ENTER   ESC BACK", 25, 735, Color.Wheat, 2);
     }
 
     private void DrawDilemma()
