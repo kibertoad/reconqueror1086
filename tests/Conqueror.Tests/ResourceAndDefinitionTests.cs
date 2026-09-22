@@ -812,6 +812,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Contains(ImportedArt.Definitions, x => x is { Role: "Character.Options", IdSuffix: ":char_ops.pcx" });
         Assert.Contains(ImportedArt.Definitions, x => x is { Role: "Character.Pregenerated", IdSuffix: ":pregen.pcx" });
         Assert.Contains(ImportedArt.Definitions, x => x is { Role: "Campaign.Briefing", IdSuffix: ":fluff.pcx" });
+        Assert.Contains(ImportedArt.Definitions, x => x is { Role: "Village.Background", IdSuffix: ":town_y.pcx" });
         Assert.Contains(ImportedArt.Definitions, x => x is { Role: "Village.Inn", IdSuffix: ":innpeopl.pcx" });
         Assert.Contains(ImportedArt.Definitions, x => x is { Role: "Load.Background", IdSuffix: ":loadgame.pcx" });
         Assert.Contains(ImportedArt.Definitions, x => x is { Role: "Map.England", IdSuffix: ":engmap1.pcx" });

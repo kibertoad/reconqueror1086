@@ -707,12 +707,19 @@ public sealed partial class ConquerorGame
 
     private void DrawVillage()
     {
-        DrawPanel("THE VILLAGE", "VISIT THE MONEYLENDER, CHURCH, BLACKSMITH, AND INN");
-        DrawText("B  BORROW 200S (300S DUE AT HARVEST)", 100, 220, Color.White); DrawText("D  DONATE 15S (+1 PIETY)", 100, 280, Color.White);
-        DrawText("C  BUILD CHURCH 100S (+15% PRODUCTIVITY)", 100, 340, Color.White); DrawText("K  ENTER BLACKSMITH (ALL WEAPONS AND ARMOR)", 100, 400, Color.LightGreen, 2);
-        DrawText("I  ENTER INN   P  VISIT PARISH", 100, 435, Color.LightGreen, 2);
-        DrawText($"PLUS MINUS TAX RATE  {_campaign.State.Player.Home.TaxRate}%", 100, 475, Color.Wheat, 2);
-        DrawText("ENTER RETURN TO MAP", 100, 535, Color.LightGreen);
+        if (!DrawOriginal("Village.Background", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidOperationException("Village screen requires its verified original background art.");
+        DrawVillageHoverLabel();
+        if (_notice.Length > 0) DrawText(_notice, 24, 730, Color.Gold, 2, 976);
+    }
+
+    private void DrawVillageHoverLabel()
+    {
+        var point = OriginalPoint(_lastMouse);
+        var hotspot = _villageHotspots.FirstOrDefault(item => item.Bounds.Contains(point.X, point.Y));
+        if (hotspot is null) return;
+        var bounds = ScaleBounds(VillagePresentationDefinitions.HoverLabelBounds);
+        DrawText(hotspot.HoverLabel, bounds.X + 8, bounds.Y + 6, Color.Wheat, 2, bounds.Width - 16);
     }
 
     private void DrawDrogoDemand()

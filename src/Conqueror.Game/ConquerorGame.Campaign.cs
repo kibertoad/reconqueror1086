@@ -138,7 +138,7 @@ public sealed partial class ConquerorGame
         }
     }
 
-    private void UpdateVillage(Func<Keys, bool> press)
+    private void UpdateVillage(Func<Keys, bool> press, MouseState mouse, bool click)
     {
         if (press(Keys.B)) _notice = _campaign.Borrow(200) ? "BORROWED 200S AT 50% INTEREST" : "LOAN REFUSED";
         if (press(Keys.D)) _campaign.Donate();
@@ -152,6 +152,18 @@ public sealed partial class ConquerorGame
         if (press(Keys.OemPlus) || press(Keys.Add)) _campaign.State.Player.Home.TaxRate = Math.Min(100, _campaign.State.Player.Home.TaxRate + 5);
         if (press(Keys.OemMinus) || press(Keys.Subtract)) _campaign.State.Player.Home.TaxRate = Math.Max(0, _campaign.State.Player.Home.TaxRate - 5);
         if (press(Keys.Enter) || press(Keys.V)) _screen = Screen.Map;
+        if (!click) return;
+        var (x, y) = OriginalPoint(mouse);
+        switch (VillagePresentationDefinitions.Hit(_villageHotspots, new Point(x, y)))
+        {
+            case VillageHotspotAction.Map: _screen = Screen.Map; break;
+            case VillageHotspotAction.Inn: _notice = ""; _screen = Screen.Inn; break;
+            case VillageHotspotAction.Blacksmith: _screen = Screen.Blacksmith; break;
+            case VillageHotspotAction.Church:
+                if (!StartChurchConversation())
+                    _notice = "ORIGINAL PARISH CONVERSATION DATA IS NOT INSTALLED";
+                break;
+        }
     }
 
     private void UpdateInn(Func<Keys, bool> press, MouseState mouse, bool click)

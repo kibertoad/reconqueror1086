@@ -97,6 +97,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private IReadOnlyDictionary<FarmPresentationDefinitions.Section, FarmPresentationDefinitions.Layout> _fiefLayouts =
         FarmPresentationDefinitions.Layouts.ToDictionary(layout => layout.Section);
     private IReadOnlyList<SceneHotspot> _homeHotspots = HomePresentationDefinitions.Hotspots;
+    private IReadOnlyList<VillageHotspot> _villageHotspots = VillagePresentationDefinitions.Hotspots;
     private IReadOnlyList<SceneHotspot> _blacksmithHotspots = BlacksmithPresentationDefinitions.Hotspots;
     private InnPresentationLayout _innLayout = InnPresentationDefinitions.Fallback;
     private InnPatronHotspot? _innPatron;
@@ -232,6 +233,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         _dilemmaContinueBounds = YouthDilemmaPresentationDefinitions.ContinueFrom(dilemmaLayout);
         _estateLayout = EstatePresentationDefinitions.From(RequireLayout(":iconmap.hat"));
         _homeHotspots = HomePresentationDefinitions.HotspotsFrom(RequireLayout(":fopts.hat"));
+        _villageHotspots = VillagePresentationDefinitions.HotspotsFrom(RequireLayout(":vopts.hat"));
         _warPlanningLayout = WarPlanningPresentationDefinitions.From(RequireLayout(":fwarplan.hat"));
         _fiefLayouts = FarmPresentationDefinitions.Layouts.ToDictionary(
             layout => layout.Section,
@@ -444,7 +446,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.Home: UpdateHome(Press, mouse, click); break;
             case Screen.WarPlanning: UpdateWarPlanning(Press, mouse, click, rightClick); break;
             case Screen.Farm: UpdateFarm(Press, mouse, click); break;
-            case Screen.Village: UpdateVillage(Press); break;
+            case Screen.Village: UpdateVillage(Press, mouse, click); break;
             case Screen.Inn: UpdateInn(Press, mouse, click); break;
             case Screen.InnDialogue: UpdateInnDialogue(Press, mouse, click); break;
             case Screen.Blacksmith: UpdateBlacksmith(Press, mouse, click); break;
