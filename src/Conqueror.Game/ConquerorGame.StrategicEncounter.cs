@@ -15,6 +15,7 @@ public sealed partial class ConquerorGame
     private const int StrategicEncounterHeight = 480;
     private OriginalStrategicInteractiveEncounterHoverPresentation _strategicEncounterHover;
     private int _strategicEncounterPlayerScoreModifier;
+    private OriginalStrategicInteractiveRetreatConfirmation? _strategicInteractiveRetreatConfirmation;
 
     private void BeginStrategicEncounter(OriginalStrategicPlayerEnemyEncounter encounter)
     {
@@ -23,6 +24,7 @@ public sealed partial class ConquerorGame
         _strategicInteractiveEncounter = null;
         _strategicEncounterViewport = null;
         _strategicEncounterHover = default;
+        _strategicInteractiveRetreatConfirmation = null;
         _strategicEncounterPlayerScoreModifier = _campaign.OriginalStrategicEncounterPlayerScoreModifier(encounter);
         _screen = Screen.StrategicEncounter;
         _notice = "STRATEGIC ARMIES MEET";
@@ -62,10 +64,42 @@ public sealed partial class ConquerorGame
         var session = _strategicInteractiveEncounter;
         var viewport = _strategicEncounterViewport
             ?? throw new InvalidOperationException("Strategic encounter viewport is unavailable.");
+        if (_strategicInteractiveRetreatConfirmation is { } confirmation)
+        {
+            var accepted = press(Keys.Enter);
+            if (!accepted && !press(Keys.Escape)) return;
+            _strategicInteractiveRetreatConfirmation = null;
+            AdvanceInteractiveStrategicEncounterFrame(
+                encounter, session, viewport, confirmation.LocalX, confirmation.LocalY,
+                inputCode: 3, firstControlConfirmationAccepted: accepted);
+            return;
+        }
+
         var (x, y) = OriginalPoint(mouse);
+        if (click && session.IsMappedTacticalAdvancementEnabled
+            && session.RouteControlStripHit(x, y, viewport.ControlStripMargin, viewport.ViewportHeight)
+                == OriginalStrategicInteractiveEncounterControlStripRoute.RetreatConfirmation)
+        {
+            _strategicInteractiveRetreatConfirmation = new(x, y);
+            _notice = "RETREAT? ENTER CONFIRMS, ESC CANCELS";
+            return;
+        }
         var inputCode = click ? EncounterInputCodeFor(session, viewport, x, y) : 0;
-        var result = session.AdvanceMappedFrame(TimeSpan.FromSeconds(_presentationSeconds), inputCode, x, y,
-            viewport, _strategicEncounterPlayerScoreModifier, new HostEncounterRandom());
+        AdvanceInteractiveStrategicEncounterFrame(encounter, session, viewport, x, y, inputCode);
+    }
+
+    private void AdvanceInteractiveStrategicEncounterFrame(
+        OriginalStrategicPlayerEnemyEncounter encounter,
+        OriginalStrategicInteractiveEncounterSession session,
+        OriginalStrategicInteractiveEncounterViewport viewport,
+        int localX,
+        int localY,
+        int inputCode,
+        bool firstControlConfirmationAccepted = false)
+    {
+        var result = session.AdvanceMappedFrame(TimeSpan.FromSeconds(_presentationSeconds), inputCode,
+            localX, localY, viewport, _strategicEncounterPlayerScoreModifier,
+            new HostEncounterRandom(), firstControlConfirmationAccepted);
         _strategicEncounterHover = result.HoverPresentation;
         if (!result.ResolverEnded) return;
 
@@ -107,6 +141,7 @@ public sealed partial class ConquerorGame
         _strategicEncounterViewport = null;
         _strategicEncounterHover = default;
         _strategicEncounterPlayerScoreModifier = 0;
+        _strategicInteractiveRetreatConfirmation = null;
         _screen = Screen.Map;
         _notice = notice;
         Autosave();
@@ -153,6 +188,8 @@ public sealed partial class ConquerorGame
         DrawText("STRATEGIC ENCOUNTER", 32, 18, Color.Gold, 2);
         DrawText(session.IsMappedTacticalAdvancementEnabled
             ? "TACTICAL ORDERS ACTIVE" : "CLICK THE FIRST CONTROL TO BEGIN", 32, 46, Color.White, 2);
+        if (_strategicInteractiveRetreatConfirmation is not null)
+            DrawText("RETREAT? ENTER CONFIRMS, ESC CANCELS", 32, 74, Color.Gold, 2);
         DrawStrategicEncounterHover(viewport);
     }
 
@@ -187,4 +224,6 @@ public sealed partial class ConquerorGame
     {
         public int NextRaw() => Random.Shared.Next(int.MaxValue);
     }
+
+    private readonly record struct OriginalStrategicInteractiveRetreatConfirmation(int LocalX, int LocalY);
 }
