@@ -53,10 +53,7 @@ public sealed partial class ConquerorGame
     {
         if (_dragonBattle is null) return;
         if (!DrawOriginal("Dragon.Background", new Rectangle(0, 0, 1024, 768)))
-        {
-            Fill(new Rectangle(0, 0, 1024, 768), new Color(45, 10, 5));
-            DrawText("THE DRAGON", 330, 70, Color.OrangeRed, 4);
-        }
+            throw new InvalidOperationException("Dragon battle requires its verified original battlefield art.");
 
         var eye = new Point((int)(_dragonBattle.EyeX * 1024), (int)(_dragonBattle.EyeY * 768));
         var radius = Math.Max(8, (int)(_dragonBattle.HitRadius * 768));
@@ -65,13 +62,14 @@ public sealed partial class ConquerorGame
         Fill(new Rectangle(aim.X - 15, aim.Y - 2, 31, 4), Color.Gold);
         Fill(new Rectangle(aim.X - 2, aim.Y - 15, 4, 31), Color.Gold);
 
-        if (_originalAnimations.TryGetValue("Dragon.Lance", out var lance) && lance.Frames.Count > 0)
-        {
-            var frame = lance.Frames[Math.Min(_dragonBattle.LanceFrame, lance.Frames.Count - 1)];
-            var destination = new Rectangle(1024 - frame.Width * 8 / 5, 768 - frame.Height * 8 / 5,
-                frame.Width * 8 / 5, frame.Height * 8 / 5);
-            _batch.Draw(frame, destination, Color.White);
-        }
+        if (!_originalAnimations.TryGetValue("Dragon.Lance", out var lance))
+            throw new InvalidOperationException("Dragon battle requires its verified original lance animation.");
+        if (lance.Frames.Count != DragonBattleSession.LanceFrameCount)
+            throw new InvalidOperationException("Dragon lance animation does not have its required original frame population.");
+        var frame = lance.Frames[_dragonBattle.LanceFrame];
+        var destination = new Rectangle(1024 - frame.Width * 8 / 5, 768 - frame.Height * 8 / 5,
+            frame.Width * 8 / 5, frame.Height * 8 / 5);
+        _batch.Draw(frame, destination, Color.White);
 
         Fill(new Rectangle(70, 690, 884, 18), new Color(25, 20, 15));
         Fill(new Rectangle(70, 690, (int)(884 * _dragonBattle.RemainingSeconds /

@@ -11,6 +11,9 @@ public sealed record DragonBattleDefinition(
 
 public sealed class DragonBattleSession
 {
+    /// <summary>The complete, decoded <c>LANCE1.CSF</c> frame population.</summary>
+    public const int LanceFrameCount = 25;
+
     public static readonly DragonBattleDefinition Rules = new(8, .055, .004, .12, .65);
 
     private readonly int _strength;
@@ -24,7 +27,8 @@ public sealed class DragonBattleSession
     public double RemainingSeconds => Math.Max(0, Rules.DurationSeconds - _elapsed);
     public double HitRadius => Math.Min(Rules.MaximumEyeRadius,
         Rules.BaseEyeRadius + Math.Max(0, _strength - 16) * Rules.StrengthRadiusBonus);
-    public int LanceFrame => Math.Min(24, (int)(_elapsed / Rules.DurationSeconds * 25));
+    public int LanceFrame => Math.Min(LanceFrameCount - 1,
+        (int)(_elapsed / Rules.DurationSeconds * LanceFrameCount));
     public string LastMessage { get; private set; } = "Steady the lance and aim for the dragon's eye.";
 
     public DragonBattleSession(int strength)

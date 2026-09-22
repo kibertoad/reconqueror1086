@@ -100,11 +100,13 @@ public sealed class DragonBattleTests
     public void StrengthWidensTheEyeHitWindowAndDelayIsFatal()
     {
         Assert.True(new DragonBattleSession(30).HitRadius > new DragonBattleSession(16).HitRadius);
+        Assert.Equal(25, DragonBattleSession.LanceFrameCount);
         var battle = new DragonBattleSession(16);
 
         battle.Tick(DragonBattleSession.Rules.DurationSeconds);
 
         Assert.Equal(DragonBattleOutcome.Defeat, battle.Outcome);
+        Assert.Equal(DragonBattleSession.LanceFrameCount - 1, battle.LanceFrame);
     }
 
     [Fact]
