@@ -7,8 +7,8 @@ public sealed partial class ConquerorGame
 {
     private void UpdateMap(Func<Keys, bool> press, MouseState mouse, bool click)
     {
-        if (UpdateOriginalStrategicTargetConfirmation(press)) return;
         UpdateOriginalStrategicMapRuntime();
+        if (_screen != Screen.Map || UpdateOriginalStrategicTargetConfirmation(press)) return;
         if (UpdateOriginalStrategicMapInput(mouse, click)) return;
         if (_campaign.State.PendingDrogoEncounter)
         {
@@ -90,10 +90,14 @@ public sealed partial class ConquerorGame
     {
         var previousReport = _campaign.State.LatestSpyReport;
         var pass = OriginalStrategicHostRuntime.AdvanceFixedPass(_campaign,
-            playerEncounterHandoffActive: _strategicEncounter is not null);
+            playerEncounterHandoffActive: _strategicEncounter is not null,
+            schedulerBlockedByModal: _strategicMapTargetConfirmation is not null);
         if (pass?.SpyReport is not null) ShowNewSpyReport(previousReport);
         if (pass?.Encounters.Count > 0)
+        {
+            _strategicMapTargetConfirmation = null;
             BeginStrategicEncounter(pass.Encounters[0]);
+        }
     }
 
     /// <summary>

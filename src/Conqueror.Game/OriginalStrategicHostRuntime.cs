@@ -24,7 +24,8 @@ public static class OriginalStrategicHostRuntime
     /// </summary>
     public static OriginalStrategicCampaignPassResult? AdvanceFixedPass(
         Campaign campaign,
-        bool playerEncounterHandoffActive = false)
+        bool playerEncounterHandoffActive = false,
+        bool schedulerBlockedByModal = false)
     {
         ArgumentNullException.ThrowIfNull(campaign);
         if (campaign.State.OriginalStrategicState is not { } strategic) return null;
@@ -35,6 +36,8 @@ public static class OriginalStrategicHostRuntime
             new OriginalStrategicCampaignPassInput(
                 NoDivisionTargets,
                 PlayerEncounterHandoffActive: playerEncounterHandoffActive,
-                SchedulerBlockedByModal: schedulerFallbackUnavailable || playerEncounterHandoffActive));
+                SchedulerBlockedByModal: schedulerFallbackUnavailable
+                    || playerEncounterHandoffActive
+                    || schedulerBlockedByModal));
     }
 }

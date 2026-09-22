@@ -61,4 +61,41 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Null(pass!.SchedulerPass);
         Assert.Equal(0, state.OriginalStrategicState.GenerationAccumulator);
     }
+
+    [Fact]
+    public void HostFixedStrategicPassKeepsReportingAndPlayerUpdatesRunningDuringAModal()
+    {
+        var state = Campaign.NewFromTemplate(0);
+        state.OriginalStrategicState = OriginalStrategicCampaignState.CreateForNewGame(
+            state.Date, startingRouteSelector: 0);
+        state.Player.ActiveSpies = 1;
+        var strategic = state.OriginalStrategicState;
+        var hostile = strategic.MovementSlots[3];
+        hostile.Active = true;
+        hostile.Mode = OriginalStrategicMovement.DirectPropertyMode;
+        hostile.OriginProperty = 0;
+        hostile.Lord = strategic.Properties[0].Lord;
+        hostile.Swordsmen = 5;
+        hostile.Halberdiers = 6;
+        hostile.Knights = 7;
+        hostile.CurrentX = 100;
+        hostile.CurrentY = 100;
+        hostile.DestinationX = 1_000;
+        hostile.DestinationY = 100;
+        hostile.DirectionX = 1;
+        var campaign = new Campaign(state, seed: 42);
+        campaign.ConfigureOriginalStrategicResources(new StubStrategicResources
+        {
+            Routes = { ["sc_0.rat"] = [new OriginalStrategicRoutePoint(0, 0)] }
+        });
+
+        var pass = OriginalStrategicHostRuntime.AdvanceFixedPass(
+            campaign, schedulerBlockedByModal: true);
+
+        Assert.NotNull(pass);
+        Assert.NotNull(pass!.SpyReport);
+        Assert.NotEmpty(pass.PlayerPass.Advances);
+        Assert.Null(pass.SchedulerPass);
+        Assert.Equal(0, state.OriginalStrategicState.GenerationAccumulator);
+    }
 }
