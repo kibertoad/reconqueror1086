@@ -39,6 +39,23 @@ public sealed class DragonBattleTests
     }
 
     [Fact]
+    public void ImportedTournamentStateDefersCourtshipRewardsToTheDialogueActions()
+    {
+        var campaign = new Campaign(Campaign.NewFromTemplate(2));
+        campaign.State.ConversationVariables.AddRange(Enumerable.Repeat(0,
+            OriginalCampaignVariables.LadyColors + 1));
+        campaign.State.CurrentLocation = World.TournamentIndex(campaign.State.Date);
+
+        Assert.True(campaign.RequestColors("Jane"));
+        Assert.True(campaign.Joust(0, 0));
+
+        Assert.Empty(campaign.State.Player.CourtshipWins);
+        Assert.DoesNotContain("Medallion", campaign.State.Player.Inventory.Items);
+        Assert.Contains("return to her conversation", campaign.State.Journal[^2],
+            StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void PrototypeSaveAlreadyAtTheMoorMigratesToDiscovered()
     {
         var state = Campaign.NewFromTemplate(2);

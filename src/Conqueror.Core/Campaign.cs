@@ -703,7 +703,18 @@ public sealed partial class Campaign
             };
             State.Player.Wealth += opponent.Wager * 2;
             State.Player.TournamentWinnings += opponent.Wager;
-            if (State.Player.LadyColors is { } lady) RewardCourtship(lady);
+            if (State.Player.LadyColors is { } lady)
+            {
+                // With ALL.VTB installed, the selected lady and the joust
+                // result are carried by original global slots 42 and 3.
+                // Her conversation action tree then decides whether a reward
+                // is earned and applies its exact item/attribute mutations.
+                // Do not duplicate that work through the prototype ladder.
+                if (State.ConversationVariables.Count > OriginalCampaignVariables.LadyColors)
+                    Log($"Joust won wearing {lady}'s colors; return to her conversation for the result.");
+                else
+                    RewardCourtship(lady);
+            }
             Log($"Joust won against {opponent.Name}: {opponent.Wager}s profit and honor gained.");
         }
         else Log($"Unhorsed by {opponent.Name}; the {opponent.Wager}s wager is lost.");
