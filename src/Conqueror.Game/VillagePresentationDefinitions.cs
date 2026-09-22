@@ -63,8 +63,10 @@ public static class VillagePresentationDefinitions
         {
             case "Map": action = VillageHotspotAction.Map; return true;
             case "Inn": action = VillageHotspotAction.Inn; return true;
-            case "Smith": action = VillageHotspotAction.Blacksmith; return true;
-            case "Lend": action = VillageHotspotAction.Lender; return true;
+            case "Smith":
+            case "Blacksmith": action = VillageHotspotAction.Blacksmith; return true;
+            case "Lend":
+            case "Lender": action = VillageHotspotAction.Lender; return true;
             case "Church": action = VillageHotspotAction.Church; return true;
             default: action = default; return false;
         }

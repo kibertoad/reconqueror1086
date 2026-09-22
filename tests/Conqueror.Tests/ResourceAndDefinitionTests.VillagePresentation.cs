@@ -45,11 +45,13 @@ public sealed partial class ResourceAndDefinitionTests
             VillagePresentationDefinitions.Hit(VillagePresentationDefinitions.Hotspots, new Point(500, 300)));
     }
 
-    [Fact]
-    public void SelectedVillageSceneUsesItsEnabledCatalogRegions()
+    [Theory]
+    [InlineData("Smith", "Lend")]
+    [InlineData("Blacksmith", "Lender")]
+    public void SelectedVillageSceneUsesItsEnabledCatalogRegions(string smithLabel, string lenderLabel)
     {
         var scene = Assert.Single(VillageSceneCatalogDecoder.Decode(System.Text.Encoding.ASCII.GetBytes(
-            "V31_1111.PCX\n1,540,345,98,55; Map\n0,0,0,0,0; Tournament\n1,418,39,52,38; Inn\n1,476,148,112,80; Smith\n1,136,158,35,34; Lend\n1,342,79,71,216; Church\n")));
+            $"V31_1111.PCX\n1,540,345,98,55; Map\n0,0,0,0,0; Tournament\n1,418,39,52,38; Inn\n1,476,148,112,80; {smithLabel}\n1,136,158,35,34; {lenderLabel}\n1,342,79,71,216; Church\n")));
 
         var hotspots = VillagePresentationDefinitions.HotspotsFrom(scene);
 
