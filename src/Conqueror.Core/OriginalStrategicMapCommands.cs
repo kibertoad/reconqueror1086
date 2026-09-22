@@ -8,7 +8,15 @@ namespace Conqueror.Core;
 public readonly record struct OriginalStrategicMapDispatchResult(
     OriginalStrategicRoutePoint RoutePoint,
     OriginalStrategicPlayerMapHit Hit,
-    OriginalStrategicPlayerCommandResult Command);
+    OriginalStrategicPlayerCommandResult Command)
+{
+    /// <summary>
+    /// The source opens its shared target-confirmation modal only for the
+    /// second and third hit-table families; a player selection or empty route
+    /// click has already completed its own command path.
+    /// </summary>
+    public bool RequiresTargetConfirmation => Hit.EnemySlot is not null || Hit.DivisionSlot is not null;
+}
 
 public static class OriginalStrategicMapCommands
 {

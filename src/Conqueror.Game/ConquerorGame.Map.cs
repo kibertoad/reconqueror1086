@@ -7,6 +7,7 @@ public sealed partial class ConquerorGame
 {
     private void UpdateMap(Func<Keys, bool> press, MouseState mouse, bool click)
     {
+        if (UpdateOriginalStrategicTargetConfirmation(press)) return;
         UpdateOriginalStrategicMapRuntime();
         if (UpdateOriginalStrategicMapInput(mouse, click)) return;
         if (_campaign.State.PendingDrogoEncounter)
@@ -96,6 +97,38 @@ public sealed partial class ConquerorGame
     }
 
     /// <summary>
+    /// Binds source dispatcher <c>0x122AC</c>'s synchronous target dialog to
+    /// an explicit host state. Both target families call <c>0x256A0</c> with
+    /// prompt id <c>0x364</c>; only a return value of one commits the target.
+    /// Enter/Escape are host input policy because the original dialog event
+    /// producer and its text catalog are not yet recovered.
+    /// </summary>
+    private bool UpdateOriginalStrategicTargetConfirmation(Func<Keys, bool> press)
+    {
+        if (_strategicMapTargetConfirmation is not { } confirmation) return false;
+        if (press(Keys.Escape))
+        {
+            _strategicMapTargetConfirmation = null;
+            _notice = "TARGET CANCELLED";
+            return true;
+        }
+        if (!press(Keys.Enter)) return true;
+        if (_campaign.State.OriginalStrategicState is not { } strategic)
+        {
+            _strategicMapTargetConfirmation = null;
+            _notice = "TARGET IS NO LONGER AVAILABLE";
+            return true;
+        }
+
+        var result = OriginalStrategicMapCommands.DispatchRawPointer(
+            strategic, _originalStrategicResources, InactiveTemporaryDivisionTargets(),
+            confirmation.RawPointerX, confirmation.RawPointerY, targetConfirmed: true);
+        _strategicMapTargetConfirmation = null;
+        _notice = result.Command.Applied ? "TARGET CONFIRMED" : "TARGET IS NO LONGER AVAILABLE";
+        return true;
+    }
+
+    /// <summary>
     /// Keeps the executable-mapped map camera and pointer path ahead of the
     /// dated destination adapter. MonoGame's fixed update is the explicit,
     /// processor-independent cadence for edge scrolling; the original's
@@ -113,18 +146,26 @@ public sealed partial class ConquerorGame
             || y > OriginalStrategicMapTerrainRendering.ViewportBottom)
             return false;
 
-        var noDivisionTargets = Enumerable.Repeat(
-            new OriginalStrategicPlayerTarget(false, 0, 0),
-            OriginalStrategicMovement.PlayerDivisionTargetCount).ToArray();
         var result = OriginalStrategicMapCommands.DispatchRawPointer(
-            strategic, _originalStrategicResources, noDivisionTargets, x, y,
+            strategic, _originalStrategicResources, InactiveTemporaryDivisionTargets(), x, y,
             targetConfirmed: false);
-        if (result.Hit.EnemySlot is not null || result.Hit.DivisionSlot is not null)
-            _notice = "TARGET CONFIRMATION IS NOT YET AVAILABLE";
+        if (result.RequiresTargetConfirmation)
+        {
+            _strategicMapTargetConfirmation = new(x, y);
+            _notice = result.Hit.EnemySlot is not null
+                ? "TARGET ENEMY FORCE? ENTER CONFIRMS, ESC CANCELS"
+                : "TARGET TEMPORARY FORCE? ENTER CONFIRMS, ESC CANCELS";
+        }
         else if (result.Command.RouteLimitReached)
             _notice = "ROUTE LIMIT REACHED";
         return true;
     }
+
+    private static OriginalStrategicPlayerTarget[] InactiveTemporaryDivisionTargets() =>
+        Enumerable.Repeat(new OriginalStrategicPlayerTarget(false, 0, 0),
+            OriginalStrategicMovement.PlayerDivisionTargetCount).ToArray();
+
+    private readonly record struct OriginalStrategicMapTargetConfirmation(int RawPointerX, int RawPointerY);
 
     private void SelectMapLocation(int direction)
     {

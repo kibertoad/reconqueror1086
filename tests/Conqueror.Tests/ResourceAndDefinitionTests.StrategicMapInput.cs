@@ -103,6 +103,31 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(default, route.Hit);
         Assert.Equal(new OriginalStrategicPlayerCommandResult(true, false, false), route.Command);
         Assert.Equal(new OriginalStrategicRoutePoint(840, 60), player.Waypoints[0]);
+
+        var enemy = state.MovementSlots[0];
+        enemy.Active = true;
+        enemy.PathComplete = true;
+        enemy.Mode = OriginalStrategicMovement.DirectPropertyMode;
+        enemy.OriginProperty = 0;
+        enemy.Lord = 0;
+        enemy.Swordsmen = 1;
+        enemy.CurrentX = 840;
+        enemy.CurrentY = 60;
+
+        var pendingTarget = OriginalStrategicMapCommands.DispatchRawPointer(
+            state, resources, divisions, rawPointerX: 0, rawPointerY: 0, targetConfirmed: false);
+
+        Assert.Equal(new OriginalStrategicPlayerMapHit(null, 0, null), pendingTarget.Hit);
+        Assert.True(pendingTarget.RequiresTargetConfirmation);
+        Assert.False(pendingTarget.Command.Applied);
+        Assert.Equal(0, player.TargetHandle);
+
+        var acceptedTarget = OriginalStrategicMapCommands.DispatchRawPointer(
+            state, resources, divisions, rawPointerX: 0, rawPointerY: 0, targetConfirmed: true);
+
+        Assert.True(acceptedTarget.Command.Applied);
+        Assert.True(acceptedTarget.RequiresTargetConfirmation);
+        Assert.Equal(OriginalStrategicMovement.PlayerEnemyTargetFlag, player.TargetHandle);
     }
 
     [Fact]
