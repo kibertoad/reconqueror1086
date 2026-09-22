@@ -99,6 +99,35 @@ public sealed partial class ResourceAndDefinitionTests
             .BuildTemporaryForceBlits(state, frameCount: 3, frameWidth: 27, frameHeight: 35));
     }
 
+    [Fact]
+    public void StrategicRoutePreviewUsesTheFourFrameMarkerSequenceAndSharedProjection()
+    {
+        var state = OriginalStrategicCampaignState.CreateForNewGame(new DateTime(1086, 3, 1), 0);
+        state.CameraRow = 10;
+        state.CameraColumn = 2;
+        state.SelectedPlayerMovementSlot = OriginalStrategicMovement.PlayerAvatarMovementSlot;
+        state.PlayerRouteInputActive = true;
+        var player = state.PlayerMovementSlots[OriginalStrategicMovement.PlayerAvatarMovementSlot];
+        player.CurrentX = 1106;
+        player.CurrentY = 200;
+        player.Waypoints.Add(new OriginalStrategicRoutePoint(1200, 200));
+        player.WaypointCount = 1;
+
+        Assert.Equal([
+            new OriginalStrategicMarkerBlit(5, 1, new UiBounds(40, 139, 9, 8),
+                new UiBounds(0, 0, 9, 8)),
+            new OriginalStrategicMarkerBlit(5, 2, new UiBounds(61, 139, 9, 8),
+                new UiBounds(0, 0, 9, 8)),
+            new OriginalStrategicMarkerBlit(5, 3, new UiBounds(82, 139, 9, 8),
+                new UiBounds(0, 0, 9, 8)),
+            new OriginalStrategicMarkerBlit(5, 0, new UiBounds(103, 139, 9, 8),
+                new UiBounds(0, 0, 9, 8))
+        ], OriginalStrategicMarkerPresentation.BuildRoutePreviewBlits(
+            state, framePhase: 1, frameCount: 4, frameWidth: 9, frameHeight: 8));
+        Assert.Throws<InvalidDataException>(() => OriginalStrategicMarkerPresentation
+            .BuildRoutePreviewBlits(state, framePhase: 1, frameCount: 3, frameWidth: 9, frameHeight: 8));
+    }
+
     private static void ActivateMovementMarker(
         OriginalStrategicCampaignState state,
         int slotIndex,

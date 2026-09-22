@@ -319,6 +319,30 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void StrategicRoutePreviewUsesSourceOffsetSpacingAndFrameCycle()
+    {
+        var state = OriginalStrategicCampaignState.CreateForNewGame(new DateTime(1086, 3, 1), 0);
+        state.SelectedPlayerMovementSlot = OriginalStrategicMovement.PlayerAvatarMovementSlot;
+        state.PlayerRouteInputActive = true;
+        var player = state.PlayerMovementSlots[OriginalStrategicMovement.PlayerAvatarMovementSlot];
+        player.CurrentX = 100;
+        player.CurrentY = 100;
+        player.Waypoints.Add(new OriginalStrategicRoutePoint(218, 100));
+        player.WaypointCount = 1;
+
+        Assert.Equal([
+            new OriginalStrategicMapMarkerDraw(5, 101, 100, 2),
+            new OriginalStrategicMapMarkerDraw(5, 122, 100, 3),
+            new OriginalStrategicMapMarkerDraw(5, 143, 100, 0),
+            new OriginalStrategicMapMarkerDraw(5, 164, 100, 1),
+            new OriginalStrategicMapMarkerDraw(5, 185, 100, 2)
+        ], OriginalStrategicRoutePreview.BuildDraws(state, framePhase: 2));
+
+        state.PlayerRouteInputActive = false;
+        Assert.Empty(OriginalStrategicRoutePreview.BuildDraws(state, framePhase: 0));
+    }
+
+    [Fact]
     public void StrategicMapMarkerProjectionUsesInclusiveSourceBoundsBeforeBlitterClipping()
     {
         var state = OriginalStrategicCampaignState.CreateForNewGame(new DateTime(1086, 3, 1), 0);

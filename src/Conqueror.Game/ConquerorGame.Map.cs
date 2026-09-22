@@ -9,6 +9,7 @@ public sealed partial class ConquerorGame
     {
         UpdateOriginalStrategicMapRuntime();
         if (_screen != Screen.Map || UpdateOriginalStrategicTargetConfirmation(press)) return;
+        AdvanceOriginalStrategicRoutePreviewAnimation();
         if (UpdateOriginalStrategicMapInput(mouse, click)) return;
         if (_campaign.State.PendingDrogoEncounter)
         {
@@ -98,6 +99,27 @@ public sealed partial class ConquerorGame
             _strategicMapTargetConfirmation = null;
             BeginStrategicEncounter(pass.Encounters[0]);
         }
+    }
+
+    /// <summary>
+    /// The source increments its route-marker phase every third unrestricted
+    /// display pass. The host keeps that three-pass relationship on the
+    /// explicit 60 Hz update instead, avoiding processor-speed animation.
+    /// </summary>
+    private void AdvanceOriginalStrategicRoutePreviewAnimation()
+    {
+        if (_campaign.State.OriginalStrategicState is not { PlayerRouteInputActive: true })
+        {
+            _strategicRoutePreviewPasses = 0;
+            _strategicRoutePreviewFrame = 0;
+            return;
+        }
+
+        _strategicRoutePreviewPasses++;
+        if (_strategicRoutePreviewPasses < 3) return;
+        _strategicRoutePreviewPasses = 0;
+        _strategicRoutePreviewFrame = (_strategicRoutePreviewFrame + 1)
+            % OriginalStrategicRoutePreview.FrameCount;
     }
 
     /// <summary>

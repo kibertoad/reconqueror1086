@@ -112,6 +112,8 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private bool _showRadar = true;
     private FieldBattleSession? _fieldBattle;
     private OriginalStrategicMapTargetConfirmation? _strategicMapTargetConfirmation;
+    private int _strategicRoutePreviewPasses;
+    private int _strategicRoutePreviewFrame;
     private OriginalStrategicPlayerEnemyEncounter? _strategicEncounter;
     private OriginalStrategicInteractiveEncounterSession? _strategicInteractiveEncounter;
     private OriginalStrategicInteractiveEncounterViewport? _strategicEncounterViewport;

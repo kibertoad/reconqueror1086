@@ -76,6 +76,24 @@ public static class OriginalStrategicMarkerPresentation
             frameCount, frameWidth, frameHeight);
     }
 
+    /// <summary>Builds the marker.CSF route-input overlay after map markers.</summary>
+    public static IReadOnlyList<OriginalStrategicMarkerBlit> BuildRoutePreviewBlits(
+        OriginalStrategicCampaignState state,
+        int framePhase,
+        int frameCount,
+        int frameWidth,
+        int frameHeight)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        if (frameCount < OriginalStrategicRoutePreview.FrameCount)
+            throw new InvalidDataException("Strategic route overlay requires all four source marker frames.");
+        if (frameWidth <= 0) throw new ArgumentOutOfRangeException(nameof(frameWidth));
+        if (frameHeight <= 0) throw new ArgumentOutOfRangeException(nameof(frameHeight));
+
+        return BuildBlits(state, OriginalStrategicRoutePreview.BuildDraws(state, framePhase),
+            frameCount, frameWidth, frameHeight);
+    }
+
     private static IReadOnlyList<OriginalStrategicMarkerBlit> BuildBlits(
         OriginalStrategicCampaignState state,
         IReadOnlyList<OriginalStrategicMapMarkerDraw> draws,

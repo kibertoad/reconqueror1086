@@ -504,6 +504,23 @@ public sealed partial class ConquerorGame
                 new Rectangle(blit.Source.X, blit.Source.Y, blit.Source.Width, blit.Source.Height),
                 Color.White);
         }
+
+        if (!_originalAnimations.TryGetValue("Strategic.Map.MarkerOverlay", out var routeMarkers)
+            || routeMarkers.Frames.Count == 0)
+            return;
+        var firstRouteFrame = routeMarkers.Frames[0];
+        foreach (var frame in routeMarkers.Frames)
+            if (frame.Width != firstRouteFrame.Width || frame.Height != firstRouteFrame.Height)
+                throw new InvalidDataException("Strategic route marker frames must use one source dimension.");
+
+        foreach (var blit in OriginalStrategicMarkerPresentation.BuildRoutePreviewBlits(
+                     strategic, _strategicRoutePreviewFrame, routeMarkers.Frames.Count,
+                     firstRouteFrame.Width, firstRouteFrame.Height))
+        {
+            _batch.Draw(routeMarkers.Frames[blit.FrameIndex], ScaleBounds(blit.Destination),
+                new Rectangle(blit.Source.X, blit.Source.Y, blit.Source.Width, blit.Source.Height),
+                Color.White);
+        }
     }
 
     private void DrawLegacyEstateTerrain()
