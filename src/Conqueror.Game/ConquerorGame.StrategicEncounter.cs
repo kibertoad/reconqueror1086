@@ -149,7 +149,9 @@ public sealed partial class ConquerorGame
 
     private void DrawStrategicEncounter()
     {
-        DrawOriginal("Encounter.Strategic.Background", new Rectangle(0, 0, 1024, 728));
+        if (!DrawOriginal(OriginalStrategicInteractiveEncounterPresentation.BackgroundArtRole,
+                new Rectangle(0, 0, 1024, 728)))
+            throw new InvalidOperationException("Strategic encounter requires its verified original battlefield art.");
         if (_strategicInteractiveEncounter is null)
         {
             DrawStrategicEncounterMenu();
@@ -159,31 +161,31 @@ public sealed partial class ConquerorGame
         var session = _strategicInteractiveEncounter;
         var viewport = _strategicEncounterViewport
             ?? throw new InvalidOperationException("Strategic encounter viewport is unavailable.");
-        if (_originalAnimations.TryGetValue("Encounter.Strategic.Units", out var animation))
-        {
-            foreach (var draw in OriginalStrategicInteractiveEncounterPresentation.UnitDrawsFor(
-                         session.Units, viewport.HorizontalOffset, viewport.VerticalOffset))
-                if (draw.Frame < animation.Frames.Count)
-                    _batch.Draw(animation.Frames[draw.Frame], ScaleBounds(new UiBounds(
-                        draw.X, draw.Y, animation.Frames[draw.Frame].Width, animation.Frames[draw.Frame].Height)), Color.White);
-            foreach (var draw in OriginalStrategicInteractiveEncounterPresentation.SelectionOverlayDrawsFor(
-                         session.Units, session.SelectedUnitIndices, viewport.HorizontalOffset, viewport.VerticalOffset))
-                if (draw.Frame < animation.Frames.Count)
-                    _batch.Draw(animation.Frames[draw.Frame], ScaleBounds(new UiBounds(
-                        draw.X, draw.Y, animation.Frames[draw.Frame].Width, animation.Frames[draw.Frame].Height)), Color.White);
+        if (!_originalAnimations.TryGetValue(OriginalStrategicInteractiveEncounterPresentation.UnitAnimationRole,
+                out var animation))
+            throw new InvalidOperationException("Strategic encounter requires its verified original unit animation.");
+        if (animation.Frames.Count <= OriginalStrategicInteractiveEncounterPresentation.ControlStripFrame)
+            throw new InvalidOperationException("Strategic encounter unit animation is missing its required control frames.");
 
-            var controlFrame = session.IsMappedTacticalAdvancementEnabled
-                ? OriginalStrategicInteractiveEncounterPresentation.PendingFirstControlFrame
-                : OriginalStrategicInteractiveEncounterPresentation.ControlStripFrame;
-            var (controlX, controlY) = session.IsMappedTacticalAdvancementEnabled
-                ? OriginalStrategicInteractiveEncounterPresentation.PendingFirstControlDrawPositionFor(
-                    viewport.ControlStripMargin, viewport.ViewportHeight)
-                : OriginalStrategicInteractiveEncounterPresentation.ControlStripDrawPositionFor(
-                    viewport.ControlStripMargin, viewport.ViewportHeight);
-            if (controlFrame < animation.Frames.Count)
-                _batch.Draw(animation.Frames[controlFrame], ScaleBounds(new UiBounds(controlX, controlY,
-                    animation.Frames[controlFrame].Width, animation.Frames[controlFrame].Height)), Color.White);
-        }
+        foreach (var draw in OriginalStrategicInteractiveEncounterPresentation.UnitDrawsFor(
+                     session.Units, viewport.HorizontalOffset, viewport.VerticalOffset))
+            _batch.Draw(animation.Frames[draw.Frame], ScaleBounds(new UiBounds(
+                draw.X, draw.Y, animation.Frames[draw.Frame].Width, animation.Frames[draw.Frame].Height)), Color.White);
+        foreach (var draw in OriginalStrategicInteractiveEncounterPresentation.SelectionOverlayDrawsFor(
+                     session.Units, session.SelectedUnitIndices, viewport.HorizontalOffset, viewport.VerticalOffset))
+            _batch.Draw(animation.Frames[draw.Frame], ScaleBounds(new UiBounds(
+                draw.X, draw.Y, animation.Frames[draw.Frame].Width, animation.Frames[draw.Frame].Height)), Color.White);
+
+        var controlFrame = session.IsMappedTacticalAdvancementEnabled
+            ? OriginalStrategicInteractiveEncounterPresentation.PendingFirstControlFrame
+            : OriginalStrategicInteractiveEncounterPresentation.ControlStripFrame;
+        var (controlX, controlY) = session.IsMappedTacticalAdvancementEnabled
+            ? OriginalStrategicInteractiveEncounterPresentation.PendingFirstControlDrawPositionFor(
+                viewport.ControlStripMargin, viewport.ViewportHeight)
+            : OriginalStrategicInteractiveEncounterPresentation.ControlStripDrawPositionFor(
+                viewport.ControlStripMargin, viewport.ViewportHeight);
+        _batch.Draw(animation.Frames[controlFrame], ScaleBounds(new UiBounds(controlX, controlY,
+            animation.Frames[controlFrame].Width, animation.Frames[controlFrame].Height)), Color.White);
 
         DrawText("STRATEGIC ENCOUNTER", 32, 18, Color.Gold, 2);
         DrawText(session.IsMappedTacticalAdvancementEnabled

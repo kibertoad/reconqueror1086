@@ -26,7 +26,7 @@ public static class ImportedArt
         new("Character.Pregenerated", "image", ":pregen.pcx"),
         new("Campaign.Briefing", "image", ":fluff.pcx"),
         new("Dilemma.Background", "image", ":morality.pcx"),
-        new("Encounter.Strategic.Background", "image", ":battle.pcx"),
+        new(OriginalStrategicInteractiveEncounterPresentation.BackgroundArtRole, "image", ":battle.pcx"),
         new("Load.Background", "image", ":loadgame.pcx"),
         new("Estate.Shell", "image", ":icontemp.pcx"),
         new("Map.England", "image", ":engmap1.pcx"),
@@ -91,7 +91,8 @@ public static class ImportedAnimations
         new("Strategic.Map.Markers", ":icon_men.csf", "Estate.Shell"),
         new("Strategic.Map.MarkerOverlay", ":marker.csf", "Estate.Shell"),
         new("Combat.FirstPerson", ":skirmish.csf", "", ":SKIRMISH.PAL"),
-        new("Encounter.Strategic.Units", ":men8.csf", "Encounter.Strategic.Background"),
+        new(OriginalStrategicInteractiveEncounterPresentation.UnitAnimationRole, ":men8.csf",
+            OriginalStrategicInteractiveEncounterPresentation.BackgroundArtRole),
         new("Dragon.Lance", ":lance1.csf", "Dragon.Background"),
         .. EstatePresentationDefinitions.TileAtlases.Select(atlas =>
             new ImportedAnimationDefinition(atlas.Role, atlas.IdSuffix, "Estate.Shell"))

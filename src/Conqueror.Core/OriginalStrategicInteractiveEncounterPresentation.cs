@@ -27,6 +27,20 @@ public readonly record struct OriginalStrategicInteractiveEncounterUnitDraw(
 /// </summary>
 public static class OriginalStrategicInteractiveEncounterPresentation
 {
+    /// <summary>
+    /// The source <c>BATTLE.PCX</c> battlefield role. Both the exact strategic
+    /// resolver and the legacy adapter require this imported art; neither is
+    /// permitted to substitute a generated background.
+    /// </summary>
+    public const string BackgroundArtRole = "Encounter.Strategic.Background";
+
+    /// <summary>
+    /// The source <c>MEN8.CSF</c> unit/overlay role. A tactical renderer must
+    /// fail its setup when this verified sequence is unavailable rather than
+    /// quietly omitting troops or controls.
+    /// </summary>
+    public const string UnitAnimationRole = "Encounter.Strategic.Units";
+
     public const int UnitSpriteWidth = 90;
     public const int UnitSpriteHeight = 90;
     public const int UnitSpriteHalfWidth = UnitSpriteWidth / 2;

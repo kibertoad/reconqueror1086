@@ -14,8 +14,8 @@ public static class FieldBattlePresentation
     /// retain provisional formation mechanics, but it must never present a
     /// generated battlefield or substitute unit art.
     /// </summary>
-    public const string BackgroundArtRole = "Encounter.Strategic.Background";
-    public const string UnitAnimationRole = "Encounter.Strategic.Units";
+    public const string BackgroundArtRole = OriginalStrategicInteractiveEncounterPresentation.BackgroundArtRole;
+    public const string UnitAnimationRole = OriginalStrategicInteractiveEncounterPresentation.UnitAnimationRole;
     public const int LogicalWidth = 640;
     public const int BattlefieldHeight = 455;
 

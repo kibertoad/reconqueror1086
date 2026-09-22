@@ -9,10 +9,12 @@ public sealed partial class ResourceAndDefinitionTests
     [Fact]
     public void StrategicInteractiveEncounterUsesItsOwnedBackgroundAndUnitSequence()
     {
-        Assert.Contains(new ImportedArtDefinition("Encounter.Strategic.Background", "image", ":battle.pcx"),
+        Assert.Equal("Encounter.Strategic.Background", OriginalStrategicInteractiveEncounterPresentation.BackgroundArtRole);
+        Assert.Equal("Encounter.Strategic.Units", OriginalStrategicInteractiveEncounterPresentation.UnitAnimationRole);
+        Assert.Contains(new ImportedArtDefinition(OriginalStrategicInteractiveEncounterPresentation.BackgroundArtRole, "image", ":battle.pcx"),
             ImportedArt.Definitions);
-        Assert.Contains(new ImportedAnimationDefinition("Encounter.Strategic.Units", ":men8.csf",
-                "Encounter.Strategic.Background"),
+        Assert.Contains(new ImportedAnimationDefinition(OriginalStrategicInteractiveEncounterPresentation.UnitAnimationRole, ":men8.csf",
+                OriginalStrategicInteractiveEncounterPresentation.BackgroundArtRole),
             ImportedAnimations.Definitions);
         Assert.Contains(new ImportedAnimationDefinition("Strategic.Map.Markers", ":icon_men.csf",
                 "Estate.Shell"),
