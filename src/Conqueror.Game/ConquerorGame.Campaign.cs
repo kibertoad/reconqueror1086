@@ -156,6 +156,15 @@ public sealed partial class ConquerorGame
         var (x, y) = OriginalPoint(mouse);
         switch (VillagePresentationDefinitions.Hit(CurrentVillageHotspots(), new Point(x, y)))
         {
+            case VillageHotspotAction.Tournament:
+                if (_campaign.IsTournamentHere)
+                {
+                    _notice = "";
+                    _screen = Screen.Tournament;
+                }
+                else
+                    _notice = "THE TOURNAMENT IS NOT HERE THIS MONTH";
+                break;
             case VillageHotspotAction.Map: _screen = Screen.Map; break;
             case VillageHotspotAction.Inn: _notice = ""; _screen = Screen.Inn; break;
             case VillageHotspotAction.Blacksmith: _screen = Screen.Blacksmith; break;

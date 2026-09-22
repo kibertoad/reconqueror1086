@@ -6,10 +6,11 @@ namespace Conqueror.Game;
 /// <summary>
 /// Original Village screen controls from VOPTS.HAT. The lender remains a
 /// keyboard-only compatibility shortcut until its separate original dialogue
-/// flow has been recovered; the other four routes have executable-backed
-/// runtime destinations.
+/// flow has been recovered. The Tournament row is source-authored and has an
+/// executable-mapped dispatcher route; its calendar/location availability is
+/// supplied by the campaign's explicit host policy.
 /// </summary>
-public enum VillageHotspotAction { Map, Inn, Blacksmith, Lender, Church }
+public enum VillageHotspotAction { Tournament, Map, Inn, Blacksmith, Lender, Church }
 
 public sealed record VillageHotspot(VillageHotspotAction Action, string HoverLabel, int HatRegionId, UiBounds Bounds);
 
@@ -36,9 +37,8 @@ public static class VillagePresentationDefinitions
 
     /// <summary>
     /// Converts a selected <c>VILLAGE.DAT</c> record into its enabled source
-    /// hit regions. Tournament remains absent because its callback path has
-    /// not yet been recovered; the mapped exterior labels retain their
-    /// catalog rectangles rather than borrowing <c>VOPTS.HAT</c> geometry.
+    /// hit regions. The mapped exterior labels retain their catalog rectangles
+    /// rather than borrowing <c>VOPTS.HAT</c> geometry.
     /// </summary>
     public static IReadOnlyList<VillageHotspot> HotspotsFrom(VillageSceneDefinition scene)
     {
@@ -61,6 +61,7 @@ public static class VillagePresentationDefinitions
     {
         switch (label)
         {
+            case "Tournament": action = VillageHotspotAction.Tournament; return true;
             case "Map": action = VillageHotspotAction.Map; return true;
             case "Inn": action = VillageHotspotAction.Inn; return true;
             case "Smith":
