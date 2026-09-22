@@ -737,7 +737,7 @@ public sealed partial class ConquerorGame
     private void DrawVillageHoverLabel()
     {
         var point = OriginalPoint(_lastMouse);
-        var hotspot = _villageHotspots.FirstOrDefault(item => item.Bounds.Contains(point.X, point.Y));
+        var hotspot = CurrentVillageHotspots().FirstOrDefault(item => item.Bounds.Contains(point.X, point.Y));
         if (hotspot is null) return;
         var bounds = ScaleBounds(VillagePresentationDefinitions.HoverLabelBounds);
         DrawText(hotspot.HoverLabel, bounds.X + 8, bounds.Y + 6, Color.Wheat, 2, bounds.Width - 16);

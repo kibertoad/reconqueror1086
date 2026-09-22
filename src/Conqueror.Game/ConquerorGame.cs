@@ -99,6 +99,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private IReadOnlyList<SceneHotspot> _homeHotspots = HomePresentationDefinitions.Hotspots;
     private IReadOnlyList<VillageHotspot> _villageHotspots = VillagePresentationDefinitions.Hotspots;
     private IReadOnlyList<VillageSceneDefinition> _villageScenes = [];
+    private readonly Dictionary<string, IReadOnlyList<VillageHotspot>> _villageSceneHotspots = new(StringComparer.Ordinal);
     private IReadOnlyList<SceneHotspot> _blacksmithHotspots = BlacksmithPresentationDefinitions.Hotspots;
     private InnPresentationLayout _innLayout = InnPresentationDefinitions.Fallback;
     private InnPatronHotspot? _innPatron;

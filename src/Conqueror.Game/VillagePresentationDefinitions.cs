@@ -34,6 +34,39 @@ public static class VillagePresentationDefinitions
             : hotspot)
         .ToArray();
 
+    /// <summary>
+    /// Converts a selected <c>VILLAGE.DAT</c> record into its enabled source
+    /// hit regions. Tournament remains absent because its callback path has
+    /// not yet been recovered; the mapped exterior labels retain their
+    /// catalog rectangles rather than borrowing <c>VOPTS.HAT</c> geometry.
+    /// </summary>
+    public static IReadOnlyList<VillageHotspot> HotspotsFrom(VillageSceneDefinition scene)
+    {
+        ArgumentNullException.ThrowIfNull(scene);
+        return scene.Hotspots
+            .Where(hotspot => hotspot.Enabled && TryActionForLabel(hotspot.Label, out _))
+            .Select(hotspot =>
+            {
+                _ = TryActionForLabel(hotspot.Label, out var action);
+                return new VillageHotspot(action, hotspot.Label, -1,
+                    new UiBounds(hotspot.X, hotspot.Y, hotspot.Width, hotspot.Height));
+            })
+            .ToArray();
+    }
+
     public static VillageHotspotAction? Hit(IReadOnlyList<VillageHotspot> hotspots, Point point) => hotspots
         .FirstOrDefault(hotspot => hotspot.Bounds.Contains(point.X, point.Y))?.Action;
+
+    private static bool TryActionForLabel(string label, out VillageHotspotAction action)
+    {
+        switch (label)
+        {
+            case "Map": action = VillageHotspotAction.Map; return true;
+            case "Inn": action = VillageHotspotAction.Inn; return true;
+            case "Smith": action = VillageHotspotAction.Blacksmith; return true;
+            case "Lend": action = VillageHotspotAction.Lender; return true;
+            case "Church": action = VillageHotspotAction.Church; return true;
+            default: action = default; return false;
+        }
+    }
 }

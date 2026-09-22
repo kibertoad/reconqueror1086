@@ -45,6 +45,27 @@ public sealed partial class ResourceAndDefinitionTests
             VillagePresentationDefinitions.Hit(VillagePresentationDefinitions.Hotspots, new Point(500, 300)));
     }
 
+    [Fact]
+    public void SelectedVillageSceneUsesItsEnabledCatalogRegions()
+    {
+        var scene = Assert.Single(VillageSceneCatalogDecoder.Decode(System.Text.Encoding.ASCII.GetBytes(
+            "V31_1111.PCX\n1,540,345,98,55; Map\n0,0,0,0,0; Tournament\n1,418,39,52,38; Inn\n1,476,148,112,80; Smith\n1,136,158,35,34; Lend\n1,342,79,71,216; Church\n")));
+
+        var hotspots = VillagePresentationDefinitions.HotspotsFrom(scene);
+
+        Assert.Equal(
+        [
+            VillageHotspotAction.Map,
+            VillageHotspotAction.Inn,
+            VillageHotspotAction.Blacksmith,
+            VillageHotspotAction.Lender,
+            VillageHotspotAction.Church
+        ], hotspots.Select(hotspot => hotspot.Action));
+        Assert.Equal(new UiBounds(476, 148, 112, 80), hotspots[2].Bounds);
+        Assert.Equal(VillageHotspotAction.Blacksmith,
+            VillagePresentationDefinitions.Hit(hotspots, new Point(480, 150)));
+    }
+
     [Theory]
     [InlineData(17, 27)]
     [InlineData(18, 21)]

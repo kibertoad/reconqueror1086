@@ -154,7 +154,7 @@ public sealed partial class ConquerorGame
         if (press(Keys.Enter) || press(Keys.V)) _screen = Screen.Map;
         if (!click) return;
         var (x, y) = OriginalPoint(mouse);
-        switch (VillagePresentationDefinitions.Hit(_villageHotspots, new Point(x, y)))
+        switch (VillagePresentationDefinitions.Hit(CurrentVillageHotspots(), new Point(x, y)))
         {
             case VillageHotspotAction.Map: _screen = Screen.Map; break;
             case VillageHotspotAction.Inn: _notice = ""; _screen = Screen.Inn; break;
@@ -164,6 +164,18 @@ public sealed partial class ConquerorGame
                     _notice = "ORIGINAL PARISH CONVERSATION DATA IS NOT INSTALLED";
                 break;
         }
+    }
+
+    private IReadOnlyList<VillageHotspot> CurrentVillageHotspots()
+    {
+        var scene = OriginalVillageScenePresentation.SceneForNewGameHome(_campaign.State, _villageScenes);
+        if (scene is null) return _villageHotspots;
+        if (!_villageSceneHotspots.TryGetValue(scene.BackgroundName, out var hotspots))
+        {
+            hotspots = VillagePresentationDefinitions.HotspotsFrom(scene);
+            _villageSceneHotspots.Add(scene.BackgroundName, hotspots);
+        }
+        return hotspots;
     }
 
     private void UpdateInn(Func<Keys, bool> press, MouseState mouse, bool click)
