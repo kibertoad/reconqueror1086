@@ -367,7 +367,16 @@ public sealed class ImportedContentCatalog
             ?? throw new InvalidDataException($"The import is incomplete: required village catalog '{id}' is missing.");
         var scenes = DecodeVillageSceneCatalog(resourceId)
             ?? throw new InvalidDataException($"Required original village catalog '{id}' could not be decoded.");
-        var missing = scenes.Select(scene => ":" + scene.BackgroundName)
+        var expectedCount = id.Equals(":village.dat", StringComparison.OrdinalIgnoreCase) ? 67 : 12;
+        if (scenes.Count != expectedCount)
+            throw new InvalidDataException($"Required original village catalog '{id}' has {scenes.Count} scenes; expected {expectedCount}.");
+        // The official catalog names 14 PCX files absent from the official
+        // archive. Only the seven currently mapped starting homes are used.
+        var requiredScenes = id.Equals(":village.dat", StringComparison.OrdinalIgnoreCase)
+            ? OriginalStrategicMovement.StartingRoutes.Select(route =>
+                scenes[OriginalStrategicMovement.Persons[route.Person].VillageSceneIndex])
+            : [];
+        var missing = requiredScenes.Select(scene => ":" + scene.BackgroundName)
             .FirstOrDefault(name => FindId("image", name) is null);
         if (missing is not null)
             throw new InvalidDataException($"The import is incomplete: village catalog '{id}' references missing image '{missing}'.");

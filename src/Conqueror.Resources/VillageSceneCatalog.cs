@@ -20,6 +20,8 @@ public static class VillageSceneCatalogDecoder
     public const int SceneHeight = 480;
     private const int MaximumBytes = 128 * 1024;
     private const int MaximumScenes = 256;
+    // Six authored rectangles extend one to three pixels beyond the right edge.
+    private const int MaximumAuthoredRightEdge = SceneWidth + 3;
 
     public static IReadOnlyList<VillageSceneDefinition> Decode(ReadOnlySpan<byte> bytes)
     {
@@ -63,6 +65,18 @@ public static class VillageSceneCatalogDecoder
 
     private static VillageSceneHotspot ParseHotspot(string line)
     {
+        // The verified source catalog has three separator typos. Repair only
+        // these exact spellings; arbitrary malformed records still fail.
+        line = line.TrimStart() switch
+        {
+            var value when value.StartsWith("1,,539,374,100,59 ; Map", StringComparison.Ordinal)
+                => value.Replace("1,,539,374,100,59", "1,539,374,100,59", StringComparison.Ordinal),
+            var value when value.StartsWith("0,0,0,0,0, ; Blacksmith", StringComparison.Ordinal)
+                => value.Replace("0,0,0,0,0,", "0,0,0,0,0", StringComparison.Ordinal),
+            var value when value.StartsWith("1,356 141 43,52 ; Lender", StringComparison.Ordinal)
+                => value.Replace("1,356 141 43,52", "1,356,141,43,52", StringComparison.Ordinal),
+            _ => line
+        };
         var separator = line.IndexOf(';');
         if (separator < 0 || line.IndexOf(';', separator + 1) >= 0)
             throw new InvalidDataException("Village scene hotspot lacks its label separator.");
@@ -76,7 +90,7 @@ public static class VillageSceneCatalogDecoder
         var height = int.Parse(fields[4].Trim());
         var label = line[(separator + 1)..].Trim();
         if (enabled is < 0 or > 1 || label.Length is 0 or > 64 || x < 0 || y < 0 || width < 0 || height < 0
-            || x > SceneWidth || y > SceneHeight || width > SceneWidth - x || height > SceneHeight - y
+            || x > SceneWidth || y > SceneHeight || width > MaximumAuthoredRightEdge - x || height > SceneHeight - y
             || enabled == 1 && (width == 0 || height == 0))
             throw new InvalidDataException("Village scene hotspot is out of bounds.");
         return new VillageSceneHotspot(enabled == 1, x, y, width, height, label);

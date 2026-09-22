@@ -18,6 +18,19 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.False(scene.Hotspots[1].Enabled);
     }
 
+    [Fact]
+    public void VillageSceneCatalogAcceptsOnlyTheVerifiedSeparatorAndRightEdgeQuirks()
+    {
+        var source = "V5_1111.PCX\n0,0,0,0,0 ; Tournament\n1,,539,374,100,59 ; Map\n1,541,346,100,58 ; Inn\n0,0,0,0,0, ; Blacksmith\n1,356 141 43,52 ; Lender\n1,342,79,71,216 ; Church\n";
+        var scene = Assert.Single(VillageSceneCatalogDecoder.Decode(System.Text.Encoding.ASCII.GetBytes(source)));
+        Assert.Equal((539, 374, 100, 59), (scene.Hotspots[1].X, scene.Hotspots[1].Y,
+            scene.Hotspots[1].Width, scene.Hotspots[1].Height));
+        Assert.Equal((356, 141, 43, 52), (scene.Hotspots[4].X, scene.Hotspots[4].Y,
+            scene.Hotspots[4].Width, scene.Hotspots[4].Height));
+        Assert.Throws<InvalidDataException>(() => VillageSceneCatalogDecoder.Decode(
+            System.Text.Encoding.ASCII.GetBytes(source.Replace("1,541,346,100,58", "1,541,346,103,58"))));
+    }
+
     [Theory]
     [InlineData("V31_1111.PCX\n1,1,1,1,1; Map\n")]
     [InlineData("X31_1111.PCX\n1,1,1,1,1; A\n1,1,1,1,1; B\n1,1,1,1,1; C\n1,1,1,1,1; D\n1,1,1,1,1; E\n1,1,1,1,1; F\n")]
