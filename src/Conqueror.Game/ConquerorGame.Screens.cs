@@ -11,14 +11,8 @@ public sealed partial class ConquerorGame
 {
     private void DrawInn()
     {
-        var original = DrawOriginal("Village.Inn", new Rectangle(0, 0, 1024, 768));
-        if (!original)
-        {
-            DrawPanel("THE INN", "TRAVELLERS AND LOCAL PATRONS GATHER HERE");
-            DrawText("ORIGINAL INN ART IS NOT INSTALLED", 190, 340, Color.Wheat, 2);
-            DrawText("ENTER, I, OR V  RETURN TO VILLAGE", 185, 570, Color.LightGreen, 2);
-            return;
-        }
+        if (!DrawOriginal("Village.Inn", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidOperationException("Inn screen requires its verified original background art.");
 
         var (x, y) = OriginalPoint(_lastMouse);
         var patron = _innLayout.Patrons.FirstOrDefault(candidate => candidate.Bounds.Contains(x, y));
@@ -39,64 +33,48 @@ public sealed partial class ConquerorGame
 
         var node = _conversationSession?.CurrentNode;
         var prompt = _conversationSession?.Prompt;
-        if (DrawOriginal("Dialogue.Frame", new Rectangle(0, 0, 1024, 768)))
-        {
-            if (node?.PortraitFile is not null && _conversationPortraits.TryGetValue(node.PortraitFile, out var portrait))
-                _batch.Draw(portrait, ScaleBounds(ConversationPresentationDefinitions.Portrait), Color.White);
-            else
-                DrawOriginal(patron.PortraitRole, ScaleBounds(ConversationPresentationDefinitions.Portrait));
-            DrawText(node?.Speaker ?? patron.Name, 155, 385, Color.White, 2, 260);
-            var promptBounds = ScaleBounds(ConversationPresentationDefinitions.Prompt);
-            DrawText(prompt ?? "Conversation data is not installed.", promptBounds.X,
-                promptBounds.Y + 16, Color.White, 2, promptBounds.Width);
-            if (node is not null)
-            {
-                var (mouseX, mouseY) = OriginalPoint(_lastMouse);
-                for (var index = 0; index < node.Responses.Count; index++)
-                {
-                    var originalBounds = ConversationPresentationDefinitions.ResponseBounds(index);
-                    var bounds = ScaleBounds(originalBounds);
-                    var color = originalBounds.Contains(mouseX, mouseY) ? Color.Yellow : Color.Cyan;
-                    DrawText(node.Responses[index].Text, bounds.X + 4, bounds.Y + 8, color, 2, bounds.Width - 8);
-                }
-            }
-            else
-                DrawText($"ENTER  RETURN TO THE {_conversationReturnScreen.ToString().ToUpperInvariant()}", 75, 500, Color.Cyan, 2, 850);
-            return;
-        }
-
-        DrawPanel((node?.Speaker ?? patron.Name).ToUpperInvariant(), (prompt ?? "CONVERSATION DATA IS NOT INSTALLED").ToUpperInvariant());
+        if (!DrawOriginal("Dialogue.Frame", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidOperationException("Conversation screen requires its verified original frame art.");
+        if (node?.PortraitFile is not null && _conversationPortraits.TryGetValue(node.PortraitFile, out var portrait))
+            _batch.Draw(portrait, ScaleBounds(ConversationPresentationDefinitions.Portrait), Color.White);
+        else if (!DrawOriginal(patron.PortraitRole, ScaleBounds(ConversationPresentationDefinitions.Portrait)))
+            throw new InvalidOperationException("Conversation screen requires its verified original patron portrait.");
+        DrawText(node?.Speaker ?? patron.Name, 155, 385, Color.White, 2, 260);
+        var promptBounds = ScaleBounds(ConversationPresentationDefinitions.Prompt);
+        DrawText(prompt ?? "Conversation data is not installed.", promptBounds.X,
+            promptBounds.Y + 16, Color.White, 2, promptBounds.Width);
         if (node is null)
-            DrawText($"ENTER  RETURN TO THE {_conversationReturnScreen.ToString().ToUpperInvariant()}", 100, 300, Color.LightGreen, 2);
+            DrawText($"ENTER  RETURN TO THE {_conversationReturnScreen.ToString().ToUpperInvariant()}", 75, 500, Color.Cyan, 2, 850);
         else
+        {
+            var (mouseX, mouseY) = OriginalPoint(_lastMouse);
             for (var index = 0; index < node.Responses.Count; index++)
-                DrawText($"{index + 1}  {node.Responses[index].Text}", 100, 300 + index * 55, Color.LightGreen, 2, 820);
+            {
+                var originalBounds = ConversationPresentationDefinitions.ResponseBounds(index);
+                var bounds = ScaleBounds(originalBounds);
+                var color = originalBounds.Contains(mouseX, mouseY) ? Color.Yellow : Color.Cyan;
+                DrawText(node.Responses[index].Text, bounds.X + 4, bounds.Y + 8, color, 2, bounds.Width - 8);
+            }
+        }
     }
 
     private void DrawBlacksmith()
     {
-        var original = DrawOriginal("Blacksmith.Workshop", new Rectangle(0, 0, 1024, 768));
-        if (!original)
-            DrawPanel("THE BLACKSMITH", "SELECT THE SMITH TO BROWSE HIS WARES");
-        if (original) DrawSceneHoverLabel(_blacksmithHotspots, BlacksmithPresentationDefinitions.HoverLabelBounds);
-        else DrawText("ENTER OR B  BROWSE WARES    ESC  VILLAGE", 120, 715, Color.Wheat, 2);
+        if (!DrawOriginal("Blacksmith.Workshop", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidOperationException("Blacksmith screen requires its verified original background art.");
+        DrawSceneHoverLabel(_blacksmithHotspots, BlacksmithPresentationDefinitions.HoverLabelBounds);
     }
 
     private void DrawBlacksmithDialogue()
     {
-        if (DrawOriginal("Dialogue.Frame", new Rectangle(0, 0, 1024, 768)))
-        {
-            DrawOriginal("Blacksmith.Portrait", ScaleBounds(BlacksmithDialoguePresentationDefinitions.Portrait));
-            DrawText(BlacksmithDialoguePresentationDefinitions.Speaker, 155, 385, Color.White, 2, 260);
-            DrawText(BlacksmithDialoguePresentationDefinitions.FallbackPrompt, 435, 65, Color.White, 2, 520);
-            for (var index = 0; index < BlacksmithDialoguePresentationDefinitions.Commands.Count; index++)
-                DrawText(BlacksmithDialoguePresentationDefinitions.Commands[index].Label, 75, 500 + index * 55, Color.Cyan, 2, 850);
-            return;
-        }
-
-        DrawPanel(BlacksmithDialoguePresentationDefinitions.Speaker, BlacksmithDialoguePresentationDefinitions.FallbackPrompt.ToUpperInvariant());
+        if (!DrawOriginal("Dialogue.Frame", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidOperationException("Blacksmith conversation requires its verified original frame art.");
+        if (!DrawOriginal("Blacksmith.Portrait", ScaleBounds(BlacksmithDialoguePresentationDefinitions.Portrait)))
+            throw new InvalidOperationException("Blacksmith conversation requires its verified original portrait art.");
+        DrawText(BlacksmithDialoguePresentationDefinitions.Speaker, 155, 385, Color.White, 2, 260);
+        DrawText(BlacksmithDialoguePresentationDefinitions.FallbackPrompt, 435, 65, Color.White, 2, 520);
         for (var index = 0; index < BlacksmithDialoguePresentationDefinitions.Commands.Count; index++)
-            DrawText(BlacksmithDialoguePresentationDefinitions.Commands[index].Label, 100, 260 + index * 60, Color.LightGreen, 2);
+            DrawText(BlacksmithDialoguePresentationDefinitions.Commands[index].Label, 75, 500 + index * 55, Color.Cyan, 2, 850);
     }
 
     private void DrawSceneHoverLabel(IReadOnlyList<SceneHotspot> hotspots, UiBounds labelBounds)
@@ -112,31 +90,19 @@ public sealed partial class ConquerorGame
         var stock = Balance.StoreEquipment;
         var p = _campaign.State.Player;
         var item = stock[_shopIndex];
-        if (DrawOriginal("Shop.Inventory", new Rectangle(0, 0, 1024, 768)))
-        {
-            var imported = ImportedStoreEntry(item);
-            DrawStoreItem(imported);
-            DrawShopOverlay(ShopPresentationDefinitions.ViewOverlay(imported?.HasMovie == true));
-            DrawShopOverlay(ShopPresentationDefinitions.TransactionOverlay(p.Inventory.Items.Contains(item.Name)));
-            var descriptionBounds = ScaleBounds(ShopPresentationDefinitions.Description);
-            var fallback = item.Power > 0 ? $"{item.Name} - fighting power {item.Power}." : $"{item.Name} - armor protection {item.Armor}.";
-            DrawText(imported?.Description ?? fallback, descriptionBounds.X, descriptionBounds.Y, Color.Black, 2, descriptionBounds.Width);
-            var wealthBounds = ScaleBounds(ShopPresentationDefinitions.Wealth);
-            var priceBounds = ScaleBounds(ShopPresentationDefinitions.Price);
-            DrawText($"WEALTH\n{p.Wealth}", wealthBounds.X, wealthBounds.Y, Color.White, 2);
-            DrawText($"BUY\n{imported?.Price ?? item.BuyPrice}", priceBounds.X, priceBounds.Y, Color.White, 2);
-            return;
-        }
-
-        DrawPanel("THE BLACKSMITH", $"WEALTH {p.Wealth}S   B BUY   S SELL FOR 75%   ENTER LEAVE");
-        var first = Math.Clamp(_shopIndex - 3, 0, Math.Max(0, stock.Length - 8));
-        for (var row = 0; row < 8 && first + row < stock.Length; row++)
-        {
-            var index = first + row; var rowItem = stock[index]; var owned = p.Inventory.Items.Contains(rowItem.Name);
-            var details = rowItem.Power > 0 ? $"POWER {rowItem.Power}" : $"ARMOR {rowItem.Armor}";
-            DrawText($"{(index == _shopIndex ? ">" : " ")} {rowItem.Name}  {rowItem.BuyPrice}S  {details} {(owned ? "OWNED" : "")}", 85, 180 + row * 58, index == _shopIndex ? Color.Gold : owned ? Color.LightGreen : Color.White, 2);
-        }
-        DrawText($"EQUIPPED: {p.Inventory.Weapon} / {p.Inventory.Armor} / {p.Inventory.Shield} / {p.Inventory.Helm}", 75, 660, Color.Wheat, 2, 870);
+        if (!DrawOriginal("Shop.Inventory", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidOperationException("Shop screen requires its verified original background art.");
+        var imported = ImportedStoreEntry(item);
+        DrawStoreItem(imported);
+        DrawShopOverlay(ShopPresentationDefinitions.ViewOverlay(imported?.HasMovie == true));
+        DrawShopOverlay(ShopPresentationDefinitions.TransactionOverlay(p.Inventory.Items.Contains(item.Name)));
+        var descriptionBounds = ScaleBounds(ShopPresentationDefinitions.Description);
+        var fallback = item.Power > 0 ? $"{item.Name} - fighting power {item.Power}." : $"{item.Name} - armor protection {item.Armor}.";
+        DrawText(imported?.Description ?? fallback, descriptionBounds.X, descriptionBounds.Y, Color.Black, 2, descriptionBounds.Width);
+        var wealthBounds = ScaleBounds(ShopPresentationDefinitions.Wealth);
+        var priceBounds = ScaleBounds(ShopPresentationDefinitions.Price);
+        DrawText($"WEALTH\n{p.Wealth}", wealthBounds.X, wealthBounds.Y, Color.White, 2);
+        DrawText($"BUY\n{imported?.Price ?? item.BuyPrice}", priceBounds.X, priceBounds.Y, Color.White, 2);
     }
 
     private WeaponStoreEntry? ImportedStoreEntry(EquipmentBalance item) => item.OriginalStoreRecord is { } record
@@ -641,24 +607,15 @@ public sealed partial class ConquerorGame
     private void DrawOverview()
     {
         var p = _campaign.State.Player; var s = p.Stats;
-        if (DrawOriginal("Home.Overview", new Rectangle(0, 0, 1024, 768)))
-        {
-            DrawText(p.Name, 325, 78, Color.Wheat, 2, 360);
-            DrawText($"{p.Age}", 130, 61, Color.Wheat, 2);
-            DrawText($"{p.Home.Population}", 175, 237, Color.Wheat, 2);
-            DrawText($"{p.Wealth}", 710, 157, Color.Wheat, 2);
-            DrawText($"{s.Strength}", 710, 200, Color.Wheat, 2);
-            DrawText($"{s.Piety}", 710, 239, Color.Wheat, 2);
-            DrawText($"{s.Honor}", 710, 278, Color.Wheat, 2);
-            return;
-        }
-        DrawPanel("PERSONAL OVERVIEW", p.Name);
-        DrawText($"STRENGTH {s.Strength} {s.DescribeStrength}", 100, 190, Color.White); DrawText($"DEXTERITY {s.Dexterity} {s.DescribeDexterity}", 100, 240, Color.White);
-        DrawText($"PIETY {s.Piety} {s.DescribePiety}", 100, 290, Color.White); DrawText($"STAMINA {s.Stamina} {s.DescribeStamina}", 100, 340, Color.White);
-        DrawText($"HONOR {s.Honor} {s.DescribeHonor}", 100, 390, Color.White); DrawText($"SWORD EXPERIENCE {p.SwordExperience}", 100, 460, Color.Wheat);
-        DrawText($"LANCE EXPERIENCE {p.LanceExperience}", 100, 510, Color.Wheat); DrawText($"WIFE {p.Wife ?? "NONE"}", 100, 560, Color.Wheat);
-        DrawText($"TOURNAMENT PROFIT {p.TournamentWinnings}S  CONQUEST SPOILS {p.ConquestWinnings}S", 100, 610, Color.Gold, 2);
-        DrawText("ENTER RETURN", 740, 670, Color.LightGreen, 2);
+        if (!DrawOriginal("Home.Overview", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidOperationException("Personal overview requires its verified original background art.");
+        DrawText(p.Name, 325, 78, Color.Wheat, 2, 360);
+        DrawText($"{p.Age}", 130, 61, Color.Wheat, 2);
+        DrawText($"{p.Home.Population}", 175, 237, Color.Wheat, 2);
+        DrawText($"{p.Wealth}", 710, 157, Color.Wheat, 2);
+        DrawText($"{s.Strength}", 710, 200, Color.Wheat, 2);
+        DrawText($"{s.Piety}", 710, 239, Color.Wheat, 2);
+        DrawText($"{s.Honor}", 710, 278, Color.Wheat, 2);
     }
 
     private void DrawEnding()

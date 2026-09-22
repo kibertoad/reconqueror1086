@@ -162,15 +162,8 @@ public sealed partial class ConquerorGame
             _batch.Draw(_titleMovie.Texture, new Rectangle(0, 0, 1024, 768), Color.White);
             return;
         }
-        var hasTitle = DrawOriginal("Title.Background", new Rectangle(0, 0, 1024, 768));
-        if (!hasTitle)
-        {
-            Fill(new Rectangle(0, 0, 1024, 768), new Color(39, 50, 35));
-            Fill(new Rectangle(90, 90, 844, 590), new Color(91, 63, 38));
-            Fill(new Rectangle(110, 110, 804, 550), new Color(25, 30, 24));
-            DrawText("CONQUEROR", 250, 190, Color.Gold, 7); DrawText("A.D. 1086", 350, 265, Color.Wheat, 4);
-        }
-        if (!hasTitle) DrawText("PRESS ANY KEY", 405, 600, Color.White, 2);
+        if (!DrawOriginal("Title.Background", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidOperationException("Title screen requires its verified original background art.");
     }
 
     private void DrawEventMovie()
@@ -293,51 +286,31 @@ public sealed partial class ConquerorGame
 
     private void DrawDilemma()
     {
-        var index = _campaign.State.YouthDilemmasAnswered;
         var stats = _campaign.State.Player.Stats;
-        var original = DrawOriginal("Dilemma.Background", new Rectangle(0, 0, 1024, 768));
+        if (!DrawOriginal("Dilemma.Background", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidOperationException("Youth dilemma screen requires its verified original background art.");
         var imported = _youthDilemmaResult is null ? CurrentImportedDilemma() : null;
-        if (original && imported is not null) DrawDilemmaAnimation(imported);
+        if (imported is not null) DrawDilemmaAnimation(imported);
         if (_youthDilemmaResult is { } result)
         {
-            if (!original) DrawPanel($"YOUTH - {result.Outcome.ToString().ToUpperInvariant()}", $"DILEMMA {result.DilemmaNumber}");
-            DrawText(result.Text, original ? 84 : 90, original ? 330 : 190, original ? Color.Black : Color.Wheat, 2, original ? 850 : 820);
-            if (!original) DrawText("ENTER OR SPACE TO CONTINUE", 220, 520, Color.LightGreen, 2);
+            DrawText(result.Text, 84, 330, Color.Black, 2, 850);
         }
         else if (imported is not null)
         {
-            if (!original) DrawPanel($"YOUTH - AGE {imported.Age}", imported.Title);
-            DrawText(imported.Prompt, original ? 84 : 90, original ? 330 : 170, original ? Color.Black : Color.Wheat, 2, original ? 850 : 820);
-            if (!original)
-            {
-                for (var i = 0; i < imported.Choices.Count; i++)
-                    DrawText($"{i + 1}  {imported.Choices[i].Text}", 110, 285 + i * 75, Color.White, 2, 800);
-            }
+            DrawText(imported.Prompt, 84, 330, Color.Black, 2, 850);
         }
         else
         {
-            var dilemma = Youth.Dilemmas[Math.Min(index, Youth.Dilemmas.Length - 1)];
-            DrawPanel($"YOUTH - YEAR {index + 1} OF {Youth.OriginalPool.StageCount}", dilemma.Title);
-            DrawText(dilemma.Prompt, 90, 190, Color.Wheat, 2, 820);
-            for (var i = 0; i < dilemma.Choices.Length; i++) DrawText($"{i + 1}  {dilemma.Choices[i].Text}", 110, 300 + i * 75, Color.White);
+            throw new InvalidOperationException("Youth dilemma screen requires its verified original dialogue data.");
         }
-        if (original)
-        {
-            int[] values = [stats.Strength, stats.Dexterity, stats.Piety, stats.Stamina, stats.Honor, _campaign.State.Player.Wealth, _campaign.State.Player.Age];
-            for (var i = 0; i < values.Length; i++) DrawText(values[i].ToString(), 320, 103 + i * 27, Color.Black, 2);
-        }
-        else DrawText($"STR {stats.Strength}  DEX {stats.Dexterity}  INT {stats.Intelligence}  PIETY {stats.Piety}  STAMINA {stats.Stamina}  HONOR {stats.Honor}", 70, 590, Color.Gold, 2);
+        int[] values = [stats.Strength, stats.Dexterity, stats.Piety, stats.Stamina, stats.Honor, _campaign.State.Player.Wealth, _campaign.State.Player.Age];
+        for (var i = 0; i < values.Length; i++) DrawText(values[i].ToString(), 320, 103 + i * 27, Color.Black, 2);
     }
 
     private void DrawCampaignBriefing()
     {
-        if (DrawOriginal("Campaign.Briefing", new Rectangle(0, 0, 1024, 768))) return;
-        DrawPanel("YOUR CAMPAIGN", "TWO ROADS TO GLORY LIE BEFORE YOU");
-        DrawText("Raise an army, conquer rival holdings, and challenge the crown in London.",
-            105, 230, Color.Wheat, 2, 810);
-        DrawText("Or strengthen your estate, compete at tournaments, and seek the path to the dragon.",
-            105, 355, Color.Wheat, 2, 810);
-        DrawText("PRESS ANY KEY TO BEGIN", 310, 585, Color.LightGreen, 2);
+        if (!DrawOriginal("Campaign.Briefing", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidOperationException("Campaign briefing requires its verified original background art.");
     }
 
     private void DrawDilemmaAnimation(YouthDilemmaDefinition dilemma)
@@ -375,13 +348,9 @@ public sealed partial class ConquerorGame
 
     private void DrawMap()
     {
-        if (DrawOriginal("Estate.Shell", new Rectangle(0, 0, 1024, 768)))
-        {
-            DrawEstateMap();
-            return;
-        }
-
-        DrawFallbackMap();
+        if (!DrawOriginal("Estate.Shell", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidOperationException("Estate map requires its verified original shell art.");
+        DrawEstateMap();
     }
 
     private void DrawEstateMap()
@@ -608,21 +577,16 @@ public sealed partial class ConquerorGame
 
     private void DrawHome()
     {
-        var original = DrawOriginal("Home.Office", new Rectangle(0, 0, 1024, 768));
-        if (!original) DrawPanel("CASTLE OFFICE", "MANAGE YOUR FIEF OR RETURN TO THE ROAD");
-        if (original) DrawSceneHoverLabel(_homeHotspots, HomePresentationDefinitions.HoverLabelBounds);
-        else DrawText("F  FARM MANAGEMENT    V  VILLAGE    ENTER  MAP", 80, 715, Color.Wheat, 2);
+        if (!DrawOriginal("Home.Office", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidOperationException("Castle office requires its verified original background art.");
+        DrawSceneHoverLabel(_homeHotspots, HomePresentationDefinitions.HoverLabelBounds);
     }
 
     private void DrawWarPlanning()
     {
-        var original = DrawOriginal("Home.WarPlanning", new Rectangle(0, 0, 1024, 768));
-        if (!original)
-        {
-            DrawPanel("WAR PLANNING", "ORIGINAL COMMAND DISPATCH IS STILL UNDER INVESTIGATION");
-            DrawText("ENTER OR ESC  RETURN TO OFFICE", 610, 720, Color.Wheat, 2, 390);
-        }
-        else DrawWarPlanningControls();
+        if (!DrawOriginal("Home.WarPlanning", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidOperationException("War planning requires its verified original background art.");
+        DrawWarPlanningControls();
     }
 
     private void DrawWarPlanningControls()
@@ -688,42 +652,27 @@ public sealed partial class ConquerorGame
 
     private void DrawFarm()
     {
-        var f = _campaign.State.Player.Home; var p = _campaign.State.Player;
         var layout = _fiefLayouts[_fiefSection];
-        var original = DrawOriginal("Farm.Management", new Rectangle(0, 0, 1024, 768));
-        if (!original) DrawPanel(layout.Title, $"WEALTH {p.Wealth}S  POPULATION {f.Population}  PRODUCTIVITY {f.Productivity()}%");
-        else DrawFarmTerrain(layout.Terrain);
-
-        var accountColor = original ? Color.Black : Color.White;
+        if (!DrawOriginal("Farm.Management", new Rectangle(0, 0, 1024, 768)))
+            throw new InvalidOperationException("Farm management requires its verified original background art.");
+        DrawFarmTerrain(layout.Terrain);
+        var accountColor = Color.Black;
         DrawText(layout.Title, 55, 70, accountColor, 3);
-        if (original)
+        var entries = FarmPresentationDefinitions.EntriesFor(_fiefSection);
+        for (var row = 0; row < layout.Rows.Count && row + _fiefRowOffset < entries.Count; row++)
         {
-            var entries = FarmPresentationDefinitions.EntriesFor(_fiefSection);
-            for (var row = 0; row < layout.Rows.Count && row + _fiefRowOffset < entries.Count; row++)
-            {
-                var entry = entries[row + _fiefRowOffset];
-                var bounds = ScaleBounds(layout.Rows[row]);
-                var value = FiefEntryValue(entry);
-                DrawText(value.Length == 0 ? entry.Label : $"{entry.Label,-22} {value}",
-                    bounds.X + 4, bounds.Y + 2, accountColor, 1, bounds.Width - 8);
-            }
-            var okay = ScaleBounds(layout.Okay);
-            var cancel = ScaleBounds(layout.Cancel);
-            DrawText("OK", okay.X + 4, okay.Y + 3, Color.White, 1, okay.Width - 8);
-            DrawText("CANCEL", cancel.X + 4, cancel.Y + 3, Color.White, 1, cancel.Width - 8);
-            if (entries.Count > layout.Rows.Count)
-                DrawText($"UP/DOWN  {_fiefRowOffset + 1}-{Math.Min(entries.Count, _fiefRowOffset + layout.Rows.Count)} OF {entries.Count}", 400, 680, Color.Wheat, 1);
-            return;
+            var entry = entries[row + _fiefRowOffset];
+            var bounds = ScaleBounds(layout.Rows[row]);
+            var value = FiefEntryValue(entry);
+            DrawText(value.Length == 0 ? entry.Label : $"{entry.Label,-22} {value}",
+                bounds.X + 4, bounds.Y + 2, accountColor, 1, bounds.Width - 8);
         }
-        DrawText($"WEALTH          {p.Wealth}", 55, 120, accountColor, 2);
-        DrawText($"POPULATION      {f.Population}", 55, 155, accountColor, 2);
-        DrawText($"SERFS AVAILABLE {f.AvailableSerfs}", 55, 190, accountColor, 2);
-        DrawText($"PRODUCTIVITY    {f.Productivity()}%", 55, 225, accountColor, 2);
-        DrawText($"HOUSES          {f.Houses}", 55, 260, accountColor, 2);
-        var helpRows = FarmPresentationDefinitions.HelpRowsFor(_fiefSection);
-        for (var row = 0; row < helpRows.Count; row++)
-            DrawText(helpRows[row], 55, 525 + row * 36,
-                row == helpRows.Count - 1 ? Color.Gold : Color.Wheat, 1, 900);
+        var okay = ScaleBounds(layout.Okay);
+        var cancel = ScaleBounds(layout.Cancel);
+        DrawText("OK", okay.X + 4, okay.Y + 3, Color.White, 1, okay.Width - 8);
+        DrawText("CANCEL", cancel.X + 4, cancel.Y + 3, Color.White, 1, cancel.Width - 8);
+        if (entries.Count > layout.Rows.Count)
+            DrawText($"UP/DOWN  {_fiefRowOffset + 1}-{Math.Min(entries.Count, _fiefRowOffset + layout.Rows.Count)} OF {entries.Count}", 400, 680, Color.Wheat, 1);
     }
 
     private string FiefEntryValue(FarmPresentationDefinitions.Entry entry)
