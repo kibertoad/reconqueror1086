@@ -243,6 +243,33 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void SchemaOneSettlementPreservesAnAlreadyBootstrappedStrategicState()
+    {
+        var state = Campaign.NewFromTemplate(0);
+        state.SchemaVersion = 1;
+        state.Date = new DateTime(1087, 9, 3);
+        state.GarrisonStrength[2] = 12;
+        var strategic = OriginalStrategicCampaignState.CreateForNewGame(state.Date, startingRouteSelector: 4);
+        strategic.CameraRow = 91;
+        strategic.CameraColumn = 42;
+        strategic.Properties[3].Garrison = 77;
+        state.OriginalStrategicState = strategic;
+        state.EnemyMovements.Add(new StrategicEnemyMovement(
+            3, 2, 4, state.Date, state.Date.AddDays(4), 2, 3, 4));
+
+        var settlement = StrategicSchemaTwoMigration.Prepare(state);
+
+        Assert.Equal(new StrategicSchemaOneSettlement(1, 0, 9, 0), settlement);
+        Assert.Same(strategic, state.OriginalStrategicState);
+        Assert.Equal((4, 91, 42, 77), (strategic.StartingRouteSelector, strategic.CameraRow,
+            strategic.CameraColumn, strategic.Properties[3].Garrison));
+        Assert.Equal(21, state.GarrisonStrength[2]);
+        Assert.Empty(state.EnemyMovements);
+        Assert.Contains("slot 3 (9 troops)", state.Journal[^1], StringComparison.Ordinal);
+        Assert.Throws<InvalidOperationException>(() => StrategicSchemaTwoMigration.Prepare(state));
+    }
+
+    [Fact]
     public void SchemaTwoStrategicValidationRejectsLossyOrAmbiguousState()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() =>

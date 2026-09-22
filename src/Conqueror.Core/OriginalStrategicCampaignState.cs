@@ -366,9 +366,18 @@ public static class StrategicSchemaTwoMigration
         ArgumentNullException.ThrowIfNull(state);
         if (state.SchemaVersion != 1)
             throw new InvalidOperationException("Only schema-1 campaign state can be prepared for schema 2.");
-        if (state.OriginalStrategicState is not null)
-            throw new InvalidOperationException("Campaign already contains schema-2 strategic state.");
         ValidateSchemaOneRoster(state);
+        var existingStrategicState = state.OriginalStrategicState;
+        if (existingStrategicState is not null)
+        {
+            // Schema-one saves written after source-shaped new-game bootstrap can
+            // contain both representations. The dated roster is still
+            // irrecoverable, but the exact strategic state must not be thrown
+            // away merely because the old adapter also advanced it.
+            existingStrategicState.Validate();
+            if (state.EnemyMovements.Count == 0)
+                throw new InvalidOperationException("Campaign already has a settled strategic state.");
+        }
 
         var returnedColumns = 0;
         var dispersedColumns = 0;
@@ -401,10 +410,13 @@ public static class StrategicSchemaTwoMigration
         }
 
         state.EnemyMovements.Clear();
-        state.OriginalStrategicState = OriginalStrategicCampaignState.CreateForSchemaOneMigration(
-            state.Date,
-            Math.Clamp(state.DaySpeed, OriginalStrategicMovement.MinimumSpeedMultiplier,
-                OriginalStrategicMovement.MaximumSpeedMultiplier));
+        if (existingStrategicState is null)
+        {
+            state.OriginalStrategicState = OriginalStrategicCampaignState.CreateForSchemaOneMigration(
+                state.Date,
+                Math.Clamp(state.DaySpeed, OriginalStrategicMovement.MinimumSpeedMultiplier,
+                    OriginalStrategicMovement.MaximumSpeedMultiplier));
+        }
         return new(returnedColumns, dispersedColumns, returnedTroops, dispersedTroops);
     }
 
