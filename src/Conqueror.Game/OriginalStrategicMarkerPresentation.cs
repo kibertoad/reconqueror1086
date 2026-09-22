@@ -56,6 +56,26 @@ public static class OriginalStrategicMarkerPresentation
             frameCount, frameWidth, frameHeight);
     }
 
+    /// <summary>
+    /// Converts the temporary-force rendering branch in lifecycle routine
+    /// <c>0x3B0E4</c>. Its active records use the shared marker projection
+    /// with the fixed source frame selected by Core.
+    /// </summary>
+    public static IReadOnlyList<OriginalStrategicMarkerBlit> BuildTemporaryForceBlits(
+        OriginalStrategicCampaignState state,
+        int frameCount,
+        int frameWidth,
+        int frameHeight)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        if (frameCount <= 0) throw new ArgumentOutOfRangeException(nameof(frameCount));
+        if (frameWidth <= 0) throw new ArgumentOutOfRangeException(nameof(frameWidth));
+        if (frameHeight <= 0) throw new ArgumentOutOfRangeException(nameof(frameHeight));
+
+        return BuildBlits(state, OriginalStrategicMapMarkerPresentation.BuildTemporaryForceDraws(state),
+            frameCount, frameWidth, frameHeight);
+    }
+
     private static IReadOnlyList<OriginalStrategicMarkerBlit> BuildBlits(
         OriginalStrategicCampaignState state,
         IReadOnlyList<OriginalStrategicMapMarkerDraw> draws,

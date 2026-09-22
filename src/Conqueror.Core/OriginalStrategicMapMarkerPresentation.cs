@@ -7,6 +7,7 @@ namespace Conqueror.Core;
 /// </summary>
 public static class OriginalStrategicMapMarkerPresentation
 {
+    public const int TemporaryForceMarkerFrame = 3;
     public const int OrdinaryUnselectedOffset = 1;
     public const int AvatarUnselectedOffset = 2;
     public const int DistinguishedUnselectedOffset = 5;
@@ -92,6 +93,31 @@ public static class OriginalStrategicMapMarkerPresentation
                 TruncateTowardZero(record.CurrentX),
                 TruncateTowardZero(record.CurrentY),
                 frame));
+        }
+        return draws;
+    }
+
+    /// <summary>
+    /// Enumerates active temporary-force records in their physical source
+    /// order. Lifecycle pass <c>0x3B0E4</c> truncates each record's live
+    /// <c>+0x5C/+0x60</c> position and sends it through the common
+    /// <c>icon_men.CSF</c> projection with fixed frame three.
+    /// </summary>
+    public static IReadOnlyList<OriginalStrategicMapMarkerDraw> BuildTemporaryForceDraws(
+        OriginalStrategicCampaignState state)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        state.Validate();
+
+        var draws = new List<OriginalStrategicMapMarkerDraw>();
+        foreach (var force in state.TemporaryForceSlots.OrderBy(force => force.Slot))
+        {
+            if (!force.Active) continue;
+            draws.Add(new OriginalStrategicMapMarkerDraw(
+                force.Slot,
+                TruncateTowardZero(force.CurrentX),
+                TruncateTowardZero(force.CurrentY),
+                TemporaryForceMarkerFrame));
         }
         return draws;
     }

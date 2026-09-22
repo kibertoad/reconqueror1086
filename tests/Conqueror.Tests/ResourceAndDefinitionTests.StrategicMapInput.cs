@@ -300,6 +300,25 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void TemporaryForceMarkerDrawPlanUsesFrameThreeAndPhysicalSourceOrder()
+    {
+        var state = OriginalStrategicCampaignState.CreateForNewGame(new DateTime(1086, 3, 1), 0);
+        state.TemporaryForceSlots[2].Active = true;
+        state.TemporaryForceSlots[2].CurrentX = 33.9f;
+        state.TemporaryForceSlots[2].CurrentY = -44.9f;
+        state.TemporaryForceSlots[0].Active = true;
+        state.TemporaryForceSlots[0].CurrentX = -23.9f;
+        state.TemporaryForceSlots[0].CurrentY = 101.9f;
+
+        Assert.Equal([
+            new OriginalStrategicMapMarkerDraw(0, -23, 101,
+                OriginalStrategicMapMarkerPresentation.TemporaryForceMarkerFrame),
+            new OriginalStrategicMapMarkerDraw(2, 33, -44,
+                OriginalStrategicMapMarkerPresentation.TemporaryForceMarkerFrame)
+        ], OriginalStrategicMapMarkerPresentation.BuildTemporaryForceDraws(state));
+    }
+
+    [Fact]
     public void StrategicMapMarkerProjectionUsesInclusiveSourceBoundsBeforeBlitterClipping()
     {
         var state = OriginalStrategicCampaignState.CreateForNewGame(new DateTime(1086, 3, 1), 0);

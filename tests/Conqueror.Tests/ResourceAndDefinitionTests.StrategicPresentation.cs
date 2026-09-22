@@ -73,6 +73,32 @@ public sealed partial class ResourceAndDefinitionTests
         ], blits);
     }
 
+    [Fact]
+    public void StrategicTemporaryForceMarkersUseTheSharedIconFrameAndClipping()
+    {
+        var state = OriginalStrategicCampaignState.CreateForNewGame(new DateTime(1086, 3, 1), 0);
+        state.CameraRow = 10;
+        state.CameraColumn = 2;
+        state.TemporaryForceSlots[1].Active = true;
+        state.TemporaryForceSlots[1].CurrentX = 1107;
+        state.TemporaryForceSlots[1].CurrentY = 200;
+        state.TemporaryForceSlots[2].Active = true;
+        state.TemporaryForceSlots[2].CurrentX = 1067;
+        state.TemporaryForceSlots[2].CurrentY = 100;
+
+        var blits = OriginalStrategicMarkerPresentation.BuildTemporaryForceBlits(
+            state, frameCount: 128, frameWidth: 27, frameHeight: 35);
+
+        Assert.Equal([
+            new OriginalStrategicMarkerBlit(1, 3, new UiBounds(40, 112, 27, 35),
+                new UiBounds(0, 0, 27, 35)),
+            new OriginalStrategicMarkerBlit(2, 3, new UiBounds(20, 12, 7, 35),
+                new UiBounds(20, 0, 7, 35))
+        ], blits);
+        Assert.Throws<InvalidDataException>(() => OriginalStrategicMarkerPresentation
+            .BuildTemporaryForceBlits(state, frameCount: 3, frameWidth: 27, frameHeight: 35));
+    }
+
     private static void ActivateMovementMarker(
         OriginalStrategicCampaignState state,
         int slotIndex,
