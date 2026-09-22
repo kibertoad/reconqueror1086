@@ -59,6 +59,19 @@ public sealed partial class ConquerorGame
         var radius = Math.Max(8, (int)(_dragonBattle.HitRadius * 768));
         DrawOutline(new Rectangle(eye.X - radius, eye.Y - radius, radius * 2, radius * 2), Color.Red, 3);
         var aim = new Point((int)(_dragonBattle.AimX * 1024), (int)(_dragonBattle.AimY * 768));
+        if (!_originalAnimations.TryGetValue("Dragon.Lance", out var lances) || lances.Frames.Count != 25)
+            throw new InvalidOperationException("Dragon battle requires its verified 25-frame lance foreground.");
+        // `0x1B86C`-`0x1B8B4` selects a five-row, reversed-horizontal
+        // frame grid. The source's transformed anchors are still unknown;
+        // quantize the host aim in both axes until that path is recovered.
+        var row = Math.Min(4, (int)(_dragonBattle.AimY * 5));
+        var column = Math.Min(4, (int)(_dragonBattle.AimX * 5));
+        var lanceIndex = row * 5 + (4 - column);
+        var lance = lances.Frames[lanceIndex];
+        var width = lance.Width * 1024 / 640;
+        var height = lance.Height * 768 / 480;
+        _batch.Draw(lance, new Rectangle(aim.X - width / 2, aim.Y - height / 2,
+            width, height), Color.White);
         Fill(new Rectangle(aim.X - 15, aim.Y - 2, 31, 4), Color.Gold);
         Fill(new Rectangle(aim.X - 2, aim.Y - 15, 4, 31), Color.Gold);
 

@@ -475,6 +475,8 @@ public sealed partial class ResourceAndDefinitionTests
     {
         Assert.Contains(new ImportedArtDefinition("Dragon.Background", "image", ":drjstwin.pcx"),
             ImportedArt.Definitions);
+        Assert.Contains(new ImportedAnimationDefinition("Dragon.Lance", ":lance1.csf", "Dragon.Background"),
+            ImportedAnimations.Definitions);
         Assert.Contains(new ImportedMovieDefinition("Travel.DragonLair", "/trandrag.smk"),
             ImportedMovies.Definitions);
         Assert.Contains(new ImportedMovieDefinition("Ending.DragonVictory", "/drjstwin.smk"),

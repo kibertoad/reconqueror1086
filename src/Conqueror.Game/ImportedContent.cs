@@ -96,6 +96,7 @@ public static class ImportedAnimations
         new("Strategic.Map.Markers", ":icon_men.csf", "Estate.Shell"),
         new("Strategic.Map.MarkerOverlay", ":marker.csf", "Estate.Shell"),
         new("Combat.FirstPerson", ":skirmish.csf", "", ":SKIRMISH.PAL"),
+        new("Dragon.Lance", ":lance1.csf", "Dragon.Background"),
         new(OriginalStrategicInteractiveEncounterPresentation.UnitAnimationRole, ":men8.csf",
             OriginalStrategicInteractiveEncounterPresentation.BackgroundArtRole),
         .. EstatePresentationDefinitions.TileAtlases.Select(atlas =>
