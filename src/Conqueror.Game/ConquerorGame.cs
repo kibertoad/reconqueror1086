@@ -105,7 +105,10 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private InnPresentationLayout _innLayout = InnPresentationDefinitions.Fallback;
     private InnPatronHotspot? _innPatron;
     private Screen _conversationReturnScreen = Screen.Inn;
-    private int _joustCursor;
+    // The original joust presentation's cadence is not recovered. Keep this
+    // replacement meter stable at the former 60 Hz visual rate (2 * 60).
+    private const double JoustCursorUnitsPerSecond = 120d;
+    private double _joustCursor;
     private SiegeSession? _siege;
     private SiegeVisuals? _siegeVisuals;
     private SiegeForegroundTrajectory? _siegeWeaponTrajectory;
@@ -464,7 +467,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.Blacksmith: UpdateBlacksmith(Press, mouse, click); break;
             case Screen.BlacksmithDialogue: UpdateBlacksmithDialogue(Press); break;
             case Screen.Shop: UpdateShop(Press, mouse, click); break;
-            case Screen.Tournament: UpdateTournament(Press); break;
+            case Screen.Tournament: UpdateTournament(Press, gameTime); break;
             case Screen.DrogoDemand: UpdateDrogoDemand(Press); break;
             case Screen.FieldBattle: UpdateFieldBattle(Press, gameTime); break;
             case Screen.StrategicEncounter: UpdateStrategicEncounter(Press, mouse, click); break;

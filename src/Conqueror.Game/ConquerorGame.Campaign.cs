@@ -419,9 +419,10 @@ public sealed partial class ConquerorGame
             _notice = _campaign.BuyEquipment(item.Name) ? $"BOUGHT {item.Name}" : "PURCHASE REFUSED";
     }
 
-    private void UpdateTournament(Func<Keys, bool> press)
+    private void UpdateTournament(Func<Keys, bool> press, GameTime gameTime)
     {
-        _joustCursor = (_joustCursor + 2) % 200;
+        var elapsedSeconds = Math.Max(0, gameTime.ElapsedGameTime.TotalSeconds);
+        _joustCursor = (_joustCursor + elapsedSeconds * JoustCursorUnitsPerSecond) % 200d;
         if (press(Keys.Up)) _ladyIndex = (_ladyIndex + Balance.Courtships.Length - 1) % Balance.Courtships.Length;
         if (press(Keys.Down)) _ladyIndex = (_ladyIndex + 1) % Balance.Courtships.Length;
         if (press(Keys.Left)) _tournamentOpponent = (_tournamentOpponent + Balance.TournamentOpponents.Length - 1) % Balance.TournamentOpponents.Length;
@@ -438,7 +439,8 @@ public sealed partial class ConquerorGame
         {
             var lady = _campaign.State.Player.LadyColors;
             var before = _campaign.State.JoustsThisTournament;
-            var won = _campaign.Joust(Math.Abs(100 - _joustCursor), _tournamentOpponent);
+            var accuracy = (int)Math.Round(Math.Abs(100d - _joustCursor), MidpointRounding.AwayFromZero);
+            var won = _campaign.Joust(accuracy, _tournamentOpponent);
             if (_campaign.State.JoustsThisTournament > before)
                 OriginalConversationBindings.RecordJoustResult(_campaign.State, lady, won);
             _notice = won ? "A CLEAN STRIKE - YOU WIN THE WAGER" : "YOU MISS, CANNOT PAY, OR THE LISTS ARE CLOSED";
