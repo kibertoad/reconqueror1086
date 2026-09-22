@@ -11,16 +11,16 @@ public sealed record OriginalStrategicTemporaryForceRoute(
     int PointCount);
 
 /// <summary>
-/// One executable-fixed creator descriptor. The two calendar comparison
-/// fields are retained as raw descriptor facts; their user-facing lifetime
-/// semantics have not been recovered.
+/// One executable-fixed creator descriptor. The source stores its expiry
+/// month and year in the descriptor table, then removes the record only when
+/// both independent comparisons have reached their thresholds.
 /// </summary>
 public sealed record OriginalStrategicTemporaryForceCreator(
     int ActionId,
     int DescriptorIndex,
     int OriginProperty,
-    int FirstCalendarThreshold,
-    int SecondCalendarThreshold);
+    int ExpiryMonth,
+    int ExpiryYear);
 
 public static class OriginalStrategicTemporaryForces
 {

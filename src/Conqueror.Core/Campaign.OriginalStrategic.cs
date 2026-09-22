@@ -336,7 +336,7 @@ public sealed partial class Campaign
 
         strategic.Validate();
         var temporaryForcePass = OriginalStrategicMovement.AdvanceTemporaryForcePass(
-            strategic, _originalStrategicResources);
+            strategic, _originalStrategicResources, State.Date);
         var report = CaptureOriginalStrategicSpyReport(strategic);
         var divisionTargets = strategic.TemporaryForceSlots.Any(slot => slot.Active)
             ? strategic.TemporaryForceSlots.OrderBy(slot => slot.Slot)

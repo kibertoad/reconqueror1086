@@ -64,4 +64,56 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal([1, 2], advanced.TemporaryForcePass.Select(advance => advance.Slot));
         Assert.Empty(advanced.TemporaryForceCreations);
     }
+
+    [Fact]
+    public void TemporaryForceExpiryRunsAfterItsMovementAndUsesTheIndependentMonthAndYearGates()
+    {
+        var state = Campaign.NewFromTemplate(0);
+        state.Date = new DateTime(2000, 2, 1);
+        state.OriginalStrategicState = OriginalStrategicCampaignState.CreateForNewGame(
+            state.Date, startingRouteSelector: 0);
+        var strategic = state.OriginalStrategicState;
+        var force = strategic.TemporaryForceSlots[1];
+        force.Active = true;
+        force.WaypointCount = 44;
+        force.Swordsmen = 1;
+        force.OriginProperty = 7;
+        force.Lord = strategic.Properties[7].Lord;
+        force.Mode = OriginalStrategicMovement.RoutedMode;
+        var resources = new StubStrategicResources
+        {
+            Routes =
+            {
+                ["sc_0.rat"] = [new OriginalStrategicRoutePoint(0, 0)],
+                ["scot.rat"] = Enumerable.Range(0, 44)
+                    .Select(index => new OriginalStrategicRoutePoint(index + 1, 0)).ToArray()
+            }
+        };
+        var campaign = new Campaign(state);
+        campaign.ConfigureOriginalStrategicResources(resources);
+
+        var expired = Assert.Single(campaign.AdvanceOriginalStrategicPass(
+            new OriginalStrategicCampaignPassInput([
+                new OriginalStrategicPlayerTarget(false, 0, 0),
+                new OriginalStrategicPlayerTarget(false, 0, 0),
+                new OriginalStrategicPlayerTarget(false, 0, 0)], SchedulerBlockedByModal: true),
+            new QueueStrategicRandom()).TemporaryForcePass);
+
+        Assert.Equal((1, false, false, true),
+            (expired.Slot, expired.Looped, expired.CompletionSignal, expired.ExpirationSignal));
+        Assert.Equal((false, 44, 1, 0.8f, 0f),
+            (force.Active, force.WaypointCount, force.WaypointIndex, force.DirectionX, force.DirectionY));
+
+        state.Date = new DateTime(2001, 1, 1);
+        force.Active = true;
+        force.WaypointCount = 44;
+        var retained = Assert.Single(campaign.AdvanceOriginalStrategicPass(
+            new OriginalStrategicCampaignPassInput([
+                new OriginalStrategicPlayerTarget(false, 0, 0),
+                new OriginalStrategicPlayerTarget(false, 0, 0),
+                new OriginalStrategicPlayerTarget(false, 0, 0)], SchedulerBlockedByModal: true),
+            new QueueStrategicRandom()).TemporaryForcePass);
+        Assert.False(retained.ExpirationSignal);
+        Assert.True(force.Active);
+    }
 }

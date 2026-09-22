@@ -70,7 +70,8 @@ public static partial class OriginalStrategicMovement
     /// </summary>
     public static IReadOnlyList<OriginalStrategicTemporaryForceAdvance> AdvanceTemporaryForcePass(
         OriginalStrategicCampaignState state,
-        IOriginalStrategicResources resources)
+        IOriginalStrategicResources resources,
+        DateTime calendarDate)
     {
         ArgumentNullException.ThrowIfNull(state);
         ArgumentNullException.ThrowIfNull(resources);
@@ -79,14 +80,41 @@ public static partial class OriginalStrategicMovement
         var advances = new List<OriginalStrategicTemporaryForceAdvance>();
         foreach (var slot in state.TemporaryForceSlots.OrderBy(slot => slot.Slot))
         {
-            if (!slot.Active
-                || slot.PathComplete
-                || slot.WaypointCount == 0
-                || !OriginalStrategicTemporaryForces.TryGetRoute(slot.Slot, out var descriptor))
+            if (!slot.Active || !OriginalStrategicTemporaryForces.TryGetRoute(slot.Slot, out var descriptor)
+                || !TryGetCreatorForSlot(slot.Slot, out var creator))
                 continue;
-            advances.Add(AdvanceTemporaryForce(slot, descriptor, state, resources));
+
+            OriginalStrategicTemporaryForceAdvance? advance = null;
+            if (!slot.PathComplete && slot.WaypointCount != 0)
+                advance = AdvanceTemporaryForce(slot, descriptor, state, resources);
+
+            // 0x3B831 invokes 0x4A61C before the two descriptor comparisons.
+            // The comparisons are independent, rather than a conventional
+            // lexicographic date test: month is zero based and each must be
+            // at least its descriptor value to release the route and clear
+            // the active record.
+            if (calendarDate.Month - 1 >= creator.ExpiryMonth
+                && calendarDate.Year >= creator.ExpiryYear)
+            {
+                // 0x3B86B-0x3B890 clears only the descriptor and force
+                // active flags before releasing the heap route. The record's
+                // completion, cursor, and direction fields stay intact until
+                // a later creator overwrites them.
+                slot.Active = false;
+                advances.Add(new(slot.Slot, advance?.Looped ?? false,
+                    advance?.CompletionSignal ?? false, ActiveAfter: false, ExpirationSignal: true));
+            }
+            else if (advance is { } result)
+                advances.Add(result);
         }
         return advances;
+    }
+
+    private static bool TryGetCreatorForSlot(int slot, out OriginalStrategicTemporaryForceCreator creator)
+    {
+        creator = OriginalStrategicTemporaryForces.Creators.FirstOrDefault(candidate =>
+            candidate.DescriptorIndex == slot)!;
+        return creator is not null;
     }
 
     private static OriginalStrategicTemporaryForceAdvance AdvanceTemporaryForce(
@@ -195,7 +223,8 @@ public readonly record struct OriginalStrategicTemporaryForceAdvance(
     int Slot,
     bool Looped,
     bool CompletionSignal,
-    bool ActiveAfter);
+    bool ActiveAfter,
+    bool ExpirationSignal = false);
 
 /// <summary>One accepted source temporary-force creator action.</summary>
 public readonly record struct OriginalStrategicTemporaryForceCreation(int ActionId, int Slot);

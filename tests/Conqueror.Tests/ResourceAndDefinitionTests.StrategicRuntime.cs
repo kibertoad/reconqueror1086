@@ -207,7 +207,8 @@ public sealed partial class ResourceAndDefinitionTests
             }
         };
 
-        var first = Assert.Single(OriginalStrategicMovement.AdvanceTemporaryForcePass(state, resources));
+        var first = Assert.Single(OriginalStrategicMovement.AdvanceTemporaryForcePass(
+            state, resources, new DateTime(1086, 6, 1)));
 
         Assert.Equal((1, false, false, true),
             (first.Slot, first.Looped, first.CompletionSignal, first.ActiveAfter));
@@ -218,7 +219,8 @@ public sealed partial class ResourceAndDefinitionTests
 
         force.WaypointIndex = 43;
         force.CurrentX = 430;
-        var loop = Assert.Single(OriginalStrategicMovement.AdvanceTemporaryForcePass(state, resources));
+        var loop = Assert.Single(OriginalStrategicMovement.AdvanceTemporaryForcePass(
+            state, resources, new DateTime(1086, 6, 1)));
 
         Assert.True(loop.Looped);
         Assert.False(loop.CompletionSignal);
@@ -231,7 +233,8 @@ public sealed partial class ResourceAndDefinitionTests
         force.WaypointIndex = 1;
         force.CurrentX = 0;
         force.DirectionX = 51;
-        var completed = Assert.Single(OriginalStrategicMovement.AdvanceTemporaryForcePass(state, resources));
+        var completed = Assert.Single(OriginalStrategicMovement.AdvanceTemporaryForcePass(
+            state, resources, new DateTime(1086, 6, 1)));
 
         Assert.True(completed.CompletionSignal);
         Assert.True(force.Active);
