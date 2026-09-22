@@ -707,10 +707,31 @@ public sealed partial class ConquerorGame
 
     private void DrawVillage()
     {
-        if (!DrawOriginal("Village.Background", new Rectangle(0, 0, 1024, 768)))
+        var scene = OriginalVillageScenePresentation.SceneForNewGameHome(_campaign.State, _villageScenes);
+        if (scene is not null)
+        {
+            DrawVillageSceneBackground(scene, new Rectangle(0, 0, 1024, 768));
+        }
+        else if (!DrawOriginal("Village.Background", new Rectangle(0, 0, 1024, 768)))
             throw new InvalidOperationException("Village screen requires its verified original background art.");
         DrawVillageHoverLabel();
         if (_notice.Length > 0) DrawText(_notice, 24, 730, Color.Gold, 2, 976);
+    }
+
+    private void DrawVillageSceneBackground(VillageSceneDefinition scene, Rectangle destination)
+    {
+        var role = "Village.Scene." + scene.BackgroundName;
+        if (!_originalArt.TryGetValue(role, out var texture))
+        {
+            var id = _importedContent.FindId("image", ":" + scene.BackgroundName)
+                ?? throw new InvalidDataException($"Required original village image '{scene.BackgroundName}' is missing.");
+            var image = _importedContent.DecodePcx(id)
+                ?? throw new InvalidDataException($"Required original village image '{scene.BackgroundName}' could not be decoded.");
+            texture = new Texture2D(GraphicsDevice, image.Width, image.Height, false, SurfaceFormat.Color);
+            texture.SetData(image.ToRgba());
+            _originalArt.Add(role, texture);
+        }
+        _batch.Draw(texture, destination, Color.White);
     }
 
     private void DrawVillageHoverLabel()

@@ -210,6 +210,8 @@ public sealed class OriginalStrategicPersonState
     public byte ListNext { get; set; }
     public byte State14 { get; set; }
     public byte State15 { get; set; }
+    /// <summary>Original person record <c>+0x0F</c>; see <see cref="OriginalStrategicPersonDefinition.VillageSceneIndex"/>.</summary>
+    public byte VillageSceneIndex => State15;
     public byte State16 { get; set; }
     public byte State17 { get; set; }
 

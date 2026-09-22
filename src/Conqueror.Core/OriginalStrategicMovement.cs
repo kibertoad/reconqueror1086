@@ -607,7 +607,14 @@ public readonly record struct OriginalStrategicPersonDefinition(
     byte State14,
     byte State15,
     byte State16,
-    byte State17);
+    byte State17)
+{
+    /// <summary>
+    /// Zero-based <c>VILLAGE.DAT</c> exterior record selected by executable
+    /// helper <c>0x43080</c> from original person record <c>+0x0F</c>.
+    /// </summary>
+    public byte VillageSceneIndex => State15;
+}
 
 public readonly record struct OriginalStrategicPropertyGenerationState(byte OwnerOrState, byte State13);
 

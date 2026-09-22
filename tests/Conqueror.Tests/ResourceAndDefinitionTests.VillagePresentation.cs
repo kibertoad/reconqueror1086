@@ -1,3 +1,4 @@
+using Conqueror.Core;
 using Conqueror.Game;
 using Conqueror.Resources;
 using Microsoft.Xna.Framework;
@@ -42,5 +43,31 @@ public sealed partial class ResourceAndDefinitionTests
             VillagePresentationDefinitions.Hit(VillagePresentationDefinitions.Hotspots, new Point(160, 170)));
         Assert.Equal(VillageHotspotAction.Church,
             VillagePresentationDefinitions.Hit(VillagePresentationDefinitions.Hotspots, new Point(500, 300)));
+    }
+
+    [Theory]
+    [InlineData(17, 27)]
+    [InlineData(18, 21)]
+    [InlineData(24, 33)]
+    [InlineData(29, 39)]
+    [InlineData(86, 36)]
+    [InlineData(144, 35)]
+    [InlineData(166, 54)]
+    public void OriginalStartingHomesUseTheirPersonVillageSceneIndex(int person, int sceneIndex)
+    {
+        Assert.Equal(sceneIndex, OriginalStrategicMovement.Persons[person].VillageSceneIndex);
+        var scenes = Enumerable.Range(0, 67)
+            .Select(index => new VillageSceneDefinition($"V{index}_1111.PCX", []))
+            .ToArray();
+        var state = new CampaignState
+        {
+            CurrentLocation = 0,
+            OriginalStrategicState = OriginalStrategicCampaignState.CreateForNewGame(new DateTime(1086, 1, 1),
+                OriginalStrategicMovement.StartingRoutes.Single(route => route.Person == person).Selector)
+        };
+
+        Assert.Same(scenes[sceneIndex], OriginalVillageScenePresentation.SceneForNewGameHome(state, scenes));
+        state.CurrentLocation = 1;
+        Assert.Null(OriginalVillageScenePresentation.SceneForNewGameHome(state, scenes));
     }
 }

@@ -98,6 +98,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         FarmPresentationDefinitions.Layouts.ToDictionary(layout => layout.Section);
     private IReadOnlyList<SceneHotspot> _homeHotspots = HomePresentationDefinitions.Hotspots;
     private IReadOnlyList<VillageHotspot> _villageHotspots = VillagePresentationDefinitions.Hotspots;
+    private IReadOnlyList<VillageSceneDefinition> _villageScenes = [];
     private IReadOnlyList<SceneHotspot> _blacksmithHotspots = BlacksmithPresentationDefinitions.Hotspots;
     private InnPresentationLayout _innLayout = InnPresentationDefinitions.Fallback;
     private InnPatronHotspot? _innPatron;
@@ -234,6 +235,9 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         _estateLayout = EstatePresentationDefinitions.From(RequireLayout(":iconmap.hat"));
         _homeHotspots = HomePresentationDefinitions.HotspotsFrom(RequireLayout(":fopts.hat"));
         _villageHotspots = VillagePresentationDefinitions.HotspotsFrom(RequireLayout(":vopts.hat"));
+        var villageCatalogId = RequireId("resource", ":village.dat");
+        _villageScenes = _importedContent.DecodeVillageSceneCatalog(villageCatalogId)
+            ?? throw new InvalidDataException("Required original VILLAGE.DAT could not be decoded.");
         _warPlanningLayout = WarPlanningPresentationDefinitions.From(RequireLayout(":fwarplan.hat"));
         _fiefLayouts = FarmPresentationDefinitions.Layouts.ToDictionary(
             layout => layout.Section,
