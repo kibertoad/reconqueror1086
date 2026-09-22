@@ -575,21 +575,39 @@ public sealed partial class ConquerorGame
     private void DrawFieldBattle()
     {
         if (_fieldBattle is null) return;
-        Fill(new Rectangle(0, 0, 1024, 768), new Color(75, 95, 52));
-        Fill(new Rectangle(45, 75, 934, 500), new Color(96, 116, 66));
-        for (var x = 0; x <= FieldBattleSession.Rules.Width; x++) Fill(new Rectangle(45 + x * 66, 75, 1, 500), new Color(70, 85, 50));
-        for (var y = 0; y <= FieldBattleSession.Rules.Height; y++) Fill(new Rectangle(45, 75 + y * 55, 934, 1), new Color(70, 85, 50));
-        foreach (var squad in _fieldBattle.Squads.Where(x => x.Count > 0))
+        if (!DrawOriginal("Encounter.Strategic.Background", new Rectangle(0, 0, 1024, 728)))
+            Fill(new Rectangle(0, 0, 1024, 768), new Color(75, 95, 52));
+
+        var draws = FieldBattlePresentation.SpriteDrawsFor(
+            _fieldBattle.Squads, _selectedUnit, _fieldBattle.TickNumber);
+        if (_originalAnimations.TryGetValue("Encounter.Strategic.Units", out var animation))
         {
-            var x = 55 + squad.X * 66; var y = 85 + squad.Y * 55;
-            var color = squad.Friendly ? squad.Type == _selectedUnit ? Color.Gold : Color.RoyalBlue : Color.DarkRed;
-            Fill(new Rectangle(x, y, 48, 38), color);
-            DrawText($"{squad.Count}", x + 8, y + 10, Color.White, 2);
+            foreach (var draw in draws)
+            {
+                if (draw.Frame >= animation.Frames.Count) continue;
+                var frame = animation.Frames[draw.Frame];
+                _batch.Draw(frame, ScaleBounds(new UiBounds(draw.X, draw.Y, frame.Width, frame.Height)), Color.White);
+                if (draw.Selected && OriginalStrategicInteractiveEncounterPresentation.SelectionOverlayFrame < animation.Frames.Count)
+                {
+                    var overlay = animation.Frames[OriginalStrategicInteractiveEncounterPresentation.SelectionOverlayFrame];
+                    _batch.Draw(overlay, ScaleBounds(new UiBounds(
+                        draw.X + OriginalStrategicInteractiveEncounterPresentation.UnitSpriteHalfWidth
+                            - OriginalStrategicInteractiveEncounterPresentation.SelectionOverlayOffsetX,
+                        draw.Y + OriginalStrategicInteractiveEncounterPresentation.UnitSpriteHalfHeight
+                            - OriginalStrategicInteractiveEncounterPresentation.SelectionOverlayOffsetY,
+                        overlay.Width, overlay.Height)), Color.White);
+                }
+            }
         }
-        DrawText($"FIELD BATTLE - TICK {_fieldBattle.TickNumber}", 55, 20, Color.Gold, 3);
-        DrawText($"SELECTED {_selectedUnit}: 1 SWORDS  2 HALBERDS  3 KNIGHTS", 60, 600, Color.White, 2);
-        DrawText("A ADVANCE  H HOLD  Q/E FLANK  R WITHDRAW", 60, 635, Color.Wheat, 2);
-        DrawText("C CAPTAINS CONTROL ALL  W WITHDRAW ALL", 60, 670, Color.Wheat, 2);
+        foreach (var draw in draws)
+        {
+            var squad = _fieldBattle.Squads[draw.SquadIndex];
+            var count = ScaleBounds(new UiBounds(draw.X + 34, draw.Y + 34, 30, 14));
+            DrawText($"{squad.Count}", count.X, count.Y, Color.White, 1, count.Width);
+        }
+        DrawText($"FIELD BATTLE - TICK {_fieldBattle.TickNumber}", 34, 18, Color.Gold, 2);
+        DrawText($"SELECTED {_selectedUnit}: 1 SWORDS  2 HALBERDS  3 KNIGHTS", 48, 728, Color.White, 1);
+        DrawText("A ADVANCE  H HOLD  Q/E FLANK  R WITHDRAW  C CAPTAINS  W WITHDRAW ALL", 48, 748, Color.Wheat, 1);
     }
 
     private void DrawRadar(SiegeSession siege, Rectangle? requestedBounds = null)
