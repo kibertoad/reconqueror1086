@@ -173,8 +173,9 @@ Check(!campaign.Borrow(1), "one outstanding loan only");
 campaign.State.Date = new DateTime(1086, 7, 1);
 campaign.SettleMonth();
 Check(campaign.State.PendingDrogoEncounter && campaign.State.Player.Debt == 300, "harvest debt summons Drogo");
-var drogoBattle = campaign.CreateDrogoBattle();
-Check(drogoBattle.AlliesStarted == 0 && drogoBattle.Enemies.Count == 1, "Drogo core fallback is isolated");
+var drogoBattle = campaign.CreateDrogoBattle(DocumentedDrogoLayout());
+Check(drogoBattle.AlliesStarted == 0 && drogoBattle.Enemies.Count == 4 &&
+    drogoBattle.Enemies.Sum(enemy => enemy.Health) == 55, "Drogo requires the documented external scene layout");
 
 var fief = campaign.State.Player.Home;
 campaign.Build("Steward"); campaign.Build("Beadle"); campaign.Build("Priest"); campaign.Build("Monastery"); campaign.Build("Woodward");
@@ -391,6 +392,25 @@ catch (Exception error)
 Console.WriteLine();
 Console.WriteLine($"Result: {passed} passed, {failed} failed, {passed + failed} total.");
 Environment.ExitCode = failed == 0 ? 0 : 1;
+
+static SiegeLayout DocumentedDrogoLayout()
+{
+    var tiles = new SiegeTile[7, 3];
+    for (var x = 0; x < 7; x++)
+    for (var y = 0; y < 3; y++)
+        tiles[x, y] = SiegeTile.Floor;
+    var templates = new[] { 9, 8, 3, 3 };
+    return new SiegeLayout(tiles, 1, 1, Facing.North,
+        templates.Select((template, index) =>
+        {
+            var definition = OriginalCombatantTemplates.For(template);
+            return new SiegeSpawn(index + 3, 1, Champion: false,
+                OriginalArmor: definition.Armor, OriginalHealth: definition.Health,
+                OriginalCombatRow: index == 0 ? 16 : 17, OriginalAttackSkill: definition.AttackSkill,
+                OriginalActorTemplate: template);
+        }).ToArray(), playerActor: new SiegeSpawn(1, 1, Champion: false,
+            OriginalActorTemplate: 0));
+}
 
 static string CreateSyntheticDilemma()
 {

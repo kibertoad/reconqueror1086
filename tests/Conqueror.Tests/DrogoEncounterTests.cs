@@ -58,7 +58,7 @@ public sealed class DrogoEncounterTests
         var campaign = new Campaign(Campaign.NewFromTemplate(2), seed: 7);
         campaign.State.Player.Debt = 300;
         campaign.State.PendingDrogoEncounter = true;
-        var battle = campaign.CreateDrogoBattle();
+        var battle = campaign.CreateDrogoBattle(OutcomeFixtureLayout());
 
         Assert.Equal(0, battle.AlliesStarted);
         Assert.Single(battle.Enemies);
@@ -111,7 +111,7 @@ public sealed class DrogoEncounterTests
         var campaign = new Campaign(Campaign.NewFromTemplate(2));
         campaign.State.Player.Debt = 300;
         campaign.State.PendingDrogoEncounter = true;
-        var battle = campaign.CreateDrogoBattle();
+        var battle = campaign.CreateDrogoBattle(OutcomeFixtureLayout());
 
         for (var turn = 0; turn < 100 && !battle.Defeated; turn++)
         {
@@ -123,5 +123,15 @@ public sealed class DrogoEncounterTests
         Assert.False(campaign.FinishDrogoBattle(battle));
         Assert.Equal(VictoryKind.Defeat, campaign.State.Victory);
         Assert.Equal(CampaignEndReason.Drogo, campaign.State.EndReason);
+    }
+
+    private static SiegeLayout OutcomeFixtureLayout()
+    {
+        var tiles = new SiegeTile[5, 5];
+        for (var x = 0; x < 5; x++)
+        for (var y = 0; y < 5; y++)
+            tiles[x, y] = x is 0 or 4 || y is 0 or 4 ? SiegeTile.Wall : SiegeTile.Floor;
+        return new SiegeLayout(tiles, 1, 2, Facing.East,
+            [new SiegeSpawn(2, 2, Champion: true)]);
     }
 }

@@ -463,17 +463,10 @@ public sealed partial class Campaign
         return true;
     }
 
-    public SiegeSession CreateDrogoBattle()
-    {
-        if (!State.PendingDrogoEncounter || State.Player.Debt <= 0)
-            throw new InvalidOperationException("Drogo is not waiting to collect a debt.");
-        return DrogoEncounterDefinitions.Create(State.Player, State.Date.DayOfYear + State.Date.Year);
-    }
-
     /// <summary>
-    /// Constructs the debt encounter in an imported original scene. Scene
-    /// selection belongs at the presentation/import boundary; its outcome and
-    /// no-retainer contract remain campaign state.
+    /// Constructs the debt encounter in its required imported original scene.
+    /// Scene selection belongs at the presentation/import boundary; its
+    /// outcome and no-retainer contract remain campaign state.
     /// </summary>
     public SiegeSession CreateDrogoBattle(SiegeLayout layout)
     {
