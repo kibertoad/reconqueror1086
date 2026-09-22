@@ -7,14 +7,14 @@ namespace Conqueror.Tests;
 public sealed partial class ResourceAndDefinitionTests
 {
     [Fact]
-    public void OriginalUiFontRequiresTheObservedFixedAsciiSheet()
+    public void OriginalUiFontRequiresTheObservedProportionalAsciiSheet()
     {
         Assert.True(OriginalUiFontDefinition.IsCompatible(
+            Enumerable.Repeat(new CsfDimensionHeader(9, 13), 256).ToArray()));
+        Assert.False(OriginalUiFontDefinition.IsCompatible(
+            Enumerable.Repeat(new CsfDimensionHeader(9, 13), 255).ToArray()));
+        Assert.False(OriginalUiFontDefinition.IsCompatible(
             Enumerable.Repeat(new CsfDimensionHeader(11, 13), 256).ToArray()));
-        Assert.False(OriginalUiFontDefinition.IsCompatible(
-            Enumerable.Repeat(new CsfDimensionHeader(11, 13), 255).ToArray()));
-        Assert.False(OriginalUiFontDefinition.IsCompatible(
-            Enumerable.Repeat(new CsfDimensionHeader(11, 12), 256).ToArray()));
         Assert.Contains(ImportedFonts.Definitions, font =>
             font.IdSuffix == OriginalUiFontDefinition.ResourceSuffix);
     }

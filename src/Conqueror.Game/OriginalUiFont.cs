@@ -4,17 +4,19 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Conqueror.Game;
 
-/// <summary>Shape contract for the source game's fixed ASCII font resource.</summary>
+/// <summary>Shape contract for the executable-loaded proportional ASCII font resource.</summary>
 public static class OriginalUiFontDefinition
 {
-    public const string ResourceSuffix = ":font.CSF";
+    public const string ResourceSuffix = ":CONFONT.CSF";
     public const int GlyphCount = 256;
-    public const int GlyphWidth = 11;
     public const int GlyphHeight = 13;
+    public const int MinimumGlyphWidth = 2;
+    public const int MaximumGlyphWidth = 10;
 
     public static bool IsCompatible(IReadOnlyList<CsfDimensionHeader> glyphs) =>
         glyphs.Count == GlyphCount && glyphs.All(glyph =>
-            glyph.Width == GlyphWidth && glyph.Height == GlyphHeight);
+            glyph.Width is >= MinimumGlyphWidth and <= MaximumGlyphWidth
+            && glyph.Height == GlyphHeight);
 }
 
 /// <summary>
@@ -24,10 +26,11 @@ public static class OriginalUiFontDefinition
 /// </summary>
 internal sealed class OriginalUiFont : IDisposable
 {
-    // Retain the existing clean-room UI slots while replacing their procedural glyph shapes.
-    // Full source-screen typography spacing is not yet mapped.
-    private const int CompatibilityAdvance = 6;
-    private const int CompatibilityHeight = 7;
+    // The existing canvas has a two-thirds conversion from the source's nominal nine-pixel
+    // glyph width to its previous six-pixel text slot. Preserve that host layout while making
+    // the source's per-glyph advance exact relative to every other glyph.
+    private const int SourceToCanvasNumerator = 2;
+    private const int SourceToCanvasDenominator = 3;
     private const int CompatibilityLineHeight = 9;
     private readonly Texture2D[] _glyphs;
 
@@ -65,9 +68,7 @@ internal sealed class OriginalUiFont : IDisposable
         ArgumentNullException.ThrowIfNull(batch);
         ArgumentNullException.ThrowIfNull(text);
         if (scale <= 0) throw new ArgumentOutOfRangeException(nameof(scale));
-        var renderedText = wrap > 0
-            ? PixelTextLayout.Wrap(text, Math.Max(1, wrap / (CompatibilityAdvance * scale)))
-            : text;
+        var renderedText = wrap > 0 ? Wrap(text, wrap, scale) : text;
         var x = (int)position.X;
         var y = (int)position.Y;
         var origin = x;
@@ -81,10 +82,46 @@ internal sealed class OriginalUiFont : IDisposable
                 continue;
             }
             var glyph = _glyphs[character <= byte.MaxValue ? character : '?'];
-            batch.Draw(glyph, new Rectangle(x, y, CompatibilityAdvance * scale, CompatibilityHeight * scale), color);
-            x += CompatibilityAdvance * scale;
+            var width = CanvasPixels(glyph.Width, scale);
+            batch.Draw(glyph, new Rectangle(x, y, width, CanvasPixels(glyph.Height, scale)), color);
+            x += width;
         }
     }
+
+    private string Wrap(string text, int maximumWidth, int scale)
+    {
+        var result = new System.Text.StringBuilder(text.Length + text.Length / 8);
+        var paragraphs = text.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n').Split('\n');
+        for (var paragraphIndex = 0; paragraphIndex < paragraphs.Length; paragraphIndex++)
+        {
+            if (paragraphIndex > 0) result.Append('\n');
+            var words = paragraphs[paragraphIndex].Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+            var lineWidth = 0;
+            foreach (var word in words)
+            {
+                var wordWidth = TextWidth(word, scale);
+                var separator = lineWidth == 0 ? 0 : TextWidth(" ", scale);
+                if (lineWidth > 0 && lineWidth + separator + wordWidth > maximumWidth)
+                {
+                    result.Append('\n');
+                    lineWidth = 0;
+                    separator = 0;
+                }
+                else if (separator > 0)
+                    result.Append(' ');
+                result.Append(word);
+                lineWidth += separator + wordWidth;
+            }
+        }
+        return result.ToString();
+    }
+
+    private int TextWidth(string text, int scale) => text.Sum(character =>
+        CanvasPixels(_glyphs[character <= byte.MaxValue ? character : '?'].Width, scale));
+
+    private static int CanvasPixels(int sourcePixels, int scale) => Math.Max(1,
+        (sourcePixels * SourceToCanvasNumerator * scale + SourceToCanvasDenominator / 2)
+        / SourceToCanvasDenominator);
 
     public void Dispose()
     {

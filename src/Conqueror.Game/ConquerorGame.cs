@@ -217,9 +217,9 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         _pixel.SetData([Color.White]);
         var fontId = RequireId("indexed-animation", OriginalUiFontDefinition.ResourceSuffix);
         var sourceFont = _importedContent.DecodeCsf(fontId)
-            ?? throw new InvalidDataException("Required original font.CSF could not be decoded.");
+            ?? throw new InvalidDataException("Required original CONFONT.CSF could not be decoded.");
         _originalUiFont = OriginalUiFont.Create(GraphicsDevice, sourceFont)
-            ?? throw new InvalidDataException("Required original font.CSF does not contain the expected 256 11-by-13 glyphs.");
+            ?? throw new InvalidDataException("Required original CONFONT.CSF does not contain the expected proportional 256-glyph sheet.");
         _canvas = new RenderTarget2D(GraphicsDevice, PresentationScaling.VirtualWidth,
             PresentationScaling.VirtualHeight, false, SurfaceFormat.Color, DepthFormat.None);
         _importedSoundLibrary = ImportedSoundLibrary.Load(_importedContent);
