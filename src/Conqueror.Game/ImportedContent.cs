@@ -204,6 +204,8 @@ public sealed class ImportedContentCatalog
                 ("resource", $":{route.ResourceName}")))
             .Concat(OriginalStrategicMovement.StartingRoutes.Select(route =>
                 ("resource", $":{route.ResourceName}")))
+            .Concat(OriginalStrategicTemporaryForces.Routes.Select(route =>
+                ("resource", $":{route.ResourceName}")))
             .Append(("resource", ":icon.jp"))
             .Append(("resource", ":weapons.dat"))
             .ToArray();

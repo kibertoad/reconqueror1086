@@ -266,6 +266,20 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void OriginalStrategicTemporaryForceRoutesBindTheTwoAutomaticCreatorSlots()
+    {
+        Assert.Equal([
+            new OriginalStrategicTemporaryForceRoute(1, "scot.rat", 44),
+            new OriginalStrategicTemporaryForceRoute(2, "wales.rat", 42)
+        ], OriginalStrategicTemporaryForces.Routes);
+        Assert.True(OriginalStrategicTemporaryForces.TryGetRoute(1, out var scot));
+        Assert.Equal("scot.rat", scot.ResourceName);
+        Assert.True(OriginalStrategicTemporaryForces.TryGetRoute(2, out var wales));
+        Assert.Equal("wales.rat", wales.ResourceName);
+        Assert.False(OriginalStrategicTemporaryForces.TryGetRoute(0, out _));
+    }
+
+    [Fact]
     public void OriginalStrategicPropertyLayoutAndRowsMatchExecutableTable()
     {
         Assert.Equal(0xB8EC, OriginalStrategicMovement.PropertyTableAddress);
@@ -778,6 +792,11 @@ public sealed partial class ResourceAndDefinitionTests
                 [new OriginalStrategicRoutePoint(789, 321),
                     new OriginalStrategicRoutePoint(123, -456)],
                 resources.Route(resourceName, reverse: true));
+            Assert.Equal(
+                [new OriginalStrategicRoutePoint(123, -456),
+                    new OriginalStrategicRoutePoint(789, 321)],
+                resources.Route(OriginalStrategicTemporaryForces.Routes[0].ResourceName,
+                    reverse: false));
             Assert.Throws<InvalidDataException>(() => resources.Route("not-a-route.rat", false));
 
             var center = StrategicWorldProjection.CellCenter(7, 11);
@@ -841,6 +860,7 @@ public sealed partial class ResourceAndDefinitionTests
         var routeNames = OriginalStrategicMovement.PropertyRouteResources
             .Select(route => route.ResourceName)
             .Concat(OriginalStrategicMovement.StartingRoutes.Select(route => route.ResourceName))
+            .Concat(OriginalStrategicTemporaryForces.Routes.Select(route => route.ResourceName))
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToArray();
         for (var index = 0; index < routeNames.Length; index++)

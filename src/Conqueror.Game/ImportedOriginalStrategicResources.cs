@@ -24,6 +24,7 @@ public sealed class ImportedOriginalStrategicResources : IOriginalStrategicResou
         var routeNames = OriginalStrategicMovement.PropertyRouteResources
             .Select(route => route.ResourceName)
             .Concat(OriginalStrategicMovement.StartingRoutes.Select(route => route.ResourceName))
+            .Concat(OriginalStrategicTemporaryForces.Routes.Select(route => route.ResourceName))
             .Distinct(StringComparer.OrdinalIgnoreCase);
         foreach (var resourceName in routeNames)
         {
