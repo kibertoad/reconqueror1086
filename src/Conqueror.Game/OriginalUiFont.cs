@@ -19,7 +19,8 @@ public static class OriginalUiFontDefinition
 
 /// <summary>
 /// Monochrome textures reconstructed from the source font's alpha masks. Palette indices are
-/// deliberately ignored because the original face is tinted by each surrounding UI palette.
+/// deliberately ignored because the runtime text color is supplied by each caller; the original
+/// screen-specific palette association has not yet been recovered.
 /// </summary>
 internal sealed class OriginalUiFont : IDisposable
 {
