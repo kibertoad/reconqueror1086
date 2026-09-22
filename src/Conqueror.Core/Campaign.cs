@@ -468,9 +468,9 @@ public sealed partial class Campaign
     }
 
     /// <summary>
-    /// Constructs the one-on-one debt encounter in an imported original scene.
-    /// Scene selection belongs at the presentation/import boundary; its outcome
-    /// and no-retainer contract remain campaign state.
+    /// Constructs the debt encounter in an imported original scene. Scene
+    /// selection belongs at the presentation/import boundary; its outcome and
+    /// no-retainer contract remain campaign state.
     /// </summary>
     public SiegeSession CreateDrogoBattle(SiegeLayout layout)
     {

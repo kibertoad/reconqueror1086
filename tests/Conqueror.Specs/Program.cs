@@ -174,7 +174,7 @@ campaign.State.Date = new DateTime(1086, 7, 1);
 campaign.SettleMonth();
 Check(campaign.State.PendingDrogoEncounter && campaign.State.Player.Debt == 300, "harvest debt summons Drogo");
 var drogoBattle = campaign.CreateDrogoBattle();
-Check(drogoBattle.AlliesStarted == 0 && drogoBattle.Enemies.Count == 1, "Drogo fight is one on one");
+Check(drogoBattle.AlliesStarted == 0 && drogoBattle.Enemies.Count == 1, "Drogo core fallback is isolated");
 
 var fief = campaign.State.Player.Home;
 campaign.Build("Steward"); campaign.Build("Beadle"); campaign.Build("Priest"); campaign.Build("Monastery"); campaign.Build("Woodward");

@@ -56,19 +56,25 @@ public sealed class DrogoEncounterTests
         var campaign = new Campaign(Campaign.NewFromTemplate(2));
         campaign.State.Player.Debt = 300;
         campaign.State.PendingDrogoEncounter = true;
-        var tiles = new SiegeTile[4, 3];
-        for (var x = 0; x < 4; x++)
+        var tiles = new SiegeTile[7, 3];
+        for (var x = 0; x < 7; x++)
         for (var y = 0; y < 3; y++)
             tiles[x, y] = SiegeTile.Floor;
         var layout = new SiegeLayout(tiles, 1, 1, Facing.North,
-            [new SiegeSpawn(3, 1, Champion: true, OriginalHealth: 20)],
-            retainers: [new SiegeSpawn(2, 1, Champion: false)]);
+            [
+                new SiegeSpawn(3, 1, Champion: false, OriginalHealth: 20, OriginalCombatRow: 16, OriginalActorTemplate: 9),
+                new SiegeSpawn(4, 1, Champion: false, OriginalHealth: 15, OriginalCombatRow: 17, OriginalActorTemplate: 8),
+                new SiegeSpawn(5, 1, Champion: false, OriginalHealth: 10, OriginalCombatRow: 17, OriginalActorTemplate: 3),
+                new SiegeSpawn(6, 1, Champion: false, OriginalHealth: 10, OriginalCombatRow: 17, OriginalActorTemplate: 3)
+            ], retainers: [new SiegeSpawn(2, 1, Champion: false)],
+            playerActor: new SiegeSpawn(1, 1, Champion: false, OriginalActorTemplate: 0));
 
         var battle = campaign.CreateDrogoBattle(layout);
 
         Assert.Equal((1, 1, Facing.North), (battle.PlayerX, battle.PlayerY, battle.Facing));
-        var enemy = Assert.Single(battle.Enemies);
-        Assert.Equal((3, 1, 20), (enemy.X, enemy.Y, enemy.Health));
+        Assert.Equal(4, battle.Enemies.Count);
+        Assert.Equal([9, 8, 3, 3], battle.Enemies.Select(enemy => enemy.OriginalActorTemplate!.Value));
+        Assert.Equal(55, battle.Enemies.Sum(enemy => enemy.Health));
         Assert.Equal(0, battle.AlliesStarted);
         Assert.Empty(battle.Retainers);
     }

@@ -1,9 +1,9 @@
 namespace Conqueror.Core;
 
 /// <summary>
-/// Provides the provisional core-only room and strength for the
-/// executable-confirmed one-on-one Drogo debt encounter. The desktop runtime
-/// supplies its decoded MONEY.RES scene through Campaign.CreateDrogoBattle.
+/// Provides the provisional core-only room and strength for the confirmed
+/// Drogo debt encounter. The desktop runtime supplies its decoded MONEY.RES
+/// scene through Campaign.CreateDrogoBattle.
 /// </summary>
 public static class DrogoEncounterDefinitions
 {

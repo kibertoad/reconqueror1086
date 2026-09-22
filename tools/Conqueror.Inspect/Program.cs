@@ -584,7 +584,8 @@ foreach (var file in files.Where(x => DynamixArchive.HasContainerExtension(x.Pat
                 archive.ReadDecoded(mapEntry), blockBytes, archive.ReadDecoded(effectsEntry));
             var sceneName = Path.GetFileNameWithoutExtension(file.Path);
             if (reportSceneBlocks && (sceneName.StartsWith("MELEE", StringComparison.OrdinalIgnoreCase)
-                || sceneName.StartsWith("DEFEND", StringComparison.OrdinalIgnoreCase)))
+                || sceneName.StartsWith("DEFEND", StringComparison.OrdinalIgnoreCase)
+                || sceneName.Equals("MONEY", StringComparison.OrdinalIgnoreCase)))
             {
                 var placements = new int[scene.Blocks.Count];
                 for (var x = 0; x < DynamixScene.MapWidth; x++)
