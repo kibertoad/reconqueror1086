@@ -17,6 +17,18 @@ public static class OriginalUiFontDefinition
         glyphs.Count == GlyphCount && glyphs.All(glyph =>
             glyph.Width is >= MinimumGlyphWidth and <= MaximumGlyphWidth
             && glyph.Height == GlyphHeight);
+
+    /// <summary>
+    /// Converts a cumulative source-pixel advance into the existing host canvas.
+    /// Conversion is deliberately applied after accumulating source advances so
+    /// narrow proportional glyphs do not compound rounding error.
+    /// </summary>
+    public static int CanvasAdvance(int sourcePixels, int scale)
+    {
+        if (sourcePixels < 0) throw new ArgumentOutOfRangeException(nameof(sourcePixels));
+        if (scale <= 0) throw new ArgumentOutOfRangeException(nameof(scale));
+        return (sourcePixels * 2 * scale + 1) / 3;
+    }
 }
 
 /// <summary>
@@ -29,8 +41,6 @@ internal sealed class OriginalUiFont : IDisposable
     // The existing canvas has a two-thirds conversion from the source's nominal nine-pixel
     // glyph width to its previous six-pixel text slot. Preserve that host layout while making
     // the source's per-glyph advance exact relative to every other glyph.
-    private const int SourceToCanvasNumerator = 2;
-    private const int SourceToCanvasDenominator = 3;
     private const int CompatibilityLineHeight = 9;
     private readonly Texture2D[] _glyphs;
 
@@ -72,6 +82,7 @@ internal sealed class OriginalUiFont : IDisposable
         var x = (int)position.X;
         var y = (int)position.Y;
         var origin = x;
+        var sourceAdvance = 0;
         foreach (var character in renderedText)
         {
             if (character == '\r') continue;
@@ -79,12 +90,15 @@ internal sealed class OriginalUiFont : IDisposable
             {
                 x = origin;
                 y += CompatibilityLineHeight * scale;
+                sourceAdvance = 0;
                 continue;
             }
             var glyph = _glyphs[character <= byte.MaxValue ? character : '?'];
-            var width = CanvasPixels(glyph.Width, scale);
-            batch.Draw(glyph, new Rectangle(x, y, width, CanvasPixels(glyph.Height, scale)), color);
-            x += width;
+            x = origin + OriginalUiFontDefinition.CanvasAdvance(sourceAdvance, scale);
+            sourceAdvance += glyph.Width;
+            var nextX = origin + OriginalUiFontDefinition.CanvasAdvance(sourceAdvance, scale);
+            batch.Draw(glyph, new Rectangle(x, y, Math.Max(1, nextX - x),
+                OriginalUiFontDefinition.CanvasAdvance(glyph.Height, scale)), color);
         }
     }
 
@@ -99,9 +113,9 @@ internal sealed class OriginalUiFont : IDisposable
             var lineWidth = 0;
             foreach (var word in words)
             {
-                var wordWidth = TextWidth(word, scale);
-                var separator = lineWidth == 0 ? 0 : TextWidth(" ", scale);
-                if (lineWidth > 0 && lineWidth + separator + wordWidth > maximumWidth)
+                var wordWidth = SourceWidth(word);
+                var separator = lineWidth == 0 ? 0 : SourceWidth(" ");
+                if (lineWidth > 0 && OriginalUiFontDefinition.CanvasAdvance(lineWidth + separator + wordWidth, scale) > maximumWidth)
                 {
                     result.Append('\n');
                     lineWidth = 0;
@@ -116,12 +130,8 @@ internal sealed class OriginalUiFont : IDisposable
         return result.ToString();
     }
 
-    private int TextWidth(string text, int scale) => text.Sum(character =>
-        CanvasPixels(_glyphs[character <= byte.MaxValue ? character : '?'].Width, scale));
-
-    private static int CanvasPixels(int sourcePixels, int scale) => Math.Max(1,
-        (sourcePixels * SourceToCanvasNumerator * scale + SourceToCanvasDenominator / 2)
-        / SourceToCanvasDenominator);
+    private int SourceWidth(string text) => text.Sum(character =>
+        _glyphs[character <= byte.MaxValue ? character : '?'].Width);
 
     public void Dispose()
     {

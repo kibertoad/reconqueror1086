@@ -20,6 +20,16 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void OriginalUiFontConvertsCumulativeSourceAdvancesWithoutNarrowGlyphDrift()
+    {
+        Assert.Equal(4, OriginalUiFontDefinition.CanvasAdvance(6, 1));
+        Assert.Equal(3, OriginalUiFontDefinition.CanvasAdvance(2, 1)
+            + OriginalUiFontDefinition.CanvasAdvance(2, 1)
+            + OriginalUiFontDefinition.CanvasAdvance(2, 1));
+        Assert.Equal(9, OriginalUiFontDefinition.CanvasAdvance(13, 1));
+    }
+
+    [Fact]
     public void SiegeVisualsResolveTheImportedCombatPaletteByItsDecodedKind()
     {
         var root = Path.Combine(Path.GetTempPath(), $"conqueror-combat-palette-{Guid.NewGuid():N}");
