@@ -11,10 +11,6 @@ public static class OriginalStrategicHostRuntime
 {
     public static readonly TimeSpan FixedCadence = TimeSpan.FromSeconds(1d / 60d);
 
-    private static readonly OriginalStrategicPlayerTarget[] NoDivisionTargets =
-        Enumerable.Repeat(new OriginalStrategicPlayerTarget(false, 0, 0),
-            OriginalStrategicMovement.PlayerDivisionTargetCount).ToArray();
-
     /// <summary>
     /// Advances player and hostile strategic records once when the campaign
     /// owns a source-shaped strategic state. Schema-one migrated saves retain
@@ -34,7 +30,8 @@ public static class OriginalStrategicHostRuntime
             || strategic.SchedulerFallbackOriginProperty < 0;
         return campaign.AdvanceOriginalStrategicPass(
             new OriginalStrategicCampaignPassInput(
-                NoDivisionTargets,
+                strategic.TemporaryForceSlots.OrderBy(slot => slot.Slot)
+                    .Select(slot => slot.AsPlayerTarget()).ToArray(),
                 PlayerEncounterHandoffActive: playerEncounterHandoffActive,
                 SchedulerBlockedByModal: schedulerFallbackUnavailable
                     || playerEncounterHandoffActive

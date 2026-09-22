@@ -98,4 +98,37 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Null(pass.SchedulerPass);
         Assert.Equal(0, state.OriginalStrategicState.GenerationAccumulator);
     }
+
+    [Fact]
+    public void HostFixedStrategicPassUsesPersistedTemporaryForceTargets()
+    {
+        var state = Campaign.NewFromTemplate(0);
+        state.OriginalStrategicState = OriginalStrategicCampaignState.CreateForNewGame(
+            state.Date, startingRouteSelector: 0);
+        var strategic = state.OriginalStrategicState;
+        var player = strategic.PlayerMovementSlots[0];
+        player.Active = true;
+        player.PathComplete = false;
+        player.TargetHandle = OriginalStrategicMovement.PlayerDivisionTargetFlag | 1;
+        player.CurrentX = 100;
+        player.CurrentY = 200;
+        var force = strategic.TemporaryForceSlots[1];
+        force.Active = true;
+        force.Swordsmen = 5;
+        force.CurrentX = 400.9f;
+        force.CurrentY = 600.9f;
+
+        var campaign = new Campaign(state, seed: 42);
+        campaign.ConfigureOriginalStrategicResources(new StubStrategicResources
+        {
+            Routes = { ["sc_0.rat"] = [new OriginalStrategicRoutePoint(0, 0)] }
+        });
+
+        var pass = OriginalStrategicHostRuntime.AdvanceFixedPass(
+            campaign, schedulerBlockedByModal: true);
+
+        Assert.NotNull(pass);
+        Assert.Equal((400, 600), (player.DestinationX, player.DestinationY));
+        Assert.Null(pass!.SchedulerPass);
+    }
 }

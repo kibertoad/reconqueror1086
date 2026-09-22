@@ -125,7 +125,7 @@ public sealed partial class ConquerorGame
         }
 
         var result = OriginalStrategicMapCommands.DispatchRawPointer(
-            strategic, _originalStrategicResources, InactiveTemporaryDivisionTargets(),
+            strategic, _originalStrategicResources, TemporaryDivisionTargets(strategic),
             confirmation.RawPointerX, confirmation.RawPointerY, targetConfirmed: true);
         _strategicMapTargetConfirmation = null;
         _notice = result.Command.Applied ? "TARGET CONFIRMED" : "TARGET IS NO LONGER AVAILABLE";
@@ -151,7 +151,7 @@ public sealed partial class ConquerorGame
             return false;
 
         var result = OriginalStrategicMapCommands.DispatchRawPointer(
-            strategic, _originalStrategicResources, InactiveTemporaryDivisionTargets(), x, y,
+            strategic, _originalStrategicResources, TemporaryDivisionTargets(strategic), x, y,
             targetConfirmed: false);
         if (result.RequiresTargetConfirmation)
         {
@@ -165,9 +165,9 @@ public sealed partial class ConquerorGame
         return true;
     }
 
-    private static OriginalStrategicPlayerTarget[] InactiveTemporaryDivisionTargets() =>
-        Enumerable.Repeat(new OriginalStrategicPlayerTarget(false, 0, 0),
-            OriginalStrategicMovement.PlayerDivisionTargetCount).ToArray();
+    private static OriginalStrategicPlayerTarget[] TemporaryDivisionTargets(
+        OriginalStrategicCampaignState strategic) => strategic.TemporaryForceSlots
+            .OrderBy(slot => slot.Slot).Select(slot => slot.AsPlayerTarget()).ToArray();
 
     private readonly record struct OriginalStrategicMapTargetConfirmation(int RawPointerX, int RawPointerY);
 

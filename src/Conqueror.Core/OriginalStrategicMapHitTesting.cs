@@ -3,8 +3,8 @@ namespace Conqueror.Core;
 /// <summary>
 /// Reproduces the original strategic-map dispatcher's ordered record hit
 /// testing after <c>0x640A0</c> has converted the raw pointer to route space.
-/// The temporary division targets remain caller-owned because their table is
-/// not persisted by the strategic campaign state.
+/// Temporary-force targets are supplied at the boundary so this primitive
+/// remains usable with source-shaped state and focused fixtures alike.
 /// </summary>
 public static class OriginalStrategicMapHitTesting
 {

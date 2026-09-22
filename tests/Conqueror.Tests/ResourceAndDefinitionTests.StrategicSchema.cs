@@ -19,8 +19,10 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(OriginalStrategicMovement.PropertyCount, state.Properties.Count);
         Assert.Equal(OriginalStrategicMovement.PersonCount, state.Persons.Count);
         Assert.Equal([0, 1, 2, 3, 4], state.MovementSlots.Select(slot => slot.Slot));
+        Assert.Equal([0, 1, 2], state.TemporaryForceSlots.Select(slot => slot.Slot));
         Assert.Equal([0, 1, 2, 3, 4, 5], state.PlayerMovementSlots.Select(slot => slot.Slot));
         Assert.All(state.MovementSlots, slot => Assert.False(slot.Active));
+        Assert.All(state.TemporaryForceSlots, slot => Assert.False(slot.Active));
         Assert.All(state.PlayerMovementSlots.Take(5), slot => Assert.False(slot.Active));
         var starting = OriginalStrategicMovement.StartingRoutes[4];
         Assert.Equal((starting.GridX, starting.GridY, 0),
@@ -101,6 +103,13 @@ public sealed partial class ResourceAndDefinitionTests
         movement.DirectionY = -0.25f;
         movement.RouteResource = "sc_0.rat";
         movement.RouteReversed = false;
+        var temporary = strategic.TemporaryForceSlots[1];
+        temporary.Active = true;
+        temporary.Swordsmen = 8;
+        temporary.Halberdiers = 9;
+        temporary.Knights = 10;
+        temporary.CurrentX = 4_444.5f;
+        temporary.CurrentY = 888.25f;
         strategic.SelectedPlayerMovementSlot = 4;
         strategic.EngagedPlayerMovementSlot = 3;
         strategic.PlayerRouteInputActive = true;
@@ -135,6 +144,7 @@ public sealed partial class ResourceAndDefinitionTests
         var roundTripped = Assert.IsType<OriginalStrategicCampaignState>(restored!.OriginalStrategicState);
         roundTripped.Validate();
         var restoredMovement = roundTripped.MovementSlots[2];
+        var restoredTemporary = roundTripped.TemporaryForceSlots[1];
         var restoredPlayerMovement = roundTripped.PlayerMovementSlots[4];
         Assert.Equal((6, 7, 199, 399, 4_999, 51, StrategicTerrainProfile.Autumn),
             (roundTripped.StartingRouteSelector, roundTripped.SpeedMultiplier,
@@ -152,6 +162,10 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal((7_438.5f, 2_801.25f, 0.75f, -0.25f),
             (restoredMovement.CurrentX, restoredMovement.CurrentY,
              restoredMovement.DirectionX, restoredMovement.DirectionY));
+        Assert.Equal((true, 8, 9, 10, 4_444.5f, 888.25f),
+            (restoredTemporary.Active, restoredTemporary.Swordsmen,
+             restoredTemporary.Halberdiers, restoredTemporary.Knights,
+             restoredTemporary.CurrentX, restoredTemporary.CurrentY));
         Assert.Equal((17, 23, 4, 4, 3, true, true, 13, 2, 1, 19, 3),
             (roundTripped.PlayerHomeGridX, roundTripped.PlayerHomeGridY,
              roundTripped.ActivePlayerRecordCount,

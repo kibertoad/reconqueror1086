@@ -34,6 +34,11 @@ public sealed class OriginalStrategicCampaignState
     public List<OriginalStrategicPersonState> Persons { get; init; } = [];
     public List<OriginalStrategicPlayerMovementSlot> PlayerMovementSlots { get; init; } = [];
     public List<OriginalStrategicMovementSlot> MovementSlots { get; init; } = [];
+    // Object-2 +0x1A150: three 0x118-byte temporary-force records. This
+    // initializer also keeps saves written before the field existed readable.
+    public List<OriginalStrategicTemporaryForceSlot> TemporaryForceSlots { get; init; } =
+        Enumerable.Range(0, OriginalStrategicMovement.PlayerDivisionTargetCount)
+            .Select(slot => new OriginalStrategicTemporaryForceSlot { Slot = slot }).ToList();
     public List<OriginalStrategicTerrainMutation> TerrainMutations { get; init; } = [];
 
     public static OriginalStrategicCampaignState CreateForNewGame(
@@ -78,6 +83,13 @@ public sealed class OriginalStrategicCampaignState
             || MovementSlots.Select(slot => slot.Slot).Distinct().Count() != OriginalStrategicMovement.SlotCount
             || MovementSlots.Any(slot => slot.Slot is < 0 or >= OriginalStrategicMovement.SlotCount))
             throw new InvalidDataException("Strategic state must contain the five original movement slots.");
+        if (TemporaryForceSlots is null
+            || TemporaryForceSlots.Count != OriginalStrategicMovement.PlayerDivisionTargetCount
+            || TemporaryForceSlots.Select(slot => slot.Slot).Distinct().Count()
+                != OriginalStrategicMovement.PlayerDivisionTargetCount
+            || TemporaryForceSlots.Any(slot => slot.Slot is < 0
+                or >= OriginalStrategicMovement.PlayerDivisionTargetCount))
+            throw new InvalidDataException("Strategic state must contain the three temporary force slots.");
         if (SelectedPlayerMovementSlot is < 0 or >= OriginalStrategicMovement.PlayerMovementRecordCount
             || EngagedPlayerMovementSlot is < 0 or >= OriginalStrategicMovement.PlayerMovementRecordCount
             || PlayerMovementSlots is null
@@ -98,6 +110,7 @@ public sealed class OriginalStrategicCampaignState
             if (property.Lord >= Persons.Count)
                 throw new InvalidDataException("Strategic property references an invalid lord.");
         foreach (var slot in MovementSlots) slot.Validate();
+        foreach (var slot in TemporaryForceSlots) slot.Validate();
         foreach (var slot in PlayerMovementSlots) slot.Validate();
     }
 
@@ -279,6 +292,35 @@ public sealed class OriginalStrategicMovementSlot
             route.ResourceName.Equals(resource, StringComparison.OrdinalIgnoreCase))
         || OriginalStrategicMovement.StartingRoutes.Any(route =>
             route.ResourceName.Equals(resource, StringComparison.OrdinalIgnoreCase));
+}
+
+/// <summary>
+/// Mutable counterpart of one temporary-force record at object-2
+/// <c>+0x1A150 + 0x118 * slot</c>. The source uses <c>+0x00</c> as its
+/// active flag, force counters at <c>+0x1C/+0x20/+0x24</c>, and the map
+/// target coordinates at <c>+0x5C/+0x60</c>. Its construction and expiry
+/// descriptor remain intentionally outside this narrow persisted boundary.
+/// </summary>
+public sealed class OriginalStrategicTemporaryForceSlot
+{
+    public int Slot { get; set; }
+    public bool Active { get; set; }
+    public int Swordsmen { get; set; }
+    public int Halberdiers { get; set; }
+    public int Knights { get; set; }
+    public float CurrentX { get; set; }
+    public float CurrentY { get; set; }
+
+    public OriginalStrategicPlayerTarget AsPlayerTarget() =>
+        new(Active, CurrentX, CurrentY);
+
+    public void Validate()
+    {
+        if (Slot is < 0 or >= OriginalStrategicMovement.PlayerDivisionTargetCount
+            || Swordsmen < 0 || Halberdiers < 0 || Knights < 0
+            || !float.IsFinite(CurrentX) || !float.IsFinite(CurrentY))
+            throw new InvalidDataException("Temporary strategic force slot contains invalid persisted fields.");
+    }
 }
 
 public sealed record OriginalStrategicTerrainMutation(int Row, int Column, uint CellValue);
