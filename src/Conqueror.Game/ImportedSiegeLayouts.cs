@@ -10,6 +10,8 @@ public sealed record ImportedSiegeScene(
 public static class ImportedSiegeLayouts
 {
     public const string CombatPaletteSuffix = ":SKIRMISH.PAL";
+    // Calendar debt branch 0x1074C resolves object-2 +0xA4 on both combat
+    // paths before common first-person setup 0x1070C; that object is MONEY.RES.
     public const string DrogoSceneName = "MONEY.RES";
     // The executable's actor-color loader writes global walk-family slots
     // 64/96/128 into live blocks. DEFEND2.RES is the supported high-resolution

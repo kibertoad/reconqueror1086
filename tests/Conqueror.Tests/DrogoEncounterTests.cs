@@ -27,6 +27,32 @@ public sealed class DrogoEncounterTests
     }
 
     [Fact]
+    public void OutstandingDebtSchedulesTheDemandAtEachJulyGate()
+    {
+        var campaign = new Campaign(Campaign.NewFromTemplate(2));
+        campaign.State.Player.Debt = 300;
+
+        campaign.State.Date = new DateTime(1086, 6, 1);
+        campaign.SettleMonth();
+        Assert.False(campaign.State.PendingDrogoEncounter);
+
+        campaign.State.Date = new DateTime(1086, 7, 1);
+        campaign.SettleMonth();
+        Assert.True(campaign.State.PendingDrogoEncounter);
+
+        // Clear the delivered prompt while deliberately leaving the debt unpaid
+        // so the next calendar gate can be verified independently.
+        campaign.State.PendingDrogoEncounter = false;
+        campaign.State.Date = new DateTime(1087, 6, 1);
+        campaign.SettleMonth();
+        Assert.False(campaign.State.PendingDrogoEncounter);
+
+        campaign.State.Date = new DateTime(1087, 7, 1);
+        campaign.SettleMonth();
+        Assert.True(campaign.State.PendingDrogoEncounter);
+    }
+
+    [Fact]
     public void KillingDrogoEndsTheDebtAndClosesTheMoneylender()
     {
         var campaign = new Campaign(Campaign.NewFromTemplate(2), seed: 7);

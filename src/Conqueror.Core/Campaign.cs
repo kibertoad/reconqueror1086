@@ -440,6 +440,9 @@ public sealed partial class Campaign
         if (f.TaxRate > 10) growthRate *= .93;
         f.Population = Math.Max(0, (int)Math.Round(f.Population * (1 + growthRate)));
 
+        // Calendar pass 0x2B060 tests its zero-based month value against 6,
+        // then calls debt branch 0x1074C when the outstanding-debt accessor is
+        // nonzero. Its refusal paths directly load MONEY.RES at object-2 +0xA4.
         if (july && p.Debt > 0)
         {
             State.PendingDrogoEncounter = true;
