@@ -14,6 +14,7 @@ public sealed partial class ConquerorGame
     private const int StrategicEncounterWidth = 640;
     private const int StrategicEncounterHeight = 480;
     private OriginalStrategicInteractiveEncounterHoverPresentation _strategicEncounterHover;
+    private int _strategicEncounterPlayerScoreModifier;
 
     private void BeginStrategicEncounter(OriginalStrategicPlayerEnemyEncounter encounter)
     {
@@ -22,6 +23,7 @@ public sealed partial class ConquerorGame
         _strategicInteractiveEncounter = null;
         _strategicEncounterViewport = null;
         _strategicEncounterHover = default;
+        _strategicEncounterPlayerScoreModifier = _campaign.OriginalStrategicEncounterPlayerScoreModifier(encounter);
         _screen = Screen.StrategicEncounter;
         _notice = "STRATEGIC ARMIES MEET";
     }
@@ -41,7 +43,7 @@ public sealed partial class ConquerorGame
             if (entry.Value.ExitsToAutomaticFallback)
             {
                 var automatic = _campaign.ResolveAutomaticOriginalStrategicEncounter(
-                    encounter, playerScoreModifier: 0, new HostEncounterRandom());
+                    encounter, _strategicEncounterPlayerScoreModifier, new HostEncounterRandom());
                 FinishStrategicEncounter(automatic.ResolverResult.PlayerWon ? "STRATEGIC VICTORY" : "STRATEGIC DEFEAT");
                 return;
             }
@@ -63,7 +65,7 @@ public sealed partial class ConquerorGame
         var (x, y) = OriginalPoint(mouse);
         var inputCode = click ? EncounterInputCodeFor(session, viewport, x, y) : 0;
         var result = session.AdvanceMappedFrame(TimeSpan.FromSeconds(_presentationSeconds), inputCode, x, y,
-            viewport, playerScoreModifier: 0, new HostEncounterRandom());
+            viewport, _strategicEncounterPlayerScoreModifier, new HostEncounterRandom());
         _strategicEncounterHover = result.HoverPresentation;
         if (!result.ResolverEnded) return;
 
@@ -104,6 +106,7 @@ public sealed partial class ConquerorGame
         _strategicInteractiveEncounter = null;
         _strategicEncounterViewport = null;
         _strategicEncounterHover = default;
+        _strategicEncounterPlayerScoreModifier = 0;
         _screen = Screen.Map;
         _notice = notice;
         Autosave();

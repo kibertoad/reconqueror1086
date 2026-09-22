@@ -79,6 +79,22 @@ public static class OriginalStrategicEncounterStaging
 {
     public const int ResolverForceThreshold = 60;
     public const int PlayerLargeCategoryThreshold = 20;
+    public const int DistinguishedPlayerScoreBonus = 20;
+    public const int PlayerScoreDivisor = 6;
+
+    /// <summary>
+    /// Maps wrapper <c>0x35924:0x3593F-0x35967</c>. The source reads dynamic
+    /// character fields 5/6 (HONOR/FAME), adds 20 only for the record named
+    /// by global <c>AE6C</c>, then uses signed division by six as resolver
+    /// argument seven. Argument eight remains zero at its campaign caller.
+    /// </summary>
+    public static int PlayerScoreModifier(Player player, bool isDistinguishedPlayerRecord)
+    {
+        ArgumentNullException.ThrowIfNull(player);
+        var total = checked(player.Stats.Honor + player.Fame
+            + (isDistinguishedPlayerRecord ? DistinguishedPlayerScoreBonus : 0));
+        return total / PlayerScoreDivisor;
+    }
 
     /// <summary>
     /// Maps wrapper <c>0x35924</c>'s pre-resolver counter reductions. Its
@@ -250,6 +266,21 @@ public sealed record OriginalStrategicInteractiveEncounterApplication(
 
 public sealed partial class Campaign
 {
+    /// <summary>
+    /// Recovers wrapper <c>0x35924</c>'s player-side resolver modifier for a
+    /// captured contact. The distinguished marker is the persisted source
+    /// global <c>AE6C</c>, not necessarily the avatar or army slot zero.
+    /// </summary>
+    public int OriginalStrategicEncounterPlayerScoreModifier(
+        OriginalStrategicPlayerEnemyEncounter encounter)
+    {
+        ArgumentNullException.ThrowIfNull(encounter);
+        if (State.OriginalStrategicState is not { } strategic)
+            throw new InvalidOperationException("Campaign has no original strategic movement state.");
+        return OriginalStrategicEncounterStaging.PlayerScoreModifier(State.Player,
+            encounter.PlayerMovementSlot == strategic.EngagedPlayerMovementSlot);
+    }
+
     /// <summary>
     /// Uses this campaign's seeded random stream for the host-owned fixed
     /// strategic pass. The explicit-random overload remains available to
