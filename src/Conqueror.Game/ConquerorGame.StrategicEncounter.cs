@@ -13,6 +13,7 @@ public sealed partial class ConquerorGame
 {
     private const int StrategicEncounterWidth = 640;
     private const int StrategicEncounterHeight = 480;
+    private OriginalStrategicInteractiveEncounterHoverPresentation _strategicEncounterHover;
 
     private void BeginStrategicEncounter(OriginalStrategicPlayerEnemyEncounter encounter)
     {
@@ -20,6 +21,7 @@ public sealed partial class ConquerorGame
         _strategicEncounter = encounter;
         _strategicInteractiveEncounter = null;
         _strategicEncounterViewport = null;
+        _strategicEncounterHover = default;
         _screen = Screen.StrategicEncounter;
         _notice = "STRATEGIC ARMIES MEET";
     }
@@ -62,6 +64,7 @@ public sealed partial class ConquerorGame
         var inputCode = click ? EncounterInputCodeFor(session, viewport, x, y) : 0;
         var result = session.AdvanceMappedFrame(TimeSpan.FromSeconds(_presentationSeconds), inputCode, x, y,
             viewport, playerScoreModifier: 0, new HostEncounterRandom());
+        _strategicEncounterHover = result.HoverPresentation;
         if (!result.ResolverEnded) return;
 
         var settlement = _campaign.ResolveInteractiveOriginalStrategicEncounter(encounter, session);
@@ -100,6 +103,7 @@ public sealed partial class ConquerorGame
         _strategicEncounter = null;
         _strategicInteractiveEncounter = null;
         _strategicEncounterViewport = null;
+        _strategicEncounterHover = default;
         _screen = Screen.Map;
         _notice = notice;
         Autosave();
@@ -146,6 +150,17 @@ public sealed partial class ConquerorGame
         DrawText("STRATEGIC ENCOUNTER", 32, 18, Color.Gold, 2);
         DrawText(session.IsMappedTacticalAdvancementEnabled
             ? "TACTICAL ORDERS ACTIVE" : "CLICK THE FIRST CONTROL TO BEGIN", 32, 46, Color.White, 2);
+        DrawStrategicEncounterHover(viewport);
+    }
+
+    private void DrawStrategicEncounterHover(OriginalStrategicInteractiveEncounterViewport viewport)
+    {
+        var text = _strategicEncounterHover.Text;
+        if (text.Length == 0) return;
+        var panel = OriginalStrategicInteractiveEncounterPresentation.HoverStatusPanelBoundsFor(
+            viewport.ControlStripMargin, viewport.ViewportHeight);
+        var bounds = ScaleBounds(new UiBounds(panel.X, panel.Y, panel.Width, panel.Height));
+        DrawText(text, bounds.X, bounds.Y, Color.White, 1, bounds.Width);
     }
 
     private void DrawStrategicEncounterMenu()
