@@ -1,4 +1,5 @@
 using Conqueror.Core;
+using Conqueror.Game;
 using Xunit;
 
 namespace Conqueror.Tests;
@@ -42,5 +43,18 @@ public sealed class OriginalPracticeJoustTrialTests
         var trial = new OriginalPracticeJoustTrial();
         trial.RecordFrame(80, 191, 191);
         Assert.Throws<InvalidOperationException>(() => trial.Resolve(() => 0));
+    }
+
+    [Theory]
+    [InlineData(100, 260, "YOUR LANCE MISSES LEFT AND LOW")]
+    [InlineData(260, 100, "YOUR LANCE MISSES RIGHT AND HIGH")]
+    public void PracticeResultUsesSignedMissDirectionInsteadOfErrorCoordinates(
+        int lanceX, int lanceY, string expected)
+    {
+        var trial = new OriginalPracticeJoustTrial();
+        for (var frame = 80; frame <= 82; frame++) trial.RecordFrame(frame, lanceX, lanceY);
+        var result = trial.Resolve(() => 0);
+        Assert.Equal(expected, OriginalPracticeJoustResultPresentation.DescriptionFor(result));
+        Assert.Equal(OriginalPracticeJoustOutcome.OpponentHit, result.Outcome);
     }
 }

@@ -98,9 +98,8 @@ public sealed partial class ConquerorGame
     {
         if (_practiceJoustResult is not { } result) return;
         Fill(new Rectangle(136, 255, 752, 246), new Color(12, 18, 12));
-        DrawText(_notice, 213, 292, Color.Gold, 3);
-        DrawText($"LANCE ERROR X {result.HorizontalError}  Y {result.VerticalError}",
-            215, 369, Color.White, 2);
+        DrawText(OriginalPracticeJoustResultPresentation.DescriptionFor(result),
+            190, 346, Color.Gold, 2);
         DrawText("PRESS ANY KEY OR CLICK", 265, 443, Color.White, 2);
     }
 }

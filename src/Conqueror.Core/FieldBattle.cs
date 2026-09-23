@@ -1,6 +1,6 @@
 namespace Conqueror.Core;
 
-public enum UnitOrder { Hold, Advance, FlankLeft, FlankRight, Withdraw, Captains }
+public enum UnitOrder { Hold, Advance, FlankLeft, FlankRight, Withdraw, Captains, MoveTo }
 public enum FieldBattleOutcome { InProgress, Victory, Defeat, Withdrawn }
 public sealed record FieldBattleDefinition(int Width, int Height, double CounterBonus, int BaseMorale, int WithdrawMoraleLoss);
 
@@ -13,6 +13,8 @@ public sealed class BattleSquad
     public int Y { get; set; }
     public int Morale { get; set; }
     public UnitOrder Order { get; set; }
+    public int? DestinationX { get; set; }
+    public int? DestinationY { get; set; }
 }
 
 public sealed class FieldBattleSession
@@ -39,11 +41,26 @@ public sealed class FieldBattleSession
 
     public void Issue(UnitType type, UnitOrder order)
     {
+        if (order == UnitOrder.MoveTo) throw new ArgumentException("Use IssueDestination for a map point.", nameof(order));
         var squad = Friendly.FirstOrDefault(x => x.Type == type);
         if (squad is null || Outcome != FieldBattleOutcome.InProgress) return;
         squad.Order = order;
+        squad.DestinationX = null;
+        squad.DestinationY = null;
         if (order == UnitOrder.Withdraw) squad.Morale = Math.Max(0, squad.Morale - Rules.WithdrawMoraleLoss);
         LastMessage = $"{type}: {order}.";
+    }
+
+    public bool IssueDestination(UnitType type, int x, int y)
+    {
+        if (x < 0 || x >= Rules.Width || y < 0 || y >= Rules.Height) return false;
+        var squad = Friendly.FirstOrDefault(item => item.Type == type);
+        if (squad is null || Outcome != FieldBattleOutcome.InProgress) return false;
+        squad.DestinationX = x;
+        squad.DestinationY = y;
+        squad.Order = UnitOrder.MoveTo;
+        LastMessage = $"{type}: move to {x + 1}, {y + 1}.";
+        return true;
     }
 
     public void IssueAll(UnitOrder order)
@@ -79,6 +96,11 @@ public sealed class FieldBattleSession
 
     private void MoveSquad(BattleSquad squad)
     {
+        if (squad.Friendly && squad.Order == UnitOrder.MoveTo)
+        {
+            AdvanceToDestination(squad);
+            return;
+        }
         var captainDriven = squad.Order != UnitOrder.Withdraw && (!squad.Friendly || squad.Order == UnitOrder.Captains);
         var target = captainDriven ? ChooseCaptainTarget(squad) : null;
         var order = target is null ? squad.Order : ChooseCaptainOrder(squad, target);
@@ -94,6 +116,73 @@ public sealed class FieldBattleSession
             if (Squads.Any(x => x.Friendly != squad.Friendly && x.Count > 0 && x.X == nextX && x.Y == squad.Y)) return;
             squad.X = nextX;
         }
+    }
+
+    private void AdvanceToDestination(BattleSquad squad)
+    {
+        if (squad.DestinationX is not { } targetX || squad.DestinationY is not { } targetY)
+        {
+            squad.Order = UnitOrder.Hold;
+            return;
+        }
+        if (squad.X == targetX && squad.Y == targetY)
+        {
+            CompleteDestination(squad);
+            return;
+        }
+
+        var visited = new bool[Rules.Width, Rules.Height];
+        var queue = new Queue<(int X, int Y, int FirstX, int FirstY, int Depth)>();
+        queue.Enqueue((squad.X, squad.Y, squad.X, squad.Y, 0));
+        visited[squad.X, squad.Y] = true;
+        var bestDistance = Math.Abs(targetX - squad.X) + Math.Abs(targetY - squad.Y);
+        var bestStep = (X: squad.X, Y: squad.Y);
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+            var towardY = Math.Sign(targetY - current.Y);
+            var towardX = Math.Sign(targetX - current.X);
+            foreach (var (dx, dy) in new[]
+                     {
+                         (0, towardY), (towardX, 0), (0, -towardY), (-towardX, 0),
+                         (0, -1), (0, 1), (-1, 0), (1, 0)
+                     })
+            {
+                if (dx == 0 && dy == 0) continue;
+                var nextX = current.X + dx;
+                var nextY = current.Y + dy;
+                if (nextX < 0 || nextX >= Rules.Width || nextY < 0 || nextY >= Rules.Height
+                    || visited[nextX, nextY]
+                    || Squads.Any(other => other != squad && other.Count > 0
+                        && other.X == nextX && other.Y == nextY)) continue;
+                visited[nextX, nextY] = true;
+                var firstX = current.Depth == 0 ? nextX : current.FirstX;
+                var firstY = current.Depth == 0 ? nextY : current.FirstY;
+                var distance = Math.Abs(targetX - nextX) + Math.Abs(targetY - nextY);
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    bestStep = (firstX, firstY);
+                }
+                if (nextX == targetX && nextY == targetY)
+                {
+                    squad.X = firstX;
+                    squad.Y = firstY;
+                    if (squad.X == targetX && squad.Y == targetY) CompleteDestination(squad);
+                    return;
+                }
+                queue.Enqueue((nextX, nextY, firstX, firstY, current.Depth + 1));
+            }
+        }
+        squad.X = bestStep.X;
+        squad.Y = bestStep.Y;
+    }
+
+    private static void CompleteDestination(BattleSquad squad)
+    {
+        squad.Order = UnitOrder.Hold;
+        squad.DestinationX = null;
+        squad.DestinationY = null;
     }
 
     private BattleSquad? ChooseCaptainTarget(BattleSquad squad)
@@ -127,7 +216,12 @@ public sealed class FieldBattleSession
         if (_random.NextDouble() >= chance) return;
         defender.Count--;
         defender.Morale = Math.Max(0, defender.Morale - (attacker.Type == UnitType.Knights ? 8 : 5));
-        if (defender.Morale == 0) defender.Order = UnitOrder.Withdraw;
+        if (defender.Morale == 0)
+        {
+            defender.Order = UnitOrder.Withdraw;
+            defender.DestinationX = null;
+            defender.DestinationY = null;
+        }
         LastMessage = $"{attacker.Type} strike {defender.Type}.";
     }
 }

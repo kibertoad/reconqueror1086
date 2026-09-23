@@ -812,6 +812,8 @@ public sealed partial class ConquerorGame
             else if (FieldBattlePointerControls.FriendlyUnitAt(
                     _fieldBattle, _selectedUnit, x, y) is { } unit)
                 _selectedUnit = unit;
+            else if (FieldBattlePointerControls.DestinationAt(x, y) is { } destination)
+                _fieldBattle.IssueDestination(_selectedUnit, destination.X, destination.Y);
         }
         _battleTick += gameTime.ElapsedGameTime.TotalSeconds;
         while (_battleTick >= FieldBattleTickSeconds && _fieldBattle.Outcome == FieldBattleOutcome.InProgress)

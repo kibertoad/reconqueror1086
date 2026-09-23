@@ -9,7 +9,8 @@ public enum OriginalPracticeJoustOutcome
 
 public sealed record OriginalPracticeJoustResult(
     OriginalPracticeJoustOutcome Outcome, int HorizontalError, int VerticalError,
-    int PlayerPoints, int OpponentPoints);
+    int PlayerPoints, int OpponentPoints,
+    int HorizontalOffset, int VerticalOffset);
 
 /// <summary>
 /// Practice worker 0x4184D-0x41929 samples frames 80-82; 0x41A97-0x41B34
@@ -22,6 +23,8 @@ public sealed class OriginalPracticeJoustTrial
     private readonly bool[] _sampled = new bool[3];
     private int _horizontalError;
     private int _verticalError;
+    private int _horizontalOffset;
+    private int _verticalOffset;
 
     public const int FirstContactFrame = 80;
     public const int LastContactFrame = 82;
@@ -35,6 +38,8 @@ public sealed class OriginalPracticeJoustTrial
         _sampled[index] = true;
         _horizontalError += Math.Abs(TargetX[index] - lanceX);
         _verticalError += Math.Abs(TargetY[index] - lanceY);
+        _horizontalOffset += TargetX[index] - lanceX;
+        _verticalOffset += TargetY[index] - lanceY;
     }
 
     public OriginalPracticeJoustResult Resolve(Func<int> rollBelowOneHundred)
@@ -46,7 +51,8 @@ public sealed class OriginalPracticeJoustTrial
         var threshold = 90 - InitialPlayerPoints;
         if (_horizontalError < threshold && _verticalError < threshold)
             return new(OriginalPracticeJoustOutcome.PlayerHit,
-                _horizontalError, _verticalError, InitialPlayerPoints + 2, InitialOpponentPoints);
+                _horizontalError, _verticalError, InitialPlayerPoints + 2, InitialOpponentPoints,
+                _horizontalOffset, _verticalOffset);
 
         var roll = rollBelowOneHundred();
         if ((uint)roll >= 100) throw new ArgumentOutOfRangeException(nameof(rollBelowOneHundred));
@@ -54,6 +60,7 @@ public sealed class OriginalPracticeJoustTrial
         return new(opponentHit ? OriginalPracticeJoustOutcome.OpponentHit
                 : OriginalPracticeJoustOutcome.BothMissed,
             _horizontalError, _verticalError, InitialPlayerPoints,
-            InitialOpponentPoints + (opponentHit ? 2 : 0));
+            InitialOpponentPoints + (opponentHit ? 2 : 0),
+            _horizontalOffset, _verticalOffset);
     }
 }

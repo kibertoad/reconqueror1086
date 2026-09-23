@@ -577,8 +577,15 @@ public sealed partial class ConquerorGame
             DrawText($"{squad.Count}", count.X, count.Y, Color.White, 1, count.Width);
         }
         DrawText($"FIELD BATTLE - TICK {_fieldBattle.TickNumber}", 34, 18, Color.Gold, 2);
-        DrawText($"SELECTED {_selectedUnit}: CLICK A FRIENDLY UNIT OR PRESS 1/2/3", 20, 700, Color.White, 1);
-        var selectedOrder = _fieldBattle.Friendly.FirstOrDefault(squad => squad.Type == _selectedUnit)?.Order;
+        DrawText($"SELECTED {_selectedUnit}: CLICK FRIENDLY, THEN CLICK GROUND TO MOVE", 20, 700, Color.White, 1);
+        var selectedSquad = _fieldBattle.Friendly.FirstOrDefault(squad => squad.Type == _selectedUnit);
+        var selectedOrder = selectedSquad?.Order;
+        if (selectedSquad is { DestinationX: { } targetX, DestinationY: { } targetY })
+        {
+            var cell = FieldBattlePresentation.CellBounds(targetX, targetY);
+            var target = ScaleBounds(new UiBounds(cell.X, cell.Y, cell.Width, cell.Height));
+            DrawOutline(new Rectangle(target.Center.X - 10, target.Center.Y - 10, 20, 20), Color.Gold, 2);
+        }
         foreach (var button in FieldBattlePointerControls.Buttons)
         {
             var bounds = ScaleBounds(button.Bounds);

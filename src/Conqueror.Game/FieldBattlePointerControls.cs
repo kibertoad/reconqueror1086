@@ -19,6 +19,26 @@ public static class FieldBattlePointerControls
     public static FieldBattleOrderButton? ButtonAt(int x, int y) =>
         Buttons.FirstOrDefault(button => button.Bounds.Contains(x, y));
 
+    public static (int X, int Y)? DestinationAt(int x, int y)
+    {
+        if (x < 0 || x >= FieldBattlePresentation.LogicalWidth
+            || y < 0 || y >= FieldBattlePresentation.BattlefieldHeight) return null;
+        var gridX = (int)Math.Round(
+            (x - OriginalStrategicInteractiveEncounterPresentation.UnitSpriteHalfWidth)
+                * (FieldBattleSession.Rules.Width - 1d)
+                / (FieldBattlePresentation.LogicalWidth
+                    - OriginalStrategicInteractiveEncounterPresentation.UnitSpriteWidth),
+            MidpointRounding.AwayFromZero);
+        var gridY = (int)Math.Round(
+            (y - OriginalStrategicInteractiveEncounterPresentation.UnitSpriteHalfHeight)
+                * (FieldBattleSession.Rules.Height - 1d)
+                / (FieldBattlePresentation.BattlefieldHeight
+                    - OriginalStrategicInteractiveEncounterPresentation.UnitSpriteHeight),
+            MidpointRounding.AwayFromZero);
+        return (Math.Clamp(gridX, 0, FieldBattleSession.Rules.Width - 1),
+            Math.Clamp(gridY, 0, FieldBattleSession.Rules.Height - 1));
+    }
+
     public static UnitType? FriendlyUnitAt(FieldBattleSession battle,
         UnitType selectedUnit, int x, int y)
     {

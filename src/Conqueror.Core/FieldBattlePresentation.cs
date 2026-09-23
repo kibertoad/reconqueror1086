@@ -19,6 +19,24 @@ public static class FieldBattlePresentation
     public const int LogicalWidth = 640;
     public const int BattlefieldHeight = 455;
 
+    public static (int X, int Y, int Width, int Height) CellBounds(int gridX, int gridY)
+    {
+        if (gridX < 0 || gridX >= FieldBattleSession.Rules.Width
+            || gridY < 0 || gridY >= FieldBattleSession.Rules.Height)
+            throw new ArgumentOutOfRangeException(nameof(gridX));
+        var centerX = OriginalStrategicInteractiveEncounterPresentation.UnitSpriteHalfWidth
+            + gridX * (LogicalWidth - OriginalStrategicInteractiveEncounterPresentation.UnitSpriteWidth)
+                / (FieldBattleSession.Rules.Width - 1);
+        var centerY = OriginalStrategicInteractiveEncounterPresentation.UnitSpriteHalfHeight
+            + gridY * (BattlefieldHeight - OriginalStrategicInteractiveEncounterPresentation.UnitSpriteHeight)
+                / (FieldBattleSession.Rules.Height - 1);
+        return (
+            centerX - OriginalStrategicInteractiveEncounterPresentation.UnitSpriteHalfWidth,
+            centerY - OriginalStrategicInteractiveEncounterPresentation.UnitSpriteHalfHeight,
+            OriginalStrategicInteractiveEncounterPresentation.UnitSpriteWidth,
+            OriginalStrategicInteractiveEncounterPresentation.UnitSpriteHeight);
+    }
+
     /// <summary>
     /// Places each adapter formation by its stable logical grid coordinate,
     /// then selects a neutral, facing-inward MEN8 sprite. This is host-owned
@@ -36,15 +54,9 @@ public static class FieldBattlePresentation
             if (squad.Count <= 0) continue;
             var x = Math.Clamp(squad.X, 0, FieldBattleSession.Rules.Width - 1);
             var y = Math.Clamp(squad.Y, 0, FieldBattleSession.Rules.Height - 1);
-            var centerX = OriginalStrategicInteractiveEncounterPresentation.UnitSpriteHalfWidth
-                + x * (LogicalWidth - OriginalStrategicInteractiveEncounterPresentation.UnitSpriteWidth)
-                    / (FieldBattleSession.Rules.Width - 1);
-            var centerY = OriginalStrategicInteractiveEncounterPresentation.UnitSpriteHalfHeight
-                + y * (BattlefieldHeight - OriginalStrategicInteractiveEncounterPresentation.UnitSpriteHeight)
-                    / (FieldBattleSession.Rules.Height - 1);
+            var bounds = CellBounds(x, y);
             draws.Add(new FieldBattleSpriteDraw(index, FrameFor(squad, phase),
-                centerX - OriginalStrategicInteractiveEncounterPresentation.UnitSpriteHalfWidth,
-                centerY - OriginalStrategicInteractiveEncounterPresentation.UnitSpriteHalfHeight,
+                bounds.X, bounds.Y,
                 squad.Friendly && squad.Type == selectedType));
         }
 

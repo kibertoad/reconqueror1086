@@ -33,10 +33,42 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(UnitOrder.Advance, FieldBattlePointerControls.ButtonAt(100, 460)?.Order);
         Assert.True(FieldBattlePointerControls.ButtonAt(550, 460)?.AllUnits);
         Assert.Null(FieldBattlePointerControls.ButtonAt(100, 440));
+        Assert.Equal((0, 0), FieldBattlePointerControls.DestinationAt(45, 45));
+        Assert.Equal((13, 8), FieldBattlePointerControls.DestinationAt(595, 410));
+        Assert.Equal((7, 4), FieldBattlePointerControls.DestinationAt(341, 227));
+        Assert.Null(FieldBattlePointerControls.DestinationAt(100, 460));
     }
 
     [Fact]
-    public void LegacyFieldBattlePresentationUsesTheMappedMen8FamiliesAndStableGridPlacement()
+    public void OverheadBattleDestinationMovesSelectedSquadAndAnOrderCancelsTheRoute()
+    {
+        var friendly = new Army();
+        friendly.Units[UnitType.Swordsmen] = 12;
+        var enemy = new Army();
+        enemy.Units[UnitType.Knights] = 12;
+        var battle = new FieldBattleSession(friendly, enemy, 1086);
+        var swords = Assert.Single(battle.Friendly);
+
+        Assert.False(battle.IssueDestination(UnitType.Swordsmen, 14, 0));
+        Assert.True(battle.IssueDestination(UnitType.Swordsmen, 3, 3));
+        battle.Tick();
+        Assert.Equal((1, 3), (swords.X, swords.Y));
+        Assert.Equal(UnitOrder.MoveTo, swords.Order);
+        battle.Tick();
+        Assert.Equal((2, 3), (swords.X, swords.Y));
+        battle.Tick();
+        Assert.Equal((3, 3), (swords.X, swords.Y));
+        Assert.Equal(UnitOrder.Hold, swords.Order);
+        Assert.Null(swords.DestinationX);
+
+        Assert.True(battle.IssueDestination(UnitType.Swordsmen, 7, 4));
+        battle.Issue(UnitType.Swordsmen, UnitOrder.Withdraw);
+        Assert.Equal(UnitOrder.Withdraw, swords.Order);
+        Assert.Null(swords.DestinationX);
+    }
+
+    [Fact]
+    public void OverheadFieldBattlePresentationUsesTheMappedMen8FamiliesAndStableGridPlacement()
     {
         Assert.Equal("Encounter.Strategic.Background", FieldBattlePresentation.BackgroundArtRole);
         Assert.Equal("Encounter.Strategic.Units", FieldBattlePresentation.UnitAnimationRole);

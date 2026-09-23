@@ -116,3 +116,13 @@ on a new ordinary key press or click before another choice. The original
 message wording and exact physical dialog events remain **Provisional**.
 The caller's practice points are local stack values;
 this isolated training run does not mutate campaign tournament scoring.
+
+The source result selector at `0x41B59-0x41C93` reads data-object strings
+`+0x6218`, `+0x623C`, and `+0x6250` through `+0x6304`: a common exit prompt,
+a win message, and eight signed miss-direction cases. It uses the sums of
+`targetX - lanceX` and `targetY - lanceY`, not the accumulated absolute
+errors, and does not announce the opponent's separate scoring roll.
+`OriginalPracticeJoustResult` retains both signed sums;
+`OriginalPracticeJoustResultPresentation` follows the **Confirmed** branch
+selection using independently authored text. Its wording and dialog placement
+remain **Provisional**.
