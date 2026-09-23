@@ -90,14 +90,21 @@ public sealed partial class Campaign
         patrol = new(Math.Max(0, patrol.Swordsmen), Math.Max(0, patrol.Halberdiers), Math.Max(0, patrol.Knights));
         var strategic = State.OriginalStrategicState!;
         var army = State.Player.ArmyAt(encounter.PlayerMovementSlot);
-        army.Units[UnitType.Swordsmen] = player.Swordsmen;
-        army.Units[UnitType.Halberdiers] = player.Halberdiers;
-        army.Units[UnitType.Knights] = player.Knights;
-        army.RecordOriginalStrategicEncounterResolution();
         var force = strategic.TemporaryForceSlots.Single(slot => slot.Slot == encounter.Slot);
         force.Swordsmen = patrol.Swordsmen;
         force.Halberdiers = patrol.Halberdiers;
         force.Knights = patrol.Knights;
+        // 0x3B5D5-0x3B645 ends the contacted player's current route even
+        // when neither side has been eliminated. 0x63EC0 truncates the live
+        // floats toward zero before storing the destination integers.
+        var playerRecord = strategic.PlayerMovementSlots.Single(slot =>
+            slot.Slot == encounter.PlayerMovementSlot);
+        playerRecord.WaypointCount = 0;
+        playerRecord.WaypointIndex = 0;
+        playerRecord.DestinationX = checked((int)playerRecord.CurrentX);
+        playerRecord.DestinationY = checked((int)playerRecord.CurrentY);
+        playerRecord.PathComplete = true;
+        strategic.PlayerRouteInputActive = false;
 
         var variables = State.ConversationVariables;
         while (variables.Count <= 25) variables.Add(0);
@@ -108,14 +115,22 @@ public sealed partial class Campaign
         var reward = 0;
         if (cleared)
         {
-            reward = encounter.Slot == 1 ? 40 : checked(rewardRandom.Next(100) + 50);
+            army.Units[UnitType.Swordsmen] = player.Swordsmen;
+            army.Units[UnitType.Halberdiers] = player.Halberdiers;
+            army.Units[UnitType.Knights] = player.Knights;
+            army.RecordOriginalStrategicEncounterResolution();
+            // 0x3B690 draws before 0x3B6A5 overrides slot one's award.
+            var drawnReward = checked(rewardRandom.Next(100) + 50);
+            reward = encounter.Slot == 1 ? 40 : drawnReward;
             variables[17] = unchecked(variables[17] + reward);
             variables[24] = unchecked(variables[24] + 1);
+            force.EncounterResultMarked = true;
             force.Active = false;
         }
         else if (player.Total == 0)
         {
             variables[25] = unchecked(variables[25] + 1);
+            force.EncounterResultMarked = true;
             if (encounter.PlayerMovementSlot == strategic.EngagedPlayerMovementSlot)
                 modal = true;
             else

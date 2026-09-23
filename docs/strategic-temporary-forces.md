@@ -85,16 +85,22 @@ force counters into `Campaign.OriginalStrategicPatrolEncounter`, where the
 shared `0x258FC` automatic/tactical resolver receives zero score modifiers
 and zero player reserves. `ConquerorGame.StrategicEncounter` presents that
 separate caller through the existing tactical screen. Settlement clamps
-counters, zeroes patrol survivors on resolver victory, writes army and patrol
-survivors, increments scope-zero variables 5/24/25, awards scope-zero variable
-17, and clears the active descriptor/record or removes an empty ordinary
-field record. The distinguished record raises the existing loss-modal signal.
+counters, zeroes patrol survivors on resolver victory, writes patrol survivors
+on either result and player survivors only on victory, increments the applicable
+scope-zero variables 5/24/25, awards scope-zero variable 17 after consuming
+the random draw even for fixed-award slot 1, and clears the active
+descriptor/record or removes an empty ordinary field record. The distinguished
+record raises the existing loss-modal signal. The resolver return also resets
+the engaged player's route and truncates its current position to the route
+destination, as at `0x3B5D5-0x3B645` (round-toward-zero helper `0x63EC0`).
 The runtime preserves variable 17 as a source conversation variable; no
 modern wallet equivalence is asserted. These bindings and the slot-1 fixed
 reward are covered by the patrol settlement test.
 
-The source's descriptor `+0x18` terminal marker and heap route release have
-no persisted replacement fields yet; clearing `Active` prevents further
-route execution. The exact notice text selectors and loss-modal presentation
-remain Provisional. The source battle UI and original conversation
-availability predicates also remain Provisional.
+`OriginalStrategicTemporaryForceSlot.EncounterResultMarked` persists the
+descriptor `+0x18` terminal marker; creation resets it, and terminal victory
+or an empty-player defeat sets it. Clearing `Active` prevents further route
+execution; the replacement owns no equivalent heap route pointer to free.
+The exact notice text selectors and loss-modal presentation remain
+Provisional. The source battle UI and original conversation availability
+predicates also remain Provisional.

@@ -113,11 +113,18 @@ public sealed partial class ConquerorGame
     {
         _eventMovie?.Dispose();
         _eventMovie = null;
+        _activeEventMovieRole = null;
         while (_eventMovieQueue.TryDequeue(out var roleOrSuffix))
         {
             var movie = CreateMovie(roleOrSuffix);
             if (movie is null) continue;
             _eventMovie = movie;
+            _activeEventMovieRole = roleOrSuffix;
+            if (roleOrSuffix == "Practice.Joust")
+            {
+                _practiceJoustLanceX = 225;
+                _practiceJoustLanceY = 150;
+            }
             if (_musicInstance?.State == SoundState.Playing) _musicInstance.Pause();
             _screen = Screen.Movie;
             return;
@@ -178,6 +185,21 @@ public sealed partial class ConquerorGame
             DrawShop();
             _batch.Draw(_eventMovie.Texture, ScaleBounds(ShopPresentationDefinitions.ItemBounds(
                 _eventMovie.Texture.Width, _eventMovie.Texture.Height)), Color.White);
+            return;
+        }
+        if (_activeEventMovieRole == "Practice.Joust")
+        {
+            Fill(new Rectangle(0, 0, 1024, 768), Color.Black);
+            _batch.Draw(_eventMovie.Texture, new Rectangle(0, 144, 1024, 480), Color.White);
+            if (!_originalAnimations.TryGetValue("Dragon.Lance", out var lances)
+                || lances.Frames.Count != 25)
+                throw new InvalidOperationException("Joust practice requires the imported lance foreground.");
+            var frame = lances.Frames[OriginalDragonLanceSelection.FrameFor(
+                _practiceJoustLanceX, _practiceJoustLanceY)];
+            _batch.Draw(frame, new Rectangle(_practiceJoustLanceX * 1024 / 640,
+                (_practiceJoustLanceY + 90) * 768 / 480,
+                frame.Width * 1024 / 640, frame.Height * 768 / 480), Color.White);
+            DrawText("MOVE MOUSE TO AIM THE LANCE   ESC TO LEAVE", 55, 670, Color.White, 2);
             return;
         }
         _batch.Draw(_eventMovie.Texture, new Rectangle(0, 0, 1024, 768), Color.White);

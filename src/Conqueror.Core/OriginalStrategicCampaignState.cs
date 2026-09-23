@@ -312,6 +312,8 @@ public sealed class OriginalStrategicTemporaryForceSlot
 {
     public int Slot { get; set; }
     public bool Active { get; set; }
+    // Creator descriptor +0x18, set by either terminal resolver branch.
+    public bool EncounterResultMarked { get; set; }
     public bool PathComplete { get; set; }
     public int WaypointCount { get; set; }
     public int WaypointIndex { get; set; }

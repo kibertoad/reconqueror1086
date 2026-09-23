@@ -82,8 +82,10 @@ public sealed partial class ResourceAndDefinitionTests
         patrol.Swordsmen = 1;
         var playerRecord = strategic.PlayerMovementSlots[0];
         playerRecord.Active = true;
-        playerRecord.PathComplete = true;
-        playerRecord.CurrentX = 1_000;
+        playerRecord.PathComplete = false;
+        playerRecord.Waypoints.Add(new OriginalStrategicRoutePoint(1_050, 2_000));
+        playerRecord.WaypointCount = 1;
+        playerRecord.CurrentX = 1_000.75f;
         playerRecord.CurrentY = 2_000;
         var army = state.Player.ArmyAt(0);
         army.Units[UnitType.Swordsmen] = 100;
@@ -107,14 +109,19 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Empty(pass.TemporaryForcePass);
 
         var settled = campaign.ResolveAutomaticOriginalStrategicPatrolEncounter(
-            encounter, new QueueEncounterRandom(0, 0, 0), new QueueStrategicRandom());
+            encounter, new QueueEncounterRandom(0, 0, 0), new QueueStrategicRandom(17));
         Assert.True(settled.PatrolCleared);
         Assert.Equal(40, settled.Reward);
         Assert.False(patrol.Active);
+        Assert.True(patrol.EncounterResultMarked);
         Assert.Equal(40, state.ConversationVariables[17]);
         Assert.Equal(1, state.ConversationVariables[24]);
         Assert.Equal(1, state.ConversationVariables[5]);
         Assert.Equal(100, army.Units[UnitType.Swordsmen]);
+        Assert.True(playerRecord.PathComplete);
+        Assert.Equal((0, 0, 1_000, 2_000),
+            (playerRecord.WaypointCount, playerRecord.WaypointIndex,
+                playerRecord.DestinationX, playerRecord.DestinationY));
     }
 
     [Fact]
@@ -144,7 +151,8 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.False(settlement.DistinguishedPlayerLossRequiresModal);
         Assert.False(playerRecord.Active);
         Assert.True(patrol.Active);
+        Assert.True(patrol.EncounterResultMarked);
         Assert.Equal(1, state.ConversationVariables[25]);
-        Assert.Equal(0, army.Units[UnitType.Swordsmen]);
+        Assert.Equal(1, army.Units[UnitType.Swordsmen]);
     }
 }

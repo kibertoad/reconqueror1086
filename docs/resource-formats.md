@@ -674,3 +674,5 @@ The verified `VILLAGE.DAT` also has three authored separator defects: one-based 
 1. Recover the semantic meaning of directory field `0x24` and test whether data extents may alias or overlap.
 2. Specify nested chunk headers and the exact compression selector used inside decoded resources.
 3. Associate CSF sequences and scene textures with their palettes, confirm `.666` event bindings, and specify the remaining PCC, scene `Viewer`/`Scenario`, non-property-route RAT, and FNT semantics as each decoder is validated.
+
+Presentation binding (2026-09-23): `OriginalUiFontDefinition.MaskPixel` expands each decoded `CONFONT.CSF` mask intensity into premultiplied RGBA, matching MonoGame `SpriteBatch` alpha blending and preventing solid glyph rectangles. Generic replacement-screen text is drawn by `PixelFont` for a legible 5x7 grid on the current layouts. The imported source font is retained and validated for screens whose original typesetting can be mapped. The map notice is drawn only in its right information panel.

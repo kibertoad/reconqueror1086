@@ -449,7 +449,9 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
                 else
                 {
                     _eventMovie.Update(gameTime.ElapsedGameTime);
-                    if (pressAny || click || _eventMovie.IsComplete) FinishEventMovie();
+                    UpdatePracticeJoustPointer(mouse);
+                    if (_eventMovie.IsComplete || _activeEventMovieRole != "Practice.Joust" && (pressAny || click))
+                        FinishEventMovie();
                 }
                 break;
             case Screen.OptionsHub: UpdateOptionsHub(Press, mouse, click, release); break;
@@ -474,7 +476,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.Shop: UpdateShop(Press, mouse, click); break;
             case Screen.Tournament: UpdateTournament(Press, gameTime); break;
             case Screen.DrogoDemand: UpdateDrogoDemand(Press); break;
-            case Screen.FieldBattle: UpdateFieldBattle(Press, gameTime); break;
+            case Screen.FieldBattle: UpdateFieldBattle(Press, mouse, click, gameTime); break;
             case Screen.StrategicEncounter:
                 UpdateStrategicEncounter(Press, mouse, click, release, controllerRightClick);
                 break;

@@ -29,6 +29,9 @@ public static class OriginalUiFontDefinition
         if (scale <= 0) throw new ArgumentOutOfRangeException(nameof(scale));
         return (sourcePixels * 2 * scale + 1) / 3;
     }
+
+    /// <summary>SpriteBatch's default AlphaBlend expects premultiplied texture channels.</summary>
+    public static Color MaskPixel(byte opacity) => new(opacity, opacity, opacity, opacity);
 }
 
 /// <summary>
@@ -59,7 +62,7 @@ internal sealed class OriginalUiFont : IDisposable
             for (var index = 0; index < glyphs.Length; index++)
             {
                 var frame = source.DecodeFrame(source.Chunks[index]);
-                var pixels = frame.Alpha.Select(alpha => new Color((byte)255, (byte)255, (byte)255, alpha)).ToArray();
+                var pixels = frame.Alpha.Select(OriginalUiFontDefinition.MaskPixel).ToArray();
                 var texture = new Texture2D(graphicsDevice, frame.Width, frame.Height, false, SurfaceFormat.Color);
                 texture.SetData(pixels);
                 glyphs[index] = texture;

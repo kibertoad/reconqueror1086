@@ -577,8 +577,15 @@ public sealed partial class ConquerorGame
             DrawText($"{squad.Count}", count.X, count.Y, Color.White, 1, count.Width);
         }
         DrawText($"FIELD BATTLE - TICK {_fieldBattle.TickNumber}", 34, 18, Color.Gold, 2);
-        DrawText($"SELECTED {_selectedUnit}: 1 SWORDS  2 HALBERDS  3 KNIGHTS", 48, 728, Color.White, 1);
-        DrawText("A ADVANCE  H HOLD  Q/E FLANK  R WITHDRAW  C CAPTAINS  W WITHDRAW ALL", 48, 748, Color.Wheat, 1);
+        DrawText($"SELECTED {_selectedUnit}: CLICK A FRIENDLY UNIT OR PRESS 1/2/3", 20, 700, Color.White, 1);
+        var selectedOrder = _fieldBattle.Friendly.FirstOrDefault(squad => squad.Type == _selectedUnit)?.Order;
+        foreach (var button in FieldBattlePointerControls.Buttons)
+        {
+            var bounds = ScaleBounds(button.Bounds);
+            Fill(new Rectangle(bounds.X, bounds.Y, bounds.Width, bounds.Height),
+                !button.AllUnits && button.Order == selectedOrder ? Color.DarkOliveGreen : Color.DarkSlateGray);
+            DrawText(button.Label, bounds.X + 4, bounds.Y + 6, Color.White, 1, bounds.Width - 8);
+        }
     }
 
     private void DrawRadar(SiegeSession siege, Rectangle? requestedBounds = null)
@@ -769,5 +776,5 @@ public sealed partial class ConquerorGame
         };
     }
     private void DrawText(string text, int x, int y, Color color, int scale = 3, int wrap = 0) =>
-        PixelFont.Draw(_batch, _pixel, text, new Vector2(x, y), color, scale, wrap, _originalUiFont);
+        PixelFont.Draw(_batch, _pixel, text, new Vector2(x, y), color, scale, wrap);
 }

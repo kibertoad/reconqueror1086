@@ -30,6 +30,19 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
+    public void OriginalUiFontMasksArePremultipliedForTheDefaultSpriteBatchBlend()
+    {
+        var transparent = OriginalUiFontDefinition.MaskPixel(0);
+        var partial = OriginalUiFontDefinition.MaskPixel(127);
+        Assert.Equal((byte)0, transparent.R);
+        Assert.Equal((byte)0, transparent.A);
+        Assert.Equal((byte)127, partial.R);
+        Assert.Equal((byte)127, partial.G);
+        Assert.Equal((byte)127, partial.B);
+        Assert.Equal((byte)127, partial.A);
+    }
+
+    [Fact]
     public void SiegeVisualsResolveTheImportedCombatPaletteByItsDecodedKind()
     {
         var root = Path.Combine(Path.GetTempPath(), $"conqueror-combat-palette-{Guid.NewGuid():N}");

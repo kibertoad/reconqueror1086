@@ -782,7 +782,7 @@ public sealed partial class ConquerorGame
         }
     }
 
-    private void UpdateFieldBattle(Func<Keys, bool> press, GameTime gameTime)
+    private void UpdateFieldBattle(Func<Keys, bool> press, MouseState mouse, bool click, GameTime gameTime)
     {
         if (_fieldBattle is null)
         {
@@ -801,6 +801,18 @@ public sealed partial class ConquerorGame
         if (press(Keys.R)) _fieldBattle.Issue(_selectedUnit, UnitOrder.Withdraw);
         if (press(Keys.C)) _fieldBattle.IssueAll(UnitOrder.Captains);
         if (press(Keys.W)) _fieldBattle.IssueAll(UnitOrder.Withdraw);
+        if (click)
+        {
+            var (x, y) = OriginalPoint(mouse);
+            if (FieldBattlePointerControls.ButtonAt(x, y) is { } button)
+            {
+                if (button.AllUnits) _fieldBattle.IssueAll(button.Order);
+                else _fieldBattle.Issue(_selectedUnit, button.Order);
+            }
+            else if (FieldBattlePointerControls.FriendlyUnitAt(
+                    _fieldBattle, _selectedUnit, x, y) is { } unit)
+                _selectedUnit = unit;
+        }
         _battleTick += gameTime.ElapsedGameTime.TotalSeconds;
         while (_battleTick >= FieldBattleTickSeconds && _fieldBattle.Outcome == FieldBattleOutcome.InProgress)
         {
@@ -842,7 +854,7 @@ public sealed partial class ConquerorGame
             case Screen.DrogoDemand: DrawDrogoDemand(); break; case Screen.Siege: DrawSiege(); break; case Screen.Overview: DrawOverview(); break; case Screen.Ending: DrawEnding(); break;
             case Screen.DragonBattle: DrawDragonBattle(); break;
         }
-        if (_screen is not Screen.Title and not Screen.Movie and not Screen.LoadGame
+        if (_screen is not Screen.Title and not Screen.Movie and not Screen.Map and not Screen.LoadGame
             and not Screen.Character and not Screen.Dilemma and not Screen.Briefing and not Screen.Inn and not Screen.InnDialogue)
             DrawText(_notice, 24, 730, Color.Gold, 2);
         if (_paused)

@@ -41,6 +41,7 @@ public static partial class OriginalStrategicMovement
             // Source 0x3B1A2/0x3B1B0 takes random(1), then
             // 0x3B1B8/0x3B1CB takes random(1) + 1, leaving knights zero.
             slot.Active = true;
+            slot.EncounterResultMarked = false;
             slot.PathComplete = false;
             slot.WaypointCount = points.Count;
             slot.WaypointIndex = 0;

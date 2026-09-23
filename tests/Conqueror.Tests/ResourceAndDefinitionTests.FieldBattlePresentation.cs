@@ -7,6 +7,35 @@ namespace Conqueror.Tests;
 public sealed partial class ResourceAndDefinitionTests
 {
     [Fact]
+    public void OverheadBattleMouseSelectsFriendlySpriteAndMapsVisibleOrderButtons()
+    {
+        static Army ArmyWith(int swords, int halberds, int knights)
+        {
+            var army = new Army();
+            army.Units[UnitType.Swordsmen] = swords;
+            army.Units[UnitType.Halberdiers] = halberds;
+            army.Units[UnitType.Knights] = knights;
+            return army;
+        }
+
+        var battle = new FieldBattleSession(ArmyWith(12, 10, 8), ArmyWith(10, 9, 7), 1086);
+        var draws = FieldBattlePresentation.SpriteDrawsFor(battle.Squads, UnitType.Swordsmen, 0);
+        var knights = Assert.Single(draws, draw =>
+            battle.Squads[draw.SquadIndex].Friendly
+            && battle.Squads[draw.SquadIndex].Type == UnitType.Knights);
+        Assert.Equal(UnitType.Knights, FieldBattlePointerControls.FriendlyUnitAt(
+            battle, UnitType.Swordsmen, knights.X + 45, knights.Y + 45));
+        var enemy = Assert.Single(draws, draw =>
+            !battle.Squads[draw.SquadIndex].Friendly
+            && battle.Squads[draw.SquadIndex].Type == UnitType.Knights);
+        Assert.Null(FieldBattlePointerControls.FriendlyUnitAt(
+            battle, UnitType.Swordsmen, enemy.X + 45, enemy.Y + 45));
+        Assert.Equal(UnitOrder.Advance, FieldBattlePointerControls.ButtonAt(100, 460)?.Order);
+        Assert.True(FieldBattlePointerControls.ButtonAt(550, 460)?.AllUnits);
+        Assert.Null(FieldBattlePointerControls.ButtonAt(100, 440));
+    }
+
+    [Fact]
     public void LegacyFieldBattlePresentationUsesTheMappedMen8FamiliesAndStableGridPlacement()
     {
         Assert.Equal("Encounter.Strategic.Background", FieldBattlePresentation.BackgroundArtRole);
