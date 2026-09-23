@@ -98,9 +98,8 @@ public sealed partial class ConquerorGame
     private int ClassifyStrategicPointerInput(bool click, bool release,
         bool rightClick, bool rightRelease, bool controllerRightClick)
     {
-        // Four source timer units are mapped to a stable 250 ms host interval.
-        // The source interrupt frequency has not yet been recovered.
-        var timerUnits = (long)Math.Floor(_presentationSeconds * 16d);
+        var timerUnits = OriginalStrategicPointerClock.UnitsAt(
+            TimeSpan.FromSeconds(_presentationSeconds));
         if (click) return _strategicPointerEvents.Classify(
             OriginalStrategicPointerTransition.PrimaryDown, timerUnits);
         if (release) return _strategicPointerEvents.Classify(

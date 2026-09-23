@@ -6,6 +6,31 @@ namespace Conqueror.Tests;
 public sealed partial class ResourceAndDefinitionTests
 {
     [Fact]
+    public void StrategicPointerClockFollowsTheChainedBiosTickAccumulator()
+    {
+        Assert.Equal(0, OriginalStrategicPointerClock.UnitsAt(TimeSpan.FromMilliseconds(55)));
+        Assert.Equal(1, OriginalStrategicPointerClock.UnitsAt(TimeSpan.FromMilliseconds(56)));
+        Assert.Equal(3, OriginalStrategicPointerClock.UnitsAt(TimeSpan.FromMilliseconds(219)));
+        Assert.Equal(4, OriginalStrategicPointerClock.UnitsAt(TimeSpan.FromMilliseconds(220)));
+        Assert.Equal(4, OriginalStrategicPointerClock.UnitsAt(TimeSpan.FromMilliseconds(250)));
+        Assert.Equal(18, OriginalStrategicPointerClock.UnitsAt(TimeSpan.FromSeconds(1)));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            OriginalStrategicPointerClock.UnitsAt(TimeSpan.FromTicks(-1)));
+
+        var shortPress = new OriginalStrategicPointerEventClassifier();
+        shortPress.Classify(OriginalStrategicPointerTransition.PrimaryDown,
+            OriginalStrategicPointerClock.UnitsAt(TimeSpan.Zero));
+        Assert.Equal(3, shortPress.Classify(OriginalStrategicPointerTransition.PrimaryUp,
+            OriginalStrategicPointerClock.UnitsAt(TimeSpan.FromMilliseconds(219))));
+
+        var heldPress = new OriginalStrategicPointerEventClassifier();
+        heldPress.Classify(OriginalStrategicPointerTransition.PrimaryDown,
+            OriginalStrategicPointerClock.UnitsAt(TimeSpan.Zero));
+        Assert.Equal(2, heldPress.Classify(OriginalStrategicPointerTransition.PrimaryUp,
+            OriginalStrategicPointerClock.UnitsAt(TimeSpan.FromMilliseconds(220))));
+    }
+
+    [Fact]
     public void StrategicPointerClassifierPreservesPrimaryPressHoldAndRepeatCodes()
     {
         var events = new OriginalStrategicPointerEventClassifier();
