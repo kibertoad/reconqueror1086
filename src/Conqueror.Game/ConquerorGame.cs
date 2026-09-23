@@ -204,6 +204,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private Campaign BindStrategicResources(Campaign campaign)
     {
         campaign.ConfigureOriginalStrategicResources(_originalStrategicResources);
+        _strategicDragonTriggerSuppressed = false;
         return campaign;
     }
 

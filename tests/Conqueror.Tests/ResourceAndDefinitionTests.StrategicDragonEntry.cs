@@ -45,5 +45,18 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Empty(result.Encounters);
         Assert.Null(result.SchedulerPass);
         Assert.Equal(100, hostile.CurrentX);
+
+        var suppressed = campaign.AdvanceOriginalStrategicPass(
+            new OriginalStrategicCampaignPassInput([
+                new OriginalStrategicPlayerTarget(false, 0, 0),
+                new OriginalStrategicPlayerTarget(false, 0, 0),
+                new OriginalStrategicPlayerTarget(false, 0, 0)],
+                SuppressDragonEntry: true),
+            new QueueStrategicRandom());
+
+        Assert.False(suppressed.PlayerPass.DragonEntryTriggered);
+        Assert.Contains(suppressed.PlayerPass.Advances, advance =>
+            advance.Slot == OriginalStrategicMovement.PlayerAvatarMovementSlot);
+        Assert.NotNull(suppressed.SchedulerPass);
     }
 }

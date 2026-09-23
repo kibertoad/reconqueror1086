@@ -30,6 +30,19 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.NotNull(second!.SchedulerPass);
         Assert.Equal(2, newState.OriginalStrategicState.GenerationAccumulator);
 
+        var distinguished = newState.OriginalStrategicState.PlayerMovementSlots[5];
+        distinguished.PathComplete = true;
+        distinguished.GridX = 63;
+        distinguished.GridY = 114;
+        var entry = OriginalStrategicHostRuntime.AdvanceFixedPass(newCampaign);
+        var afterWithdrawal = OriginalStrategicHostRuntime.AdvanceFixedPass(
+            newCampaign, suppressDragonEntry: true);
+        Assert.True(entry!.PlayerPass.DragonEntryTriggered);
+        Assert.Null(entry.SchedulerPass);
+        Assert.False(afterWithdrawal!.PlayerPass.DragonEntryTriggered);
+        Assert.NotNull(afterWithdrawal.SchedulerPass);
+        Assert.Equal(3, newState.OriginalStrategicState.GenerationAccumulator);
+
         var migratedState = Campaign.NewFromTemplate(0);
         migratedState.OriginalStrategicState = OriginalStrategicCampaignState.CreateForSchemaOneMigration(
             migratedState.Date, OriginalStrategicMovement.InitialSpeedMultiplier);

@@ -97,7 +97,8 @@ public static partial class OriginalStrategicMovement
         OriginalStrategicCampaignState state,
         IOriginalStrategicResources resources,
         IReadOnlyList<OriginalStrategicPlayerTarget> worldTargets,
-        bool modalActive = false)
+        bool modalActive = false,
+        bool suppressDragonEntry = false)
     {
         ArgumentNullException.ThrowIfNull(state);
         ArgumentNullException.ThrowIfNull(resources);
@@ -140,7 +141,7 @@ public static partial class OriginalStrategicMovement
                 }
             }
 
-            if (playerIndex == state.EngagedPlayerMovementSlot
+            if (!suppressDragonEntry && playerIndex == state.EngagedPlayerMovementSlot
                 && IsDragonEntryCell(player.GridX, player.GridY))
                 return new(
                     advances.AsReadOnly(), contacts.AsReadOnly(), avatarAlerts.AsReadOnly(), true);

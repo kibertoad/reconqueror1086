@@ -21,7 +21,8 @@ public static class OriginalStrategicHostRuntime
     public static OriginalStrategicCampaignPassResult? AdvanceFixedPass(
         Campaign campaign,
         bool playerEncounterHandoffActive = false,
-        bool schedulerBlockedByModal = false)
+        bool schedulerBlockedByModal = false,
+        bool suppressDragonEntry = false)
     {
         ArgumentNullException.ThrowIfNull(campaign);
         if (campaign.State.OriginalStrategicState is not { } strategic) return null;
@@ -35,6 +36,7 @@ public static class OriginalStrategicHostRuntime
                 PlayerEncounterHandoffActive: playerEncounterHandoffActive,
                 SchedulerBlockedByModal: schedulerFallbackUnavailable
                     || playerEncounterHandoffActive
-                    || schedulerBlockedByModal));
+                    || schedulerBlockedByModal,
+                SuppressDragonEntry: suppressDragonEntry));
     }
 }

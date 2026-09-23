@@ -13,7 +13,8 @@ public sealed record OriginalStrategicCampaignPassInput(
     IReadOnlyList<OriginalStrategicPlayerTarget> DivisionTargets,
     bool PlayerEncounterHandoffActive = false,
     bool SchedulerBlockedByModal = false,
-    IReadOnlyList<int>? TemporaryForceActionIds = null);
+    IReadOnlyList<int>? TemporaryForceActionIds = null,
+    bool SuppressDragonEntry = false);
 
 /// <summary>
 /// Typed output from one recovered strategic-map pass. A spy report is taken
@@ -344,7 +345,7 @@ public sealed partial class Campaign
             : input.DivisionTargets;
         var playerPass = OriginalStrategicMovement.AdvancePlayerPass(
             strategic, _originalStrategicResources, divisionTargets,
-            input.PlayerEncounterHandoffActive);
+            input.PlayerEncounterHandoffActive, input.SuppressDragonEntry);
         var encounters = playerPass.Contacts.Select(contact =>
             OriginalStrategicPlayerEnemyEncounter.Capture(
                 strategic, State.Player, contact.PlayerSlot, contact.EnemySlot)).ToArray();

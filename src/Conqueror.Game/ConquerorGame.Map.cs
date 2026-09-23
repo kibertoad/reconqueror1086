@@ -94,7 +94,8 @@ public sealed partial class ConquerorGame
         var previousReport = _campaign.State.LatestSpyReport;
         var pass = OriginalStrategicHostRuntime.AdvanceFixedPass(_campaign,
             playerEncounterHandoffActive: _strategicEncounter is not null,
-            schedulerBlockedByModal: _strategicMapTargetConfirmation is not null);
+            schedulerBlockedByModal: _strategicMapTargetConfirmation is not null,
+            suppressDragonEntry: _strategicDragonTriggerSuppressed);
         if (pass?.SpyReport is not null) ShowNewSpyReport(previousReport);
         if (pass?.Encounters.Count > 0)
         {
@@ -102,12 +103,18 @@ public sealed partial class ConquerorGame
             BeginStrategicEncounter(pass.Encounters[0]);
             return;
         }
-        if (pass?.PlayerPass.DragonEntryTriggered != true)
+        if (_strategicDragonTriggerSuppressed)
         {
+            if (_campaign.State.OriginalStrategicState is { } strategic)
+            {
+                var distinguished = strategic.PlayerMovementSlots.Single(slot =>
+                    slot.Slot == strategic.EngagedPlayerMovementSlot);
+                if (distinguished.Active && OriginalStrategicMovement.IsDragonEntryCell(
+                        distinguished.GridX, distinguished.GridY)) return;
+            }
             _strategicDragonTriggerSuppressed = false;
-            return;
         }
-        if (_strategicDragonTriggerSuppressed) return;
+        if (pass?.PlayerPass.DragonEntryTriggered != true) return;
 
         _dragonBattle = _campaign.BeginDragonBattleFromStrategicMap()
             ?? throw new InvalidOperationException("The mapped dragon entry has no live distinguished player record.");
