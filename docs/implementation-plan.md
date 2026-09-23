@@ -50,7 +50,9 @@ The repository currently provides:
 - An executable-confirmed `TITLE.HAT`/`FFTITLE.PCX` title load followed by a corroborated character-options flow whose exact geometry comes from installed `CGOPTS.HAT` and `PREGEN.HAT`.
 - Self-contained Windows x64, Linux x64, macOS arm64, and macOS x64 packaging automation, with a smart ownership-aware Windows installer and a pinned four-artifact release workflow.
 - A repository-wide 1,000-line compiled-source ceiling; the game shell and resource regression suite are split into focused partial modules so the limit passes without exemptions.
-- 532 xUnit test cases and 146 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
+- 534 xUnit test cases and 146 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
+
+Practice joust recovery: executable `0x41164` opens `jousprac.SMK`, while caller `0x41CEC` loads `lance1.csf`. The replacement now uses the practice worker's distinct five-band frame table, bounded 8.8 lance motion, raw mouse coordinates, and a source-parameter-120 impulse every seven decoded movie frames. The original busy loop has no stable wall-clock cadence, so the host advances once per movie frame. Palette binding and practice scoring remain Provisional. See `docs/joust-practice.md`.
 
 ## Dependency map
 

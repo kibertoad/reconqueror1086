@@ -122,8 +122,8 @@ public sealed partial class ConquerorGame
             _activeEventMovieRole = roleOrSuffix;
             if (roleOrSuffix == "Practice.Joust")
             {
-                _practiceJoustLanceX = 225;
-                _practiceJoustLanceY = 150;
+                _practiceJoustLance = new();
+                _practiceJoustLastFrame = -1;
             }
             if (_musicInstance?.State == SoundState.Playing) _musicInstance.Pause();
             _screen = Screen.Movie;
@@ -194,10 +194,9 @@ public sealed partial class ConquerorGame
             if (!_originalAnimations.TryGetValue("Dragon.Lance", out var lances)
                 || lances.Frames.Count != 25)
                 throw new InvalidOperationException("Joust practice requires the imported lance foreground.");
-            var frame = lances.Frames[OriginalDragonLanceSelection.FrameFor(
-                _practiceJoustLanceX, _practiceJoustLanceY)];
-            _batch.Draw(frame, new Rectangle(_practiceJoustLanceX * 1024 / 640,
-                (_practiceJoustLanceY + 90) * 768 / 480,
+            var frame = lances.Frames[_practiceJoustLance.Frame];
+            _batch.Draw(frame, new Rectangle(_practiceJoustLance.X * 1024 / 640,
+                (_practiceJoustLance.Y + OriginalPracticeJoustLance.MovieTop) * 768 / 480,
                 frame.Width * 1024 / 640, frame.Height * 768 / 480), Color.White);
             DrawText("MOVE MOUSE TO AIM THE LANCE   ESC TO LEAVE", 55, 670, Color.White, 2);
             return;

@@ -22,6 +22,7 @@ public sealed class SmackerMoviePlayer : IDisposable
 
     public Texture2D Texture { get; }
     public bool IsComplete { get; private set; }
+    public int CurrentFrameIndex => _nextFrame - 1;
 
     public SmackerMoviePlayer(GraphicsDevice graphicsDevice, Stream source, float volume = 1f)
     {

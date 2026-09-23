@@ -6,16 +6,15 @@ namespace Conqueror.Game;
 public sealed partial class ConquerorGame
 {
     private string? _activeEventMovieRole;
-    private int _practiceJoustLanceX = 225;
-    private int _practiceJoustLanceY = 150;
+    private OriginalPracticeJoustLance _practiceJoustLance = new();
+    private int _practiceJoustLastFrame = -1;
 
     private void UpdatePracticeJoustPointer(MouseState mouse)
     {
         if (_activeEventMovieRole != "Practice.Joust") return;
         var (pointerX, pointerY) = OriginalPoint(mouse);
-        _practiceJoustLanceX = Math.Clamp(pointerX,
-            OriginalDragonLanceSelection.MinimumX, OriginalDragonLanceSelection.MaximumX);
-        _practiceJoustLanceY = Math.Clamp(pointerY - 90,
-            OriginalDragonLanceSelection.MinimumY, OriginalDragonLanceSelection.MaximumY);
+        var frame = _eventMovie?.CurrentFrameIndex ?? -1;
+        while (_practiceJoustLastFrame < frame)
+            _practiceJoustLance.Advance(++_practiceJoustLastFrame, pointerX, pointerY);
     }
 }
