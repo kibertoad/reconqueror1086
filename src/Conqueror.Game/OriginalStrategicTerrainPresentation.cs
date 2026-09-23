@@ -14,6 +14,18 @@ public readonly record struct OriginalStrategicTerrainBlit(
 
 public static class OriginalStrategicTerrainPresentation
 {
+    public static string TransitionMovieRoleFor(StrategicTerrainProfile profile) => profile switch
+    {
+        StrategicTerrainProfile.Summer => "Season.Summer",
+        StrategicTerrainProfile.Autumn => "Season.Autumn",
+        StrategicTerrainProfile.Winter => "Season.Winter",
+        StrategicTerrainProfile.Spring => "Season.Spring",
+        _ => throw new ArgumentOutOfRangeException(nameof(profile))
+    };
+
+    public static UiBounds TransitionMovieBounds(int width, int height) =>
+        new(100, 100, width, height);
+
     public static string AtlasRoleFor(StrategicTerrainProfile profile) => profile switch
     {
         StrategicTerrainProfile.Spring or StrategicTerrainProfile.Summer => "Estate.Tiles.SpringSummer",

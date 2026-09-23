@@ -195,6 +195,14 @@ public sealed partial class ConquerorGame
                 _eventMovie.Texture.Width, _eventMovie.Texture.Height)), Color.White);
             return;
         }
+        if (_movieReturnScreen == Screen.Map && _activeEventMovieRole?.StartsWith("Season.", StringComparison.Ordinal) == true)
+        {
+            DrawMap();
+            _batch.Draw(_eventMovie.Texture, ScaleBounds(
+                OriginalStrategicTerrainPresentation.TransitionMovieBounds(
+                    _eventMovie.Texture.Width, _eventMovie.Texture.Height)), Color.White);
+            return;
+        }
         if (_activeEventMovieRole == "Practice.Joust")
         {
             Fill(new Rectangle(0, 0, 1024, 768), Color.Black);

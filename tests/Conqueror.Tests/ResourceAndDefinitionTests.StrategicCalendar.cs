@@ -1,10 +1,25 @@
 using Conqueror.Core;
+using Conqueror.Game;
 using Xunit;
 
 namespace Conqueror.Tests;
 
 public sealed partial class ResourceAndDefinitionTests
 {
+    [Theory]
+    [InlineData(StrategicTerrainProfile.Spring, "Season.Spring", "/tran1.smk")]
+    [InlineData(StrategicTerrainProfile.Autumn, "Season.Autumn", "/tran2.smk")]
+    [InlineData(StrategicTerrainProfile.Winter, "Season.Winter", "/tran3.smk")]
+    [InlineData(StrategicTerrainProfile.Summer, "Season.Summer", "/tran4.smk")]
+    public void SeasonalMovieBindingMatchesTheExecutableProfileTable(
+        StrategicTerrainProfile profile, string role, string suffix)
+    {
+        Assert.Equal(role, OriginalStrategicTerrainPresentation.TransitionMovieRoleFor(profile));
+        Assert.Contains(new ImportedMovieDefinition(role, suffix), ImportedMovies.Definitions);
+        Assert.Equal(new UiBounds(100, 100, 192, 268),
+            OriginalStrategicTerrainPresentation.TransitionMovieBounds(192, 268));
+    }
+
     [Theory]
     [InlineData(2, 28, StrategicTerrainProfile.Spring)]
     [InlineData(5, 31, StrategicTerrainProfile.Summer)]

@@ -6,9 +6,11 @@ namespace Conqueror.Game;
 public sealed partial class ConquerorGame
 {
     private bool _strategicDragonTriggerSuppressed;
+    private (Campaign Campaign, StrategicTerrainProfile Profile)? _pendingStrategicSeason;
 
     private void UpdateMap(Func<Keys, bool> press, MouseState mouse, bool click)
     {
+        if (PlayPendingStrategicSeason()) return;
         UpdateOriginalStrategicMapRuntime();
         if (_screen != Screen.Map || UpdateOriginalStrategicTargetConfirmation(press)) return;
         AdvanceOriginalStrategicRoutePreviewAnimation();
@@ -27,7 +29,11 @@ public sealed partial class ConquerorGame
         if (press(Keys.Right) || press(Keys.Down)) SelectMapLocation(1);
         for (var armyIndex = 0; armyIndex < Player.ArmyDivisionLimit; armyIndex++)
             if (press(Keys.D1 + armyIndex)) _warPlanningArmyIndex = armyIndex;
-        if (press(Keys.Enter)) TravelToSelectedLocation();
+        if (press(Keys.Enter))
+        {
+            TravelToSelectedLocation();
+            if (_screen != Screen.Map) return;
+        }
         if (press(Keys.H) && _campaign.State.CurrentLocation == 0) _screen = Screen.Home;
         if (press(Keys.V)) _screen = Screen.Village;
         if (press(Keys.T) && _campaign.IsTournamentHere) _screen = Screen.Tournament;
@@ -62,9 +68,12 @@ public sealed partial class ConquerorGame
         if (press(Keys.E))
         {
             var previousReport = _campaign.State.LatestSpyReport;
+            var previousProfile = _campaign.State.OriginalStrategicState?.TerrainProfile;
             _campaign.AdvanceDays(_campaign.State.DaySpeed);
+            QueueStrategicSeason(previousProfile);
             ShowNewSpyReport(previousReport);
             Autosave();
+            if (PlayPendingStrategicSeason()) return;
         }
         if (press(Keys.OemPlus) || press(Keys.Add)) _campaign.AdjustStrategicSpeed(1);
         if (press(Keys.OemMinus) || press(Keys.Subtract)) _campaign.AdjustStrategicSpeed(-1);
@@ -239,7 +248,9 @@ public sealed partial class ConquerorGame
             return;
         }
         var previousReport = _campaign.State.LatestSpyReport;
+        var previousProfile = _campaign.State.OriginalStrategicState?.TerrainProfile;
         var days = _campaign.TravelTo(_selectedLocation);
+        QueueStrategicSeason(previousProfile);
         _notice = days == 0 ? $"ALREADY AT {World.Locations[_selectedLocation].Name}" : $"TRAVELLED {days} DAYS TO {World.Locations[_selectedLocation].Name}";
         ShowNewSpyReport(previousReport);
         if (days > 0) Autosave();
@@ -258,7 +269,26 @@ public sealed partial class ConquerorGame
             StartDragonRunMovie();
             _screen = Screen.DragonBattle;
             PlayEventMovie("Travel.DragonLair", Screen.DragonBattle);
+            return;
         }
+        PlayPendingStrategicSeason();
+    }
+
+    private void QueueStrategicSeason(StrategicTerrainProfile? previous)
+    {
+        if (!_animationEnabled || previous is null
+            || _campaign.State.OriginalStrategicState is not { } strategic
+            || strategic.TerrainProfile == previous) return;
+        _pendingStrategicSeason = (_campaign, strategic.TerrainProfile);
+    }
+
+    private bool PlayPendingStrategicSeason()
+    {
+        if (_pendingStrategicSeason is not { } pending) return false;
+        _pendingStrategicSeason = null;
+        if (!_animationEnabled || !ReferenceEquals(pending.Campaign, _campaign)) return false;
+        PlayEventMovie(OriginalStrategicTerrainPresentation.TransitionMovieRoleFor(pending.Profile), Screen.Map);
+        return _screen == Screen.Movie;
     }
 
     private void ShowNewSpyReport(StrategicSpyReport? previousReport)
