@@ -17,6 +17,21 @@ public sealed partial class ConquerorGame
     private int _strategicEncounterPlayerScoreModifier;
     private OriginalStrategicInteractiveRetreatConfirmation? _strategicInteractiveRetreatConfirmation;
     private OriginalStrategicPointerEventQueue _strategicPointerEvents = new();
+    private OriginalStrategicTemporaryForceEncounter? _strategicPatrolEncounter;
+
+    private void BeginStrategicPatrolEncounter(OriginalStrategicTemporaryForceEncounter encounter)
+    {
+        _strategicPatrolEncounter = encounter;
+        _strategicEncounter = null;
+        _strategicInteractiveEncounter = null;
+        _strategicEncounterViewport = null;
+        _strategicEncounterHover = default;
+        _strategicInteractiveRetreatConfirmation = null;
+        _strategicPointerEvents = new();
+        _strategicEncounterPlayerScoreModifier = 0;
+        _screen = Screen.StrategicEncounter;
+        _notice = "PATROL CONTACT";
+    }
 
     private void BeginStrategicEncounter(OriginalStrategicPlayerEnemyEncounter encounter)
     {
@@ -35,7 +50,9 @@ public sealed partial class ConquerorGame
     private void UpdateStrategicEncounter(Func<Keys, bool> press, MouseState mouse,
         bool click, bool release, bool controllerRightClick)
     {
-        if (_strategicEncounter is not { } encounter)
+        var encounter = _strategicEncounter;
+        var patrolEncounter = _strategicPatrolEncounter;
+        if (encounter is null && patrolEncounter is null)
         {
             _screen = Screen.Map;
             return;
@@ -47,16 +64,30 @@ public sealed partial class ConquerorGame
             if (entry is null) return;
             if (entry.Value.ExitsToAutomaticFallback)
             {
-                var automatic = _campaign.ResolveAutomaticOriginalStrategicEncounter(
-                    encounter, _strategicEncounterPlayerScoreModifier, new HostEncounterRandom());
-                FinishStrategicEncounter(automatic.ResolverResult.PlayerWon ? "STRATEGIC VICTORY" : "STRATEGIC DEFEAT");
+                if (patrolEncounter is not null)
+                {
+                    var settlement = _campaign.ResolveAutomaticOriginalStrategicPatrolEncounter(
+                        patrolEncounter, new HostEncounterRandom());
+                    FinishStrategicEncounter(settlement.PatrolCleared ? "PATROL DEFEATED" : "STRATEGIC DEFEAT");
+                }
+                else
+                {
+                    var automatic = _campaign.ResolveAutomaticOriginalStrategicEncounter(
+                        encounter!, _strategicEncounterPlayerScoreModifier, new HostEncounterRandom());
+                    FinishStrategicEncounter(automatic.ResolverResult.PlayerWon ? "STRATEGIC VICTORY" : "STRATEGIC DEFEAT");
+                }
                 return;
             }
 
-            _strategicInteractiveEncounter = _campaign.BeginInteractiveOriginalStrategicEncounter(
-                encounter, entry.Value.InteractiveSelectionCode!.Value,
-                StrategicEncounterWidth, StrategicEncounterHeight,
-                TimeSpan.FromSeconds(_presentationSeconds), new HostEncounterRandom());
+            _strategicInteractiveEncounter = patrolEncounter is not null
+                ? _campaign.BeginInteractiveOriginalStrategicPatrolEncounter(
+                    patrolEncounter, entry.Value.InteractiveSelectionCode!.Value,
+                    StrategicEncounterWidth, StrategicEncounterHeight,
+                    TimeSpan.FromSeconds(_presentationSeconds), new HostEncounterRandom())
+                : _campaign.BeginInteractiveOriginalStrategicEncounter(
+                    encounter!, entry.Value.InteractiveSelectionCode!.Value,
+                    StrategicEncounterWidth, StrategicEncounterHeight,
+                    TimeSpan.FromSeconds(_presentationSeconds), new HostEncounterRandom());
             _strategicEncounterViewport = OriginalStrategicInteractiveEncounterViewport.ForResolvedDisplay(
                 StrategicEncounterWidth, StrategicEncounterHeight,
                 StrategicEncounterWidth, StrategicEncounterHeight);
@@ -77,7 +108,7 @@ public sealed partial class ConquerorGame
             if (!accepted && !press(Keys.Escape)) return;
             _strategicInteractiveRetreatConfirmation = null;
             AdvanceInteractiveStrategicEncounterFrame(
-                encounter, session, viewport, confirmation.LocalX, confirmation.LocalY,
+                encounter, patrolEncounter, session, viewport, confirmation.LocalX, confirmation.LocalY,
                 inputCode: 3, firstControlConfirmationAccepted: accepted);
             return;
         }
@@ -94,7 +125,7 @@ public sealed partial class ConquerorGame
             _notice = "RETREAT? ENTER CONFIRMS, ESC CANCELS";
             return;
         }
-        AdvanceInteractiveStrategicEncounterFrame(encounter, session, viewport, x, y, inputCode);
+        AdvanceInteractiveStrategicEncounterFrame(encounter, patrolEncounter, session, viewport, x, y, inputCode);
     }
 
     private void CaptureStrategicPointerInput(MouseState mouse, bool click, bool release,
@@ -111,7 +142,8 @@ public sealed partial class ConquerorGame
     }
 
     private void AdvanceInteractiveStrategicEncounterFrame(
-        OriginalStrategicPlayerEnemyEncounter encounter,
+        OriginalStrategicPlayerEnemyEncounter? encounter,
+        OriginalStrategicTemporaryForceEncounter? patrolEncounter,
         OriginalStrategicInteractiveEncounterSession session,
         OriginalStrategicInteractiveEncounterViewport viewport,
         int localX,
@@ -125,7 +157,14 @@ public sealed partial class ConquerorGame
         _strategicEncounterHover = result.HoverPresentation;
         if (!result.ResolverEnded) return;
 
-        var settlement = _campaign.ResolveInteractiveOriginalStrategicEncounter(encounter, session);
+        if (patrolEncounter is not null)
+        {
+            var patrolSettlement = _campaign.ResolveInteractiveOriginalStrategicPatrolEncounter(
+                patrolEncounter, session);
+            FinishStrategicEncounter(patrolSettlement.PatrolCleared ? "PATROL DEFEATED" : "STRATEGIC DEFEAT");
+            return;
+        }
+        var settlement = _campaign.ResolveInteractiveOriginalStrategicEncounter(encounter!, session);
         FinishStrategicEncounter(settlement.Outcome switch
         {
             OriginalStrategicInteractiveEncounterOutcome.EnemyDefeated => "STRATEGIC VICTORY",
@@ -147,6 +186,7 @@ public sealed partial class ConquerorGame
     private void FinishStrategicEncounter(string notice)
     {
         _strategicEncounter = null;
+        _strategicPatrolEncounter = null;
         _strategicInteractiveEncounter = null;
         _strategicEncounterViewport = null;
         _strategicEncounterHover = default;

@@ -70,13 +70,31 @@ player record `AE6C` to the loss modal or removes an ordinary field record
 through `0x29D24`. These counter and branch relationships are Confirmed.
 The modern campaign wallet is not inferred from variable 17.
 
-## Runtime boundary still open
+## Runtime mapping and remaining evidence
 
-`AdvanceTemporaryForcePass` currently advances routes and applies expiry;
-it does not run the contact scan or settle its resolver. The next integration
-needs to preserve descriptor/player scan order, pre-route positions, the
-avatar cooldown, direct six-counter staging, and the caller-specific
-write-back and removal paths. Existing player-versus-hostile encounter code
-uses wrapper `0x35924` with reserve reductions, so it cannot be reused as a
-patrol settlement without adapting that staging. The source battle UI and
-original conversation availability predicates remain Provisional.
+`AdvanceTemporaryForceContactPass` scans active descriptors and player records
+in physical order at their pre-route positions. It returns the first army
+contact before route movement or the later strategic pass, while avatar
+contact emits `OriginalStrategicTemporaryForceAvatarNotice` and sets the
+existing 120-pass `CollisionCooldown`. Strict `< 30.0` comparisons and the
+first-contact handoff are tested by
+`ResourceAndDefinitionTests.StrategicTemporaryForceContact`.
+
+`OriginalStrategicTemporaryForceEncounter.Capture` carries the six direct
+force counters into `Campaign.OriginalStrategicPatrolEncounter`, where the
+shared `0x258FC` automatic/tactical resolver receives zero score modifiers
+and zero player reserves. `ConquerorGame.StrategicEncounter` presents that
+separate caller through the existing tactical screen. Settlement clamps
+counters, zeroes patrol survivors on resolver victory, writes army and patrol
+survivors, increments scope-zero variables 5/24/25, awards scope-zero variable
+17, and clears the active descriptor/record or removes an empty ordinary
+field record. The distinguished record raises the existing loss-modal signal.
+The runtime preserves variable 17 as a source conversation variable; no
+modern wallet equivalence is asserted. These bindings and the slot-1 fixed
+reward are covered by the patrol settlement test.
+
+The source's descriptor `+0x18` terminal marker and heap route release have
+no persisted replacement fields yet; clearing `Active` prevents further
+route execution. The exact notice text selectors and loss-modal presentation
+remain Provisional. The source battle UI and original conversation
+availability predicates also remain Provisional.

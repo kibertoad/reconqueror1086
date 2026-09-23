@@ -93,10 +93,18 @@ public sealed partial class ConquerorGame
     {
         var previousReport = _campaign.State.LatestSpyReport;
         var pass = OriginalStrategicHostRuntime.AdvanceFixedPass(_campaign,
-            playerEncounterHandoffActive: _strategicEncounter is not null,
+            playerEncounterHandoffActive: _strategicEncounter is not null || _strategicPatrolEncounter is not null,
             schedulerBlockedByModal: _strategicMapTargetConfirmation is not null,
             suppressDragonEntry: _strategicDragonTriggerSuppressed);
         if (pass?.SpyReport is not null) ShowNewSpyReport(previousReport);
+        if (pass?.TemporaryForceAvatarNotices.Count > 0)
+            _notice = "BRIGANDS ARE NEARBY";
+        if (pass?.TemporaryForceEncounter is { } patrolEncounter)
+        {
+            _strategicMapTargetConfirmation = null;
+            BeginStrategicPatrolEncounter(patrolEncounter);
+            return;
+        }
         if (pass?.Encounters.Count > 0)
         {
             _strategicMapTargetConfirmation = null;

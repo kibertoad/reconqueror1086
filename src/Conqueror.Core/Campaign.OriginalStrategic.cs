@@ -27,7 +27,30 @@ public sealed record OriginalStrategicCampaignPassResult(
     OriginalStrategicPlayerPassResult PlayerPass,
     IReadOnlyList<OriginalStrategicPlayerEnemyEncounter> Encounters,
     OriginalStrategicSchedulerResult? SchedulerPass,
-    IReadOnlyList<OriginalStrategicTemporaryForceCreation> TemporaryForceCreations);
+    IReadOnlyList<OriginalStrategicTemporaryForceCreation> TemporaryForceCreations,
+    IReadOnlyList<OriginalStrategicTemporaryForceAvatarNotice> TemporaryForceAvatarNotices,
+    OriginalStrategicTemporaryForceEncounter? TemporaryForceEncounter);
+
+/// <summary>Direct six-counter patrol handoff from caller 0x3B365, without wrapper 0x35924's reserves.</summary>
+public sealed record OriginalStrategicTemporaryForceEncounter(
+    int Slot, int PlayerMovementSlot,
+    OriginalStrategicEncounterForces PlayerForces,
+    OriginalStrategicEncounterForces PatrolForces)
+{
+    public OriginalStrategicEncounterPreparation Preparation =>
+        new(PlayerForces, new(0, 0, 0), PatrolForces);
+
+    internal static OriginalStrategicTemporaryForceEncounter Capture(
+        OriginalStrategicCampaignState strategic, Player player,
+        OriginalStrategicTemporaryForceContact contact)
+    {
+        var patrol = strategic.TemporaryForceSlots.Single(slot => slot.Slot == contact.Slot);
+        var army = player.ArmyAt(contact.PlayerMovementSlot);
+        return new(contact.Slot, contact.PlayerMovementSlot,
+            new(army.Units[UnitType.Swordsmen], army.Units[UnitType.Halberdiers], army.Units[UnitType.Knights]),
+            new(patrol.Swordsmen, patrol.Halberdiers, patrol.Knights));
+    }
+}
 
 /// <summary>
 /// The three typed force counters staged for one side of the original
@@ -336,8 +359,15 @@ public sealed partial class Campaign
                 nameof(input));
 
         strategic.Validate();
-        var temporaryForcePass = OriginalStrategicMovement.AdvanceTemporaryForcePass(
-            strategic, _originalStrategicResources, State.Date);
+        var patrolPass = OriginalStrategicMovement.AdvanceTemporaryForceContactPass(
+            strategic, _originalStrategicResources, State.Date, input.PlayerEncounterHandoffActive);
+        var temporaryForcePass = patrolPass.Advances;
+        if (patrolPass.Contact is { } contact)
+        {
+            var encounter = OriginalStrategicTemporaryForceEncounter.Capture(strategic, State.Player, contact);
+            return new(temporaryForcePass, null,
+                new([], [], [], false), [], null, [], patrolPass.AvatarNotices, encounter);
+        }
         var report = CaptureOriginalStrategicSpyReport(strategic);
         var divisionTargets = strategic.TemporaryForceSlots.Any(slot => slot.Active)
             ? strategic.TemporaryForceSlots.OrderBy(slot => slot.Slot)
@@ -377,7 +407,8 @@ public sealed partial class Campaign
         }
         var temporaryForceCreations = OriginalStrategicMovement.ProcessTemporaryForceActions(
             strategic, _originalStrategicResources, input.TemporaryForceActionIds, random);
-        return new(temporaryForcePass, report, playerPass, encounters, schedulerPass, temporaryForceCreations);
+        return new(temporaryForcePass, report, playerPass, encounters, schedulerPass, temporaryForceCreations,
+            patrolPass.AvatarNotices, null);
     }
 
     private sealed class CampaignStrategicRandom(Random random) : IOriginalStrategicRandom

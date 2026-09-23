@@ -72,15 +72,46 @@ public static partial class OriginalStrategicMovement
         OriginalStrategicCampaignState state,
         IOriginalStrategicResources resources,
         DateTime calendarDate)
+        => AdvanceTemporaryForceContactPass(state, resources, calendarDate).Advances;
+
+    /// <summary>Scans each patrol's live position before its route update, as at 0x3B2C9.</summary>
+    public static OriginalStrategicTemporaryForcePassResult AdvanceTemporaryForceContactPass(
+        OriginalStrategicCampaignState state,
+        IOriginalStrategicResources resources,
+        DateTime calendarDate,
+        bool encounterHandoffActive = false)
     {
         ArgumentNullException.ThrowIfNull(state);
         ArgumentNullException.ThrowIfNull(resources);
         state.Validate();
 
         var advances = new List<OriginalStrategicTemporaryForceAdvance>();
+        var notices = new List<OriginalStrategicTemporaryForceAvatarNotice>();
         foreach (var slot in state.TemporaryForceSlots.OrderBy(slot => slot.Slot))
         {
-            if (!slot.Active || !OriginalStrategicTemporaryForces.TryGetRoute(slot.Slot, out var descriptor)
+            if (!slot.Active) continue;
+            foreach (var player in state.PlayerMovementSlots.OrderBy(player => player.Slot))
+            {
+                if (!player.Active
+                    || Math.Abs((double)player.CurrentX - slot.CurrentX) >= 30.0
+                    || Math.Abs((double)player.CurrentY - slot.CurrentY) >= 30.0)
+                    continue;
+                state.SelectedPlayerMovementSlot = player.Slot;
+                if (player.Slot == PlayerAvatarMovementSlot)
+                {
+                    if (player.CollisionCooldown == 0)
+                    {
+                        player.CollisionCooldown = PlayerAvatarCollisionCooldown;
+                        notices.Add(new(slot.Slot, player.Slot));
+                    }
+                    continue;
+                }
+                if (!encounterHandoffActive)
+                    return new(advances.AsReadOnly(), notices.AsReadOnly(),
+                        new OriginalStrategicTemporaryForceContact(slot.Slot, player.Slot));
+            }
+
+            if (!OriginalStrategicTemporaryForces.TryGetRoute(slot.Slot, out var descriptor)
                 || !TryGetCreatorForSlot(slot.Slot, out var creator))
                 continue;
 
@@ -107,7 +138,7 @@ public static partial class OriginalStrategicMovement
             else if (advance is { } result)
                 advances.Add(result);
         }
-        return advances;
+        return new(advances.AsReadOnly(), notices.AsReadOnly(), null);
     }
 
     private static bool TryGetCreatorForSlot(int slot, out OriginalStrategicTemporaryForceCreator creator)
@@ -228,3 +259,12 @@ public readonly record struct OriginalStrategicTemporaryForceAdvance(
 
 /// <summary>One accepted source temporary-force creator action.</summary>
 public readonly record struct OriginalStrategicTemporaryForceCreation(int ActionId, int Slot);
+
+public readonly record struct OriginalStrategicTemporaryForceContact(int Slot, int PlayerMovementSlot);
+
+public readonly record struct OriginalStrategicTemporaryForceAvatarNotice(int Slot, int PlayerMovementSlot);
+
+public sealed record OriginalStrategicTemporaryForcePassResult(
+    IReadOnlyList<OriginalStrategicTemporaryForceAdvance> Advances,
+    IReadOnlyList<OriginalStrategicTemporaryForceAvatarNotice> AvatarNotices,
+    OriginalStrategicTemporaryForceContact? Contact);
