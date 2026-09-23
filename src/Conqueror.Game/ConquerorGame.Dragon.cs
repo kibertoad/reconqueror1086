@@ -6,8 +6,11 @@ namespace Conqueror.Game;
 
 public sealed partial class ConquerorGame
 {
+    private bool _dragonPointerInitialized;
+
     private void StartDragonRunMovie()
     {
+        _dragonPointerInitialized = false;
         _dragonRunMovie?.Dispose();
         _dragonRunMovie = CreateMovie("Dragon.Run")
             ?? throw new InvalidDataException("The required original dragon run movie could not be decoded.");
@@ -29,11 +32,12 @@ public sealed partial class ConquerorGame
 
         if (_controllerPointerActive)
             _dragonBattle.SetAim(_controllerPointer.X / 639d, _controllerPointer.Y / 479d);
-        else if (mouse.X != _lastMouse.X || mouse.Y != _lastMouse.Y)
+        else if (!_dragonPointerInitialized || mouse.X != _lastMouse.X || mouse.Y != _lastMouse.Y)
         {
             var point = OriginalPoint(mouse);
             _dragonBattle.SetAim(point.X / 639d, point.Y / 479d);
         }
+        _dragonPointerInitialized = true;
 
         _dragonBattle.Tick(seconds);
         _notice = _dragonBattle.LastMessage.ToUpperInvariant();
