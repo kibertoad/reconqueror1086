@@ -485,8 +485,7 @@ public sealed partial class ResourceAndDefinitionTests
             ImportedMovies.Definitions);
         Assert.Contains(new ImportedMovieDefinition("Ending.DragonDefeat", "/drjstlse.smk"),
             ImportedMovies.Definitions);
-        Assert.Contains(new ImportedMovieDefinition("Dragon.Retreat", "/drjstrun.smk"),
-            ImportedMovies.Definitions);
+        Assert.DoesNotContain(ImportedMovies.Definitions, movie => movie.Role == "Dragon.Retreat");
         Assert.Contains(new ImportedMovieDefinition("Ending.CrownVictory", "/crownl30.smk"),
             ImportedMovies.Definitions);
         Assert.Contains(new ImportedMovieDefinition("Ending.AgeLimit", "/avg_end.smk"),

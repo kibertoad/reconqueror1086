@@ -59,7 +59,6 @@ public sealed partial class ConquerorGame
         if (outcome == DragonBattleOutcome.Victory)
             PlayEventMovieSequence(["Ending.DragonVictory", "Ending.DragonInvestiture"], Screen.Ending);
         else if (outcome == DragonBattleOutcome.Defeat) PlayEventMovie("Ending.DragonDefeat", Screen.Ending);
-        else PlayEventMovie("Dragon.Retreat", Screen.Map);
     }
 
     private void DrawDragonBattle()
