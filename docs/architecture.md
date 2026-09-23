@@ -109,7 +109,7 @@ The control-strip coordinate is intentionally independent from battlefield scrol
 
 ## Validation
 
-The executable specifications reject duplicate equipment and courtship names, duplicate win rewards, mismatched building keys, and dragon requirements that cannot be earned from a defined reward ladder. Full campaign behavior tests then exercise the same generic interpreters used by the game.
+The executable specifications reject duplicate equipment and courtship names, duplicate win rewards, mismatched building keys, and dragon score items that cannot be earned from a defined reward ladder. Full campaign behavior tests then exercise the same generic interpreters used by the game.
 
 ## Runtime paths and packages
 

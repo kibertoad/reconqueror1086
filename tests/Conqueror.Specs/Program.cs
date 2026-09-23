@@ -26,7 +26,8 @@ Check(Balance.Buildings.All(x => x.Key == x.Value.Kind) && Balance.Buildings.Val
 Check(Balance.Equipment.Select(x => x.Name).Distinct(StringComparer.OrdinalIgnoreCase).Count() == Balance.Equipment.Length, "equipment definitions have unique names");
 Check(Balance.Courtships.Select(x => x.Name).Distinct(StringComparer.OrdinalIgnoreCase).Count() == Balance.Courtships.Length && Balance.Courtships.All(x => x.Rewards.Select(r => r.Win).Distinct().Count() == x.Rewards.Length), "courtship definitions valid");
 var rewardItems = Balance.Courtships.SelectMany(x => x.Rewards).Where(x => x.Item is not null).Select(x => x.Item!).ToHashSet(StringComparer.OrdinalIgnoreCase);
-Check(Balance.Victories[VictoryKind.Dragon].RequiredItems.All(rewardItems.Contains), "victory items obtainable from definitions");
+Check(new[] { OriginalDragonRunScore.LanceItem, OriginalDragonRunScore.ArmorItem,
+    OriginalDragonRunScore.ShieldItem }.All(rewardItems.Contains), "dragon score items obtainable from definitions");
 Check(Balance.Strategy == new StrategicDefinition(80, 98, 9), "strategic warfare definitions");
 Check(Balance.TournamentOpponents.Length == 5 && Balance.TournamentOpponents.All(x => x.Wager is >= 20 and <= 80 && x.Swordsmen + x.Halberdiers + x.Knights == 8), "tournament opponent definitions valid");
 Check(ImportedArt.Definitions.Select(x => x.Role).Distinct(StringComparer.OrdinalIgnoreCase).Count() == ImportedArt.Definitions.Count, "imported art roles are unique definitions");
@@ -284,9 +285,13 @@ dragonCampaign.State.Player.Inventory.Items.Add("Dragon Slaying Lance");
 dragonCampaign.State.Player.Inventory.Items.Add("Dragon Slaying Armor");
 dragonCampaign.State.Player.Inventory.Items.Add("Shield of St. George");
 dragonCampaign.State.DragonProgress = 1;
-Check(!dragonCampaign.AttemptDragon(), "dragon challenge requires the moor");
+dragonCampaign.State.Player.LanceExperience = 20;
+Check(dragonCampaign.BeginDragonBattle() is null, "dated dragon challenge requires the moor");
 dragonCampaign.State.CurrentLocation = World.Locations.Length - 1;
-Check(dragonCampaign.AttemptDragon() && dragonCampaign.State.Victory == VictoryKind.Dragon, "dragon victory route");
+var dragonBattle = dragonCampaign.BeginDragonBattle()!;
+dragonBattle.SetAim(277d / 639, 145d / 479);
+dragonBattle.Tick(DragonBattleSession.Rules.DurationSeconds);
+Check(dragonCampaign.FinishDragonBattle(dragonBattle) && dragonCampaign.State.Victory == VictoryKind.Dragon, "dragon victory route");
 
 var crownCampaign = new Campaign(Campaign.NewFromTemplate(2));
 crownCampaign.State.Player.Army.Units[UnitType.Knights] = 1;

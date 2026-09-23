@@ -354,9 +354,10 @@ public sealed partial class Campaign
         OriginalStrategicSchedulerResult? schedulerPass = null;
         // Source 0x13168 invokes encounter wrapper 0x39428 synchronously before
         // caller 0x3C290 reaches its scheduler gate. The host hands that
-        // encounter to a modal on the next UI boundary, so retain the captured
-        // records until the resolver returns instead of advancing them now.
-        if (!input.SchedulerBlockedByModal && encounters.Length == 0)
+        // encounter or dragon run to a later UI boundary, so retain the map
+        // records until that route returns instead of advancing them now.
+        if (!input.SchedulerBlockedByModal && encounters.Length == 0
+            && !playerPass.DragonEntryTriggered)
         {
             if (strategic.SchedulerFallbackTargetPerson < 0
                 || strategic.SchedulerFallbackOriginProperty < 0)

@@ -69,9 +69,9 @@ public sealed class DragonBattleTests
     }
 
     [Fact]
-    public void ChallengeRequiresTheDragonVictoryEquipmentAndLocation()
+    public void DatedDragonEntryRequiresTheDiscoveredMoorButScoresActualEquipment()
     {
-        var campaign = ReadyCampaign();
+        var campaign = new Campaign(Campaign.NewFromTemplate(2));
         campaign.State.CurrentLocation = 0;
 
         Assert.Null(campaign.BeginDragonBattle());
@@ -79,8 +79,42 @@ public sealed class DragonBattleTests
         campaign.State.CurrentLocation = World.Locations.Length - 1;
         campaign.State.DragonProgress = 1;
         campaign.State.Player.LanceExperience = 20;
-        Assert.Equal(442, campaign.BeginDragonBattle()!.ScoreThreshold);
+        campaign.State.Player.Stats = campaign.State.Player.Stats with { Strength = 1 };
+        Assert.Equal(0, campaign.BeginDragonBattle()!.ScoreThreshold);
         Assert.Equal(VictoryKind.None, campaign.State.Victory);
+    }
+
+    [Fact]
+    public void StrategicFiveCellEntryRunsTheDragonBattleWithoutTheDatedLocationGate()
+    {
+        var state = Campaign.NewFromTemplate(2);
+        state.OriginalStrategicState = OriginalStrategicCampaignState.CreateForNewGame(state.Date, 0);
+        var strategic = state.OriginalStrategicState;
+        strategic.EngagedPlayerMovementSlot = 3;
+        var distinguished = strategic.PlayerMovementSlots[3];
+        distinguished.Active = true;
+        distinguished.GridX = 63;
+        distinguished.GridY = 112;
+        var campaign = new Campaign(state);
+
+        Assert.Null(campaign.BeginDragonBattleFromStrategicMap());
+        distinguished.GridY = 114;
+        Assert.Equal(OriginalDragonRunScore.Threshold(0, 0),
+            campaign.BeginDragonBattleFromStrategicMap()!.ScoreThreshold);
+
+        campaign.State.Player.LanceExperience = 20;
+        campaign.State.Player.Inventory.Items.UnionWith([
+            OriginalDragonRunScore.LanceItem, OriginalDragonRunScore.ArmorItem,
+            OriginalDragonRunScore.ShieldItem]);
+        campaign.State.Player.Stats = campaign.State.Player.Stats with { Strength = 1 };
+        var battle = campaign.BeginDragonBattleFromStrategicMap()!;
+        battle.SetAim(277d / 639, 145d / 479);
+        battle.Tick(DragonBattleSession.Rules.DurationSeconds);
+
+        Assert.Equal(DragonBattleOutcome.Victory, battle.Outcome);
+        Assert.True(campaign.FinishDragonBattle(battle));
+        Assert.Equal(VictoryKind.Dragon, campaign.State.Victory);
+        Assert.Equal(0, campaign.State.CurrentLocation);
     }
 
     [Fact]
@@ -246,7 +280,9 @@ public sealed class DragonBattleTests
     private static Campaign ReadyCampaign()
     {
         var campaign = new Campaign(Campaign.NewFromTemplate(2));
-        campaign.State.Player.Inventory.Items.UnionWith(Balance.Victories[VictoryKind.Dragon].RequiredItems);
+        campaign.State.Player.Inventory.Items.UnionWith([
+            OriginalDragonRunScore.LanceItem, OriginalDragonRunScore.ArmorItem,
+            OriginalDragonRunScore.ShieldItem]);
         campaign.State.DragonProgress = 1;
         campaign.State.CurrentLocation = World.Locations.Length - 1;
         return campaign;

@@ -134,9 +134,7 @@ public static class Balance
 
     public static readonly IReadOnlyDictionary<VictoryKind, VictoryDefinition> Victories = new Dictionary<VictoryKind, VictoryDefinition>
     {
-        [VictoryKind.Crown] = new(VictoryKind.Crown, 1, 0, 1, 0, []),
-        [VictoryKind.Dragon] = new(VictoryKind.Dragon, World.Locations.Length - 1, 0, 0, 16,
-            ["Dragon Slaying Armor", "Shield of St. George", "Dragon Slaying Lance"])
+        [VictoryKind.Crown] = new(VictoryKind.Crown, 1, 0, 1, 0, [])
     };
 
     public static int ScaleFrom50(int at50, int at100, int productivity) =>

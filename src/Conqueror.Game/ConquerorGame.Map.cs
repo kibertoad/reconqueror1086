@@ -5,6 +5,8 @@ namespace Conqueror.Game;
 
 public sealed partial class ConquerorGame
 {
+    private bool _strategicDragonTriggerSuppressed;
+
     private void UpdateMap(Func<Keys, bool> press, MouseState mouse, bool click)
     {
         UpdateOriginalStrategicMapRuntime();
@@ -98,7 +100,22 @@ public sealed partial class ConquerorGame
         {
             _strategicMapTargetConfirmation = null;
             BeginStrategicEncounter(pass.Encounters[0]);
+            return;
         }
+        if (pass?.PlayerPass.DragonEntryTriggered != true)
+        {
+            _strategicDragonTriggerSuppressed = false;
+            return;
+        }
+        if (_strategicDragonTriggerSuppressed) return;
+
+        _dragonBattle = _campaign.BeginDragonBattleFromStrategicMap()
+            ?? throw new InvalidOperationException("The mapped dragon entry has no live distinguished player record.");
+        _strategicDragonTriggerSuppressed = true;
+        _strategicMapTargetConfirmation = null;
+        StartDragonRunMovie();
+        _notice = _dragonBattle.LastMessage.ToUpperInvariant();
+        _screen = Screen.DragonBattle;
     }
 
     /// <summary>
@@ -217,7 +234,7 @@ public sealed partial class ConquerorGame
             _dragonBattle = _campaign.BeginDragonBattle();
             if (_dragonBattle is null)
             {
-                _notice = "YOU REACH THE LAIR, BUT CANNOT CHALLENGE THE DRAGON WITHOUT MIGHTY STRENGTH, ARMOR, SHIELD, AND LANCE";
+                _notice = "THE DRAGON ENCOUNTER COULD NOT START";
                 PlayEventMovie("Travel.DragonLair", Screen.Map);
                 return;
             }
@@ -247,6 +264,6 @@ public sealed partial class ConquerorGame
             _screen = Screen.DragonBattle;
             _notice = _dragonBattle.LastMessage.ToUpperInvariant();
         }
-        else _notice = "DRAGON CHALLENGE REQUIRES ITS LOCATION, MIGHTY STRENGTH, ARMOR, SHIELD, AND LANCE";
+        else _notice = "REACH THE DISCOVERED DRAGON LAIR TO CHALLENGE IT";
     }
 }

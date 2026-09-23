@@ -141,7 +141,7 @@ public static partial class OriginalStrategicMovement
             }
 
             if (playerIndex == state.EngagedPlayerMovementSlot
-                && IsPlayerSpecialTriggerCell(player.GridX, player.GridY))
+                && IsDragonEntryCell(player.GridX, player.GridY))
                 return new(
                     advances.AsReadOnly(), contacts.AsReadOnly(), avatarAlerts.AsReadOnly(), true);
         }
@@ -326,7 +326,7 @@ public static partial class OriginalStrategicMovement
         _ = ResolvePlayerTerrain(
             slot, state, resources, Truncate(slot.CurrentX), Truncate(slot.CurrentY));
 
-    private static bool IsPlayerSpecialTriggerCell(int x, int y) =>
+    public static bool IsDragonEntryCell(int x, int y) =>
         x == 63 && y - 2 == 114
         || x + 1 == 63 && y == 114
         || x - 1 == 63 && y - 1 == 114
@@ -342,4 +342,4 @@ public sealed record OriginalStrategicPlayerPassResult(
     IReadOnlyList<OriginalStrategicPlayerAdvance> Advances,
     IReadOnlyList<OriginalStrategicPlayerEnemyContact> Contacts,
     IReadOnlyList<OriginalStrategicPlayerAvatarAlert> AvatarAlerts,
-    bool SpecialMapTrigger);
+    bool DragonEntryTriggered);

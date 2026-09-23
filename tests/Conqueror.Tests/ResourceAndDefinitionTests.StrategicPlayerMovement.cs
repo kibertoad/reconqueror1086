@@ -434,7 +434,7 @@ public sealed partial class ResourceAndDefinitionTests
     [InlineData(64, 115)]
     [InlineData(63, 114)]
     [InlineData(63, 113)]
-    public void EngagedPlayerArmyUsesTheExactFiveCellSpecialTrigger(int gridX, int gridY)
+    public void EngagedPlayerArmyUsesTheExactFiveCellDragonEntry(int gridX, int gridY)
     {
         var state = RuntimeState();
         state.EngagedPlayerMovementSlot = 3;
@@ -446,7 +446,7 @@ public sealed partial class ResourceAndDefinitionTests
         var result = OriginalStrategicMovement.AdvancePlayerPass(
             state, new StubStrategicResources(), []);
 
-        Assert.True(result.SpecialMapTrigger);
+        Assert.True(result.DragonEntryTriggered);
     }
 
     private static void ActivatePlayerRoute(

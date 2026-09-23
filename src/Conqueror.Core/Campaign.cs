@@ -749,18 +749,27 @@ public sealed partial class Campaign
         return AttemptVictory(VictoryKind.Crown);
     }
 
-    public bool AttemptDragon()
-    {
-        return AttemptVictory(VictoryKind.Dragon);
-    }
-
     public DragonBattleSession? BeginDragonBattle()
     {
-        return MeetsVictoryRequirements(VictoryKind.Dragon, logFailure: true)
-            ? new DragonBattleSession(State.Player.LanceExperience,
-                OriginalDragonRunScore.EquipmentBonus(State.Player.Inventory.Items))
+        return DragonLairDiscovered && State.CurrentLocation == World.Locations.Length - 1
+            ? CreateDragonBattle()
             : null;
     }
+
+    public DragonBattleSession? BeginDragonBattleFromStrategicMap()
+    {
+        if (State.OriginalStrategicState is not { } strategic) return null;
+        var distinguished = strategic.PlayerMovementSlots.Single(slot =>
+            slot.Slot == strategic.EngagedPlayerMovementSlot);
+        return distinguished.Active
+            && OriginalStrategicMovement.IsDragonEntryCell(distinguished.GridX, distinguished.GridY)
+            ? CreateDragonBattle()
+            : null;
+    }
+
+    private DragonBattleSession CreateDragonBattle() =>
+        new(State.Player.LanceExperience,
+            OriginalDragonRunScore.EquipmentBonus(State.Player.Inventory.Items));
 
     public bool FinishDragonBattle(DragonBattleSession battle)
     {
@@ -768,7 +777,9 @@ public sealed partial class Campaign
         switch (battle.Outcome)
         {
             case DragonBattleOutcome.Victory:
-                return AttemptVictory(VictoryKind.Dragon);
+                State.Victory = VictoryKind.Dragon;
+                Log("The dragon falls. England hails its champion.");
+                return true;
             case DragonBattleOutcome.Defeat:
                 State.Victory = VictoryKind.Defeat;
                 State.EndReason = CampaignEndReason.Dragon;
@@ -784,9 +795,10 @@ public sealed partial class Campaign
 
     public bool AttemptVictory(VictoryKind kind)
     {
+        if (kind != VictoryKind.Crown) return false;
         if (!MeetsVictoryRequirements(kind, logFailure: true)) return false;
         State.Victory = kind;
-        Log(kind == VictoryKind.Crown ? "William is overthrown. You take the crown of England." : "The dragon falls. England hails its champion.");
+        Log("William is overthrown. You take the crown of England.");
         return true;
     }
 
@@ -795,12 +807,11 @@ public sealed partial class Campaign
         if (!Balance.Victories.TryGetValue(kind, out var definition)) return false;
         var p = State.Player;
         var missingItems = definition.RequiredItems.Where(x => !p.Inventory.Items.Contains(x)).ToArray();
-        var missingDiscovery = kind == VictoryKind.Dragon && !DragonLairDiscovered;
-        if (missingDiscovery || State.CurrentLocation != definition.LocationIndex || p.Fiefs < definition.RequiredFiefs || p.Army.Total < definition.RequiredArmy
+        if (State.CurrentLocation != definition.LocationIndex || p.Fiefs < definition.RequiredFiefs || p.Army.Total < definition.RequiredArmy
             || p.Stats.Strength < definition.RequiredStrength || missingItems.Length > 0)
         {
             if (logFailure)
-                Log($"Requirements not met for {kind}: discover its location, travel to {World.Locations[definition.LocationIndex].Name}, fiefs {definition.RequiredFiefs}, army {definition.RequiredArmy}, strength {definition.RequiredStrength}, items {string.Join(", ", definition.RequiredItems)}.");
+                Log($"Requirements not met for {kind}: travel to {World.Locations[definition.LocationIndex].Name}, fiefs {definition.RequiredFiefs}, army {definition.RequiredArmy}, strength {definition.RequiredStrength}, items {string.Join(", ", definition.RequiredItems)}.");
             return false;
         }
         return true;
