@@ -24,6 +24,8 @@ Complete a clean-room MonoGame reimplementation of *Conqueror: A.D. 1086* that p
 
 ## Current baseline
 
+Hostile combat mode-9 update: supported kinds 2/4/7 use same-side authored-order ray acquisition. Success selects mode 6, failure selects no-effect mode 1, and the thinker invokes only that selected mode's handler. The runtime now implements both edges; forced-state tests cover templates 3, 5, and 9. None of the official supported placements starts in mode 9, and ordinary-play entry remains **Provisional**. The transition and handler fixups are recorded in `docs/original-findings.md`.
+
 Friendly combat mode-9 update: both kind tables send mode 9 through the authored-order same-side ray, retain mode 9 on success, or enter mode 6 on failure. The current handler shares mode 10's scaled non-cardinal escape motion. Both states are now implemented and tested in forced-state conditions; no supported placed actor starts in mode 9, and an ordinary-play inbound edge remains **Provisional**. The executable fixups and runtime types are mapped in `docs/original-findings.md`.
 
 Strategic tactical cadence correction: setup `0x183E8` registers counter callback `0x183C0` at 250 Hz. Helper `0x18420` multiplies that counter by four, and resolver `0x26C3A` tests a strict 200-unit threshold. The default host timer now quantizes to four-ms steps, so a pass first becomes eligible at 204 ms from an aligned sample and a delayed pass resets its baseline without catch-up. This registration and nominal cadence are **Confirmed** from executable control flow; hardware phase remains **Provisional**. See the address-level map in `docs/original-findings.md`.

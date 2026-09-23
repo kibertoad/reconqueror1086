@@ -23,6 +23,61 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(current, hostile.ActorMode);
     }
 
+    [Theory]
+    [InlineData(3)]
+    [InlineData(5)]
+    [InlineData(9)]
+    public void SupportedHostileModeNineLeavesForModeSixOnSameSideRay(int template)
+    {
+        var tiles = new SiegeTile[12, 5];
+        var army = new Army();
+        army.Units[UnitType.Halberdiers] = 1;
+        var kind = OriginalCombatantTemplates.ActorKindForSceneTemplate(template);
+        var first = new SiegeSpawn(5, 2, false, OriginalHealth: 10,
+            OriginalActorKind: kind, OriginalActorTemplate: template, OriginalActorOrder: 1,
+            OriginalMovement: new SiegeActorMovement(3, 200, 64, 0, 0x142));
+        var second = new SiegeSpawn(8, 2, false, OriginalHealth: 10,
+            OriginalActorKind: kind, OriginalActorTemplate: template, OriginalActorOrder: 2);
+        var retainer = new SiegeSpawn(2, 2, false, OriginalHealth: 5,
+            OriginalActorKind: 0, OriginalActorOrder: 0);
+        var battle = new SiegeSession(new Player(), army, 0, 1086,
+            new SiegeLayout(tiles, 1, 1, Facing.East, [first, second], retainers: [retainer]));
+        var hostile = battle.Enemies[0];
+        var ally = battle.Enemies[1];
+        typeof(SiegeEnemy).GetProperty(nameof(SiegeEnemy.ActorMode))!.SetValue(hostile, 9);
+        battle.ConfigureActorRaycast((source, target) =>
+            ReferenceEquals(source, hostile) && ReferenceEquals(target, ally)
+                ? new SiegeActorRayHit(ally, 0x180)
+                : null);
+
+        battle.AdvanceHostileMovement(0);
+
+        Assert.Equal(6, hostile.ActorMode);
+        Assert.Equal((5, 2, 0, 0),
+            (hostile.X, hostile.Y, hostile.OffsetX8, hostile.OffsetY8));
+        battle.AdvanceHostileMovement(0.2001);
+        Assert.Equal(64, Math.Abs(hostile.OffsetX8) + Math.Abs(hostile.OffsetY8));
+    }
+
+    [Theory]
+    [InlineData(3)]
+    [InlineData(5)]
+    [InlineData(9)]
+    public void SupportedHostileModeNineFailureEntersModeOneForOnePass(int template)
+    {
+        var battle = HostileBattle(enemyX: 5, retainerX: 2, enemyHealth: 10,
+            retainerHealth: 5, actorTemplate: template);
+        var hostile = Assert.Single(battle.Enemies);
+        typeof(SiegeEnemy).GetProperty(nameof(SiegeEnemy.ActorMode))!.SetValue(hostile, 9);
+        battle.ConfigureActorRaycast((_, _) => null);
+
+        battle.AdvanceHostileMovement(0);
+
+        Assert.Equal(1, hostile.ActorMode);
+        Assert.Equal((5, 2, 0, 0),
+            (hostile.X, hostile.Y, hostile.OffsetX8, hostile.OffsetY8));
+    }
+
     [Fact]
     public void HostileModeSixAcquiresAndPursuesWithExactSubCellMovement()
     {

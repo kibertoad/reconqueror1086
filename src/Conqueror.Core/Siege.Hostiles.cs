@@ -160,6 +160,15 @@ public sealed partial class SiegeSession
                 nextMode = enemy.HostileTarget is { Health: > 0 } pursued && IsFriendlyActor(pursued) &&
                     HostileHasContact(enemy, pursued) ? 11 : 6;
                 break;
+            case 9:
+            {
+                // Kinds 2/4/7 use the same 0x4FC34 acquisition but 0x4E8D8
+                // leaves mode 9 for mode 6 on success or mode 1 on failure.
+                var ally = AcquireHostileFormationTarget(enemy);
+                if (ally is not null) enemy.HostileTarget = ally;
+                nextMode = ally is null ? 1 : 6;
+                break;
+            }
             case 10:
             {
                 var opponent = AcquireHostileTarget(enemy);
