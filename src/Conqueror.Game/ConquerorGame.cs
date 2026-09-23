@@ -447,7 +447,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
                 break;
             case Screen.Movie: UpdateEventMovie(gameTime, mouse, pressAny, click); break;
             case Screen.OptionsHub: UpdateOptionsHub(Press, mouse, click, release); break;
-            case Screen.Practice: UpdatePractice(Press, mouse, click); break;
+            case Screen.Practice: UpdatePractice(Press, pressAny, mouse, click); break;
             case Screen.LoadGame: UpdateLoadGame(Press, mouse, click); break;
             case Screen.CharacterOptions: UpdateCharacterOptions(Press, mouse, click); break;
             case Screen.CharacterName: UpdateCharacterName(Press); break;
@@ -586,9 +586,9 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         }
     }
 
-    private void UpdatePractice(Func<Keys, bool> press, MouseState mouse, bool click)
+    private void UpdatePractice(Func<Keys, bool> press, bool pressAny, MouseState mouse, bool click)
     {
-        if (UpdatePracticeJoustResult(press, click)) return;
+        if (UpdatePracticeJoustResult(pressAny, click)) return;
         var moved = false;
         if (press(Keys.Up) || press(Keys.Left))
         {

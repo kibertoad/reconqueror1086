@@ -87,10 +87,10 @@ public sealed partial class ConquerorGame
         };
     }
 
-    private bool UpdatePracticeJoustResult(Func<Keys, bool> press, bool click)
+    private bool UpdatePracticeJoustResult(bool pressAny, bool click)
     {
         if (_practiceJoustResult is null) return false;
-        if (press(Keys.Enter) || click) _practiceJoustResult = null;
+        if (pressAny || click) _practiceJoustResult = null;
         return true;
     }
 
@@ -101,6 +101,6 @@ public sealed partial class ConquerorGame
         DrawText(_notice, 213, 292, Color.Gold, 3);
         DrawText($"LANCE ERROR X {result.HorizontalError}  Y {result.VerticalError}",
             215, 369, Color.White, 2);
-        DrawText("ENTER OR CLICK TO CONTINUE", 265, 443, Color.White, 2);
+        DrawText("PRESS ANY KEY OR CLICK", 265, 443, Color.White, 2);
     }
 }

@@ -75,8 +75,8 @@ subtracts it when the movie frame counter is divisible by seven.
 The original worker runs in an unrestricted loop, so its number of motion
 iterations per displayed movie frame depends on processor speed. The host
 advances once per decoded movie frame, catching up elapsed frames in order;
-this is an explicit stable timing policy. The exact foreground palette remains
-**Provisional**.
+this is an explicit stable timing policy. The active movie palette is the
+confirmed host foreground binding described above.
 
 ## Contact and result
 
@@ -101,9 +101,18 @@ both riders missing. The random draw is skipped entirely on a player hit.
 `OriginalPracticeJoustTrial` and its threshold, draw, and incomplete-frame
 tests preserve this **Confirmed** branch structure.
 
+`0x412A0-0x4130D` draws an opening prompt and the initial movie surface.
+The following `0x63050` call at `0x41312` only clears input count `0xDF38`;
+the movie frame loop begins without an input wait. That call's meaning is
+**Confirmed** by the helper body at `0x63050-0x63058`. The prompt's precise
+visibility duration under the original unrestricted loop remains
+**Provisional**.
+
 `0x41B59-0x41C93` picks result and direction-dependent source message
-pointers, then waits for an input event. The host shows a short authored result
-overlay on the Practice screen and requires dismissal before another choice.
-Its wording, the original text catalog, and exact physical dialog events
-remain **Provisional**. The caller's practice points are local stack values;
+pointers. The loop at `0x41CAE-0x41CD8` waits until pointer decoder `0x63114`
+returns event 3 or keyboard poll `0x65380` returns a nonzero key. The host
+shows a short authored result overlay on the Practice screen and dismisses it
+on a new ordinary key press or click before another choice. The original
+message wording and exact physical dialog events remain **Provisional**.
+The caller's practice points are local stack values;
 this isolated training run does not mutate campaign tournament scoring.
