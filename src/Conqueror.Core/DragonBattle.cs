@@ -4,18 +4,15 @@ public enum DragonBattleOutcome { InProgress, Victory, Defeat, Withdrawn }
 
 public sealed record DragonBattleDefinition(
     double DurationSeconds,
-    double BaseEyeRadius,
-    double StrengthRadiusBonus,
-    double MaximumEyeRadius,
     double AimSpeed);
 
 public sealed class DragonBattleSession
 {
     public static readonly DragonBattleDefinition Rules = new(
         OriginalDragonRunTimeline.EndFrame * OriginalDragonRunTimeline.FrameMilliseconds / 1000d,
-        .055, .004, .12, .65);
+        .65);
 
-    private readonly int _strength;
+    private readonly int _lanceExperience;
     private double _elapsed;
 
     public DragonBattleOutcome Outcome { get; private set; }
@@ -27,13 +24,16 @@ public sealed class DragonBattleSession
     public bool EyeVisible => SourceFrame is >= OriginalDragonRunTimeline.FirstTargetFrame
         and < OriginalDragonRunTimeline.EndFrame;
     public double RemainingSeconds => Math.Max(0, Rules.DurationSeconds - _elapsed);
-    public double HitRadius => Math.Min(Rules.MaximumEyeRadius,
-        Rules.BaseEyeRadius + Math.Max(0, _strength - 16) * Rules.StrengthRadiusBonus);
-    public string LastMessage { get; private set; } = "Steady the lance and aim for the dragon's eye.";
+    public int HorizontalError { get; private set; }
+    public int VerticalError { get; private set; }
+    public int ScoredFrames { get; private set; }
+    public int ScoreThreshold => OriginalDragonRunScore.Threshold(_lanceExperience,
+        OriginalDragonRunScore.FullEquipmentBonus);
+    public string LastMessage { get; private set; } = "Keep the lance aligned with the dragon's eye.";
 
-    public DragonBattleSession(int strength)
+    public DragonBattleSession(int lanceExperience)
     {
-        _strength = strength;
+        _lanceExperience = lanceExperience;
     }
 
     public void MoveAim(double horizontal, double vertical, double elapsedSeconds)
@@ -53,33 +53,31 @@ public sealed class DragonBattleSession
     public void Tick(double elapsedSeconds)
     {
         if (Outcome != DragonBattleOutcome.InProgress || elapsedSeconds <= 0) return;
+        var previousFrame = SourceFrame;
         _elapsed = Math.Min(Rules.DurationSeconds, _elapsed + elapsedSeconds);
         SourceFrame = OriginalDragonRunTimeline.FrameAt(TimeSpan.FromSeconds(_elapsed));
-        if (OriginalDragonRunTimeline.TargetAt(SourceFrame) is { } target)
+        for (var frame = Math.Max(previousFrame + 1, OriginalDragonRunTimeline.FirstTargetFrame);
+             frame < Math.Min(SourceFrame + 1, OriginalDragonRunTimeline.EndFrame); frame++)
         {
+            var target = OriginalDragonRunTimeline.TargetAt(frame)!.Value;
             EyeX = (double)target.X / OriginalDragonRunTimeline.ScreenWidth;
             EyeY = (double)target.Y / OriginalDragonRunTimeline.ScreenHeight;
+            // The host aim-to-lance geometry remains provisional. Score its
+            // source-screen position once per distinct movie frame.
+            var aimX = (int)Math.Round(AimX * (OriginalDragonRunTimeline.ScreenWidth - 1));
+            var aimY = (int)Math.Round(AimY * (OriginalDragonRunTimeline.ScreenHeight - 1));
+            HorizontalError += Math.Abs(target.X - aimX);
+            VerticalError += Math.Abs(target.Y - aimY);
+            ScoredFrames++;
         }
         if (_elapsed >= Rules.DurationSeconds)
         {
-            Outcome = DragonBattleOutcome.Defeat;
-            LastMessage = "The dragon strikes before you lower the lance.";
+            var hit = OriginalDragonRunScore.Succeeds(_lanceExperience,
+                OriginalDragonRunScore.FullEquipmentBonus, HorizontalError, VerticalError);
+            Outcome = hit ? DragonBattleOutcome.Victory : DragonBattleOutcome.Defeat;
+            LastMessage = hit ? "The lance finds the dragon's eye."
+                : "The lance misses the dragon's eye.";
         }
-    }
-
-    public bool Strike()
-    {
-        if (Outcome != DragonBattleOutcome.InProgress) return false;
-        var dx = AimX - EyeX;
-        var dy = AimY - EyeY;
-        // Exact source alignment scoring is still unresolved; this retained
-        // one-thrust hit radius is a provisional host interaction rule.
-        var hit = EyeVisible && dx * dx + dy * dy <= HitRadius * HitRadius;
-        Outcome = hit ? DragonBattleOutcome.Victory : DragonBattleOutcome.Defeat;
-        LastMessage = hit
-            ? "The lance finds the dragon's eye."
-            : "Your only thrust misses the dragon's eye.";
-        return hit;
     }
 
     public void Withdraw()

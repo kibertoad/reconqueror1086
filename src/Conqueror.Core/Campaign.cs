@@ -757,7 +757,7 @@ public sealed partial class Campaign
     public DragonBattleSession? BeginDragonBattle()
     {
         return MeetsVictoryRequirements(VictoryKind.Dragon, logFailure: true)
-            ? new DragonBattleSession(State.Player.Stats.Strength)
+            ? new DragonBattleSession(State.Player.LanceExperience)
             : null;
     }
 

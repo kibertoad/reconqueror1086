@@ -78,14 +78,15 @@ public sealed class DragonBattleTests
 
         campaign.State.CurrentLocation = World.Locations.Length - 1;
         campaign.State.DragonProgress = 1;
-        Assert.NotNull(campaign.BeginDragonBattle());
+        campaign.State.Player.LanceExperience = 20;
+        Assert.Equal(442, campaign.BeginDragonBattle()!.ScoreThreshold);
         Assert.Equal(VictoryKind.None, campaign.State.Victory);
     }
 
     [Fact]
-    public void DragonRunUsesTheAuthoredLateTargetTrackAndOneAccurateThrustWins()
+    public void DragonRunUsesTheAuthoredLateTargetTrackAndScoresAtTheEnd()
     {
-        var battle = new DragonBattleSession(16);
+        var battle = new DragonBattleSession(20);
         var firstTargetTime = OriginalDragonRunTimeline.FirstTargetFrame
             * OriginalDragonRunTimeline.FrameMilliseconds / 1000d;
         battle.Tick(firstTargetTime - .001);
@@ -96,12 +97,41 @@ public sealed class DragonBattleTests
         Assert.True(battle.EyeVisible);
         Assert.Equal(277d / 640, battle.EyeX);
         Assert.Equal(215d / 480, battle.EyeY);
-        battle.MoveAim((battle.EyeX - battle.AimX) / DragonBattleSession.Rules.AimSpeed,
-            (battle.EyeY - battle.AimY) / DragonBattleSession.Rules.AimSpeed, 1);
+        Assert.Equal(1, battle.ScoredFrames);
+        Assert.Equal(DragonBattleOutcome.InProgress, battle.Outcome);
+    }
 
-        Assert.True(battle.Strike());
+    [Fact]
+    public void TrackingAllLateMovieFramesWinsOnTheOriginalAxisGate()
+    {
+        var battle = new DragonBattleSession(20);
+        battle.Tick(107 * .071);
+        for (var frame = 108; frame < 134; frame++)
+        {
+            var target = OriginalDragonRunTimeline.TargetAt(frame)!.Value;
+            battle.SetAim(target.X / 639d, target.Y / 479d);
+            battle.Tick(.071 + 1e-9);
+        }
+        Assert.Equal(26, battle.ScoredFrames);
+        Assert.Equal(0, battle.HorizontalError);
+        Assert.Equal(0, battle.VerticalError);
+        Assert.Equal(DragonBattleOutcome.InProgress, battle.Outcome);
+
+        battle.Tick(.071);
+
         Assert.Equal(DragonBattleOutcome.Victory, battle.Outcome);
-        Assert.False(battle.Strike());
+    }
+
+    [Fact]
+    public void DragonScoreUsesLanceExperienceFullGearBonusAndStrictPerAxisBounds()
+    {
+        Assert.Equal(17, OriginalDragonRunScore.EquipmentBonus(true, true, true));
+        Assert.Equal(8, OriginalDragonRunScore.EquipmentBonus(true, true, false));
+        Assert.Equal(442, OriginalDragonRunScore.Threshold(20, 17));
+        Assert.Equal(338, OriginalDragonRunScore.Threshold(16, 17));
+        Assert.True(OriginalDragonRunScore.Succeeds(20, 17, 441, 441));
+        Assert.False(OriginalDragonRunScore.Succeeds(20, 17, 442, 0));
+        Assert.False(OriginalDragonRunScore.Succeeds(20, 17, 0, 442));
     }
 
     [Fact]
@@ -122,7 +152,8 @@ public sealed class DragonBattleTests
     {
         var defeatedCampaign = ReadyCampaign();
         var defeatedBattle = defeatedCampaign.BeginDragonBattle()!;
-        Assert.False(defeatedBattle.Strike());
+        defeatedBattle.Tick(DragonBattleSession.Rules.DurationSeconds);
+        Assert.Equal(DragonBattleOutcome.Defeat, defeatedBattle.Outcome);
         Assert.False(defeatedCampaign.FinishDragonBattle(defeatedBattle));
         Assert.Equal(VictoryKind.Defeat, defeatedCampaign.State.Victory);
         Assert.Equal(CampaignEndReason.Dragon, defeatedCampaign.State.EndReason);
@@ -135,9 +166,9 @@ public sealed class DragonBattleTests
     }
 
     [Fact]
-    public void StrengthWidensTheEyeHitWindowAndDelayIsFatal()
+    public void LanceExperienceRaisesTheScoreGateAndUnalignedAimIsFatal()
     {
-        Assert.True(new DragonBattleSession(30).HitRadius > new DragonBattleSession(16).HitRadius);
+        Assert.True(new DragonBattleSession(20).ScoreThreshold > new DragonBattleSession(16).ScoreThreshold);
         var battle = new DragonBattleSession(16);
 
         battle.Tick(DragonBattleSession.Rules.DurationSeconds);

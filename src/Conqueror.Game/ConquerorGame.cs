@@ -476,7 +476,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.FieldBattle: UpdateFieldBattle(Press, gameTime); break;
             case Screen.StrategicEncounter: UpdateStrategicEncounter(Press, mouse, click); break;
             case Screen.Siege: UpdateSiege(Press, mouse, click, gameTime); break;
-            case Screen.DragonBattle: UpdateDragonBattle(Press, keys, gamePad, mouse, click, gameTime); break;
+            case Screen.DragonBattle: UpdateDragonBattle(keys, gamePad, mouse, gameTime); break;
             case Screen.Overview: if (Press(Keys.Enter) || Press(Keys.O)) _screen = _overviewReturnScreen; break;
             case Screen.Ending: if (Press(Keys.Enter)) _screen = Screen.Title; break;
         }
