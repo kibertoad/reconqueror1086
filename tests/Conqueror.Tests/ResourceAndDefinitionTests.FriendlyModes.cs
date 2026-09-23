@@ -82,6 +82,48 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(4, retainer.ActorMode);
     }
 
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    public void FriendlyModeNineRetainsScaledEscapeWhileSameSideRaySucceeds(int actorKind)
+    {
+        var battle = FriendlyModeBattle(actorKind, retainerX: 4, enemyX: 10,
+            retainerHealth: 12, enemyHealth: 20, playerX: 1);
+        var retainer = Assert.Single(battle.Retainers);
+        battle.CommandRetainers(SiegeRetainerCommand.Defend);
+        typeof(SiegeEnemy).GetProperty(nameof(SiegeEnemy.ActorMode))!.SetValue(retainer, 9);
+        battle.ConfigureActorRaycast((source, target) =>
+            ReferenceEquals(source, retainer) && ReferenceEquals(target, battle.PlayerActor)
+                ? new SiegeActorRayHit(target, 0x180)
+                : null);
+
+        battle.AdvanceRetainerOrders();
+
+        Assert.Equal(9, retainer.ActorMode);
+        Assert.Equal(Facing.East, retainer.Facing);
+        battle.AdvanceRetainerMovement(0.2001);
+        Assert.Equal(96, retainer.OffsetX8);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    public void FriendlyModeNineFallsBackToModeSixWithoutSameSideRay(int actorKind)
+    {
+        var battle = FriendlyModeBattle(actorKind, retainerX: 4, enemyX: 10,
+            retainerHealth: 12, enemyHealth: 20, playerX: 1);
+        var retainer = Assert.Single(battle.Retainers);
+        battle.CommandRetainers(SiegeRetainerCommand.Defend);
+        typeof(SiegeEnemy).GetProperty(nameof(SiegeEnemy.ActorMode))!.SetValue(retainer, 9);
+        battle.ConfigureActorRaycast((_, _) => null);
+
+        battle.AdvanceRetainerOrders();
+
+        Assert.Equal(6, retainer.ActorMode);
+        battle.AdvanceRetainerMovement(0.2001);
+        Assert.Equal(64, Math.Abs(retainer.OffsetX8) + Math.Abs(retainer.OffsetY8));
+    }
+
     private static SiegeSession FriendlyModeBattle(int actorKind, int retainerX, int enemyX,
         int retainerHealth, int enemyHealth, int retainerAttackSkill = 50, int playerX = 1)
     {

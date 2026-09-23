@@ -167,6 +167,15 @@ public sealed partial class SiegeSession
                 retainer.ActorMode = opponent is null ? 6 : 11;
                 break;
             }
+            case 9:
+            {
+                // Both kind tables use 0x4E758: same-side acquisition keeps
+                // mode 9, while failure returns to attack wandering mode 6.
+                var ally = RetreatFormationTarget(retainer);
+                if (ally is not null) StoreFriendlyTarget(retainer, ally);
+                retainer.ActorMode = ally is null ? 6 : 9;
+                break;
+            }
             case 10:
             {
                 var opponent = AcquireRetreatOrderTarget(retainer);
@@ -258,6 +267,7 @@ public sealed partial class SiegeSession
                     retainer.MovementActive = true;
                 }
                 break;
+            case 9:
             case 10:
                 BeginFriendlyEscape(retainer);
                 break;
