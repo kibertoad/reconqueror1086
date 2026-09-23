@@ -16,7 +16,7 @@ public sealed partial class ConquerorGame
     private OriginalStrategicInteractiveEncounterHoverPresentation _strategicEncounterHover;
     private int _strategicEncounterPlayerScoreModifier;
     private OriginalStrategicInteractiveRetreatConfirmation? _strategicInteractiveRetreatConfirmation;
-    private OriginalStrategicPointerEventClassifier _strategicPointerEvents = new();
+    private OriginalStrategicPointerEventQueue _strategicPointerEvents = new();
 
     private void BeginStrategicEncounter(OriginalStrategicPlayerEnemyEncounter encounter)
     {
@@ -33,7 +33,7 @@ public sealed partial class ConquerorGame
     }
 
     private void UpdateStrategicEncounter(Func<Keys, bool> press, MouseState mouse,
-        bool click, bool release, bool rightClick, bool controllerRightClick)
+        bool click, bool release, bool controllerRightClick)
     {
         if (_strategicEncounter is not { } encounter)
         {
@@ -68,6 +68,9 @@ public sealed partial class ConquerorGame
         var session = _strategicInteractiveEncounter;
         var viewport = _strategicEncounterViewport
             ?? throw new InvalidOperationException("Strategic encounter viewport is unavailable.");
+        var (pointerX, pointerY) = OriginalPoint(mouse);
+        CaptureStrategicPointerInput(mouse, click, release, controllerRightClick,
+            pointerX, pointerY);
         if (_strategicInteractiveRetreatConfirmation is { } confirmation)
         {
             var accepted = press(Keys.Enter);
@@ -79,11 +82,10 @@ public sealed partial class ConquerorGame
             return;
         }
 
-        var (x, y) = OriginalPoint(mouse);
-        var inputCode = ClassifyStrategicPointerInput(click, release, rightClick,
-            mouse.RightButton == ButtonState.Released
-                && _lastMouse.RightButton == ButtonState.Pressed,
-            controllerRightClick);
+        var input = _strategicPointerEvents.TryDequeue(out var queued)
+            ? queued
+            : new OriginalStrategicPointerInput(0, pointerX, pointerY);
+        var (inputCode, x, y) = input;
         if (inputCode == 3 && session.IsMappedTacticalAdvancementEnabled
             && session.RouteControlStripHit(x, y, viewport.ControlStripMargin, viewport.ViewportHeight)
                 == OriginalStrategicInteractiveEncounterControlStripRoute.RetreatConfirmation)
@@ -95,21 +97,17 @@ public sealed partial class ConquerorGame
         AdvanceInteractiveStrategicEncounterFrame(encounter, session, viewport, x, y, inputCode);
     }
 
-    private int ClassifyStrategicPointerInput(bool click, bool release,
-        bool rightClick, bool rightRelease, bool controllerRightClick)
+    private void CaptureStrategicPointerInput(MouseState mouse, bool click, bool release,
+        bool controllerRightClick, int x, int y)
     {
         var timerUnits = OriginalStrategicPointerClock.UnitsAt(
             TimeSpan.FromSeconds(_presentationSeconds));
-        if (click) return _strategicPointerEvents.Classify(
-            OriginalStrategicPointerTransition.PrimaryDown, timerUnits);
-        if (release) return _strategicPointerEvents.Classify(
-            OriginalStrategicPointerTransition.PrimaryUp, timerUnits);
-        if (controllerRightClick) return 7;
-        if (rightClick) return _strategicPointerEvents.Classify(
-            OriginalStrategicPointerTransition.SecondaryDown, timerUnits);
-        if (rightRelease) return _strategicPointerEvents.Classify(
-            OriginalStrategicPointerTransition.SecondaryUp, timerUnits);
-        return 0;
+        _strategicPointerEvents.EnqueueTransitions(click, release,
+            mouse.RightButton == ButtonState.Pressed && _lastMouse.RightButton == ButtonState.Released,
+            mouse.RightButton == ButtonState.Released && _lastMouse.RightButton == ButtonState.Pressed,
+            timerUnits, x, y);
+        if (controllerRightClick)
+            _strategicPointerEvents.EnqueueControllerDestination(timerUnits, x, y);
     }
 
     private void AdvanceInteractiveStrategicEncounterFrame(

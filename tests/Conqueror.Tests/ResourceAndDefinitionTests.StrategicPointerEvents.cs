@@ -6,6 +6,60 @@ namespace Conqueror.Tests;
 public sealed partial class ResourceAndDefinitionTests
 {
     [Fact]
+    public void StrategicPointerQueueRetainsEverySameCallbackEdgeInSourceOrder()
+    {
+        var queue = new OriginalStrategicPointerEventQueue();
+        queue.EnqueueTransitions(true, true, true, true, 1, 12, 34);
+        queue.EnqueueTransitions(true, false, false, false, 2, 56, 78);
+
+        Assert.Equal(5, queue.Count);
+        Assert.True(queue.TryDequeue(out var primaryDown));
+        Assert.Equal(new OriginalStrategicPointerInput(1, 12, 34), primaryDown);
+        Assert.True(queue.TryDequeue(out var primaryUp));
+        Assert.Equal(new OriginalStrategicPointerInput(3, 12, 34), primaryUp);
+        Assert.True(queue.TryDequeue(out var secondaryDown));
+        Assert.Equal(new OriginalStrategicPointerInput(5, 12, 34), secondaryDown);
+        Assert.True(queue.TryDequeue(out var secondaryUp));
+        Assert.Equal(new OriginalStrategicPointerInput(7, 12, 34), secondaryUp);
+        Assert.True(queue.TryDequeue(out var laterDown));
+        Assert.Equal(new OriginalStrategicPointerInput(1, 56, 78), laterDown);
+        Assert.False(queue.TryDequeue(out _));
+    }
+
+    [Fact]
+    public void StrategicPointerQueueStopsAtThirtyEntries()
+    {
+        var queue = new OriginalStrategicPointerEventQueue();
+        for (var timestamp = 0; timestamp < 29; timestamp++)
+            queue.EnqueueTransitions(true, false, false, false, timestamp, timestamp, 0);
+        queue.EnqueueTransitions(true, true, true, true, 29, 29, 1);
+        queue.EnqueueControllerDestination(29, 30, 1);
+
+        Assert.Equal(OriginalStrategicPointerEventQueue.Capacity, queue.Count);
+        for (var index = 0; index < 29; index++)
+        {
+            Assert.True(queue.TryDequeue(out var input));
+            Assert.Equal(new OriginalStrategicPointerInput(1, index, 0), input);
+        }
+        Assert.True(queue.TryDequeue(out var last));
+        Assert.Equal(new OriginalStrategicPointerInput(1, 29, 1), last);
+        Assert.False(queue.TryDequeue(out _));
+    }
+
+    [Fact]
+    public void StrategicPointerQueueClassifiesCapturedTimeAfterDelayedConsumption()
+    {
+        var queue = new OriginalStrategicPointerEventQueue();
+        queue.EnqueueTransitions(true, false, false, false, 10, 40, 50);
+        queue.EnqueueTransitions(false, true, false, false, 14, 60, 70);
+
+        Assert.True(queue.TryDequeue(out var down));
+        Assert.Equal(new OriginalStrategicPointerInput(1, 40, 50), down);
+        Assert.True(queue.TryDequeue(out var release));
+        Assert.Equal(new OriginalStrategicPointerInput(2, 60, 70), release);
+    }
+
+    [Fact]
     public void StrategicPointerClockFollowsTheChainedBiosTickAccumulator()
     {
         Assert.Equal(0, OriginalStrategicPointerClock.UnitsAt(TimeSpan.FromMilliseconds(55)));
