@@ -345,6 +345,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         foreach (var animation in _dilemmaAnimations.Values.OfType<DilemmaAnimation>())
             foreach (var texture in animation.Frames) texture.Dispose();
         DisposeOriginalSounds();
+        DisposePracticeJoustLances();
         _originalUiFont?.Dispose();
         _canvas.Dispose();
         _pixel.Dispose();

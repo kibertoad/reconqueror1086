@@ -52,7 +52,7 @@ The repository currently provides:
 - A repository-wide 1,000-line compiled-source ceiling; the game shell and resource regression suite are split into focused partial modules so the limit passes without exemptions.
 - 538 xUnit test cases and 146 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
 
-Practice joust recovery: executable `0x41164` opens `jousprac.SMK`, while caller `0x41CEC` loads `lance1.csf`. The replacement now uses the practice worker's distinct five-band frame table, bounded 8.8 lance motion, raw mouse coordinates, and a source-parameter-120 impulse every seven decoded movie frames. The original busy loop has no stable wall-clock cadence, so the host advances once per movie frame. The three-frame target table, strict per-axis hit threshold, and miss-only opponent roll are now active; palette binding and source result prose remain Provisional. See `docs/joust-practice.md`.
+Practice joust recovery: executable `0x41164` opens `jousprac.SMK`, while caller `0x41CEC` loads `lance1.csf`. The replacement now uses the practice worker's distinct five-band frame table, bounded 8.8 lance motion, raw mouse coordinates, and a source-parameter-120 impulse every seven decoded movie frames. The original busy loop has no stable wall-clock cadence, so the host advances once per movie frame. The three-frame target table, strict per-axis hit threshold, and miss-only opponent roll are now active; the stable movie palette now colors the practice lance, and source result prose remains Provisional. See `docs/joust-practice.md`.
 
 ## Dependency map
 

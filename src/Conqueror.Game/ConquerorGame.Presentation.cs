@@ -113,11 +113,17 @@ public sealed partial class ConquerorGame
     {
         _eventMovie?.Dispose();
         _eventMovie = null;
+        DisposePracticeJoustLances();
         _activeEventMovieRole = null;
         while (_eventMovieQueue.TryDequeue(out var roleOrSuffix))
         {
             var movie = CreateMovie(roleOrSuffix);
             if (movie is null) continue;
+            if (roleOrSuffix == "Practice.Joust")
+            {
+                try { LoadPracticeJoustLances(movie); }
+                catch { movie.Dispose(); throw; }
+            }
             _eventMovie = movie;
             _activeEventMovieRole = roleOrSuffix;
             if (roleOrSuffix == "Practice.Joust")
@@ -193,10 +199,9 @@ public sealed partial class ConquerorGame
         {
             Fill(new Rectangle(0, 0, 1024, 768), Color.Black);
             _batch.Draw(_eventMovie.Texture, new Rectangle(0, 144, 1024, 480), Color.White);
-            if (!_originalAnimations.TryGetValue("Dragon.Lance", out var lances)
-                || lances.Frames.Count != 25)
+            if (_practiceJoustLances is not { Count: 25 } lances)
                 throw new InvalidOperationException("Joust practice requires the imported lance foreground.");
-            var frame = lances.Frames[_practiceJoustLance.Frame];
+            var frame = lances[_practiceJoustLance.Frame];
             _batch.Draw(frame, new Rectangle(_practiceJoustLance.X * 1024 / 640,
                 (_practiceJoustLance.Y + OriginalPracticeJoustLance.MovieTop) * 768 / 480,
                 frame.Width * 1024 / 640, frame.Height * 768 / 480), Color.White);

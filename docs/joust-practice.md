@@ -21,8 +21,23 @@ releases the lance handle through `0x41154` at `0x41D69`. Worker
 `0x4169E-0x4174F` reads that handle, crops the selected frame, and paints it
 at `(lanceX, lanceY + 90)`. The `lance1.csf` foreground identity and 90-pixel
 paint offset are **Confirmed**. The replacement currently uses its imported
-`Dragon.Lance` texture role for the same source file; exact active palette
-association during the practice movie remains **Provisional**.
+`Dragon.Lance` texture role remains for the dragon encounter. Practice now
+decodes its own `lance1.csf` textures with the active `jousprac.SMK` frame-0
+palette.
+
+A controlled decode of the complete owned practice movie found a palette
+update only at frame 0; all 88 frames retain that palette. Across the 25
+source lance frames, 22 palette indices appear in 176,061 nontransparent
+pixels. Weighting each used index by its occurrence, the mean absolute RGB
+difference from the movie palette is 29.382 per channel for the former
+`DRJSTWIN.PCX` dragon palette and 2.673 for `PRACTICE.PCX`. The comparison is
+reproducible by decoding the three owned resources and averaging
+`count[index] * abs(movieRgb[index,channel] - candidateRgb[index,channel])`
+over all used indices and RGB channels. Thus the previous dragon-palette
+binding is **Disproved** for practice. The movie palette's frame-0 stability
+and measured mismatch are **Confirmed** resource facts; the original
+renderer binding between movie and CSF is **Corroborated** by the indexed
+render path and the source movie/lance call sequence.
 
 ## Frame selection and motion
 
