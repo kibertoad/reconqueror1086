@@ -352,7 +352,11 @@ public sealed partial class Campaign
         var engaged = strategic.PlayerMovementSlots.Single(slot =>
             slot.Slot == strategic.EngagedPlayerMovementSlot);
         OriginalStrategicSchedulerResult? schedulerPass = null;
-        if (!input.SchedulerBlockedByModal)
+        // Source 0x13168 invokes encounter wrapper 0x39428 synchronously before
+        // caller 0x3C290 reaches its scheduler gate. The host hands that
+        // encounter to a modal on the next UI boundary, so retain the captured
+        // records until the resolver returns instead of advancing them now.
+        if (!input.SchedulerBlockedByModal && encounters.Length == 0)
         {
             if (strategic.SchedulerFallbackTargetPerson < 0
                 || strategic.SchedulerFallbackOriginProperty < 0)

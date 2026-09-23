@@ -760,7 +760,7 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
-    public void OriginalStrategicPassCapturesTheContactSixCounterHandoffBeforeTheScheduler()
+    public void NewlyCapturedStrategicEncounterKeepsCombatantsStableForTheDeferredModal()
     {
         var state = Campaign.NewFromTemplate(0);
         state.OriginalStrategicState = OriginalStrategicCampaignState.CreateForNewGame(
@@ -812,7 +812,9 @@ public sealed partial class ResourceAndDefinitionTests
                 new OriginalStrategicEncounterForces(11, 12, 13),
                 new OriginalStrategicEncounterForces(21, 22, 23)),
             Assert.Single(result.Encounters));
-        Assert.NotNull(result.SchedulerPass);
+        Assert.Null(result.SchedulerPass);
+        Assert.Equal(1_000, hostile.CurrentX);
+        Assert.Equal((21, 22, 23), (hostile.Swordsmen, hostile.Halberdiers, hostile.Knights));
     }
 
     [Fact]
