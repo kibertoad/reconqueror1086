@@ -68,7 +68,8 @@ public sealed partial class ConquerorGame
                 {
                     var settlement = _campaign.ResolveAutomaticOriginalStrategicPatrolEncounter(
                         patrolEncounter, new HostEncounterRandom());
-                    FinishStrategicEncounter(settlement.PatrolCleared ? "PATROL DEFEATED" : "STRATEGIC DEFEAT");
+                    FinishStrategicEncounter(settlement.PatrolCleared ? "PATROL DEFEATED" : "STRATEGIC DEFEAT",
+                        settlement.DistinguishedPlayerLossRequiresModal);
                 }
                 else
                 {
@@ -161,7 +162,8 @@ public sealed partial class ConquerorGame
         {
             var patrolSettlement = _campaign.ResolveInteractiveOriginalStrategicPatrolEncounter(
                 patrolEncounter, session);
-            FinishStrategicEncounter(patrolSettlement.PatrolCleared ? "PATROL DEFEATED" : "STRATEGIC DEFEAT");
+            FinishStrategicEncounter(patrolSettlement.PatrolCleared ? "PATROL DEFEATED" : "STRATEGIC DEFEAT",
+                patrolSettlement.DistinguishedPlayerLossRequiresModal);
             return;
         }
         var settlement = _campaign.ResolveInteractiveOriginalStrategicEncounter(encounter!, session);
@@ -183,7 +185,7 @@ public sealed partial class ConquerorGame
         return OriginalStrategicEncounterMenu.FindMappedEntryAt(x, y);
     }
 
-    private void FinishStrategicEncounter(string notice)
+    private void FinishStrategicEncounter(string notice, bool distinguishedPatrolLoss = false)
     {
         _strategicEncounter = null;
         _strategicPatrolEncounter = null;
@@ -192,9 +194,23 @@ public sealed partial class ConquerorGame
         _strategicEncounterHover = default;
         _strategicEncounterPlayerScoreModifier = 0;
         _strategicInteractiveRetreatConfirmation = null;
-        _screen = Screen.Map;
+        _screen = distinguishedPatrolLoss ? Screen.PatrolLoss : Screen.Map;
         _notice = notice;
         Autosave();
+    }
+
+    private void DrawStrategicPatrolLoss()
+    {
+        DrawMap();
+        Fill(new Rectangle(0, 0, 1024, 768), new Color(0, 0, 0, 180));
+        Fill(new Rectangle(168, 286, 688, 196), Color.Black);
+        DrawText("YOUR ARMY WAS DEFEATED BY THE PATROL", 205, 320, Color.Gold, 2);
+        DrawText("ENTER, CLICK OR ESC TO CONTINUE", 255, 415, Color.White, 2);
+    }
+
+    private void UpdateStrategicPatrolLoss(Func<Keys, bool> press, bool click)
+    {
+        if (press(Keys.Enter) || press(Keys.Escape) || click) _screen = Screen.Map;
     }
 
     private void DrawStrategicEncounter()

@@ -50,7 +50,7 @@ The repository currently provides:
 - An executable-confirmed `TITLE.HAT`/`FFTITLE.PCX` title load followed by a corroborated character-options flow whose exact geometry comes from installed `CGOPTS.HAT` and `PREGEN.HAT`.
 - Self-contained Windows x64, Linux x64, macOS arm64, and macOS x64 packaging automation, with a smart ownership-aware Windows installer and a pinned four-artifact release workflow.
 - A repository-wide 1,000-line compiled-source ceiling; the game shell and resource regression suite are split into focused partial modules so the limit passes without exemptions.
-- 511 xUnit test cases and 146 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
+- 532 xUnit test cases and 146 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
 
 ## Dependency map
 

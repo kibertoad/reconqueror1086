@@ -101,6 +101,11 @@ reward are covered by the patrol settlement test.
 descriptor `+0x18` terminal marker; creation resets it, and terminal victory
 or an empty-player defeat sets it. Clearing `Active` prevents further route
 execution; the replacement owns no equivalent heap route pointer to free.
-The exact notice text selectors and loss-modal presentation remain
-Provisional. The source battle UI and original conversation availability
-predicates also remain Provisional.
+The host now presents the distinguished player's loss as a modal before
+returning to the map. Source `0x3B7C5-0x3B7F2` calls dialog helper `0x256A0`,
+then `0x106C0`, then `0x1BF54(2)`, and sets global `ADC0` to one. The source
+dialog's text, input bindings, and the precise meaning of those subsequent
+display calls remain Provisional, so the host's wording and dismissal inputs
+are presentation policy. The exact avatar notice text selectors, source
+battle UI, and original conversation availability predicates also remain
+Provisional.

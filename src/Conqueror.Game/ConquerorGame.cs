@@ -53,7 +53,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     }
     private const string OriginalCursorAnimationRole = "Interface.Cursor";
 
-    private enum Screen { Title, Movie, OptionsHub, Practice, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Briefing, Map, Home, WarPlanning, Farm, Village, Inn, InnDialogue, Blacksmith, BlacksmithDialogue, Shop, Tournament, DrogoDemand, FieldBattle, StrategicEncounter, Siege, DragonBattle, Overview, Ending }
+    private enum Screen { Title, Movie, OptionsHub, Practice, LoadGame, CharacterOptions, CharacterName, Character, Dilemma, Briefing, Map, PatrolLoss, Home, WarPlanning, Farm, Village, Inn, InnDialogue, Blacksmith, BlacksmithDialogue, Shop, Tournament, DrogoDemand, FieldBattle, StrategicEncounter, Siege, DragonBattle, Overview, Ending }
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _batch = null!;
     private Texture2D _pixel = null!;
@@ -428,7 +428,6 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
             }
             else { if (_screen == Screen.Siege && _siege is not null) _campaign.FinishSiege(_siege); _screen = Screen.Map; }
         }
-
         switch (_screen)
         {
             case Screen.Title:
@@ -465,6 +464,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
             case Screen.Dilemma: UpdateDilemma(Press, mouse, click); break;
             case Screen.Briefing: if (pressAny || click) EnterCampaignMap(); break;
             case Screen.Map: UpdateMap(Press, mouse, click); break;
+            case Screen.PatrolLoss: UpdateStrategicPatrolLoss(Press, click); break;
             case Screen.Home: UpdateHome(Press, mouse, click); break;
             case Screen.WarPlanning: UpdateWarPlanning(Press, mouse, click, rightClick); break;
             case Screen.Farm: UpdateFarm(Press, mouse, click); break;
