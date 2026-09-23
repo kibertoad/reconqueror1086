@@ -164,7 +164,7 @@ public sealed partial class ResourceAndDefinitionTests
         session.Units[0].PositionX = 100;
         session.Units[0].PositionY = 100;
         session.ActivateMappedFirstControl();
-        var accepted = session.AdvanceMappedFrame(TimeSpan.FromMilliseconds(201), 0, 100, 100,
+        var accepted = session.AdvanceMappedFrame(TimeSpan.FromMilliseconds(204), 0, 100, 100,
             viewport, playerScoreModifier: 0, contactSideFilter: 0, random);
         Assert.True(accepted.TacticalPassAdvanced);
         Assert.Equal(OriginalStrategicInteractiveEncounterCombat.ContactStateCode, session.Units[0].StateCode);
@@ -182,19 +182,19 @@ public sealed partial class ResourceAndDefinitionTests
         var viewport = new OriginalStrategicInteractiveEncounterViewport(640, 180, 640, 480);
         var random = new QueueEncounterRandom(6, 0);
 
-        var armed = session.AdvanceMappedFrame(TimeSpan.FromMilliseconds(201), 3, 410, 150,
+        var armed = session.AdvanceMappedFrame(TimeSpan.FromMilliseconds(204), 3, 410, 150,
             viewport, playerScoreModifier: 0, contactSideFilter: 0, random);
         Assert.True(session.IsMappedTacticalAdvancementEnabled);
         Assert.True(armed.TacticalPassAdvanced);
 
-        var declined = session.AdvanceMappedFrame(TimeSpan.FromMilliseconds(402), 3, 410, 150,
+        var declined = session.AdvanceMappedFrame(TimeSpan.FromMilliseconds(408), 3, 410, 150,
             viewport, playerScoreModifier: 0, contactSideFilter: 0, random,
             firstControlConfirmationAccepted: false);
         Assert.False(declined.ResolverEnded);
         Assert.Equal([0], session.SelectedUnitIndices);
         Assert.True(session.IsMappedTacticalAdvancementEnabled);
 
-        var ended = session.AdvanceMappedFrame(TimeSpan.FromMilliseconds(603), 3, 410, 150,
+        var ended = session.AdvanceMappedFrame(TimeSpan.FromMilliseconds(612), 3, 410, 150,
             viewport, playerScoreModifier: 0, contactSideFilter: 0, random,
             firstControlConfirmationAccepted: true);
         Assert.True(ended.ResolverEnded);

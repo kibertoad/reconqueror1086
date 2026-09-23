@@ -4,17 +4,17 @@ namespace Conqueror.Core;
 /// Stable elapsed-time boundary for interactive resolver loop <c>0x26B88</c>.
 /// The executable compares its scaled timer strictly against the prior sample
 /// plus <c>0xC8</c>, then records a fresh sample after one accepted pass. Its
-/// interrupt frequency is unrecovered, so the host cadence is explicit rather
-/// than being presented as an original wall-clock measurement.
+/// callback is registered for 250 Hz, so the source clock advances in four-unit
+/// steps. The default host clock preserves that quantization.
 /// </summary>
 public sealed class OriginalStrategicInteractiveEncounterTiming
 {
     /// <summary>
-    /// Deterministic replacement policy for callers that have no measured
-    /// timer calibration. This is not a claim about the original interrupt
-    /// frequency.
+    /// Recovered nominal duration of the source's 200-unit threshold.
     /// </summary>
     public static readonly TimeSpan DefaultCompatibilityCadence = TimeSpan.FromMilliseconds(200);
+    private static readonly TimeSpan SourceTimerTick = TimeSpan.FromMilliseconds(4);
+    private readonly bool _useSourceTimerTicks;
 
     public OriginalStrategicInteractiveEncounterTiming(
         TimeSpan initialSample,
@@ -25,7 +25,8 @@ public sealed class OriginalStrategicInteractiveEncounterTiming
         Cadence = cadence ?? DefaultCompatibilityCadence;
         if (Cadence <= TimeSpan.Zero)
             throw new ArgumentOutOfRangeException(nameof(cadence));
-        LastSample = initialSample;
+        _useSourceTimerTicks = cadence is null;
+        LastSample = _useSourceTimerTicks ? QuantizeToSourceTick(initialSample) : initialSample;
     }
 
     /// <summary>
@@ -40,18 +41,23 @@ public sealed class OriginalStrategicInteractiveEncounterTiming
     public TimeSpan Cadence { get; }
 
     /// <summary>
-    /// Returns true only once the current absolute time is strictly beyond the
-    /// prior sample plus the configured stable cadence. A late update becomes
-    /// the new baseline rather than producing synthetic catch-up passes.
+    /// Returns true only once the current clock is strictly beyond the prior
+    /// sample plus the threshold. The recovered default samples four-ms ticks;
+    /// explicit host calibrations use their supplied continuous clock. A late
+    /// update becomes the new baseline without synthetic catch-up passes.
     /// </summary>
     public bool TryBeginPass(TimeSpan currentTime)
     {
         if (currentTime < LastSample)
             throw new ArgumentOutOfRangeException(nameof(currentTime));
-        if (currentTime - LastSample <= Cadence)
+        var sampledTime = _useSourceTimerTicks ? QuantizeToSourceTick(currentTime) : currentTime;
+        if (sampledTime - LastSample <= Cadence)
             return false;
 
-        LastSample = currentTime;
+        LastSample = sampledTime;
         return true;
     }
+
+    private static TimeSpan QuantizeToSourceTick(TimeSpan time) =>
+        TimeSpan.FromTicks(time.Ticks / SourceTimerTick.Ticks * SourceTimerTick.Ticks);
 }

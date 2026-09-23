@@ -80,20 +80,22 @@ public sealed partial class ResourceAndDefinitionTests
     }
 
     [Fact]
-    public void StrategicInteractiveEncounterTimingUsesItsStrictCompatibilityCadenceWithoutCatchUp()
+    public void StrategicInteractiveEncounterTimingUsesSourceTicksAndDoesNotCatchUp()
     {
         var timing = new OriginalStrategicInteractiveEncounterTiming(TimeSpan.Zero);
 
         Assert.Equal(OriginalStrategicInteractiveEncounterTiming.DefaultCompatibilityCadence, timing.Cadence);
         Assert.False(timing.TryBeginPass(TimeSpan.FromMilliseconds(200)));
-        Assert.True(timing.TryBeginPass(TimeSpan.FromMilliseconds(201)));
-        Assert.Equal(TimeSpan.FromMilliseconds(201), timing.LastSample);
-        Assert.False(timing.TryBeginPass(TimeSpan.FromMilliseconds(401)));
-        Assert.True(timing.TryBeginPass(TimeSpan.FromMilliseconds(402)));
+        Assert.False(timing.TryBeginPass(TimeSpan.FromMilliseconds(203)));
+        Assert.True(timing.TryBeginPass(TimeSpan.FromMilliseconds(204)));
+        Assert.Equal(TimeSpan.FromMilliseconds(204), timing.LastSample);
+        Assert.False(timing.TryBeginPass(TimeSpan.FromMilliseconds(407)));
+        Assert.True(timing.TryBeginPass(TimeSpan.FromMilliseconds(408)));
 
         Assert.True(timing.TryBeginPass(TimeSpan.FromSeconds(2)));
         Assert.Equal(TimeSpan.FromSeconds(2), timing.LastSample);
         Assert.False(timing.TryBeginPass(TimeSpan.FromMilliseconds(2200)));
+        Assert.True(timing.TryBeginPass(TimeSpan.FromMilliseconds(2204)));
     }
 
     [Fact]
@@ -515,7 +517,7 @@ public sealed partial class ResourceAndDefinitionTests
         session.CompleteDeathAnimation(0);
         Assert.Equal((1, 1), (session.PlayerLaneCount, session.EnemyLaneCount));
         Assert.False(session.Timing.TryBeginPass(TimeSpan.FromMilliseconds(200)));
-        Assert.True(session.Timing.TryBeginPass(TimeSpan.FromMilliseconds(201)));
+        Assert.True(session.Timing.TryBeginPass(TimeSpan.FromMilliseconds(204)));
     }
 
     [Fact]
