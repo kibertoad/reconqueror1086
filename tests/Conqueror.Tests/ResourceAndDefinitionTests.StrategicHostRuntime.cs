@@ -7,6 +7,44 @@ namespace Conqueror.Tests;
 public sealed partial class ResourceAndDefinitionTests
 {
     [Fact]
+    public void HostFixedPassCreatesBothPatrolsFromTheConversationActionVariables()
+    {
+        var state = Campaign.NewFromTemplate(0);
+        state.OriginalStrategicState = OriginalStrategicCampaignState.CreateForNewGame(
+            state.Date, startingRouteSelector: 0);
+        state.ConversationVariables.AddRange(Enumerable.Repeat(0, 94));
+        state.ConversationVariables[0x2B] = 2;
+        state.ConversationVariables[0x5D] = -1;
+        var campaign = new Campaign(state, seed: 42);
+        campaign.ConfigureOriginalStrategicResources(new StubStrategicResources
+        {
+            Routes =
+            {
+                ["sc_0.rat"] = [new OriginalStrategicRoutePoint(0, 0)],
+                ["scot.rat"] = Enumerable.Range(0, 44)
+                    .Select(index => new OriginalStrategicRoutePoint(6_656 - index, 405)).ToArray(),
+                ["wales.rat"] = Enumerable.Range(0, 42)
+                    .Select(index => new OriginalStrategicRoutePoint(5_668 - index, 2_201)).ToArray()
+            }
+        });
+
+        var created = OriginalStrategicHostRuntime.AdvanceFixedPass(
+            campaign, schedulerBlockedByModal: true);
+
+        Assert.NotNull(created);
+        Assert.Equal([
+            new OriginalStrategicTemporaryForceCreation(0x2B, 1),
+            new OriginalStrategicTemporaryForceCreation(0x5D, 2)
+        ], created!.TemporaryForceCreations);
+        Assert.True(state.OriginalStrategicState.TemporaryForceSlots[1].Active);
+        Assert.True(state.OriginalStrategicState.TemporaryForceSlots[2].Active);
+
+        var repeated = OriginalStrategicHostRuntime.AdvanceFixedPass(
+            campaign, schedulerBlockedByModal: true);
+        Assert.Empty(repeated!.TemporaryForceCreations);
+    }
+
+    [Fact]
     public void HostFixedStrategicPassUsesTheCampaignStreamAndDoesNotInventMigratedFallbacks()
     {
         Assert.Equal(TimeSpan.FromSeconds(1d / 60d), OriginalStrategicHostRuntime.FixedCadence);

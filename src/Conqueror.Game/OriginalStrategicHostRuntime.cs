@@ -29,6 +29,14 @@ public static class OriginalStrategicHostRuntime
 
         var schedulerFallbackUnavailable = strategic.SchedulerFallbackTargetPerson < 0
             || strategic.SchedulerFallbackOriginProperty < 0;
+        // UI poll 0x22242-0x2228A tests the same scope-zero variables that
+        // conversation action groups 2423 and 2552 set. It raises each
+        // creator flag for any nonzero value, in descriptor order.
+        var conversationVariables = campaign.State.ConversationVariables;
+        var creatorActions = OriginalStrategicTemporaryForces.Creators
+            .Where(creator => creator.ActionId < conversationVariables.Count
+                && conversationVariables[creator.ActionId] != 0)
+            .Select(creator => creator.ActionId).ToArray();
         return campaign.AdvanceOriginalStrategicPass(
             new OriginalStrategicCampaignPassInput(
                 strategic.TemporaryForceSlots.OrderBy(slot => slot.Slot)
@@ -37,6 +45,7 @@ public static class OriginalStrategicHostRuntime
                 SchedulerBlockedByModal: schedulerFallbackUnavailable
                     || playerEncounterHandoffActive
                     || schedulerBlockedByModal,
-                SuppressDragonEntry: suppressDragonEntry));
+                SuppressDragonEntry: suppressDragonEntry,
+                TemporaryForceActionIds: creatorActions));
     }
 }
