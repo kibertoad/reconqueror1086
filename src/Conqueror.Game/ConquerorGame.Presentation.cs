@@ -123,6 +123,8 @@ public sealed partial class ConquerorGame
             if (roleOrSuffix == "Practice.Joust")
             {
                 _practiceJoustLance = new();
+                _practiceJoustTrial = new();
+                _practiceJoustResult = null;
                 _practiceJoustLastFrame = -1;
             }
             if (_musicInstance?.State == SoundState.Playing) _musicInstance.Pause();
@@ -244,6 +246,7 @@ public sealed partial class ConquerorGame
     {
         if (!DrawOriginal("Practice.Background", new Rectangle(0, 0, 1024, 768)))
             throw new InvalidOperationException("Practice menu requires its verified original background art.");
+        DrawPracticeJoustResult();
     }
 
     private bool SettingEnabled(OptionsHubSetting setting) => setting switch

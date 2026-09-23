@@ -399,6 +399,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
             if (_screen == Screen.Title) Exit();
             else if (_screen == Screen.Movie) FinishEventMovie();
             else if (_screen == Screen.OptionsHub) _screen = Screen.Title;
+            else if (_screen == Screen.Practice && _practiceJoustResult is not null) _practiceJoustResult = null;
             else if (_screen == Screen.Practice) _screen = Screen.OptionsHub;
             else if (_screen == Screen.LoadGame) ResumeFromLoadGame();
             else if (_screen == Screen.CharacterName) _screen = Screen.CharacterOptions;
@@ -443,16 +444,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
                     _screen = Screen.OptionsHub;
                 }
                 break;
-            case Screen.Movie:
-                if (_eventMovie is null) FinishEventMovie();
-                else
-                {
-                    _eventMovie.Update(gameTime.ElapsedGameTime);
-                    UpdatePracticeJoustPointer(mouse);
-                    if (_eventMovie.IsComplete || _activeEventMovieRole != "Practice.Joust" && (pressAny || click))
-                        FinishEventMovie();
-                }
-                break;
+            case Screen.Movie: UpdateEventMovie(gameTime, mouse, pressAny, click); break;
             case Screen.OptionsHub: UpdateOptionsHub(Press, mouse, click, release); break;
             case Screen.Practice: UpdatePractice(Press, mouse, click); break;
             case Screen.LoadGame: UpdateLoadGame(Press, mouse, click); break;
@@ -595,6 +587,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
 
     private void UpdatePractice(Func<Keys, bool> press, MouseState mouse, bool click)
     {
+        if (UpdatePracticeJoustResult(press, click)) return;
         var moved = false;
         if (press(Keys.Up) || press(Keys.Left))
         {

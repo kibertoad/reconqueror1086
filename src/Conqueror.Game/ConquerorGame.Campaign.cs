@@ -856,7 +856,8 @@ public sealed partial class ConquerorGame
         }
         if (_screen is not Screen.Title and not Screen.Movie and not Screen.Map and not Screen.LoadGame
             and not Screen.Character and not Screen.Dilemma and not Screen.Briefing and not Screen.Inn and not Screen.InnDialogue)
-            DrawText(_notice, 24, 730, Color.Gold, 2);
+            if (_screen != Screen.Practice || _practiceJoustResult is null)
+                DrawText(_notice, 24, 730, Color.Gold, 2);
         if (_paused)
         {
             Fill(new Rectangle(0, 0, PresentationScaling.VirtualWidth, PresentationScaling.VirtualHeight),

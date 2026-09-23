@@ -53,5 +53,35 @@ subtracts it when the movie frame counter is divisible by seven.
 The original worker runs in an unrestricted loop, so its number of motion
 iterations per displayed movie frame depends on processor speed. The host
 advances once per decoded movie frame, catching up elapsed frames in order;
-this is an explicit stable timing policy. Practice hit scoring, the exact
-foreground palette, and the remaining on-screen prompts are **Provisional**.
+this is an explicit stable timing policy. The exact foreground palette remains
+**Provisional**.
+
+## Contact and result
+
+Object-2 `+0xB864` is the first contact frame, 80. The worker's strict gate at
+`0x4184D-0x41871` admits only movie frame counters 80, 81, and 82. The x
+targets at `+0xB84C` are `191,161,122`; the y targets at `+0xB858` are
+`191,203,211`. At `0x41877-0x41922`, it accumulates the absolute x and y
+distance from each target independently, while also retaining signed deltas
+for later direction-specific text. The 88-frame movie completes at frame 87.
+These table entries and the three-frame window are **Confirmed** by direct
+executable data and control flow.
+
+Caller `0x41CEC-0x41D46` initializes local player points to 20, opponent
+points to 50, and passes a result pointer to `0x41164`. At `0x41A97-0x41AD9`,
+the worker succeeds only when `90 - playerPoints` is strictly greater than
+**both** accumulated errors. This practice invocation therefore requires each
+axis error to be below 70. A hit sets result 1 and adds two player points.
+On a miss, `0x41ADB-0x41B34` draws `random(100)` through `0x41110` and
+compares it strictly below `opponentPoints - playerPoints + 50 = 80`: a lower
+roll sets result 0 and adds two opponent points; otherwise result 2 records
+both riders missing. The random draw is skipped entirely on a player hit.
+`OriginalPracticeJoustTrial` and its threshold, draw, and incomplete-frame
+tests preserve this **Confirmed** branch structure.
+
+`0x41B59-0x41C93` picks result and direction-dependent source message
+pointers, then waits for an input event. The host shows a short authored result
+overlay on the Practice screen and requires dismissal before another choice.
+Its wording, the original text catalog, and exact physical dialog events
+remain **Provisional**. The caller's practice points are local stack values;
+this isolated training run does not mutate campaign tournament scoring.
