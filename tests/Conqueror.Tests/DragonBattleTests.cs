@@ -90,13 +90,11 @@ public sealed class DragonBattleTests
         var firstTargetTime = OriginalDragonRunTimeline.FirstTargetFrame
             * OriginalDragonRunTimeline.FrameMilliseconds / 1000d;
         battle.Tick(firstTargetTime - .001);
-        Assert.False(battle.EyeVisible);
+        Assert.Equal(107, battle.SourceFrame);
         battle.Tick(.001);
 
         Assert.Equal(108, battle.SourceFrame);
-        Assert.True(battle.EyeVisible);
-        Assert.Equal(277d / 640, battle.EyeX);
-        Assert.Equal(215d / 480, battle.EyeY);
+        Assert.Equal((277, 215), OriginalDragonRunTimeline.TargetAt(battle.SourceFrame));
         Assert.Equal(1, battle.ScoredFrames);
         Assert.Equal(DragonBattleOutcome.InProgress, battle.Outcome);
     }

@@ -67,9 +67,6 @@ public sealed partial class ConquerorGame
             throw new InvalidOperationException("Dragon battle requires its original run movie.");
         _batch.Draw(_dragonRunMovie.Texture, new Rectangle(0, 144, 1024, 480), Color.White);
 
-        var eye = new Point((int)(_dragonBattle.EyeX * 1024), (int)(_dragonBattle.EyeY * 768));
-        if (_dragonBattle.EyeVisible)
-            DrawOutline(new Rectangle(eye.X - 8, eye.Y - 8, 16, 16), Color.Red, 2);
         var aim = new Point((int)(_dragonBattle.AimX * 1024), (int)(_dragonBattle.AimY * 768));
         if (!_originalAnimations.TryGetValue("Dragon.Lance", out var lances) || lances.Frames.Count != 25)
             throw new InvalidOperationException("Dragon battle requires its verified 25-frame lance foreground.");

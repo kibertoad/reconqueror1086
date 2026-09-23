@@ -21,14 +21,10 @@ public sealed class DragonBattleSession
     public DragonBattleOutcome Outcome { get; private set; }
     public double AimX { get; private set; } = .5;
     public double AimY { get; private set; } = .72;
-    public double EyeX { get; private set; } = 277d / OriginalDragonRunTimeline.ScreenWidth;
-    public double EyeY { get; private set; } = 215d / OriginalDragonRunTimeline.ScreenHeight;
     public int LanceX => _lance.X;
     public int LanceY => _lance.Y;
     public int LanceFrame => OriginalDragonLanceSelection.FrameFor(LanceX, LanceY);
     public int SourceFrame { get; private set; }
-    public bool EyeVisible => SourceFrame is >= OriginalDragonRunTimeline.FirstTargetFrame
-        and < OriginalDragonRunTimeline.EndFrame;
     public double RemainingSeconds => (OriginalDragonRunTimeline.EndFrame *
         OriginalDragonRunTimeline.FrameMilliseconds * TimeSpan.TicksPerMillisecond - _elapsedTicks)
         / (double)TimeSpan.TicksPerSecond;
@@ -76,8 +72,6 @@ public sealed class DragonBattleSession
             _lance.Advance(frame, pointerX, pointerY);
             _lastProcessedFrame = frame;
             if (OriginalDragonRunTimeline.TargetAt(frame) is not { } target) continue;
-            EyeX = (double)target.X / OriginalDragonRunTimeline.ScreenWidth;
-            EyeY = (double)target.Y / OriginalDragonRunTimeline.ScreenHeight;
             HorizontalError += Math.Abs(target.X - LanceX);
             VerticalError += Math.Abs(target.Y - OriginalDragonRunTimeline.MovieTop - LanceY);
             ScoredFrames++;
