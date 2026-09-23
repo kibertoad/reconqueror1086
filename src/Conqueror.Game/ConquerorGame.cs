@@ -125,6 +125,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     private OriginalStrategicInteractiveEncounterSession? _strategicInteractiveEncounter;
     private OriginalStrategicInteractiveEncounterViewport? _strategicEncounterViewport;
     private DragonBattleSession? _dragonBattle;
+    private SmackerMoviePlayer? _dragonRunMovie;
     private PracticeCombatKind? _activePracticeCombat;
     private bool _drogoCombat;
     private UnitType _selectedUnit = UnitType.Swordsmen;
@@ -332,6 +333,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
     {
         _titleMovie?.Dispose();
         _eventMovie?.Dispose();
+        _dragonRunMovie?.Dispose();
         ClearSiegeVisuals();
         _musicInstance?.Dispose();
         _importedMusic?.Dispose();
@@ -800,6 +802,8 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
         _hasActiveCampaign = true;
         _fieldBattle = null;
         _dragonBattle = null;
+        _dragonRunMovie?.Dispose();
+        _dragonRunMovie = null;
         _siege = null;
         ClearSiegeVisuals();
         _youthDilemmaResult = null;

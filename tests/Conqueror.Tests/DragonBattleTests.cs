@@ -1,4 +1,5 @@
 using Conqueror.Core;
+using Conqueror.Game;
 using Xunit;
 
 namespace Conqueror.Tests;
@@ -82,18 +83,38 @@ public sealed class DragonBattleTests
     }
 
     [Fact]
-    public void EyeMovesAndOneAccurateThrustWins()
+    public void DragonRunUsesTheAuthoredLateTargetTrackAndOneAccurateThrustWins()
     {
         var battle = new DragonBattleSession(16);
-        battle.Tick(1);
+        var firstTargetTime = OriginalDragonRunTimeline.FirstTargetFrame
+            * OriginalDragonRunTimeline.FrameMilliseconds / 1000d;
+        battle.Tick(firstTargetTime - .001);
+        Assert.False(battle.EyeVisible);
+        battle.Tick(.001);
 
-        Assert.NotEqual(.5, battle.EyeX);
+        Assert.Equal(108, battle.SourceFrame);
+        Assert.True(battle.EyeVisible);
+        Assert.Equal(277d / 640, battle.EyeX);
+        Assert.Equal(215d / 480, battle.EyeY);
         battle.MoveAim((battle.EyeX - battle.AimX) / DragonBattleSession.Rules.AimSpeed,
             (battle.EyeY - battle.AimY) / DragonBattleSession.Rules.AimSpeed, 1);
 
         Assert.True(battle.Strike());
         Assert.Equal(DragonBattleOutcome.Victory, battle.Outcome);
         Assert.False(battle.Strike());
+    }
+
+    [Fact]
+    public void DragonRunTargetsEndAtTheSourceMovieStopFrame()
+    {
+        Assert.Contains(new ImportedMovieDefinition("Dragon.Run", "/drjstrun.smk"),
+            ImportedMovies.Definitions);
+        Assert.Null(OriginalDragonRunTimeline.TargetAt(107));
+        Assert.Equal((277, 215), OriginalDragonRunTimeline.TargetAt(108));
+        Assert.Equal((254, 158), OriginalDragonRunTimeline.TargetAt(133));
+        Assert.Null(OriginalDragonRunTimeline.TargetAt(134));
+        Assert.Equal(134, OriginalDragonRunTimeline.FrameAt(TimeSpan.FromMilliseconds(134 * 71)));
+        Assert.Equal(134 * 71 / 1000d, DragonBattleSession.Rules.DurationSeconds);
     }
 
     [Fact]

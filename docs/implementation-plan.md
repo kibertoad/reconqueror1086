@@ -24,6 +24,8 @@ Complete a clean-room MonoGame reimplementation of *Conqueror: A.D. 1086* that p
 
 ## Current baseline
 
+Dragon encounter continuation: `DRJSTRUN.SMK` is now required and drawn as the active 640×300 run movie, and the late frame-108–133 target coordinates from executable object-2 tables drive the stable 71 ms track. The worker stops at frame 134. Its score threshold and input mechanics remain to map; the current single-thrust radius and lance placement are provisional host policy. See `docs/original-findings.md` for the address-level mapping.
+
 The repository currently provides:
 
 - A MonoGame desktop application and data-driven campaign core that requires verified owner-imported official assets.

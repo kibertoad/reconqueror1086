@@ -6,10 +6,18 @@ namespace Conqueror.Game;
 
 public sealed partial class ConquerorGame
 {
+    private void StartDragonRunMovie()
+    {
+        _dragonRunMovie?.Dispose();
+        _dragonRunMovie = CreateMovie("Dragon.Run")
+            ?? throw new InvalidDataException("The required original dragon run movie could not be decoded.");
+    }
+
     private void UpdateDragonBattle(Func<Keys, bool> press, KeyboardState keys, GamePadState gamePad,
         MouseState mouse, bool click, GameTime gameTime)
     {
         if (_dragonBattle is null) { _screen = Screen.Map; return; }
+        _dragonRunMovie?.Update(gameTime.ElapsedGameTime);
         var seconds = gameTime.ElapsedGameTime.TotalSeconds;
         var horizontal = (keys.IsKeyDown(Keys.Right) || keys.IsKeyDown(Keys.D) ? 1d : 0)
             - (keys.IsKeyDown(Keys.Left) || keys.IsKeyDown(Keys.A) ? 1d : 0);
@@ -40,6 +48,8 @@ public sealed partial class ConquerorGame
         var outcome = battle.Outcome;
         _campaign.FinishDragonBattle(battle);
         _dragonBattle = null;
+        _dragonRunMovie?.Dispose();
+        _dragonRunMovie = null;
         _notice = battle.LastMessage.ToUpperInvariant();
         _screen = outcome == DragonBattleOutcome.Withdrawn ? Screen.Map : Screen.Ending;
         Autosave();
@@ -54,10 +64,14 @@ public sealed partial class ConquerorGame
         if (_dragonBattle is null) return;
         if (!DrawOriginal("Dragon.Background", new Rectangle(0, 0, 1024, 768)))
             throw new InvalidOperationException("Dragon battle requires its verified original battlefield art.");
+        if (_dragonRunMovie is null)
+            throw new InvalidOperationException("Dragon battle requires its original run movie.");
+        _batch.Draw(_dragonRunMovie.Texture, new Rectangle(0, 144, 1024, 480), Color.White);
 
         var eye = new Point((int)(_dragonBattle.EyeX * 1024), (int)(_dragonBattle.EyeY * 768));
         var radius = Math.Max(8, (int)(_dragonBattle.HitRadius * 768));
-        DrawOutline(new Rectangle(eye.X - radius, eye.Y - radius, radius * 2, radius * 2), Color.Red, 3);
+        if (_dragonBattle.EyeVisible)
+            DrawOutline(new Rectangle(eye.X - radius, eye.Y - radius, radius * 2, radius * 2), Color.Red, 3);
         var aim = new Point((int)(_dragonBattle.AimX * 1024), (int)(_dragonBattle.AimY * 768));
         if (!_originalAnimations.TryGetValue("Dragon.Lance", out var lances) || lances.Frames.Count != 25)
             throw new InvalidOperationException("Dragon battle requires its verified 25-frame lance foreground.");

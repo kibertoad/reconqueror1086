@@ -130,6 +130,7 @@ public static class ImportedMovies
         new("Options.Credits", "/creditzz.smk"),
         new("Practice.Joust", "/jousprac.smk"),
         new("Travel.DragonLair", "/trandrag.smk"),
+        new("Dragon.Run", "/drjstrun.smk"),
         new("Ending.DragonVictory", "/drjstwin.smk"),
         new("Ending.DragonInvestiture", "/champl30.smk"),
         new("Ending.DragonDefeat", "/drjstlse.smk"),

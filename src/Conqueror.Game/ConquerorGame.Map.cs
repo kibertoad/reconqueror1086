@@ -223,6 +223,7 @@ public sealed partial class ConquerorGame
             }
 
             _notice = _dragonBattle.LastMessage.ToUpperInvariant();
+            StartDragonRunMovie();
             _screen = Screen.DragonBattle;
             PlayEventMovie("Travel.DragonLair", Screen.DragonBattle);
         }
@@ -240,7 +241,12 @@ public sealed partial class ConquerorGame
     private void BeginDragonChallenge()
     {
         _dragonBattle = _campaign.BeginDragonBattle();
-        if (_dragonBattle is not null) { _screen = Screen.DragonBattle; _notice = _dragonBattle.LastMessage.ToUpperInvariant(); }
+        if (_dragonBattle is not null)
+        {
+            StartDragonRunMovie();
+            _screen = Screen.DragonBattle;
+            _notice = _dragonBattle.LastMessage.ToUpperInvariant();
+        }
         else _notice = "DRAGON CHALLENGE REQUIRES ITS LOCATION, MIGHTY STRENGTH, ARMOR, SHIELD, AND LANCE";
     }
 }
