@@ -16,6 +16,7 @@ public sealed partial class ConquerorGame
     private OriginalStrategicInteractiveEncounterHoverPresentation _strategicEncounterHover;
     private int _strategicEncounterPlayerScoreModifier;
     private OriginalStrategicInteractiveRetreatConfirmation? _strategicInteractiveRetreatConfirmation;
+    private OriginalStrategicPointerEventClassifier _strategicPointerEvents = new();
 
     private void BeginStrategicEncounter(OriginalStrategicPlayerEnemyEncounter encounter)
     {
@@ -25,12 +26,14 @@ public sealed partial class ConquerorGame
         _strategicEncounterViewport = null;
         _strategicEncounterHover = default;
         _strategicInteractiveRetreatConfirmation = null;
+        _strategicPointerEvents = new();
         _strategicEncounterPlayerScoreModifier = _campaign.OriginalStrategicEncounterPlayerScoreModifier(encounter);
         _screen = Screen.StrategicEncounter;
         _notice = "STRATEGIC ARMIES MEET";
     }
 
-    private void UpdateStrategicEncounter(Func<Keys, bool> press, MouseState mouse, bool click)
+    private void UpdateStrategicEncounter(Func<Keys, bool> press, MouseState mouse,
+        bool click, bool release, bool rightClick, bool controllerRightClick)
     {
         if (_strategicEncounter is not { } encounter)
         {
@@ -57,6 +60,7 @@ public sealed partial class ConquerorGame
             _strategicEncounterViewport = OriginalStrategicInteractiveEncounterViewport.ForResolvedDisplay(
                 StrategicEncounterWidth, StrategicEncounterHeight,
                 StrategicEncounterWidth, StrategicEncounterHeight);
+            _strategicPointerEvents = new();
             _notice = "SELECT UNITS, THEN ARM THE FIRST CONTROL";
             return;
         }
@@ -76,7 +80,11 @@ public sealed partial class ConquerorGame
         }
 
         var (x, y) = OriginalPoint(mouse);
-        if (click && session.IsMappedTacticalAdvancementEnabled
+        var inputCode = ClassifyStrategicPointerInput(click, release, rightClick,
+            mouse.RightButton == ButtonState.Released
+                && _lastMouse.RightButton == ButtonState.Pressed,
+            controllerRightClick);
+        if (inputCode == 3 && session.IsMappedTacticalAdvancementEnabled
             && session.RouteControlStripHit(x, y, viewport.ControlStripMargin, viewport.ViewportHeight)
                 == OriginalStrategicInteractiveEncounterControlStripRoute.RetreatConfirmation)
         {
@@ -84,8 +92,25 @@ public sealed partial class ConquerorGame
             _notice = "RETREAT? ENTER CONFIRMS, ESC CANCELS";
             return;
         }
-        var inputCode = click ? EncounterInputCodeFor(session, viewport, x, y) : 0;
         AdvanceInteractiveStrategicEncounterFrame(encounter, session, viewport, x, y, inputCode);
+    }
+
+    private int ClassifyStrategicPointerInput(bool click, bool release,
+        bool rightClick, bool rightRelease, bool controllerRightClick)
+    {
+        // Four source timer units are mapped to a stable 250 ms host interval.
+        // The source interrupt frequency has not yet been recovered.
+        var timerUnits = (long)Math.Floor(_presentationSeconds * 16d);
+        if (click) return _strategicPointerEvents.Classify(
+            OriginalStrategicPointerTransition.PrimaryDown, timerUnits);
+        if (release) return _strategicPointerEvents.Classify(
+            OriginalStrategicPointerTransition.PrimaryUp, timerUnits);
+        if (controllerRightClick) return 7;
+        if (rightClick) return _strategicPointerEvents.Classify(
+            OriginalStrategicPointerTransition.SecondaryDown, timerUnits);
+        if (rightRelease) return _strategicPointerEvents.Classify(
+            OriginalStrategicPointerTransition.SecondaryUp, timerUnits);
+        return 0;
     }
 
     private void AdvanceInteractiveStrategicEncounterFrame(
@@ -120,18 +145,6 @@ public sealed partial class ConquerorGame
         if (!click) return null;
         var (x, y) = OriginalPoint(mouse);
         return OriginalStrategicEncounterMenu.FindMappedEntryAt(x, y);
-    }
-
-    private static int EncounterInputCodeFor(OriginalStrategicInteractiveEncounterSession session,
-        OriginalStrategicInteractiveEncounterViewport viewport, int x, int y)
-    {
-        if (session.RouteControlStripHit(x, y, viewport.ControlStripMargin, viewport.ViewportHeight)
-            != OriginalStrategicInteractiveEncounterControlStripRoute.UnitSelectionFallback)
-            return 3;
-        var worldX = x + viewport.HorizontalOffset;
-        var worldY = y + viewport.VerticalOffset;
-        return OriginalStrategicInteractiveEncounterGeometry.FindFirstContainingOneBased(
-            session.RenderRectangles(), worldX, worldY) != 0 ? 2 : 6;
     }
 
     private void FinishStrategicEncounter(string notice)
@@ -192,6 +205,8 @@ public sealed partial class ConquerorGame
             ? "TACTICAL ORDERS ACTIVE" : "CLICK THE FIRST CONTROL TO BEGIN", 32, 46, Color.White, 2);
         if (_strategicInteractiveRetreatConfirmation is not null)
             DrawText("RETREAT? ENTER CONFIRMS, ESC CANCELS", 32, 74, Color.Gold, 2);
+        else
+            DrawText("LEFT SELECT   RIGHT ORDER", 32, 74, Color.White, 2);
         DrawStrategicEncounterHover(viewport);
     }
 

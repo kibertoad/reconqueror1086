@@ -24,6 +24,8 @@ Complete a clean-room MonoGame reimplementation of *Conqueror: A.D. 1086* that p
 
 ## Current baseline
 
+Strategic tactical input continuation: queue pop `0x63098` and classifier `0x63114` now map the original 20-byte pointer event to eight press/release codes. The resolver's primary selection/control and secondary destination routes receive those identities from live host button transitions. The executable initializes both hold/repeat thresholds to four timer units; the host uses a stable 250-ms four-unit calibration while the source interrupt rate remains Provisional. Tests cover strict repeat boundaries and independent buttons. This replaces the earlier screen-location-based synthetic code selection.
+
 Dragon encounter continuation: `DRJSTRUN.SMK` is required and drawn as the active 640×300 run movie, and the frame-108–133 target coordinates from executable object-2 tables drive a stable 71 ms track. The worker stops at frame 134. Its exact lance-experience/three-item score threshold and strict per-axis error gate are implemented, with one sample per movie frame as the processor-independent compatibility rule. The three possession slots now resolve through the executable conversation-selector table. The foreground uses the recovered uneven five-band frame selector and safely clamps the original unbounded below-92 scan; the lance now uses its recovered 8.8 local motion and paint-call origin. The worker has no separate target-marker draw, so the constructed outline is removed; the four-unit event classifier is mapped, while its wall-clock throughput and cursor presentation remain to recover. See `docs/original-findings.md` for the address-level mapping.
 
 The repository currently provides:
@@ -38,7 +40,7 @@ The repository currently provides:
 - An executable-confirmed `TITLE.HAT`/`FFTITLE.PCX` title load followed by a corroborated character-options flow whose exact geometry comes from installed `CGOPTS.HAT` and `PREGEN.HAT`.
 - Self-contained Windows x64, Linux x64, macOS arm64, and macOS x64 packaging automation, with a smart ownership-aware Windows installer and a pinned four-artifact release workflow.
 - A repository-wide 1,000-line compiled-source ceiling; the game shell and resource regression suite are split into focused partial modules so the limit passes without exemptions.
-- 196 xUnit test cases and 146 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
+- 511 xUnit test cases and 146 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
 
 ## Dependency map
 
