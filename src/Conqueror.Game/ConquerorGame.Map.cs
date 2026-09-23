@@ -66,8 +66,8 @@ public sealed partial class ConquerorGame
             ShowNewSpyReport(previousReport);
             Autosave();
         }
-        if (press(Keys.OemPlus) || press(Keys.Add)) _campaign.State.DaySpeed = Math.Min(15, _campaign.State.DaySpeed + 1);
-        if (press(Keys.OemMinus) || press(Keys.Subtract)) _campaign.State.DaySpeed = Math.Max(1, _campaign.State.DaySpeed - 1);
+        if (press(Keys.OemPlus) || press(Keys.Add)) _campaign.AdjustStrategicSpeed(1);
+        if (press(Keys.OemMinus) || press(Keys.Subtract)) _campaign.AdjustStrategicSpeed(-1);
         if (!click || !_originalArt.ContainsKey("Estate.Shell")) return;
 
         var (x, y) = OriginalPoint(mouse);

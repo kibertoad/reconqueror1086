@@ -404,7 +404,12 @@ public sealed partial class Campaign
             ResolveArmyOrders();
             ResolveEnemyMovements();
             TryStartEnemyMovement();
-            if (State.Date.Month != previousMonth) SettleMonth();
+            if (State.Date.Month != previousMonth)
+            {
+                if (State.OriginalStrategicState is { } strategic)
+                    strategic.TerrainProfile = OriginalStrategicMovement.TerrainProfileForMonth(State.Date.Month - 1);
+                SettleMonth();
+            }
             if (State.Date.Year != previousYear)
             {
                 State.Player.Age++;
@@ -416,6 +421,22 @@ public sealed partial class Campaign
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Changes the live source-shaped movement rate and keeps the dated map
+    /// adapter's temporary speed control in step until its replacement.
+    /// </summary>
+    public int AdjustStrategicSpeed(int delta)
+    {
+        var strategic = State.OriginalStrategicState;
+        var current = strategic?.SpeedMultiplier ?? State.DaySpeed;
+        var next = (int)Math.Clamp((long)current + delta,
+            OriginalStrategicMovement.MinimumSpeedMultiplier,
+            OriginalStrategicMovement.MaximumSpeedMultiplier);
+        if (strategic is not null) strategic.SpeedMultiplier = next;
+        State.DaySpeed = next;
+        return next;
     }
 
     public void SettleMonth()
