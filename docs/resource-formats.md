@@ -335,6 +335,16 @@ The fixed header also contains 30 signed action-ID slots for each of five respon
 
 The bounded recursive decoder validates all 689 groups, 2,267 unique actions, 10,373 unique expressions, and 13,352 unique values, rejecting invalid counts, offsets, kinds, arities, flags, operators, excessive depth, and cycles. Every distinct conversation action ID resolves except `5011`, which is retained and reported as an anomaly in the original data. Structural decoding and function roles are **Confirmed**. The scope-1 adapter maps selectors `0/2/3/5/6/7/8` to wealth/honor/fame/piety/strength/stamina/intelligence, and produced or consumed item selectors `0` through `23` to named campaign inventory. The only other item operand is a producer-less `161` check in Victoria's final shield-offer gate; it is retained as raw original state rather than assigned a speculative identity.
 
+The executable maps those conversation item selectors to physical possession slots through a little-endian 16-bit table at object 2 `+0xA938`: helper `0x2250C` reads the high word of the dword at `+0xA936 + 2 * selector`, then passes that slot to increment helper `0x43100`. `0x2252C` and `0x2254C` use the same lookup for clearing and testing. The 24 supported selector-to-slot values, in selector order, are **Confirmed** from the hashed executable:
+
+| Selectors | Physical possession slots |
+| --- | --- |
+| 0–7 | 65, 17, 10, 19, 21, 49, 18, 9 |
+| 8–15 | 20, 53, 54, 55, 15, 6, 58, 59 |
+| 16–23 | 14, 61, 6, 63, 64, 67, 68, 69 |
+
+The possession array uses eight bytes per slot at object 2 `+0xC6C4`: the dword at `+0x04` is the live count. `0x43100` increments it, `0x4310C` tests nonzero, and `0x43124` clears it. Enumerator `0x430B0` bounds the array at `0x230` bytes, or 70 slots. Selector 10 is Dragon Slaying Lance and maps to slot `0x36`; selector 15 is Shield of St. George and maps to `0x3B`; selector 20 is Dragon Slaying Armor and maps to `0x40`. These are exactly the three slots tested by dragon worker `0x1B5DA`–`0x1B614`. Name identities come from the existing executable item-name catalog and decoded conversation rewards; the slot relation comes directly from the table and helper control flow. `OriginalConversationBindings.Items`, `OriginalDragonRunScore`, and `Campaign.BeginDragonBattle` retain the mapping. The anomalous selector 161 is outside this 24-entry mapping and remains raw.
+
 `ALL.VTB` is a 12-byte signed-dword header followed by its variable values. The owned file declares 190 elements, an element size of 4, and element kind 5; exactly 190 signed 32-bit zero values consume the rest of its 772 bytes. The decoder requires exact length, the confirmed element size/kind, and a bounded population. These values form the persistent scope-zero state read and changed by action functions 4-6.
 
 `DynamixConversationDecoder` bounds the node population and every record extent, validates IDs, offsets, markers, ASCII strings, response counts, and graph targets, and exposes typed prompt variants and responses without copying original prose into the repository. `conversation-report.txt` contains only aggregate structural counts.

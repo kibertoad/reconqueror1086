@@ -73,12 +73,13 @@ public sealed partial class ConquerorGame
         var aim = new Point((int)(_dragonBattle.AimX * 1024), (int)(_dragonBattle.AimY * 768));
         if (!_originalAnimations.TryGetValue("Dragon.Lance", out var lances) || lances.Frames.Count != 25)
             throw new InvalidOperationException("Dragon battle requires its verified 25-frame lance foreground.");
-        // `0x1B86C`-`0x1B8B4` selects a five-row, reversed-horizontal
-        // frame grid. The source's transformed anchors are still unknown;
-        // quantize the host aim in both axes until that path is recovered.
-        var row = Math.Min(4, (int)(_dragonBattle.AimY * 5));
-        var column = Math.Min(4, (int)(_dragonBattle.AimX * 5));
-        var lanceIndex = row * 5 + (4 - column);
+        // The aim-to-source-lance transform remains host policy. Once mapped
+        // into the source's bounded lance coordinates, use its frame selector.
+        var sourceX = OriginalDragonLanceSelection.MinimumX + (int)Math.Round(
+            _dragonBattle.AimX * (OriginalDragonLanceSelection.MaximumX - OriginalDragonLanceSelection.MinimumX));
+        var sourceY = OriginalDragonLanceSelection.MinimumY + (int)Math.Round(
+            _dragonBattle.AimY * (OriginalDragonLanceSelection.MaximumY - OriginalDragonLanceSelection.MinimumY));
+        var lanceIndex = OriginalDragonLanceSelection.FrameFor(sourceX, sourceY);
         var lance = lances.Frames[lanceIndex];
         var width = lance.Width * 1024 / 640;
         var height = lance.Height * 768 / 480;

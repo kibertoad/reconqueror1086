@@ -86,7 +86,7 @@ public sealed class DragonBattleTests
     [Fact]
     public void DragonRunUsesTheAuthoredLateTargetTrackAndScoresAtTheEnd()
     {
-        var battle = new DragonBattleSession(20);
+        var battle = new DragonBattleSession(20, OriginalDragonRunScore.FullEquipmentBonus);
         var firstTargetTime = OriginalDragonRunTimeline.FirstTargetFrame
             * OriginalDragonRunTimeline.FrameMilliseconds / 1000d;
         battle.Tick(firstTargetTime - .001);
@@ -104,7 +104,7 @@ public sealed class DragonBattleTests
     [Fact]
     public void TrackingAllLateMovieFramesWinsOnTheOriginalAxisGate()
     {
-        var battle = new DragonBattleSession(20);
+        var battle = new DragonBattleSession(20, OriginalDragonRunScore.FullEquipmentBonus);
         battle.Tick(107 * .071);
         for (var frame = 108; frame < 134; frame++)
         {
@@ -127,11 +127,33 @@ public sealed class DragonBattleTests
     {
         Assert.Equal(17, OriginalDragonRunScore.EquipmentBonus(true, true, true));
         Assert.Equal(8, OriginalDragonRunScore.EquipmentBonus(true, true, false));
+        Assert.Equal(17, OriginalDragonRunScore.EquipmentBonus(
+            new HashSet<string>([OriginalDragonRunScore.LanceItem,
+                OriginalDragonRunScore.ArmorItem, OriginalDragonRunScore.ShieldItem])));
+        Assert.Equal("Dragon Slaying Lance", OriginalConversationBindings.Items[10]);
+        Assert.Equal("Shield of St. George", OriginalConversationBindings.Items[15]);
+        Assert.Equal("Dragon Slaying Armor", OriginalConversationBindings.Items[20]);
+        Assert.Equal(0x36, OriginalDragonRunScore.LanceSlot);
+        Assert.Equal(0x3B, OriginalDragonRunScore.ShieldSlot);
+        Assert.Equal(0x40, OriginalDragonRunScore.ArmorSlot);
         Assert.Equal(442, OriginalDragonRunScore.Threshold(20, 17));
         Assert.Equal(338, OriginalDragonRunScore.Threshold(16, 17));
         Assert.True(OriginalDragonRunScore.Succeeds(20, 17, 441, 441));
         Assert.False(OriginalDragonRunScore.Succeeds(20, 17, 442, 0));
         Assert.False(OriginalDragonRunScore.Succeeds(20, 17, 0, 442));
+    }
+
+    [Fact]
+    public void LanceFrameUsesSourceBandsAndClampsTheUnboundedHighAimCase()
+    {
+        Assert.Equal(70, OriginalDragonLanceSelection.HorizontalBandWidth);
+        Assert.Equal(4, OriginalDragonLanceSelection.FrameFor(50, 240));
+        Assert.Equal(0, OriginalDragonLanceSelection.FrameFor(400, 240));
+        Assert.Equal(9, OriginalDragonLanceSelection.FrameFor(50, 188));
+        Assert.Equal(14, OriginalDragonLanceSelection.FrameFor(50, 187));
+        Assert.Equal(19, OriginalDragonLanceSelection.FrameFor(50, 114));
+        Assert.Equal(24, OriginalDragonLanceSelection.FrameFor(50, 92));
+        Assert.Equal(24, OriginalDragonLanceSelection.FrameFor(50, 20));
     }
 
     [Fact]
@@ -168,8 +190,9 @@ public sealed class DragonBattleTests
     [Fact]
     public void LanceExperienceRaisesTheScoreGateAndUnalignedAimIsFatal()
     {
-        Assert.True(new DragonBattleSession(20).ScoreThreshold > new DragonBattleSession(16).ScoreThreshold);
-        var battle = new DragonBattleSession(16);
+        Assert.True(new DragonBattleSession(20, 17).ScoreThreshold
+            > new DragonBattleSession(16, 17).ScoreThreshold);
+        var battle = new DragonBattleSession(16, 17);
 
         battle.Tick(DragonBattleSession.Rules.DurationSeconds);
 

@@ -13,6 +13,7 @@ public sealed class DragonBattleSession
         .65);
 
     private readonly int _lanceExperience;
+    private readonly int _equipmentBonus;
     private double _elapsed;
 
     public DragonBattleOutcome Outcome { get; private set; }
@@ -28,12 +29,13 @@ public sealed class DragonBattleSession
     public int VerticalError { get; private set; }
     public int ScoredFrames { get; private set; }
     public int ScoreThreshold => OriginalDragonRunScore.Threshold(_lanceExperience,
-        OriginalDragonRunScore.FullEquipmentBonus);
+        _equipmentBonus);
     public string LastMessage { get; private set; } = "Keep the lance aligned with the dragon's eye.";
 
-    public DragonBattleSession(int lanceExperience)
+    public DragonBattleSession(int lanceExperience, int equipmentBonus)
     {
         _lanceExperience = lanceExperience;
+        _equipmentBonus = equipmentBonus;
     }
 
     public void MoveAim(double horizontal, double vertical, double elapsedSeconds)
@@ -73,7 +75,7 @@ public sealed class DragonBattleSession
         if (_elapsed >= Rules.DurationSeconds)
         {
             var hit = OriginalDragonRunScore.Succeeds(_lanceExperience,
-                OriginalDragonRunScore.FullEquipmentBonus, HorizontalError, VerticalError);
+                _equipmentBonus, HorizontalError, VerticalError);
             Outcome = hit ? DragonBattleOutcome.Victory : DragonBattleOutcome.Defeat;
             LastMessage = hit ? "The lance finds the dragon's eye."
                 : "The lance misses the dragon's eye.";

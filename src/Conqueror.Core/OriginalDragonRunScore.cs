@@ -7,12 +7,21 @@ namespace Conqueror.Core;
 public static class OriginalDragonRunScore
 {
     public const int FullEquipmentBonus = 17;
+    public const int LanceSlot = 0x36;
+    public const int ArmorSlot = 0x40;
+    public const int ShieldSlot = 0x3B;
+    public const string LanceItem = "Dragon Slaying Lance";
+    public const string ArmorItem = "Dragon Slaying Armor";
+    public const string ShieldItem = "Shield of St. George";
 
-    public static int EquipmentBonus(bool armor, bool shield, bool lance)
+    public static int EquipmentBonus(bool lance, bool armor, bool shield)
     {
-        var bonus = (armor ? 4 : 0) + (shield ? 4 : 0) + (lance ? 4 : 0);
+        var bonus = (lance ? 4 : 0) + (armor ? 4 : 0) + (shield ? 4 : 0);
         return bonus == 12 ? 17 : bonus;
     }
+
+    public static int EquipmentBonus(IReadOnlySet<string> items) => EquipmentBonus(
+        items.Contains(LanceItem), items.Contains(ArmorItem), items.Contains(ShieldItem));
 
     public static int Threshold(int lanceExperience, int equipmentBonus) =>
         26 * (Math.Clamp(lanceExperience, 0, 20) - 20 + equipmentBonus);
