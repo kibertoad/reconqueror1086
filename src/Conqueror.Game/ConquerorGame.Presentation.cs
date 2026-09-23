@@ -202,9 +202,12 @@ public sealed partial class ConquerorGame
             if (_practiceJoustLances is not { Count: 25 } lances)
                 throw new InvalidOperationException("Joust practice requires the imported lance foreground.");
             var frame = lances[_practiceJoustLance.Frame];
-            _batch.Draw(frame, new Rectangle(_practiceJoustLance.X * 1024 / 640,
-                (_practiceJoustLance.Y + OriginalPracticeJoustLance.MovieTop) * 768 / 480,
-                frame.Width * 1024 / 640, frame.Height * 768 / 480), Color.White);
+            if (OriginalPracticeJoustLancePresentation.Clip(
+                    _practiceJoustLance.X, _practiceJoustLance.Y,
+                    frame.Width, frame.Height) is { } blit)
+                _batch.Draw(frame, ScaleBounds(blit.Destination),
+                    new Rectangle(blit.Source.X, blit.Source.Y,
+                        blit.Source.Width, blit.Source.Height), Color.White);
             DrawText("MOVE MOUSE TO AIM THE LANCE   ESC TO LEAVE", 55, 670, Color.White, 2);
             return;
         }

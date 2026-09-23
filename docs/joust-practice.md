@@ -19,9 +19,16 @@ object-2 `+0x61B0` string `lance%1d.csf`, loads it through `0x18430`, and stores
 the handle at `+0x1C170`. The caller then invokes `0x41164` at `0x41D46` and
 releases the lance handle through `0x41154` at `0x41D69`. Worker
 `0x4169E-0x4174F` reads that handle, crops the selected frame, and paints it
-at `(lanceX, lanceY + 90)`. The `lance1.csf` foreground identity and 90-pixel
-paint offset are **Confirmed**. The replacement currently uses its imported
-`Dragon.Lance` texture role remains for the dragon encounter. Practice now
+at `(lanceX, lanceY + 90)`. Specifically, `0x416D1-0x41720` intersects its
+source dimensions with nonnegative x/y and the strict right/bottom boundaries
+`0x27F = 639` and `0x12B = 299`; clip helper `0x64320` receives y plus 90,
+and `0x65130` paints the selected texture through that clip. Thus an authored
+frame extending beyond the movie never paints into the surrounding screen.
+`OriginalPracticeJoustLancePresentation.Clip` returns matching source and
+destination rectangles before host scaling, with edge and oversized-frame
+regressions. This crop, `lance1.csf` foreground identity, and 90-pixel paint
+offset are **Confirmed**. The imported `Dragon.Lance` texture role remains
+for the dragon encounter. Practice now
 decodes its own `lance1.csf` textures with the active `jousprac.SMK` frame-0
 palette.
 
