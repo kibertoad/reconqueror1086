@@ -740,16 +740,10 @@ public sealed partial class ConquerorGame
             : new Point(PresentationScaling.ToVirtual(mouse.X, mouse.Y, CanvasBounds()).X,
                 PresentationScaling.ToVirtual(mouse.X, mouse.Y, CanvasBounds()).Y);
         if (!_originalAnimations.TryGetValue(OriginalCursorAnimationRole, out var cursor))
-        {
-            if (_controllerPointerActive)
-            {
-                Fill(new Rectangle(point.X - 8, point.Y - 1, 17, 3), Color.Gold);
-                Fill(new Rectangle(point.X - 1, point.Y - 8, 3, 17), Color.Gold);
-            }
-            return;
-        }
+            throw new InvalidOperationException("Cursor requires its imported original animation.");
         var frameIndex = OriginalCursorDefinitions.Frame(CurrentCursorKind(mouse));
-        if (cursor.Frames.Count <= frameIndex) return;
+        if (cursor.Frames.Count <= frameIndex)
+            throw new InvalidDataException("Original cursor animation is missing a required frame.");
         var frame = cursor.Frames[frameIndex];
         _batch.Draw(frame, new Rectangle(point.X, point.Y,
             frame.Width * 1024 / 640, frame.Height * 768 / 480), Color.White);

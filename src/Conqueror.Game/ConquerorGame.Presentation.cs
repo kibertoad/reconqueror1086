@@ -395,10 +395,10 @@ public sealed partial class ConquerorGame
 
     private void DrawEstateMap()
     {
-        var originalStrategicTerrain = DrawEstateTerrain();
-        if (originalStrategicTerrain && _campaign.State.OriginalStrategicState is { } strategic)
-            DrawOriginalStrategicMarkers(strategic);
-        DrawEstateMarkers();
+        var strategic = _campaign.State.OriginalStrategicState
+            ?? throw new InvalidOperationException("Estate map requires original strategic state.");
+        DrawOriginalStrategicTerrain(strategic);
+        DrawOriginalStrategicMarkers(strategic);
         DrawEstateInformation();
 
         foreach (var control in _estateLayout.Controls)
@@ -414,20 +414,11 @@ public sealed partial class ConquerorGame
         DrawText(World.Locations[_selectedLocation].Name.ToUpperInvariant(), footer.X + 8, footer.Y + 7, Color.Wheat, 2, footer.Width - 16);
     }
 
-    private bool DrawEstateTerrain()
-    {
-        if (_campaign.State.OriginalStrategicState is { } strategic
-            && DrawOriginalStrategicTerrain(strategic))
-            return true;
-
-        DrawLegacyEstateTerrain();
-        return false;
-    }
-
-    private bool DrawOriginalStrategicTerrain(OriginalStrategicCampaignState strategic)
+    private void DrawOriginalStrategicTerrain(OriginalStrategicCampaignState strategic)
     {
         var role = OriginalStrategicTerrainPresentation.AtlasRoleFor(strategic.TerrainProfile);
-        if (!_originalAnimations.TryGetValue(role, out var atlas)) return false;
+        if (!_originalAnimations.TryGetValue(role, out var atlas))
+            throw new InvalidOperationException("Estate map requires its imported strategic terrain atlas.");
 
         foreach (var blit in OriginalStrategicTerrainPresentation.BuildBlits(
                      strategic, _originalStrategicResources, atlas.Frames.Count))
@@ -436,14 +427,13 @@ public sealed partial class ConquerorGame
                 new Rectangle(blit.Source.X, blit.Source.Y, blit.Source.Width, blit.Source.Height),
                 Color.White);
         }
-        return true;
     }
 
     private void DrawOriginalStrategicMarkers(OriginalStrategicCampaignState strategic)
     {
         if (!_originalAnimations.TryGetValue("Strategic.Map.Markers", out var markers)
             || markers.Frames.Count == 0)
-            return;
+            throw new InvalidOperationException("Estate map requires its imported strategic markers.");
 
         var firstFrame = markers.Frames[0];
         foreach (var frame in markers.Frames)
@@ -477,7 +467,7 @@ public sealed partial class ConquerorGame
 
         if (!_originalAnimations.TryGetValue("Strategic.Map.MarkerOverlay", out var routeMarkers)
             || routeMarkers.Frames.Count == 0)
-            return;
+            throw new InvalidOperationException("Estate map requires its imported route markers.");
         var firstRouteFrame = routeMarkers.Frames[0];
         foreach (var frame in routeMarkers.Frames)
             if (frame.Width != firstRouteFrame.Width || frame.Height != firstRouteFrame.Height)
@@ -491,41 +481,6 @@ public sealed partial class ConquerorGame
                 new Rectangle(blit.Source.X, blit.Source.Y, blit.Source.Width, blit.Source.Height),
                 Color.White);
         }
-    }
-
-    private void DrawLegacyEstateTerrain()
-    {
-        var terrain = EstatePresentationDefinitions.TerrainFor(_campaign.State.Player.Home);
-        var atlasDefinition = EstatePresentationDefinitions.AtlasFor(_campaign.State.Date);
-        if (!_originalAnimations.TryGetValue(atlasDefinition.Role, out var atlas))
-            throw new InvalidOperationException("Estate map requires its verified original seasonal tile atlas.");
-        var highestRequiredFrame = EstatePresentationDefinitions.TileFrames.Values.Max();
-        if (atlas.Frames.Count <= highestRequiredFrame)
-            throw new InvalidOperationException("Estate map tile atlas is missing a required original frame.");
-        for (var index = 0; index < terrain.Count; index++)
-        {
-            var frameIndex = EstatePresentationDefinitions.TileFrames[terrain[index]];
-            _batch.Draw(atlas.Frames[frameIndex],
-                ScaleBounds(EstatePresentationDefinitions.TileSpriteBounds(_estateLayout.MainViewport, index)), Color.White);
-        }
-    }
-
-    private void DrawEstateMarkers()
-    {
-        for (var index = 0; index < World.Locations.Length; index++)
-        {
-            if (!_campaign.CanRevealLocation(index)) continue;
-            var point = EstatePresentationDefinitions.InsetPoint(_estateLayout.InsetMap, World.Locations[index]);
-            var marker = ScaleBounds(new UiBounds(point.X - 2, point.Y - 2, index == _selectedLocation ? 6 : 4, index == _selectedLocation ? 6 : 4));
-            var owned = index == 0 || _campaign.State.ConqueredLocations.Contains(index);
-            Fill(marker, index == _campaign.State.CurrentLocation ? Color.Red : index == _selectedLocation ? Color.Gold : owned ? Color.LightGreen : Color.White);
-        }
-        DrawArmyMarkers((armyIndex, x, y) =>
-        {
-            var point = EstatePresentationDefinitions.InsetPoint(_estateLayout.InsetMap, x, y);
-            var marker = ScaleBounds(new UiBounds(point.X - 3 + armyIndex, point.Y - 3, 5, 5));
-            Fill(marker, armyIndex == _warPlanningArmyIndex ? Color.Gold : Color.Cyan);
-        });
     }
 
     private void DrawEstateInformation()
@@ -557,62 +512,6 @@ public sealed partial class ConquerorGame
         DrawText($"{_campaign.State.Date:MMM d, yyyy}\nTIME {_campaign.State.DaySpeed}X\nWEALTH {player.Wealth}\nCENSUS {player.Home.Population}",
             panel.X + 12, panel.Y + panel.Height - 138, Color.White, 2, panel.Width - 24);
         if (!string.IsNullOrEmpty(_notice)) DrawText(_notice, panel.X + 12, panel.Y + panel.Height - 34, Color.Gold, 1, panel.Width - 24);
-    }
-
-    private void DrawFallbackMap()
-    {
-        if (!DrawOriginal("Map.England", new Rectangle(0, 0, 760, 768)))
-            Fill(new Rectangle(0, 0, 760, 768), new Color(71, 92, 58));
-        for (var i = 0; i < World.Locations.Length; i++)
-        {
-            if (!_campaign.CanRevealLocation(i)) continue;
-            var place = World.Locations[i];
-            var owned = i == 0 || _campaign.State.ConqueredLocations.Contains(i);
-            var color = i == _selectedLocation ? Color.Gold : owned ? Color.LightGreen : place.Kind == LocationKind.DragonLair ? Color.DarkRed : Color.White;
-            Fill(new Rectangle(place.X, place.Y, i == _selectedLocation ? 13 : 8, i == _selectedLocation ? 13 : 8), color);
-            if (i == _selectedLocation) DrawText(place.Name, Math.Max(5, place.X - 30), Math.Max(5, place.Y - 25), Color.Gold, 1);
-        }
-        var current = World.Locations[_campaign.State.CurrentLocation];
-        Fill(new Rectangle(current.X - 5, current.Y - 5, 18, 18), Color.Red);
-        DrawArmyMarkers((armyIndex, x, y) =>
-            Fill(new Rectangle(x - 4 + armyIndex * 2, y - 4, 8, 8),
-                armyIndex == _warPlanningArmyIndex ? Color.Gold : Color.Cyan));
-        Fill(new Rectangle(760, 0, 264, 768), new Color(47, 36, 28));
-        var p = _campaign.State.Player; var f = p.Home;
-        var selected = World.Locations[_selectedLocation];
-        var intel = _campaign.HasGarrisonIntel(_selectedLocation) ? _campaign.GarrisonAt(_selectedLocation).ToString() : "UNKNOWN";
-        DrawText("ENGLAND", 820, 25, Color.Gold, 3); DrawText($"{_campaign.State.Date:DD MMM YYYY}", 785, 80, Color.White, 2);
-        DrawText(p.Name, 780, 125, Color.Wheat, 2, 230); DrawText($"AGE {p.Age}   WEALTH {p.Wealth}S", 780, 180, Color.White, 2);
-        DrawText($"FIEFS {p.Fiefs}  VILLAGES {p.Villages}", 780, 215, Color.White, 2); DrawText($"ARMIES {p.TotalArmyPopulation}  FAME {p.Fame}", 780, 250, Color.White, 2);
-        DrawText($"PRODUCTIVITY {f.Productivity()}%", 780, 285, Color.White, 2);
-        var tournament = World.Locations[World.TournamentIndex(_campaign.State.Date)].Name;
-        DrawText($"AT {current.Name}", 780, 320, Color.Gold, 2, 230);
-        DrawText($"TARGET {selected.Name} GARRISON {intel}", 780, 350, Color.Wheat, 2, 230);
-        DrawText("ARROWS SELECT ENTER TRAVEL", 780, 395, Color.LightGreen, 2, 230); DrawText("H HOME   V VILLAGE", 780, 440, Color.LightGreen, 2);
-        DrawText("T TOURNAMENT O OVERVIEW", 780, 475, Color.LightGreen, 2, 230);
-        DrawText("S SIEGE   B FIELD BATTLE", 780, 520, Color.LightGreen, 2, 230); DrawText("1-5 ARMY  A DISPATCH", 780, 555, Color.LightGreen, 2, 230);
-        DrawText("P SPY 80S   D DRAGON", 780, 585, Color.LightGreen, 2, 230);
-        DrawText($"TOURNAMENT {tournament}", 780, 615, Color.Wheat, 2, 230); DrawText("E ADVANCE  PLUS MINUS SPEED", 780, 650, Color.LightGreen, 2, 230);
-        DrawText("F5 SAVE  F9 LOAD", 780, 690, Color.Gold, 2);
-    }
-
-    private void DrawArmyMarkers(Action<int, int, int> draw)
-    {
-        var player = _campaign.State.Player;
-        player.EnsureArmyRoster();
-        for (var armyIndex = 0; armyIndex < Player.ArmyDivisionLimit; armyIndex++)
-        {
-            if (!player.ArmyIsFielded(armyIndex) || player.ArmyAt(armyIndex).Total == 0) continue;
-            var order = _campaign.ArmyOrderAt(armyIndex);
-            var origin = World.Locations[order?.Origin ?? player.ArmyLocationAt(armyIndex)];
-            if (order is null) { draw(armyIndex, origin.X, origin.Y); continue; }
-            var destination = World.Locations[order.Destination];
-            var duration = Math.Max(1, (order.Arrives - order.Departed).TotalDays);
-            var progress = Math.Clamp((_campaign.State.Date - order.Departed).TotalDays / duration, 0, 1);
-            draw(armyIndex,
-                (int)Math.Round(origin.X + (destination.X - origin.X) * progress),
-                (int)Math.Round(origin.Y + (destination.Y - origin.Y) * progress));
-        }
     }
 
     private void DrawHome()

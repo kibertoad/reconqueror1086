@@ -37,7 +37,7 @@ Check(ImportedAnimations.Definitions.Any(x => x is { Role: "Interface.Cursor", I
 Check(ImportedMovies.Definitions.Any(x => x is { Role: "Title.Intro", IdSuffix: "/title.smk" }), "original title movie role uses the disc-file identifier shape");
 Check(ImportedMovies.Definitions.Any(x => x is { Role: "Options.Credits", IdSuffix: "/creditzz.smk" }), "original credits movie role is definition driven");
 Check(EstatePresentationDefinitions.From(null).Controls.Select(x => x.Action).Distinct().Count() == Enum.GetValues<EstateControlAction>().Length, "estate controls are unique definitions");
-Check(EstatePresentationDefinitions.TileAtlases.Count == 3 && EstatePresentationDefinitions.TileFrames.Count == Enum.GetValues<EstateTerrainKind>().Length, "seasonal estate tile atlases are definition driven");
+Check(EstatePresentationDefinitions.TileAtlases.Count == 3, "seasonal estate tile atlases are definition driven");
 Check(FarmPresentationDefinitions.Commands.Select(x => x.Key).Distinct().Count() == FarmPresentationDefinitions.Commands.Count, "farm commands are unique definitions");
 Check(FarmPresentationDefinitions.Layouts.Select(x => x.Section).SequenceEqual(Enum.GetValues<FarmPresentationDefinitions.Section>()), "four original fief-management variants are definition driven");
 Check(FarmPresentationDefinitions.Layouts.All(x => ImportedLayouts.Definitions.Any(layout => layout.Role == x.LayoutRole && layout.IdSuffix == x.LayoutSuffix)), "fief-management HAT descriptors are imported");

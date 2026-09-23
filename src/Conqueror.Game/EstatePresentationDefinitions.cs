@@ -5,7 +5,6 @@ namespace Conqueror.Game;
 
 public enum EstatePanel { Map, Orders, Help }
 public enum EstateControlAction { Map, Orders, Help, Home, Village }
-public enum EstateTerrainKind { Meadow, HedgedField, Forest, Grain, Beans, Vegetables, Fruit, Settlement }
 public enum EstateSeason { SpringSummer, Autumn, Winter }
 
 public sealed record EstateControl(
@@ -25,11 +24,8 @@ public sealed record EstateLayout(
 
 public static class EstatePresentationDefinitions
 {
-    public const int Columns = 5;
-    public const int Rows = 14;
     private const int WorldWidth = 760;
     private const int WorldHeight = 768;
-    public const int OriginalTileSize = 80;
 
     public static EstateLayout Fallback { get; } = new(
         new UiBounds(19, 8, 370, 433),
@@ -51,38 +47,6 @@ public static class EstatePresentationDefinitions
         new(EstateSeason.Winter, "Estate.Tiles.Winter", ":icw.csf")
     ];
 
-    // The atlases and matching frame order are confirmed. These semantic choices are
-    // intentionally provisional until the executable's estate map table is recovered.
-    public static IReadOnlyDictionary<EstateTerrainKind, int> TileFrames { get; } =
-        new Dictionary<EstateTerrainKind, int>
-        {
-            [EstateTerrainKind.Meadow] = 293,
-            [EstateTerrainKind.HedgedField] = 258,
-            [EstateTerrainKind.Forest] = 255,
-            [EstateTerrainKind.Grain] = 287,
-            [EstateTerrainKind.Beans] = 290,
-            [EstateTerrainKind.Vegetables] = 289,
-            [EstateTerrainKind.Fruit] = 292,
-            [EstateTerrainKind.Settlement] = 24
-        };
-
-    private static EstateTerrainKind[] BasePattern { get; } =
-    [
-        EstateTerrainKind.Meadow, EstateTerrainKind.HedgedField, EstateTerrainKind.Meadow,
-        EstateTerrainKind.Forest, EstateTerrainKind.HedgedField, EstateTerrainKind.Meadow,
-        EstateTerrainKind.HedgedField, EstateTerrainKind.Forest, EstateTerrainKind.Meadow,
-        EstateTerrainKind.HedgedField
-    ];
-
-    private static IReadOnlyDictionary<CropType, EstateTerrainKind> CropKinds { get; } =
-        new Dictionary<CropType, EstateTerrainKind>
-        {
-            [CropType.Grain] = EstateTerrainKind.Grain,
-            [CropType.Beans] = EstateTerrainKind.Beans,
-            [CropType.Vegetables] = EstateTerrainKind.Vegetables,
-            [CropType.Fruit] = EstateTerrainKind.Fruit
-        };
-
     public static EstateLayout From(HatLayout? layout)
     {
         UiBounds Region(int id, UiBounds fallback) => layout?.FindRegion(id) is { } region
@@ -95,29 +59,6 @@ public static class EstatePresentationDefinitions
             Region(9, Fallback.InformationPanel),
             Region(13, Fallback.FooterStatus),
             Fallback.Controls.Select(control => control with { Bounds = Region(control.HatRegionId, control.Bounds) }).ToArray());
-    }
-
-    public static IReadOnlyList<EstateTerrainKind> TerrainFor(Fief fief)
-    {
-        var count = Columns * Rows;
-        var result = Enumerable.Range(0, count).Select(index => BasePattern[index % BasePattern.Length]).ToArray();
-        var developed = CropKinds.SelectMany(pair => Enumerable.Repeat(pair.Value, fief.Crops[pair.Key]))
-            .Concat(Enumerable.Repeat(EstateTerrainKind.Forest, fief.Forest.Values.Sum()))
-            .Concat(Enumerable.Repeat(EstateTerrainKind.Settlement, Math.Min(6, fief.Houses)))
-            .Take(count)
-            .ToArray();
-        for (var index = 0; index < developed.Length; index++) result[(index * 11 + 7) % count] = developed[index];
-        return result;
-    }
-
-    public static UiBounds TileSpriteBounds(UiBounds viewport, int index)
-    {
-        if (index < 0 || index >= Columns * Rows) throw new ArgumentOutOfRangeException(nameof(index));
-        var column = index % Columns;
-        var row = index / Columns;
-        var x = viewport.X + column * (viewport.Width - OriginalTileSize) / (Columns - 1);
-        var y = viewport.Y + row * (viewport.Height - OriginalTileSize) / (Rows - 1);
-        return new UiBounds(x, y, OriginalTileSize, OriginalTileSize);
     }
 
     public static EstateSeason SeasonFor(DateTime date) => date.Month switch

@@ -721,9 +721,7 @@ public sealed partial class ConquerorGame
         ? ((int)(_controllerPointer.X * 1024 / 640), (int)(_controllerPointer.Y * 768 / 480))
         : PresentationScaling.ToVirtual(mouse.X, mouse.Y, CanvasBounds());
 
-    private Rectangle SiegeViewport() => _originalArt.ContainsKey("Combat.Shell")
-        ? ScaleSiegeBounds(SiegeCombatPresentation.Viewport)
-        : new Rectangle(0, 85, 1024, 520);
+    private Rectangle SiegeViewport() => ScaleSiegeBounds(SiegeCombatPresentation.Viewport);
 
     private readonly record struct SiegePointerHit(
         int Distance8, SiegeEnemy? Actor, SiegeObject? Object, (int X, int Y)? TargetCell);
