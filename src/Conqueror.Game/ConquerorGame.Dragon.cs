@@ -73,17 +73,11 @@ public sealed partial class ConquerorGame
         var aim = new Point((int)(_dragonBattle.AimX * 1024), (int)(_dragonBattle.AimY * 768));
         if (!_originalAnimations.TryGetValue("Dragon.Lance", out var lances) || lances.Frames.Count != 25)
             throw new InvalidOperationException("Dragon battle requires its verified 25-frame lance foreground.");
-        // The aim-to-source-lance transform remains host policy. Once mapped
-        // into the source's bounded lance coordinates, use its frame selector.
-        var sourceX = OriginalDragonLanceSelection.MinimumX + (int)Math.Round(
-            _dragonBattle.AimX * (OriginalDragonLanceSelection.MaximumX - OriginalDragonLanceSelection.MinimumX));
-        var sourceY = OriginalDragonLanceSelection.MinimumY + (int)Math.Round(
-            _dragonBattle.AimY * (OriginalDragonLanceSelection.MaximumY - OriginalDragonLanceSelection.MinimumY));
-        var lanceIndex = OriginalDragonLanceSelection.FrameFor(sourceX, sourceY);
-        var lance = lances.Frames[lanceIndex];
+        var lance = lances.Frames[_dragonBattle.LanceFrame];
         var width = lance.Width * 1024 / 640;
         var height = lance.Height * 768 / 480;
-        _batch.Draw(lance, new Rectangle(aim.X - width / 2, aim.Y - height / 2,
+        _batch.Draw(lance, new Rectangle(_dragonBattle.LanceX * 1024 / 640,
+            (_dragonBattle.LanceY + OriginalDragonRunTimeline.MovieTop) * 768 / 480,
             width, height), Color.White);
         Fill(new Rectangle(aim.X - 15, aim.Y - 2, 31, 4), Color.Gold);
         Fill(new Rectangle(aim.X - 2, aim.Y - 15, 4, 31), Color.Gold);

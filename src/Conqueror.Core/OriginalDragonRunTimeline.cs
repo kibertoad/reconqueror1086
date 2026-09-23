@@ -29,7 +29,7 @@ public static class OriginalDragonRunTimeline
 
     public static int FrameAt(TimeSpan elapsed) => elapsed <= TimeSpan.Zero
         ? 0
-        : (int)Math.Min(EndFrame, Math.Floor(elapsed.TotalMilliseconds / FrameMilliseconds));
+        : (int)Math.Min(EndFrame, elapsed.Ticks / (FrameMilliseconds * TimeSpan.TicksPerMillisecond));
 
     public static (int X, int Y)? TargetAt(int frame)
     {

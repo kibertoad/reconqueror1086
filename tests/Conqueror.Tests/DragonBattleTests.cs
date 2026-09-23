@@ -102,24 +102,57 @@ public sealed class DragonBattleTests
     }
 
     [Fact]
-    public void TrackingAllLateMovieFramesWinsOnTheOriginalAxisGate()
+    public void SustainedLanceAlignmentWinsAtTheMovieBoundary()
     {
         var battle = new DragonBattleSession(20, OriginalDragonRunScore.FullEquipmentBonus);
-        battle.Tick(107 * .071);
-        for (var frame = 108; frame < 134; frame++)
-        {
-            var target = OriginalDragonRunTimeline.TargetAt(frame)!.Value;
-            battle.SetAim(target.X / 639d, target.Y / 479d);
-            battle.Tick(.071 + 1e-9);
-        }
+        battle.SetAim(277d / 639, 145d / 479);
+        battle.Tick(133 * .071);
         Assert.Equal(26, battle.ScoredFrames);
-        Assert.Equal(0, battle.HorizontalError);
-        Assert.Equal(0, battle.VerticalError);
+        Assert.True(battle.HorizontalError < battle.ScoreThreshold);
+        Assert.True(battle.VerticalError < battle.ScoreThreshold);
         Assert.Equal(DragonBattleOutcome.InProgress, battle.Outcome);
 
         battle.Tick(.071);
 
         Assert.Equal(DragonBattleOutcome.Victory, battle.Outcome);
+    }
+
+    [Fact]
+    public void LanceMotionUsesFixedPointRecoilDampingAndPointerPull()
+    {
+        var motion = new OriginalDragonLanceMotion();
+        Assert.Equal((225, 150), (motion.X, motion.Y));
+
+        motion.Advance(0, 225, 150);
+        Assert.Equal((225, 150), (motion.X, motion.Y));
+        Assert.Equal(-5000, motion.VelocityY8);
+
+        motion.Advance(1, 225, 150);
+        Assert.Equal((225, 130), (motion.X, motion.Y));
+        Assert.Equal(-3488, motion.VelocityY8);
+
+        var pulled = new OriginalDragonLanceMotion();
+        pulled.Advance(0, 400, 150);
+        Assert.Equal(4352, pulled.VelocityX8);
+        pulled.Advance(1, 400, 150);
+        Assert.Equal(242, pulled.X);
+    }
+
+    [Fact]
+    public void DragonMovieFrameSubdivisionDoesNotChangeSteadyAimOutcome()
+    {
+        var oneUpdate = new DragonBattleSession(20, 17);
+        var manyUpdates = new DragonBattleSession(20, 17);
+        oneUpdate.SetAim(277d / 639, 145d / 479);
+        manyUpdates.SetAim(277d / 639, 145d / 479);
+        oneUpdate.Tick(DragonBattleSession.Rules.DurationSeconds);
+        for (var frame = 1; frame <= 134; frame++)
+            manyUpdates.Tick(.071);
+
+        Assert.Equal(oneUpdate.ScoredFrames, manyUpdates.ScoredFrames);
+        Assert.Equal(oneUpdate.HorizontalError, manyUpdates.HorizontalError);
+        Assert.Equal(oneUpdate.VerticalError, manyUpdates.VerticalError);
+        Assert.Equal(oneUpdate.Outcome, manyUpdates.Outcome);
     }
 
     [Fact]
