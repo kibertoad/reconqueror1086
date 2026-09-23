@@ -53,6 +53,20 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal((0, 2, 0), (strategic.TemporaryForceSlots[2].Swordsmen,
             strategic.TemporaryForceSlots[2].Halberdiers, strategic.TemporaryForceSlots[2].Knights));
 
+        var repeated = campaign.AdvanceOriginalStrategicPass(
+            new OriginalStrategicCampaignPassInput(
+                [new OriginalStrategicPlayerTarget(false, 0, 0),
+                    new OriginalStrategicPlayerTarget(false, 0, 0),
+                    new OriginalStrategicPlayerTarget(false, 0, 0)],
+                SchedulerBlockedByModal: true,
+                TemporaryForceActionIds: [0x2B, 0x5D]),
+            new QueueStrategicRandom());
+        Assert.Empty(repeated.TemporaryForceCreations);
+        Assert.Equal((1, 1, 0), (strategic.TemporaryForceSlots[1].Swordsmen,
+            strategic.TemporaryForceSlots[1].Halberdiers, strategic.TemporaryForceSlots[1].Knights));
+        Assert.Equal((0, 2, 0), (strategic.TemporaryForceSlots[2].Swordsmen,
+            strategic.TemporaryForceSlots[2].Halberdiers, strategic.TemporaryForceSlots[2].Knights));
+
         var advanced = campaign.AdvanceOriginalStrategicPass(
             new OriginalStrategicCampaignPassInput(
                 [new OriginalStrategicPlayerTarget(false, 0, 0),
