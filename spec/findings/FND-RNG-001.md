@@ -1,9 +1,9 @@
 ---
 id: FND-RNG-001
 title: The random number generator is a linear congruential generator with its state at 0x0009E044
-status: recorded
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
+superseded_by: [FND-RNG-003]
 recorded_by: kibertoad
 reproduced_by: []
 method: static

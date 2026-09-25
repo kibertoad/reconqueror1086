@@ -11,6 +11,7 @@ public interface IDynamixActionState
 
 public sealed record DynamixActionExecutionResult(bool Success, int? RedirectNodeId);
 
+// RULE-TALK-002, RULE-TALK-003.
 /// <summary>Executes the expression and branch grammar used by ALL.TMB.</summary>
 public sealed class DynamixActionInterpreter(DynamixActionTreeDatabase database, IDynamixActionState state)
 {
@@ -117,6 +118,8 @@ public sealed class DynamixActionInterpreter(DynamixActionTreeDatabase database,
                 return state.TryClearItem(arguments[1]) ? 1 : 0;
             case 9 when arguments.Length == 2:
                 return state.HasItem(arguments[1]) ? 1 : 0;
+            // PLACEHOLDER: RULE-TALK-003. The original fails the action on an unknown function;
+            // here it reads 0 and the action goes on.
             default:
                 return 0;
         }

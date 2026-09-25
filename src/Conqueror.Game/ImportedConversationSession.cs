@@ -32,6 +32,8 @@ public sealed class ImportedConversationSession(
         return MoveTo(node.ContinuationNodeId ?? 0, choosePrompt);
     }
 
+    // PLACEHOLDER: RULE-TALK-001. The original runs a node's actions after the player answers it, then
+    // the response actions, and only then follows a redirect; running them on arrival is a guess.
     private bool MoveTo(int nodeId, Func<int, int> choosePrompt)
     {
         ArgumentNullException.ThrowIfNull(choosePrompt);

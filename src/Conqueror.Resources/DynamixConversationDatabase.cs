@@ -24,6 +24,7 @@ public sealed class DynamixConversationDatabase(IReadOnlyDictionary<int, Dynamix
     public DynamixConversationNode? Find(int id) => Nodes.GetValueOrDefault(id);
 }
 
+// FMT-TALK-001, FMT-TALK-002. The strings are split at NULs; the original reads them by the header lengths.
 /// <summary>Bounded decoder for the original ALL.CBF conversation records and ALL.CIF node index.</summary>
 public static class DynamixConversationDecoder
 {

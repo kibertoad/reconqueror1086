@@ -4,10 +4,10 @@ title: The game's random number generator
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-RNG-001, FND-RNG-002, FND-ASSAULT-031]
+evidence: [FND-RNG-002, FND-RNG-003, FND-ASSAULT-031]
 conflicting: []
 split_with: []
-related: []
+related: [RULE-TALK-001]
 ---
 
 ## Summary
@@ -20,8 +20,8 @@ to `n`, and `dice(count, sides)` adds `count` rolls of 1 to `sides`.
 ## When it runs
 
 `draw()` runs wherever a rule draws. The routine at `0x00029FF4` calls `seed_random` once, at the
-start of a session; the routine at `0x0001A173` calls it again with a value of its own (see Open
-questions).
+start of a session, and `show_prompt` of RULE-TALK-001 calls it with `fn_0006B3B4(0)` before drawing
+a prompt variant.
 
 ## Parameters
 
@@ -78,4 +78,3 @@ None known.
 ## Open questions
 
 - What `fn_0006B3B4` returns; it is likely the C library's `time`.
-- What the routine that reseeds at `0x0001A173` is for, and which seed it uses.

@@ -259,6 +259,8 @@ public sealed partial class ConquerorGame
 
     private bool StartConversation(InnPatronHotspot speaker, Screen returnScreen)
     {
+        // PLACEHOLDER: RULE-TALK-001. The original reseeds the game generator from the clock and
+        // draws the prompt variant from it; Random.Shared stands in for that.
         if (_conversationSession?.Start(speaker.ConversationRootNodeId, Random.Shared.Next) != true) return false;
         _innPatron = speaker;
         _conversationReturnScreen = returnScreen;

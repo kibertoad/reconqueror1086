@@ -55,6 +55,7 @@ public sealed class DynamixActionTreeDatabase(
     public DynamixActionGroup? Find(int id) => Groups.GetValueOrDefault(id);
 }
 
+// FMT-TALK-003 to FMT-TALK-007.
 /// <summary>Bounded structural decoder for the original ALL.TMI/ALL.TMB recursive action trees.</summary>
 public static class DynamixActionTreeDecoder
 {

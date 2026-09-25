@@ -7,6 +7,8 @@ public static class OriginalConversationBindings
 {
     public const int DragonLairDiscoveryVariable = OriginalCampaignVariables.DragonLairDiscovery;
     public const int JoustOutcomeVariable = OriginalCampaignVariables.JoustOutcome;
+    // PLACEHOLDER: RULE-TALK-005. Only the scripts use variable 42; reading it as the lady whose
+    // colours the player wears, with these codes, is a guess.
     public const int LadyColorsVariable = OriginalCampaignVariables.LadyColors;
 
     public static readonly IReadOnlyDictionary<int, string> LadyColors = new Dictionary<int, string>
@@ -18,6 +20,7 @@ public static class OriginalConversationBindings
         [5] = "Jane"
     };
 
+    // RULE-TALK-003: scope-1 selectors and the attribute each reaches.
     public static readonly IReadOnlyDictionary<int, CharacterAttribute> Attributes =
         new Dictionary<int, CharacterAttribute>
         {
@@ -26,8 +29,8 @@ public static class OriginalConversationBindings
             [3] = CharacterAttribute.Fame,
             [5] = CharacterAttribute.Piety,
             [6] = CharacterAttribute.Strength,
-            [7] = CharacterAttribute.Stamina,
-            [8] = CharacterAttribute.Intelligence
+            [7] = CharacterAttribute.Intelligence,
+            [8] = CharacterAttribute.Stamina
         };
 
     public static readonly IReadOnlyDictionary<int, string> Items = new Dictionary<int, string>
@@ -65,6 +68,8 @@ public static class OriginalConversationBindings
             campaign.ConversationVariables[LadyColorsVariable]);
     }
 
+    // PLACEHOLDER: RULE-TALK-005. The original writes variable 3 after every joust won or lost,
+    // whether or not the player wears a lady's colours.
     public static void RecordJoustResult(CampaignState campaign, string? lady, bool won)
     {
         if (!RecordLadyColors(campaign, lady)) return;
@@ -108,6 +113,7 @@ public sealed class ImportedConversationActionState(CampaignState campaign) : ID
             value = CharacterAttributes.Read(campaign.Player, attribute);
             return true;
         }
+        // PLACEHOLDER: RULE-TALK-003. The original reads 0 for selectors 1 and 4 and anything above 8.
         value = campaign.ConversationAttributes.GetValueOrDefault(index);
         return true;
     }
@@ -127,6 +133,7 @@ public sealed class ImportedConversationActionState(CampaignState campaign) : ID
             SetAttribute(attribute, value);
             return true;
         }
+        // PLACEHOLDER: RULE-TALK-003. The original writes nothing for an unmapped selector.
         campaign.ConversationAttributes[index] = value;
         return true;
     }

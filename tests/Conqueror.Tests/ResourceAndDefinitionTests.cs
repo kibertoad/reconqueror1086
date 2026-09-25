@@ -418,7 +418,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.True(siege.Won);
     }
 
-    [Fact]
+    [Fact] // Covers FMT-TALK-001, FMT-TALK-002.
     public void ConversationDatabaseDecodesIndexedPromptsResponsesAndLinks()
     {
         var first = ConversationNode(["GERARD.PCC", "Earl Gerard", "Greetings.", "Ask about the dragon.", "Farewell."],
@@ -445,7 +445,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Null(gerard.ContinuationNodeId);
     }
 
-    [Fact]
+    [Fact] // Covers FMT-TALK-001, FMT-TALK-002.
     public void ConversationDatabaseRejectsMalformedIndicesMarkersTextAndLinks()
     {
         var valid = ConversationNode(["GERARD.PCC", "Earl Gerard", "Greetings.", "Continue."], [0]);
@@ -472,7 +472,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Throws<InvalidDataException>(() => DynamixConversationDecoder.Decode(badAction, oneIndex));
     }
 
-    [Fact]
+    [Fact] // Covers RULE-TALK-001.
     public void ImportedConversationSessionTraversesSelectorsResponsesAndTimedContinuations()
     {
         var nodes = new Dictionary<int, DynamixConversationNode>
@@ -496,7 +496,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Throws<InvalidDataException>(() => cycle.Start(1, _ => 0));
     }
 
-    [Fact]
+    [Fact] // Covers FMT-TALK-003, FMT-TALK-004, FMT-TALK-005, FMT-TALK-006, FMT-TALK-007.
     public void ActionTreeDatabaseDecodesIndexedRecursiveExpressionsWithinBounds()
     {
         var body = new byte[104];
@@ -540,7 +540,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Throws<ArgumentOutOfRangeException>(() => PixelTextLayout.Wrap("ONE", 0));
     }
 
-    [Fact]
+    [Fact] // Covers FMT-TALK-008, RULE-TALK-002, RULE-TALK-003.
     public void VariableTableAndActionInterpreterApplyPersistentMutationAndRedirect()
     {
         var variableBytes = new byte[20];
@@ -595,7 +595,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal([3, 0], campaign.ConversationVariables);
     }
 
-    [Fact]
+    [Fact] // Covers RULE-TALK-003.
     public void OriginalConversationSelectorsAndItemsUseTypedCampaignState()
     {
         var campaign = new CampaignState
@@ -619,8 +619,8 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.True(state.TryGetVariable(1, 3, out var fame));
         Assert.True(state.TryGetVariable(1, 5, out var piety));
         Assert.True(state.TryGetVariable(1, 6, out var strength));
-        Assert.True(state.TryGetVariable(1, 7, out var stamina));
-        Assert.True(state.TryGetVariable(1, 8, out var intelligence));
+        Assert.True(state.TryGetVariable(1, 7, out var intelligence));
+        Assert.True(state.TryGetVariable(1, 8, out var stamina));
         Assert.Equal((15, 4, 13, 11, 14, 16), (honor, fame, piety, strength, stamina, intelligence));
 
         Assert.True(state.TrySetVariable(1, 2, 30));

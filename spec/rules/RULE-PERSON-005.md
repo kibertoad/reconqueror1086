@@ -4,10 +4,10 @@ title: Courtship and marriage
 status: sourced
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [SRC-MANUAL, SRC-GAMEFAQS-66730]
+evidence: [SRC-MANUAL, SRC-GAMEFAQS-66730, FND-TALK-008]
 conflicting: []
 split_with: []
-related: []
+related: [RULE-TALK-004]
 ---
 
 ## Summary
@@ -57,7 +57,7 @@ None known.
 
 ## Open questions
 
-- How the executable runs courtship; its lady conversations and their actions are the likely
-  place, and the TALK area holds them.
-- What field 28 (MARRIED) of row 0 holds, and what writes it.
+- How the lady conversations decide on colours, prizes and marriage; that is script content run
+  by RULE-TALK-002 and RULE-TALK-003. The executable's own part is RULE-TALK-004, which sets
+  field 28 (MARRIED) of row 0 to the code of the lady whose marriage variable a conversation set.
 - The conditions and rewards for each lady, which are content.

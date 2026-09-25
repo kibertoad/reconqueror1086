@@ -4,7 +4,7 @@ title: Tournament joust wager and rewards
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-TOURNEY-001, FND-TOURNEY-003, FND-TOURNEY-004, FND-RNG-002, FND-PERSON-002, SRC-GAMEFAQS-66730]
+evidence: [FND-TOURNEY-001, FND-TOURNEY-003, FND-TOURNEY-004, FND-RNG-002, FND-PERSON-002, SRC-GAMEFAQS-66730, FND-TALK-006]
 conflicting: []
 split_with: []
 related: [RULE-RNG-001, RULE-PERSON-001]

@@ -4,10 +4,10 @@ title: Map events from conversation variables
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-STRATEGY-001, FND-STRATEGY-019, FND-STRATEGY-036, FND-STRATEGY-037, FND-TOURNEY-001, FND-TOURNEY-004, FND-TOURNEY-005]
+evidence: [FND-STRATEGY-001, FND-STRATEGY-019, FND-STRATEGY-036, FND-STRATEGY-037, FND-TOURNEY-001, FND-TOURNEY-004, FND-TOURNEY-005, FND-TALK-006]
 conflicting: []
 split_with: []
-related: []
+related: [RULE-TALK-004]
 ---
 
 ## Summary
@@ -18,7 +18,7 @@ a melee in `MELEE0.RES`, and the Scottish and Welsh raids. Accepting the tasks o
 
 ## When it runs
 
-From the engine callback the strategic screen registers, near the end of the hook.
+From the hook of the dialogue screen, after the part RULE-TALK-004 gives.
 
 ## Parameters
 
@@ -83,7 +83,6 @@ None known.
 
 ## Open questions
 
-- What the hook does before these tests.
 - What `fn_00021E28`, `fn_0005B0D4`, `fn_00049478`, `fn_00049200`, `fn_00059760` and `fn_00062828`
   do.
 - What makes conversation nodes 2439 and 2593 reachable.

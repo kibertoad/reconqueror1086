@@ -4,7 +4,7 @@ title: Character generation, the pre-generated knights and dubbing
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-PERSON-001, FND-PERSON-003, FND-PERSON-004, FND-PERSON-006, FND-PERSON-007, FND-RNG-002, FND-STRATEGY-019, SRC-MANUAL, FND-STRATEGY-036]
+evidence: [FND-PERSON-001, FND-PERSON-003, FND-PERSON-004, FND-PERSON-006, FND-PERSON-007, FND-RNG-002, FND-STRATEGY-019, SRC-MANUAL, FND-STRATEGY-036, FND-TALK-007]
 conflicting: []
 split_with: []
 related: [RULE-PERSON-001, RULE-PERSON-002, RULE-PERSON-004, RULE-RNG-001]

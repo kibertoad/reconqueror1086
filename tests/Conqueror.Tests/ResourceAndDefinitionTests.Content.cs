@@ -494,7 +494,7 @@ public sealed partial class ResourceAndDefinitionTests
             ImportedMovies.Definitions.Select(movie => movie.Role).Distinct(StringComparer.Ordinal).Count());
     }
 
-    [Fact]
+    [Fact] // Covers RULE-TALK-005.
     public void TournamentConversationRootsAndOriginalStateBridgesAreDefinitionDriven()
     {
         Assert.Equal(Balance.Courtships.Select(lady => lady.Name),

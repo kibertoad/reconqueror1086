@@ -23,7 +23,7 @@ Entries by kind.
 
 ## formats
 
-23 entries.
+31 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -41,6 +41,14 @@ Entries by kind.
 | [FMT-STRATEGY-004](../formats/FMT-STRATEGY-004.md) | Route file, a list of route points | supported |
 | [FMT-STRATEGY-005](../formats/FMT-STRATEGY-005.md) | Strategic terrain grid, icon.jp | supported |
 | [FMT-STRATEGY-006](../formats/FMT-STRATEGY-006.md) | Brigand order, the descriptor of one brigand force | supported |
+| [FMT-TALK-001](../formats/FMT-TALK-001.md) | Conversation index record, ALL.CIF | supported |
+| [FMT-TALK-002](../formats/FMT-TALK-002.md) | Conversation node, one record of ALL.CBF | supported |
+| [FMT-TALK-003](../formats/FMT-TALK-003.md) | Action index, ALL.TMI | supported |
+| [FMT-TALK-004](../formats/FMT-TALK-004.md) | Action group, a record of ALL.TMB | supported |
+| [FMT-TALK-005](../formats/FMT-TALK-005.md) | Action, a record of ALL.TMB | supported |
+| [FMT-TALK-006](../formats/FMT-TALK-006.md) | Expression, a record of ALL.TMB | supported |
+| [FMT-TALK-007](../formats/FMT-TALK-007.md) | Value, a record of ALL.TMB | supported |
+| [FMT-TALK-008](../formats/FMT-TALK-008.md) | Conversation variables, ALL.VTB | supported |
 | [FMT-VIEW-001](../formats/FMT-VIEW-001.md) | Scene block definition, one record of the Blocks resource | supported |
 | [FMT-VIEW-002](../formats/FMT-VIEW-002.md) | Scene map, the Map resource | supported |
 | [FMT-VIEW-003](../formats/FMT-VIEW-003.md) | Scene start position, the Viewer resource | supported |
@@ -53,7 +61,7 @@ Entries by kind.
 
 ## rules
 
-90 entries.
+95 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -135,6 +143,11 @@ Entries by kind.
 | [RULE-STRATEGY-017](../rules/RULE-STRATEGY-017.md) | Brigand pass and brigand movement | supported |
 | [RULE-STRATEGY-018](../rules/RULE-STRATEGY-018.md) | Spies | supported |
 | [RULE-STRATEGY-019](../rules/RULE-STRATEGY-019.md) | Map events from conversation variables | supported |
+| [RULE-TALK-001](../rules/RULE-TALK-001.md) | Conversation walk | supported |
+| [RULE-TALK-002](../rules/RULE-TALK-002.md) | Action-tree interpreter | supported |
+| [RULE-TALK-003](../rules/RULE-TALK-003.md) | Script functions and conversation variables | supported |
+| [RULE-TALK-004](../rules/RULE-TALK-004.md) | Conversation entry and its aftermath | supported |
+| [RULE-TALK-005](../rules/RULE-TALK-005.md) | Joust result for the conversations | supported |
 | [RULE-TOURNEY-001](../rules/RULE-TOURNEY-001.md) | Monthly tournament site | supported |
 | [RULE-TOURNEY-002](../rules/RULE-TOURNEY-002.md) | Tournament tent opponents and actions | supported |
 | [RULE-TOURNEY-003](../rules/RULE-TOURNEY-003.md) | Tournament joust wager and rewards | supported |
@@ -150,7 +163,7 @@ Entries by kind.
 
 ## findings
 
-159 entries.
+169 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -244,8 +257,9 @@ Entries by kind.
 | [FND-PERSON-008](../findings/FND-PERSON-008.md) | The game ends the campaign when row 0 AGE is 30 | recorded |
 | [FND-PERSON-009](../findings/FND-PERSON-009.md) | The tournament melee turns COLOR 3, 0 and 5 into colour index 0, 1 and 2 at 0x0009D498 | recorded |
 | [FND-PERSON-010](../findings/FND-PERSON-010.md) | DILEM0.DAT to DILEM29.DAT are marker-line text files with three choices of three outcomes | recorded |
-| [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |
+| [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
+| [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |
 | [FND-STRATEGY-001](../findings/FND-STRATEGY-001.md) | The strategic pass at 0x0003C290 runs brigands, the spy, the player forces and then the hostile pass | recorded |
 | [FND-STRATEGY-002](../findings/FND-STRATEGY-002.md) | Routine 0x0003B9F4 issues a brigand order or an order from the king | recorded |
 | [FND-STRATEGY-003](../findings/FND-STRATEGY-003.md) | The hostile pass at 0x0003C088 generates first, then moves slots 0 to 4 and resolves each arrival | recorded |
@@ -284,6 +298,15 @@ Entries by kind.
 | [FND-STRATEGY-036](../findings/FND-STRATEGY-036.md) | The strategic action hook 0x00021EEC turns conversation variables into map events | recorded |
 | [FND-STRATEGY-037](../findings/FND-STRATEGY-037.md) | Two conversation groups set variables 43 and 93 when the player accepts a raid | recorded |
 | [FND-STRATEGY-038](../findings/FND-STRATEGY-038.md) | The spy report names +0x1C the halberdiers and shows one converted number three times | recorded |
+| [FND-TALK-001](../findings/FND-TALK-001.md) | Conversation nodes are read by length from the .CBF file through a sorted .CIF index | recorded |
+| [FND-TALK-002](../findings/FND-TALK-002.md) | The conversation loop runs node actions, then the chosen response actions, then follows a redirect | recorded |
+| [FND-TALK-003](../findings/FND-TALK-003.md) | The prompt variant is drawn after reseeding the generator from the clock | recorded |
+| [FND-TALK-004](../findings/FND-TALK-004.md) | The action-tree interpreter runs groups, actions, expressions and values from .TMI and .TMB | recorded |
+| [FND-TALK-005](../findings/FND-TALK-005.md) | Script functions 3 to 9 redirect, assign, add, read and handle items | recorded |
+| [FND-TALK-006](../findings/FND-TALK-006.md) | Conversation variables come from ALL.VTB and are read and written by index | recorded |
+| [FND-TALK-007](../findings/FND-TALK-007.md) | The conversation partner picks the root node, set from the stands, the inn and the blacksmith | recorded |
+| [FND-TALK-008](../findings/FND-TALK-008.md) | After a conversation variable 6 becomes the debt and five variables set the marriage | recorded |
+| [FND-TALK-009](../findings/FND-TALK-009.md) | The joust settlement writes variable 3 with 2 for a win and 1 for a loss | recorded |
 | [FND-TOURNEY-001](../findings/FND-TOURNEY-001.md) | Each month the game picks a tournament site different from the last one | recorded |
 | [FND-TOURNEY-002](../findings/FND-TOURNEY-002.md) | The tournament tent picks five distinct opponents from rows 1 to 14, never row 8 | recorded |
 | [FND-TOURNEY-003](../findings/FND-TOURNEY-003.md) | The tent allows three jousts and one melee between clears of its counts, and rewards wins through 0x0009DC40 | recorded |
@@ -320,7 +343,7 @@ Entries by kind.
 
 ## bugs
 
-12 entries.
+13 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -335,6 +358,7 @@ Entries by kind.
 | [BUG-STRATEGY-003](../bugs/BUG-STRATEGY-003.md) | A battle against a hostile force counts its result twice | supported |
 | [BUG-STRATEGY-004](../bugs/BUG-STRATEGY-004.md) | Hostile forces lost to water or a dropped route are never uncounted | supported |
 | [BUG-STRATEGY-005](../bugs/BUG-STRATEGY-005.md) | The spy report shows the swordsmen count in place of all three troop counts | supported |
+| [BUG-TALK-001](../bugs/BUG-TALK-001.md) | The conversation variable bound check lets a script reach one variable past the table | supported |
 | [BUG-TOURNEY-001](../bugs/BUG-TOURNEY-001.md) | The tournament melee always loads a scene whose two digits repeat the site digit | supported |
 
 ## screens

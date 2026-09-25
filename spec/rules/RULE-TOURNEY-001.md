@@ -4,7 +4,7 @@ title: Monthly tournament site
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-TOURNEY-001, FND-TOURNEY-002, FND-TOURNEY-003, FND-TOURNEY-004, FND-RNG-002]
+evidence: [FND-TOURNEY-001, FND-TOURNEY-002, FND-TOURNEY-003, FND-TOURNEY-004, FND-RNG-002, FND-TALK-006, FND-TALK-007]
 conflicting: []
 split_with: []
 related: [RULE-RNG-001]

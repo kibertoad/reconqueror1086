@@ -4,6 +4,7 @@ namespace Conqueror.Resources;
 
 public sealed record DynamixVariableTable(int ElementSize, int ElementKind, IReadOnlyList<int> InitialValues);
 
+// FMT-TALK-008. Only the 4-byte kind 5 table the GOG archive ships is accepted.
 public static class DynamixVariableTableDecoder
 {
     private const int HeaderSize = 12;

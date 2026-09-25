@@ -327,7 +327,31 @@ Entries by area.
 
 ## TALK
 
-None.
+| ID | Title | Status |
+|---|---|---|
+| [BUG-TALK-001](../bugs/BUG-TALK-001.md) | The conversation variable bound check lets a script reach one variable past the table | supported |
+| [FMT-TALK-001](../formats/FMT-TALK-001.md) | Conversation index record, ALL.CIF | supported |
+| [FMT-TALK-002](../formats/FMT-TALK-002.md) | Conversation node, one record of ALL.CBF | supported |
+| [FMT-TALK-003](../formats/FMT-TALK-003.md) | Action index, ALL.TMI | supported |
+| [FMT-TALK-004](../formats/FMT-TALK-004.md) | Action group, a record of ALL.TMB | supported |
+| [FMT-TALK-005](../formats/FMT-TALK-005.md) | Action, a record of ALL.TMB | supported |
+| [FMT-TALK-006](../formats/FMT-TALK-006.md) | Expression, a record of ALL.TMB | supported |
+| [FMT-TALK-007](../formats/FMT-TALK-007.md) | Value, a record of ALL.TMB | supported |
+| [FMT-TALK-008](../formats/FMT-TALK-008.md) | Conversation variables, ALL.VTB | supported |
+| [FND-TALK-001](../findings/FND-TALK-001.md) | Conversation nodes are read by length from the .CBF file through a sorted .CIF index | recorded |
+| [FND-TALK-002](../findings/FND-TALK-002.md) | The conversation loop runs node actions, then the chosen response actions, then follows a redirect | recorded |
+| [FND-TALK-003](../findings/FND-TALK-003.md) | The prompt variant is drawn after reseeding the generator from the clock | recorded |
+| [FND-TALK-004](../findings/FND-TALK-004.md) | The action-tree interpreter runs groups, actions, expressions and values from .TMI and .TMB | recorded |
+| [FND-TALK-005](../findings/FND-TALK-005.md) | Script functions 3 to 9 redirect, assign, add, read and handle items | recorded |
+| [FND-TALK-006](../findings/FND-TALK-006.md) | Conversation variables come from ALL.VTB and are read and written by index | recorded |
+| [FND-TALK-007](../findings/FND-TALK-007.md) | The conversation partner picks the root node, set from the stands, the inn and the blacksmith | recorded |
+| [FND-TALK-008](../findings/FND-TALK-008.md) | After a conversation variable 6 becomes the debt and five variables set the marriage | recorded |
+| [FND-TALK-009](../findings/FND-TALK-009.md) | The joust settlement writes variable 3 with 2 for a win and 1 for a loss | recorded |
+| [RULE-TALK-001](../rules/RULE-TALK-001.md) | Conversation walk | supported |
+| [RULE-TALK-002](../rules/RULE-TALK-002.md) | Action-tree interpreter | supported |
+| [RULE-TALK-003](../rules/RULE-TALK-003.md) | Script functions and conversation variables | supported |
+| [RULE-TALK-004](../rules/RULE-TALK-004.md) | Conversation entry and its aftermath | supported |
+| [RULE-TALK-005](../rules/RULE-TALK-005.md) | Joust result for the conversations | supported |
 
 ## DRAGON
 
@@ -361,6 +385,7 @@ None.
 
 | ID | Title | Status |
 |---|---|---|
-| [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |
+| [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
+| [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |
 | [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number generator | supported |
