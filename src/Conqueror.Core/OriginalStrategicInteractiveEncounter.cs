@@ -1,7 +1,7 @@
 namespace Conqueror.Core;
 
 /// <summary>
-/// The two immutable side lanes used by resolver <c>0x28C38</c>'s interactive
+/// The two immutable side lanes used by resolver RULE-BATTLE-002's interactive
 /// unit records. Their values are the original record field values, rather
 /// than screen positions.
 /// </summary>
@@ -12,8 +12,8 @@ public enum OriginalStrategicInteractiveEncounterSide
 }
 
 /// <summary>
-/// The immutable category column used to classify a live interactive unit at
-/// resolver completion.
+/// PLACEHOLDER: FMT-BATTLE-001. The spec names category 0 halberdiers and 0x78
+/// swordsmen (FND-BATTLE-007); these names keep the older reading.
 /// </summary>
 public enum OriginalStrategicInteractiveEncounterCategory
 {
@@ -24,7 +24,7 @@ public enum OriginalStrategicInteractiveEncounterCategory
 
 /// <summary>
 /// The observable input-code branches in interactive dispatcher
-/// <c>0x264F8</c>. The original event producer has not yet been recovered, so
+/// RULE-BATTLE-008. The original event producer has not yet been recovered, so
 /// these describe dispatch destinations rather than semantic user actions.
 /// </summary>
 public enum OriginalStrategicInteractiveEncounterInputRoute
@@ -36,7 +36,7 @@ public enum OriginalStrategicInteractiveEncounterInputRoute
 }
 
 /// <summary>
-/// The outcome of the control-strip selector that dispatcher <c>0x264F8</c>
+/// The outcome of the control-strip selector that dispatcher RULE-BATTLE-008
 /// runs only for input code three. Its first control arms the mapped retreat
 /// confirmation; the other controls retain their literal record mutations.
 /// </summary>
@@ -49,7 +49,7 @@ public enum OriginalStrategicInteractiveEncounterControlStripRoute
 }
 
 /// <summary>
-/// The terminal result returned by interactive resolver <c>0x26B88</c> to
+/// The terminal result returned by interactive resolver RULE-BATTLE-003 to
 /// its caller. The original returns one for either a dispatcher exit or an
 /// exhausted player lane and two for an exhausted enemy lane; its caller
 /// separates the two return-one cases by inspecting the player count.
@@ -64,7 +64,7 @@ public enum OriginalStrategicInteractiveEncounterOutcome
 
 /// <summary>
 /// The short source-owned status line chosen before the resolver dispatches
-/// input at <c>0x264F8-0x26787</c>. A blank point shows the aggregate result
+/// input at RULE-BATTLE-008. A blank point shows the aggregate result
 /// only for the one pass immediately following a unit hover.
 /// </summary>
 public enum OriginalStrategicInteractiveEncounterHoverKind
@@ -110,7 +110,7 @@ public readonly record struct OriginalStrategicInteractiveEncounterFrameResult(
 }
 
 /// <summary>
-/// One live unit materialized by resolver <c>0x28C38</c>. The original
+/// One live unit materialized by resolver RULE-BATTLE-002. The original
 /// terminal write-back reads only <see cref="RemainingStrength"/> and the
 /// category/side fields while strength is positive. The mapped knight-death
 /// completion mutates its category column only after zeroing strength.
@@ -135,7 +135,7 @@ public sealed class OriginalStrategicInteractiveEncounterUnit
     /// <summary>
     /// Original record <c>+0x14</c>: an eight-way heading, initialized to
     /// three for player entries and seven for enemy entries. Helper
-    /// <c>0x296B4</c> turns this field one octant at a time toward a stored
+    /// RULE-BATTLE-006 turns this field one octant at a time toward a stored
     /// target and enters contact state when it already faces that target.
     /// </summary>
     public int HeadingOctant { get; internal set; }
@@ -160,7 +160,7 @@ public sealed class OriginalStrategicInteractiveEncounterUnit
     public int PositionY { get; set; }
 
     /// <summary>
-    /// Original record <c>+0x0C/+0x10</c>. Constructor <c>0x28C38</c>
+    /// Original record <c>+0x0C/+0x10</c>. Constructor RULE-BATTLE-002
     /// initializes both fields to -1; the interactive input path later writes
     /// them as a paired transient destination. Their presentation name is not
     /// yet established.
@@ -213,8 +213,8 @@ public static class OriginalStrategicInteractiveEncounter
     public const int FormationGridInset = 30;
 
     /// <summary>
-    /// Mirrors the input-code comparisons at <c>0x267A4-0x267D8</c> and
-    /// <c>0x26A7F</c>. Code two reaches player selection, code three reaches
+    /// Mirrors the input-code comparisons at RULE-BATTLE-008 and
+    /// RULE-BATTLE-008. Code two reaches player selection, code three reaches
     /// the control strip, and codes six and seven share destination ordering;
     /// every other code returns to the loop without a mapped record mutation.
     /// </summary>
@@ -227,7 +227,7 @@ public static class OriginalStrategicInteractiveEncounter
             _ => OriginalStrategicInteractiveEncounterInputRoute.Ignored,
         };
 
-    /// <summary>Maps <c>0x27ED2</c>'s raw category routes, independently of the small pointer/control dispatcher codes.</summary>
+    /// <summary>Maps RULE-BATTLE-009's raw category routes, independently of the small pointer/control dispatcher codes.</summary>
     public static OriginalStrategicInteractiveEncounterCategory? RouteMappedCategorySelectionInputCode(
         int rawInputCode) =>
         rawInputCode switch
@@ -240,7 +240,7 @@ public static class OriginalStrategicInteractiveEncounter
 
     /// <summary>
     /// Mirrors the zero-based branch after the three-rectangle selector at
-    /// <c>0x267D8-0x26999</c>. A selector miss falls through to player-unit
+    /// RULE-BATTLE-008. A selector miss falls through to player-unit
     /// selection; the first hit takes a separately unresolved path; hits two
     /// and three perform the literal control-code mutations represented by
     /// the final two route values.
@@ -271,7 +271,7 @@ public static class OriginalStrategicInteractiveEncounter
     }
 
     /// <summary>
-    /// Mirrors the record mutations at <c>0x26D29-0x26D46</c> after a unit's
+    /// Mirrors the record mutations at RULE-BATTLE-003 after a unit's
     /// death animation has completed. Timing and target selection remain in
     /// the not-yet-modeled tactical loop; this method deliberately represents
     /// only the completed-record effect.
@@ -283,7 +283,7 @@ public static class OriginalStrategicInteractiveEncounter
     }
 
     /// <summary>
-    /// Mirrors the selected-record destination write at <c>0x26A7F-0x26B64</c>.
+    /// Mirrors the selected-record destination write at RULE-BATTLE-008.
     /// The source clamps only the local y input to <c>[45, verticalSpan - 85]</c>,
     /// adds the live viewport offsets, clears record <c>+0x28</c>, and writes
     /// the paired <c>+0x0C/+0x10</c> fields in selected-list order.
@@ -321,7 +321,7 @@ public static class OriginalStrategicInteractiveEncounter
     }
 
     /// <summary>
-    /// Mirrors the player-hit selection append at <c>0x26999-0x26A77</c>.
+    /// Mirrors the player-hit selection append at RULE-BATTLE-008.
     /// The original accepts only a living player-lane unit, searches the
     /// existing byte-indexed list, and appends the unit only when absent; it
     /// does not toggle an existing entry.
@@ -348,7 +348,7 @@ public static class OriginalStrategicInteractiveEncounter
 
     /// <summary>
     /// Mirrors the three player-category selection loops at
-    /// <c>0x2814F-0x283CC</c>. Each loop scans the whole table in authored
+    /// RULE-BATTLE-009. Each loop scans the whole table in authored
     /// order, accepts only living player-lane entries with its immutable
     /// category value, and appends entries absent from the current selection
     /// without clearing the entries already there.
@@ -377,7 +377,7 @@ public static class OriginalStrategicInteractiveEncounter
 
     /// <summary>
     /// Writes control code one to every record named by the current selected
-    /// list, matching <c>0x26918-0x26966</c>. The source does not recheck
+    /// list, matching RULE-BATTLE-008. The source does not recheck
     /// strength or side while processing the already-populated list.
     /// </summary>
     public static void SetMappedControlCodeOneForSelectedRecords(
@@ -398,7 +398,7 @@ public static class OriginalStrategicInteractiveEncounter
 
     /// <summary>
     /// Writes control code one to every positive-strength record, matching
-    /// <c>0x26968-0x26999</c>. This source path does not filter by side.
+    /// RULE-BATTLE-008. This source path does not filter by side.
     /// </summary>
     public static void SetMappedControlCodeOneForLivingRecords(
         IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units)
@@ -413,7 +413,7 @@ public static class OriginalStrategicInteractiveEncounter
     }
 
     /// <summary>
-    /// Returns the source-compatible octant chosen by <c>0x2964C</c> for a
+    /// Returns the source-compatible octant chosen by RULE-BATTLE-006 for a
     /// unit at <paramref name="sourceX"/>, <paramref name="sourceY"/> toward
     /// a target coordinate. A target coordinate of minus one follows the
     /// helper's axis fallback rather than being treated as an absent order.
@@ -434,7 +434,7 @@ public static class OriginalStrategicInteractiveEncounter
     }
 
     /// <summary>
-    /// Mirrors target-turn helper <c>0x296B4</c>. It reads the indexed
+    /// Mirrors target-turn helper RULE-BATTLE-006. It reads the indexed
     /// target's live coordinates from record <c>+0x30</c>, rotates record
     /// <c>+0x14</c> through the shorter cyclic route (ties decrement), and
     /// enters state <c>0x28</c> with phase zero only when it already faces the
@@ -472,12 +472,12 @@ public static class OriginalStrategicInteractiveEncounter
     }
 
     /// <summary>
-    /// Mirrors the no-target destination path at <c>0x27479-0x27C59</c>.
+    /// Mirrors the no-target destination path at RULE-BATTLE-007.
     /// A state-zero unit without a table target first turns toward its paired
     /// <c>+0x0C/+0x10</c> destination. Once aligned, it processes vertical
     /// movement before horizontal movement in that same tactical pass. Knights
     /// probe and move ten units per axis; the other categories use five. Each
-    /// step retains <c>0x28408</c>'s ordered contact semantics through the
+    /// step retains RULE-BATTLE-004's ordered contact semantics through the
     /// supplied pre-pass selector table: an opposing contact updates the live
     /// coordinate and turns toward its selected record, while a same-lane
     /// contact switches control code to one and reverses the stored axis
@@ -528,8 +528,8 @@ public static class OriginalStrategicInteractiveEncounter
     }
 
     /// <summary>
-    /// Mirrors state-zero's automatic no-target/no-destination branch at
-    /// <c>0x27CE7-0x27E16</c>. A living control-code-one source runs it only
+    /// PLACEHOLDER: RULE-BATTLE-007. The original copies the chosen unit's stored
+    /// x destination to the source here. A living control-code-one source runs it only
     /// while both original lane counters remain positive. It scans the record
     /// table in order, excludes itself and its own lane, and keeps a candidate
     /// only when its positive-strength truncated Euclidean distance is
@@ -604,11 +604,11 @@ public static class OriginalStrategicInteractiveEncounter
 
     /// <summary>
     /// Composes state-zero record handling in the exact order reached from
-    /// <c>0x270BB</c>: first run the distinct opposing-corner acquisition,
+    /// RULE-BATTLE-003: first run the distinct opposing-corner acquisition,
     /// turn immediately when a target field exists, otherwise process a
     /// paired destination, then finally attempt control-code-one automatic
     /// destination assignment. The caller supplies the rectangle table built
-    /// before the unit pass, just as <c>0x26B88</c> does; this method does not
+    /// before the unit pass, just as RULE-BATTLE-003 does; this method does not
     /// create an unverified outer scheduler or input loop.
     /// </summary>
     public static bool AdvanceMappedStateZero(
@@ -650,9 +650,9 @@ public static class OriginalStrategicInteractiveEncounter
     }
 
     /// <summary>
-    /// Applies the mapped player-prefix formation paths in <c>0x2904B</c>,
-    /// <c>0x290BA</c>, and <c>0x29132</c>. Menu code 3 has its own method
-    /// because its exact path also consumes a raw draw and the viewport width.
+    /// PLACEHOLDER: RULE-BATTLE-002. Formations 0 to 2 leave the foe unplaced and
+    /// make no draw, and the wedge uses the smallest row count; the original places
+    /// the foe after every formation and widens a wedge of a non-triangular count.
     /// </summary>
     public static void ApplyMappedMenuFormation(
         IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
@@ -700,7 +700,7 @@ public static class OriginalStrategicInteractiveEncounter
     }
 
     /// <summary>
-    /// Applies menu code 3's complete formation path at <c>0x29209-0x29643</c>.
+    /// Applies menu code 3's complete formation path at RULE-BATTLE-002.
     /// It divides the player swordsmen into two four-unit rows, then places
     /// the other player categories and one of two reachable hostile grids.
     /// The executable takes one signed remainder by two from its raw generator;
@@ -930,7 +930,7 @@ public static class OriginalStrategicInteractiveEncounter
     }
 
     /// <summary>
-    /// Mirrors <c>0x263C4-0x26477</c>: reset three category totals, then scan
+    /// Mirrors RULE-BATTLE-001: reset three category totals, then scan
     /// live units in table order and retain only a strictly positive strength.
     /// </summary>
     public static OriginalStrategicEncounterForces CountSurvivors(

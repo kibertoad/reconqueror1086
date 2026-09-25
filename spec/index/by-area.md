@@ -244,7 +244,44 @@ Entries by area.
 
 ## BATTLE
 
-None.
+| ID | Title | Status |
+|---|---|---|
+| [BUG-BATTLE-001](../bugs/BUG-BATTLE-001.md) | Morale adds the remainder by 3 instead of a third | supported |
+| [BUG-BATTLE-002](../bugs/BUG-BATTLE-002.md) | A unit still turning toward its target turns toward another unit | supported |
+| [FMT-BATTLE-001](../formats/FMT-BATTLE-001.md) | Field battle unit, one troop in an interactive field battle | supported |
+| [FMT-BATTLE-002](../formats/FMT-BATTLE-002.md) | Pointer event, one entry of the pointer queue | supported |
+| [FND-BATTLE-001](../findings/FND-BATTLE-001.md) | The field battle resolver takes the player's three counts, the foe's three, and two morale values | recorded |
+| [FND-BATTLE-002](../findings/FND-BATTLE-002.md) | The automatic battle compares totals plus the remainder of each morale value by 3 | recorded |
+| [FND-BATTLE-003](../findings/FND-BATTLE-003.md) | The battle choice gate offers five rectangles and maps the first four to formation codes 2, 3, 1 and 0 | recorded |
+| [FND-BATTLE-004](../findings/FND-BATTLE-004.md) | The unit constructor fills one 52-byte record per troop, player first | recorded |
+| [FND-BATTLE-005](../findings/FND-BATTLE-005.md) | Formation codes 0, 1 and 2 place the player's units in columns, reversed columns or a wedge | recorded |
+| [FND-BATTLE-006](../findings/FND-BATTLE-006.md) | Formation code 3 splits the player's first category, and the foe is placed on a coin toss | recorded |
+| [FND-BATTLE-007](../findings/FND-BATTLE-007.md) | Category 0 is the halberdiers, 0x78 the swordsmen and 0xF0 the knights | recorded |
+| [FND-BATTLE-008](../findings/FND-BATTLE-008.md) | Each loop pass draws rectangles, dispatches input, and runs the unit pass every 200 clock units | recorded |
+| [FND-BATTLE-009](../findings/FND-BATTLE-009.md) | The battle clock counts at 250 Hz and its reader returns four times the count | recorded |
+| [FND-BATTLE-010](../findings/FND-BATTLE-010.md) | The rectangle hit test returns the first containing rectangle, counted from 1 | recorded |
+| [FND-BATTLE-011](../findings/FND-BATTLE-011.md) | The neighbour probe tests four corners and stops early after a dead first hit | recorded |
+| [FND-BATTLE-012](../findings/FND-BATTLE-012.md) | The unit pass completes deaths, probes contacts and deals damage by category | recorded |
+| [FND-BATTLE-013](../findings/FND-BATTLE-013.md) | Units turn one octant at a time toward a target or destination | recorded |
+| [FND-BATTLE-014](../findings/FND-BATTLE-014.md) | State 0 acquires a target, walks to a destination, or picks the nearest foe | recorded |
+| [FND-BATTLE-015](../findings/FND-BATTLE-015.md) | The pointer dispatcher scrolls, shows hover status, and routes codes 2, 3, 6 and 7 | recorded |
+| [FND-BATTLE-016](../findings/FND-BATTLE-016.md) | The keyboard dispatcher selects by category, pauses, exits, and has two test switches | recorded |
+| [FND-BATTLE-017](../findings/FND-BATTLE-017.md) | The resolver counts survivors by category and returns 1 for a win | recorded |
+| [FND-BATTLE-018](../findings/FND-BATTLE-018.md) | The resolver reads WAR_MODE and loads BATTLE.PCX and MEN8.CSF | recorded |
+| [FND-BATTLE-019](../findings/FND-BATTLE-019.md) | The renderer sorts dead units first then by y and x, and picks frames by lane, category, heading and phase | recorded |
+| [FND-BATTLE-020](../findings/FND-BATTLE-020.md) | Pointer events are queued with a timer count and classified into eight codes | recorded |
+| [RULE-BATTLE-001](../rules/RULE-BATTLE-001.md) | Field battle resolution | supported |
+| [RULE-BATTLE-002](../rules/RULE-BATTLE-002.md) | Field battle units and formations | supported |
+| [RULE-BATTLE-003](../rules/RULE-BATTLE-003.md) | Field battle pass | supported |
+| [RULE-BATTLE-004](../rules/RULE-BATTLE-004.md) | Field battle rectangle tests | supported |
+| [RULE-BATTLE-005](../rules/RULE-BATTLE-005.md) | Field battle contact | supported |
+| [RULE-BATTLE-006](../rules/RULE-BATTLE-006.md) | Field battle turning | supported |
+| [RULE-BATTLE-007](../rules/RULE-BATTLE-007.md) | Field battle idle update | supported |
+| [RULE-BATTLE-008](../rules/RULE-BATTLE-008.md) | Field battle pointer handling | supported |
+| [RULE-BATTLE-009](../rules/RULE-BATTLE-009.md) | Field battle keys | supported |
+| [RULE-BATTLE-010](../rules/RULE-BATTLE-010.md) | Battle clock | supported |
+| [RULE-BATTLE-011](../rules/RULE-BATTLE-011.md) | Field battle drawing | supported |
+| [RULE-BATTLE-012](../rules/RULE-BATTLE-012.md) | Pointer events | supported |
 
 ## ESTATE
 

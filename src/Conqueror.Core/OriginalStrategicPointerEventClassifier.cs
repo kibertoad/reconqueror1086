@@ -9,9 +9,9 @@ public enum OriginalStrategicPointerTransition
 }
 
 /// <summary>
-/// Source 0x63114 classifies queued pointer transitions into codes 1-8.
-/// The caller supplies monotonic timer units; the original interrupt rate is
-/// not assumed here.
+/// Source RULE-BATTLE-012 classifies queued pointer transitions into codes 1-8.
+/// PLACEHOLDER: RULE-BATTLE-012. An unmatched release returns 0 and a missing
+/// time counts as absent; the original compares with stored times, 0 at start.
 /// </summary>
 public sealed class OriginalStrategicPointerEventClassifier
 {

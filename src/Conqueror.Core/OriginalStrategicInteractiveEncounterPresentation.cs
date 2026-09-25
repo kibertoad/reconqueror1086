@@ -23,7 +23,7 @@ public readonly record struct OriginalStrategicInteractiveEncounterUnitDraw(
 
 /// <summary>
 /// Frame selection owned by the interactive strategic resolver's
-/// <c>MEN8.CSF</c> presentation at <c>0x28AD8</c>.
+/// <c>MEN8.CSF</c> presentation at RULE-BATTLE-011.
 /// </summary>
 public static class OriginalStrategicInteractiveEncounterPresentation
 {
@@ -61,7 +61,7 @@ public static class OriginalStrategicInteractiveEncounterPresentation
     public const int ControlStripFrame = 722;
 
     /// <summary>
-    /// Mirrors <c>0x28AF9-0x28B20</c>: lane plus category, five times the
+    /// Mirrors RULE-BATTLE-011: lane plus category, five times the
     /// live heading octant, the signed divide-by-five remainder of the phase,
     /// and the live state code select one ordinary sprite frame.
     /// </summary>
@@ -81,10 +81,10 @@ public static class OriginalStrategicInteractiveEncounterPresentation
     }
 
     /// <summary>
-    /// Mirrors the draw coordinates at <c>0x28B20-0x28B3F</c>. The source
+    /// Mirrors the draw coordinates at RULE-BATTLE-011. The source
     /// centers the 90-by-90 frame on record <c>+0x04/+0x08</c> after applying
     /// its horizontal and vertical scroll globals. Painter ordering is owned
-    /// by the unresolved comparator passed through <c>0x28A48</c>.
+    /// by the unresolved comparator passed through RULE-BATTLE-011.
     /// </summary>
     public static (int X, int Y) DrawPositionFor(
         OriginalStrategicInteractiveEncounterUnit unit,
@@ -102,8 +102,8 @@ public static class OriginalStrategicInteractiveEncounterPresentation
     }
 
     /// <summary>
-    /// Mirrors pointer ordering at <c>0x28A48</c> and comparator
-    /// <c>0x289CC-0x28A47</c>: non-positive-strength records first, then
+    /// Mirrors pointer ordering at RULE-BATTLE-011 and comparator
+    /// RULE-BATTLE-011: non-positive-strength records first, then
     /// ascending live Y and X coordinates. The source comparator returns
     /// zero for exact ties; authored unit order is the deterministic
     /// compatibility tie-breaker rather than reproducing a library sort's
@@ -147,7 +147,7 @@ public static class OriginalStrategicInteractiveEncounterPresentation
     }
 
     /// <summary>
-    /// Mirrors <c>0x28B5C-0x28B9D</c>. Frame 720 is positioned relative to
+    /// Mirrors RULE-BATTLE-011. Frame 720 is positioned relative to
     /// the selected unit's live coordinate, not centered within its 90-pixel
     /// ordinary sprite. The source applies its horizontal and vertical scroll
     /// globals before the separate five- and seven-pixel offsets.
@@ -198,7 +198,7 @@ public static class OriginalStrategicInteractiveEncounterPresentation
     }
 
     /// <summary>
-    /// Mirrors the armed branch at <c>0x268C8-0x268E4</c>. It draws frame
+    /// Mirrors the armed branch at RULE-BATTLE-008. It draws frame
     /// 721 against the first mapped control-strip rectangle, with the source
     /// offsets rather than treating this 39-by-13 frame as a centered sprite.
     /// </summary>
@@ -213,7 +213,7 @@ public static class OriginalStrategicInteractiveEncounterPresentation
     }
 
     /// <summary>
-    /// Mirrors setup's frame-722 draw at <c>0x25FCD-0x26000</c>. Its 57-by-14
+    /// Mirrors setup's frame-722 draw at RULE-BATTLE-001. Its 57-by-14
     /// control-strip image is placed against the same first control rectangle
     /// but has a distinct horizontal source offset from the armed frame.
     /// </summary>
@@ -228,8 +228,8 @@ public static class OriginalStrategicInteractiveEncounterPresentation
     }
 
     /// <summary>
-    /// Mirrors the status-panel placement at <c>0x2665E-0x2667D</c> and
-    /// <c>0x2670E-0x2672D</c>. Hover labels use the same resolution margin as
+    /// Mirrors the status-panel placement at RULE-BATTLE-008 and
+    /// RULE-BATTLE-008. Hover labels use the same resolution margin as
     /// the control strip, but a separate fixed lower status-panel anchor.
     /// </summary>
     public static OriginalStrategicInteractiveEncounterRectangle HoverStatusPanelBoundsFor(

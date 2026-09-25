@@ -4,10 +4,10 @@ title: Brigand pass and brigand movement
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-STRATEGY-001, FND-STRATEGY-013, FND-STRATEGY-014, FND-STRATEGY-015, FND-STRATEGY-019, FND-STRATEGY-021, FND-STRATEGY-022, FND-STRATEGY-024, FND-STRATEGY-026, FND-STRATEGY-029, FND-STRATEGY-030, FND-STRATEGY-032, FND-STRATEGY-033, FND-STRATEGY-034, FND-TOURNEY-001, FND-TOURNEY-004]
+evidence: [FND-BATTLE-001, FND-STRATEGY-001, FND-STRATEGY-013, FND-STRATEGY-014, FND-STRATEGY-015, FND-STRATEGY-019, FND-STRATEGY-021, FND-STRATEGY-022, FND-STRATEGY-024, FND-STRATEGY-026, FND-STRATEGY-029, FND-STRATEGY-030, FND-STRATEGY-032, FND-STRATEGY-033, FND-STRATEGY-034, FND-TOURNEY-001, FND-TOURNEY-004]
 conflicting: []
 split_with: []
-related: [RULE-PERSON-001, RULE-RNG-001, RULE-STRATEGY-007, RULE-STRATEGY-009, RULE-STRATEGY-014, RULE-STRATEGY-015]
+related: [RULE-BATTLE-001, RULE-PERSON-001, RULE-RNG-001, RULE-STRATEGY-007, RULE-STRATEGY-009, RULE-STRATEGY-014, RULE-STRATEGY-015]
 ---
 
 ## Summary
@@ -28,8 +28,8 @@ From the strategic pass (RULE-STRATEGY-001).
 ## Inputs
 
 The attributes HONOR (5), WEALTH (17), BATTLE_WON (24) and BATTLE_LOST (25) of row 0, and the
-conversation state `g_0009A928`. `fn_000258FC` receives the three brigand counts then the player's
-three pools, with 0 and 0. The floating-point arithmetic runs on the x87 with the precision and
+conversation state `g_0009A928`. `resolve_encounter` receives the player's pools 1, 0 and 2 then the
+three brigand counts, with 0 and 0. The floating-point arithmetic runs on the x87 with the precision and
 rounding in effect at the time, which no finding records; the procedure assumes the processor's
 starting rounding to nearest even and a 64-bit significand, and `INT32` truncates toward zero.
 
@@ -75,9 +75,11 @@ define fight_brigand(i, d):
     set_attr(0, 5, attr(0, 5) + 1)
     # saves the screen and shows the message that the army meets brigands
     fn_0003CED8()
-    let counts = [b.swordsmen, b.halberdiers, b.knights, fn_00029E58(i, 0), fn_00029E58(i, 1), fn_00029E58(i, 2)]
+    let counts = [fn_00029E58(i, 1), fn_00029E58(i, 0), fn_00029E58(i, 2), b.swordsmen, b.halberdiers, b.knights]
     f.target = 0
-    let e = fn_000258FC(counts, 0, 0)
+    let e = resolve_encounter(counts, 0, 0)
+    # puts the brigand counts first and the pools back in their own order
+    counts = [counts[3], counts[4], counts[5], counts[1], counts[0], counts[2]]
     if d == 1:
         fn_000628AC(g_0009A928, 0x2C, 1)
     if d == 2:
@@ -198,7 +200,6 @@ None known.
 - What `fn_000628AC` does with conversation variables, and what reads variables 44 and 97.
 - What `fn_000106C0` does.
 - What `fn_0001BF54` does.
-- What `fn_000258FC` does.
 - What `fn_00029D24` does.
 - What `fn_00029DE0` does.
 - What `fn_00029E58` does.

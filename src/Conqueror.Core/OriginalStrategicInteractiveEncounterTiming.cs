@@ -1,7 +1,7 @@
 namespace Conqueror.Core;
 
 /// <summary>
-/// Stable elapsed-time boundary for interactive resolver loop <c>0x26B88</c>.
+/// Stable elapsed-time boundary for interactive resolver loop RULE-BATTLE-003.
 /// The executable compares its scaled timer strictly against the prior sample
 /// plus <c>0xC8</c>, then records a fresh sample after one accepted pass. Its
 /// callback is registered for 250 Hz, so the source clock advances in four-unit

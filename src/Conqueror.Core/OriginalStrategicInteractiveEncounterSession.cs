@@ -31,12 +31,12 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     public OriginalStrategicInteractiveEncounterTiming Timing { get; }
     public int PlayerLaneCount => _playerLaneCount;
     public int EnemyLaneCount => _enemyLaneCount;
-    /// <summary>Source global <c>19C98</c>, initialized to zero by <c>0x258FC</c>.</summary>
+    /// <summary>Source global <c>battle_contact_filter</c>, initialized to zero by RULE-BATTLE-001.</summary>
     public int MappedContactSideFilter { get; private set; }
     public OriginalStrategicInteractiveEncounterOutcome Outcome { get; private set; }
 
     /// <summary>
-    /// Source <c>19C7C</c> starts nonzero and skips tactical passes. The first
+    /// Source <c>battle_paused</c> starts nonzero and skips tactical passes. The first
     /// control sets it to zero and enables them; later hits enter retreat confirmation.
     /// </summary>
     public bool IsMappedTacticalAdvancementEnabled => !_tacticalAdvancementPaused;
@@ -46,7 +46,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
 
     /// <summary>
     /// Mirrors the mutation-bearing input routes from dispatcher
-    /// <c>0x267A4-0x26B67</c>. Coordinates remain caller-owned outputs of the
+    /// RULE-BATTLE-008. Coordinates remain caller-owned outputs of the
     /// unrecovered event producer: selection offsets its point through the
     /// viewport, the control strip uses its absolute rectangles, and codes
     /// six/seven issue the mapped selected-unit destination order.
@@ -95,7 +95,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     }
 
     /// <summary>
-    /// Advances the recovered outer ordering of resolver <c>0x26B88</c>:
+    /// Advances the recovered outer ordering of resolver RULE-BATTLE-003:
     /// edge scrolling, input dispatch, the first-control activation or later
     /// retreat-confirmation branch, then the configured stable tactical gate.
     /// A false response to an already activated first control deliberately
@@ -194,8 +194,8 @@ public sealed class OriginalStrategicInteractiveEncounterSession
                 localY));
 
     /// <summary>
-    /// Mirrors the first control hit when <c>19C8C</c> is zero: it records the
-    /// activated state and clears <c>19C7C</c>, enabling tactical passes.
+    /// Mirrors the first control hit when <c>battle_started</c> is zero: it records the
+    /// activated state and clears <c>battle_paused</c>, enabling tactical passes.
     /// </summary>
     public void ActivateMappedFirstControl()
     {
@@ -207,7 +207,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
 
     /// <summary>
     /// Mirrors the already-activated retreat-control branch at
-    /// <c>0x26832-0x2685B</c>. A true dialog result exits the resolver;
+    /// RULE-BATTLE-008. A true dialog result exits the resolver;
     /// a false result falls through to ordinary unit selection and does not
     /// clear the activated state or pause tactical advancement.
     /// </summary>
@@ -220,7 +220,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
 
     /// <summary>
     /// Mirrors the source status branch before input dispatch at
-    /// <c>0x265CC-0x26787</c>. The rectangle selector receives the scroll-
+    /// RULE-BATTLE-008. The rectangle selector receives the scroll-
     /// adjusted point. A player record formats its current strength; an enemy
     /// record prints the foe label. The first blank pass after either hover
     /// instead compares the live enemy and player lane counts, then clears
@@ -280,7 +280,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     }
 
     /// <summary>
-    /// Creates the interactive resolver from wrapper <c>0x35924</c>'s staged
+    /// Creates the interactive resolver from wrapper RULE-STRATEGY-011's staged
     /// counters. Player reserves are intentionally absent from the live unit
     /// table and are restored only by the caller's terminal settlement path.
     /// This avoids treating the original six-counter handoff as a full army
@@ -313,7 +313,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
 
     /// <summary>
     /// Applies only the raw category-selection key routes recovered from
-    /// <c>0x27ED2-0x283CC</c>. Unknown raw codes deliberately do nothing;
+    /// RULE-BATTLE-009. Unknown raw codes deliberately do nothing;
     /// the operating-system/input-library event producer remains host-owned.
     /// </summary>
     public int AppendMappedPlayerCategorySelectionForInputCode(int rawInputCode)
@@ -326,7 +326,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     }
 
     /// <summary>
-    /// Applies the two raw <c>0x27ED2</c> branches that write control code one:
+    /// Applies the two raw RULE-BATTLE-009 branches that write control code one:
     /// <c>0x61</c> affects the selected list and <c>0x41</c> all living records.
     /// </summary>
     public bool ApplyMappedRawControlCodeOneInput(int rawInputCode)
@@ -346,7 +346,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
 
     /// <summary>
     /// Applies the two externally gated raw-input families from
-    /// <c>0x27ED2-0x2814A</c>. The three gate bytes deliberately retain their
+    /// RULE-BATTLE-009. The three gate bytes deliberately retain their
     /// object-2 offsets because their higher-level meanings are not recovered.
     /// </summary>
     public bool ApplyMappedRawContactFilterInput(
@@ -377,7 +377,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
         }
     }
 
-    /// <summary>Mirrors raw <c>0x50/0x70</c>: after activation, toggles <c>19C7C</c>.</summary>
+    /// <summary>Mirrors raw <c>0x50/0x70</c>: after activation, toggles <c>battle_paused</c>.</summary>
     public bool ToggleMappedTacticalAdvancementForInputCode(int rawInputCode)
     {
         if (!_firstControlActivated || (rawInputCode is not 0x50 and not 0x70))
@@ -401,7 +401,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
 
     /// <summary>
     /// Mirrors selection's viewport-adjusted selector at
-    /// <c>0x26999-0x26A77</c>. A selector miss or an ineligible player record
+    /// RULE-BATTLE-008. A selector miss or an ineligible player record
     /// leaves the append-only selection list unchanged.
     /// </summary>
     public bool TryAppendMappedPlayerSelectionAt(
@@ -482,7 +482,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
     /// <summary>
     /// Advances one state-zero record with a fresh caller-visible rectangle
     /// snapshot. A complete tactical pass must instead retain one snapshot
-    /// for every unit, matching <c>0x26B88</c>'s pre-pass construction.
+    /// for every unit, matching RULE-BATTLE-003's pre-pass construction.
     /// </summary>
     public bool AdvanceStateZero(int unitIndex, int contentWidth, int contentHeight) =>
         OriginalStrategicInteractiveEncounter.AdvanceMappedStateZero(
@@ -490,7 +490,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
             _playerLaneCount, _enemyLaneCount);
 
     /// <summary>
-    /// Advances one already-authorized tactical pass from <c>0x26C81-0x27E16</c>.
+    /// Advances one already-authorized tactical pass from RULE-BATTLE-003.
     /// It builds one rectangle snapshot, visits records in table order, advances
     /// death state, applies the state-<c>0x28</c> zero-offset neighbor probe and
     /// due contact, then enters state zero only when the resulting state is
@@ -601,7 +601,7 @@ public sealed class OriginalStrategicInteractiveEncounterSession
 
     private OriginalStrategicInteractiveEncounterOutcome MappedLaneTerminalOutcome()
     {
-        // 0x2808E tests 19C94 first, then 0x283E2 tests 19C70. Counts are
+        // RULE-BATTLE-003 tests battle_foe_alive first, then RULE-BATTLE-003 tests battle_player_alive. Counts are
         // maintained as non-negative lane totals, so equality is intentional.
         if (_enemyLaneCount == 0)
             return OriginalStrategicInteractiveEncounterOutcome.EnemyDefeated;

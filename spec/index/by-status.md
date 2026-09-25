@@ -21,10 +21,12 @@ Entries by status.
 
 ## supported
 
-88 entries.
+104 entries.
 
 | ID | Title |
 |---|---|
+| [BUG-BATTLE-001](../bugs/BUG-BATTLE-001.md) | Morale adds the remainder by 3 instead of a third |
+| [BUG-BATTLE-002](../bugs/BUG-BATTLE-002.md) | A unit still turning toward its target turns toward another unit |
 | [BUG-JOUST-001](../bugs/BUG-JOUST-001.md) | The dragon lance frame scan reads past its table when the lance is above y 92 |
 | [BUG-STRATEGY-001](../bugs/BUG-STRATEGY-001.md) | The rare pursuit branch of the hostile generator tests a stale property |
 | [BUG-STRATEGY-002](../bugs/BUG-STRATEGY-002.md) | A small pursuit keeps the halberdiers and knights of the slot's previous force |
@@ -34,6 +36,8 @@ Entries by status.
 | [FMT-ASSAULT-001](../formats/FMT-ASSAULT-001.md) | Combatant record, one of the actors of a first-person assault |
 | [FMT-ASSAULT-002](../formats/FMT-ASSAULT-002.md) | Combat row, one of the 25 weapon records in the executable |
 | [FMT-ASSAULT-003](../formats/FMT-ASSAULT-003.md) | Scene effect descriptor, one record of the SFXDEFS resource |
+| [FMT-BATTLE-001](../formats/FMT-BATTLE-001.md) | Field battle unit, one troop in an interactive field battle |
+| [FMT-BATTLE-002](../formats/FMT-BATTLE-002.md) | Pointer event, one entry of the pointer queue |
 | [FMT-STRATEGY-001](../formats/FMT-STRATEGY-001.md) | Strategic movement record, one force on the strategic map |
 | [FMT-STRATEGY-002](../formats/FMT-STRATEGY-002.md) | Property record, one castle of the strategic map |
 | [FMT-STRATEGY-003](../formats/FMT-STRATEGY-003.md) | Person record, one character of the strategic map |
@@ -78,6 +82,18 @@ Entries by status.
 | [RULE-ASSAULT-028](../rules/RULE-ASSAULT-028.md) | Blood effect of a strike |
 | [RULE-ASSAULT-029](../rules/RULE-ASSAULT-029.md) | Change an actor's look |
 | [RULE-ASSAULT-031](../rules/RULE-ASSAULT-031.md) | The player's weapon breaking on a miss |
+| [RULE-BATTLE-001](../rules/RULE-BATTLE-001.md) | Field battle resolution |
+| [RULE-BATTLE-002](../rules/RULE-BATTLE-002.md) | Field battle units and formations |
+| [RULE-BATTLE-003](../rules/RULE-BATTLE-003.md) | Field battle pass |
+| [RULE-BATTLE-004](../rules/RULE-BATTLE-004.md) | Field battle rectangle tests |
+| [RULE-BATTLE-005](../rules/RULE-BATTLE-005.md) | Field battle contact |
+| [RULE-BATTLE-006](../rules/RULE-BATTLE-006.md) | Field battle turning |
+| [RULE-BATTLE-007](../rules/RULE-BATTLE-007.md) | Field battle idle update |
+| [RULE-BATTLE-008](../rules/RULE-BATTLE-008.md) | Field battle pointer handling |
+| [RULE-BATTLE-009](../rules/RULE-BATTLE-009.md) | Field battle keys |
+| [RULE-BATTLE-010](../rules/RULE-BATTLE-010.md) | Battle clock |
+| [RULE-BATTLE-011](../rules/RULE-BATTLE-011.md) | Field battle drawing |
+| [RULE-BATTLE-012](../rules/RULE-BATTLE-012.md) | Pointer events |
 | [RULE-JOUST-001](../rules/RULE-JOUST-001.md) | Lance motion and sprite frame |
 | [RULE-JOUST-002](../rules/RULE-JOUST-002.md) | Practice joust pass |
 | [RULE-JOUST-003](../rules/RULE-JOUST-003.md) | Dragon run |
@@ -128,7 +144,7 @@ Entries by status.
 
 ## recorded
 
-127 entries.
+147 entries.
 
 | ID | Title |
 |---|---|
@@ -178,6 +194,26 @@ Entries by status.
 | [FND-ASSAULT-044](../findings/FND-ASSAULT-044.md) | After the weapon range check, a block with behaviour bit 0x20 is replaced at once by its state target |
 | [FND-ASSAULT-045](../findings/FND-ASSAULT-045.md) | A table maps each weapon item to a combat row, and the two crossbows use rows 23 and 24 |
 | [FND-ASSAULT-046](../findings/FND-ASSAULT-046.md) | A combatant's armour is the dword at offset 0x3C, read beside its health at 0x40 |
+| [FND-BATTLE-001](../findings/FND-BATTLE-001.md) | The field battle resolver takes the player's three counts, the foe's three, and two morale values |
+| [FND-BATTLE-002](../findings/FND-BATTLE-002.md) | The automatic battle compares totals plus the remainder of each morale value by 3 |
+| [FND-BATTLE-003](../findings/FND-BATTLE-003.md) | The battle choice gate offers five rectangles and maps the first four to formation codes 2, 3, 1 and 0 |
+| [FND-BATTLE-004](../findings/FND-BATTLE-004.md) | The unit constructor fills one 52-byte record per troop, player first |
+| [FND-BATTLE-005](../findings/FND-BATTLE-005.md) | Formation codes 0, 1 and 2 place the player's units in columns, reversed columns or a wedge |
+| [FND-BATTLE-006](../findings/FND-BATTLE-006.md) | Formation code 3 splits the player's first category, and the foe is placed on a coin toss |
+| [FND-BATTLE-007](../findings/FND-BATTLE-007.md) | Category 0 is the halberdiers, 0x78 the swordsmen and 0xF0 the knights |
+| [FND-BATTLE-008](../findings/FND-BATTLE-008.md) | Each loop pass draws rectangles, dispatches input, and runs the unit pass every 200 clock units |
+| [FND-BATTLE-009](../findings/FND-BATTLE-009.md) | The battle clock counts at 250 Hz and its reader returns four times the count |
+| [FND-BATTLE-010](../findings/FND-BATTLE-010.md) | The rectangle hit test returns the first containing rectangle, counted from 1 |
+| [FND-BATTLE-011](../findings/FND-BATTLE-011.md) | The neighbour probe tests four corners and stops early after a dead first hit |
+| [FND-BATTLE-012](../findings/FND-BATTLE-012.md) | The unit pass completes deaths, probes contacts and deals damage by category |
+| [FND-BATTLE-013](../findings/FND-BATTLE-013.md) | Units turn one octant at a time toward a target or destination |
+| [FND-BATTLE-014](../findings/FND-BATTLE-014.md) | State 0 acquires a target, walks to a destination, or picks the nearest foe |
+| [FND-BATTLE-015](../findings/FND-BATTLE-015.md) | The pointer dispatcher scrolls, shows hover status, and routes codes 2, 3, 6 and 7 |
+| [FND-BATTLE-016](../findings/FND-BATTLE-016.md) | The keyboard dispatcher selects by category, pauses, exits, and has two test switches |
+| [FND-BATTLE-017](../findings/FND-BATTLE-017.md) | The resolver counts survivors by category and returns 1 for a win |
+| [FND-BATTLE-018](../findings/FND-BATTLE-018.md) | The resolver reads WAR_MODE and loads BATTLE.PCX and MEN8.CSF |
+| [FND-BATTLE-019](../findings/FND-BATTLE-019.md) | The renderer sorts dead units first then by y and x, and picks frames by lane, category, heading and phase |
+| [FND-BATTLE-020](../findings/FND-BATTLE-020.md) | Pointer events are queued with a timer count and classified into eight codes |
 | [FND-JOUST-001](../findings/FND-JOUST-001.md) | The practice joust plays jousprac.SMK and paints frames of lance1.csf over it at y + 90, clipped to the movie area |
 | [FND-JOUST-002](../findings/FND-JOUST-002.md) | The practice lance moves with 8.8 velocities that decay to 80 per cent, pull towards the pointer, and drop by (150 - p) * 50 every seventh movie frame |
 | [FND-JOUST-003](../findings/FND-JOUST-003.md) | The practice lance frame comes from the first row threshold at or above the lance and a 70-pixel column |
@@ -276,12 +312,15 @@ Entries whose Open questions section says more than None known.
 
 | ID | Title | Status |
 |---|---|---|
+| [BUG-BATTLE-001](../bugs/BUG-BATTLE-001.md) | Morale adds the remainder by 3 instead of a third | supported |
 | [BUG-STRATEGY-001](../bugs/BUG-STRATEGY-001.md) | The rare pursuit branch of the hostile generator tests a stale property | supported |
 | [BUG-STRATEGY-004](../bugs/BUG-STRATEGY-004.md) | Hostile forces lost to water or a dropped route are never uncounted | supported |
 | [FMT-ASSAULT-001](../formats/FMT-ASSAULT-001.md) | Combatant record, one of the actors of a first-person assault | supported |
 | [FMT-ASSAULT-002](../formats/FMT-ASSAULT-002.md) | Combat row, one of the 25 weapon records in the executable | supported |
 | [FMT-ASSAULT-003](../formats/FMT-ASSAULT-003.md) | Scene effect descriptor, one record of the SFXDEFS resource | supported |
 | [FMT-ASSAULT-004](../formats/FMT-ASSAULT-004.md) | Live effect record, one of the 64 effects the scheduler runs | unknown |
+| [FMT-BATTLE-001](../formats/FMT-BATTLE-001.md) | Field battle unit, one troop in an interactive field battle | supported |
+| [FMT-BATTLE-002](../formats/FMT-BATTLE-002.md) | Pointer event, one entry of the pointer queue | supported |
 | [FMT-STRATEGY-001](../formats/FMT-STRATEGY-001.md) | Strategic movement record, one force on the strategic map | supported |
 | [FMT-STRATEGY-002](../formats/FMT-STRATEGY-002.md) | Property record, one castle of the strategic map | supported |
 | [FMT-STRATEGY-003](../formats/FMT-STRATEGY-003.md) | Person record, one character of the strategic map | supported |
@@ -324,6 +363,16 @@ Entries whose Open questions section says more than None known.
 | [RULE-ASSAULT-029](../rules/RULE-ASSAULT-029.md) | Change an actor's look | supported |
 | [RULE-ASSAULT-030](../rules/RULE-ASSAULT-030.md) | Which retainer the loader removes above the cap | unknown |
 | [RULE-ASSAULT-031](../rules/RULE-ASSAULT-031.md) | The player's weapon breaking on a miss | supported |
+| [RULE-BATTLE-001](../rules/RULE-BATTLE-001.md) | Field battle resolution | supported |
+| [RULE-BATTLE-002](../rules/RULE-BATTLE-002.md) | Field battle units and formations | supported |
+| [RULE-BATTLE-003](../rules/RULE-BATTLE-003.md) | Field battle pass | supported |
+| [RULE-BATTLE-005](../rules/RULE-BATTLE-005.md) | Field battle contact | supported |
+| [RULE-BATTLE-007](../rules/RULE-BATTLE-007.md) | Field battle idle update | supported |
+| [RULE-BATTLE-008](../rules/RULE-BATTLE-008.md) | Field battle pointer handling | supported |
+| [RULE-BATTLE-009](../rules/RULE-BATTLE-009.md) | Field battle keys | supported |
+| [RULE-BATTLE-010](../rules/RULE-BATTLE-010.md) | Battle clock | supported |
+| [RULE-BATTLE-011](../rules/RULE-BATTLE-011.md) | Field battle drawing | supported |
+| [RULE-BATTLE-012](../rules/RULE-BATTLE-012.md) | Pointer events | supported |
 | [RULE-JOUST-001](../rules/RULE-JOUST-001.md) | Lance motion and sprite frame | supported |
 | [RULE-JOUST-002](../rules/RULE-JOUST-002.md) | Practice joust pass | supported |
 | [RULE-JOUST-003](../rules/RULE-JOUST-003.md) | Dragon run | supported |

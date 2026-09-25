@@ -2,7 +2,7 @@ namespace Conqueror.Core;
 
 /// <summary>
 /// Result of one already-acquired state-<c>0x28</c> contact at
-/// <c>0x26DCB-0x270B4</c>. Target acquisition and phase scheduling are
+/// RULE-BATTLE-005. Target acquisition and phase scheduling are
 /// deliberately outside this narrow arithmetic boundary.
 /// </summary>
 public readonly record struct OriginalStrategicInteractiveEncounterContactResult(
@@ -31,7 +31,7 @@ public static class OriginalStrategicInteractiveEncounterCombat
     public const int LowHealthDeathThreshold = 20;
 
     /// <summary>
-    /// Applies <c>0x26D4B-0x26DC5</c> after the caller has supplied the
+    /// Applies RULE-BATTLE-003 after the caller has supplied the
     /// original neighbor helper's return value. Values zero and one clear the
     /// current contact; every other value advances the phase modulo five and
     /// makes a resolved contact due only at phase two.
@@ -63,9 +63,9 @@ public static class OriginalStrategicInteractiveEncounterCombat
     /// <summary>
     /// Applies a contact after the source's neighbor query has selected the
     /// target. <paramref name="contactSideFilter"/> preserves global
-    /// <c>19C98</c>: one suppresses contacts against the player lane and
+    /// <c>battle_contact_filter</c>: one suppresses contacts against the player lane and
     /// minus one suppresses contacts against the enemy lane; zero permits
-    /// both. Other values take the source's ordinary contact path.
+    /// both. PLACEHOLDER: RULE-BATTLE-005: adds morale / 3 for % 3, skips the rest on a filter, draws no sound.
     /// </summary>
     public static OriginalStrategicInteractiveEncounterContactResult ApplyMappedResolvedContact(
         IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,

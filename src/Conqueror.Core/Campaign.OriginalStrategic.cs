@@ -73,7 +73,7 @@ public readonly record struct OriginalStrategicEncounterForces(
 }
 
 /// <summary>
-/// The force staging of RULE-STRATEGY-011, performed immediately before resolver <c>0x258FC</c>.
+/// The force staging of RULE-STRATEGY-011, performed immediately before resolver RULE-BATTLE-001.
 /// Player reserves are deliberately held outside the resolver and added back
 /// after it returns; hostile values are resolver-owned write-back counters.
 /// </summary>
@@ -93,7 +93,7 @@ public interface IOriginalStrategicEncounterRandom
 }
 
 /// <summary>
-/// Result of resolver <c>0x258FC</c>'s non-interactive fallback. The player
+/// Result of resolver RULE-BATTLE-001's non-interactive fallback. The player
 /// totals include the staging reserves restored as RULE-STRATEGY-011 describes.
 /// </summary>
 public readonly record struct OriginalStrategicAutomaticEncounterResult(
@@ -150,10 +150,10 @@ public static class OriginalStrategicEncounterStaging
     }
 
     /// <summary>
-    /// Reproduces <c>0x258FC:0x259D0-0x25A88</c>, the automatic branch used
+    /// Reproduces RULE-BATTLE-001, the automatic branch used
     /// when its prior interactive choice dialog returns zero. The caller owns
-    /// the two explicit score modifiers because the staging of
-    /// RULE-STRATEGY-011 constructs them outside this resolver.
+    /// the two score modifiers (RULE-STRATEGY-011). PLACEHOLDER: RULE-BATTLE-001.
+    /// The original adds the remainder of each modifier by 3; this adds a third.
     /// </summary>
     public static OriginalStrategicAutomaticEncounterResult ResolveAutomatic(
         OriginalStrategicEncounterPreparation preparation,
@@ -413,7 +413,7 @@ public sealed partial class Campaign
     }
 
     /// <summary>
-    /// Applies only resolver <c>0x258FC</c>'s automatic-exit result to the
+    /// Applies only resolver RULE-BATTLE-001's automatic-exit result to the
     /// six-counter strategic handoff. The interactive resolver intentionally
     /// remains outside this path.
     /// </summary>

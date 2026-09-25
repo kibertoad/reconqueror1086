@@ -4,10 +4,10 @@ title: Encounter with a hostile force
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-STRATEGY-001, FND-STRATEGY-002, FND-STRATEGY-003, FND-STRATEGY-015, FND-STRATEGY-019, FND-STRATEGY-021, FND-STRATEGY-022, FND-STRATEGY-023, FND-STRATEGY-024, FND-STRATEGY-026, FND-STRATEGY-033]
+evidence: [FND-BATTLE-001, FND-STRATEGY-001, FND-STRATEGY-002, FND-STRATEGY-003, FND-STRATEGY-015, FND-STRATEGY-019, FND-STRATEGY-021, FND-STRATEGY-022, FND-STRATEGY-023, FND-STRATEGY-024, FND-STRATEGY-026, FND-STRATEGY-033]
 conflicting: []
 split_with: []
-related: [RULE-PERSON-001, RULE-RNG-001, RULE-STRATEGY-004, RULE-STRATEGY-009, RULE-STRATEGY-014]
+related: [RULE-BATTLE-001, RULE-PERSON-001, RULE-RNG-001, RULE-STRATEGY-004, RULE-STRATEGY-009, RULE-STRATEGY-014]
 ---
 
 ## Summary
@@ -29,8 +29,8 @@ From the player pass when an army touches a hostile force (RULE-STRATEGY-010).
 ## Inputs
 
 The attributes FAME (6), INTELLIGENCE (4), HONOR (5), BATTLE_WON (24) and BATTLE_LOST (25) of row 0,
-and the troop pools through `fn_00029E58`. `fn_000258FC` receives the six troop counts by reference,
-the three hostile counts then the player's three pools in this procedure, with the morale value and 0.
+and the troop pools through `fn_00029E58`. `resolve_encounter` receives the six troop counts,
+the player's pools 1, 0 and 2 and then the three hostile counts, with the morale value and 0.
 
 ## Procedure
 
@@ -128,8 +128,10 @@ define stage_battle(i, j):
                 if r + 1 < p[k]:
                     p[k] = p[k] - r
                     kept[k] = r
-    let counts = [h.swordsmen, h.halberdiers, h.knights, p[0], p[1], p[2]]
-    let e = fn_000258FC(counts, morale, 0)
+    let counts = [p[1], p[0], p[2], h.swordsmen, h.halberdiers, h.knights]
+    let e = resolve_encounter(counts, morale, 0)
+    # puts the hostile counts first and the pools back in their own order
+    counts = [counts[3], counts[4], counts[5], counts[1], counts[0], counts[2]]
     if e == 1:
         set_attr(0, 24, attr(0, 24) + 1)
     else:
@@ -176,9 +178,8 @@ None known.
 
 ## Open questions
 
-- What `fn_000258FC`, `fn_00029DE0`, `fn_000106C0`, `fn_0005B3B0`, `g_0009AEFC` and `fn_0001146C`
+- What `fn_00029DE0`, `fn_000106C0`, `fn_0005B3B0`, `g_0009AEFC` and `fn_0001146C`
   do beyond what the findings record.
-- In which order the original passes the six counts to `fn_000258FC`.
 - What `fn_0001BF54` does.
 - What `fn_00029D24` does.
 - What `fn_00029E58` does.

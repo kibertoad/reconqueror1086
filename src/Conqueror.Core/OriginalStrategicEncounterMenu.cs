@@ -1,9 +1,9 @@
 namespace Conqueror.Core;
 
 /// <summary>
-/// One fixed hit region in resolver <c>0x256FC</c>'s encounter-choice dialog.
+/// One fixed hit region in resolver RULE-BATTLE-001's encounter-choice dialog.
 /// A null interactive selection code is the dialog's exit path, which makes
-/// resolver <c>0x258FC</c> take its automatic fallback.
+/// resolver RULE-BATTLE-001 take its automatic fallback.
 /// </summary>
 public readonly record struct OriginalStrategicEncounterMenuEntry(
     int RegionIndex,
@@ -18,7 +18,7 @@ public readonly record struct OriginalStrategicEncounterMenuEntry(
 
 /// <summary>
 /// Verified fixed dialog geometry and dispatch identity for strategic resolver
-/// <c>0x256FC</c>. The four interactive values are deliberately numeric: the
+/// RULE-BATTLE-001. The four interactive values are deliberately numeric: the
 /// executable's later battle setup uses them for distinct formations, but the
 /// player-facing tactical meanings have not yet been recovered.
 /// </summary>
@@ -38,7 +38,7 @@ public static class OriginalStrategicEncounterMenu
         ]);
 
     /// <summary>
-    /// Mirrors the <c>0x6FF10</c> call at <c>0x257E5-0x2588B</c>: scan the
+    /// Mirrors the RULE-BATTLE-004 call at RULE-BATTLE-001: scan the
     /// five original regions in table order and accept a left/top edge while
     /// excluding the right/bottom edge. A null result is a missed dialog
     /// click; a returned entry with a null selection code is the fifth

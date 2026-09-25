@@ -2,10 +2,10 @@ namespace Conqueror.Core;
 
 /// <summary>
 /// Scroll offsets used by the interactive encounter input path at
-/// <c>0x264F8</c>. The original moves an offset by ten while the pointer is
+/// RULE-BATTLE-008. The original moves an offset by ten while the pointer is
 /// in a five-pixel edge band; the horizontal and vertical content limits are
 /// intentionally asymmetric. The control-strip margin is separate: setup
-/// stores it at <c>19C74</c>, while scrolling uses <c>19CA8/19CAC</c>.
+/// stores it at <c>battle_control_margin</c>, while scrolling uses <c>battle_scroll_y</c>/battle_scroll_x.
 /// </summary>
 public sealed class OriginalStrategicInteractiveEncounterViewport
 {
@@ -59,9 +59,9 @@ public sealed class OriginalStrategicInteractiveEncounterViewport
     public int ControlStripMargin { get; }
 
     /// <summary>
-    /// Reproduces resolver setup <c>0x25F08-0x25F36</c>'s mapping from its
-    /// already-resolved display-width global (<c>19CC8</c>) to the separate
-    /// control-strip margin global (<c>19C74</c>). The preceding
+    /// Reproduces resolver setup RULE-BATTLE-001's mapping from its
+    /// already-resolved display-width global (<c>battle_mode_width</c>) to the separate
+    /// control-strip margin global (<c>battle_control_margin</c>). The preceding
     /// <c>WAR_MODE</c> display-selection and capability probes are deliberately
     /// not modeled here: the source only makes these two nonzero assignments
     /// after a successful display-mode change.

@@ -3,7 +3,7 @@ namespace Conqueror.Core;
 public readonly record struct OriginalStrategicPointerInput(int Code, int X, int Y);
 
 /// <summary>
-/// Bounded source-order mouse event queue from callback 0x8497C and pop 0x63098.
+/// Bounded source-order mouse event queue from callback RULE-BATTLE-012 and pop RULE-BATTLE-012.
 /// Each callback can append several transitions with one timestamp and position.
 /// </summary>
 public sealed class OriginalStrategicPointerEventQueue

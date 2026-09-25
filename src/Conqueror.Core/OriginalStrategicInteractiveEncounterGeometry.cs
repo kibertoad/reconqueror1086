@@ -1,7 +1,7 @@
 namespace Conqueror.Core;
 
 /// <summary>
-/// One eight-byte rectangle consumed by rectangle selector <c>0x6FF10</c>.
+/// One eight-byte rectangle consumed by rectangle selector RULE-BATTLE-004.
 /// </summary>
 public readonly record struct OriginalStrategicInteractiveEncounterRectangle(
     int X,
@@ -10,7 +10,7 @@ public readonly record struct OriginalStrategicInteractiveEncounterRectangle(
     int Height)
 {
     /// <summary>
-    /// Mirrors predicate <c>0x64164</c>: left/top are included, while the
+    /// Mirrors predicate RULE-BATTLE-004: left/top are included, while the
     /// right and bottom edges are excluded.
     /// </summary>
     public bool Contains(int x, int y) => x >= X && x < checked(X + Width)
@@ -31,7 +31,7 @@ public static class OriginalStrategicInteractiveEncounterGeometry
 
     /// <summary>
     /// Builds the three control-strip rectangles appended directly after the
-    /// live unit rectangle table by setup routine <c>0x258FC</c>. They retain
+    /// live unit rectangle table by setup routine RULE-BATTLE-001. They retain
     /// their selector order: the first path is still unresolved, while the
     /// latter two are the two mapped control-code-one mutations.
     /// </summary>
@@ -50,7 +50,7 @@ public static class OriginalStrategicInteractiveEncounterGeometry
     }
 
     /// <summary>
-    /// Mirrors <c>0x26BAF-0x26BFC</c>. A non-positive unit emits the zero
+    /// Mirrors RULE-BATTLE-003. A non-positive unit emits the zero
     /// rectangle; a positive unit maps its live formation coordinates to the
     /// rectangle consumed by the later selector.
     /// </summary>
@@ -68,7 +68,7 @@ public static class OriginalStrategicInteractiveEncounterGeometry
     }
 
     /// <summary>
-    /// Mirrors <c>0x6FF10</c>: returns the first matching rectangle's one-based
+    /// Mirrors RULE-BATTLE-004: returns the first matching rectangle's one-based
     /// index, or zero when no rectangle contains the point.
     /// </summary>
     public static int FindFirstContainingOneBased(
@@ -87,7 +87,7 @@ public static class OriginalStrategicInteractiveEncounterGeometry
     }
 
     /// <summary>
-    /// Mirrors neighbor helper <c>0x28408</c>. The source rectangle is
+    /// Mirrors neighbor helper RULE-BATTLE-004. The source rectangle is
     /// temporarily replaced by a one-by-one offscreen rectangle, then its
     /// offset corners are probed in top-left, bottom-left, top-right,
     /// bottom-right order. A living hit returns one for the source lane or
@@ -96,9 +96,9 @@ public static class OriginalStrategicInteractiveEncounterGeometry
     ///
     /// If the first corner hits a dead record, a miss at any later corner
     /// stops immediately. If the first corner misses, later misses instead
-    /// continue to the next corner. This intentionally preserves the source
-    /// branch asymmetry rather than substituting overlap or nearest-unit
-    /// selection.
+    /// continue to the next corner. PLACEHOLDER: RULE-BATTLE-004. The original
+    /// also stops at a miss after a dead hit at a later corner, which this
+    /// search does not.
     /// </summary>
     public static int ProbeMappedNeighborContact(
         IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
@@ -197,16 +197,16 @@ public static class OriginalStrategicInteractiveEncounterGeometry
     }
 
     /// <summary>
-    /// Mirrors state-zero acquisition at <c>0x270CB-0x27474</c>. It hides the
+    /// Mirrors state-zero acquisition at RULE-BATTLE-007. It hides the
     /// source selector rectangle, then checks its four corners in top-left,
-    /// bottom-left, top-right, bottom-right order. Unlike <c>0x28408</c>, a
+    /// bottom-left, top-right, bottom-right order. Unlike RULE-BATTLE-004, a
     /// selector hit is useful only for a living unit in the opposite lane and
     /// only that accepted hit writes <paramref name="targetUnitIndex"/>.
     ///
     /// The source has the same material first-corner split: after an initial
     /// hit (even a same-lane or dead one), a later selector miss ends the
     /// search; after an initial miss, later misses continue through remaining
-    /// corners. This intentionally is not a generic overlap query.
+    /// corners. PLACEHOLDER: RULE-BATTLE-007: the original also ends at a miss after any later hit.
     /// </summary>
     public static bool TryAcquireMappedOpposingTarget(
         IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,

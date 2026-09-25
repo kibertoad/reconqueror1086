@@ -12,20 +12,7 @@ The authoritative gate is:
 
 ## Latest completed combat recovery
 
-Strategic player/enemy contact now reaches the recovered resolver instead of
-leaving the map with a placeholder handoff notice. `ConquerorGame.StrategicEncounter`
-holds the captured six-counter contact, blocks subsequent player/hostile
-scheduler work, uses the exact five `0x256FC` menu rectangles, and renders the
-owned `BATTLE.PCX`/`MEN8.CSF` source assets through the existing exact session
-draw helpers. Its automatic exit and interactive terminal path settle only
-through the corresponding `Campaign` resolver methods; the generic
-`FieldBattleSession` is not involved. The tactical event producer, user-facing
-meanings of the four menu codes, caller-owned score modifier, and presentation
-scaling are still Provisional. The older `FieldBattle` screen is a separate
-provisional combat mode: it now requires and renders the same owned
-`BATTLE.PCX`/`MEN8.CSF` assets rather than falling back to generic art, while
-its grid formation mechanics and command HUD remain host-owned replacement
-policy and a priority fidelity gap.
+Strategic player/enemy contact reaches the field battle of the spec area BATTLE: `ConquerorGame.StrategicEncounter` holds the captured contact, blocks later scheduler work, and settles only through the `Campaign` resolver methods. `parity/BATTLE.md` lists what differs from the original. The older `FieldBattle` screen is a separate provisional combat mode whose grid formation mechanics and command HUD are host-owned replacement policy and a priority fidelity gap.
 
 The latest sequence of commits is:
 
