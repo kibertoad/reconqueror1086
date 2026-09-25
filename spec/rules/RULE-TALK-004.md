@@ -4,7 +4,7 @@ title: Conversation entry and its aftermath
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-TALK-007, FND-TALK-008, FND-STRATEGY-036, FND-TOURNEY-001, FND-PERSON-001, FND-PERSON-002, FND-PERSON-004, FND-PERSON-006]
+evidence: [FND-TALK-007, FND-TALK-008, FND-STRATEGY-036, FND-TOURNEY-001, FND-PERSON-001, FND-PERSON-002, FND-PERSON-004, FND-PERSON-006, FND-UI-004]
 conflicting: []
 split_with: []
 related: [RULE-TALK-001, RULE-TALK-003, RULE-STRATEGY-019, RULE-PERSON-001, RULE-PERSON-005]
@@ -29,7 +29,7 @@ None.
 
 ## Inputs
 
-`fn_00059D50`, the region clicked; `stands_partners`, `inn_partners`, `conversation_roots`, `g_0009DED4` and the conversation variables.
+`fn_00059D50`, the region clicked; `stands_partners`, `inn_partners`, `conversation_roots`, `tournament_here` and the conversation variables.
 
 ## Procedure
 
@@ -40,7 +40,7 @@ define talk_at_stands():
 
 define talk_at_inn():
     conversation_partner = inn_partners[fn_00059D50()]
-    if g_0009DED4 != 0 or conversation_partner == 21:
+    if tournament_here != 0 or conversation_partner == 21:
         g_0009DEA8 = 1
         fn_000596C0(0x18, 0, 1)
 
@@ -83,7 +83,7 @@ None known.
 
 ## Open questions
 
-- What `fn_00059D50`, `fn_000596C0`, `fn_0002C250`, `g_0009DED4`, `g_0009DEA8` and `g_0009A934` do
+- What `fn_00059D50`, `fn_000596C0`, `fn_0002C250`, `g_0009DEA8` and `g_0009A934` do
   or hold beyond what is described here.
 - What the two other writers of `conversation_partner`, at `0x00060D85` and `0x00060DE5`, are.
 - Where rumours come from: no code of their own was found, so they are presumably conversation

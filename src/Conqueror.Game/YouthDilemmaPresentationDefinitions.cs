@@ -2,6 +2,7 @@ using Conqueror.Resources;
 
 namespace Conqueror.Game;
 
+// SCR-UI-004.
 public static class YouthDilemmaPresentationDefinitions
 {
     public const int ChoiceCount = 3;

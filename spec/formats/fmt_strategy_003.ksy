@@ -25,4 +25,11 @@ seq:
   - id: next
     type: u1
   - id: unk_0e
-    size: 4
+    type: u1
+  - id: village_scene
+    type: u1
+    doc: Record of VILLAGE.DAT and TVILLAGE.DAT the place shows.
+  - id: church_partner
+    type: u1
+  - id: lender_partner
+    type: u1

@@ -36,6 +36,7 @@ public sealed record SceneHotspot(
     SceneNavigationAction Action, string HoverLabel, int HatRegionId, UiBounds Bounds,
     bool Interactive = true);
 
+// SCR-UI-009.
 public static class HomePresentationDefinitions
 {
     private const int OverviewRegionId = 0;
@@ -79,6 +80,7 @@ public static class HomePresentationDefinitions
         .ToArray();
 }
 
+// SCR-UI-010.
 public static class WarPlanningPresentationDefinitions
 {
     public sealed record Layout(
@@ -131,6 +133,7 @@ public static class WarPlanningPresentationDefinitions
             : fallback;
 }
 
+// SCR-UI-007.
 public static class ShopPresentationDefinitions
 {
     private const int ItemViewportWidth = 240;
@@ -179,6 +182,7 @@ public static class ShopPresentationDefinitions
     private static ShopOverlay Overlay(ShopOverlayState state) => Overlays.Single(overlay => overlay.State == state);
 }
 
+// SCR-UI-007.
 public static class BlacksmithPresentationDefinitions
 {
     private const int BlacksmithRegionId = 0;
@@ -232,6 +236,7 @@ public static class ChurchConversationPresentationDefinitions
             : GenericRootNodeId;
 }
 
+// SCR-UI-011.
 public static class FarmPresentationDefinitions
 {
     public enum Section { Castle, Village, Farm, Forest }

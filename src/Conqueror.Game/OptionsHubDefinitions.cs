@@ -36,6 +36,7 @@ public sealed record OptionsHubOption(
     bool RequiresCampaign = false,
     OptionsHubSetting? Setting = null);
 
+// SCR-UI-002.
 public static class OptionsHubDefinitions
 {
     public static IReadOnlyList<OptionsHubOption> Options { get; } =

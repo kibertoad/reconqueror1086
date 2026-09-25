@@ -9,7 +9,7 @@ byte_order: little
 size: 18
 text: false
 definition: fmt_strategy_003.ksy
-evidence: [FND-STRATEGY-003, FND-STRATEGY-007, FND-STRATEGY-008, FND-STRATEGY-015, FND-STRATEGY-021, FND-STRATEGY-023]
+evidence: [FND-STRATEGY-003, FND-STRATEGY-007, FND-STRATEGY-008, FND-STRATEGY-015, FND-STRATEGY-021, FND-STRATEGY-023, FND-UI-004, FND-UI-005, FND-UI-006]
 conflicting: []
 split_with: []
 related: []
@@ -33,7 +33,10 @@ changes them in place. Record 0 is never used.
 | `0x0A` | 2 | `UINT16LE` | `cell_col` | Column of that cell. | supported | FND-STRATEGY-007, FND-STRATEGY-023 |
 | `0x0C` | 1 | `UINT8` | `rating` | The lord rating that sizes the property's forces. | supported | FND-STRATEGY-008, FND-STRATEGY-021 |
 | `0x0D` | 1 | `UINT8` | `next` | Link of the person list, `0xFF` at its end. | supported | FND-STRATEGY-008, FND-STRATEGY-015 |
-| `0x0E` | 4 | `BYTE[4]` | `unk_0E` | Purpose unknown. | supported | FND-STRATEGY-015 |
+| `0x0E` | 1 | `UINT8` | `unk_0E` | Purpose unknown. | supported | FND-STRATEGY-015 |
+| `0x0F` | 1 | `UINT8` | `village_scene` | The record of the exterior catalogs (FMT-UI-003) the person's place shows, 0 to 66; the game reports a larger value as an error. | supported | FND-UI-004, FND-UI-006 |
+| `0x10` | 1 | `UINT8` | `church_partner` | The conversation partner of the place's church. | supported | FND-UI-005 |
+| `0x11` | 1 | `UINT8` | `lender_partner` | The conversation partner of the place's lender. | supported | FND-UI-005 |
 | `0x12` | | | | Total size 18 | | |
 
 ## Enumerations and flags

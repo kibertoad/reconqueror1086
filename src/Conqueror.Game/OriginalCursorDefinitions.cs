@@ -10,6 +10,7 @@ public enum OriginalCursorKind
     Hand
 }
 
+// SCR-UI-006 shows frame 5 over a hot spot and frame 0 elsewhere.
 /// <summary>
 /// Visual identities of the six ordered <c>FFMOUSE.CSF</c> frames. Startup
 /// sequence <c>0x2A4DC</c> passes object-2 resource string <c>+0x3A70</c> to

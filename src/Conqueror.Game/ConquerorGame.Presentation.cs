@@ -170,6 +170,7 @@ public sealed partial class ConquerorGame
         _originalSounds.Clear();
     }
 
+    // SCR-UI-001.
     private void DrawTitle()
     {
         if (_titleMovie is { IsComplete: false })

@@ -652,8 +652,6 @@ Potential higher-powered-machine presentation work should be opt-in and observat
 
 ## Home checkpoint: 2026-09-14 inactive `JUMP!!` region
 
-`FOPTS.HAT` defines ten enabled regions and the executable's adjacent label table includes `JUMP!!` at index 7. Registration routine `0x302A0`-`0x30492`, however, installs action, hover-state, and release callbacks only for indices 0-6 and 8-9. The omission is repeated across all three callback families while label renderer `0x30768`-`0x307D4` can still index the complete table. Therefore region 7 is deliberately visible label-only scenery, not an unrecovered command.
-
 `SceneHotspot.Interactive` now expresses that distinction: Home retains all ten HAT bounds and hover labels, while activation ignores `JUMP!!`. A focused test pins region 7 as the only inactive Home hotspot. This callback membership and runtime mapping are **Confirmed**; the placeholder action and its claim that further executable confirmation was needed are **Disproved**.
 
 ## Session checkpoint: 2026-09-10

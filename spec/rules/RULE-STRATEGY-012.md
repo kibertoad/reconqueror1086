@@ -205,7 +205,7 @@ define remove_army(i):
 
 ## Outputs
 
-The records and globals named. `new_strategic_game` also sets `g_000AC180`, and the home person
+The records and globals named. `new_strategic_game` also sets `place_person`, and the home person
 keeps its cell.
 
 ## Edge cases
@@ -225,5 +225,5 @@ None known.
 
 ## Open questions
 
-- What value `new_strategic_game` stores in `g_000AC180`.
+- What value `new_strategic_game` stores in `place_person`.
 - Whether the reset routine clears the freed route pointers.

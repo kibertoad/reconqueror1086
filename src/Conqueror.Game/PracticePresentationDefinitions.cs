@@ -17,6 +17,7 @@ public sealed record PracticeOption(
     UiBounds OriginalBounds,
     int HatRegionId);
 
+// SCR-UI-008.
 /// <summary>
 /// PRACTICE.HAT regions in order, paired with the executable's contiguous
 /// War/Joust/Melee/Exit/Castle Skirmish label table.

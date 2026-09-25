@@ -4,10 +4,10 @@ title: Tournament melee wager, scene and settlement
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-TOURNEY-001, FND-TOURNEY-003, FND-TOURNEY-005, FND-TOURNEY-006, FND-RNG-002, FND-PERSON-002, SRC-GAMEFAQS-66730]
+evidence: [FND-TOURNEY-001, FND-TOURNEY-003, FND-TOURNEY-005, FND-TOURNEY-006, FND-RNG-002, FND-PERSON-002, SRC-GAMEFAQS-66730, FND-UI-004]
 conflicting: []
 split_with: []
-related: [RULE-RNG-001, RULE-PERSON-001, RULE-TOURNEY-002]
+related: [RULE-RNG-001, RULE-PERSON-001, RULE-TOURNEY-002, RULE-UI-002]
 ---
 
 ## Summary
@@ -26,7 +26,7 @@ None.
 
 ## Inputs
 
-`tent_opponent`, `melees_today`, `g_000AC180`, `player_accepts`.
+`tent_opponent`, `melees_today`, `place_person`, `player_accepts`.
 
 ## Procedure
 
@@ -44,7 +44,7 @@ define tent_melee():
         tier = 2
     else if half < 18:
         tier = 3
-    let site_digit = g_000AC180 % 3
+    let site_digit = place_person % 3
     let wager = (tier + 1) * (random_inclusive(20) + 1)
     let wealth = attr(0, 17)
     if wealth == 0:
@@ -106,7 +106,7 @@ None known.
 
 ## Open questions
 
-- Whether anything clears the joust and melee counts each day. The refusal messages speak of today, but the only clears found are the monthly reset, `0x0005C520` and `0x00010FF0`.
-- What `g_000AC180` holds, and what the value `fn_0002C20C` returns and `fn_0002C218` stores
+- Whether anything clears the joust and melee counts each day. The refusal messages speak of today, but the only clears found are the monthly reset, `0x0005C520`, `0x00010FF0` and the village map exit while a tournament is in town (RULE-UI-002).
+- What the value `fn_0002C20C` returns and `fn_0002C218` stores
   stands for.
 - How `fn_0005877C` uses its arguments; `side_a` and `side_b` are likely the two side sizes.

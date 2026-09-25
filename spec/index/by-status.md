@@ -28,7 +28,7 @@ Entries by status.
 
 ## supported
 
-133 entries.
+154 entries.
 
 | ID | Title |
 |---|---|
@@ -45,6 +45,7 @@ Entries by status.
 | [BUG-STRATEGY-005](../bugs/BUG-STRATEGY-005.md) | The spy report shows the swordsmen count in place of all three troop counts |
 | [BUG-TALK-001](../bugs/BUG-TALK-001.md) | The conversation variable bound check lets a script reach one variable past the table |
 | [BUG-TOURNEY-001](../bugs/BUG-TOURNEY-001.md) | The tournament melee always loads a scene whose two digits repeat the site digit |
+| [BUG-UI-001](../bugs/BUG-UI-001.md) | The lender of village record 37 takes three of its numbers from record 36 |
 | [FMT-ASSAULT-001](../formats/FMT-ASSAULT-001.md) | Combatant record, one of the actors of a first-person assault |
 | [FMT-ASSAULT-002](../formats/FMT-ASSAULT-002.md) | Combat row, one of the 25 weapon records in the executable |
 | [FMT-ASSAULT-003](../formats/FMT-ASSAULT-003.md) | Scene effect descriptor, one record of the SFXDEFS resource |
@@ -66,6 +67,10 @@ Entries by status.
 | [FMT-TALK-006](../formats/FMT-TALK-006.md) | Expression, a record of ALL.TMB |
 | [FMT-TALK-007](../formats/FMT-TALK-007.md) | Value, a record of ALL.TMB |
 | [FMT-TALK-008](../formats/FMT-TALK-008.md) | Conversation variables, ALL.VTB |
+| [FMT-UI-001](../formats/FMT-UI-001.md) | Screen layout, a HAT file |
+| [FMT-UI-002](../formats/FMT-UI-002.md) | Screen region, one record of a HAT file |
+| [FMT-UI-003](../formats/FMT-UI-003.md) | Exterior catalogs, VILLAGE.DAT and TVILLAGE.DAT |
+| [FMT-UI-004](../formats/FMT-UI-004.md) | Store catalog, WEAPONS.DAT |
 | [FMT-VIEW-001](../formats/FMT-VIEW-001.md) | Scene block definition, one record of the Blocks resource |
 | [FMT-VIEW-002](../formats/FMT-VIEW-002.md) | Scene map, the Map resource |
 | [FMT-VIEW-003](../formats/FMT-VIEW-003.md) | Scene start position, the Viewer resource |
@@ -159,12 +164,28 @@ Entries by status.
 | [RULE-TOURNEY-003](../rules/RULE-TOURNEY-003.md) | Tournament joust wager and rewards |
 | [RULE-TOURNEY-004](../rules/RULE-TOURNEY-004.md) | Tournament melee wager, scene and settlement |
 | [RULE-TOURNEY-005](../rules/RULE-TOURNEY-005.md) | Practice melee scene |
+| [RULE-UI-001](../rules/RULE-UI-001.md) | Village exterior hot spots |
+| [RULE-UI-002](../rules/RULE-UI-002.md) | Village exterior actions |
+| [RULE-UI-003](../rules/RULE-UI-003.md) | Store stock |
 | [RULE-VIEW-001](../rules/RULE-VIEW-001.md) | Heading from one map point to another |
 | [RULE-VIEW-002](../rules/RULE-VIEW-002.md) | Integer sine, cosine and rotation |
 | [RULE-VIEW-003](../rules/RULE-VIEW-003.md) | Cast a ray through the scene and find the first opaque surface at a view row |
 | [RULE-VIEW-005](../rules/RULE-VIEW-005.md) | Draw the backdrop |
 | [RULE-VIEW-006](../rules/RULE-VIEW-006.md) | Build a scene's distance colour maps |
 | [RULE-VIEW-007](../rules/RULE-VIEW-007.md) | Colour map of a drawn surface |
+| [SCR-UI-001](../screens/SCR-UI-001.md) | Title screen |
+| [SCR-UI-002](../screens/SCR-UI-002.md) | Game options |
+| [SCR-UI-003](../screens/SCR-UI-003.md) | Character options |
+| [SCR-UI-004](../screens/SCR-UI-004.md) | Youth dilemma |
+| [SCR-UI-005](../screens/SCR-UI-005.md) | Pre-generated characters |
+| [SCR-UI-006](../screens/SCR-UI-006.md) | Village exterior |
+| [SCR-UI-007](../screens/SCR-UI-007.md) | Forge and store |
+| [SCR-UI-008](../screens/SCR-UI-008.md) | Practice grounds |
+| [SCR-UI-009](../screens/SCR-UI-009.md) | Castle office |
+| [SCR-UI-010](../screens/SCR-UI-010.md) | War planning |
+| [SCR-UI-011](../screens/SCR-UI-011.md) | Fief management tables |
+| [SCR-UI-012](../screens/SCR-UI-012.md) | Estate map |
+| [SCR-UI-013](../screens/SCR-UI-013.md) | Conversation |
 
 ## established
 
@@ -184,7 +205,7 @@ Entries by status.
 
 ## recorded
 
-172 entries.
+182 entries.
 
 | ID | Title |
 |---|---|
@@ -339,6 +360,16 @@ Entries by status.
 | [FND-TOURNEY-006](../findings/FND-TOURNEY-006.md) | The melee scene name repeats the site digit because both digits share one buffer |
 | [FND-TOURNEY-007](../findings/FND-TOURNEY-007.md) | The practice melee loads MELEE0 to MELEE2 with a draw of 0 to 2 |
 | [FND-TOURNEY-008](../findings/FND-TOURNEY-008.md) | Strings for the tournament refusals and the joust opponents' portraits |
+| [FND-UI-001](../findings/FND-UI-001.md) | Startup registers 25 screens, each a HAT file and a setup routine |
+| [FND-UI-002](../findings/FND-UI-002.md) | The HAT loader reads a 40-byte header and 24-byte region records, taking the region count from the file size |
+| [FND-UI-003](../findings/FND-UI-003.md) | The setup routines bind four callback slots per region and name the screens a click switches to |
+| [FND-UI-004](../findings/FND-UI-004.md) | The village exterior takes its six hot spots from a record of VILLAGE.DAT or TVILLAGE.DAT |
+| [FND-UI-005](../findings/FND-UI-005.md) | The village exterior actions: tournament gate, map, inn, forge, lender and church |
+| [FND-UI-006](../findings/FND-UI-006.md) | VILLAGE.DAT has 67 records and TVILLAGE.DAT 12, with one row of VILLAGE.DAT that stops after two numbers |
+| [FND-UI-007](../findings/FND-UI-007.md) | The store offers a random share of WEAPONS.DAT and lists the owned items it can buy back |
+| [FND-UI-008](../findings/FND-UI-008.md) | The pointer is a frame of FFMOUSE.CSF chosen through 0x00064030 |
+| [FND-UI-009](../findings/FND-UI-009.md) | The conversation screen draws five 558-by-35 response rows from (41, 302) and picks a row by pointer height |
+| [FND-UI-010](../findings/FND-UI-010.md) | The HAT backgrounds and the control sprite sets decode to the sizes the layouts expect |
 | [FND-VIEW-001](../findings/FND-VIEW-001.md) | Every combat scene archive holds its blocks as 96-byte records ending in 0xCC 0xCC with a 16-byte label at offset 78 |
 | [FND-VIEW-002](../findings/FND-VIEW-002.md) | Every combat scene map is 128 by 128 block numbers stored column by column |
 | [FND-VIEW-003](../findings/FND-VIEW-003.md) | The heading helper folds the vector into octants around floor(0x20 * minor / major), and callers pass (-dy, dx) |
@@ -382,6 +413,7 @@ Entries whose Open questions section says more than None known.
 | [BUG-STRATEGY-001](../bugs/BUG-STRATEGY-001.md) | The rare pursuit branch of the hostile generator tests a stale property | supported |
 | [BUG-STRATEGY-004](../bugs/BUG-STRATEGY-004.md) | Hostile forces lost to water or a dropped route are never uncounted | supported |
 | [BUG-TALK-001](../bugs/BUG-TALK-001.md) | The conversation variable bound check lets a script reach one variable past the table | supported |
+| [BUG-UI-001](../bugs/BUG-UI-001.md) | The lender of village record 37 takes three of its numbers from record 36 | supported |
 | [FMT-ASSAULT-001](../formats/FMT-ASSAULT-001.md) | Combatant record, one of the actors of a first-person assault | supported |
 | [FMT-ASSAULT-002](../formats/FMT-ASSAULT-002.md) | Combat row, one of the 25 weapon records in the executable | supported |
 | [FMT-ASSAULT-003](../formats/FMT-ASSAULT-003.md) | Scene effect descriptor, one record of the SFXDEFS resource | supported |
@@ -401,6 +433,10 @@ Entries whose Open questions section says more than None known.
 | [FMT-TALK-005](../formats/FMT-TALK-005.md) | Action, a record of ALL.TMB | supported |
 | [FMT-TALK-007](../formats/FMT-TALK-007.md) | Value, a record of ALL.TMB | supported |
 | [FMT-TALK-008](../formats/FMT-TALK-008.md) | Conversation variables, ALL.VTB | supported |
+| [FMT-UI-001](../formats/FMT-UI-001.md) | Screen layout, a HAT file | supported |
+| [FMT-UI-002](../formats/FMT-UI-002.md) | Screen region, one record of a HAT file | supported |
+| [FMT-UI-003](../formats/FMT-UI-003.md) | Exterior catalogs, VILLAGE.DAT and TVILLAGE.DAT | supported |
+| [FMT-UI-004](../formats/FMT-UI-004.md) | Store catalog, WEAPONS.DAT | supported |
 | [FMT-VIEW-001](../formats/FMT-VIEW-001.md) | Scene block definition, one record of the Blocks resource | supported |
 | [FMT-VIEW-003](../formats/FMT-VIEW-003.md) | Scene start position, the Viewer resource | supported |
 | [FMT-VIEW-004](../formats/FMT-VIEW-004.md) | Scene settings, the Scenario resource | supported |
@@ -490,6 +526,9 @@ Entries whose Open questions section says more than None known.
 | [RULE-TOURNEY-003](../rules/RULE-TOURNEY-003.md) | Tournament joust wager and rewards | supported |
 | [RULE-TOURNEY-004](../rules/RULE-TOURNEY-004.md) | Tournament melee wager, scene and settlement | supported |
 | [RULE-TOURNEY-005](../rules/RULE-TOURNEY-005.md) | Practice melee scene | supported |
+| [RULE-UI-001](../rules/RULE-UI-001.md) | Village exterior hot spots | supported |
+| [RULE-UI-002](../rules/RULE-UI-002.md) | Village exterior actions | supported |
+| [RULE-UI-003](../rules/RULE-UI-003.md) | Store stock | supported |
 | [RULE-VIEW-001](../rules/RULE-VIEW-001.md) | Heading from one map point to another | supported |
 | [RULE-VIEW-002](../rules/RULE-VIEW-002.md) | Integer sine, cosine and rotation | supported |
 | [RULE-VIEW-003](../rules/RULE-VIEW-003.md) | Cast a ray through the scene and find the first opaque surface at a view row | supported |
@@ -497,3 +536,16 @@ Entries whose Open questions section says more than None known.
 | [RULE-VIEW-005](../rules/RULE-VIEW-005.md) | Draw the backdrop | supported |
 | [RULE-VIEW-006](../rules/RULE-VIEW-006.md) | Build a scene's distance colour maps | supported |
 | [RULE-VIEW-007](../rules/RULE-VIEW-007.md) | Colour map of a drawn surface | supported |
+| [SCR-UI-001](../screens/SCR-UI-001.md) | Title screen | supported |
+| [SCR-UI-002](../screens/SCR-UI-002.md) | Game options | supported |
+| [SCR-UI-003](../screens/SCR-UI-003.md) | Character options | supported |
+| [SCR-UI-004](../screens/SCR-UI-004.md) | Youth dilemma | supported |
+| [SCR-UI-005](../screens/SCR-UI-005.md) | Pre-generated characters | supported |
+| [SCR-UI-006](../screens/SCR-UI-006.md) | Village exterior | supported |
+| [SCR-UI-007](../screens/SCR-UI-007.md) | Forge and store | supported |
+| [SCR-UI-008](../screens/SCR-UI-008.md) | Practice grounds | supported |
+| [SCR-UI-009](../screens/SCR-UI-009.md) | Castle office | supported |
+| [SCR-UI-010](../screens/SCR-UI-010.md) | War planning | supported |
+| [SCR-UI-011](../screens/SCR-UI-011.md) | Fief management tables | supported |
+| [SCR-UI-012](../screens/SCR-UI-012.md) | Estate map | supported |
+| [SCR-UI-013](../screens/SCR-UI-013.md) | Conversation | supported |

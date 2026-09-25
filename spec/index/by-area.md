@@ -366,7 +366,39 @@ Entries by area.
 
 ## UI
 
-None.
+| ID | Title | Status |
+|---|---|---|
+| [BUG-UI-001](../bugs/BUG-UI-001.md) | The lender of village record 37 takes three of its numbers from record 36 | supported |
+| [FMT-UI-001](../formats/FMT-UI-001.md) | Screen layout, a HAT file | supported |
+| [FMT-UI-002](../formats/FMT-UI-002.md) | Screen region, one record of a HAT file | supported |
+| [FMT-UI-003](../formats/FMT-UI-003.md) | Exterior catalogs, VILLAGE.DAT and TVILLAGE.DAT | supported |
+| [FMT-UI-004](../formats/FMT-UI-004.md) | Store catalog, WEAPONS.DAT | supported |
+| [FND-UI-001](../findings/FND-UI-001.md) | Startup registers 25 screens, each a HAT file and a setup routine | recorded |
+| [FND-UI-002](../findings/FND-UI-002.md) | The HAT loader reads a 40-byte header and 24-byte region records, taking the region count from the file size | recorded |
+| [FND-UI-003](../findings/FND-UI-003.md) | The setup routines bind four callback slots per region and name the screens a click switches to | recorded |
+| [FND-UI-004](../findings/FND-UI-004.md) | The village exterior takes its six hot spots from a record of VILLAGE.DAT or TVILLAGE.DAT | recorded |
+| [FND-UI-005](../findings/FND-UI-005.md) | The village exterior actions: tournament gate, map, inn, forge, lender and church | recorded |
+| [FND-UI-006](../findings/FND-UI-006.md) | VILLAGE.DAT has 67 records and TVILLAGE.DAT 12, with one row of VILLAGE.DAT that stops after two numbers | recorded |
+| [FND-UI-007](../findings/FND-UI-007.md) | The store offers a random share of WEAPONS.DAT and lists the owned items it can buy back | recorded |
+| [FND-UI-008](../findings/FND-UI-008.md) | The pointer is a frame of FFMOUSE.CSF chosen through 0x00064030 | recorded |
+| [FND-UI-009](../findings/FND-UI-009.md) | The conversation screen draws five 558-by-35 response rows from (41, 302) and picks a row by pointer height | recorded |
+| [FND-UI-010](../findings/FND-UI-010.md) | The HAT backgrounds and the control sprite sets decode to the sizes the layouts expect | recorded |
+| [RULE-UI-001](../rules/RULE-UI-001.md) | Village exterior hot spots | supported |
+| [RULE-UI-002](../rules/RULE-UI-002.md) | Village exterior actions | supported |
+| [RULE-UI-003](../rules/RULE-UI-003.md) | Store stock | supported |
+| [SCR-UI-001](../screens/SCR-UI-001.md) | Title screen | supported |
+| [SCR-UI-002](../screens/SCR-UI-002.md) | Game options | supported |
+| [SCR-UI-003](../screens/SCR-UI-003.md) | Character options | supported |
+| [SCR-UI-004](../screens/SCR-UI-004.md) | Youth dilemma | supported |
+| [SCR-UI-005](../screens/SCR-UI-005.md) | Pre-generated characters | supported |
+| [SCR-UI-006](../screens/SCR-UI-006.md) | Village exterior | supported |
+| [SCR-UI-007](../screens/SCR-UI-007.md) | Forge and store | supported |
+| [SCR-UI-008](../screens/SCR-UI-008.md) | Practice grounds | supported |
+| [SCR-UI-009](../screens/SCR-UI-009.md) | Castle office | supported |
+| [SCR-UI-010](../screens/SCR-UI-010.md) | War planning | supported |
+| [SCR-UI-011](../screens/SCR-UI-011.md) | Fief management tables | supported |
+| [SCR-UI-012](../screens/SCR-UI-012.md) | Estate map | supported |
+| [SCR-UI-013](../screens/SCR-UI-013.md) | Conversation | supported |
 
 ## RES
 

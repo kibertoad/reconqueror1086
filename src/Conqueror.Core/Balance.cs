@@ -128,6 +128,8 @@ public static class Balance
         new("War Helm", 180, 10, 0, Slot: EquipmentSlot.Helm, OriginalStoreRecord: 29), new("Norman Helm", 120, 5, 0, Slot: EquipmentSlot.Helm, OriginalStoreRecord: 31), new("Footman's Helm", 60, 0, 0, Slot: EquipmentSlot.Helm, OriginalStoreRecord: 28)
     ];
 
+    // PLACEHOLDER: RULE-UI-003. The original draws each visit's stock from the records of the place's
+    // residue modulo 4 with a chance each and lists owned items after them; this offers every store item.
     public static readonly EquipmentBalance[] StoreEquipment = Equipment
         .Where(item => item.Shop)
         .OrderBy(item => item.OriginalStoreRecord ?? int.MaxValue)

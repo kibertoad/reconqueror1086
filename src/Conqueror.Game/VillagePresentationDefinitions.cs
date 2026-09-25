@@ -14,6 +14,7 @@ public enum VillageHotspotAction { Tournament, Map, Inn, Blacksmith, Lender, Chu
 
 public sealed record VillageHotspot(VillageHotspotAction Action, string HoverLabel, int HatRegionId, UiBounds Bounds);
 
+// SCR-UI-006.
 public static class VillagePresentationDefinitions
 {
     public static UiBounds HoverLabelBounds { get; } = new(4, 319, 137, 161);

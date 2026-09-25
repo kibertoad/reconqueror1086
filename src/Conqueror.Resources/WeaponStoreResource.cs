@@ -17,6 +17,7 @@ public sealed record WeaponStoreEntry(
 
 public sealed record WeaponStoreResource(IReadOnlyList<WeaponStoreEntry> Entries);
 
+// FMT-UI-004. The original reads records 0 to 38 only (RULE-UI-003).
 public static class WeaponStoreDecoder
 {
     private const int FieldsPerRecord = 6;

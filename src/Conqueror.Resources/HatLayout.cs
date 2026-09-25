@@ -5,6 +5,7 @@ namespace Conqueror.Resources;
 
 public sealed record HatRegion(int Id, int X, int Y, int Width, int Height, int Enabled);
 
+// FMT-UI-001, FMT-UI-002. The original counts regions from the file size and ignores the header count.
 /// <summary>Bounded parser for the original fixed-header screen-layout descriptors.</summary>
 public sealed class HatLayout
 {

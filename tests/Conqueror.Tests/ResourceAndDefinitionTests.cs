@@ -880,7 +880,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal("Options.Background", optionsAnimation.PaletteArtRole);
     }
 
-    [Fact]
+    [Fact] // Covers SCR-UI-006.
     public void OriginalCursorFramesRetainTheirDecodedOrder()
     {
         Assert.Equal(OriginalCursorDefinitions.FrameCount, Enum.GetValues<OriginalCursorKind>().Length);

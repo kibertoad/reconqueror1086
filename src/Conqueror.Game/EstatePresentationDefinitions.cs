@@ -22,6 +22,7 @@ public sealed record EstateLayout(
     UiBounds FooterStatus,
     IReadOnlyList<EstateControl> Controls);
 
+// SCR-UI-012.
 public static class EstatePresentationDefinitions
 {
     private const int WorldWidth = 760;

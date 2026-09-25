@@ -12,6 +12,7 @@ public sealed record VillageSceneHotspot(bool Enabled, int X, int Y, int Width, 
 /// </summary>
 public sealed record VillageSceneDefinition(string BackgroundName, IReadOnlyList<VillageSceneHotspot> Hotspots);
 
+// FMT-UI-003. The original maps hot spots by row position and discards the labels (RULE-UI-001).
 /// <summary>Bounded decoder for the line-oriented VILLAGE.DAT/TVILLAGE.DAT scene catalogs.</summary>
 public static class VillageSceneCatalogDecoder
 {

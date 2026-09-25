@@ -28,6 +28,7 @@ public sealed record HeraldicColorOption(
     int HatRegionId,
     int OriginalStrategicCharacterColor);
 
+// SCR-UI-003, SCR-UI-005.
 /// <summary>Original 640x480 character-options screen hotspots, kept as data rather than rendering branches.</summary>
 public static class CharacterCreationDefinitions
 {

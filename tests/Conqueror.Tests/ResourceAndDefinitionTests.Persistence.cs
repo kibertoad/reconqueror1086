@@ -311,7 +311,7 @@ public sealed partial class ResourceAndDefinitionTests
             entry => entry.Contains("enemy column reaches Bristol", StringComparison.Ordinal));
     }
 
-    [Fact]
+    [Fact] // Covers FMT-UI-004.
     public void WeaponStoreTableParsesBoundedSixLineRecords()
     {
         var text = "first.smk\r\n2\r\n7\r\n9\r\n500\r\nA synthetic sword.\r\n#\r\n3\r\n8\r\n10\r\n120\r\nSynthetic armor.";
@@ -323,7 +323,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(8, resource.Entries[1].ImageFrame);
     }
 
-    [Fact]
+    [Fact] // Covers FMT-UI-004.
     public void WeaponStoreTableAndEquipmentMappingsRejectAmbiguity()
     {
         var incomplete = System.Text.Encoding.ASCII.GetBytes("#\r\n1\r\n2");
@@ -363,7 +363,7 @@ public sealed partial class ResourceAndDefinitionTests
             YouthDilemmaPresentationDefinitions.ContinueFrom(new HatLayout(bytes)));
     }
 
-    [Fact]
+    [Fact] // Covers FMT-UI-001, FMT-UI-002.
     public void HatLayoutDecodesAndOverridesFallbackRegions()
     {
         var bytes = new byte[64];
@@ -443,7 +443,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(new UiBounds(115, 31, 41, 51), layout.HoverLabelBounds);
     }
 
-    [Fact]
+    [Fact] // Covers FMT-UI-001, FMT-UI-002.
     public void HatLayoutRejectsOutOfBoundsRegions()
     {
         var bytes = new byte[64];

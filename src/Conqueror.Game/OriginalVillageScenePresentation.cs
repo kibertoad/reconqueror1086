@@ -3,6 +3,7 @@ using Conqueror.Resources;
 
 namespace Conqueror.Game;
 
+// PLACEHOLDER: RULE-UI-001. The original picks the catalog and record for every place it visits.
 /// <summary>Executable-mapped binding between an original new-game home and its exterior catalog record.</summary>
 public static class OriginalVillageScenePresentation
 {
