@@ -16,9 +16,7 @@ public static class OriginalStrategicMapMarkerPresentation
     public const int CharacterColorFrameStride = 8;
 
     /// <summary>
-    /// Recreates initializer <c>0x12A77-0x12AA5</c>'s frame-base assignment:
-    /// the character configuration's zero-based <c>COLOR</c> field is scaled
-    /// by eight before being stored at each player record's <c>+0x38</c>.
+    /// The frame base of RULE-STRATEGY-015: eight times the COLOR attribute.
     /// </summary>
     public static int FrameBaseForCharacterColor(int characterColor)
     {
@@ -35,8 +33,8 @@ public static class OriginalStrategicMapMarkerPresentation
 
     /// <summary>
     /// Enumerates the active source marker inputs in the physical record order
-    /// used by <c>0x12F28</c>. Coordinates are deliberately left in route
-    /// space: the subsequent <c>0x3F0A0</c> clipping projection still belongs
+    /// of <c>draw_player_markers</c> (RULE-STRATEGY-015). Coordinates are left in route
+    /// space: the clipping of <c>draw_marker</c> still belongs
     /// to the presentation boundary.
     /// </summary>
     public static IReadOnlyList<OriginalStrategicMapMarkerDraw> BuildDraws(
@@ -68,8 +66,8 @@ public static class OriginalStrategicMapMarkerPresentation
 
     /// <summary>
     /// Enumerates the five movement records in the physical order used
-    /// by <c>0x3A63C</c>. Unlike player markers, their already-stored
-    /// <c>+0x38</c> value is a direct frame index: there is no selection
+    /// of <c>draw_hostile_markers</c> (RULE-STRATEGY-015). Unlike player markers, their
+    /// stored frame is used as it is: there is no selection
     /// offset. A zero value on an old replacement save is recovered from the
     /// confirmed origin-property table, because no supported source property
     /// uses frame zero.
@@ -99,9 +97,7 @@ public static class OriginalStrategicMapMarkerPresentation
 
     /// <summary>
     /// Enumerates active temporary-force records in their physical source
-    /// order. Lifecycle pass <c>0x3B0E4</c> truncates each record's live
-    /// <c>+0x5C/+0x60</c> position and sends it through the common
-    /// <c>icon_men.CSF</c> projection with fixed frame three.
+    /// order, drawn with frame 3 at the truncated position (RULE-STRATEGY-017).
     /// </summary>
     public static IReadOnlyList<OriginalStrategicMapMarkerDraw> BuildTemporaryForceDraws(
         OriginalStrategicCampaignState state)
@@ -123,7 +119,7 @@ public static class OriginalStrategicMapMarkerPresentation
     }
 
     /// <summary>
-    /// Mirrors <c>0x12F32-0x130C3</c> for an already-active player record.
+    /// Mirrors <c>draw_player_markers</c> (RULE-STRATEGY-015) for an already-active player record.
     /// The original stores <paramref name="frameBase"/> at record <c>+0x38</c>
     /// and selects an offset from record <c>+0x04</c>, global <c>AE6C</c>, and
     /// the special avatar slot 5.
@@ -155,7 +151,7 @@ public static class OriginalStrategicMapMarkerPresentation
 /// <summary>
 /// One active player marker immediately before the original map blitter's
 /// viewport projection. <see cref="SourceX"/> and <see cref="SourceY"/> are
-/// the x87 toward-zero integer conversions made by <c>0x12F28</c>.
+/// the toward-zero integer conversions of RULE-STRATEGY-015.
 /// </summary>
 public readonly record struct OriginalStrategicMapMarkerDraw(
     int Slot,

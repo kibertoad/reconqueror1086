@@ -10,8 +10,8 @@ public sealed class OriginalStrategicCampaignState
     public const int WorldColumnCount = 400;
 
     public int StartingRouteSelector { get; set; } = -1;
-    // Object-2 +0x1B0C4/+0x1B0CC. New-game initializer 0x110E8 writes the
-    // selected home person, then its resolved fallback origin property here.
+    // fallback_person and fallback_origin (RULE-STRATEGY-012). A new game writes the
+    // selected home person, then its group, here.
     // These values can be changed by later original UI/save paths, so they
     // are persisted state rather than recomputed from the selector on demand.
     public int SchedulerFallbackTargetPerson { get; set; } = -1;
@@ -34,7 +34,7 @@ public sealed class OriginalStrategicCampaignState
     public List<OriginalStrategicPersonState> Persons { get; init; } = [];
     public List<OriginalStrategicPlayerMovementSlot> PlayerMovementSlots { get; init; } = [];
     public List<OriginalStrategicMovementSlot> MovementSlots { get; init; } = [];
-    // Object-2 +0x1A150: three 0x118-byte temporary-force records. This
+    // brigand_forces, three FMT-STRATEGY-001 records. This
     // initializer also keeps saves written before the field existed readable.
     public List<OriginalStrategicTemporaryForceSlot> TemporaryForceSlots { get; init; } =
         Enumerable.Range(0, OriginalStrategicMovement.PlayerDivisionTargetCount)
@@ -297,12 +297,8 @@ public sealed class OriginalStrategicMovementSlot
 }
 
 /// <summary>
-/// Mutable counterpart of one temporary-force record at object-2
-/// <c>+0x1A150 + 0x118 * slot</c>. The source uses <c>+0x00</c> as its
-/// active flag, completion at <c>+0x0C</c>, route count/cursor at
-/// <c>+0x18/+0x30</c>, force counters at <c>+0x1C/+0x20/+0x24</c>, target
-/// and grid coordinates at <c>+0x3C..+0x48</c>, and the live position and
-/// direction at <c>+0x5C..+0x68</c>. The route allocation itself is source
+/// Mutable counterpart of one record of <c>brigand_forces</c>, laid out as
+/// FMT-STRATEGY-001. The route allocation itself is source
 /// process memory; the two recovered automatic route identities are instead
 /// bound by physical slot in <see cref="OriginalStrategicTemporaryForces"/>.
 /// Construction and expiry descriptor semantics remain outside this persisted

@@ -1,6 +1,6 @@
 namespace Conqueror.Core;
 
-/// <summary>Settlement of caller 0x3B365's direct patrol resolver.</summary>
+/// <summary>Settlement of a brigand fight (RULE-STRATEGY-017).</summary>
 public sealed record OriginalStrategicTemporaryForceSettlement(
     OriginalStrategicEncounterForces PlayerSurvivors,
     OriginalStrategicEncounterForces PatrolSurvivors,
@@ -94,9 +94,8 @@ public sealed partial class Campaign
         force.Swordsmen = patrol.Swordsmen;
         force.Halberdiers = patrol.Halberdiers;
         force.Knights = patrol.Knights;
-        // 0x3B5D5-0x3B645 ends the contacted player's current route even
-        // when neither side has been eliminated. 0x63EC0 truncates the live
-        // floats toward zero before storing the destination integers.
+        // RULE-STRATEGY-017: the army's route ends even when both sides keep
+        // troops, and its destination is its truncated position.
         var playerRecord = strategic.PlayerMovementSlots.Single(slot =>
             slot.Slot == encounter.PlayerMovementSlot);
         playerRecord.WaypointCount = 0;
@@ -119,7 +118,7 @@ public sealed partial class Campaign
             army.Units[UnitType.Halberdiers] = player.Halberdiers;
             army.Units[UnitType.Knights] = player.Knights;
             army.RecordOriginalStrategicEncounterResolution();
-            // 0x3B690 draws before 0x3B6A5 overrides slot one's award.
+            // RULE-STRATEGY-017: the bounty is drawn before slot 1's fixed 40 replaces it.
             var drawnReward = checked(rewardRandom.Next(100) + 50);
             reward = encounter.Slot == 1 ? 40 : drawnReward;
             variables[17] = unchecked(variables[17] + reward);

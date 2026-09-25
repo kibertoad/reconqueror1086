@@ -2,7 +2,7 @@ namespace Conqueror.Core;
 
 /// <summary>
 /// Converts the original strategic screen's raw map-pointer coordinates to
-/// route-space coordinates through helper <c>0x640A0</c>. This intentionally
+/// route-space coordinates as RULE-STRATEGY-013 does. This intentionally
 /// does not convert physical display pixels; the application owns that input
 /// boundary before supplying the source coordinate pair.
 /// </summary>

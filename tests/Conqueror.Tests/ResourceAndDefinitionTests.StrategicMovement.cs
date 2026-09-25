@@ -7,6 +7,7 @@ using Xunit;
 
 namespace Conqueror.Tests;
 
+// Covers RULE-STRATEGY-004, RULE-STRATEGY-005, RULE-STRATEGY-006, RULE-STRATEGY-007, RULE-STRATEGY-008, RULE-STRATEGY-009, RULE-STRATEGY-014, FMT-STRATEGY-002, FMT-STRATEGY-003, FMT-STRATEGY-004, FMT-STRATEGY-005.
 public sealed partial class ResourceAndDefinitionTests
 {
     [Fact]

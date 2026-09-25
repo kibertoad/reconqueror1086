@@ -1,8 +1,8 @@
 namespace Conqueror.Core;
 
 /// <summary>
-/// Mutable counterpart of one record in the six-entry player strategic table
-/// at object-2 <c>+0x1A4B8</c>. The first five records are armies; record five
+/// Mutable counterpart of one record of <c>player_forces</c> (FMT-STRATEGY-001,
+/// RULE-STRATEGY-010). The first five records are armies; record five
 /// is the special player-avatar record.
 /// </summary>
 public sealed class OriginalStrategicPlayerMovementSlot

@@ -39,7 +39,7 @@ public static partial class OriginalStrategicMovement
         state.Validate();
         if (playerSlot is < 0 or >= PlayerMovementRecordCount)
             throw new ArgumentOutOfRangeException(nameof(playerSlot));
-        // 0x12CB6 tests > 5, so the sixth successful construction is retained.
+        // RULE-STRATEGY-012: place_army tests > 5, so a sixth placement succeeds.
         if (state.ActivePlayerRecordCount > PlayerArmyMovementCount) return false;
 
         var selected = SelectedPlayerSlot(state);

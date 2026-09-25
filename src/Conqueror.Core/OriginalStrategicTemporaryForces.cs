@@ -1,9 +1,8 @@
 namespace Conqueror.Core;
 
 /// <summary>
-/// Fixed temporary-force route descriptors recovered from constructor
-/// <c>0x3B0E4</c>. Descriptor index is also the physical temporary-record
-/// slot selected by the source's 0x20-byte creator-data table.
+/// Fixed brigand order descriptors (FMT-STRATEGY-006, RULE-STRATEGY-016).
+/// The descriptor index is also the brigand record's slot.
 /// </summary>
 public sealed record OriginalStrategicTemporaryForceRoute(
     int DescriptorIndex,

@@ -98,8 +98,8 @@ public static partial class OriginalStrategicMovement
     public const int ReducedTerrainProfile = 2;
     public const int ImpassableTerrainKind = 9;
 
-    // Object-2 +0xAE88 stores the property-keyed selector which 0x3A764 and
-    // 0x3AC5C shift left three places into each live movement record +0x38.
+    // marker_words: RULE-STRATEGY-004 shifts the property's word left three
+    // places into each live movement record's frame.
     // Only the first fourteen entries are reachable through the 0..13
     // strategic property domain.
     private static readonly int[] MovementMarkerFrameBases =

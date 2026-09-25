@@ -3,7 +3,7 @@ namespace Conqueror.Core;
 /// <summary>
 /// Fixed-update motion kernel for the original five enemy movement records.
 /// Generator construction and completion/contact resolution remain separate,
-/// matching the call boundaries around dispatcher <c>0x3C088</c>.
+/// matching the call boundaries of the hostile pass (RULE-STRATEGY-002).
 /// </summary>
 public static partial class OriginalStrategicMovement
 {

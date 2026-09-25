@@ -29,9 +29,8 @@ public static class OriginalStrategicHostRuntime
 
         var schedulerFallbackUnavailable = strategic.SchedulerFallbackTargetPerson < 0
             || strategic.SchedulerFallbackOriginProperty < 0;
-        // UI poll 0x22242-0x2228A tests the same scope-zero variables that
-        // conversation action groups 2423 and 2552 set. It raises each
-        // creator flag for any nonzero value, in descriptor order.
+        // RULE-STRATEGY-019: variables 43 and 93 raise the raid requests for any
+        // nonzero value, in descriptor order.
         var conversationVariables = campaign.State.ConversationVariables;
         var creatorActions = OriginalStrategicTemporaryForces.Creators
             .Where(creator => creator.ActionId < conversationVariables.Count

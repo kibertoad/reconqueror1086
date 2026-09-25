@@ -21,7 +21,7 @@ public readonly record struct OriginalStrategicMapDispatchResult(
 public static class OriginalStrategicMapCommands
 {
     /// <summary>
-    /// Performs <c>0x122AC</c>'s source-order pointer path after the caller
+    /// Performs the map click of RULE-STRATEGY-013 after the caller
     /// has supplied the logical source pointer and any confirmation response
     /// for an enemy or temporary-division target.
     /// </summary>

@@ -3,10 +3,8 @@ namespace Conqueror.Resources;
 public readonly record struct StrategicWorldCellPosition(int Row, int Column);
 
 /// <summary>
-/// Reproduces the strategic world's staggered-cell coordinate helpers. The
-/// original routines are <c>0x63E20</c> (cell to route-space anchor),
-/// <c>0x629B0</c> (bring a route-space point into the current viewport), and
-/// <c>0x6E5A0</c> (scan the rendered cell diamonds in draw order).
+/// Reproduces the strategic world's staggered-cell coordinate helpers:
+/// <c>anchor_x</c>, <c>anchor_y</c> and <c>pick_cell</c> (RULE-STRATEGY-014).
 /// </summary>
 public static class StrategicWorldProjection
 {
@@ -16,8 +14,7 @@ public static class StrategicWorldProjection
     public const int ViewBottom = 441;
 
     /// <summary>
-    /// Returns the route-space anchor produced by original helper
-    /// <c>0x63E20</c>. On odd columns this is the diamond center; on even
+    /// Returns the route-space anchor of RULE-STRATEGY-014. On odd columns this is the diamond center; on even
     /// columns it is the shared right/left vertex, whose ownership therefore
     /// follows the original viewport scan order.
     /// </summary>
@@ -41,10 +38,10 @@ public static class StrategicWorldProjection
 
     /// <summary>
     /// Converts one original route-space point to its live grid address. Edge
-    /// pixels deliberately retain camera-dependent ownership because
-    /// <c>0x6E5A0</c> accepts both inclusive diamond edges and returns the
-    /// first cell encountered from the current row/column.
+    /// pixels keep camera-dependent ownership: the first cell the scan reaches wins.
     /// </summary>
+    // PLACEHOLDER: RULE-STRATEGY-014. The cell test here is a symmetric diamond, |dx| + 2|dy| <= 40;
+    // the rule's lower half is one line taller and 2 wider, which picks another cell for some points.
     public static bool TryWorldToCell(
         int worldX,
         int worldY,

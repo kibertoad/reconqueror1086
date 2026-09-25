@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Conqueror.Tests;
 
+// Covers FMT-STRATEGY-001, FMT-STRATEGY-002, FMT-STRATEGY-003.
 public sealed partial class ResourceAndDefinitionTests
 {
     [Fact]

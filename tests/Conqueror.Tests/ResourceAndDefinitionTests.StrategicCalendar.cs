@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Conqueror.Tests;
 
+// Covers RULE-STRATEGY-009.
 public sealed partial class ResourceAndDefinitionTests
 {
     [Theory]

@@ -8,17 +8,17 @@ How much of the spec in `spec/` the rebuild does. The rows are in `parity/`, one
 |---|---|
 | unknown | 4 |
 | sourced | 0 |
-| supported | 42 |
+| supported | 53 |
 | established | 0 |
 | disputed | 0 |
-| implemented | 15 |
+| implemented | 29 |
 | validated | 0 |
 
 | Code | Rows |
 |---|---|
 | missing | 1 |
-| partial | 45 |
-| complete | 15 |
+| partial | 56 |
+| complete | 29 |
 
 ## Areas
 
@@ -28,5 +28,6 @@ How much of the spec in `spec/` the rebuild does. The rows are in `parity/`, one
 | [VIEW](parity/VIEW.md) | 16 |
 | [JOUST](parity/JOUST.md) | 3 |
 | [TOURNEY](parity/TOURNEY.md) | 5 |
+| [STRATEGY](parity/STRATEGY.md) | 25 |
 | [PERSON](parity/PERSON.md) | 1 |
 | [RNG](parity/RNG.md) | 1 |

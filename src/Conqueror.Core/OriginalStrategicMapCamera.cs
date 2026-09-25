@@ -1,8 +1,8 @@
 namespace Conqueror.Core;
 
 /// <summary>
-/// Maps the strategic screen's raw-pointer edge panning at
-/// <c>0x3D83C-0x3D8B5</c>. The application owns conversion of a physical
+/// Maps the strategic screen's edge panning and focusing (RULE-STRATEGY-014).
+/// The application owns conversion of a physical
 /// pointer to this source coordinate space and requests its own redraw after
 /// this state-only operation succeeds.
 /// </summary>
@@ -19,11 +19,7 @@ public static class OriginalStrategicMapCamera
     public const int FocusColumnLead = 11;
 
     /// <summary>
-    /// Maps focus adapter <c>0x130E4</c> and helper <c>0x3C6E0</c>. The
-    /// helper first wraps the requested grid row minus two in the 200-row
-    /// world and subtracts eleven from the grid column. The caller then
-    /// clamps the resulting render camera rather than trying to center an
-    /// unavailable edge location.
+    /// Maps <c>focus_on</c> (RULE-STRATEGY-014).
     /// </summary>
     public static void FocusOnGridCell(
         OriginalStrategicCampaignState state,
@@ -44,10 +40,10 @@ public static class OriginalStrategicMapCamera
     }
 
     /// <summary>
-    /// Moves at most one row and one column. Right/bottom edges are strict
-    /// greater-than tests, while left/top edges are strict less-than tests,
-    /// matching the original branch ordering and allowing diagonal panning.
+    /// Moves at most one row and one column.
     /// </summary>
+    // PLACEHOLDER: RULE-STRATEGY-014. The rule moves one axis per call, rows before columns, and
+    // leaves map_busy set after a move; moving both axes at once is the rebuild's own.
     public static bool ApplyMappedEdgeScroll(
         OriginalStrategicCampaignState state,
         int pointerX,

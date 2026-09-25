@@ -8,7 +8,7 @@ namespace Conqueror.Core;
 public static class OriginalStrategicMapMarkerProjection
 {
     /// <summary>
-    /// Mirrors the bounds and origin arithmetic in <c>0x3F0A0-0x3F205</c> for
+    /// Mirrors the bounds and origin arithmetic of <c>draw_marker</c> (RULE-STRATEGY-015) for
     /// the 80-by-80 strategic-grid geometry. The original checks its source
     /// bounds inclusively, subtracts the marker image height, and lets the
     /// eventual blitter crop the resulting image rectangle.

@@ -23,7 +23,7 @@ public readonly record struct OriginalStrategicMapTerrainTileDraw(
     ushort TileId);
 
 /// <summary>
-/// Reproduces the resource-neutral viewport traversal at <c>0x3C770</c>.
+/// Reproduces the viewport traversal of <c>draw_terrain</c> (RULE-STRATEGY-015).
 /// It deliberately exposes draw order and placement rather than choosing a
 /// host renderer, texture atlas, or scaling policy.
 /// </summary>
@@ -70,9 +70,8 @@ public static class OriginalStrategicMapTerrainRendering
     }
 
     /// <summary>
-    /// Resolves each draw's frame selector through the source grid. This
-    /// mirrors <c>0x3C838-0x3C843</c>, which masks the cell to its low word
-    /// immediately before its tile-blitter call.
+    /// Resolves each draw's frame selector through the source grid, the cell's
+    /// low word (RULE-STRATEGY-015).
     /// </summary>
     public static IReadOnlyList<OriginalStrategicMapTerrainTileDraw> BuildTileDraws(
         OriginalStrategicCampaignState state,

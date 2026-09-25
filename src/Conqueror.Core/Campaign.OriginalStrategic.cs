@@ -5,9 +5,9 @@ namespace Conqueror.Core;
 /// The three transient targets mirror the original division-force target
 /// handles; they are deliberately supplied at the application boundary rather
 /// than guessed from the incompatible dated campaign map. A modal blocks only
-/// the hostile scheduler, after the report and player pass, as at `0x3C290`.
-/// Player-contact handoff has its own active state, matching `0x39428`'s
-/// independent `ADC0` guard.
+/// the hostile scheduler, after the report and player pass (RULE-STRATEGY-001).
+/// Player-contact handoff has its own active state, as the encounter's
+/// map-session guard does (RULE-STRATEGY-011).
 /// </summary>
 public sealed record OriginalStrategicCampaignPassInput(
     IReadOnlyList<OriginalStrategicPlayerTarget> DivisionTargets,
@@ -31,7 +31,7 @@ public sealed record OriginalStrategicCampaignPassResult(
     IReadOnlyList<OriginalStrategicTemporaryForceAvatarNotice> TemporaryForceAvatarNotices,
     OriginalStrategicTemporaryForceEncounter? TemporaryForceEncounter);
 
-/// <summary>Direct six-counter patrol handoff from caller 0x3B365, without wrapper 0x35924's reserves.</summary>
+/// <summary>Direct six-counter brigand handoff (RULE-STRATEGY-017), without the staging reserves of RULE-STRATEGY-011.</summary>
 public sealed record OriginalStrategicTemporaryForceEncounter(
     int Slot, int PlayerMovementSlot,
     OriginalStrategicEncounterForces PlayerForces,
@@ -73,7 +73,7 @@ public readonly record struct OriginalStrategicEncounterForces(
 }
 
 /// <summary>
-/// The exact force staging performed immediately before resolver <c>0x258FC</c>.
+/// The force staging of RULE-STRATEGY-011, performed immediately before resolver <c>0x258FC</c>.
 /// Player reserves are deliberately held outside the resolver and added back
 /// after it returns; hostile values are resolver-owned write-back counters.
 /// </summary>
@@ -94,7 +94,7 @@ public interface IOriginalStrategicEncounterRandom
 
 /// <summary>
 /// Result of resolver <c>0x258FC</c>'s non-interactive fallback. The player
-/// totals include the staging reserves restored by wrapper <c>0x35924</c>.
+/// totals include the staging reserves restored as RULE-STRATEGY-011 describes.
 /// </summary>
 public readonly record struct OriginalStrategicAutomaticEncounterResult(
     bool PlayerWon,
@@ -110,10 +110,8 @@ public static class OriginalStrategicEncounterStaging
     public const int PlayerScoreDivisor = 6;
 
     /// <summary>
-    /// Maps wrapper <c>0x35924:0x3593F-0x35967</c>. The source reads dynamic
-    /// character fields 5/6 (HONOR/FAME), adds 20 only for the record named
-    /// by global <c>AE6C</c>, then uses signed division by six as resolver
-    /// argument seven. Argument eight remains zero at its campaign caller.
+    /// RULE-STRATEGY-011: the morale value <c>stage_battle</c> passes to the
+    /// battle.
     /// </summary>
     public static int PlayerScoreModifier(Player player, bool isDistinguishedPlayerRecord)
     {
@@ -124,9 +122,8 @@ public static class OriginalStrategicEncounterStaging
     }
 
     /// <summary>
-    /// Maps wrapper <c>0x35924</c>'s pre-resolver counter reductions. Its
-    /// original integer divisions and strict <c>reduction + 1 &lt; count</c>
-    /// tests are retained rather than treating either side as an aggregate.
+    /// RULE-STRATEGY-011: the counter reductions <c>stage_battle</c> makes
+    /// before the battle.
     /// </summary>
     public static OriginalStrategicEncounterPreparation Prepare(
         OriginalStrategicEncounterForces playerForces,
@@ -155,8 +152,8 @@ public static class OriginalStrategicEncounterStaging
     /// <summary>
     /// Reproduces <c>0x258FC:0x259D0-0x25A88</c>, the automatic branch used
     /// when its prior interactive choice dialog returns zero. The caller owns
-    /// the two explicit score modifiers because wrapper <c>0x35924</c>
-    /// constructs them outside this resolver.
+    /// the two explicit score modifiers because the staging of
+    /// RULE-STRATEGY-011 constructs them outside this resolver.
     /// </summary>
     public static OriginalStrategicAutomaticEncounterResult ResolveAutomatic(
         OriginalStrategicEncounterPreparation preparation,
@@ -294,9 +291,8 @@ public sealed record OriginalStrategicInteractiveEncounterApplication(
 public sealed partial class Campaign
 {
     /// <summary>
-    /// Recovers wrapper <c>0x35924</c>'s player-side resolver modifier for a
-    /// captured contact. The distinguished marker is the persisted source
-    /// global <c>AE6C</c>, not necessarily the avatar or army slot zero.
+    /// The morale value of RULE-STRATEGY-011 for a captured contact; its bonus
+    /// follows the record the player rides with.
     /// </summary>
     public int OriginalStrategicEncounterPlayerScoreModifier(
         OriginalStrategicPlayerEnemyEncounter encounter)
@@ -383,8 +379,8 @@ public sealed partial class Campaign
         var engaged = strategic.PlayerMovementSlots.Single(slot =>
             slot.Slot == strategic.EngagedPlayerMovementSlot);
         OriginalStrategicSchedulerResult? schedulerPass = null;
-        // Source 0x13168 invokes encounter wrapper 0x39428 synchronously before
-        // caller 0x3C290 reaches its scheduler gate. The host hands that
+        // The player pass fights an encounter before the strategic pass reaches
+        // the hostile pass (RULE-STRATEGY-001, RULE-STRATEGY-010). The host hands that
         // encounter or dragon run to a later UI boundary, so retain the map
         // records until that route returns instead of advancing them now.
         if (!input.SchedulerBlockedByModal && encounters.Length == 0
@@ -492,7 +488,7 @@ public sealed partial class Campaign
 
     /// <summary>
     /// Applies the completed interactive resolver's survivor counters through
-    /// wrapper <c>0x35924</c>'s same reserve-restoration and field-record path.
+    /// the reserve restoration and field-record path of RULE-STRATEGY-011.
     /// </summary>
     public OriginalStrategicInteractiveEncounterApplication ResolveInteractiveOriginalStrategicEncounter(
         OriginalStrategicPlayerEnemyEncounter encounter,

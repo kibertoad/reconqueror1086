@@ -173,7 +173,74 @@ Entries by area.
 
 ## STRATEGY
 
-None.
+| ID | Title | Status |
+|---|---|---|
+| [BUG-STRATEGY-001](../bugs/BUG-STRATEGY-001.md) | The rare pursuit branch of the hostile generator tests a stale property | supported |
+| [BUG-STRATEGY-002](../bugs/BUG-STRATEGY-002.md) | A small pursuit keeps the halberdiers and knights of the slot's previous force | supported |
+| [BUG-STRATEGY-003](../bugs/BUG-STRATEGY-003.md) | A battle against a hostile force counts its result twice | supported |
+| [BUG-STRATEGY-004](../bugs/BUG-STRATEGY-004.md) | Hostile forces lost to water or a dropped route are never uncounted | supported |
+| [FMT-STRATEGY-001](../formats/FMT-STRATEGY-001.md) | Strategic movement record, one force on the strategic map | supported |
+| [FMT-STRATEGY-002](../formats/FMT-STRATEGY-002.md) | Property record, one castle of the strategic map | supported |
+| [FMT-STRATEGY-003](../formats/FMT-STRATEGY-003.md) | Person record, one character of the strategic map | supported |
+| [FMT-STRATEGY-004](../formats/FMT-STRATEGY-004.md) | Route file, a list of route points | supported |
+| [FMT-STRATEGY-005](../formats/FMT-STRATEGY-005.md) | Strategic terrain grid, icon.jp | supported |
+| [FMT-STRATEGY-006](../formats/FMT-STRATEGY-006.md) | Brigand order, the descriptor of one brigand force | supported |
+| [FND-STRATEGY-001](../findings/FND-STRATEGY-001.md) | The strategic pass at 0x0003C290 runs brigands, the spy, the player forces and then the hostile pass | recorded |
+| [FND-STRATEGY-002](../findings/FND-STRATEGY-002.md) | Routine 0x0003B9F4 issues a brigand order or an order from the king | recorded |
+| [FND-STRATEGY-003](../findings/FND-STRATEGY-003.md) | The hostile pass at 0x0003C088 generates first, then moves slots 0 to 4 and resolves each arrival | recorded |
+| [FND-STRATEGY-004](../findings/FND-STRATEGY-004.md) | The hostile generator 0x0003BE58 tries a reactive pursuit, then a timed movement every 5,000 speed units | recorded |
+| [FND-STRATEGY-005](../findings/FND-STRATEGY-005.md) | The reactive finder 0x0003BB4C scans properties, then player forces, and marks alerted and approached properties | recorded |
+| [FND-STRATEGY-006](../findings/FND-STRATEGY-006.md) | The pursuit constructor 0x0003A764 detaches a force aimed at a player force | recorded |
+| [FND-STRATEGY-007](../findings/FND-STRATEGY-007.md) | The movement constructor 0x0003AC5C builds a direct or routed movement from a property | recorded |
+| [FND-STRATEGY-008](../findings/FND-STRATEGY-008.md) | Force sizes come from the household count and the lord rating, or from the garrison for a pursuit | recorded |
+| [FND-STRATEGY-009](../findings/FND-STRATEGY-009.md) | Mode 1 at 0x00038D78 steps straight toward the destination at 0.9 times the terrain speed | recorded |
+| [FND-STRATEGY-010](../findings/FND-STRATEGY-010.md) | Mode 3 at 0x0003908C chases the live position of a player force | recorded |
+| [FND-STRATEGY-011](../findings/FND-STRATEGY-011.md) | Mode 2 at 0x0004A300 follows a route one waypoint at a time and stops on bad terrain | recorded |
+| [FND-STRATEGY-012](../findings/FND-STRATEGY-012.md) | The retargeter 0x0003A9BC sends an arrived force at the first player force within 300 units, else home or at the player | recorded |
+| [FND-STRATEGY-013](../findings/FND-STRATEGY-013.md) | Terrain speed comes from a tile-kind table and four profile pointers, scaled by a speed from 1 to 15 | recorded |
+| [FND-STRATEGY-014](../findings/FND-STRATEGY-014.md) | The month selects one of four terrain profiles through the table at 0x0009B720 | recorded |
+| [FND-STRATEGY-015](../findings/FND-STRATEGY-015.md) | The property and person tables hold 14 records of 15 bytes and 176 records of 18 bytes | recorded |
+| [FND-STRATEGY-016](../findings/FND-STRATEGY-016.md) | The route resources are a count followed by that many pairs of signed dwords | recorded |
+| [FND-STRATEGY-017](../findings/FND-STRATEGY-017.md) | The strategic terrain is resource 292, icon.jp, a 200 by 400 grid of dwords | recorded |
+| [FND-STRATEGY-018](../findings/FND-STRATEGY-018.md) | A route point maps to a grid cell through staggered diamonds, scanned in camera order, whose lower half is one line taller | recorded |
+| [FND-STRATEGY-019](../findings/FND-STRATEGY-019.md) | The player pass at 0x00013168 moves each player record, then tests it against the hostile records and the dragon cells | recorded |
+| [FND-STRATEGY-020](../findings/FND-STRATEGY-020.md) | Routine 0x00011554 moves one player record along its route or toward its target | recorded |
+| [FND-STRATEGY-021](../findings/FND-STRATEGY-021.md) | The encounter routine 0x00039428 fights a player army against a hostile force and settles the result | recorded |
+| [FND-STRATEGY-022](../findings/FND-STRATEGY-022.md) | The staging routine 0x00035924 trims both sides to 60 and hands six counters to the battle | recorded |
+| [FND-STRATEGY-023](../findings/FND-STRATEGY-023.md) | New-game setup 0x000110E8 places the player at one of seven homes and clears the strategic records | recorded |
+| [FND-STRATEGY-024](../findings/FND-STRATEGY-024.md) | Joining and leaving an army swap the player record 0x0009AE6C between an army and the avatar | recorded |
+| [FND-STRATEGY-025](../findings/FND-STRATEGY-025.md) | Field records are placed round the home at six fixed offsets and removed with the selection passed on | recorded |
+| [FND-STRATEGY-026](../findings/FND-STRATEGY-026.md) | Map clicks at 0x000122AC pick a player record, confirm a target or add a route point | recorded |
+| [FND-STRATEGY-027](../findings/FND-STRATEGY-027.md) | Focusing puts a record near the upper left of the view, and edge panning moves the camera one cell on one axis | recorded |
+| [FND-STRATEGY-028](../findings/FND-STRATEGY-028.md) | The terrain renderer 0x0003C770 draws the low word of each visible cell in scan order | recorded |
+| [FND-STRATEGY-029](../findings/FND-STRATEGY-029.md) | The player markers take a frame base of eight times the COLOR attribute | recorded |
+| [FND-STRATEGY-030](../findings/FND-STRATEGY-030.md) | The hostile markers use a frame from a per-property table and brigands frame 3 | recorded |
+| [FND-STRATEGY-031](../findings/FND-STRATEGY-031.md) | The route preview at 0x00011CC0 dots the selected record's route with marker frames | recorded |
+| [FND-STRATEGY-032](../findings/FND-STRATEGY-032.md) | Routine 0x0003B0E4 with a descriptor creates a brigand force on one of three route families | recorded |
+| [FND-STRATEGY-033](../findings/FND-STRATEGY-033.md) | The brigand pass fights player armies on contact, rewards or punishes, and ends orders by date | recorded |
+| [FND-STRATEGY-034](../findings/FND-STRATEGY-034.md) | The brigand step 0x0004A61C loops its route and has no terrain or step-size stop | recorded |
+| [FND-STRATEGY-035](../findings/FND-STRATEGY-035.md) | A spy costs 80, only one is out at a time, and its report lists every active hostile force | recorded |
+| [FND-STRATEGY-036](../findings/FND-STRATEGY-036.md) | The strategic action hook 0x00021EEC turns conversation variables into map events | recorded |
+| [FND-STRATEGY-037](../findings/FND-STRATEGY-037.md) | Two conversation groups set variables 43 and 93 when the player accepts a raid | recorded |
+| [RULE-STRATEGY-001](../rules/RULE-STRATEGY-001.md) | Strategic pass and the yearly orders | supported |
+| [RULE-STRATEGY-002](../rules/RULE-STRATEGY-002.md) | Hostile pass and arrival | supported |
+| [RULE-STRATEGY-003](../rules/RULE-STRATEGY-003.md) | Hostile generator and reactive finder | supported |
+| [RULE-STRATEGY-004](../rules/RULE-STRATEGY-004.md) | Hostile force construction and removal | supported |
+| [RULE-STRATEGY-005](../rules/RULE-STRATEGY-005.md) | Hostile force size | supported |
+| [RULE-STRATEGY-006](../rules/RULE-STRATEGY-006.md) | Direct and pursuit movement | supported |
+| [RULE-STRATEGY-007](../rules/RULE-STRATEGY-007.md) | Routed movement | supported |
+| [RULE-STRATEGY-008](../rules/RULE-STRATEGY-008.md) | Retargeting after arrival | supported |
+| [RULE-STRATEGY-009](../rules/RULE-STRATEGY-009.md) | Terrain speed, seasons and the speed setting | supported |
+| [RULE-STRATEGY-010](../rules/RULE-STRATEGY-010.md) | Player records on the map | supported |
+| [RULE-STRATEGY-011](../rules/RULE-STRATEGY-011.md) | Encounter with a hostile force | supported |
+| [RULE-STRATEGY-012](../rules/RULE-STRATEGY-012.md) | New game, joining armies and field placement | supported |
+| [RULE-STRATEGY-013](../rules/RULE-STRATEGY-013.md) | Map clicks and drawn routes | supported |
+| [RULE-STRATEGY-014](../rules/RULE-STRATEGY-014.md) | Strategic grid, projection and camera | supported |
+| [RULE-STRATEGY-015](../rules/RULE-STRATEGY-015.md) | Terrain, markers and the route preview | supported |
+| [RULE-STRATEGY-016](../rules/RULE-STRATEGY-016.md) | Brigand orders, raids and orders from the king | supported |
+| [RULE-STRATEGY-017](../rules/RULE-STRATEGY-017.md) | Brigand pass and brigand movement | supported |
+| [RULE-STRATEGY-018](../rules/RULE-STRATEGY-018.md) | Spies | supported |
+| [RULE-STRATEGY-019](../rules/RULE-STRATEGY-019.md) | Map events from conversation variables | supported |
 
 ## BATTLE
 

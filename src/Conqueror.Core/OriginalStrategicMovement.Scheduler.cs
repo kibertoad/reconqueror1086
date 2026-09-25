@@ -112,10 +112,9 @@ public static partial class OriginalStrategicMovement
         if (Next(random, GenerationRollLimit) <= GenerationStartThreshold) return;
 
         var propertyListPresent = state.PropertyListHead != 0xFF;
-        // 0x3BE58 reads the property local after 0x3BB4C has returned false even
-        // though 0x3BB4C does not initialize either out pointer on failure. The
-        // original result is stale stack data. The clean-room scheduler admits
-        // this branch only when this pass supplied a real detection.
+        // PLACEHOLDER: RULE-STRATEGY-003. The rule tests generator_property, which can
+        // hold a stale value (BUG-STRATEGY-001); admitting this branch only after a
+        // detection in this pass is the rebuild's own.
         if (propertyListPresent && reactiveDetection is { } timedDetected
             && state.Properties[timedDetected.Property].State13 != 0)
         {
@@ -306,8 +305,8 @@ public static partial class OriginalStrategicMovement
             && (person.Flags & HouseholdEligibleFlag) != 0);
     }
 
-    // 0x38A8C/0x38B40 special-case property 7: 0xB0 minus 0x43558's
-    // linked PersonListHead count, not a screen-provided population value.
+    // household_of (RULE-STRATEGY-005): property 7 uses 176 minus the length
+    // of the person list.
     private static int CountPersonListEntries(OriginalStrategicCampaignState state)
     {
         var count = 0;
@@ -480,6 +479,8 @@ public static partial class OriginalStrategicMovement
     private static (int X, int Y) RouteAnchor(int row, int column) =>
         (checked(80 * (row + 1)), checked(20 * (column + 1)));
 
+    // PLACEHOLDER: RULE-STRATEGY-004. The rule keeps hostile_count, which forces lost to
+    // water or a dropped route never lower (BUG-STRATEGY-004); counting live slots is the rebuild's own.
     private static int ActiveCount(OriginalStrategicCampaignState state) =>
         state.MovementSlots.Count(slot => slot.Active);
 

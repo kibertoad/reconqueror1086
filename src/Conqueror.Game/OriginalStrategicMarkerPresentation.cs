@@ -37,9 +37,8 @@ public static class OriginalStrategicMarkerPresentation
     }
 
     /// <summary>
-    /// Converts the independent five-record movement-marker pass at
-    /// <c>0x3A63C</c>. The source calls this after player markers and passes
-    /// each active record's direct <c>+0x38</c> frame to the same blitter.
+    /// Converts <c>draw_hostile_markers</c> (RULE-STRATEGY-015), drawn after the
+    /// player markers with each record's stored frame.
     /// </summary>
     public static IReadOnlyList<OriginalStrategicMarkerBlit> BuildMovementBlits(
         OriginalStrategicCampaignState state,
@@ -57,9 +56,8 @@ public static class OriginalStrategicMarkerPresentation
     }
 
     /// <summary>
-    /// Converts the temporary-force rendering branch in lifecycle routine
-    /// <c>0x3B0E4</c>. Its active records use the shared marker projection
-    /// with the fixed source frame selected by Core.
+    /// Converts the brigand markers of RULE-STRATEGY-017, which use the shared
+    /// marker projection with frame 3.
     /// </summary>
     public static IReadOnlyList<OriginalStrategicMarkerBlit> BuildTemporaryForceBlits(
         OriginalStrategicCampaignState state,

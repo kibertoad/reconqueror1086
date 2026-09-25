@@ -3,6 +3,7 @@ using Xunit;
 
 namespace Conqueror.Tests;
 
+// Covers RULE-STRATEGY-002, RULE-STRATEGY-003, RULE-STRATEGY-004, RULE-STRATEGY-005, RULE-STRATEGY-008.
 public sealed partial class ResourceAndDefinitionTests
 {
     [Fact]

@@ -1,8 +1,8 @@
 namespace Conqueror.Core;
 
 /// <summary>
-/// Fixed-update execution for the two recovered temporary-force patrols.
-/// It mirrors updater <c>0x4A61C</c>: the route cursor loops instead of
+/// Fixed-update execution for the brigand forces (RULE-STRATEGY-017).
+/// It mirrors <c>step_brigand</c>: the route cursor loops instead of
 /// becoming an arrival state, while terminal route failures retain the live
 /// record for the surrounding lifecycle routine to resolve.
 /// </summary>
@@ -10,7 +10,7 @@ public static partial class OriginalStrategicMovement
 {
     /// <summary>
     /// Applies source UI action identifiers after the ordinary strategic pass,
-    /// at the same post-scheduler boundary as <c>0x3C2D6</c>. This is a raw
+    /// at the same post-scheduler boundary as RULE-STRATEGY-001. This is a raw
     /// action boundary, not a claim about the unrecovered visible controls.
     /// </summary>
     public static IReadOnlyList<OriginalStrategicTemporaryForceCreation> ProcessTemporaryForceActions(
@@ -38,8 +38,8 @@ public static partial class OriginalStrategicMovement
                 throw new InvalidDataException(
                     $"Temporary strategic force route length does not match '{route.ResourceName}'.");
 
-            // Source 0x3B1A2/0x3B1B0 takes random(1), then
-            // 0x3B1B8/0x3B1CB takes random(1) + 1, leaving knights zero.
+            // RULE-STRATEGY-016: random_inclusive(1) swordsmen, random_inclusive(1) + 1
+            // halberdiers and no knights.
             slot.Active = true;
             slot.EncounterResultMarked = false;
             slot.PathComplete = false;
@@ -75,7 +75,7 @@ public static partial class OriginalStrategicMovement
         DateTime calendarDate)
         => AdvanceTemporaryForceContactPass(state, resources, calendarDate).Advances;
 
-    /// <summary>Scans each patrol's live position before its route update, as at 0x3B2C9.</summary>
+    /// <summary>Scans each brigand's live position before its route update (RULE-STRATEGY-017).</summary>
     public static OriginalStrategicTemporaryForcePassResult AdvanceTemporaryForceContactPass(
         OriginalStrategicCampaignState state,
         IOriginalStrategicResources resources,
@@ -120,18 +120,12 @@ public static partial class OriginalStrategicMovement
             if (!slot.PathComplete && slot.WaypointCount != 0)
                 advance = AdvanceTemporaryForce(slot, descriptor, state, resources);
 
-            // 0x3B831 invokes 0x4A61C before the two descriptor comparisons.
-            // The comparisons are independent, rather than a conventional
-            // lexicographic date test: month is zero based and each must be
-            // at least its descriptor value to release the route and clear
-            // the active record.
+            // RULE-STRATEGY-017: the step comes before the two independent date
+            // comparisons.
             if (calendarDate.Month - 1 >= creator.ExpiryMonth
                 && calendarDate.Year >= creator.ExpiryYear)
             {
-                // 0x3B86B-0x3B890 clears only the descriptor and force
-                // active flags before releasing the heap route. The record's
-                // completion, cursor, and direction fields stay intact until
-                // a later creator overwrites them.
+                // RULE-STRATEGY-017 clears only the two active flags and frees the route.
                 slot.Active = false;
                 advances.Add(new(slot.Slot, advance?.Looped ?? false,
                     advance?.CompletionSignal ?? false, ActiveAfter: false, ExpirationSignal: true));
@@ -219,8 +213,8 @@ public static partial class OriginalStrategicMovement
         OriginalStrategicTemporaryForceSlot slot,
         bool looped)
     {
-        // 0x4A61C marks completion and clears its cursor/count, but leaves
-        // lifecycle ownership (including active/expiry) to 0x3B0E4.
+        // step_brigand (RULE-STRATEGY-017) marks completion and clears the cursor and
+        // count, and leaves the active flag and expiry to brigand_pass.
         slot.PathComplete = true;
         slot.WaypointIndex = 0;
         slot.WaypointCount = 0;

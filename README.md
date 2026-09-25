@@ -66,11 +66,8 @@ and integrated. Original media import, modern saves, controller input, and
 cross-platform packaging are operational.
 
 The tables below distinguish playable features from evidence-backed parity.
-In particular, a strategic state, exact terrain grid, route/movement kernels,
-seasonal terrain presentation, source marker passes, and basic map selection/
-route controls are implemented. The daily campaign adapter, target-confirmation
-dialogue, temporary-force producer, and deterministic strategic scheduler still
-await their full replacement.
+`parity/STRATEGY.md` lists how much of the strategic map the rebuild
+implements; the daily campaign adapter still awaits its full replacement.
 
 ### Implemented and usable now
 
@@ -79,7 +76,7 @@ await their full replacement.
 | Character and campaign | Six named profiles, custom character generation, the six formative ages, March 1086 start, daily/monthly progression, and the age-30 deadline. Imported content activates all 30 original dilemma definitions and their executable-confirmed selection/outcome rules. |
 | Estate and economy | Castle staffing, farm, village, forest, productivity, population, taxation, loans, harvest debt, army upkeep, shop transactions, and transactional management books. Original crop/forest tables, unit endpoints, shop prices, and the 75% resale rule are represented. |
 | Strategy (legacy adapter) | Eighteen destinations, travel time, five persistent army divisions, recruitment, joining, spies, field orders, hostile garrisons, interception, conquest, and a moving tournament circuit. This is playable recreation behavior, not yet the executable-mapped strategic scheduler. |
-| Strategic foundation | New campaigns create and save the original-shaped property/person/movement state, decoded `icon.jp` grid, camera, terrain profile, routes, mutations, and movement remainder. Core implements recovered route, terrain, profile, movement, marker-frame, and projection kernels. When that state is present, terrain uses the source tile order and clipped seasonal `ics`/`ica`/`icw` atlas; player markers use the recovered physical order, 8x persisted source color base, frame offsets, projection, and viewport clipping, followed by the five-slot movement-marker pass with its origin-property frame. The original shield controls map Red/Green/Blue to 0/3/5. The recovered scheduler now advances source-shaped new campaigns once per host 60 Hz fixed map update, rather than at processor speed; old migrated saves do not fabricate the unavailable source fallback globals. |
+| Strategic foundation | New campaigns create and save the original-shaped property/person/movement state, decoded `icon.jp` grid, camera, terrain profile, routes, mutations, and movement remainder. Core implements the route, terrain, movement, marker and projection rules that `parity/STRATEGY.md` lists. The scheduler advances source-shaped new campaigns once per host 60 Hz fixed map update, rather than at processor speed; old migrated saves do not fabricate the unavailable source fallback globals. |
 | Tournaments and quests | Wagered jousts and skirmishes (`parity/TOURNEY.md` lists how far they follow the original), courtship ladders, marriage, imported conversations, the dragon equipment quest, and crown/dragon/age endings. |
 | Field and siege combat | Playable formation orders and counter-based field battles. First-person assaults include imported scene geometry, facing, doors, secret rooms, radar, melee, crossbows, ammunition, champions, clickable authored actors and objects, selected-retainer ground orders, the four retainer orders, campaign retainer losses, and placed-scene rewards. `parity/ASSAULT.md` lists how much of the recovered combat rules the rebuild implements. |
 | Required original content | Read-only import with hash/provenance validation; decoded PCX/PCC/HAT/CSF scenes, conversations, `.666` audio, CD music, and direct Smacker playback. Startup verifies the supported GOG release and every manifest-owned file before the title screen. |
@@ -91,7 +88,7 @@ await their full replacement.
 |---|---|
 | Exact gameplay parity | Remaining economy interpolation, construction costs, character edge cases, tournament records, world tables, political simulation, quest boundaries, and native random-number consumption still require executable-backed confirmation. |
 | Combat parity | Critical-hit behavior, stair transitions, enemy food use, later formation choices, and some presentation sequencing remain open. `parity/ASSAULT.md` and `parity/VIEW.md` list the rules the rebuild implements only in part. |
-| Strategic runtime | The map host now focuses new campaigns, applies source edge panning on its fixed update, and dispatches source marker-selection/route clicks; target-confirmation dialogue, the scheduler, contacts, generated hostiles, and property ownership must still be wired before the dated campaign adapter can be removed. Marker palette identity remains corroborated rather than confirmed. Generated routing, garrisons, tournament movement, field-battle coefficients, captain battle rules, and opponent behavior also still need fixed original-game traces. |
+| Strategic runtime | The yearly brigand order, the orders from the king, and property ownership must still be wired before the dated campaign adapter can be removed (`parity/STRATEGY.md`). Marker palette identity remains corroborated rather than confirmed. Generated routing, garrisons, tournament movement, field-battle coefficients, captain battle rules, and opponent behavior also still need fixed original-game traces. |
 | Visual and audio parity | Some palettes, Sierra payloads, conversation entry points, `.666` events, Smacker triggers/seeking, font metrics, status fields, terrain composition, and exact hit regions remain unmapped. |
 | Platform polish | Installers are unsigned. Native installer QA, macOS notarization, customizable bindings, and broader accessibility work remain. |
 | Save compatibility | Recreation saves are versioned and migrated, but their final post-1.0 compatibility policy is not yet set. Original DOS save import/export is not supported. |
