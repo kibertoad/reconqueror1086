@@ -355,7 +355,14 @@ Entries by area.
 
 ## DRAGON
 
-None.
+| ID | Title | Status |
+|---|---|---|
+| [FND-DRAGON-001](../findings/FND-DRAGON-001.md) | The dragon encounter wrapper limits lance experience to 0..20, stores it back after the run, and reports failure for results 1 and 2 | recorded |
+| [FND-DRAGON-002](../findings/FND-DRAGON-002.md) | The dragon media routine adds 2 to the lance copy on a win and plays the win or loss movie | recorded |
+| [FND-DRAGON-003](../findings/FND-DRAGON-003.md) | After a won dragon run the lair shows the victory text and plays champl30.smk | recorded |
+| [FND-DRAGON-004](../findings/FND-DRAGON-004.md) | Winning the siege of person 100's castle is the crown ending | recorded |
+| [RULE-DRAGON-001](../rules/RULE-DRAGON-001.md) | Dragon encounter | supported |
+| [RULE-DRAGON-002](../rules/RULE-DRAGON-002.md) | Crown ending | supported |
 
 ## UI
 

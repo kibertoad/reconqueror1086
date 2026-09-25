@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Conqueror.Tests;
 
+// Covers RULE-DRAGON-001.
 public sealed class DragonBattleTests
 {
     [Fact]

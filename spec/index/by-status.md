@@ -28,7 +28,7 @@ Entries by status.
 
 ## supported
 
-131 entries.
+133 entries.
 
 | ID | Title |
 |---|---|
@@ -116,6 +116,8 @@ Entries by status.
 | [RULE-BATTLE-010](../rules/RULE-BATTLE-010.md) | Battle clock |
 | [RULE-BATTLE-011](../rules/RULE-BATTLE-011.md) | Field battle drawing |
 | [RULE-BATTLE-012](../rules/RULE-BATTLE-012.md) | Pointer events |
+| [RULE-DRAGON-001](../rules/RULE-DRAGON-001.md) | Dragon encounter |
+| [RULE-DRAGON-002](../rules/RULE-DRAGON-002.md) | Crown ending |
 | [RULE-ESTATE-001](../rules/RULE-ESTATE-001.md) | War Planning armies, companies and prices |
 | [RULE-ESTATE-002](../rules/RULE-ESTATE-002.md) | Monthly estate pass and upkeep |
 | [RULE-ESTATE-003](../rules/RULE-ESTATE-003.md) | Loans and the July collection |
@@ -182,7 +184,7 @@ Entries by status.
 
 ## recorded
 
-168 entries.
+172 entries.
 
 | ID | Title |
 |---|---|
@@ -252,6 +254,10 @@ Entries by status.
 | [FND-BATTLE-018](../findings/FND-BATTLE-018.md) | The resolver reads WAR_MODE and loads BATTLE.PCX and MEN8.CSF |
 | [FND-BATTLE-019](../findings/FND-BATTLE-019.md) | The renderer sorts dead units first then by y and x, and picks frames by lane, category, heading and phase |
 | [FND-BATTLE-020](../findings/FND-BATTLE-020.md) | Pointer events are queued with a timer count and classified into eight codes |
+| [FND-DRAGON-001](../findings/FND-DRAGON-001.md) | The dragon encounter wrapper limits lance experience to 0..20, stores it back after the run, and reports failure for results 1 and 2 |
+| [FND-DRAGON-002](../findings/FND-DRAGON-002.md) | The dragon media routine adds 2 to the lance copy on a win and plays the win or loss movie |
+| [FND-DRAGON-003](../findings/FND-DRAGON-003.md) | After a won dragon run the lair shows the victory text and plays champl30.smk |
+| [FND-DRAGON-004](../findings/FND-DRAGON-004.md) | Winning the siege of person 100's castle is the crown ending |
 | [FND-ESTATE-001](../findings/FND-ESTATE-001.md) | The fief-management label catalogs hold 17 castle, 17 village, 4 farm and 7 forest entries |
 | [FND-ESTATE-002](../findings/FND-ESTATE-002.md) | War Planning stages five armies, prices companies by fame and commits on OK |
 | [FND-ESTATE-003](../findings/FND-ESTATE-003.md) | The monthly estate pass settles fief 0 once a month and charges company upkeep |
@@ -442,6 +448,8 @@ Entries whose Open questions section says more than None known.
 | [RULE-BATTLE-010](../rules/RULE-BATTLE-010.md) | Battle clock | supported |
 | [RULE-BATTLE-011](../rules/RULE-BATTLE-011.md) | Field battle drawing | supported |
 | [RULE-BATTLE-012](../rules/RULE-BATTLE-012.md) | Pointer events | supported |
+| [RULE-DRAGON-001](../rules/RULE-DRAGON-001.md) | Dragon encounter | supported |
+| [RULE-DRAGON-002](../rules/RULE-DRAGON-002.md) | Crown ending | supported |
 | [RULE-ESTATE-001](../rules/RULE-ESTATE-001.md) | War Planning armies, companies and prices | supported |
 | [RULE-ESTATE-002](../rules/RULE-ESTATE-002.md) | Monthly estate pass and upkeep | supported |
 | [RULE-ESTATE-003](../rules/RULE-ESTATE-003.md) | Loans and the July collection | supported |

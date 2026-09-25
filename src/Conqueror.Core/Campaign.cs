@@ -710,6 +710,8 @@ public sealed partial class Campaign
             return false;
         }
         WinSiege();
+        // PLACEHOLDER: RULE-DRAGON-002. The original crowns the player when the besieged cell holds
+        // person 100; this tests the location index of the crown victory.
         if (location == Balance.Victories[VictoryKind.Crown].LocationIndex)
         {
             State.Victory = VictoryKind.Crown;
@@ -807,6 +809,8 @@ public sealed partial class Campaign
         new(State.Player.LanceExperience,
             OriginalDragonRunScore.EquipmentBonus(State.Player.Inventory.Items));
 
+    // PLACEHOLDER: RULE-DRAGON-001. A win does not add 2 to the lance experience, and the
+    // withdrawn outcome has no counterpart in the original.
     public bool FinishDragonBattle(DragonBattleSession battle)
     {
         ArgumentNullException.ThrowIfNull(battle);
@@ -829,6 +833,7 @@ public sealed partial class Campaign
         }
     }
 
+    // PLACEHOLDER: RULE-DRAGON-002. The original has no requirement check; its crown comes only from a won siege.
     public bool AttemptVictory(VictoryKind kind)
     {
         if (kind != VictoryKind.Crown) return false;

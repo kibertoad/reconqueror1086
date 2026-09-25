@@ -44,6 +44,7 @@ public sealed partial class ConquerorGame
         if (_dragonBattle.Outcome != DragonBattleOutcome.InProgress) ResolveDragonBattle();
     }
 
+    // RULE-DRAGON-001: the win and loss movies. PLACEHOLDER: the first-pass wait and its sound are not played.
     private void ResolveDragonBattle()
     {
         if (_dragonBattle is null) return;

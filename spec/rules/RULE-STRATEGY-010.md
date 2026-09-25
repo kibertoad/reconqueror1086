@@ -4,10 +4,10 @@ title: Player records on the map
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-STRATEGY-001, FND-STRATEGY-003, FND-STRATEGY-013, FND-STRATEGY-019, FND-STRATEGY-020, FND-STRATEGY-021, FND-STRATEGY-024, FND-STRATEGY-026, FND-STRATEGY-032, FND-STRATEGY-036]
+evidence: [FND-DRAGON-001, FND-STRATEGY-001, FND-STRATEGY-003, FND-STRATEGY-013, FND-STRATEGY-019, FND-STRATEGY-020, FND-STRATEGY-021, FND-STRATEGY-024, FND-STRATEGY-026, FND-STRATEGY-032, FND-STRATEGY-036]
 conflicting: []
 split_with: []
-related: [RULE-JOUST-003, RULE-STRATEGY-007, RULE-STRATEGY-009, RULE-STRATEGY-011, RULE-STRATEGY-014]
+related: [RULE-DRAGON-001, RULE-JOUST-003, RULE-STRATEGY-007, RULE-STRATEGY-009, RULE-STRATEGY-011, RULE-STRATEGY-014]
 ---
 
 ## Summary
@@ -59,7 +59,7 @@ define player_pass():
                     fn_0003CED8()
                     fn_0005B2C0()
                     g_0009AAC4 = -1
-                    let won = fn_0001BB5C()
+                    let won = dragon_encounter()
                     # restores the screen and shows the victory message and media when won is 1, the death message otherwise
                     if won == 1:
                         fn_0001BF54(1)
@@ -155,8 +155,8 @@ define step_player(i):
 ## Outputs
 
 The records' positions, cells, routes and selection, the warnings, and the battles of
-RULE-STRATEGY-011. At the lair the dragon run (RULE-JOUST-003) runs through `fn_0001BB5C`, and the
-map session ends whatever its result.
+RULE-STRATEGY-011. At the lair the dragon encounter of RULE-DRAGON-001 runs, and the map session ends whatever its
+result.
 
 ## Edge cases
 
@@ -180,4 +180,3 @@ None known.
 - What `fn_0003CED8`, `fn_0005B2C0`, `fn_0001BF54`, `fn_00024CA0` and `g_0009AAC4` are.
 - What `pick_cell` leaves in the second probe's cell when the probe finds no cell; the procedure
   treats it as passable.
-- What `fn_0001BB5C` does.
