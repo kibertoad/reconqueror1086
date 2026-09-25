@@ -5,6 +5,7 @@ namespace Conqueror.Core;
 /// character-options shield controls. The values select strategic marker
 /// frame groups and must not be substituted with combat palette indices.
 /// </summary>
+// RULE-PERSON-003: the shields write COLOR 0, 3 and 5. PLACEHOLDER: which one is red, green or blue is a guess.
 public static class OriginalStrategicCharacterColor
 {
     public const int Red = 0;

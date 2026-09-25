@@ -698,7 +698,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.True(PresentationScaling.ToLogical(destination.X - 1, destination.Y, destination, 640, 480).X < 0);
     }
 
-    [Fact]
+    [Fact] // Covers FMT-PERSON-002.
     public void DilemmaTextIsParsedIntoDataDrivenChoicesAndOutcomes()
     {
         var dilemma = DilemmaTextDecoder.Decode(System.Text.Encoding.ASCII.GetBytes(SyntheticDilemma()));
@@ -726,7 +726,7 @@ public sealed partial class ResourceAndDefinitionTests
     [Theory]
     [InlineData(17, YouthDilemmaOutcome.Win)]
     [InlineData(6, YouthDilemmaOutcome.Draw)]
-    [InlineData(5, YouthDilemmaOutcome.Lose)]
+    [InlineData(5, YouthDilemmaOutcome.Lose)] // Covers RULE-PERSON-004.
     public void DilemmaBreakpointsUseInclusiveOrderedBands(int score, YouthDilemmaOutcome expected)
     {
         var choice = new YouthDilemmaChoiceDefinition("Choice", CharacterAttribute.Strength, 6, 17,
@@ -735,7 +735,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(expected, YouthDilemmaRules.Resolve(choice, score));
     }
 
-    [Fact]
+    [Fact] // Covers RULE-PERSON-004.
     public void CampaignPersistsSelectionAndAppliesImportedOutcomeChanges()
     {
         var state = Campaign.NewCustom("Test", 42);
@@ -773,7 +773,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.InRange(campaign.CurrentYouthDilemmaNumber, 5, 9);
     }
 
-    [Fact]
+    [Fact] // Covers FMT-PERSON-002.
     public void DilemmaTextRejectsUnboundedOrIncompleteData()
     {
         var bytes = System.Text.Encoding.ASCII.GetBytes(SyntheticDilemma());

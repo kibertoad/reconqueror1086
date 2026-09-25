@@ -272,8 +272,6 @@ Reading kind-2 data with a 12-bit ceiling produces the exact four-byte PCX prefi
 
 ## Dilemma text resources
 
-The 30 `DILEM0.DAT` through `DILEM29.DAT` resources are marker-delimited 7-bit ASCII text ending optionally in DOS EOF byte `0x1A`. Each contains a stable numeric identifier, declared age, title, and CSF reference, a multi-line prompt, and exactly three choice records. The declarations form six groups of five definitions for ages 12 through 17. Each choice declares a scoring attribute, high/low breakpoints, and win/draw/lose outcomes; each outcome contains text and a counted table of named integer attribute modifiers. The marker spelling contains two harmless inconsistencies in the original data, so the parser dispatches on the stable prefix character and validates the following typed row rather than matching commentary prose. This structure, including the age grouping, and all 30 instances are **Confirmed** for the hashed release. Static analysis also confirms selection number `(age - 12) * 5 + random(0..4)` and inclusive high/draw-low outcome bands; gameplay evidence is recorded in [`original-findings.md`](original-findings.md).
-
 `DilemmaTextDecoder` bounds input size, accepts ASCII only, validates identifiers, counts, integer rows, unique choices, and the complete outcome set. `ImportedDialogueRepository` resolves a locally imported definition by stable number and maps its named attributes into the typed core interpreter. The inspector records only structural counts and text lengths in `dilemma-text-report.txt` and compact breakpoint/modifier metadata in `dilemma-rules-report.txt`; original prose remains confined to ignored `UserContent`.
 
 ## Weapon-store text resource

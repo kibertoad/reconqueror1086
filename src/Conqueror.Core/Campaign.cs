@@ -49,6 +49,7 @@ public sealed partial class Campaign
         _originalStrategicResources = resources;
     }
 
+    // RULE-PERSON-003: the pre-generated knights.
     public static CampaignState NewFromTemplate(int index, string heraldicColor = "Green",
         int? originalStrategicCharacterColor = null)
     {
@@ -67,6 +68,8 @@ public sealed partial class Campaign
         };
     }
 
+    // PLACEHOLDER: RULE-PERSON-002, RULE-PERSON-003. The original starts from row 0 of CHARACTR.DAT
+    // shifted by -8 to 8 and ages every character at dubbing; these 2 to 12 rolls are guesses.
     public static CampaignState NewCustom(string name, int seed, string heraldicColor = "Green",
         int? originalStrategicCharacterColor = null)
     {
@@ -87,6 +90,7 @@ public sealed partial class Campaign
         };
     }
 
+    // RULE-PERSON-004: dilemma (age - 12) * 5 plus a draw of 0 to 4.
     public int CurrentYouthDilemmaNumber
     {
         get
@@ -417,6 +421,7 @@ public sealed partial class Campaign
             }
             if (State.Date.Year != previousYear)
             {
+                // PLACEHOLDER: RULE-PERSON-006. What advances AGE after dubbing in the original is not known.
                 State.Player.Age++;
                 if (State.Player.Age >= Balance.FinalAge)
                 {
@@ -848,6 +853,7 @@ public sealed partial class Campaign
         return true;
     }
 
+    // PLACEHOLDER: RULE-PERSON-005. The original runs courtship through the lady conversations.
     public bool RequestColors(string lady)
     {
         if (!IsTournamentHere) { Log("Courtship takes place at the tournament stands."); return false; }
@@ -861,6 +867,7 @@ public sealed partial class Campaign
         return true;
     }
 
+    // PLACEHOLDER: RULE-PERSON-005.
     private void RewardCourtship(string lady)
     {
         var p = State.Player;

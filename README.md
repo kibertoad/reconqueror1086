@@ -73,7 +73,7 @@ implements; the daily campaign adapter still awaits its full replacement.
 
 | Area | Available now |
 |---|---|
-| Character and campaign | Six named profiles, custom character generation, the six formative ages, March 1086 start, daily/monthly progression, and the age-30 deadline. Imported content activates all 30 original dilemma definitions and their executable-confirmed selection/outcome rules. |
+| Character and campaign | Pre-generated and generated knights, the youth dilemmas and the age-30 deadline (`parity/PERSON.md` lists how far they follow the original), March 1086 start and daily/monthly progression. |
 | Estate and economy | Castle staffing, farm, village, forest, productivity, population, taxation, loans, harvest debt, army upkeep, shop transactions, and transactional management books. `parity/ESTATE.md` lists how far they follow the original. Shop prices and the 75% resale rule are represented. |
 | Strategy (legacy adapter) | Eighteen destinations, travel time, five persistent army divisions, recruitment, joining, spies, field orders, hostile garrisons, interception, conquest, and a moving tournament circuit. This is playable recreation behavior, not yet the executable-mapped strategic scheduler. |
 | Strategic foundation | New campaigns create and save the original-shaped property/person/movement state, decoded `icon.jp` grid, camera, terrain profile, routes, mutations, and movement remainder. Core implements the route, terrain, movement, marker and projection rules that `parity/STRATEGY.md` lists. The scheduler advances source-shaped new campaigns once per host 60 Hz fixed map update, rather than at processor speed; old migrated saves do not fabricate the unavailable source fallback globals. |

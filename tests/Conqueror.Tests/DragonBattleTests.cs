@@ -23,7 +23,7 @@ public sealed class DragonBattleTests
         Assert.True(campaign.CanRevealLocation(moor));
     }
 
-    [Fact]
+    [Fact] // Covers RULE-PERSON-005.
     public void AnnaLisaProvidesTheCleanRoomDiscoveryRouteAfterTwoWins()
     {
         var campaign = new Campaign(Campaign.NewFromTemplate(2));
@@ -39,7 +39,7 @@ public sealed class DragonBattleTests
         Assert.Contains("northwestern Wales", campaign.State.Journal[^2], StringComparison.OrdinalIgnoreCase);
     }
 
-    [Fact]
+    [Fact] // Covers RULE-PERSON-005.
     public void ImportedTournamentStateDefersCourtshipRewardsToTheDialogueActions()
     {
         var campaign = new Campaign(Campaign.NewFromTemplate(2));

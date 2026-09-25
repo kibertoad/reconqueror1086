@@ -64,6 +64,7 @@ public sealed record YouthDilemmaPoolDefinition(int FirstAge, int LastAge, int V
         && age <= LastAge;
 }
 
+// RULE-PERSON-004: the first breakpoint the score reaches gives the outcome.
 public static class YouthDilemmaRules
 {
     public static YouthDilemmaOutcome Resolve(YouthDilemmaChoiceDefinition choice, int score)
@@ -77,6 +78,7 @@ public static class YouthDilemmaRules
     }
 }
 
+// PLACEHOLDER: RULE-PERSON-004. NONE scores 0 and changes nothing; the original's field for it is not known.
 public static class CharacterAttributes
 {
     public static int Read(Player player, CharacterAttribute attribute) => attribute switch

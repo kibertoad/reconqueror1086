@@ -20,7 +20,9 @@ public static class Balance
 {
     public const int StartingYear = 1086;
     public const int StartingAge = 18;
+    // RULE-PERSON-006: the campaign ends when AGE is 30.
     public const int FinalAge = 30;
+    // RULE-PERSON-003: dubbing adds 240 shillings to the wealth the route left.
     public const int StartingCustomWealth = 240;
     // RULE-ESTATE-003: the ceiling comes from SRC-MANUAL; the interest is half the loan.
     public const int MaxLoan = 200;
@@ -77,6 +79,8 @@ public static class Balance
         new(.21, .03), new(double.Epsilon, .01), new(0, -.017)
     ];
 
+    // PLACEHOLDER: RULE-PERSON-003. The values follow SRC-MANUAL with the dubbing wealth folded in;
+    // the original rolls Sir Chaunce Norman at random, and these fixed values for him are a guess.
     public static readonly CharacterTemplate[] Templates =
     [
         new("Chaunce Norman", new(8, 8, 8, 8, 8), 240),
@@ -129,6 +133,7 @@ public static class Balance
         .OrderBy(item => item.OriginalStoreRecord ?? int.MaxValue)
         .ToArray();
 
+    // PLACEHOLDER: RULE-PERSON-005. The per-lady conditions, rewards and marriage counts are guesses.
     public static readonly CourtshipDefinition[] Courtships =
     [
         new("Adela", false, 0, null, false, 0, []),

@@ -7,7 +7,7 @@ superseded_by: []
 evidence: [FND-PERSON-001, FND-PERSON-002]
 conflicting: []
 split_with: []
-related: []
+related: [RULE-PERSON-002]
 ---
 
 ## Summary
@@ -64,4 +64,6 @@ None known.
 
 ## Open questions
 
-- Which code writes attributes without `set_attr`.
+- Which code writes attributes without `set_attr`; the load shift of RULE-PERSON-002 is one.
+- How the executable turns a value into the rank words it shows, such as those on the
+  pre-generated screen.

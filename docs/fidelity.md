@@ -13,16 +13,11 @@ Binary-derived claims and their confidence levels are recorded in [`original-fin
 
 ## Verified balance encoded verbatim
 
-- Attribute ranges and qualitative ranks (0-20)
-- Template values documented for Ronald, Hayward, Spencer, Mordred, and Simon
-- Custom starting wealth of 240 shillings and baseline equipment
 - Swordsmen beat halberdiers, halberdiers beat knights, knights beat swordsmen
 - Shop prices, 75% resale rule, armor bar values, and crossbow availability
 - The original store table order, item-image indices, local descriptions, Fighter's Dagger price of 84 shillings, and `BUYSELL.CSF` view/transaction labels
-- Lady-specific colors, piety/fame restrictions, win-indexed courtship rewards, and simultaneous courtships
 - Dragon score inputs: the Dragon Slaying Lance, Shield of St. George, Dragon Slaying Armor, and lance experience; no independent Mighty strength gate
-- Thirty imported youth-dilemma definitions grouped five per age from 12 through 17, with executable-confirmed random selection and inclusive breakpoint outcome rules
-- Age 18 campaign start, age 30 deadline, crown and dragon endings
+- Crown and dragon endings
 
 ## Inferred and isolated
 

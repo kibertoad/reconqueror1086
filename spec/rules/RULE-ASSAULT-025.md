@@ -4,7 +4,7 @@ title: Actor colours follow the player's colour
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-ASSAULT-039, FND-ASSAULT-001]
+evidence: [FND-ASSAULT-039, FND-ASSAULT-001, FND-PERSON-009]
 conflicting: []
 split_with: []
 related: [RULE-ASSAULT-027, FMT-ASSAULT-001, FMT-VIEW-001]
@@ -67,7 +67,7 @@ None known.
 
 ## Open questions
 
-- How `player_color` is stored is not recorded; the procedure numbers red, green and blue 0, 1
-  and 2.
+- Which colour each value of `player_color` is; the procedure's red, green and blue for 0, 1 and
+  2 is a guess.
 - Whether the loader writes the actors' own blocks or their base blocks is not recorded.
 - Where `combatants` and `scene_blocks` are kept is not recorded.

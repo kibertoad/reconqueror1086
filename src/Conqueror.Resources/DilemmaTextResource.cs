@@ -21,6 +21,7 @@ public sealed record DilemmaTextResource(
     string Prompt,
     IReadOnlyList<DilemmaChoiceText> Choices);
 
+// FMT-PERSON-002.
 /// <summary>Parses the marker-delimited ASCII DILEM*.DAT resources.</summary>
 public static partial class DilemmaTextDecoder
 {

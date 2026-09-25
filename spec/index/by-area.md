@@ -306,9 +306,24 @@ Entries by area.
 
 | ID | Title | Status |
 |---|---|---|
+| [FMT-PERSON-001](../formats/FMT-PERSON-001.md) | Character table, CHARACTR.DAT and saved copies | supported |
+| [FMT-PERSON-002](../formats/FMT-PERSON-002.md) | Youth dilemma, DILEM0.DAT to DILEM29.DAT | supported |
 | [FND-PERSON-001](../findings/FND-PERSON-001.md) | Character attributes are read by 0x00015EF0 and written by 0x00015F0C, which limits the first 15 to 0..20 | recorded |
 | [FND-PERSON-002](../findings/FND-PERSON-002.md) | CHARACTR.DAT lists 15 characters and 30 attributes | recorded |
+| [FND-PERSON-003](../findings/FND-PERSON-003.md) | CHARACTR.DAT is parsed by 0x00015920 and 0x00016124, which shift row 0 by up to 8 on each of the first 15 fields | recorded |
+| [FND-PERSON-004](../findings/FND-PERSON-004.md) | The generation screen draws the first dilemma, sets COLOR from three shields, rerolls and continues by age | recorded |
+| [FND-PERSON-005](../findings/FND-PERSON-005.md) | A dilemma choice scores one attribute against ordered breakpoints and applies its outcome through 0x00015F0C | recorded |
+| [FND-PERSON-006](../findings/FND-PERSON-006.md) | The pre-generated handler randomises row 0 for the first shield and stores constants for the other five | recorded |
+| [FND-PERSON-007](../findings/FND-PERSON-007.md) | Dubbing sets every AGE to 18, gives five items and adds 240 to WEALTH | recorded |
+| [FND-PERSON-008](../findings/FND-PERSON-008.md) | The game ends the campaign when row 0 AGE is 30 | recorded |
+| [FND-PERSON-009](../findings/FND-PERSON-009.md) | The tournament melee turns COLOR 3, 0 and 5 into colour index 0, 1 and 2 at 0x0009D498 | recorded |
+| [FND-PERSON-010](../findings/FND-PERSON-010.md) | DILEM0.DAT to DILEM29.DAT are marker-line text files with three choices of three outcomes | recorded |
 | [RULE-PERSON-001](../rules/RULE-PERSON-001.md) | Character attributes | supported |
+| [RULE-PERSON-002](../rules/RULE-PERSON-002.md) | Loading and saving the character table | supported |
+| [RULE-PERSON-003](../rules/RULE-PERSON-003.md) | Character generation, the pre-generated knights and dubbing | supported |
+| [RULE-PERSON-004](../rules/RULE-PERSON-004.md) | Youth dilemmas | supported |
+| [RULE-PERSON-005](../rules/RULE-PERSON-005.md) | Courtship and marriage | sourced |
+| [RULE-PERSON-006](../rules/RULE-PERSON-006.md) | Retirement at 30 | supported |
 
 ## TALK
 

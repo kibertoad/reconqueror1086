@@ -17,17 +17,18 @@ Entries by status.
 
 ## sourced
 
-3 entries.
+4 entries.
 
 | ID | Title |
 |---|---|
 | [RULE-ESTATE-004](../rules/RULE-ESTATE-004.md) | Productivity from staff and buildings |
 | [RULE-ESTATE-005](../rules/RULE-ESTATE-005.md) | Crop and forest revenue |
 | [RULE-ESTATE-006](../rules/RULE-ESTATE-006.md) | Population, food, housing and taxes |
+| [RULE-PERSON-005](../rules/RULE-PERSON-005.md) | Courtship and marriage |
 
 ## supported
 
-111 entries.
+117 entries.
 
 | ID | Title |
 |---|---|
@@ -48,6 +49,8 @@ Entries by status.
 | [FMT-ASSAULT-003](../formats/FMT-ASSAULT-003.md) | Scene effect descriptor, one record of the SFXDEFS resource |
 | [FMT-BATTLE-001](../formats/FMT-BATTLE-001.md) | Field battle unit, one troop in an interactive field battle |
 | [FMT-BATTLE-002](../formats/FMT-BATTLE-002.md) | Pointer event, one entry of the pointer queue |
+| [FMT-PERSON-001](../formats/FMT-PERSON-001.md) | Character table, CHARACTR.DAT and saved copies |
+| [FMT-PERSON-002](../formats/FMT-PERSON-002.md) | Youth dilemma, DILEM0.DAT to DILEM29.DAT |
 | [FMT-STRATEGY-001](../formats/FMT-STRATEGY-001.md) | Strategic movement record, one force on the strategic map |
 | [FMT-STRATEGY-002](../formats/FMT-STRATEGY-002.md) | Property record, one castle of the strategic map |
 | [FMT-STRATEGY-003](../formats/FMT-STRATEGY-003.md) | Person record, one character of the strategic map |
@@ -111,6 +114,10 @@ Entries by status.
 | [RULE-JOUST-002](../rules/RULE-JOUST-002.md) | Practice joust pass |
 | [RULE-JOUST-003](../rules/RULE-JOUST-003.md) | Dragon run |
 | [RULE-PERSON-001](../rules/RULE-PERSON-001.md) | Character attributes |
+| [RULE-PERSON-002](../rules/RULE-PERSON-002.md) | Loading and saving the character table |
+| [RULE-PERSON-003](../rules/RULE-PERSON-003.md) | Character generation, the pre-generated knights and dubbing |
+| [RULE-PERSON-004](../rules/RULE-PERSON-004.md) | Youth dilemmas |
+| [RULE-PERSON-006](../rules/RULE-PERSON-006.md) | Retirement at 30 |
 | [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number generator |
 | [RULE-STRATEGY-001](../rules/RULE-STRATEGY-001.md) | Strategic pass and the yearly orders |
 | [RULE-STRATEGY-002](../rules/RULE-STRATEGY-002.md) | Hostile pass and arrival |
@@ -157,7 +164,7 @@ Entries by status.
 
 ## recorded
 
-151 entries.
+159 entries.
 
 | ID | Title |
 |---|---|
@@ -243,6 +250,14 @@ Entries by status.
 | [FND-JOUST-011](../findings/FND-JOUST-011.md) | The dragon lance frame scan has no end check and reads past its five thresholds when the lance is above y 92 |
 | [FND-PERSON-001](../findings/FND-PERSON-001.md) | Character attributes are read by 0x00015EF0 and written by 0x00015F0C, which limits the first 15 to 0..20 |
 | [FND-PERSON-002](../findings/FND-PERSON-002.md) | CHARACTR.DAT lists 15 characters and 30 attributes |
+| [FND-PERSON-003](../findings/FND-PERSON-003.md) | CHARACTR.DAT is parsed by 0x00015920 and 0x00016124, which shift row 0 by up to 8 on each of the first 15 fields |
+| [FND-PERSON-004](../findings/FND-PERSON-004.md) | The generation screen draws the first dilemma, sets COLOR from three shields, rerolls and continues by age |
+| [FND-PERSON-005](../findings/FND-PERSON-005.md) | A dilemma choice scores one attribute against ordered breakpoints and applies its outcome through 0x00015F0C |
+| [FND-PERSON-006](../findings/FND-PERSON-006.md) | The pre-generated handler randomises row 0 for the first shield and stores constants for the other five |
+| [FND-PERSON-007](../findings/FND-PERSON-007.md) | Dubbing sets every AGE to 18, gives five items and adds 240 to WEALTH |
+| [FND-PERSON-008](../findings/FND-PERSON-008.md) | The game ends the campaign when row 0 AGE is 30 |
+| [FND-PERSON-009](../findings/FND-PERSON-009.md) | The tournament melee turns COLOR 3, 0 and 5 into colour index 0, 1 and 2 at 0x0009D498 |
+| [FND-PERSON-010](../findings/FND-PERSON-010.md) | DILEM0.DAT to DILEM29.DAT are marker-line text files with three choices of three outcomes |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-STRATEGY-001](../findings/FND-STRATEGY-001.md) | The strategic pass at 0x0003C290 runs brigands, the spy, the player forces and then the hostile pass |
@@ -339,6 +354,8 @@ Entries whose Open questions section says more than None known.
 | [FMT-ASSAULT-004](../formats/FMT-ASSAULT-004.md) | Live effect record, one of the 64 effects the scheduler runs | unknown |
 | [FMT-BATTLE-001](../formats/FMT-BATTLE-001.md) | Field battle unit, one troop in an interactive field battle | supported |
 | [FMT-BATTLE-002](../formats/FMT-BATTLE-002.md) | Pointer event, one entry of the pointer queue | supported |
+| [FMT-PERSON-001](../formats/FMT-PERSON-001.md) | Character table, CHARACTR.DAT and saved copies | supported |
+| [FMT-PERSON-002](../formats/FMT-PERSON-002.md) | Youth dilemma, DILEM0.DAT to DILEM29.DAT | supported |
 | [FMT-STRATEGY-001](../formats/FMT-STRATEGY-001.md) | Strategic movement record, one force on the strategic map | supported |
 | [FMT-STRATEGY-002](../formats/FMT-STRATEGY-002.md) | Property record, one castle of the strategic map | supported |
 | [FMT-STRATEGY-003](../formats/FMT-STRATEGY-003.md) | Person record, one character of the strategic map | supported |
@@ -401,6 +418,11 @@ Entries whose Open questions section says more than None known.
 | [RULE-JOUST-002](../rules/RULE-JOUST-002.md) | Practice joust pass | supported |
 | [RULE-JOUST-003](../rules/RULE-JOUST-003.md) | Dragon run | supported |
 | [RULE-PERSON-001](../rules/RULE-PERSON-001.md) | Character attributes | supported |
+| [RULE-PERSON-002](../rules/RULE-PERSON-002.md) | Loading and saving the character table | supported |
+| [RULE-PERSON-003](../rules/RULE-PERSON-003.md) | Character generation, the pre-generated knights and dubbing | supported |
+| [RULE-PERSON-004](../rules/RULE-PERSON-004.md) | Youth dilemmas | supported |
+| [RULE-PERSON-005](../rules/RULE-PERSON-005.md) | Courtship and marriage | sourced |
+| [RULE-PERSON-006](../rules/RULE-PERSON-006.md) | Retirement at 30 | supported |
 | [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number generator | supported |
 | [RULE-STRATEGY-001](../rules/RULE-STRATEGY-001.md) | Strategic pass and the yearly orders | supported |
 | [RULE-STRATEGY-002](../rules/RULE-STRATEGY-002.md) | Hostile pass and arrival | supported |

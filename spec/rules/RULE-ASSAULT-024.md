@@ -4,7 +4,7 @@ title: The player's skill and health in an assault
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-ASSAULT-033, FND-ASSAULT-001]
+evidence: [FND-ASSAULT-033, FND-ASSAULT-001, FND-PERSON-001, FND-PERSON-002]
 conflicting: []
 split_with: []
 related: [FMT-ASSAULT-001]
