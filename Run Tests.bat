@@ -22,6 +22,9 @@ set "TEST_ARTIFACTS=%TEMP%\reconqueror1086-tests-%RANDOM%-%RANDOM%"
 powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File tools\Verify-Repository.ps1
 if errorlevel 1 goto failed
 
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File tools\Check-Documentation.ps1
+if errorlevel 1 goto failed
+
 "%DOTNET_EXE%" build tests\Conqueror.Tests\Conqueror.Tests.csproj --artifacts-path "%TEST_ARTIFACTS%" -m:1 -p:UseSharedCompilation=false -v:minimal
 if errorlevel 1 goto failed
 if not exist "%TEST_ARTIFACTS%\bin\Conqueror.Tests\debug\Conqueror.Tests.dll" (

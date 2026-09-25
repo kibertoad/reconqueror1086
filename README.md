@@ -169,8 +169,9 @@ Run `Install Original Resources.bat` first, or pass the verified import with
 
 On Windows, `Run Tests.bat` enforces the legal boundary, builds into an isolated
 temporary directory, and runs both the xUnit suite and executable
-specifications without requiring a graphics device. Packaging scripts for
-Windows, Linux, and macOS are under `tools`.
+specifications without requiring a graphics device. [Validation](docs/VALIDATION.md)
+describes that gate, the documentation standard check, and what CI runs.
+Packaging scripts for Windows, Linux, and macOS are under `tools`.
 
 Technical claims are graded as Confirmed, Corroborated, or Provisional in the
 [original findings register](docs/original-findings.md). The full delivery
