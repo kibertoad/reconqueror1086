@@ -6,3 +6,6 @@ For each entry, the entries and glossary terms that cite or relate to it, and th
 
 | ID | Cited by |
 |---|---|
+| [BLD-GOG-EN](../builds/BLD-GOG-EN.md) | None |
+| [SRC-GAMEFAQS-66730](../sources/SRC-GAMEFAQS-66730.md) | None |
+| [SRC-MANUAL](../sources/SRC-MANUAL.md) | [BLD-GOG-EN](../builds/BLD-GOG-EN.md) (body) |

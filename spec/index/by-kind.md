@@ -6,11 +6,20 @@ Entries by kind.
 
 ## builds
 
-0 entries.
+1 entries.
+
+| ID | Title | Status |
+|---|---|---|
+| [BLD-GOG-EN](../builds/BLD-GOG-EN.md) | Conqueror A.D. 1086 1.0, English, GOG release | None |
 
 ## sources
 
-0 entries.
+2 entries.
+
+| ID | Title | Status |
+|---|---|---|
+| [SRC-GAMEFAQS-66730](../sources/SRC-GAMEFAQS-66730.md) | Conqueror 1086 A.D. FAQ by mikel123456, GameFAQs FAQ 66730 | None |
+| [SRC-MANUAL](../sources/SRC-MANUAL.md) | Conqueror A.D. 1086 manual, as shipped with the GOG release | None |
 
 ## formats
 
