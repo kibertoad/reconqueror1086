@@ -22,6 +22,7 @@ public static class Balance
     public const int StartingAge = 18;
     public const int FinalAge = 30;
     public const int StartingCustomWealth = 240;
+    // RULE-ESTATE-003: the ceiling comes from SRC-MANUAL; the interest is half the loan.
     public const int MaxLoan = 200;
     public const decimal LoanInterest = 0.50m;
     public static readonly StrategicDefinition Strategy = new(80, 98, 9);
@@ -38,12 +39,14 @@ public static class Balance
         new("Hugh", 80, 12, 2, 3, 3)
     ];
 
+    // PLACEHOLDER: RULE-ESTATE-005. Costs and revenues at 50% productivity from SRC-GAMEFAQS-66730.
     public static readonly IReadOnlyDictionary<CropType, CropBalance> Crops = new Dictionary<CropType, CropBalance>
     {
         [CropType.Grain] = new(1, 2, 25), [CropType.Beans] = new(1, 2, 25),
         [CropType.Vegetables] = new(1, 10, 10), [CropType.Fruit] = new(5, 5, 5)
     };
 
+    // PLACEHOLDER: RULE-ESTATE-005. Costs, serfs and revenues from SRC-GAMEFAQS-66730.
     public static readonly IReadOnlyDictionary<ForestIndustry, ForestBalance> Forest = new Dictionary<ForestIndustry, ForestBalance>
     {
         [ForestIndustry.Timber] = new(5, 5, 5), [ForestIndustry.IronMine] = new(400, 15, 10),
@@ -51,6 +54,8 @@ public static class Balance
         [ForestIndustry.SilverMine] = new(400, 15, 10)
     };
 
+    // PLACEHOLDER: RULE-ESTATE-001. The two sets match the original, which picks the cheaper one when
+    // FAME is above 16; scaling between them by productivity is a guess.
     public static readonly IReadOnlyDictionary<UnitType, UnitBalance> Units = new Dictionary<UnitType, UnitBalance>
     {
         [UnitType.Swordsmen] = new(28, 20, 12, 8),
@@ -65,6 +70,7 @@ public static class Balance
         [UnitType.Knights] = UnitType.Swordsmen
     };
 
+    // PLACEHOLDER: RULE-ESTATE-006. Growth bands from SRC-GAMEFAQS-66730.
     public static readonly GrowthBand[] PopulationGrowth =
     [
         new(1.00, .07), new(.50, .06), new(.36, .05), new(.29, .04),
@@ -81,6 +87,7 @@ public static class Balance
         new("Simon Hakluyt", new(7, 4, 4, 7, 2), 240)
     ];
 
+    // PLACEHOLDER: RULE-ESTATE-004. Bonuses from SRC-GAMEFAQS-66730; the costs the guide does not give are guesses.
     public static readonly IReadOnlyDictionary<BuildingKind, BuildingDefinition> Buildings = new Dictionary<BuildingKind, BuildingDefinition>
     {
         [BuildingKind.House] = new(BuildingKind.House, "House", 5, 0, true),

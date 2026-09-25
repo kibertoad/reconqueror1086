@@ -25,5 +25,5 @@ was not recorded when it was read.
 None known. Some of its claims have not been checked against the executable yet, and the rules
 that cover them list them in their Open questions sections: that building the same
 productivity buildings in a different order can give 90% instead of 95%, and that Chaunce
-Norman's attributes and wealth are random. Its weapon lengths are values measured in play, and
+Norman's attributes and wealth are random. It gives each unit kind's price and upkeep at 50% and 100% productivity; the executable holds the same two sets and picks between them by FAME (RULE-ESTATE-001). Its weapon lengths are values measured in play, and
 the rules for reach and damage come from the executable's combat rows instead.

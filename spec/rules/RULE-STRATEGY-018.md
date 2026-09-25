@@ -4,10 +4,10 @@ title: Spies
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-STRATEGY-003, FND-STRATEGY-015, FND-STRATEGY-035, FND-STRATEGY-038]
+evidence: [FND-STRATEGY-003, FND-STRATEGY-015, FND-STRATEGY-035, FND-STRATEGY-038, FND-ESTATE-002]
 conflicting: []
 split_with: []
-related: [RULE-PERSON-001]
+related: [RULE-PERSON-001, RULE-ESTATE-001]
 ---
 
 ## Summary
@@ -18,7 +18,7 @@ order, and comes back.
 
 ## When it runs
 
-`buy_spy` from the war-planning screen; `spy_report` from the strategic pass (RULE-STRATEGY-001).
+`buy_spy` from the war-planning screen (RULE-ESTATE-001); `spy_report` from the strategic pass (RULE-STRATEGY-001).
 
 ## Parameters
 
@@ -41,11 +41,7 @@ define buy_spy():
         spies_pending = spies_pending + 1
         # attribute 17 is WEALTH
         set_attr(0, 17, planning_wealth)
-        send_spies()
-
-define send_spies():
-    for k in 0..spies_pending:
-        dispatch_spy()
+        commit_war_planning()
 
 define dispatch_spy():
     if spy_out == 1:
@@ -75,8 +71,9 @@ to 0 when it opens.
 
 ## Edge cases
 
-A second spy bought while one is out costs 80 and does nothing. Because `send_spies` runs for every
-spy bought since the screen opened, the count only matters for how often `dispatch_spy` is called.
+A second spy bought while one is out costs 80 and only shows that spies are already out. Buying a spy
+also writes back every other change made on the war-planning screen and leaves it
+(RULE-ESTATE-001), so one visit buys at most one spy.
 
 ## What the sources say
 

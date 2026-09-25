@@ -17,16 +17,25 @@ Entries by status.
 
 ## sourced
 
-0 entries.
+3 entries.
+
+| ID | Title |
+|---|---|
+| [RULE-ESTATE-004](../rules/RULE-ESTATE-004.md) | Productivity from staff and buildings |
+| [RULE-ESTATE-005](../rules/RULE-ESTATE-005.md) | Crop and forest revenue |
+| [RULE-ESTATE-006](../rules/RULE-ESTATE-006.md) | Population, food, housing and taxes |
 
 ## supported
 
-105 entries.
+111 entries.
 
 | ID | Title |
 |---|---|
 | [BUG-BATTLE-001](../bugs/BUG-BATTLE-001.md) | Morale adds the remainder by 3 instead of a third |
 | [BUG-BATTLE-002](../bugs/BUG-BATTLE-002.md) | A unit still turning toward its target turns toward another unit |
+| [BUG-ESTATE-001](../bugs/BUG-ESTATE-001.md) | Removing a company refunds its price only after the committed companies of its kind are used up |
+| [BUG-ESTATE-002](../bugs/BUG-ESTATE-002.md) | Removing a company gives back population that raising it did not take |
+| [BUG-ESTATE-003](../bugs/BUG-ESTATE-003.md) | Killing Drogo after refusing to pay leaves the debt |
 | [BUG-JOUST-001](../bugs/BUG-JOUST-001.md) | The dragon lance frame scan reads past its table when the lance is above y 92 |
 | [BUG-STRATEGY-001](../bugs/BUG-STRATEGY-001.md) | The rare pursuit branch of the hostile generator tests a stale property |
 | [BUG-STRATEGY-002](../bugs/BUG-STRATEGY-002.md) | A small pursuit keeps the swordsmen and knights of the slot's previous force |
@@ -95,6 +104,9 @@ Entries by status.
 | [RULE-BATTLE-010](../rules/RULE-BATTLE-010.md) | Battle clock |
 | [RULE-BATTLE-011](../rules/RULE-BATTLE-011.md) | Field battle drawing |
 | [RULE-BATTLE-012](../rules/RULE-BATTLE-012.md) | Pointer events |
+| [RULE-ESTATE-001](../rules/RULE-ESTATE-001.md) | War Planning armies, companies and prices |
+| [RULE-ESTATE-002](../rules/RULE-ESTATE-002.md) | Monthly estate pass and upkeep |
+| [RULE-ESTATE-003](../rules/RULE-ESTATE-003.md) | Loans and the July collection |
 | [RULE-JOUST-001](../rules/RULE-JOUST-001.md) | Lance motion and sprite frame |
 | [RULE-JOUST-002](../rules/RULE-JOUST-002.md) | Practice joust pass |
 | [RULE-JOUST-003](../rules/RULE-JOUST-003.md) | Dragon run |
@@ -145,7 +157,7 @@ Entries by status.
 
 ## recorded
 
-148 entries.
+151 entries.
 
 | ID | Title |
 |---|---|
@@ -215,6 +227,9 @@ Entries by status.
 | [FND-BATTLE-018](../findings/FND-BATTLE-018.md) | The resolver reads WAR_MODE and loads BATTLE.PCX and MEN8.CSF |
 | [FND-BATTLE-019](../findings/FND-BATTLE-019.md) | The renderer sorts dead units first then by y and x, and picks frames by lane, category, heading and phase |
 | [FND-BATTLE-020](../findings/FND-BATTLE-020.md) | Pointer events are queued with a timer count and classified into eight codes |
+| [FND-ESTATE-001](../findings/FND-ESTATE-001.md) | The fief-management label catalogs hold 17 castle, 17 village, 4 farm and 7 forest entries |
+| [FND-ESTATE-002](../findings/FND-ESTATE-002.md) | War Planning stages five armies, prices companies by fame and commits on OK |
+| [FND-ESTATE-003](../findings/FND-ESTATE-003.md) | The monthly estate pass settles fief 0 once a month and charges company upkeep |
 | [FND-JOUST-001](../findings/FND-JOUST-001.md) | The practice joust plays jousprac.SMK and paints frames of lance1.csf over it at y + 90, clipped to the movie area |
 | [FND-JOUST-002](../findings/FND-JOUST-002.md) | The practice lance moves with 8.8 velocities that decay to 80 per cent, pull towards the pointer, and drop by (150 - p) * 50 every seventh movie frame |
 | [FND-JOUST-003](../findings/FND-JOUST-003.md) | The practice lance frame comes from the first row threshold at or above the lance and a 70-pixel column |
@@ -315,6 +330,7 @@ Entries whose Open questions section says more than None known.
 | ID | Title | Status |
 |---|---|---|
 | [BUG-BATTLE-001](../bugs/BUG-BATTLE-001.md) | Morale adds the remainder by 3 instead of a third | supported |
+| [BUG-ESTATE-001](../bugs/BUG-ESTATE-001.md) | Removing a company refunds its price only after the committed companies of its kind are used up | supported |
 | [BUG-STRATEGY-001](../bugs/BUG-STRATEGY-001.md) | The rare pursuit branch of the hostile generator tests a stale property | supported |
 | [BUG-STRATEGY-004](../bugs/BUG-STRATEGY-004.md) | Hostile forces lost to water or a dropped route are never uncounted | supported |
 | [FMT-ASSAULT-001](../formats/FMT-ASSAULT-001.md) | Combatant record, one of the actors of a first-person assault | supported |
@@ -375,6 +391,12 @@ Entries whose Open questions section says more than None known.
 | [RULE-BATTLE-010](../rules/RULE-BATTLE-010.md) | Battle clock | supported |
 | [RULE-BATTLE-011](../rules/RULE-BATTLE-011.md) | Field battle drawing | supported |
 | [RULE-BATTLE-012](../rules/RULE-BATTLE-012.md) | Pointer events | supported |
+| [RULE-ESTATE-001](../rules/RULE-ESTATE-001.md) | War Planning armies, companies and prices | supported |
+| [RULE-ESTATE-002](../rules/RULE-ESTATE-002.md) | Monthly estate pass and upkeep | supported |
+| [RULE-ESTATE-003](../rules/RULE-ESTATE-003.md) | Loans and the July collection | supported |
+| [RULE-ESTATE-004](../rules/RULE-ESTATE-004.md) | Productivity from staff and buildings | sourced |
+| [RULE-ESTATE-005](../rules/RULE-ESTATE-005.md) | Crop and forest revenue | sourced |
+| [RULE-ESTATE-006](../rules/RULE-ESTATE-006.md) | Population, food, housing and taxes | sourced |
 | [RULE-JOUST-001](../rules/RULE-JOUST-001.md) | Lance motion and sprite frame | supported |
 | [RULE-JOUST-002](../rules/RULE-JOUST-002.md) | Practice joust pass | supported |
 | [RULE-JOUST-003](../rules/RULE-JOUST-003.md) | Dragon run | supported |

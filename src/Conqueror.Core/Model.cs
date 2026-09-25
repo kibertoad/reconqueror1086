@@ -177,6 +177,7 @@ public sealed class Fief
         }
     }
 
+    // PLACEHOLDER: RULE-ESTATE-004. Bonuses are summed in any order and the July penalties follow SRC-GAMEFAQS-66730.
     public int Productivity(bool julyCheck = false)
     {
         var value = 50 + Balance.Buildings.Values.Where(x => Has(x.Kind)).Sum(x => x.ProductivityBonus);

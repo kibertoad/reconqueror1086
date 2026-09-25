@@ -2,6 +2,8 @@ using Conqueror.Core;
 using Conqueror.Game;
 using Xunit;
 
+// Covers RULE-ESTATE-003.
+
 namespace Conqueror.Tests;
 
 public sealed class DrogoEncounterTests

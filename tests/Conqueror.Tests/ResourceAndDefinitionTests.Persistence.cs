@@ -4,6 +4,8 @@ using Conqueror.Resources;
 using System.Buffers.Binary;
 using Xunit;
 
+// Covers RULE-ESTATE-001.
+
 namespace Conqueror.Tests;
 
 public sealed partial class ResourceAndDefinitionTests

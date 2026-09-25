@@ -287,7 +287,20 @@ Entries by area.
 
 ## ESTATE
 
-None.
+| ID | Title | Status |
+|---|---|---|
+| [BUG-ESTATE-001](../bugs/BUG-ESTATE-001.md) | Removing a company refunds its price only after the committed companies of its kind are used up | supported |
+| [BUG-ESTATE-002](../bugs/BUG-ESTATE-002.md) | Removing a company gives back population that raising it did not take | supported |
+| [BUG-ESTATE-003](../bugs/BUG-ESTATE-003.md) | Killing Drogo after refusing to pay leaves the debt | supported |
+| [FND-ESTATE-001](../findings/FND-ESTATE-001.md) | The fief-management label catalogs hold 17 castle, 17 village, 4 farm and 7 forest entries | recorded |
+| [FND-ESTATE-002](../findings/FND-ESTATE-002.md) | War Planning stages five armies, prices companies by fame and commits on OK | recorded |
+| [FND-ESTATE-003](../findings/FND-ESTATE-003.md) | The monthly estate pass settles fief 0 once a month and charges company upkeep | recorded |
+| [RULE-ESTATE-001](../rules/RULE-ESTATE-001.md) | War Planning armies, companies and prices | supported |
+| [RULE-ESTATE-002](../rules/RULE-ESTATE-002.md) | Monthly estate pass and upkeep | supported |
+| [RULE-ESTATE-003](../rules/RULE-ESTATE-003.md) | Loans and the July collection | supported |
+| [RULE-ESTATE-004](../rules/RULE-ESTATE-004.md) | Productivity from staff and buildings | sourced |
+| [RULE-ESTATE-005](../rules/RULE-ESTATE-005.md) | Crop and forest revenue | sourced |
+| [RULE-ESTATE-006](../rules/RULE-ESTATE-006.md) | Population, food, housing and taxes | sourced |
 
 ## PERSON
 

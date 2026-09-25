@@ -1,8 +1,10 @@
 namespace Conqueror.Core;
 
+// RULE-ESTATE-001: the screen stages its changes; OK writes them back and Cancel drops them.
 public sealed class WarPlanningCheckpoint
 {
     public const int CompanySize = 100;
+    // PLACEHOLDER: RULE-ESTATE-001. SRC-MANUAL advises 60; the original does not enforce a limit.
     public const int MaximumCompaniesPerArmy = 60;
 
     private sealed record DivisionSnapshot(string Name, bool IsFielded, int Location,

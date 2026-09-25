@@ -191,6 +191,8 @@ public sealed partial class Campaign
         return true;
     }
 
+    // PLACEHOLDER: RULE-ESTATE-001. The original also charges the price and takes 100 from the
+    // population, refunds as BUG-ESTATE-001 describes, and has no 60-company limit.
     public bool AdjustArmyCompany(int armyIndex, UnitType type, int companies)
     {
         if (armyIndex is < 0 or >= Player.ArmyDivisionLimit || companies is not (-1 or 1)) return false;
@@ -301,6 +303,7 @@ public sealed partial class Campaign
         return true;
     }
 
+    // PLACEHOLDER: RULE-ESTATE-003. The debt of the loan plus half matches; the lower bound of 20 is not applied.
     public bool Borrow(int amount)
     {
         if (amount <= 0 || amount > Balance.MaxLoan || State.Player.Debt != 0
@@ -318,6 +321,7 @@ public sealed partial class Campaign
         return true;
     }
 
+    // RULE-ESTATE-005: crops are planted in March.
     public bool Plant(CropType crop)
     {
         var f = State.Player.Home;
@@ -384,6 +388,7 @@ public sealed partial class Campaign
         return definition is not null && Build(definition.Kind);
     }
 
+    // PLACEHOLDER: RULE-ESTATE-004. Construction costs are guesses.
     public bool Build(BuildingKind kind)
     {
         if (!Balance.Buildings.TryGetValue(kind, out var definition)) return false;
@@ -439,6 +444,8 @@ public sealed partial class Campaign
         return next;
     }
 
+    // PLACEHOLDER: RULE-ESTATE-002. Revenue (RULE-ESTATE-005), growth (RULE-ESTATE-006) and
+    // productivity follow SRC-GAMEFAQS-66730; the upkeep of every company in every army matches.
     public void SettleMonth()
     {
         var p = State.Player;

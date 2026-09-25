@@ -32,10 +32,10 @@ environment: null
 
 ## Observation
 
-`0x00036720` plays a sound and, when the dword at `0x0009A090` is below 80, shows a refusal. Otherwise,
+`0x00036720` plays a sound and, when the dword at `0x000AA090` is below 80, shows a refusal. Otherwise,
 when the confirmation `0x00025004` returns not 0, it subtracts 80 through `0x00037340`, adds 1 to the
-dword at `0x0009A0EC`, stores the wealth in attribute 17 of row 0 and calls `0x00036AFC`.
-`0x00036E87` stores 0 in `0x0009A0EC` when the war-planning screen opens, and `0x00036AFC` calls
+dword at `0x000AA0EC`, stores the wealth in attribute 17 of row 0 and calls `0x00036AFC`.
+`0x00036E87` stores 0 in `0x000AA0EC` when the war-planning screen opens, and `0x00036AFC` calls
 `0x00038C68` once for each pending spy. `0x00038C68` returns 0 when the dword at `0x0009AE68` is 1,
 and otherwise stores 1 there and returns 1.
 
@@ -46,7 +46,7 @@ stores 0 in `0x0009AE68` after the scan.
 
 ## Interpretation
 
-`0x0009A090` is the wealth the war-planning screen works with. A spy stays out until a hostile force
+`0x000AA090` is the wealth the war-planning screen works with. A spy stays out until a hostile force
 exists, and then reports all of them at once, in slot order, before returning.
 
 ## Alternatives
