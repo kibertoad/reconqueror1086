@@ -1,8 +1,8 @@
 namespace Conqueror.Core;
 
 /// <summary>
-/// Dragon worker 0x1B644-0x1BA25, advanced once per source movie frame.
-/// The original unrestricted worker loop has no stable wall-clock cadence.
+/// RULE-JOUST-001 lance motion for the dragon run (p = 50), one pass per
+/// movie frame (DEV-JOUST-001).
 /// </summary>
 public sealed class OriginalDragonLanceMotion
 {

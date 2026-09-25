@@ -43,7 +43,7 @@ Entries by kind.
 
 ## rules
 
-39 entries.
+42 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -78,6 +78,9 @@ Entries by kind.
 | [RULE-ASSAULT-029](../rules/RULE-ASSAULT-029.md) | Change an actor's look | supported |
 | [RULE-ASSAULT-030](../rules/RULE-ASSAULT-030.md) | Which retainer the loader removes above the cap | unknown |
 | [RULE-ASSAULT-031](../rules/RULE-ASSAULT-031.md) | The player's weapon breaking on a miss | supported |
+| [RULE-JOUST-001](../rules/RULE-JOUST-001.md) | Lance motion and sprite frame | supported |
+| [RULE-JOUST-002](../rules/RULE-JOUST-002.md) | Practice joust pass | supported |
+| [RULE-JOUST-003](../rules/RULE-JOUST-003.md) | Dragon run | supported |
 | [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number routine | unknown |
 | [RULE-VIEW-001](../rules/RULE-VIEW-001.md) | Heading from one map point to another | supported |
 | [RULE-VIEW-002](../rules/RULE-VIEW-002.md) | Integer sine, cosine and rotation | supported |
@@ -89,7 +92,7 @@ Entries by kind.
 
 ## findings
 
-67 entries.
+78 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -139,6 +142,17 @@ Entries by kind.
 | [FND-ASSAULT-044](../findings/FND-ASSAULT-044.md) | After the weapon range check, a block with behaviour bit 0x20 is replaced at once by its state target | recorded |
 | [FND-ASSAULT-045](../findings/FND-ASSAULT-045.md) | A table maps each weapon item to a combat row, and the two crossbows use rows 23 and 24 | recorded |
 | [FND-ASSAULT-046](../findings/FND-ASSAULT-046.md) | A combatant's armour is the dword at offset 0x3C, read beside its health at 0x40 | recorded |
+| [FND-JOUST-001](../findings/FND-JOUST-001.md) | The practice joust plays jousprac.SMK and paints frames of lance1.csf over it at y + 90, clipped to the movie area | recorded |
+| [FND-JOUST-002](../findings/FND-JOUST-002.md) | The practice lance moves with 8.8 velocities that decay to 80 per cent, pull towards the pointer, and drop by (150 - p) * 50 every seventh movie frame | recorded |
+| [FND-JOUST-003](../findings/FND-JOUST-003.md) | The practice lance frame comes from the first row threshold at or above the lance and a 70-pixel column | recorded |
+| [FND-JOUST-004](../findings/FND-JOUST-004.md) | The practice joust compares the lance with three targets on movie frames 80 to 82 | recorded |
+| [FND-JOUST-005](../findings/FND-JOUST-005.md) | A practice pass hits when 90 less the player points beats both error totals; otherwise random(100) decides whether the opponent scores | recorded |
+| [FND-JOUST-006](../findings/FND-JOUST-006.md) | The practice worker waits for a click or key after its first pass and after the result, and picks a miss message from the signs of the signed totals | recorded |
+| [FND-JOUST-007](../findings/FND-JOUST-007.md) | The lance1.csf colours match the practice movie palette and not the DRJSTWIN.PCX palette | recorded |
+| [FND-JOUST-008](../findings/FND-JOUST-008.md) | The dragon run scores the lance against two 26-entry target tables on movie frames 108 to 133 and stops at frame 134 | recorded |
+| [FND-JOUST-009](../findings/FND-JOUST-009.md) | The dragon run succeeds when 26 times (lance experience - 20 + item bonus) beats both error totals | recorded |
+| [FND-JOUST-010](../findings/FND-JOUST-010.md) | The dragon lance moves by the practice formula with pull 256 per 10 pixels and an upward jerk of 5,000 | recorded |
+| [FND-JOUST-011](../findings/FND-JOUST-011.md) | The dragon lance frame scan has no end check and reads past its five thresholds when the lance is above y 92 | recorded |
 | [FND-VIEW-001](../findings/FND-VIEW-001.md) | Every combat scene archive holds its blocks as 96-byte records ending in 0xCC 0xCC with a 16-byte label at offset 78 | recorded |
 | [FND-VIEW-002](../findings/FND-VIEW-002.md) | Every combat scene map is 128 by 128 block numbers stored column by column | recorded |
 | [FND-VIEW-003](../findings/FND-VIEW-003.md) | The heading helper folds the vector into octants around floor(0x20 * minor / major), and callers pass (-dy, dx) | recorded |
@@ -167,7 +181,11 @@ Entries by kind.
 
 ## bugs
 
-0 entries.
+1 entries.
+
+| ID | Title | Status |
+|---|---|---|
+| [BUG-JOUST-001](../bugs/BUG-JOUST-001.md) | The dragon lance frame scan reads past its table when the lance is above y 92 | supported |
 
 ## screens
 

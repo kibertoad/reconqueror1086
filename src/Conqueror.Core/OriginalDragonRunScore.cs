@@ -1,8 +1,8 @@
 namespace Conqueror.Core;
 
 /// <summary>
-/// The dragon worker's final per-axis score. Its sample count depends on the
-/// original main loop, so the session takes one sample per movie frame.
+/// RULE-JOUST-003 dragon score. The session takes one sample per movie frame
+/// (DEV-JOUST-001).
 /// </summary>
 public static class OriginalDragonRunScore
 {

@@ -5,8 +5,8 @@ namespace Conqueror.Game;
 public readonly record struct PracticeJoustLanceBlit(UiBounds Source, UiBounds Destination);
 
 /// <summary>
-/// Source draw path 0x4169E-0x4174F crops the 25-frame lance within the
-/// 640-by-300 movie region before painting at local y plus 90.
+/// RULE-JOUST-002 lance drawing: the frame is cropped to the 640-by-300 movie
+/// region and painted at local y plus 90.
 /// </summary>
 public static class OriginalPracticeJoustLancePresentation
 {

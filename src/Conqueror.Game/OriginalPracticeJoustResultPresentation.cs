@@ -2,7 +2,7 @@ using Conqueror.Core;
 
 namespace Conqueror.Game;
 
-/// <summary>Authored wording following the source's win and signed-miss branches.</summary>
+/// <summary>Authored wording for the RULE-JOUST-002 win and signed-miss branches.</summary>
 public static class OriginalPracticeJoustResultPresentation
 {
     public static string DescriptionFor(OriginalPracticeJoustResult result)

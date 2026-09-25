@@ -13,8 +13,8 @@ public sealed record OriginalPracticeJoustResult(
     int HorizontalOffset, int VerticalOffset);
 
 /// <summary>
-/// Practice worker 0x4184D-0x41929 samples frames 80-82; 0x41A97-0x41B34
-/// resolves the strict two-axis player hit and miss-only opponent roll.
+/// RULE-JOUST-002 contact window on frames 80-82 and result, sampled once
+/// per movie frame (DEV-JOUST-001).
 /// </summary>
 public sealed class OriginalPracticeJoustTrial
 {

@@ -1,7 +1,7 @@
 namespace Conqueror.Core;
 
 /// <summary>
-/// Dragon run movie timing and the executable's late 26-frame target track.
+/// RULE-JOUST-003 dragon run movie timing and its 26-frame target track.
 /// Coordinates are in the 640x300 movie; the movie begins at screen y=90.
 /// </summary>
 public static class OriginalDragonRunTimeline
@@ -13,8 +13,7 @@ public static class OriginalDragonRunTimeline
     public const int ScreenWidth = 640;
     public const int ScreenHeight = 480;
 
-    // Object-2 dword tables +0xA5E4 and +0xA64C, indexed by source frame.
-    // These slices contain entries 108..133; the earlier entries are not used here.
+    // RULE-JOUST-003 target tables for movie frames 108..133.
     private static readonly int[] TargetX =
     [
         277, 277, 277, 277, 277, 277, 277, 276, 276, 276, 276, 277, 276,

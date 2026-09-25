@@ -36,7 +36,7 @@ Strategic tactical cadence correction: setup `0x183E8` registers counter callbac
 
 Strategic tactical input continuation: queue pop `0x63098` and classifier `0x63114` now map the original 20-byte pointer event to eight press/release codes. The resolver's primary selection/control and secondary destination routes receive those identities from live host button transitions. The executable initializes both hold/repeat thresholds to four timer units; the host now advances their timestamp through the recovered IRQ0-to-INT 1Ch accumulator, nominally reaching four units at 220 ms from an aligned zero phase. The bounded host queue now retains every same-callback edge in low-bit order with its event-time coordinates, consuming one per stable update; tests cover strict repeat boundaries, independent buttons, simultaneous edges, coordinate snapshots, and the 30-entry cap. This replaces the earlier screen-location-based synthetic code selection.
 
-Dragon encounter continuation: `DRJSTRUN.SMK` is required and drawn as the active 640×300 run movie, and the frame-108–133 target coordinates from executable object-2 tables drive a stable 71 ms track. The worker stops at frame 134. Its exact lance-experience/three-item score threshold and strict per-axis error gate are implemented, with one sample per movie frame as the processor-independent compatibility rule. The three possession slots now resolve through the executable conversation-selector table. The foreground uses the recovered uneven five-band frame selector and safely clamps the original unbounded below-92 scan; the lance now uses its recovered 8.8 local motion and paint-call origin. The worker has no separate target-marker draw, so the constructed outline is removed; the four-unit event classifier is mapped, while its wall-clock throughput and cursor presentation remain to recover. See `docs/original-findings.md` for the address-level mapping.
+Dragon encounter continuation: the run follows RULE-JOUST-001 and RULE-JOUST-003 with one pass per movie frame (DEV-JOUST-001). The event classifier's wall-clock throughput and cursor presentation remain to recover.
 
 The repository currently provides:
 
@@ -52,7 +52,7 @@ The repository currently provides:
 - A repository-wide 1,000-line compiled-source ceiling; the game shell and resource regression suite are split into focused partial modules so the limit passes without exemptions.
 - 540 xUnit test cases and 146 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
 
-Practice joust recovery: executable `0x41164` opens `jousprac.SMK`, while caller `0x41CEC` loads `lance1.csf`. The replacement now uses the practice worker's distinct five-band frame table, bounded 8.8 lance motion, raw mouse coordinates, and a source-parameter-120 impulse every seven decoded movie frames. The original busy loop has no stable wall-clock cadence, so the host advances once per movie frame. The three-frame target table, strict per-axis hit threshold, and miss-only opponent roll are now active; the stable movie palette now colors the practice lance and the original 639-by-299 crop constrains its draw; source result prose remains Provisional. See `docs/joust-practice.md`.
+Practice joust: the replacement follows RULE-JOUST-001 and RULE-JOUST-002, advancing once per movie frame (DEV-JOUST-001); parity/JOUST.md lists what remains.
 
 ## Dependency map
 

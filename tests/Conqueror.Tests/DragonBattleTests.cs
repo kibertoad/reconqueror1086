@@ -208,8 +208,8 @@ public sealed class DragonBattleTests
         Assert.False(OriginalDragonRunScore.Succeeds(20, 17, 0, 442));
     }
 
-    [Fact]
-    public void LanceFrameUsesSourceBandsAndClampsTheUnboundedHighAimCase()
+    [Fact] // Covers RULE-JOUST-001, BUG-JOUST-001.
+    public void LanceFrameUsesSourceBandsAndTheOverrunHighAimFrame()
     {
         Assert.Equal(70, OriginalDragonLanceSelection.HorizontalBandWidth);
         Assert.Equal(4, OriginalDragonLanceSelection.FrameFor(50, 240));
@@ -219,6 +219,8 @@ public sealed class DragonBattleTests
         Assert.Equal(19, OriginalDragonLanceSelection.FrameFor(50, 114));
         Assert.Equal(24, OriginalDragonLanceSelection.FrameFor(50, 92));
         Assert.Equal(24, OriginalDragonLanceSelection.FrameFor(50, 20));
+        Assert.Equal(19, OriginalDragonLanceSelection.FrameFor(400, 92));
+        Assert.Equal(24, OriginalDragonLanceSelection.FrameFor(400, 91));
     }
 
     [Fact]

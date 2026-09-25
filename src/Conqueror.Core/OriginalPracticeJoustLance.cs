@@ -1,9 +1,8 @@
 namespace Conqueror.Core;
 
 /// <summary>
-/// Practice joust worker 0x41164: lance frame table at object-2 +0xB838,
-/// fixed 8.8 motion at 0x41562-0x41846, and caller parameter 120 at 0x41D2E.
-/// The original busy loop is advanced once per decoded movie frame here.
+/// RULE-JOUST-001 lance motion with the RULE-JOUST-002 practice rows and
+/// p = 120. One pass runs per decoded movie frame (DEV-JOUST-001).
 /// </summary>
 public sealed class OriginalPracticeJoustLance
 {
@@ -42,10 +41,13 @@ public sealed class OriginalPracticeJoustLance
     {
         _x8 += _velocityX8;
         _y8 += _velocityY8;
-        X = Math.Clamp(_x8 / 256, MinimumX, MaximumX);
-        Y = Math.Clamp(_y8 / 256, MinimumY, MaximumY);
-        if (X is MinimumX or MaximumX) _x8 = X << 8;
-        if (Y is MinimumY or MaximumY) _y8 = Y << 8;
+        var x = _x8 / 256;
+        var y = _y8 / 256;
+        X = Math.Clamp(x, MinimumX, MaximumX);
+        Y = Math.Clamp(y, MinimumY, MaximumY);
+        // Only a crossed bound resets the fixed-point remainder.
+        if (X != x) _x8 = X << 8;
+        if (Y != y) _y8 = Y << 8;
 
         _velocityX8 = _velocityX8 * 80 / 100
             + ((rawPointerX - X) / 10) * 0x3200 / JoustParameter;
