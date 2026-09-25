@@ -416,7 +416,24 @@ Entries by area.
 
 ## RES
 
-None.
+| ID | Title | Status |
+|---|---|---|
+| [FMT-RES-001](../formats/FMT-RES-001.md) | Resource container, a GOB, RES or LOW file | supported |
+| [FMT-RES-002](../formats/FMT-RES-002.md) | Container directory record | supported |
+| [FMT-RES-003](../formats/FMT-RES-003.md) | Kind-1 stream, the stored bytes of a kind-1 entry | supported |
+| [FMT-RES-004](../formats/FMT-RES-004.md) | Kind-2 stream, the stored bytes of a kind-2 entry | supported |
+| [FND-RES-001](../findings/FND-RES-001.md) | All 100 containers share one layout: a header, the entry data packed from offset 8, and a directory of 52-byte records at the end | recorded |
+| [FND-RES-002](../findings/FND-RES-002.md) | One archive is open at a time; the game opens it, finds an entry by name or index, and reads it by its kind | recorded |
+| [FND-RES-003](../findings/FND-RES-003.md) | Kind 1 is a sequence of length-prefixed blocks, each stored or compressed with literals, back-references and runs | recorded |
+| [FND-RES-004](../findings/FND-RES-004.md) | Kind 2 is one LZW bit stream with codes of 9 to 14 bits, read most significant bit first | recorded |
+| [FND-RES-005](../findings/FND-RES-005.md) | The game can write containers: an entry is compressed with its kind and falls back to kind 0 when compression fails | recorded |
+| [FND-RES-006](../findings/FND-RES-006.md) | The game builds three archive paths from CONQUER.INI and reopens C1086.GOB after reading any other archive | recorded |
+| [FND-RES-007](../findings/FND-RES-007.md) | The fifteen two-digit MELEE scenes are three families of five that share textures and differ in layout and colour maps | recorded |
+| [FND-RES-008](../findings/FND-RES-008.md) | Kind-1 blocks are neither the LSB-first LZW of other Dynamix files nor classic LH1 | recorded |
+| [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
+| [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
+| [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |
+| [RULE-RES-004](../rules/RULE-RES-004.md) | Archive paths and which archive is open | supported |
 
 ## MEDIA
 

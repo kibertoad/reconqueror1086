@@ -28,7 +28,7 @@ Entries by status.
 
 ## supported
 
-162 entries.
+170 entries.
 
 | ID | Title |
 |---|---|
@@ -53,6 +53,10 @@ Entries by status.
 | [FMT-BATTLE-002](../formats/FMT-BATTLE-002.md) | Pointer event, one entry of the pointer queue |
 | [FMT-PERSON-001](../formats/FMT-PERSON-001.md) | Character table, CHARACTR.DAT and saved copies |
 | [FMT-PERSON-002](../formats/FMT-PERSON-002.md) | Youth dilemma, DILEM0.DAT to DILEM29.DAT |
+| [FMT-RES-001](../formats/FMT-RES-001.md) | Resource container, a GOB, RES or LOW file |
+| [FMT-RES-002](../formats/FMT-RES-002.md) | Container directory record |
+| [FMT-RES-003](../formats/FMT-RES-003.md) | Kind-1 stream, the stored bytes of a kind-1 entry |
+| [FMT-RES-004](../formats/FMT-RES-004.md) | Kind-2 stream, the stored bytes of a kind-2 entry |
 | [FMT-STRATEGY-001](../formats/FMT-STRATEGY-001.md) | Strategic movement record, one force on the strategic map |
 | [FMT-STRATEGY-002](../formats/FMT-STRATEGY-002.md) | Property record, one castle of the strategic map |
 | [FMT-STRATEGY-003](../formats/FMT-STRATEGY-003.md) | Person record, one character of the strategic map |
@@ -134,6 +138,10 @@ Entries by status.
 | [RULE-PERSON-003](../rules/RULE-PERSON-003.md) | Character generation, the pre-generated knights and dubbing |
 | [RULE-PERSON-004](../rules/RULE-PERSON-004.md) | Youth dilemmas |
 | [RULE-PERSON-006](../rules/RULE-PERSON-006.md) | Retirement at 30 |
+| [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive |
+| [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding |
+| [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding |
+| [RULE-RES-004](../rules/RULE-RES-004.md) | Archive paths and which archive is open |
 | [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number generator |
 | [RULE-STRATEGY-001](../rules/RULE-STRATEGY-001.md) | Strategic pass and the yearly orders |
 | [RULE-STRATEGY-002](../rules/RULE-STRATEGY-002.md) | Hostile pass and arrival |
@@ -213,7 +221,7 @@ Entries by status.
 
 ## recorded
 
-188 entries.
+196 entries.
 
 | ID | Title |
 |---|---|
@@ -311,6 +319,14 @@ Entries by status.
 | [FND-PERSON-008](../findings/FND-PERSON-008.md) | The game ends the campaign when row 0 AGE is 30 |
 | [FND-PERSON-009](../findings/FND-PERSON-009.md) | The tournament melee turns COLOR 3, 0 and 5 into colour index 0, 1 and 2 at 0x0009D498 |
 | [FND-PERSON-010](../findings/FND-PERSON-010.md) | DILEM0.DAT to DILEM29.DAT are marker-line text files with three choices of three outcomes |
+| [FND-RES-001](../findings/FND-RES-001.md) | All 100 containers share one layout: a header, the entry data packed from offset 8, and a directory of 52-byte records at the end |
+| [FND-RES-002](../findings/FND-RES-002.md) | One archive is open at a time; the game opens it, finds an entry by name or index, and reads it by its kind |
+| [FND-RES-003](../findings/FND-RES-003.md) | Kind 1 is a sequence of length-prefixed blocks, each stored or compressed with literals, back-references and runs |
+| [FND-RES-004](../findings/FND-RES-004.md) | Kind 2 is one LZW bit stream with codes of 9 to 14 bits, read most significant bit first |
+| [FND-RES-005](../findings/FND-RES-005.md) | The game can write containers: an entry is compressed with its kind and falls back to kind 0 when compression fails |
+| [FND-RES-006](../findings/FND-RES-006.md) | The game builds three archive paths from CONQUER.INI and reopens C1086.GOB after reading any other archive |
+| [FND-RES-007](../findings/FND-RES-007.md) | The fifteen two-digit MELEE scenes are three families of five that share textures and differ in layout and colour maps |
+| [FND-RES-008](../findings/FND-RES-008.md) | Kind-1 blocks are neither the LSB-first LZW of other Dynamix files nor classic LH1 |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-STRATEGY-001](../findings/FND-STRATEGY-001.md) | The strategic pass at 0x0003C290 runs brigands, the spy, the player forces and then the hostile pass |
@@ -436,6 +452,8 @@ Entries whose Open questions section says more than None known.
 | [FMT-BATTLE-002](../formats/FMT-BATTLE-002.md) | Pointer event, one entry of the pointer queue | supported |
 | [FMT-PERSON-001](../formats/FMT-PERSON-001.md) | Character table, CHARACTR.DAT and saved copies | supported |
 | [FMT-PERSON-002](../formats/FMT-PERSON-002.md) | Youth dilemma, DILEM0.DAT to DILEM29.DAT | supported |
+| [FMT-RES-001](../formats/FMT-RES-001.md) | Resource container, a GOB, RES or LOW file | supported |
+| [FMT-RES-002](../formats/FMT-RES-002.md) | Container directory record | supported |
 | [FMT-STRATEGY-001](../formats/FMT-STRATEGY-001.md) | Strategic movement record, one force on the strategic map | supported |
 | [FMT-STRATEGY-002](../formats/FMT-STRATEGY-002.md) | Property record, one castle of the strategic map | supported |
 | [FMT-STRATEGY-003](../formats/FMT-STRATEGY-003.md) | Person record, one character of the strategic map | supported |
@@ -515,6 +533,8 @@ Entries whose Open questions section says more than None known.
 | [RULE-PERSON-004](../rules/RULE-PERSON-004.md) | Youth dilemmas | supported |
 | [RULE-PERSON-005](../rules/RULE-PERSON-005.md) | Courtship and marriage | sourced |
 | [RULE-PERSON-006](../rules/RULE-PERSON-006.md) | Retirement at 30 | supported |
+| [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
+| [RULE-RES-004](../rules/RULE-RES-004.md) | Archive paths and which archive is open | supported |
 | [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number generator | supported |
 | [RULE-STRATEGY-001](../rules/RULE-STRATEGY-001.md) | Strategic pass and the yearly orders | supported |
 | [RULE-STRATEGY-002](../rules/RULE-STRATEGY-002.md) | Hostile pass and arrival | supported |

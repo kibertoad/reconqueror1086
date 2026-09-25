@@ -4,11 +4,15 @@ using System.Text;
 
 namespace Conqueror.Resources;
 
+// FMT-RES-002 directory record: Flags is the kind and Reserved is unk_24.
 public sealed record DynamixEntry(int Index, string Name, uint Flags, uint Reserved, uint StoredSize, uint ExpandedSize, uint Offset)
 {
-    public bool IsStored => StoredSize == ExpandedSize;
+    // RULE-RES-001: the kind alone picks the decoder; BAR0's kind-1 Pal102 has equal sizes.
+    public bool IsStored => Flags == 0;
 }
 
+// FMT-RES-001 container. The original keeps one archive open at a time (RULE-RES-001, RULE-RES-004);
+// the importer reads every archive whole instead.
 public sealed class DynamixArchive
 {
     private const int HeaderSize = 8;

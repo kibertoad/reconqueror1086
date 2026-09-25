@@ -99,7 +99,7 @@ $env:NUGET_PACKAGES = 'C:\Users\kiber\.nuget\packages'
 $artifactPath = Join-Path $env:TEMP ('reconqueror-disassembly-' + [guid]::NewGuid().ToString('N'))
 dotnet run --project tools\Conqueror.Inspect --artifacts-path $artifactPath -- `
   'C:\GOG Games\Conqueror AD1086' 'analysis\original' `
-  '--disassemble=0x45C6E,0x456F4,0x4576C' '--executable-only'
+  '--disassemble=0x486B8,0x4819C,0x48658' '--executable-only'
 ```
 
 This writes the ignored metadata-only `analysis/original/executable-disassembly-report.txt`. Addresses are LE virtual addresses, not raw file offsets. The inspector locates the nested MZ module that owns the LE header, applies module-relative LE page offsets, and then maps virtual addresses through the executable's object and page tables before decoding 32-bit x86 instructions. For this build, adding the page offset to the LE header would be wrong by `0x2AA8`; the enumerated pages begin at raw file offset `0x4C254`, not `0x4ECFC`.

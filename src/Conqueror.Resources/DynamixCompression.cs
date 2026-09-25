@@ -15,6 +15,8 @@ public static class DynamixCompression
     private const int Kind2MaximumCodeCount = 1 << 14;
     public const int DefaultMaximumExpandedSize = 256 * 1024 * 1024;
 
+    // FMT-RES-003 and RULE-RES-002. The original takes any marker other than 0x80 as compressed and
+    // does not require 16 KiB blocks or copies inside the block; every shipped stream satisfies both.
     /// <summary>
     /// Inventories the framing observed in outer-archive compression kind 1.
     /// Each block has a two-byte little-endian payload length.
@@ -157,6 +159,7 @@ public static class DynamixCompression
         return (int)Math.Min(Kind1ExpandedBlockSize, remaining);
     }
 
+    // FND-RES-008 shows this is not the kind-1 codec; nothing in the original's containers uses it.
     /// <summary>
     /// Decodes the raw, least-significant-bit-first LZW stream used by
     /// documented inner Dynamix chunks. The exact expanded size is external.
@@ -231,6 +234,8 @@ public static class DynamixCompression
         return output;
     }
 
+    // FMT-RES-004 and RULE-RES-003. A code above the next free code is rejected, where the original
+    // expands it as the next one.
     /// <summary>Decodes outer-archive kind 2 using the executable-confirmed MSB-first 9-to-14-bit LZW variant.</summary>
     public static byte[] DecodeKind2(ReadOnlySpan<byte> source, int expectedSize, int maximumExpandedSize = DefaultMaximumExpandedSize)
     {

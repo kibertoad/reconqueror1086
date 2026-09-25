@@ -78,6 +78,7 @@ var lzwFixture = PackLsbCodes([65, 66, 257, 259], 9);
 Check(Encoding.ASCII.GetString(DynamixCompression.DecodeLzw(lzwFixture, 7)) == "ABABABA", "Dynamix LZW expands dictionary and special code");
 Check(Throws<InvalidDataException>(() => DynamixCompression.DecodeLzw(lzwFixture, 8)), "Dynamix LZW rejects truncated streams cleanly");
 Check(Throws<InvalidDataException>(() => DynamixCompression.DecodeLzw(lzwFixture, 7, 6)), "Dynamix LZW enforces expanded-size limit");
+// Covers FMT-RES-004, RULE-RES-003.
 var kind2Fixture = PackMsbCodes([(256, 9), (65, 9), (66, 9), (258, 9), (260, 9), (257, 9)]);
 Check(Encoding.ASCII.GetString(DynamixCompression.DecodeKind2(kind2Fixture, 7)) == "ABABABA", "Dynamix kind-2 handles clear, dictionary, special, and end codes");
 (int Count, int Width)[] kind2WidthRuns = [(254, 9), (512, 10), (1_024, 11), (2_048, 12), (4_096, 13), (8_193, 14)];
@@ -88,6 +89,7 @@ Check(DynamixCompression.DecodeKind2(PackMsbCodes(kind2GrowthCodes), kind2WidthR
 Check(Throws<InvalidDataException>(() => DynamixCompression.DecodeKind2(kind2Fixture[..^1], 7)), "Dynamix kind-2 rejects a stream without its end code");
 Check(Throws<InvalidDataException>(() => DynamixCompression.DecodeKind2(PackMsbCodes([(256, 9), (300, 9), (257, 9)]), 1)), "Dynamix kind-2 rejects undefined dictionary codes");
 Check(Throws<InvalidDataException>(() => DynamixCompression.DecodeKind2(kind2Fixture, 7, 6)), "Dynamix kind-2 enforces expanded-size limit");
+// Covers FMT-RES-003, RULE-RES-002.
 var kind1Source = new byte[] { 3, 0, 0x80, 2, 3, 2, 0, 0x40, 5 };
 var kind1Blocks = DynamixCompression.ReadKind1Blocks(kind1Source);
 Check(kind1Blocks.SequenceEqual([new DynamixCompressedBlock(0, 2, 3, DynamixBlockStorage.Stored), new DynamixCompressedBlock(1, 7, 2, DynamixBlockStorage.Compressed)]), "Dynamix kind-1 block framing and storage markers");
@@ -148,6 +150,7 @@ finally
     if (File.Exists(isoPath)) File.Delete(isoPath);
 }
 
+// Covers FMT-RES-001, FMT-RES-002.
 var resPath = Path.Combine(Path.GetTempPath(), $"conqueror-res-{Guid.NewGuid():N}.res");
 try
 {

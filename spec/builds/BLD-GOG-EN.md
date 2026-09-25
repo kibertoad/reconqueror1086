@@ -30,8 +30,9 @@ each audio track over its raw 2,352-byte sectors, taken from `game.gog` at the p
 `game.ins` gives.
 
 `CD:CONQUER.EXE` is a DOS/16M-bound LE executable. Its MZ stub embeds a second MZ module at file
-offset `0x26654`, and the LE header sits at file offset `0x290FC`. It is not packed. Addresses in
-the spec place each LE object at the relocation base its object table gives:
+offset `0x26654`, and the LE header sits at file offset `0x290FC`. The LE header's data-pages
+offset counts from the start of that module, so the pages begin at file offset `0x4C254`. It is
+not packed. Addresses in the spec place each LE object at the relocation base its object table gives:
 
 | Object | Holds | Relocation base | Virtual size | Pages |
 |---|---|---|---|---|
