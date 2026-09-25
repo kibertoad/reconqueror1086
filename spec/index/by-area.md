@@ -383,9 +383,16 @@ Entries by area.
 | [FND-UI-008](../findings/FND-UI-008.md) | The pointer is a frame of FFMOUSE.CSF chosen through 0x00064030 | recorded |
 | [FND-UI-009](../findings/FND-UI-009.md) | The conversation screen draws five 558-by-35 response rows from (41, 302) and picks a row by pointer height | recorded |
 | [FND-UI-010](../findings/FND-UI-010.md) | The HAT backgrounds and the control sprite sets decode to the sizes the layouts expect | recorded |
+| [FND-UI-011](../findings/FND-UI-011.md) | Picture, sound and music numbers are indexes into the C1086.GOB directory | recorded |
+| [FND-UI-012](../findings/FND-UI-012.md) | The game options screen toggles six settings in CONQUER.INI and routes to new game, load, save, practice, resume and quit | recorded |
+| [FND-UI-013](../findings/FND-UI-013.md) | Character creation, practice and the tournament screens route between screens 3, 6, 8 to 12 and 24 | recorded |
+| [FND-UI-014](../findings/FND-UI-014.md) | The forge hides the smith without a tournament, and the store buys at the listed price and sells at three quarters | recorded |
+| [FND-UI-015](../findings/FND-UI-015.md) | The office, overview and estate map regions open the report pictures, the orders message and the map controls | recorded |
+| [FND-UI-016](../findings/FND-UI-016.md) | The four fief tables share row, terrain, full-screen, OK and Cancel routines, and the village table sets the tax in steps of 5 | recorded |
 | [RULE-UI-001](../rules/RULE-UI-001.md) | Village exterior hot spots | supported |
 | [RULE-UI-002](../rules/RULE-UI-002.md) | Village exterior actions | supported |
 | [RULE-UI-003](../rules/RULE-UI-003.md) | Store stock | supported |
+| [RULE-UI-004](../rules/RULE-UI-004.md) | Store purchase and sale | supported |
 | [SCR-UI-001](../screens/SCR-UI-001.md) | Title screen | supported |
 | [SCR-UI-002](../screens/SCR-UI-002.md) | Game options | supported |
 | [SCR-UI-003](../screens/SCR-UI-003.md) | Character options | supported |
@@ -399,6 +406,13 @@ Entries by area.
 | [SCR-UI-011](../screens/SCR-UI-011.md) | Fief management tables | supported |
 | [SCR-UI-012](../screens/SCR-UI-012.md) | Estate map | supported |
 | [SCR-UI-013](../screens/SCR-UI-013.md) | Conversation | supported |
+| [SCR-UI-014](../screens/SCR-UI-014.md) | Tournament grounds | supported |
+| [SCR-UI-015](../screens/SCR-UI-015.md) | Tournament stands | supported |
+| [SCR-UI-016](../screens/SCR-UI-016.md) | Tournament tents | supported |
+| [SCR-UI-017](../screens/SCR-UI-017.md) | Inn | supported |
+| [SCR-UI-018](../screens/SCR-UI-018.md) | Fief overview | supported |
+| [SCR-UI-019](../screens/SCR-UI-019.md) | Dubbing | supported |
+| [SCR-UI-020](../screens/SCR-UI-020.md) | Screen 5 | supported |
 
 ## RES
 

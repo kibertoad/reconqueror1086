@@ -5,10 +5,10 @@ status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
 resolution: 640x480
-evidence: [FND-UI-001, FND-UI-002, FND-UI-003, FND-UI-010]
+evidence: [FND-BATTLE-001, FND-JOUST-001, FND-TOURNEY-007, FND-UI-001, FND-UI-002, FND-UI-003, FND-UI-010, FND-UI-013]
 conflicting: []
 split_with: []
-related: []
+related: [RULE-BATTLE-001, RULE-JOUST-002, RULE-TOURNEY-005]
 ---
 
 ## Drawn elements
@@ -21,11 +21,11 @@ related: []
 
 | Region | Rectangle | Enabled when | Effect | Evidence |
 |---|---|---|---|---|
-| region 0 | (58, 250, 250, 138) | Always | Runs a click routine that was not traced. | FND-UI-003 |
-| region 1 | (279, 140, 436, 70) | Always | Runs a click routine that was not traced. | FND-UI-003 |
-| region 2 | (374, 336, 202, 102) | Always | Runs a click routine that was not traced. | FND-UI-003 |
+| region 0 | (58, 250, 250, 138) | Always | Starts a practice field battle with drawn army sizes (RULE-BATTLE-001). | FND-UI-013, FND-BATTLE-001 |
+| region 1 | (279, 140, 436, 70) | Always | Starts the practice joust (RULE-JOUST-002). | FND-UI-013, FND-JOUST-001 |
+| region 2 | (374, 336, 202, 102) | Always | Starts the practice melee (RULE-TOURNEY-005). | FND-TOURNEY-007 |
 | region 3 | (567, 239, 48, 18) | Always | Returns to the previous screen through `0x00059760`. | FND-UI-003 |
-| region 4 | (1, 1, 234, 170) | Always | Runs a click routine that was not traced. | FND-UI-003 |
+| region 4 | (1, 1, 234, 170) | Always | Starts the castle skirmish from `R121.RES`, `R131.RES` or `R141.RES`. | FND-UI-013 |
 
 ## Keyboard input
 
@@ -53,4 +53,4 @@ None known.
 
 ## Open questions
 
-- What the click routines of regions 0, 1, 2 and 4 start.
+- How the army sizes of the practice battle are drawn.

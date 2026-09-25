@@ -28,7 +28,7 @@ Entries by status.
 
 ## supported
 
-154 entries.
+162 entries.
 
 | ID | Title |
 |---|---|
@@ -167,6 +167,7 @@ Entries by status.
 | [RULE-UI-001](../rules/RULE-UI-001.md) | Village exterior hot spots |
 | [RULE-UI-002](../rules/RULE-UI-002.md) | Village exterior actions |
 | [RULE-UI-003](../rules/RULE-UI-003.md) | Store stock |
+| [RULE-UI-004](../rules/RULE-UI-004.md) | Store purchase and sale |
 | [RULE-VIEW-001](../rules/RULE-VIEW-001.md) | Heading from one map point to another |
 | [RULE-VIEW-002](../rules/RULE-VIEW-002.md) | Integer sine, cosine and rotation |
 | [RULE-VIEW-003](../rules/RULE-VIEW-003.md) | Cast a ray through the scene and find the first opaque surface at a view row |
@@ -186,6 +187,13 @@ Entries by status.
 | [SCR-UI-011](../screens/SCR-UI-011.md) | Fief management tables |
 | [SCR-UI-012](../screens/SCR-UI-012.md) | Estate map |
 | [SCR-UI-013](../screens/SCR-UI-013.md) | Conversation |
+| [SCR-UI-014](../screens/SCR-UI-014.md) | Tournament grounds |
+| [SCR-UI-015](../screens/SCR-UI-015.md) | Tournament stands |
+| [SCR-UI-016](../screens/SCR-UI-016.md) | Tournament tents |
+| [SCR-UI-017](../screens/SCR-UI-017.md) | Inn |
+| [SCR-UI-018](../screens/SCR-UI-018.md) | Fief overview |
+| [SCR-UI-019](../screens/SCR-UI-019.md) | Dubbing |
+| [SCR-UI-020](../screens/SCR-UI-020.md) | Screen 5 |
 
 ## established
 
@@ -205,7 +213,7 @@ Entries by status.
 
 ## recorded
 
-182 entries.
+188 entries.
 
 | ID | Title |
 |---|---|
@@ -370,6 +378,12 @@ Entries by status.
 | [FND-UI-008](../findings/FND-UI-008.md) | The pointer is a frame of FFMOUSE.CSF chosen through 0x00064030 |
 | [FND-UI-009](../findings/FND-UI-009.md) | The conversation screen draws five 558-by-35 response rows from (41, 302) and picks a row by pointer height |
 | [FND-UI-010](../findings/FND-UI-010.md) | The HAT backgrounds and the control sprite sets decode to the sizes the layouts expect |
+| [FND-UI-011](../findings/FND-UI-011.md) | Picture, sound and music numbers are indexes into the C1086.GOB directory |
+| [FND-UI-012](../findings/FND-UI-012.md) | The game options screen toggles six settings in CONQUER.INI and routes to new game, load, save, practice, resume and quit |
+| [FND-UI-013](../findings/FND-UI-013.md) | Character creation, practice and the tournament screens route between screens 3, 6, 8 to 12 and 24 |
+| [FND-UI-014](../findings/FND-UI-014.md) | The forge hides the smith without a tournament, and the store buys at the listed price and sells at three quarters |
+| [FND-UI-015](../findings/FND-UI-015.md) | The office, overview and estate map regions open the report pictures, the orders message and the map controls |
+| [FND-UI-016](../findings/FND-UI-016.md) | The four fief tables share row, terrain, full-screen, OK and Cancel routines, and the village table sets the tax in steps of 5 |
 | [FND-VIEW-001](../findings/FND-VIEW-001.md) | Every combat scene archive holds its blocks as 96-byte records ending in 0xCC 0xCC with a 16-byte label at offset 78 |
 | [FND-VIEW-002](../findings/FND-VIEW-002.md) | Every combat scene map is 128 by 128 block numbers stored column by column |
 | [FND-VIEW-003](../findings/FND-VIEW-003.md) | The heading helper folds the vector into octants around floor(0x20 * minor / major), and callers pass (-dy, dx) |
@@ -536,16 +550,16 @@ Entries whose Open questions section says more than None known.
 | [RULE-VIEW-005](../rules/RULE-VIEW-005.md) | Draw the backdrop | supported |
 | [RULE-VIEW-006](../rules/RULE-VIEW-006.md) | Build a scene's distance colour maps | supported |
 | [RULE-VIEW-007](../rules/RULE-VIEW-007.md) | Colour map of a drawn surface | supported |
-| [SCR-UI-001](../screens/SCR-UI-001.md) | Title screen | supported |
 | [SCR-UI-002](../screens/SCR-UI-002.md) | Game options | supported |
-| [SCR-UI-003](../screens/SCR-UI-003.md) | Character options | supported |
 | [SCR-UI-004](../screens/SCR-UI-004.md) | Youth dilemma | supported |
-| [SCR-UI-005](../screens/SCR-UI-005.md) | Pre-generated characters | supported |
 | [SCR-UI-006](../screens/SCR-UI-006.md) | Village exterior | supported |
 | [SCR-UI-007](../screens/SCR-UI-007.md) | Forge and store | supported |
 | [SCR-UI-008](../screens/SCR-UI-008.md) | Practice grounds | supported |
-| [SCR-UI-009](../screens/SCR-UI-009.md) | Castle office | supported |
 | [SCR-UI-010](../screens/SCR-UI-010.md) | War planning | supported |
 | [SCR-UI-011](../screens/SCR-UI-011.md) | Fief management tables | supported |
 | [SCR-UI-012](../screens/SCR-UI-012.md) | Estate map | supported |
 | [SCR-UI-013](../screens/SCR-UI-013.md) | Conversation | supported |
+| [SCR-UI-014](../screens/SCR-UI-014.md) | Tournament grounds | supported |
+| [SCR-UI-018](../screens/SCR-UI-018.md) | Fief overview | supported |
+| [SCR-UI-019](../screens/SCR-UI-019.md) | Dubbing | supported |
+| [SCR-UI-020](../screens/SCR-UI-020.md) | Screen 5 | supported |

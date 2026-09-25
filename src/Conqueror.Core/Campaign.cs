@@ -363,6 +363,7 @@ public sealed partial class Campaign
         return true;
     }
 
+    // PLACEHOLDER: RULE-UI-004. The original pays price - price / 4 and clears every copy held.
     public bool SellEquipment(string name)
     {
         var item = Balance.Equipment.FirstOrDefault(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));

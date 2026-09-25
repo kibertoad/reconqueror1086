@@ -9,6 +9,7 @@
 | `RULE-UI-001` | Village exterior hot spots | supported | partial | None | None | supported | `OriginalVillageScenePresentation` picks the `VILLAGE.DAT` record from person byte `+0x0F` only for the new-game home; other places fall back to the default scene, and `TVILLAGE.DAT` is not chosen for tournament places. `VillagePresentationDefinitions` maps hot spots to actions by label, where the original maps them by row position. |
 | `RULE-UI-002` | Village exterior actions | supported | partial | None | None | supported | The rebuild's village actions lead to its own tournament, inn, forge, lender and church screens; the map exit does not clear the tournament counts, and the tournament does not close when the calendar field changes. |
 | `RULE-UI-003` | Store stock | supported | partial | None | None | supported | `Balance.StoreEquipment` offers every store item on every visit and lists owned items among them; there is no per-place residue or chance draw. |
+| `RULE-UI-004` | Store purchase and sale | supported | partial | None | None | supported | `Campaign.BuyEquipment` refuses an item already held, and `Campaign.SellEquipment` pays `price * 3 / 4` rounded down, where the original pays `price - price / 4` (23 for a price of 30, against 22); the original also clears every copy on a sale. |
 | `SCR-UI-001` | Title screen | supported | partial | None | None | supported | `ConquerorGame.DrawTitle` plays the title movie and draws the title background; its menu is the rebuild's own. |
 | `SCR-UI-002` | Game options | supported | partial | None | None | supported | `OptionsHubDefinitions` uses the `OPTION.HAT` rectangles with fallbacks. The rebuild adds settings of its own. |
 | `SCR-UI-003` | Character options | supported | partial | None | None | supported | `CharacterCreationDefinitions` uses the `CHAR_OPS.HAT` rectangles with fallbacks. |
@@ -22,3 +23,10 @@
 | `SCR-UI-011` | Fief management tables | supported | partial | None | None | supported | `FarmPresentationDefinitions` covers the four sections with rows of its own. |
 | `SCR-UI-012` | Estate map | supported | partial | None | None | supported | `EstatePresentationDefinitions`. |
 | `SCR-UI-013` | Conversation | supported | partial | None | None | supported | `ConversationPresentationDefinitions`; the rebuild wraps text with its own font metrics. |
+| `SCR-UI-014` | Tournament grounds | supported | partial | None | None | supported | The rebuild's `Tournament` screen joins the grounds, stands and tents into one screen of its own. |
+| `SCR-UI-015` | Tournament stands | supported | partial | None | None | supported | `TournamentConversationDefinitions` names the ladies and their roots; the stands picture and its regions are not used. |
+| `SCR-UI-016` | Tournament tents | supported | partial | None | None | supported | The tent actions run from the rebuild's `Tournament` screen. |
+| `SCR-UI-017` | Inn | supported | partial | None | None | supported | `InnPresentationDefinitions` uses the `VINN.HAT` regions; the tournament gate on patrons is not applied (RULE-TALK-004). |
+| `SCR-UI-018` | Fief overview | supported | partial | None | None | supported | The rebuild's `Overview` screen draws `f_over.pcx`; the three report pages are not shown. |
+| `SCR-UI-019` | Dubbing | supported | missing | None | None | supported | The rebuild goes from character creation to its own briefing screen. |
+| `SCR-UI-020` | Screen 5 | supported | missing | None | None | supported | None. |

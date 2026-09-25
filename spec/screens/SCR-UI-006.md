@@ -5,7 +5,7 @@ status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
 resolution: 640x480
-evidence: [FND-UI-001, FND-UI-002, FND-UI-003, FND-UI-004, FND-UI-005, FND-UI-008, FND-UI-010]
+evidence: [FND-UI-001, FND-UI-002, FND-UI-003, FND-UI-004, FND-UI-005, FND-UI-008, FND-UI-010, FND-UI-011]
 conflicting: []
 split_with: []
 related: [RULE-UI-001, RULE-UI-002]
@@ -45,7 +45,8 @@ None known.
 
 | Sound | Resource | Played when | Evidence |
 |---|---|---|---|
-| Click | Resource `0x164`, loaded on entry | Each click on regions 0 to 5 | FND-UI-004, FND-UI-005 |
+| Click | `C1086.GOB#vopts.666`, resource `0x164`, loaded on entry | Each click on regions 0 to 5 | FND-UI-004, FND-UI-005, FND-UI-011 |
+| Music | `C1086.GOB#village.hmp`, resource `0x18D` | On entry when no village music plays | FND-UI-004, FND-UI-011 |
 
 ## States
 
