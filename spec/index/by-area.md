@@ -154,7 +154,22 @@ Entries by area.
 
 ## TOURNEY
 
-None.
+| ID | Title | Status |
+|---|---|---|
+| [BUG-TOURNEY-001](../bugs/BUG-TOURNEY-001.md) | The tournament melee always loads a scene whose two digits repeat the site digit | supported |
+| [FND-TOURNEY-001](../findings/FND-TOURNEY-001.md) | Each month the game picks a tournament site different from the last one | recorded |
+| [FND-TOURNEY-002](../findings/FND-TOURNEY-002.md) | The tournament tent picks five distinct opponents from rows 1 to 14, never row 8 | recorded |
+| [FND-TOURNEY-003](../findings/FND-TOURNEY-003.md) | The tent allows three jousts and one melee between clears of its counts, and rewards wins through 0x0009DC40 | recorded |
+| [FND-TOURNEY-004](../findings/FND-TOURNEY-004.md) | The joust wager is 1 + a scaled draw of 30 + the opponent's lance experience, capped at the player's wealth | recorded |
+| [FND-TOURNEY-005](../findings/FND-TOURNEY-005.md) | The melee sets its wager from the average sword experience and settles it in wealth and the tallies | recorded |
+| [FND-TOURNEY-006](../findings/FND-TOURNEY-006.md) | The melee scene name repeats the site digit because both digits share one buffer | recorded |
+| [FND-TOURNEY-007](../findings/FND-TOURNEY-007.md) | The practice melee loads MELEE0 to MELEE2 with a draw of 0 to 2 | recorded |
+| [FND-TOURNEY-008](../findings/FND-TOURNEY-008.md) | Strings for the tournament refusals and the joust opponents' portraits | recorded |
+| [RULE-TOURNEY-001](../rules/RULE-TOURNEY-001.md) | Monthly tournament site | supported |
+| [RULE-TOURNEY-002](../rules/RULE-TOURNEY-002.md) | Tournament tent opponents and actions | supported |
+| [RULE-TOURNEY-003](../rules/RULE-TOURNEY-003.md) | Tournament joust wager and rewards | supported |
+| [RULE-TOURNEY-004](../rules/RULE-TOURNEY-004.md) | Tournament melee wager, scene and settlement | supported |
+| [RULE-TOURNEY-005](../rules/RULE-TOURNEY-005.md) | Practice melee scene | supported |
 
 ## STRATEGY
 
@@ -170,7 +185,11 @@ None.
 
 ## PERSON
 
-None.
+| ID | Title | Status |
+|---|---|---|
+| [FND-PERSON-001](../findings/FND-PERSON-001.md) | Character attributes are read by 0x00015EF0 and written by 0x00015F0C, which limits the first 15 to 0..20 | recorded |
+| [FND-PERSON-002](../findings/FND-PERSON-002.md) | CHARACTR.DAT lists 15 characters and 30 attributes | recorded |
+| [RULE-PERSON-001](../rules/RULE-PERSON-001.md) | Character attributes | supported |
 
 ## TALK
 
@@ -208,4 +227,6 @@ None.
 
 | ID | Title | Status |
 |---|---|---|
-| [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number routine | unknown |
+| [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |
+| [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
+| [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number generator | supported |

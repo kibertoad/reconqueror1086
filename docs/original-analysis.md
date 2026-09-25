@@ -88,7 +88,7 @@ Generated manifests, reports, and artifacts under `analysis/original` are ignore
 - Add a specification that exercises the definition through the campaign interpreter.
 - Keep uncertain values labeled provisional until a table, code path, save-state experiment, or repeated controlled observation confirms them.
 
-The inspector currently establishes that the disc contains a 919,107-byte DOS `CONQUER.EXE`, that the game has separate joust and melee wager dialogue, and that joust opponent resources include Simon, Richard, Gerard, and Gilbert identifiers. It does not by itself prove the exact wager/difficulty table.
+The inspector currently establishes that the disc contains a 919,107-byte DOS `CONQUER.EXE`.
 
 Tracked conclusions, evidence offsets, and confidence grades are maintained in [`original-findings.md`](original-findings.md). Generated reports are evidence inputs; that reviewed register is the source of truth for what the project considers factual.
 

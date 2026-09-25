@@ -26,6 +26,9 @@ public static class Balance
     public const decimal LoanInterest = 0.50m;
     public static readonly StrategicDefinition Strategy = new(80, 98, 9);
 
+    // PLACEHOLDER: RULE-TOURNEY-002. The original draws five character rows for each tournament;
+    // these fixed opponents, stakes (RULE-TOURNEY-003, RULE-TOURNEY-004), tolerances and unit
+    // mixes are guesses.
     public static readonly TournamentOpponentDefinition[] TournamentOpponents =
     [
         new("Simon", 20, 20, 3, 3, 2),

@@ -6,14 +6,13 @@ Entries by status.
 
 ## unknown
 
-5 entries.
+4 entries.
 
 | ID | Title |
 |---|---|
 | [FMT-ASSAULT-004](../formats/FMT-ASSAULT-004.md) | Live effect record, one of the 64 effects the scheduler runs |
 | [RULE-ASSAULT-027](../rules/RULE-ASSAULT-027.md) | Combatant and effect values whose layout or computation is not recorded |
 | [RULE-ASSAULT-030](../rules/RULE-ASSAULT-030.md) | Which retainer the loader removes above the cap |
-| [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number routine |
 | [RULE-VIEW-004](../rules/RULE-VIEW-004.md) | Surface intersection, depth and pixel test inside the raycaster |
 
 ## sourced
@@ -22,11 +21,12 @@ Entries by status.
 
 ## supported
 
-51 entries.
+59 entries.
 
 | ID | Title |
 |---|---|
 | [BUG-JOUST-001](../bugs/BUG-JOUST-001.md) | The dragon lance frame scan reads past its table when the lance is above y 92 |
+| [BUG-TOURNEY-001](../bugs/BUG-TOURNEY-001.md) | The tournament melee always loads a scene whose two digits repeat the site digit |
 | [FMT-ASSAULT-001](../formats/FMT-ASSAULT-001.md) | Combatant record, one of the actors of a first-person assault |
 | [FMT-ASSAULT-002](../formats/FMT-ASSAULT-002.md) | Combat row, one of the 25 weapon records in the executable |
 | [FMT-ASSAULT-003](../formats/FMT-ASSAULT-003.md) | Scene effect descriptor, one record of the SFXDEFS resource |
@@ -71,6 +71,13 @@ Entries by status.
 | [RULE-JOUST-001](../rules/RULE-JOUST-001.md) | Lance motion and sprite frame |
 | [RULE-JOUST-002](../rules/RULE-JOUST-002.md) | Practice joust pass |
 | [RULE-JOUST-003](../rules/RULE-JOUST-003.md) | Dragon run |
+| [RULE-PERSON-001](../rules/RULE-PERSON-001.md) | Character attributes |
+| [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number generator |
+| [RULE-TOURNEY-001](../rules/RULE-TOURNEY-001.md) | Monthly tournament site |
+| [RULE-TOURNEY-002](../rules/RULE-TOURNEY-002.md) | Tournament tent opponents and actions |
+| [RULE-TOURNEY-003](../rules/RULE-TOURNEY-003.md) | Tournament joust wager and rewards |
+| [RULE-TOURNEY-004](../rules/RULE-TOURNEY-004.md) | Tournament melee wager, scene and settlement |
+| [RULE-TOURNEY-005](../rules/RULE-TOURNEY-005.md) | Practice melee scene |
 | [RULE-VIEW-001](../rules/RULE-VIEW-001.md) | Heading from one map point to another |
 | [RULE-VIEW-002](../rules/RULE-VIEW-002.md) | Integer sine, cosine and rotation |
 | [RULE-VIEW-003](../rules/RULE-VIEW-003.md) | Cast a ray through the scene and find the first opaque surface at a view row |
@@ -92,7 +99,7 @@ Entries by status.
 
 ## recorded
 
-78 entries.
+90 entries.
 
 | ID | Title |
 |---|---|
@@ -153,6 +160,18 @@ Entries by status.
 | [FND-JOUST-009](../findings/FND-JOUST-009.md) | The dragon run succeeds when 26 times (lance experience - 20 + item bonus) beats both error totals |
 | [FND-JOUST-010](../findings/FND-JOUST-010.md) | The dragon lance moves by the practice formula with pull 256 per 10 pixels and an upward jerk of 5,000 |
 | [FND-JOUST-011](../findings/FND-JOUST-011.md) | The dragon lance frame scan has no end check and reads past its five thresholds when the lance is above y 92 |
+| [FND-PERSON-001](../findings/FND-PERSON-001.md) | Character attributes are read by 0x00015EF0 and written by 0x00015F0C, which limits the first 15 to 0..20 |
+| [FND-PERSON-002](../findings/FND-PERSON-002.md) | CHARACTR.DAT lists 15 characters and 30 attributes |
+| [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
+| [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
+| [FND-TOURNEY-001](../findings/FND-TOURNEY-001.md) | Each month the game picks a tournament site different from the last one |
+| [FND-TOURNEY-002](../findings/FND-TOURNEY-002.md) | The tournament tent picks five distinct opponents from rows 1 to 14, never row 8 |
+| [FND-TOURNEY-003](../findings/FND-TOURNEY-003.md) | The tent allows three jousts and one melee between clears of its counts, and rewards wins through 0x0009DC40 |
+| [FND-TOURNEY-004](../findings/FND-TOURNEY-004.md) | The joust wager is 1 + a scaled draw of 30 + the opponent's lance experience, capped at the player's wealth |
+| [FND-TOURNEY-005](../findings/FND-TOURNEY-005.md) | The melee sets its wager from the average sword experience and settles it in wealth and the tallies |
+| [FND-TOURNEY-006](../findings/FND-TOURNEY-006.md) | The melee scene name repeats the site digit because both digits share one buffer |
+| [FND-TOURNEY-007](../findings/FND-TOURNEY-007.md) | The practice melee loads MELEE0 to MELEE2 with a draw of 0 to 2 |
+| [FND-TOURNEY-008](../findings/FND-TOURNEY-008.md) | Strings for the tournament refusals and the joust opponents' portraits |
 | [FND-VIEW-001](../findings/FND-VIEW-001.md) | Every combat scene archive holds its blocks as 96-byte records ending in 0xCC 0xCC with a 16-byte label at offset 78 |
 | [FND-VIEW-002](../findings/FND-VIEW-002.md) | Every combat scene map is 128 by 128 block numbers stored column by column |
 | [FND-VIEW-003](../findings/FND-VIEW-003.md) | The heading helper folds the vector into octants around floor(0x20 * minor / major), and callers pass (-dy, dx) |
@@ -235,7 +254,13 @@ Entries whose Open questions section says more than None known.
 | [RULE-JOUST-001](../rules/RULE-JOUST-001.md) | Lance motion and sprite frame | supported |
 | [RULE-JOUST-002](../rules/RULE-JOUST-002.md) | Practice joust pass | supported |
 | [RULE-JOUST-003](../rules/RULE-JOUST-003.md) | Dragon run | supported |
-| [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number routine | unknown |
+| [RULE-PERSON-001](../rules/RULE-PERSON-001.md) | Character attributes | supported |
+| [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number generator | supported |
+| [RULE-TOURNEY-001](../rules/RULE-TOURNEY-001.md) | Monthly tournament site | supported |
+| [RULE-TOURNEY-002](../rules/RULE-TOURNEY-002.md) | Tournament tent opponents and actions | supported |
+| [RULE-TOURNEY-003](../rules/RULE-TOURNEY-003.md) | Tournament joust wager and rewards | supported |
+| [RULE-TOURNEY-004](../rules/RULE-TOURNEY-004.md) | Tournament melee wager, scene and settlement | supported |
+| [RULE-TOURNEY-005](../rules/RULE-TOURNEY-005.md) | Practice melee scene | supported |
 | [RULE-VIEW-001](../rules/RULE-VIEW-001.md) | Heading from one map point to another | supported |
 | [RULE-VIEW-002](../rules/RULE-VIEW-002.md) | Integer sine, cosine and rotation | supported |
 | [RULE-VIEW-003](../rules/RULE-VIEW-003.md) | Cast a ray through the scene and find the first opaque surface at a view row | supported |

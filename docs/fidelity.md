@@ -29,8 +29,6 @@ Binary-derived claims and their confidence levels are recorded in [`original-fin
 - 200-shilling loan ceiling with 50% harvest interest; spy price of 80
 - Shop prices, 75% resale rule, armor bar values, and crossbow availability
 - The original store table order, item-image indices, local descriptions, Fighter's Dagger price of 84 shillings, and `BUYSELL.CSF` view/transaction labels
-- Three jousts and one skirmish per tournament, lance experience cap of 20
-- Joust and melee wager dialogue, five selectable melee opponents, and the documented typical 20-80 shilling wager range
 - Lady-specific colors, piety/fame restrictions, win-indexed courtship rewards, and simultaneous courtships
 - Dragon score inputs: the Dragon Slaying Lance, Shield of St. George, Dragon Slaying Armor, and lance experience; no independent Mighty strength gate
 - Thirty imported youth-dilemma definitions grouped five per age from 12 through 17, with executable-confirmed random selection and inclusive breakpoint outcome rules
@@ -44,8 +42,7 @@ Binary-derived claims and their confidence levels are recorded in [`original-fin
 - Tactical field battles expose independent swordsman, halberdier and knight formations with live hold, advance, flank, captain-control and withdrawal orders. The exact original formation geometry remains under investigation.
 - What the rebuild implements of first-person combat is tracked in `parity/ASSAULT.md`. Critical-hit presentation and several other consequence tables remain under investigation.
 - Costs not given by the available manual/FAQ (castle staff and civic construction) are centralized in `Campaign.Build` pending executable observation.
-- World coordinates, road-distance conversion, garrisons, and the tournament circuit are provisional pending extraction of the original map tables.
-- Tournament opponent identifiers are partially recoverable from `CONQUER.EXE`; the current wager progression, difficulty tolerances, and individual eight-man compositions remain provisional pending disassembly or controlled observation.
+- World coordinates, road-distance conversion, and garrisons are provisional pending extraction of the original map tables.
 
 ## Media status
 

@@ -113,7 +113,7 @@ The five kind-2 resources are four strictly validated 640x480 `.PCX` entries and
 
 The combat maps hold an unreachable gallery of sample blocks (FND-VIEW-020). Runtime conversion therefore floods through passable and interactable cells from the Viewer, retains only that connected play area plus one enclosing wall cell, and translates the cropped coordinates back to the source map for texture lookup.
 
-The 15 two-digit `MELEE00`–`MELEE24` archives belong to the tournament name builder, not to a one-per-castle campaign sequence. The practice callback selects inclusively among the three distinct unsuffixed `MELEE0`–`MELEE2` archives. Initialization `0x21DFC` registers dispatcher `0x21EEC` in engine callback slot `+0xB0` through `0x59C24`; the sole indirect call through that slot at `0x59BC7` reaches dispatcher slot 128 and its literal `MELEE0.RES` load at `0x22226`. The common campaign binding is therefore **Confirmed**.
+Initialization `0x21DFC` registers dispatcher `0x21EEC` in engine callback slot `+0xB0` through `0x59C24`; the sole indirect call through that slot at `0x59BC7` reaches dispatcher slot 128 and its literal `MELEE0.RES` load at `0x22226`. The common campaign binding is therefore **Confirmed**.
 
 The renderer regenerates the active colour-map family with RULE-VIEW-006, selects maps with RULE-VIEW-007, and keeps each encountered texture/map result. Transparency follows the source index before remapping.
 

@@ -4,7 +4,7 @@ title: Practice joust pass
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-JOUST-001, FND-JOUST-002, FND-JOUST-003, FND-JOUST-004, FND-JOUST-005, FND-JOUST-006, FND-JOUST-007]
+evidence: [FND-JOUST-001, FND-JOUST-002, FND-JOUST-003, FND-JOUST-004, FND-JOUST-005, FND-JOUST-006, FND-JOUST-007, FND-RNG-002]
 conflicting: []
 split_with: []
 related: [RULE-JOUST-001, RULE-RNG-001]
@@ -96,5 +96,4 @@ None known.
 
 ## Open questions
 
-- Whether `0x00041110` draws from the same generator as `random` (RULE-RNG-001) is not recorded.
 - The wording of the messages is content of the game and is left out.

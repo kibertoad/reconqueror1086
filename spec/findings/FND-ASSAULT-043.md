@@ -13,7 +13,7 @@ locations:
     address: 0x000551BF..0x00055222
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0004CE4C
+    address: 0x000445B4
 tool: Ghidra 12.1.3
 environment: null
 ---
@@ -22,7 +22,7 @@ environment: null
 
 At `0x000551BF`..`0x00055222`, on the path the player's weapon takes when its contact misses, the
 code skips the rest for combat row 0. For any other row it draws `random(200 + 50 * p)` through
-`0x0004CE4C`, where `p` is the row's dword at offset `0x08`, and breaks the weapon only when the
+`0x000445B4`, where `p` is the row's dword at offset `0x08`, and breaks the weapon only when the
 draw is 0.
 
 ## Interpretation

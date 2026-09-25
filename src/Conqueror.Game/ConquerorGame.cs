@@ -627,7 +627,7 @@ public sealed partial class ConquerorGame : Microsoft.Xna.Framework.Game
             case PracticeAction.Melee:
                 _activePracticeCombat = PracticeCombatKind.Melee;
                 var meleeSeed = Environment.TickCount;
-                var meleeScene = ImportedSiegeLayouts.ForPracticeMelee(_importedContent, new Random(meleeSeed).Next(3));
+                var meleeScene = ImportedSiegeLayouts.ForPracticeMelee(_importedContent, new Random(meleeSeed).Next(3)); // PLACEHOLDER: RULE-TOURNEY-005, RULE-RNG-001
                 ActivateSiege(meleeScene,
                     PracticeCombatDefinitions.CreateMelee(meleeSeed, meleeScene.Layout));
                 _screen = Screen.Siege;

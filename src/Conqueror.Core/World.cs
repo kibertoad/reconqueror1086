@@ -26,6 +26,7 @@ public static class World
         new("Dragon Moor", LocationKind.DragonLair, 590, 95, 0)
     ];
 
+    // PLACEHOLDER: RULE-TOURNEY-001. The original draws a new site each month; this fixed circuit is a guess.
     public static int TournamentIndex(DateTime date)
     {
         int[] circuit = [4, 8, 12, 13, 6, 3, 11, 7];

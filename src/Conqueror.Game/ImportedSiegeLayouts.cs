@@ -33,6 +33,7 @@ public static class ImportedSiegeLayouts
     public static ImportedSiegeScene? ForCampaignLocation(ImportedContentCatalog catalog, int location) =>
         SceneNameForCampaignLocation(location) is { } name ? Load(catalog, name) : null;
 
+    // RULE-TOURNEY-005: the practice melee loads MELEE<variant>.RES for a variant of 0 to 2.
     public static string SceneNameForPracticeMelee(int variant) => variant switch
     {
         0 => "MELEE0.RES",

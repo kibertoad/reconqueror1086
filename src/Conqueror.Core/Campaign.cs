@@ -706,6 +706,7 @@ public sealed partial class Campaign
         return true;
     }
 
+    // PLACEHOLDER: RULE-TOURNEY-003. The limit of three matches; the wager, win test and rewards are guesses.
     public bool Joust(int accuracy, int opponentIndex = 2)
     {
         RefreshTournament();
@@ -743,6 +744,7 @@ public sealed partial class Campaign
         return won;
     }
 
+    // PLACEHOLDER: RULE-TOURNEY-004. The limit of one matches; the wager, battle and settlement are guesses.
     public BattleResult? TournamentSkirmish(int opponentIndex = 2)
     {
         RefreshTournament();

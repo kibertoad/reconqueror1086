@@ -23,6 +23,7 @@ public static class PracticeCombatDefinitions
         return new FieldBattleSession(friendly, enemy, seed);
     }
 
+    // PLACEHOLDER: RULE-TOURNEY-005. The side sizes the original draws are not used; these counts are guesses.
     public static SiegeSession CreateMelee(int seed = 1086, SiegeLayout? layout = null) =>
         new(CreateParticipant(), Army(8, 0, 0), garrison: 6, seed: seed, layout: layout);
 

@@ -9,6 +9,7 @@ public enum LocationKind { Home, Village, Castle, City, Tournament, London, Drag
 public enum EquipmentSlot { Weapon, Body, Shield, Helm, Keepsake }
 public enum BuildingKind { House, Church, Monastery, Steward, Beadle, Priest, ServantRoom, Woodward }
 
+// RULE-PERSON-001: the attributes are kept as named properties, and only some writes apply its limits.
 public sealed record CharacterStats(int Strength, int Dexterity, int Piety, int Stamina, int Honor, int Intelligence = 8)
 {
     public CharacterStats Clamp() => new(
