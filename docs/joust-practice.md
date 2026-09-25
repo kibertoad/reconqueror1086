@@ -1,7 +1,7 @@
 # Practice Joust executable map
 
-All addresses below refer to the owned GOG `CONQUER.EXE` with SHA-256
-`5d7231758766204ad061e6b82cf2f0e0cbe28899b35d095f13e4aad75c8b79d6`.
+All addresses below refer to the owned GOG `CONQUER.EXE` with XXH3-128
+`5106f53f8201761cb5112034f6c594d4`.
 The supporting disassembly and resource reports are generated locally under
 ignored `analysis/original/joust-practice-xrefs/`; no original bytes are tracked.
 

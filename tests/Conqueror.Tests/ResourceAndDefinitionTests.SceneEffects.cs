@@ -180,7 +180,7 @@ public sealed partial class ResourceAndDefinitionTests
                 Asset("CONQUER/TEST.RES#3:Blocks", "0003-Blocks", source.Blocks),
                 Asset("CONQUER/TEST.RES#4:SFXDEFS", "0004-SFXDEFS", effects)
             };
-            new ImportManifest(1, new string('a', 64), assets).Write(Path.Combine(root, "manifest.json"));
+            new ImportManifest(ImportManifest.CurrentVersion, new string('a', 32), assets).Write(Path.Combine(root, "manifest.json"));
 
             var catalog = Assert.IsType<ImportedContentCatalog>(ImportedContentCatalog.Discover(root));
             var scene = Assert.IsType<DynamixScene>(catalog.DecodeScene("CONQUER/TEST.RES"));
@@ -195,7 +195,7 @@ public sealed partial class ResourceAndDefinitionTests
                 var path = Path.Combine(root, relative);
                 Directory.CreateDirectory(Path.GetDirectoryName(path)!);
                 File.WriteAllBytes(path, bytes);
-                return new ImportedAsset(id, relative, "resource", bytes.Length, ResourceHash.Sha256(path));
+                return new ImportedAsset(id, relative, "resource", bytes.Length, ResourceHash.Xxh3(path));
             }
         }
         finally

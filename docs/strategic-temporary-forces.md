@@ -1,7 +1,7 @@
 # Original strategic temporary forces
 
-This map covers the owned GOG `CONQUER.EXE` with SHA-256
-`5d7231758766204ad061e6b82cf2f0e0cbe28899b35d095f13e4aad75c8b79d6`.
+This map covers the owned GOG `CONQUER.EXE` with XXH3-128
+`5106f53f8201761cb5112034f6c594d4`.
 Addresses below are loaded Linear Executable virtual addresses unless prefixed
 `object-2 +`. The evidence is direct LE-aware disassembly and bounded decoded
 `all.cbf/all.cif`, `all.tmb/all.tmi`, `scot.rat`, and `wales.rat` resources.

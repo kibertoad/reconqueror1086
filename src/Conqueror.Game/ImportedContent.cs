@@ -148,13 +148,13 @@ public sealed class ImportedContentCatalog
     private readonly string _root;
     private readonly ImportedAsset[] _assets;
     public int Count => _assets.Length;
-    public string SourceImageSha256 { get; }
+    public string SourceImageXxh3 { get; }
 
     private ImportedContentCatalog(string root, ImportManifest manifest)
     {
         _root = Path.GetFullPath(root) + Path.DirectorySeparatorChar;
         _assets = manifest.Assets ?? [];
-        SourceImageSha256 = manifest.SourceImageSha256 ?? "unknown";
+        SourceImageXxh3 = manifest.SourceImageXxh3 ?? "unknown";
     }
 
     public static ImportedContentCatalog? Discover(string? preferredRoot = null)
@@ -175,7 +175,7 @@ public sealed class ImportedContentCatalog
             try
             {
                 var manifest = ImportManifest.Read(manifestPath);
-                if (manifest is { Version: 1 }) return new ImportedContentCatalog(root!, manifest);
+                if (manifest.Version == ImportManifest.CurrentVersion) return new ImportedContentCatalog(root!, manifest);
             }
             catch (JsonException) { }
         }
@@ -191,7 +191,7 @@ public sealed class ImportedContentCatalog
             throw new InvalidDataException(
                 $"Original Conqueror resources are required. Run the resource importer for '{fullRoot}' before starting the game.");
         var manifest = ImportManifest.Read(manifestPath);
-        var release = SupportedOriginalReleases.NameForSourceImage(manifest.SourceImageSha256);
+        var release = SupportedOriginalReleases.NameForSourceImage(manifest.SourceImageXxh3);
         if (release is null)
             throw new InvalidDataException("The imported resources are not from a supported original Conqueror release.");
         var verification = ImportManifestVerifier.Verify(fullRoot, manifest);

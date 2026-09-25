@@ -346,18 +346,18 @@ try
     File.WriteAllText(Path.Combine(contentRoot, "dilem7.dat"), CreateSyntheticDilemma());
     var manifest = new
     {
-        Version = 1,
-        SourceImageSha256 = "test-source",
+        Version = ImportManifest.CurrentVersion,
+        SourceImageXxh3 = "test-source",
         Assets = new[]
         {
-            new { Id = "CDDA/TRACK02", Path = "Audio/track02.wav", Kind = "audio", Size = 4, Sha256 = "test" },
-            new { Id = "IMAGE", Path = "portrait.pcc", Kind = "image", Size = CreateSyntheticPcx().Length, Sha256 = "test" },
-            new { Id = "ANIMATION", Path = "animation.csf", Kind = "indexed-animation", Size = 0, Sha256 = "test" },
-            new { Id = "PALETTE", Path = "screen.pal", Kind = "palette", Size = IndexedPalette.ByteSize, Sha256 = "test" },
-            new { Id = "SOUND", Path = "interface.666", Kind = "sound-bank", Size = soundBankFixture.Length, Sha256 = "test" },
-            new { Id = "CONQUER/TITLE.SMK", Path = "title.smk", Kind = "movie", Size = 1, Sha256 = "test" },
-            new { Id = "C1086.GOB#177:dilem7.dat", Path = "dilem7.dat", Kind = "resource", Size = 0, Sha256 = "test" },
-            new { Id = "UNSAFE", Path = "../outside.bin", Kind = "resource", Size = 0, Sha256 = "test" }
+            new { Id = "CDDA/TRACK02", Path = "Audio/track02.wav", Kind = "audio", Size = 4, Xxh3 = "test" },
+            new { Id = "IMAGE", Path = "portrait.pcc", Kind = "image", Size = CreateSyntheticPcx().Length, Xxh3 = "test" },
+            new { Id = "ANIMATION", Path = "animation.csf", Kind = "indexed-animation", Size = 0, Xxh3 = "test" },
+            new { Id = "PALETTE", Path = "screen.pal", Kind = "palette", Size = IndexedPalette.ByteSize, Xxh3 = "test" },
+            new { Id = "SOUND", Path = "interface.666", Kind = "sound-bank", Size = soundBankFixture.Length, Xxh3 = "test" },
+            new { Id = "CONQUER/TITLE.SMK", Path = "title.smk", Kind = "movie", Size = 1, Xxh3 = "test" },
+            new { Id = "C1086.GOB#177:dilem7.dat", Path = "dilem7.dat", Kind = "resource", Size = 0, Xxh3 = "test" },
+            new { Id = "UNSAFE", Path = "../outside.bin", Kind = "resource", Size = 0, Xxh3 = "test" }
         }
     };
     File.WriteAllText(Path.Combine(contentRoot, "manifest.json"), JsonSerializer.Serialize(manifest));

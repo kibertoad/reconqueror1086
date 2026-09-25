@@ -55,8 +55,8 @@ public sealed partial class ResourceAndDefinitionTests
             File.WriteAllBytes(path, bytes);
             var asset = new ImportedAsset(
                 "CONQUER/SKIRMISH.RES#12:SKIRMISH.PAL", relative, "palette",
-                bytes.Length, ResourceHash.Sha256(path));
-            new ImportManifest(1, new string('a', 64), [asset]).Write(Path.Combine(root, "manifest.json"));
+                bytes.Length, ResourceHash.Xxh3(path));
+            new ImportManifest(ImportManifest.CurrentVersion, new string('a', 32), [asset]).Write(Path.Combine(root, "manifest.json"));
             var catalog = Assert.IsType<ImportedContentCatalog>(ImportedContentCatalog.Discover(root));
 
             Assert.Equal(bytes, ImportedSiegeLayouts.LoadCombatPalette(catalog).Rgb);
@@ -79,13 +79,13 @@ public sealed partial class ResourceAndDefinitionTests
                 ImportedContentCatalog.LoadRequired(root));
             Assert.Contains("resources are required", missing.Message);
 
-            new ImportManifest(1, SupportedOriginalReleases.GogEnglishSourceImageSha256, []).Write(
+            new ImportManifest(ImportManifest.CurrentVersion, SupportedOriginalReleases.GogEnglishSourceImageXxh3, []).Write(
                 Path.Combine(root, "manifest.json"));
             var incomplete = Assert.Throws<InvalidDataException>(() =>
                 ImportedContentCatalog.LoadRequired(root));
             Assert.Contains("import is incomplete", incomplete.Message);
 
-            new ImportManifest(1, new string('0', 64), []).Write(Path.Combine(root, "manifest.json"));
+            new ImportManifest(ImportManifest.CurrentVersion, new string('0', 32), []).Write(Path.Combine(root, "manifest.json"));
             var unsupported = Assert.Throws<InvalidDataException>(() =>
                 ImportedContentCatalog.LoadRequired(root));
             Assert.Contains("not from a supported", unsupported.Message);

@@ -24,10 +24,10 @@ if (!File.Exists(imagePath) || !File.Exists(cuePath) || !File.Exists(gobPath))
     Console.Error.WriteLine("A complete GOG installation with game.gog, game.ins, and C1086.GOB is required.");
     return 2;
 }
-var sourceImageHash = ResourceHash.Sha256(imagePath);
+var sourceImageHash = ResourceHash.Xxh3(imagePath);
 var releaseName = SupportedOriginalReleases.NameForSourceImage(sourceImageHash);
 if (releaseName is null)
-    Console.Error.WriteLine($"WARNING: unrecognized source image SHA-256 {sourceImageHash}; bounded validation will continue.");
+    Console.Error.WriteLine($"WARNING: unrecognized source image XXH3-128 {sourceImageHash}; bounded validation will continue.");
 else
     Console.WriteLine($"Recognized {releaseName} ({sourceImageHash}).");
 
@@ -90,7 +90,7 @@ for (var index = 0; index < tracks.Length; index++)
     ReportProgress(entries, changedFiles, $"CDDA/TRACK{track.Number:00}");
 }
 
-var manifest = new ImportManifest(1, sourceImageHash, entries.OrderBy(x => x.Id, StringComparer.OrdinalIgnoreCase).ToArray());
+var manifest = new ImportManifest(ImportManifest.CurrentVersion, sourceImageHash, entries.OrderBy(x => x.Id, StringComparer.OrdinalIgnoreCase).ToArray());
 manifest.Write(Path.Combine(output, "manifest.json"));
 var verification = ImportManifestVerifier.Verify(output, manifest);
 if (!verification.IsValid)
@@ -190,7 +190,7 @@ static string Kind(string path) => Path.GetExtension(path).ToUpperInvariant() sw
 {
     ".SMK" => "movie", ".WAV" or ".MID" => "audio", ".PCX" or ".PCC" => "image", _ => "resource"
 };
-static ImportedAsset NewEntry(string id, string relative, string kind, string path) => new(id.Replace('\\', '/'), relative.Replace('\\', '/'), kind, new FileInfo(path).Length, ResourceHash.Sha256(path));
+static ImportedAsset NewEntry(string id, string relative, string kind, string path) => new(id.Replace('\\', '/'), relative.Replace('\\', '/'), kind, new FileInfo(path).Length, ResourceHash.Xxh3(path));
 
 static string DecodedKind(string name, string path)
 {

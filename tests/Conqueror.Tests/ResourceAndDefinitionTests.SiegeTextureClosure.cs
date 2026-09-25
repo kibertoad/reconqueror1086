@@ -82,7 +82,7 @@ public sealed partial class ResourceAndDefinitionTests
                 Asset("CONQUER/DEFEND2.RES#1:TEX096 2 1", "atlas-96.bin", [3, 4]),
                 Asset("CONQUER/DEFEND2.RES#2:TEX128 2 1", "atlas-128.bin", [5, 6])
             };
-            new ImportManifest(1, new string('a', 64), assets).Write(
+            new ImportManifest(ImportManifest.CurrentVersion, new string('a', 32), assets).Write(
                 Path.Combine(root, "manifest.json"));
             var catalog = Assert.IsType<ImportedContentCatalog>(ImportedContentCatalog.Discover(root));
 
@@ -100,7 +100,7 @@ public sealed partial class ResourceAndDefinitionTests
             {
                 var path = Path.Combine(root, name);
                 File.WriteAllBytes(path, bytes);
-                return new ImportedAsset(id, name, "resource", bytes.Length, ResourceHash.Sha256(path));
+                return new ImportedAsset(id, name, "resource", bytes.Length, ResourceHash.Xxh3(path));
             }
         }
         finally

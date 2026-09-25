@@ -34,7 +34,7 @@ Runtime conversation entry also covers all six named tournament-lady selector ro
 1. Parses `game.ins` to find the end of CD data track 1.
 2. Reads MODE1/2352 sectors directly, exposing only their 2,048-byte ISO payloads.
 3. Walks the ISO-9660 directory tree without mounting or modifying the image.
-4. Writes a complete CD manifest and SHA-256 provenance hashes.
+4. Writes `cd-manifest.txt`, the size and XXH3-128 of every file on the data track, every CD audio track (over its raw 2,352-byte sectors) and every file installed beside the disc image, and `artifact-hashes.txt` for the extracted artifacts.
 5. Locally extracts small executable/configuration artifacts useful for inspection.
 6. Searches printable strings in `CONQUER.EXE` and the installed `C1086.GOB`, recording byte offsets for follow-up analysis; it can also emit a 64 KiB-bounded local printable-string report for one explicitly named decoded GOB entry.
 7. Parses the bounded top-level Dynamix archive directory and reports names, flags, sizes, and offsets. For kind-1 entries it validates every two-byte-length-prefixed block and expected 16 KiB output slice; for kind 2 it applies the executable-confirmed MSB-first 9-to-14-bit LZW stream. It validates `.666` resources as bounded rate-tagged sample banks and records metadata without exporting audio. The end-user importer writes every supported decoded entry through one centralized codec registry.

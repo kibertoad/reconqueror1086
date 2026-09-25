@@ -2,7 +2,6 @@ using Conqueror.Core;
 using Conqueror.Game;
 using Conqueror.Resources;
 using System.Buffers.Binary;
-using System.Security.Cryptography;
 using System.Text;
 using Xunit;
 
@@ -359,8 +358,8 @@ public sealed partial class ResourceAndDefinitionTests
             FormattableString.Invariant(
                 $"person {index} 0x{person.NameAddress:X} {person.Group} {person.State5} {person.Flags} {person.Assignment} {person.X} {person.Y} {person.LordRating} {person.ListNext} {person.State14} {person.State15} {person.State16} {person.State17}")));
         Assert.Equal(
-            "ec3a31ce97eb367cf3a39e033e2d9b6dccdfd72769d590a0ce9a839169754b4f",
-            Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(census))).ToLowerInvariant());
+            "3ee3a20a2dcf7a7e8c5155e6eb4bad55",
+            ResourceHash.Xxh3(Encoding.UTF8.GetBytes(census)));
 
         var eligibleByGroup = OriginalStrategicMovement.Persons
             .Where(person => person.Assignment != 0 &&
@@ -733,8 +732,8 @@ public sealed partial class ResourceAndDefinitionTests
             BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(8), -456);
             File.WriteAllBytes(path, data);
             var asset = new ImportedAsset(
-                "C1086.GOB#67:rt_1_2.rat", relative, "resource", data.Length, ResourceHash.Sha256(path));
-            new ImportManifest(1, new string('a', 64), [asset]).Write(Path.Combine(root, "manifest.json"));
+                "C1086.GOB#67:rt_1_2.rat", relative, "resource", data.Length, ResourceHash.Xxh3(path));
+            new ImportManifest(ImportManifest.CurrentVersion, new string('a', 32), [asset]).Write(Path.Combine(root, "manifest.json"));
 
             var catalog = Assert.IsType<ImportedContentCatalog>(ImportedContentCatalog.Discover(root));
             Assert.Equal(
@@ -768,8 +767,8 @@ public sealed partial class ResourceAndDefinitionTests
             WriteWorldCell(data, row: 7, column: 11, 0x0123_002A);
             File.WriteAllBytes(path, data);
             var asset = new ImportedAsset(
-                "C1086.GOB#292:icon.jp", relative, "resource", data.Length, ResourceHash.Sha256(path));
-            new ImportManifest(1, new string('a', 64), [asset]).Write(Path.Combine(root, "manifest.json"));
+                "C1086.GOB#292:icon.jp", relative, "resource", data.Length, ResourceHash.Xxh3(path));
+            new ImportManifest(ImportManifest.CurrentVersion, new string('a', 32), [asset]).Write(Path.Combine(root, "manifest.json"));
 
             var catalog = Assert.IsType<ImportedContentCatalog>(ImportedContentCatalog.Discover(root));
             Assert.Equal((ushort)42,
@@ -894,7 +893,7 @@ public sealed partial class ResourceAndDefinitionTests
         WriteWorldCell(world, row: 7, column: 11, 0xA123_002A);
         Add("C1086.GOB#292:icon.jp", "icon.jp", world);
 
-        new ImportManifest(1, new string('a', 64), assets.ToArray())
+        new ImportManifest(ImportManifest.CurrentVersion, new string('a', 32), assets.ToArray())
             .Write(Path.Combine(root, "manifest.json"));
         return (root, Assert.IsType<ImportedContentCatalog>(ImportedContentCatalog.Discover(root)));
 
@@ -903,7 +902,7 @@ public sealed partial class ResourceAndDefinitionTests
             var path = Path.Combine(root, relativePath);
             File.WriteAllBytes(path, data);
             assets.Add(new ImportedAsset(
-                id, relativePath, "resource", data.Length, ResourceHash.Sha256(path)));
+                id, relativePath, "resource", data.Length, ResourceHash.Xxh3(path)));
         }
     }
 

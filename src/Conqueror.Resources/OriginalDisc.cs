@@ -1,5 +1,5 @@
 using System.Buffers.Binary;
-using System.Security.Cryptography;
+using System.IO.Hashing;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -8,18 +8,22 @@ namespace Conqueror.Resources;
 
 public sealed record CueTrack(int Number, string Mode, int StartSector);
 public sealed record IsoFile(string Path, uint Extent, uint Size);
-public sealed record ImportedAsset(string Id, string Path, string Kind, long Size, string Sha256);
+public sealed record ImportedAsset(string Id, string Path, string Kind, long Size, string Xxh3);
 
 public static class SupportedOriginalReleases
 {
-    public const string GogEnglishSourceImageSha256 = "8a584cc03a0a19f74851d2c1f4653804a58bfbf2c16e4fd34759f7a7f88cf015";
+    public const string GogEnglishSourceImageXxh3 = "b915491c5bdce934ca216d2ceebec0ce";
 
-    public static string? NameForSourceImage(string sha256) => sha256.Equals(
-        GogEnglishSourceImageSha256, StringComparison.OrdinalIgnoreCase) ? "GOG English release" : null;
+    public static string? NameForSourceImage(string xxh3) => xxh3.Equals(
+        GogEnglishSourceImageXxh3, StringComparison.OrdinalIgnoreCase) ? "GOG English release" : null;
 }
 
-public sealed record ImportManifest(int Version, string SourceImageSha256, ImportedAsset[] Assets)
+public sealed record ImportManifest(int Version, string SourceImageXxh3, ImportedAsset[] Assets)
 {
+    // Version 2 identifies files by XXH3-128. A manifest of any other version fails verification,
+    // so an older local import is re-imported rather than misread.
+    public const int CurrentVersion = 2;
+
     public static ImportManifest Read(string path) => JsonSerializer.Deserialize<ImportManifest>(File.ReadAllText(path))
         ?? throw new InvalidDataException("Invalid imported-content manifest.");
 
@@ -27,7 +31,7 @@ public sealed record ImportManifest(int Version, string SourceImageSha256, Impor
         JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true }));
 }
 
-public sealed record InstalledFile(string Path, long Size, string Sha256, bool Changed);
+public sealed record InstalledFile(string Path, long Size, string Xxh3, bool Changed);
 public sealed record PlannedImportAsset(string Path, long Size);
 public sealed record ImportDiskPlan(long InstalledBytes, long NewBytes, long ReplacementScratchBytes)
 {
@@ -63,7 +67,7 @@ public static class GeneratedContentInstaller
     public static InstalledFile InstallBytes(string root, string relative, ReadOnlySpan<byte> bytes)
     {
         var target = ResourcePaths.SafeTarget(root, relative);
-        var hash = ResourceHash.Sha256(bytes);
+        var hash = ResourceHash.Xxh3(bytes);
         if (Matches(target, bytes.Length, hash)) return new(target, bytes.Length, hash, false);
         AtomicFile.WriteBytes(target, bytes);
         return new(target, bytes.Length, hash, true);
@@ -73,7 +77,7 @@ public static class GeneratedContentInstaller
     {
         var target = ResourcePaths.SafeTarget(root, relative);
         var info = new FileInfo(source);
-        var hash = ResourceHash.Sha256(source);
+        var hash = ResourceHash.Xxh3(source);
         if (Matches(target, info.Length, hash)) return new(target, info.Length, hash, false);
         AtomicFile.Copy(source, target);
         return new(target, info.Length, hash, true);
@@ -94,7 +98,7 @@ public static class GeneratedContentInstaller
                 stream.Flush(flushToDisk: true);
             }
             var info = new FileInfo(temporary);
-            var hash = ResourceHash.Sha256(temporary);
+            var hash = ResourceHash.Xxh3(temporary);
             if (Matches(target, info.Length, hash)) return new(target, info.Length, hash, false);
             File.Move(temporary, target, overwrite: true);
             return new(target, info.Length, hash, true);
@@ -107,7 +111,7 @@ public static class GeneratedContentInstaller
 
     private static bool Matches(string path, long size, string hash) => File.Exists(path)
         && new FileInfo(path).Length == size
-        && ResourceHash.Sha256(path).Equals(hash, StringComparison.OrdinalIgnoreCase);
+        && ResourceHash.Xxh3(path).Equals(hash, StringComparison.OrdinalIgnoreCase);
 }
 
 public static class ImportedContentUninstaller
@@ -206,10 +210,10 @@ public static class ImportManifestVerifier
         var issues = new List<ImportVerificationIssue>();
         var ids = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        if (manifest.Version != 1)
+        if (manifest.Version != ImportManifest.CurrentVersion)
             issues.Add(new("manifest", "manifest.json", $"unsupported manifest version {manifest.Version}"));
-        if (!IsSha256(manifest.SourceImageSha256))
-            issues.Add(new("manifest", "manifest.json", "invalid source-image SHA-256"));
+        if (!ResourceHash.IsXxh3(manifest.SourceImageXxh3))
+            issues.Add(new("manifest", "manifest.json", "invalid source-image XXH3"));
 
         var assets = manifest.Assets ?? [];
         foreach (var asset in assets)
@@ -228,9 +232,9 @@ public static class ImportManifestVerifier
                 issues.Add(new(assetId, assetPath, "empty, absolute, or duplicate asset path"));
                 continue;
             }
-            if (asset.Size < 0 || !IsSha256(asset.Sha256))
+            if (asset.Size < 0 || !ResourceHash.IsXxh3(asset.Xxh3))
             {
-                issues.Add(new(assetId, assetPath, "invalid declared size or SHA-256"));
+                issues.Add(new(assetId, assetPath, "invalid declared size or XXH3"));
                 continue;
             }
 
@@ -249,14 +253,11 @@ public static class ImportManifestVerifier
             var info = new FileInfo(target);
             if (info.Length != asset.Size)
                 issues.Add(new(assetId, assetPath, $"size mismatch: expected {asset.Size}, found {info.Length}"));
-            else if (!ResourceHash.Sha256(target).Equals(asset.Sha256, StringComparison.OrdinalIgnoreCase))
-                issues.Add(new(assetId, assetPath, "SHA-256 mismatch"));
+            else if (!ResourceHash.Xxh3(target).Equals(asset.Xxh3, StringComparison.OrdinalIgnoreCase))
+                issues.Add(new(assetId, assetPath, "XXH3 mismatch"));
         }
         return new(assets.Length, issues);
     }
-
-    private static bool IsSha256(string? value) => value is { Length: 64 }
-        && value.All(character => character is >= '0' and <= '9' or >= 'a' and <= 'f' or >= 'A' and <= 'F');
 }
 
 public static class ResourcePaths
@@ -281,10 +282,31 @@ public static class ResourcePaths
     }
 }
 
+// The 128-bit form of xxHash3 (XXH3_128bits, which `xxhsum -H2` prints), written as 32 lower-case hex
+// digits in the byte order of its canonical form. The documentation standard names every original
+// file by the same hash, so the build manifest in spec/builds/ and the import manifest agree.
 public static class ResourceHash
 {
-    public static string Sha256(string path) { using var stream = File.OpenRead(path); return Convert.ToHexString(SHA256.HashData(stream)).ToLowerInvariant(); }
-    public static string Sha256(ReadOnlySpan<byte> bytes) => Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
+    public const int Xxh3HexLength = 32;
+
+    public static string Xxh3(string path)
+    {
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read,
+            128 * 1024, FileOptions.SequentialScan);
+        return Xxh3(stream);
+    }
+
+    public static string Xxh3(Stream stream)
+    {
+        var hash = new XxHash128();
+        hash.Append(stream);
+        return Convert.ToHexStringLower(hash.GetCurrentHash());
+    }
+
+    public static string Xxh3(ReadOnlySpan<byte> bytes) => Convert.ToHexStringLower(XxHash128.Hash(bytes));
+
+    public static bool IsXxh3(string? value) => value is { Length: Xxh3HexLength }
+        && value.All(character => character is >= '0' and <= '9' or >= 'a' and <= 'f' or >= 'A' and <= 'F');
 }
 
 public static class CueSheet

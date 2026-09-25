@@ -9,7 +9,7 @@ This machine has a portable, user-wide Ghidra installation for clean-room analys
 | Ghidra | 12.1.3 | `C:\Users\kiber\AppData\Local\Programs\Ghidra\ghidra_12.1.3_PUBLIC` |
 | Eclipse Temurin JDK | 21.0.12.1 | `C:\Users\kiber\AppData\Local\Programs\Java\jdk-21.0.12.1+1` |
 
-The Ghidra archive was downloaded from the official NSA release and verified before extraction. Its SHA-256 is `93A5D11A9AD510622ACAAF908C556A7B9B764D338E78A7567F3689BF5081FD54` and its size is 569,445,154 bytes. Use the [official Ghidra releases page](https://github.com/NationalSecurityAgency/ghidra/releases) if the installation must be recreated; Ghidra 12.1.x requires a supported JDK 21 installation.
+The Ghidra archive was downloaded from the official NSA release and verified against the checksum published with that release before extraction. Its size is 569,445,154 bytes. Use the [official Ghidra releases page](https://github.com/NationalSecurityAgency/ghidra/releases) if the installation must be recreated; Ghidra 12.1.x requires a supported JDK 21 installation.
 
 ## Check before installing
 
@@ -60,7 +60,7 @@ Reference facts:
 
 - source installation: `C:\GOG Games\Conqueror AD1086`
 - byte length: 919,107
-- SHA-256: `5D7231758766204AD061E6B82CF2F0E0CBE28899B35D095F13E4AAD75C8B79D6`
+- XXH3-128: `5106f53f8201761cb5112034f6c594d4`
 - format: 32-bit Linear Executable embedded behind a DOS16M MZ stub
 - embedded MZ module file offset: `0x26654`
 - LE header offset within that module: `0x2AA8`

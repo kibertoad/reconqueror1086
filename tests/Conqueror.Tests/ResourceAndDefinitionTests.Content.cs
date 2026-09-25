@@ -531,27 +531,27 @@ public sealed partial class ResourceAndDefinitionTests
             var path = Path.Combine(root, relative);
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             File.WriteAllBytes(path, [1, 2, 3, 4]);
-            var sourceHash = new string('a', 64);
-            var valid = new ImportedAsset("fixture", relative, "resource", 4, ResourceHash.Sha256(path));
-            var manifest = new ImportManifest(1, sourceHash, [valid]);
+            var sourceHash = new string('a', 32);
+            var valid = new ImportedAsset("fixture", relative, "resource", 4, ResourceHash.Xxh3(path));
+            var manifest = new ImportManifest(ImportManifest.CurrentVersion, sourceHash, [valid]);
             Assert.True(ImportManifestVerifier.Verify(root, manifest).IsValid);
 
             File.WriteAllBytes(path, [4, 3, 2, 1]);
             var damaged = ImportManifestVerifier.Verify(root, manifest);
             Assert.False(damaged.IsValid);
-            Assert.Contains(damaged.Issues, issue => issue.Reason == "SHA-256 mismatch");
+            Assert.Contains(damaged.Issues, issue => issue.Reason == "XXH3 mismatch");
 
-            var unsafeManifest = new ImportManifest(1, sourceHash,
+            var unsafeManifest = new ImportManifest(ImportManifest.CurrentVersion, sourceHash,
             [
                 valid,
                 valid with { Path = "../escape.bin" },
-                valid with { Id = "bad-hash", Path = Path.Combine("Decoded", "other.bin"), Sha256 = "bad" }
+                valid with { Id = "bad-hash", Path = Path.Combine("Decoded", "other.bin"), Xxh3 = "bad" }
             ]);
             var unsafeResult = ImportManifestVerifier.Verify(root, unsafeManifest);
             Assert.False(unsafeResult.IsValid);
             Assert.Contains(unsafeResult.Issues, issue => issue.Reason.Contains("escapes", StringComparison.Ordinal));
             Assert.Contains(unsafeResult.Issues, issue => issue.Reason.Contains("duplicate", StringComparison.Ordinal));
-            Assert.Contains(unsafeResult.Issues, issue => issue.Reason.Contains("SHA-256", StringComparison.Ordinal));
+            Assert.Contains(unsafeResult.Issues, issue => issue.Reason.Contains("XXH3", StringComparison.Ordinal));
         }
         finally
         {
@@ -577,8 +577,8 @@ public sealed partial class ResourceAndDefinitionTests
 
             var unlisted = Path.Combine(root, "keep.txt");
             File.WriteAllText(unlisted, "mine");
-            var asset = new ImportedAsset("fixture", relative, "resource", replaced.Size, replaced.Sha256);
-            var manifest = new ImportManifest(1, new string('a', 64), [asset]);
+            var asset = new ImportedAsset("fixture", relative, "resource", replaced.Size, replaced.Xxh3);
+            var manifest = new ImportManifest(ImportManifest.CurrentVersion, new string('a', 32), [asset]);
             manifest.Write(Path.Combine(root, "manifest.json"));
 
             var unsafeManifest = manifest with { Assets = [asset, asset with { Id = "unsafe", Path = "../outside.bin" }] };
@@ -600,8 +600,8 @@ public sealed partial class ResourceAndDefinitionTests
     public void SupportedOriginalReleaseIsIdentifiedByExactSourceImageHash()
     {
         Assert.Equal("GOG English release", SupportedOriginalReleases.NameForSourceImage(
-            SupportedOriginalReleases.GogEnglishSourceImageSha256.ToUpperInvariant()));
-        Assert.Null(SupportedOriginalReleases.NameForSourceImage(new string('0', 64)));
+            SupportedOriginalReleases.GogEnglishSourceImageXxh3.ToUpperInvariant()));
+        Assert.Null(SupportedOriginalReleases.NameForSourceImage(new string('0', 32)));
     }
 
     [Fact]

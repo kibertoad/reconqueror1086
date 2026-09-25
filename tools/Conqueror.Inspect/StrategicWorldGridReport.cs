@@ -1,5 +1,4 @@
 using Conqueror.Resources;
-using System.Security.Cryptography;
 using System.Text;
 
 internal static class StrategicWorldGridReport
@@ -20,7 +19,7 @@ internal static class StrategicWorldGridReport
             var bytes = archive.ReadDecoded(entry);
             var grid = StrategicWorldGridDecoder.Decode(bytes);
             report.AppendLine($"resource-index {entry.Index} name {entry.Name}");
-            report.AppendLine($"encoded-length {bytes.Length} sha256 {Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant()}");
+            report.AppendLine($"encoded-length {bytes.Length} xxh3 {ResourceHash.Xxh3(bytes)}");
             report.AppendLine($"cell-size {grid.CellWidth}x{grid.CellHeight} rows {grid.RowCount} columns {grid.ColumnCount} storage column-major-dwords");
             report.AppendLine($"tile-id-range {grid.Cells.Min(cell => cell.TileId)}..{grid.Cells.Max(cell => cell.TileId)} distinct {grid.Cells.Select(cell => cell.TileId).Distinct().Count()}");
             report.AppendLine($"auxiliary-range {grid.Cells.Min(cell => cell.Auxiliary)}..{grid.Cells.Max(cell => cell.Auxiliary)} distinct {grid.Cells.Select(cell => cell.Auxiliary).Distinct().Count()}");

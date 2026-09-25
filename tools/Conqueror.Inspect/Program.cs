@@ -1,7 +1,7 @@
 using Conqueror.Resources;
 using Iced.Intel;
 using System.Buffers.Binary;
-using System.Security.Cryptography;
+using System.IO.Hashing;
 using System.Text;
 
 try
@@ -21,12 +21,7 @@ var sectors = CueSheet.DataTrackSectors(File.ReadAllLines(cuePath));
 using var image = new RawMode1Image(imagePath, sectors);
 var iso = new Iso9660(image);
 var files = iso.Files.OrderBy(x => x.Path, StringComparer.OrdinalIgnoreCase).ToArray();
-var manifest = new StringBuilder();
-manifest.AppendLine("# Original CD inventory (generated; do not redistribute artifacts)");
-manifest.AppendLine($"# Source image SHA-256: {Hash(imagePath)}");
-manifest.AppendLine($"# Data sectors: {sectors}");
-foreach (var file in files) manifest.AppendLine($"{file.Size,12}  {file.Path}");
-File.WriteAllText(Path.Combine(output, "cd-manifest.txt"), manifest.ToString());
+File.WriteAllText(Path.Combine(output, "cd-manifest.txt"), CdInventoryReport.Build(install, imagePath, cuePath, iso, files, sectors));
 
 var artifactRoot = Path.Combine(output, "artifacts");
 var interesting = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".EXE", ".COM", ".INI", ".CFG", ".DAT", ".TXT" };
@@ -218,7 +213,7 @@ if (File.Exists(gobPath))
     }
     File.WriteAllText(Path.Combine(output, "gob-compression-report.txt"), compressionReport.ToString());
 
-    var imageReport = new StringBuilder("# Width  Height  Pixel-index SHA-256  Name\n");
+    var imageReport = new StringBuilder("# Width  Height  Pixel-index XXH3-128  Name\n");
     foreach (var entry in gob.Entries.Where(DynamixArchive.CanDecode))
     {
         var bytes = gob.ReadDecoded(entry);
@@ -226,7 +221,7 @@ if (File.Exists(gobPath))
         try
         {
             var pcxImage = PcxDecoder.Decode(bytes);
-            imageReport.AppendLine($"{pcxImage.Width,5}  {pcxImage.Height,6}  {Convert.ToHexString(SHA256.HashData(pcxImage.Indices)).ToLowerInvariant()}  {entry.Name}");
+            imageReport.AppendLine($"{pcxImage.Width,5}  {pcxImage.Height,6}  {ResourceHash.Xxh3(pcxImage.Indices)}  {entry.Name}");
         }
         catch (InvalidDataException error)
         {
@@ -246,13 +241,13 @@ if (File.Exists(gobPath))
         }
     }
 
-    var csfReport = new StringBuilder("# Storage  Chunks  Minimum  Maximum  Payload bytes  Segments literal/skip/fill  Frame-sequence SHA-256  Dimension headers  Name\n");
+    var csfReport = new StringBuilder("# Storage  Chunks  Minimum  Maximum  Payload bytes  Segments literal/skip/fill  Frame-sequence XXH3-128  Dimension headers  Name\n");
     foreach (var entry in gob.Entries.Where(x => DynamixArchive.CanDecode(x) && Path.GetExtension(x.Name).Equals(".CSF", StringComparison.OrdinalIgnoreCase)))
     {
         try
         {
             var sequence = new CsfSequence(gob.ReadDecoded(entry));
-            using var frameHash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+            var frameHash = new XxHash128();
             var dimensionsBytes = new byte[4];
             long literalSegments = 0, transparentSegments = 0, fillSegments = 0;
             foreach (var chunk in sequence.Chunks)
@@ -263,12 +258,12 @@ if (File.Exists(gobPath))
                 fillSegments += frame.FillSegments;
                 System.Buffers.Binary.BinaryPrimitives.WriteUInt16LittleEndian(dimensionsBytes, checked((ushort)frame.Width));
                 System.Buffers.Binary.BinaryPrimitives.WriteUInt16LittleEndian(dimensionsBytes.AsSpan(2), checked((ushort)frame.Height));
-                frameHash.AppendData(dimensionsBytes);
-                frameHash.AppendData(frame.Indices);
-                frameHash.AppendData(frame.Alpha);
+                frameHash.Append(dimensionsBytes);
+                frameHash.Append(frame.Indices);
+                frameHash.Append(frame.Alpha);
             }
             var dimensions = sequence.Chunks.Select(x => sequence.ReadDimensionHeader(x)).GroupBy(x => x).OrderByDescending(x => x.Count()).ThenBy(x => x.Key.Width).Select(x => $"{x.Key.Width}x{x.Key.Height}:{x.Count()}");
-            csfReport.AppendLine($"{(entry.IsStored ? "stored" : "kind1"),7}  {sequence.Chunks.Count,6}  {sequence.Chunks.Min(x => x.Size),7}  {sequence.Chunks.Max(x => x.Size),7}  {sequence.Chunks.Sum(x => (long)x.Size),13}  {literalSegments}/{transparentSegments}/{fillSegments}  {Convert.ToHexString(frameHash.GetHashAndReset()).ToLowerInvariant()}  {string.Join(',', dimensions)}  {entry.Name}");
+            csfReport.AppendLine($"{(entry.IsStored ? "stored" : "kind1"),7}  {sequence.Chunks.Count,6}  {sequence.Chunks.Min(x => x.Size),7}  {sequence.Chunks.Max(x => x.Size),7}  {sequence.Chunks.Sum(x => (long)x.Size),13}  {literalSegments}/{transparentSegments}/{fillSegments}  {Convert.ToHexStringLower(frameHash.GetCurrentHash())}  {string.Join(',', dimensions)}  {entry.Name}");
         }
         catch (InvalidDataException error)
         {
@@ -529,7 +524,7 @@ var sceneReport = new StringBuilder("# Result  Entries  Stored  Kind1  Kind2  Co
 var sceneTextureReport = new StringBuilder("# Textures  Dimensions  ISO path\n");
 var sceneScenarioReport = new StringBuilder("# Enabled  MapCount  DistanceShift  BlendTarget  Generated  BlockOffsets  ISO path\n");
 var sceneBlockReport = SceneBlockReport.Create();
-var paletteReport = new StringBuilder("# Minimum  Maximum  SHA-256  Resource  ISO path\n");
+var paletteReport = new StringBuilder("# Minimum  Maximum  XXH3-128  Resource  ISO path\n");
 var skirmishFile = files.Single(file =>
     Path.GetFileName(file.Path).Equals("SKIRMISH.RES", StringComparison.OrdinalIgnoreCase));
 var skirmishArchive = new DynamixArchive(iso.ReadFile(skirmishFile), skirmishFile.Path);
@@ -624,7 +619,7 @@ foreach (var file in files.Where(x => DynamixArchive.HasContainerExtension(x.Pat
             try
             {
                 var palette = IndexedPaletteDecoder.Decode(archive.ReadStored(entry));
-                paletteReport.AppendLine($"{palette.Rgb.Min(),7}  {palette.Rgb.Max(),7}  {Convert.ToHexString(SHA256.HashData(palette.Rgb)).ToLowerInvariant()}  {entry.Name}  {file.Path}");
+                paletteReport.AppendLine($"{palette.Rgb.Min(),7}  {palette.Rgb.Max(),7}  {ResourceHash.Xxh3(palette.Rgb)}  {entry.Name}  {file.Path}");
             }
             catch (InvalidDataException error)
             {
@@ -649,7 +644,7 @@ if (reportSceneBlocks)
 }
 File.WriteAllText(Path.Combine(output, "stored-palette-report.txt"), paletteReport.ToString());
 File.WriteAllText(Path.Combine(output, "sound-bank-report.txt"), soundBankReport.ToString());
-var smackerReport = new StringBuilder("# Version  Dimensions  Frames  Frame ms  Palette changes  Audio packets  Decoded audio  Final frame SHA-256  Audio tracks  Bytes  ISO path\n");
+var smackerReport = new StringBuilder("# Version  Dimensions  Frames  Frame ms  Palette changes  Audio packets  Decoded audio  Final frame XXH3-128  Audio tracks  Bytes  ISO path\n");
 var smackerMovies = 0;
 long smackerBytes = 0;
 long smackerFrames = 0;
@@ -699,7 +694,7 @@ foreach (var file in files.Where(x => Path.GetExtension(x.Path).Equals(".SMK", S
         }
         var audio = string.Join(',', movie.AudioTracks.Select(track =>
             $"{track.Index}:{track.SampleRate}/{(track.IsCompressed ? "packed" : "pcm")}/{(track.Is16Bit ? 16 : 8)}/{(track.IsStereo ? 2 : 1)}"));
-        var frameHash = Convert.ToHexString(SHA256.HashData(indices)).ToLowerInvariant();
+        var frameHash = ResourceHash.Xxh3(indices);
         smackerReport.AppendLine(FormattableString.Invariant(
             $"SMK{movie.Version,-4}  {movie.Width}x{movie.Height,-10}  {movie.Frames.Count,6}  {movie.FrameDuration.TotalMilliseconds,8:0.###}  {paletteChanges,15}  {audioPackets,13}  {decodedAudioBytes,13}  {frameHash}  {audio,-28}  {file.Size,9}  {file.Path}"));
         smackerMovies++;
@@ -955,11 +950,7 @@ static void WritePpm(string path, CsfFrame frame, byte[] palette, int scale)
     File.WriteAllBytes(path, bytes);
 }
 
-static string Hash(string path)
-{
-    using var stream = File.OpenRead(path);
-    return Convert.ToHexString(SHA256.HashData(stream)).ToLowerInvariant();
-}
+static string Hash(string path) => ResourceHash.Xxh3(path);
 
 static void AppendAction(StringBuilder report, DynamixActionTreeDatabase database, int offset, string indent, HashSet<int> active)
 {
