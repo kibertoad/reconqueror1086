@@ -3,6 +3,7 @@ using Conqueror.Resources;
 
 namespace Conqueror.Game;
 
+// RULE-ASSAULT-010 and RULE-ASSAULT-011 actor rays, cast with RULE-VIEW-003.
 public static class OriginalSiegeActorAcquisition
 {
     public static SiegeActorRayHit? CastToward(
@@ -35,6 +36,7 @@ public static class OriginalSiegeActorAcquisition
         var candidates = OriginalSiegeProjection.CastHeading(
             siege, scene, sourceOriginX, sourceOriginY,
             sourceX8, sourceY8, heading, activeBlockAt);
+        // PLACEHOLDER: RULE-ASSAULT-010. The acquisition row is taken as the horizon; the rule does not record it.
         var horizon = viewportHeight / 2;
         foreach (var candidate in candidates)
         {
@@ -64,6 +66,7 @@ public static class OriginalSiegeActorAcquisition
         int viewportWidth)
     {
         if (textureX < 0 || textureX >= texture.Width) return false;
+        // PLACEHOLDER: RULE-ASSAULT-010. Clamping the depth to at least 0x10 before dividing is a guess.
         var depth8 = Math.Max(0x10, candidate.Hit.Distance8);
         var top = horizon - (candidate.Block.UpperElevation - 0x80) * viewportWidth / depth8;
         var bottom = horizon + (0x80 - candidate.Block.LowerElevation) * viewportWidth / depth8;

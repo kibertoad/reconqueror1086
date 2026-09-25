@@ -42,8 +42,8 @@ public static class SiegeCombatPresentation
     public static readonly UiBounds Message = new(5, 145, 205, 26);
     public static readonly UiBounds PrimaryStatus = new(225, 22, 90, 25);
     public static readonly UiBounds SecondaryStatus = new(225, 54, 90, 35);
-    // CONQUER.EXE 0x55D20-0x55DAE divides (x - 4) by 56 in this y band.
-    // The final button is clipped by the command region's exclusive x=210 bound.
+    // RULE-ASSAULT-004: the button is (x - 4) / 56 in this y band. The final
+    // button is clipped by the command region's exclusive x=210 bound.
     public static readonly IReadOnlyList<SiegeRetainerCommandButton> RetainerCommandButtons =
     [
         new(SiegeRetainerCommand.Attack, new UiBounds(4, 175, 56, 13)),
@@ -51,16 +51,16 @@ public static class SiegeCombatPresentation
         new(SiegeRetainerCommand.Follow, new UiBounds(116, 175, 56, 13)),
         new(SiegeRetainerCommand.Retreat, new UiBounds(172, 175, 38, 13))
     ];
-    // CONQUER.EXE 0x5529B-0x55448 selects offset 2 on approach, offset 1
-    // near contact, and offset 0 on return. Rows 23+ retain offset 2.
+    // RULE-ASSAULT-026: offset 2 on approach, offset 1 near contact, and
+    // offset 0 on return. Rows 23 and 24 keep offset 2.
     public static readonly SiegeFrameRun AxeAttack = new(27, 3, true);
     public static readonly SiegeFrameRun CrossbowAttack = new(30, 3);
     public static readonly SiegeFrameRun HammerAttack = new(33, 3, true);
     public static readonly SiegeFrameRun MaceAttack = new(36, 3, true);
     public static readonly SiegeFrameRun SwordAttack = new(39, 3, true);
     public static readonly SiegeFrameRun DaggerAttack = new(42, 1);
-    // CONQUER.EXE 0x55171-0x55189 chooses base 43 for a fatal strike and
-    // base 48 otherwise; 0x552FB-0x55395 renders offsets 0 through 3.
+    // RULE-ASSAULT-028: base 43 for a fatal strike and base 48 otherwise,
+    // drawn as offsets 0 through 3.
     public static readonly SiegeFrameRun FatalHitBlood = new(43, 4);
     public static readonly SiegeFrameRun WoundingHitBlood = new(48, 4);
 
@@ -142,8 +142,8 @@ public static class SiegeCombatPresentation
         return null;
     }
 
-    // CONQUER.EXE 0x55DB8-0x55DE5 adds nine pixels to the stored cursor
-    // top-left before raycasting; 0x5590C-0x5591D forwards that center point.
+    // RULE-ASSAULT-005: the click adds nine pixels to the stored cursor
+    // top-left before casting the ray, and passes that center point on.
     public static (int X, int Y)? ForegroundTarget(int pointerX, int pointerY, UiBounds viewport)
     {
         var x = (int)Math.Floor((pointerX - viewport.X) * Viewport.Width / (double)viewport.Width)

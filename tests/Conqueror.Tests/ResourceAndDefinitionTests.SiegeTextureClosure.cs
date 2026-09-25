@@ -5,6 +5,7 @@ using Xunit;
 
 namespace Conqueror.Tests;
 
+// Covers RULE-VIEW-003.
 public sealed partial class ResourceAndDefinitionTests
 {
     [Fact]

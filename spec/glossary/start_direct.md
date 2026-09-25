@@ -1,0 +1,3 @@
+# start_direct
+
+A function, defined by RULE-ASSAULT-015.

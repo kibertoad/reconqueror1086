@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Conqueror.Tests;
 
+// Covers RULE-ASSAULT-026, FMT-ASSAULT-002.
 public sealed partial class ResourceAndDefinitionTests
 {
     [Fact]

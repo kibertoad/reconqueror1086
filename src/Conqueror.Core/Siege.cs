@@ -9,7 +9,7 @@ public enum SiegeRetainerCommand { Defend = 2, Attack = 6, Retreat = 10, Follow 
 public sealed record SiegeActorRayHit(SiegeEnemy Actor, int Distance8);
 public delegate SiegeActorRayHit? SiegeActorRaycast(SiegeEnemy source, SiegeEnemy target);
 
-public class SiegeEnemy
+public class SiegeEnemy // FMT-ASSAULT-001 combatant; values RULE-ASSAULT-027 leaves unrecorded are plain properties.
 {
     public int X { get; set; }
     public int Y { get; set; }
@@ -37,7 +37,7 @@ public class SiegeEnemy
     internal SiegeEnemy? PendingHostileTarget { get; set; }
     internal int? HostileTargetX8 { get; set; }
     internal int? HostileTargetY8 { get; set; }
-    internal double HostileMovementElapsed { get; set; }
+    internal double HostileMovementElapsed { get; set; } // Live effect state (FMT-ASSAULT-004).
     internal int HostileMovementTick { get; set; }
     internal bool HostileMovementActive { get; set; }
     internal bool HostileMovementWanders { get; set; }
@@ -182,7 +182,7 @@ public sealed class SiegeLayout
 public sealed partial class SiegeSession
 {
     public static readonly SiegeDefinition Rules = new(12, 12, 5, 3, 3, 2);
-    public const double FallbackEnemyAttackSeconds = 0.63;
+    public const double FallbackEnemyAttackSeconds = 0.63; // PLACEHOLDER: RULE-ASSAULT-018. Look durations for actors without an imported effect are invented.
     public const double EnemyHitSeconds = 0.20;
     public const double FallbackEnemyDeathSeconds = 0.72;
     private readonly Player _player;
@@ -208,7 +208,7 @@ public sealed partial class SiegeSession
     public int GoldFound { get; private set; }
     public List<string> ItemsFound { get; } = [];
     public string LastMessage { get; private set; } = "Enter the keep and defeat its champion.";
-    public bool Won => _enemies.Count == 0;
+    public bool Won => _enemies.Count == 0; // PLACEHOLDER: RULE-ASSAULT-022. The rule does not record how the hostile count ends the assault; this treats an empty enemy list as a win.
     public bool Defeated => Health <= 0;
     public int RetainerLosses => AlliesStarted - AlliesAlive;
     public int Width => _map.GetLength(0);
@@ -228,7 +228,7 @@ public sealed partial class SiegeSession
         bool includeRetainers = true)
     {
         _player = player;
-        _random = new Random(seed);
+        _random = new Random(seed); // PLACEHOLDER: RULE-RNG-001. The platform generator stands in for the original's random routine.
         _map = layout?.CopyTiles() ?? GenerateMap(Rules.Width, Rules.Height);
         _movementBlocks = layout?.CopyMovementBlocks() ?? MovementBlocksFor(_map);
         if (layout is not null)
@@ -237,7 +237,7 @@ public sealed partial class SiegeSession
             PlayerY = layout.PlayerY;
             Facing = layout.Facing;
         }
-        MaxHealth = OriginalWeaponCombat.PlayerHealth(player);
+        MaxHealth = OriginalWeaponCombat.PlayerHealth(player); // PLACEHOLDER: RULE-ASSAULT-024. The healing cap is assumed to equal the starting health sum.
         Health = MaxHealth;
         PlayerActor = ActorFor(layout?.PlayerActor, PlayerX, PlayerY, Health, Facing);
         var retainerCap = includeRetainers ? OriginalRetainerCombat.CampaignRetainerCapFor(army) : 0;
@@ -246,7 +246,7 @@ public sealed partial class SiegeSession
         if (layout is not null)
         {
             var retainerSpawns = layout.Retainers.ToList();
-            while (retainerSpawns.Count > AlliesStarted)
+            while (retainerSpawns.Count > AlliesStarted) // PLACEHOLDER: RULE-ASSAULT-030. Removing one uniformly drawn retainer at a time is a guess at the original's draw.
                 retainerSpawns.RemoveAt(_random.Next(retainerSpawns.Count));
             _retainers.AddRange(retainerSpawns.Select(RetainerFor));
             foreach (var spawn in layout.Enemies)
@@ -299,7 +299,7 @@ public sealed partial class SiegeSession
     }
 
     public SiegeTile TileAt(int x, int y) => x < 0 || y < 0 || x >= Width || y >= Height ? SiegeTile.Wall : _map[x, y];
-    public SiegeEnemy? EnemyAt(int x, int y) => _enemies.FirstOrDefault(e => e.Health > 0 && e.X == x && e.Y == y);
+    public SiegeEnemy? EnemyAt(int x, int y) => _enemies.FirstOrDefault(e => e.Health > 0 && e.X == x && e.Y == y); // PLACEHOLDER: RULE-ASSAULT-009. Cells outside the map hold no actor; the rule does not say what the scan reads there.
     public SiegeRetainer? RetainerAt(int x, int y) =>
         _retainers.FirstOrDefault(retainer => retainer.Health > 0 && retainer.X == x && retainer.Y == y);
     public SiegeObject? ObjectAt(int x, int y) => _objects.FirstOrDefault(item => item.X == x && item.Y == y);
@@ -328,7 +328,7 @@ public sealed partial class SiegeSession
         foreach (var retainer in targets)
         {
             retainer.Command = command;
-            retainer.ActorMode = (int)command;
+            retainer.ActorMode = (int)command; // PLACEHOLDER: RULE-ASSAULT-004. The order installs its mode at once; the rule resets the mode to 0 and requests the new one.
             retainer.OrderedTarget = command == SiegeRetainerCommand.Follow ? PlayerActor : null;
             retainer.OrderedDestination = null;
             ResetRetainerMovement(retainer);
@@ -350,7 +350,7 @@ public sealed partial class SiegeSession
         foreach (var retainer in selected)
         {
             retainer.Command = SiegeRetainerCommand.Attack;
-            retainer.ActorMode = 8;
+            retainer.ActorMode = 8; // PLACEHOLDER: RULE-ASSAULT-005. The rule does not record how requested mode 8 is installed; this sets it at once.
             retainer.OrderedTarget = target;
             retainer.OrderedDestination = null;
             ResetRetainerMovement(retainer);
@@ -367,7 +367,7 @@ public sealed partial class SiegeSession
         if (selected.Length == 0) return false;
         foreach (var retainer in selected)
         {
-            retainer.ActorMode = 12;
+            retainer.ActorMode = 12; // PLACEHOLDER: RULE-ASSAULT-005. The rule does not record how requested mode 12 is installed; this sets it at once.
             retainer.OrderedTarget = null;
             retainer.OrderedDestination = (x, y);
             ResetRetainerMovement(retainer);
@@ -506,8 +506,8 @@ public sealed partial class SiegeSession
 
     private SiegeAction InteractCore(SiegeObject target, int distance8)
     {
-        // Pointer dispatcher 0x556AF compares the fixed-point ray depth
-        // directly against 0x280. Do not replace it with cell-center range.
+        // RULE-ASSAULT-005: an object is in reach when the fixed-point ray depth is
+        // below 0x280. Do not replace it with cell-center range.
         if (distance8 >= 0x280)
         {
             LastMessage = "That is too far away.";
@@ -573,7 +573,7 @@ public sealed partial class SiegeSession
         var hit = weapon?.OriginalWeaponItemId is { } attackItemId && target.OriginalAttackSkill is { } targetSkill
             ? OriginalWeaponCombat.Hits(OriginalWeaponCombat.PlayerAttackSkill(_player), targetSkill,
                 IsCloseRangedAttack(attackItemId, target, requestedDistance8), Facing == target.Facing, _random)
-            : _random.Next(220) < Math.Clamp((weapon?.Power ?? 35) + _player.Stats.Dexterity * 3
+            : _random.Next(220) < Math.Clamp((weapon?.Power ?? 35) + _player.Stats.Dexterity * 3 // PLACEHOLDER: RULE-ASSAULT-023. Weapons without a combat row use an invented hit chance.
                 - (target.Champion ? 35 : 0), 15, 210);
         if (hit)
         {
@@ -591,7 +591,7 @@ public sealed partial class SiegeSession
             : null;
         var broke = !hit && weapon is not null && (usesOriginalBreakRule
             ? originalBreakRange is { } range && _random.Next(range) == 0
-            : weapon.BuyPrice > 0 && _random.Next(100) < Rules.WeaponBreakPercent);
+            : weapon.BuyPrice > 0 && _random.Next(100) < Rules.WeaponBreakPercent); // PLACEHOLDER: RULE-ASSAULT-031. Weapons without a combat row use an invented break chance.
         if (broke)
         {
             _player.Inventory.Items.Remove(weapon!.Name);
@@ -675,9 +675,9 @@ public sealed partial class SiegeSession
     {
         var pickup = ObjectAt(x, y)?.Pickup ?? throw new InvalidOperationException(
             "A pickup tile is missing its decoded original reward metadata.");
-        // CONQUER.EXE 0x51E60 dispatches on block+0x48. The four placed
-        // pickup families mutate one resource, then the caller replaces
-        // the scene cell through its block+0x40 target.
+        // RULE-ASSAULT-021: the object action depends on the block's action kind.
+        // The four placed pickup families change one resource, then the cell
+        // is replaced by the block's state target.
         var result = ApplyPickup(pickup);
         ConsumeObjectAt(x, y);
         return result;
@@ -766,7 +766,7 @@ public sealed partial class SiegeSession
                 }
                 var hit = enemy.OriginalCombatRow is { } enemyRow && enemy.OriginalAttackSkill is { } enemySkill
                     ? OriginalWeaponCombat.Hits(enemySkill, OriginalWeaponCombat.PlayerAttackSkill(_player),
-                        enemyRow >= 23 && distance <= 1, enemy.Facing == Facing, _random)
+                        enemyRow >= 23 && distance <= 1, enemy.Facing == Facing, _random) // PLACEHOLDER: RULE-ASSAULT-023. "Within one cell of the player" is measured as grid distance to the target.
                     : _random.Next(100) < Math.Clamp(70 - ArmorRating(), 5, 70);
                 if (hit)
                     Health -= enemy.OriginalCombatRow is { } combatRow
@@ -787,7 +787,7 @@ public sealed partial class SiegeSession
         var distance = gridDistance ?? Distance(retainer.X, retainer.Y, target.X, target.Y);
         var hit = retainer.OriginalAttackSkill is { } skill && target.OriginalAttackSkill is { } targetSkill
             ? OriginalWeaponCombat.Hits(skill, targetSkill,
-                retainer.OriginalCombatRow is >= 23 && distance <= 1,
+                retainer.OriginalCombatRow is >= 23 && distance <= 1, // PLACEHOLDER: RULE-ASSAULT-023. "Within one cell of the player" is measured as grid distance to the target.
                 retainer.Facing == target.Facing, _random)
             : _random.Next(100) < 50;
         if (!hit) return;
@@ -820,7 +820,7 @@ public sealed partial class SiegeSession
         var hit = enemy.OriginalCombatRow is { } enemyRow && enemy.OriginalAttackSkill is { } enemySkill &&
                   retainer.OriginalAttackSkill is { } retainerSkill
             ? OriginalWeaponCombat.Hits(enemySkill, retainerSkill,
-                enemyRow >= 23 && distance <= 1, enemy.Facing == retainer.Facing, _random)
+                enemyRow >= 23 && distance <= 1, enemy.Facing == retainer.Facing, _random) // PLACEHOLDER: RULE-ASSAULT-023. "Within one cell of the player" is measured as grid distance to the target.
             : _random.Next(100) < 50;
         if (!hit) return;
         retainer.Health -= enemy.OriginalCombatRow is { } combatRow && retainer.OriginalArmor is { } armor
@@ -860,7 +860,7 @@ public sealed partial class SiegeSession
         var fixedReach = originalItemId is { } itemId
             ? OriginalWeaponCombat.ContactDistanceFor(itemId)
             : fallbackReach * 256;
-        if (fixedDistance >= fixedReach) return false;
+        if (fixedDistance >= fixedReach) return false; // PLACEHOLDER: RULE-ASSAULT-005. The rule does not record whether the reach comparison is strict.
         if (rayDistance8 is not null) return true;
         var steps = Math.Max(Math.Abs(dx), Math.Abs(dy));
         for (var step = 1; step < steps; step++)
@@ -874,7 +874,7 @@ public sealed partial class SiegeSession
         return true;
     }
 
-    private bool IsCloseRangedAttack(int originalItemId, SiegeEnemy target, int? rayDistance8 = null) =>
+    private bool IsCloseRangedAttack(int originalItemId, SiegeEnemy target, int? rayDistance8 = null) => // PLACEHOLDER: RULE-ASSAULT-023. "Within one cell" is taken as a depth of at most 256.
         OriginalWeaponCombat.CombatRowFor(originalItemId) >= 23 &&
         (rayDistance8 ?? PlayerDistanceInFixedPoint(target)) <= 256;
 

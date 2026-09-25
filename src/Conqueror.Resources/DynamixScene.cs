@@ -13,14 +13,15 @@ public sealed record DynamixSceneColorMapping(bool Enabled, int MapCount, int Di
 
 public enum DynamixSceneFace
 {
-    // CONQUER.EXE 0x44CC0-0x44F61 emits these hit masks; the selector at
-    // 0x46739-0x467F7 maps them to block offsets 44, 48, 52, and 56.
+    // RULE-VIEW-003: the ray reports these face masks and picks the block's
+    // surface at FMT-VIEW-001 offsets 44, 48, 52 and 56 from them.
     North = 0x100,
     East = 0x200,
     South = 0x400,
     West = 0x800
 }
 
+// FMT-VIEW-001 block definition.
 public sealed record DynamixSceneBlock(
     int Index,
     int Kind,
@@ -45,7 +46,7 @@ public sealed record DynamixSceneBlock(
     int ActorCombatRow,
     string Name)
 {
-    // CONQUER.EXE 0x470A8-0x474D3 uses these raw projection fields. Width is
+    // RULE-VIEW-003 uses these raw projection fields (FMT-VIEW-001). Width is
     // the decoded texture height at +0x18; Height is upper elevation +0x20.
     public int TextureWidth { get; init; }
     public int TextureWidthShift { get; init; }
@@ -94,9 +95,9 @@ public sealed record DynamixSceneBlock(
             return TextureReferences().Where(texture => texture >= 0).Distinct();
         if (Surface0 < 0) return [];
 
-        // 0x46E3B-0x46F23 selects a billboard sector from the full byte-turn.
-        // Acquisition performs the same selection, so retaining only Surface0
-        // is insufficient even when a frame is not currently being rendered.
+        // RULE-VIEW-003 selects a billboard sector from the full byte-turn.
+        // Acquisition makes the same selection, so keeping only Surface0 is
+        // not enough even when a frame is not being rendered.
         return Enumerable.Range(0, 256)
             .Select(heading => TextureForBillboardHeading(heading).TextureIndex)
             .Where(texture => texture >= 0)
@@ -135,7 +136,7 @@ public sealed class DynamixScene
     public IReadOnlyList<DynamixSceneEffectDefinition> EffectDefinitions { get; }
     public IReadOnlyList<DynamixSceneBlock> Blocks { get; }
 
-    // The original resource stores complete Y columns consecutively.
+    // FMT-VIEW-002: the resource stores complete Y columns consecutively.
     public ushort BlockIndexAt(int x, int y)
     {
         if (x is < 0 or >= MapWidth || y is < 0 or >= MapHeight)

@@ -5,6 +5,7 @@ public static class OriginalRetainerCombat
     public const int SoldiersPerCampaignRetainer = 3;
     public const int MaximumRetainersPerUnitType = 3;
 
+    // RULE-ASSAULT-001.
     public static int CampaignRetainerCapFor(Army army)
     {
         ArgumentNullException.ThrowIfNull(army);
@@ -13,6 +14,7 @@ public static class OriginalRetainerCombat
         return Math.Max(1, cap);
     }
 
+    // RULE-ASSAULT-003.
     public static void ApplyCampaignLosses(Army army, int retainerLosses)
     {
         ArgumentNullException.ThrowIfNull(army);
@@ -20,6 +22,7 @@ public static class OriginalRetainerCombat
 
         var roster = Enum.GetValues<UnitType>().ToDictionary(type => type,
             type => Math.Min(army.Units[type] / SoldiersPerCampaignRetainer, MaximumRetainersPerUnitType));
+        // PLACEHOLDER: RULE-ASSAULT-003. The rule removes no soldier when every share is 0; giving the first present type a share of 1 is a guess.
         if (roster.Values.Sum() == 0)
         {
             var firstPresent = Enum.GetValues<UnitType>().FirstOrDefault(type => army.Units[type] > 0);

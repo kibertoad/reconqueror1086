@@ -29,13 +29,15 @@ public sealed partial class SiegeSession
     {
         var target = actor is SiegeRetainer retainer ? retainer.OrderedTarget : actor.HostileTarget;
         if (target is not { Health: > 0 }) return;
-        // Mode-14 handler 0x503EC compares the newly hit source against its
-        // stored target before constructing base-state + 2. Its shared
-        // transition 0x4E77E selects attack mode 11 when source >= target and
-        // morale mode 13 otherwise. Mode 15 repeats the comparison at 0x504F2.
+        // RULE-ASSAULT-022 and RULE-ASSAULT-013: the hit handler compares the
+        // hit actor's health with its stored target's and shows the hit look.
+        // The next decision gives strike mode 11 when the actor has at least
+        // the target's health and rally mode 13 otherwise. The dying handler
+        // makes the same comparison.
         var nextMode = target.Health <= actor.Health ? 11 : 13;
         if (actor is SiegeRetainer friendly)
         {
+            // PLACEHOLDER: RULE-ASSAULT-007. Switching a hit retainer to the Retreat order is the rebuild's own.
             friendly.Command = SiegeRetainerCommand.Retreat;
             friendly.ActorMode = nextMode;
             friendly.OrderedTarget = target;
@@ -96,10 +98,10 @@ public sealed partial class SiegeSession
     {
         if (!IsOriginalHostile(enemy) || enemy.VisualState != SiegeEnemyVisualState.Walk ||
             enemy.HostileMovementActive) return;
-        // State routine 0x4F49C evaluates exactly one current-mode predicate,
-        // applies its kind-table edge through 0x4E5F0, and then invokes the
-        // new mode's handler. Modes 1-4/13 construct no live effect and are
-        // reconsidered only on a later thinker pass.
+        // RULE-ASSAULT-007 and RULE-ASSAULT-008: evaluate exactly one test for
+        // the current mode, take the kind table's transition, then run the new
+        // mode's handler. Modes 1-4 and 13 start no effect and are reconsidered
+        // only on a later thinker pass.
         var nextMode = enemy.ActorMode;
         switch (enemy.ActorMode)
         {
@@ -162,8 +164,9 @@ public sealed partial class SiegeSession
                 break;
             case 9:
             {
-                // Kinds 2/4/7 use the same 0x4FC34 acquisition but 0x4E8D8
-                // leaves mode 9 for mode 6 on success or mode 1 on failure.
+                // RULE-ASSAULT-011 and RULE-ASSAULT-008: kinds 2, 4 and 7 use the
+                // same friend acquisition, but leave mode 9 for mode 6 on success
+                // or mode 1 on failure.
                 var ally = AcquireHostileFormationTarget(enemy);
                 if (ally is not null) enemy.HostileTarget = ally;
                 nextMode = ally is null ? 1 : 6;
@@ -192,8 +195,9 @@ public sealed partial class SiegeSession
         {
             case 5:
             case 6:
-                // Shared handler 0x4FDCD clears actor/coordinate targets and
-                // constructs the descriptor's 0x40 collision family.
+                // RULE-ASSAULT-014: the wandering handler clears the targets and
+                // starts the movement effect with flag 0x40.
+                // PLACEHOLDER: RULE-ASSAULT-014. The rule does not record which target fields are cleared; this clears the actor and coordinate targets.
                 enemy.HostileTarget = null;
                 enemy.HostileTargetX8 = null;
                 enemy.HostileTargetY8 = null;
@@ -224,6 +228,7 @@ public sealed partial class SiegeSession
         return enemy.HostileMovementActive;
     }
 
+    // RULE-ASSAULT-009.
     private SiegeEnemy? AdjacentHostileActor(SiegeEnemy source)
     {
         var centerX = FixedActorX8(source) >> 8;
@@ -254,6 +259,7 @@ public sealed partial class SiegeSession
         return null;
     }
 
+    // RULE-ASSAULT-011.
     private SiegeEnemy? AcquireHostileFormationTarget(SiegeEnemy source)
     {
         SiegeEnemy? nearest = null;
@@ -279,6 +285,7 @@ public sealed partial class SiegeSession
         return !ReferenceEquals(hit.Actor, source) && hit.Actor.Health > 0 && _enemies.Contains(hit.Actor);
     }
 
+    // RULE-ASSAULT-010.
     private SiegeEnemy? AcquireHostileTarget(SiegeEnemy source)
     {
         SiegeEnemy? nearest = null;
@@ -307,6 +314,7 @@ public sealed partial class SiegeSession
     private bool IsFriendlyActor(SiegeEnemy actor) =>
         ReferenceEquals(actor, PlayerActor) || _retainers.Contains(actor);
 
+    // RULE-ASSAULT-012 enemy_in_reach.
     private bool HostileHasContact(SiegeEnemy source, SiegeEnemy target)
     {
         if (source.OriginalCombatRow is not { } row || RayToward(source, target) is not { } hit)
@@ -315,6 +323,7 @@ public sealed partial class SiegeSession
             hit.Distance8 < OriginalWeaponCombat.ActorContactDistanceForCombatRow(row);
     }
 
+    // RULE-ASSAULT-020.
     private bool TryStartHostileStrike(SiegeEnemy source)
     {
         if (source.OriginalCombatRow is not { } row ||
@@ -338,6 +347,7 @@ public sealed partial class SiegeSession
         return true;
     }
 
+    // RULE-ASSAULT-016.
     private void BeginHostileEscape(SiegeEnemy source)
     {
         var sourceX8 = FixedActorX8(source);
@@ -374,6 +384,7 @@ public sealed partial class SiegeSession
                AdvanceHostileMovementAxis(enemy, deltaY, false, flags);
     }
 
+    // RULE-ASSAULT-017.
     private bool AdvanceHostileMovementAxis(SiegeEnemy enemy, int delta, bool xAxis, int flags)
     {
         if (delta == 0) return true;
@@ -413,6 +424,7 @@ public sealed partial class SiegeSession
         if (ReferenceEquals(target, PlayerActor))
         {
             var hit = source.OriginalCombatRow is { } row && source.OriginalAttackSkill is { } skill
+                // PLACEHOLDER: RULE-ASSAULT-023. "Within one cell of the player" is measured as rounded-up distance to the target.
                 ? OriginalWeaponCombat.Hits(skill, OriginalWeaponCombat.PlayerAttackSkill(_player),
                     row >= 23 && distance <= 1, source.Facing == Facing, _random)
                 : _random.Next(100) < Math.Clamp(70 - ArmorRating(), 5, 70);

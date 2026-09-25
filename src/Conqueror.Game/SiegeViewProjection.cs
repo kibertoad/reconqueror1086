@@ -146,8 +146,8 @@ public static class SiegeViewProjection
             var forward = dx * forwardX + dy * forwardY;
             if (forward <= 0.05 || forward > MaximumDistance) continue;
             var lateral = dx * rightX + dy * rightY;
-            // Viewer setup 0x5421F-0x542E4 uses forward basis 0x4000 and
-            // one viewport-width of lateral basis. This is its inverse.
+            // RULE-VIEW-003: the viewer uses forward basis 0x4000 and one
+            // viewport width of lateral basis. This is its inverse.
             var screen = 0.5 + lateral / forward;
             if (screen is < -0.25 or > 1.25) continue;
             result.Add(new SiegeEnemyProjection(screen, forward, enemy));

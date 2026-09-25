@@ -1,5 +1,6 @@
 namespace Conqueror.Core;
 
+// FMT-ASSAULT-002 combat rows and RULE-ASSAULT-023 blow resolution.
 public static class OriginalWeaponCombat
 {
     public const int CombatRowCount = 25;
@@ -12,13 +13,14 @@ public static class OriginalWeaponCombat
         17, 18, 15, 3, 0, 1, 2, 19, 20, 21, 22
     ];
 
+    // RULE-ASSAULT-031: a miss breaks the weapon with odds set by 200 + 50 * this rating.
     private static readonly int[] BreakRatingsByCombatRow =
     [
         4, 5, 6, 3, 6, 5, 3, 4, 2, 6, 0, 2,
         1, 0, 1, 3, 2, 1, 1, 3, 1, 3, 3, 6, 6
     ];
 
-    // CONQUER.EXE object 2 offset 0xCE14, columns 0-2 of each 28-byte row.
+    // FMT-ASSAULT-002: dice, sides and penetration, columns 0-2 of each 28-byte row.
     private static readonly int[] DiceCountsByCombatRow =
     [
         1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2,
@@ -37,16 +39,16 @@ public static class OriginalWeaponCombat
         0, 1, 3, 2, 1, 1, 3, 1, 3, 3, 6, 6
     ];
 
-    // CONQUER.EXE 0x54FB8-0x54FC8 reads column 3 and calculates signed
-    // foreground velocity as (screen displacement << 9) / this divisor.
+    // FMT-ASSAULT-002 column 3. RULE-ASSAULT-026: signed foreground velocity
+    // is (screen displacement << 9) / this divisor.
     private static readonly int[] ForegroundMotionDivisorsByCombatRow =
     [
         400, 400, 380, 380, 400, 420, 460, 450, 470, 480, 500, 440, 480,
         480, 480, 520, 500, 500, 500, 520, 530, 520, 530, 900, 1000
     ];
 
-    // CONQUER.EXE object 2 offset 0xCE24 + 28 * row, column 4 of each combat row.
-    // Contact processing at 0x558D4/0x559CA adds 0x40 before comparing range.
+    // FMT-ASSAULT-002 column 4 (reach). RULE-ASSAULT-005: the player's strike
+    // adds 0x40 to it before comparing the range.
     private static readonly int[] ContactDistancesByCombatRow =
     [
         350, 350, 350, 350, 450, 440, 430, 420, 420, 420, 420, 420, 420,
@@ -80,8 +82,8 @@ public static class OriginalWeaponCombat
         return checked(ContactDistancesByCombatRow[combatRow] + 0x40);
     }
 
-    // Actor mode 11 compares the ray distance directly with object-2 table
-    // column 4 at 0xCE24 + 28 * row, without the player's +0x40 allowance.
+    // RULE-ASSAULT-020: actor mode 11 compares the ray distance with the reach
+    // column itself, without the player's 0x40 allowance.
     public static int ActorContactDistanceForCombatRow(int combatRow)
     {
         if ((uint)combatRow >= (uint)CombatRowCount) throw new ArgumentOutOfRangeException(nameof(combatRow));
@@ -100,23 +102,22 @@ public static class OriginalWeaponCombat
     public static int ForegroundVelocityForCombatRow(int combatRow, int screenDisplacement) =>
         checked((int)(((long)screenDisplacement << 9) / ForegroundMotionDivisorForCombatRow(combatRow)));
 
-    // CONQUER.EXE 0x58851-0x58887 initializes player combatant field +0x34
-    // from character attributes 0 (strength), 1 (dexterity), and 15 (sword experience).
+    // RULE-ASSAULT-024: the player's attack skill comes from strength,
+    // dexterity and sword experience.
     public static int PlayerAttackSkill(Player player)
     {
         ArgumentNullException.ThrowIfNull(player);
         return checked(player.Stats.Strength + player.Stats.Dexterity + player.SwordExperience * 2);
     }
 
-    // CONQUER.EXE 0x58851-0x58887 initializes player combatant field +0x40
-    // from character attributes 0 (strength), 3 (stamina), and 5 (honor).
+    // RULE-ASSAULT-024: the player's health comes from strength, stamina and honor.
     public static int PlayerHealth(Player player)
     {
         ArgumentNullException.ThrowIfNull(player);
         return checked(player.Stats.Strength + player.Stats.Stamina + player.Stats.Honor);
     }
 
-    // CONQUER.EXE 0x4F2AC-0x4F2D6 compares random(200) with this threshold.
+    // RULE-ASSAULT-023: a blow hits when random(200) is below this threshold.
     public static int HitThreshold(int attackerSkill, int defenderSkill, bool closeRanged, bool behindDefender)
     {
         if (attackerSkill < 0) throw new ArgumentOutOfRangeException(nameof(attackerSkill));

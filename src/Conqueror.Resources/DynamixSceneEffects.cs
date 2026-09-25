@@ -3,8 +3,8 @@ using System.Buffers.Binary;
 namespace Conqueror.Resources;
 
 /// <summary>
-/// One 0x40-byte SFXDEFS descriptor. Names are limited to fields whose use is
-/// confirmed in CONQUER.EXE; the remaining values stay addressable by offset.
+/// One 0x40-byte SFXDEFS descriptor (FMT-ASSAULT-003). Names are limited to
+/// fields whose use the spec confirms; the remaining values stay addressable by offset.
 /// </summary>
 public sealed class DynamixSceneEffectDefinition
 {

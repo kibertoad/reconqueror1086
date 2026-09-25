@@ -134,8 +134,8 @@ public static class ImportedSiegeLayouts
             .Select(point => SpawnFor(scene, scene.BlockAt(point.X, point.Y),
                 point.X - minX, point.Y - minY, actorOrder[point]))
             .ToArray();
-        // Loader 0x51560 scans x-major and promotes its first friendly actor to
-        // player D4D0. Counter 0x4D870 excludes that record from retainers.
+        // RULE-ASSAULT-002: the loader scans x-major and makes its first friendly
+        // actor the player, and the retainer count leaves that record out.
         var playerActor = mapPoints
             .Where(point => IsFriendlyActor(scene.BlockAt(point.X, point.Y)))
             .Select(point => ((int X, int Y)?)point)
@@ -247,6 +247,7 @@ public static class ImportedSiegeLayouts
             (scene.Blocks[block.StateTarget].Behavior & 2) != 0;
     }
 
+    // PLACEHOLDER: RULE-ASSAULT-002. The side comes from templates 0-2; the rule does not record how the loader derives it.
     private static bool IsFriendlyActor(DynamixSceneBlock block) =>
         IsActor(block) && OriginalCombatantTemplates.IsFriendlySceneTemplate(block.ActorTemplate);
 
@@ -334,8 +335,7 @@ public static class ImportedSiegeLayouts
         if (block.Kind != 4 || (block.Behavior & 0x10) == 0) return null;
         return block.InteractionSelector switch
         {
-            // Callback jump table at object-1 offset 0x41E10; cases 5, 7,
-            // 9, and 10 begin at 0x52509, 0x5269F, 0x52929, and 0x52BFC.
+            // RULE-ASSAULT-021: pickup actions 5, 7, 9 and 10.
             5 when block.InteractionArgument > 0 =>
                 new(SiegePickupRewardKind.Wealth, block.InteractionArgument),
             7 when block.InteractionArgument > 0 && block.InteractionArgument2 > 0 =>

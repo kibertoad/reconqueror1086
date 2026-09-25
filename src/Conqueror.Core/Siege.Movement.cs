@@ -7,15 +7,16 @@ public sealed partial class SiegeSession
         ArgumentNullException.ThrowIfNull(raycast);
         _actorRaycast = raycast;
     }
+    // PLACEHOLDER: RULE-ASSAULT-018. Actors without an imported movement descriptor use invented values.
     private static readonly SiegeActorMovement FallbackActorMovement = new(3, 200, 64, 0, 0x142, 5);
 
+    // RULE-ASSAULT-006 thinker pass and RULE-ASSAULT-018 effect ticks for retainers.
     public void AdvanceRetainerMovement(double elapsedSeconds)
     {
         if (!double.IsFinite(elapsedSeconds) || elapsedSeconds < 0)
             throw new ArgumentOutOfRangeException(nameof(elapsedSeconds));
-        // The original D5C4 cursor advances per unrestricted main-loop pass,
-        // so simultaneous actor precedence is processor/input-timing dependent.
-        // Authored list order is the stable compatibility tie-breaker.
+        // DEV-ASSAULT-001 and DEV-ASSAULT-002: the thinker runs on the fixed
+        // update and settles ties in authored retainer order.
         foreach (var retainer in _retainers.Where(retainer => retainer.Health > 0))
         {
             if (!retainer.MovementActive && !TryBeginRetainerMovement(retainer))
@@ -28,6 +29,7 @@ public sealed partial class SiegeSession
             var movement = ValidMovement(retainer.OriginalMovement) ?? FallbackActorMovement;
             retainer.MovementElapsed += elapsedSeconds;
             var catchUp = 0;
+            // PLACEHOLDER: RULE-ASSAULT-018. The rule keeps every overrun; the cap of 24 catch-up ticks per update is the rebuild's own.
             while (retainer.MovementElapsed > movement.TickSeconds && catchUp < 24)
             {
                 catchUp++;
@@ -45,6 +47,7 @@ public sealed partial class SiegeSession
                     : 0;
                 retainer.MovementActive = effectContinues && retainer.MovementTick != 0;
                 retainer.WalkFrame = (retainer.WalkFrame + 1) % movement.TickCount;
+                // PLACEHOLDER: RULE-ASSAULT-013. at_destination compares the occupied cell; the rule uses the cell under the live position.
                 if (retainer.MovementTick == 0 && retainer.OrderedDestination is { } destination &&
                     retainer.X == destination.X && retainer.Y == destination.Y)
                     CompleteDestination(retainer);
@@ -59,13 +62,13 @@ public sealed partial class SiegeSession
             ? movement
             : null;
 
-    // Direct chase/follow and mode 12 rewrite only the descriptor's low flag
-    // byte: and 0xA7, then or 0x10 (0x142 therefore becomes 0x112).
+    // RULE-ASSAULT-015: direct chase, follow and mode 12 rewrite only the
+    // descriptor's low flag byte: and 0xA7, then or 0x10 (0x142 becomes 0x112).
     private static int DirectMovementFlags(int descriptorFlags) =>
         (descriptorFlags & ~0xFF) | ((descriptorFlags & 0xFF & 0xA7) | 0x10);
 
-    // Melee Retreat reaches kind-0 mode 5. Its handler keeps the descriptor's
-    // 0x40 collision family: and 0xA7, then or 0x40 (0x142 stays 0x142).
+    // RULE-ASSAULT-014: melee Retreat reaches kind-0 mode 5, whose wandering
+    // handler uses and 0xA7, then or 0x40 (0x142 stays 0x142).
     private static int WanderingMovementFlags(int descriptorFlags) =>
         (descriptorFlags & ~0xFF) | ((descriptorFlags & 0xFF & 0xA7) | 0x40);
 
@@ -83,6 +86,7 @@ public sealed partial class SiegeSession
         if (retainer.OrderedDestination is { } destination)
         {
             retainer.MovementWanders = false;
+            // PLACEHOLDER: RULE-ASSAULT-013. at_destination compares the occupied cell; the rule uses the cell under the live position.
             if (retainer.X == destination.X && retainer.Y == destination.Y)
             {
                 CompleteDestination(retainer);
@@ -124,6 +128,7 @@ public sealed partial class SiegeSession
     private static void AimRetainerAt(SiegeRetainer retainer, int targetX, int targetY)
     {
         retainer.OriginalHeading8 = null;
+        // PLACEHOLDER: RULE-ASSAULT-015. The heading starts from the occupied cell; the rule's go_to uses the cell under the live position.
         var dx = targetX - retainer.X;
         var dy = targetY - retainer.Y;
         var absX = Math.Abs(dx);
@@ -138,8 +143,8 @@ public sealed partial class SiegeSession
             retainer.Facing = dy > 0 ? Facing.South : Facing.North;
             return;
         }
-        // 0x445C4 yields exact diagonal headings 0x20/0x60/0xA0/0xE0;
-        // mode 12 adds 0x20 and masks with 0xC0, choosing clockwise on ties.
+        // RULE-VIEW-001 gives exact diagonal headings 0x20/0x60/0xA0/0xE0.
+        // RULE-ASSAULT-015 adds 0x20 and masks with 0xC0, choosing clockwise on ties.
         if (dy > 0) retainer.Facing = dx > 0 ? Facing.South : Facing.West;
         else if (dy < 0) retainer.Facing = dx > 0 ? Facing.East : Facing.North;
     }
@@ -155,6 +160,7 @@ public sealed partial class SiegeSession
         var (deltaX, deltaY) = retainer.OriginalHeading8 is { } heading
             ? OriginalActorMotion.Rotate(localX, localY, heading)
             : RotateMovement(localX, localY, retainer.Facing);
+        // PLACEHOLDER: RULE-ASSAULT-017. Testing the x axis first, and stopping the whole tick on a refusal, follow the rule's unconfirmed choice.
         return AdvanceMovementAxis(retainer, deltaX, true, effectFlags) &&
                AdvanceMovementAxis(retainer, deltaY, false, effectFlags);
     }
@@ -178,8 +184,8 @@ public sealed partial class SiegeSession
                     retainer.Facing = (Facing)(((int)retainer.Facing + 3) & 3);
                     retainer.OriginalHeading8 = null;
                 }
-                // Flag 0x10 zeros the live effect's coordinate deltas and tick
-                // count, so actor thinking resumes immediately after this tick.
+                // RULE-ASSAULT-017: flag 0x10 stops the live effect, so the
+                // actor decides again right after this tick.
                 return (flags & 0x10) == 0;
             }
         }
@@ -203,9 +209,10 @@ public sealed partial class SiegeSession
         _ => (y, -x)
     };
 
-    // All supported actor states use behavior 0x87, so their installed map
-    // block contributes bit 0x02 exactly like an authored static blocker.
-    // Keep actor occupancy exclusive while direct movers retain/retry offsets.
+    // RULE-ASSAULT-019: all supported actor states use behavior 0x87, so the
+    // actor's map block sets bit 0x02 (FMT-VIEW-001) like a static blocker.
+    // Keep actor occupancy exclusive while direct movers keep and retry offsets.
+    // PLACEHOLDER: RULE-ASSAULT-017. Cells outside the map block movement; the rule does not record what the lookup reads there.
     private bool RetainerCanEnter(SiegeRetainer self, int x, int y) =>
         x >= 0 && y >= 0 && x < Width && y < Height && !_movementBlocks[x, y] &&
         (x != PlayerX || y != PlayerY) &&
@@ -213,9 +220,9 @@ public sealed partial class SiegeSession
         _retainers.All(retainer => ReferenceEquals(retainer, self) || retainer.Health <= 0 ||
             retainer.X != x || retainer.Y != y);
 
-    // Acquisition 0x4F98D walks authored actor order and keeps only a strictly
-    // nearer opposite-side actor whose identity is returned by 0x470A8. It
-    // exits early once the returned 8.8 depth is below 0x154.
+    // RULE-ASSAULT-010: walk authored actor order and keep only a strictly
+    // nearer opposite-side actor that the ray (RULE-VIEW-003) returns. Stop
+    // early once the 8.8 depth is below 0x154.
     private SiegeEnemy? RetreatOrderTarget(SiegeRetainer retainer) =>
         VisibleOrderTarget(retainer, preserveExplicitTarget: false);
 
@@ -250,9 +257,9 @@ public sealed partial class SiegeSession
         return nearest;
     }
 
-    // Mode-8 predicate 0x4F7A2 always casts toward the stored target, but it
-    // accepts any living opposite-side actor returned by that ray. Contact is
-    // strict against the source combat row's raw column-4 distance.
+    // RULE-ASSAULT-012: the mode-8 test casts toward the stored target, but
+    // accepts any living opposite-side actor that ray returns. Contact is
+    // strict against the source combat row's raw reach.
     private SiegeEnemy? ModeEightContactTarget(SiegeRetainer retainer, SiegeEnemy target)
     {
         if (retainer.OriginalCombatRow is not { } row ||

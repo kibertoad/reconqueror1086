@@ -3,8 +3,8 @@ namespace Conqueror.Core;
 /// <summary>Integer actor-heading and movement arithmetic recovered from the original executable.</summary>
 public static class OriginalActorMotion
 {
-    // Object-2 +0xC904. The executable uses this signed 1.15 quarter-wave
-    // through 0x446BC/0x4472C/0x44740 rather than host trigonometry.
+    // RULE-VIEW-002: the signed 1.15 quarter-wave table behind sine, cosine
+    // and rotation. The rebuild uses it in place of host trigonometry.
     private static readonly int[] QuarterSine15 =
     [
         0, 817, 1633, 2449, 3263, 4074, 4884, 5690,
@@ -17,12 +17,12 @@ public static class OriginalActorMotion
         32269, 32401, 32513, 32604, 32675, 32726, 32757, 32767
     ];
 
-    // 0x445C4 receives the original local (-worldY, worldX) vector.
+    // RULE-VIEW-001: heading_to receives the local (-worldY, worldX) vector.
     public static int HeadingToward(int deltaX8, int deltaY8) =>
         Heading(-deltaY8, deltaX8);
 
-    // The movement scheduler rotates descriptor-local coordinates by the
-    // actor's byte-turn heading, rounding every 1.15 product independently.
+    // RULE-VIEW-002: rotates descriptor-local coordinates by the actor's
+    // byte-turn heading, rounding every 1.15 product separately.
     public static (int X, int Y) Rotate(int x, int y, int heading)
     {
         var sine = Sin15(heading);
@@ -32,8 +32,9 @@ public static class OriginalActorMotion
             -FixedProduct15(cosine, x) + FixedProduct15(sine, y));
     }
 
-    // Handler 0x50020 multiplies each descriptor coordinate by object-2
-    // double +0x7CEA (= 1.5) and converts it with x87 FISTP (nearest-even).
+    // RULE-ASSAULT-016: the escape handler multiplies each descriptor
+    // coordinate by 1.5.
+    // PLACEHOLDER: RULE-ASSAULT-016. Rounding half to even assumes the processor's default rounding mode.
     public static int ScaleEscapeDelta(int value) => checked((int)Math.Round(
         value * 1.5d, MidpointRounding.ToEven));
 

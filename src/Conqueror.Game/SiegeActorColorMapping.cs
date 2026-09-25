@@ -18,8 +18,8 @@ public static class SiegeActorColorMapping
         if (authoredColorMapBase != playerMapBase)
             return new SiegeActorColorSelection(authoredColorMapBase, authoredWalkTextureBase);
 
-        // Loader 0x51A9C-0x51AED chooses blue unless the player is blue,
-        // in which case the conflicting hostile changes to green.
+        // RULE-ASSAULT-025: a hostile in the player's colour changes to blue,
+        // or to green when the player is blue.
         return SelectionFor(playerColor == 2 ? 1 : 2);
     }
 

@@ -22,6 +22,7 @@ public readonly record struct SiegeSceneRayCandidate(
     public SiegeObject? Object { get; init; }
 }
 
+// RULE-VIEW-003 cast_ray over the FMT-VIEW-002 map.
 public static class OriginalSiegeProjection
 {
     private const int MaximumTraversalSteps = 0x40;
@@ -91,6 +92,7 @@ public static class OriginalSiegeProjection
         var absoluteY = Math.Abs(rayY);
         int incrementX;
         int incrementY;
+        // PLACEHOLDER: RULE-VIEW-003. Equal ray components take y as the major axis; the original's choice is not recorded.
         if (absoluteX > absoluteY)
         {
             incrementX = signX << 8;
@@ -155,6 +157,7 @@ public static class OriginalSiegeProjection
                     return false;
                 var target = scene.Blocks[current.Block.StateTarget];
                 if (target.Kind == 0) return false;
+                // PLACEHOLDER: RULE-VIEW-003. A chained block uses its own offsets; the rule does not record whether the probe cell's offsets are kept.
                 current = new SiegeProjectedBlock(target, target.InitialXOffset8,
                     target.InitialYOffset8, projected.MapBlockIndex)
                 {
@@ -187,6 +190,7 @@ public static class OriginalSiegeProjection
         SiegeSession siege,
         out SiegeSceneRayCandidate candidate)
     {
+        // PLACEHOLDER: RULE-VIEW-004. The intersection, depth, rounding and texture-row steps from here through RoundedDivide are the rebuild's own.
         var block = projected.Block;
         var minX = (sourceCellX << 8) - viewerX8 + projected.OffsetX8;
         var minY = (sourceCellY << 8) - viewerY8 + projected.OffsetY8;

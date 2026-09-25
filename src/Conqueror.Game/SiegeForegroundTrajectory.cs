@@ -4,10 +4,11 @@ namespace Conqueror.Game;
 
 public enum SiegeForegroundPhase { Approaching, Returning, Holding, Complete }
 
-// CONQUER.EXE 0x54B68-0x55521: row-family target/outer setup, signed 8.8
-// velocity, elapsed-millisecond integration, contact reversal, and pose state.
+// RULE-ASSAULT-026: row-family target and start setup, signed 8.8 velocity,
+// elapsed-millisecond integration, contact reversal and pose state.
 public sealed class SiegeForegroundTrajectory
 {
+    // PLACEHOLDER: RULE-ASSAULT-026. Capping one update at 166 ms is the rebuild's own.
     public const int MaximumUpdateMilliseconds = 166;
     private readonly int _combatRow;
     private readonly int _baseFrame;
@@ -69,6 +70,7 @@ public sealed class SiegeForegroundTrajectory
         var mirror = false;
         int outerX;
         int outerY;
+        // PLACEHOLDER: RULE-ASSAULT-026. Each branch draws the x offset before the y offset; the rule does not record the order.
         if (combatRow <= 3)
         {
             targetX -= random.Next(8);
@@ -80,6 +82,7 @@ public sealed class SiegeForegroundTrajectory
         {
             targetX += 16 - random.Next(40);
             targetY = Math.Max(targetY - random.Next(40), viewportHeight - spriteHeight);
+            // PLACEHOLDER: RULE-ASSAULT-026. A target exactly on the H / 3 line counts as above it; the rule does not say which side.
             if (viewportHeight / 3 < targetY)
             {
                 outerY = targetY - viewportHeight / 2;
@@ -100,8 +103,9 @@ public sealed class SiegeForegroundTrajectory
         }
         else
         {
-            // 0x54E9D-0x54F12: rows 23-24 center base frame 30 on pointer x
+            // RULE-ASSAULT-026: rows 23 and 24 center base frame 30 on pointer x
             // and rise from the viewport bottom by exactly one sprite height.
+            // PLACEHOLDER: RULE-ASSAULT-026. The rule's procedure starts these rows at their target; the rise follows its summary.
             targetX -= spriteWidth / 2;
             targetY = viewportHeight - spriteHeight;
             outerX = targetX;
@@ -135,8 +139,8 @@ public sealed class SiegeForegroundTrajectory
             _y8 = _targetY8;
             if (_combatRow >= 23)
             {
-                // 0x550BC/0x553F9: the ranged pose remains at its target;
-                // only later foreground setup or siege teardown replaces it.
+                // RULE-ASSAULT-026: the ranged pose stays at its target until
+                // a later swing or the end of the assault replaces it.
                 _velocityX8 = 0;
                 _velocityY8 = 0;
                 Phase = SiegeForegroundPhase.Holding;
@@ -158,6 +162,7 @@ public sealed class SiegeForegroundTrajectory
         }
     }
 
+    // PLACEHOLDER: RULE-ASSAULT-026. The rule does not record how swing_side_x picks the side; this starts half a view away, on the far side of the center.
     private static (int X, bool Mirror) HorizontalOuterAnchor(int targetX, int viewportWidth) =>
         viewportWidth / 2 >= targetX
             ? (targetX + viewportWidth / 2, false)

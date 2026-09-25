@@ -6,11 +6,111 @@ Entries by area.
 
 ## ASSAULT
 
-None.
+| ID | Title | Status |
+|---|---|---|
+| [FMT-ASSAULT-001](../formats/FMT-ASSAULT-001.md) | Combatant record, one of the actors of a first-person assault | supported |
+| [FMT-ASSAULT-002](../formats/FMT-ASSAULT-002.md) | Combat row, one of the 25 weapon records in the executable | supported |
+| [FMT-ASSAULT-003](../formats/FMT-ASSAULT-003.md) | Scene effect descriptor, one record of the SFXDEFS resource | supported |
+| [FMT-ASSAULT-004](../formats/FMT-ASSAULT-004.md) | Live effect record, one of the 64 effects the scheduler runs | unknown |
+| [FND-ASSAULT-001](../findings/FND-ASSAULT-001.md) | The combat loader clones placed actor blocks into combatant records in x-major order and promotes the first friendly to player | recorded |
+| [FND-ASSAULT-002](../findings/FND-ASSAULT-002.md) | All 1,002 actor placements in the 42 melee and defence scene archives use templates 0 to 2 as friendly and 3, 5, 8 and 9 as hostile | recorded |
+| [FND-ASSAULT-003](../findings/FND-ASSAULT-003.md) | Placed actor blocks and their state blocks all have behaviour 0x87, and 52,278 of the 688,128 placed cells block movement | recorded |
+| [FND-ASSAULT-004](../findings/FND-ASSAULT-004.md) | Every placed actor selects movement descriptor 7 or 10, both three 200 ms ticks of 64 units with flags 0x142 | recorded |
+| [FND-ASSAULT-005](../findings/FND-ASSAULT-005.md) | Campaign castle assaults pass a retainer cap of one per three soldiers of each type, at most three per type, and at least one | recorded |
+| [FND-ASSAULT-006](../findings/FND-ASSAULT-006.md) | The retainer counter skips the player, and the loader removes retainers above the cap | recorded |
+| [FND-ASSAULT-007](../findings/FND-ASSAULT-007.md) | After an assault, each retainer lost removes one strategic soldier, taken from swordsmen, then halberdiers, then knights | recorded |
+| [FND-ASSAULT-008](../findings/FND-ASSAULT-008.md) | The command strip dispatches Attack, Defend, Follow and Retreat, which request modes 6, 2, 16 and 10 | recorded |
+| [FND-ASSAULT-009](../findings/FND-ASSAULT-009.md) | The template initializer gives the ten combatant templates their kinds and starting modes | recorded |
+| [FND-ASSAULT-010](../findings/FND-ASSAULT-010.md) | Each transition body writes a failure mode and a success mode, and helper 0x4E5F0 moves one of them into the current mode | recorded |
+| [FND-ASSAULT-011](../findings/FND-ASSAULT-011.md) | A dispatcher selects one of seven 17-entry transition tables by actor kind, and kind 7 uses the kind-2 table | recorded |
+| [FND-ASSAULT-012](../findings/FND-ASSAULT-012.md) | The kind-0 and kind-1 transition tables map each friendly mode to its next modes | recorded |
+| [FND-ASSAULT-013](../findings/FND-ASSAULT-013.md) | The kind-2 and kind-4 transition tables map each hostile mode to its next modes | recorded |
+| [FND-ASSAULT-014](../findings/FND-ASSAULT-014.md) | Two relocated tables give each mode its test and its handler | recorded |
+| [FND-ASSAULT-015](../findings/FND-ASSAULT-015.md) | The actor thinker visits about a sixteenth of the combatants per call from a persistent cursor, and the state routine runs one test and one handler | recorded |
+| [FND-ASSAULT-016](../findings/FND-ASSAULT-016.md) | The assault main loop runs input, then the effect scheduler, then the thinker, with no wait | recorded |
+| [FND-ASSAULT-017](../findings/FND-ASSAULT-017.md) | The mode-1 and mode-2 tests scan the 3 by 3 cells around the actor for the first same-side or opposite-side actor | recorded |
+| [FND-ASSAULT-018](../findings/FND-ASSAULT-018.md) | Opposite-side acquisition casts a centred ray at each enemy in record order and keeps the strictly nearest one it actually hits | recorded |
+| [FND-ASSAULT-019](../findings/FND-ASSAULT-019.md) | Same-side acquisition casts a centred ray at each friend in record order and keeps the strictly nearest one it hits, stopping below 0x200 | recorded |
+| [FND-ASSAULT-020](../findings/FND-ASSAULT-020.md) | The mode-8 and mode-7 contact tests accept whichever combatant the ray actually hits, within the combat-row reach or below 0x200 | recorded |
+| [FND-ASSAULT-021](../findings/FND-ASSAULT-021.md) | The tests for modes 12, 13 and 17 check the destination, the health threshold 6 and a clear line to the player | recorded |
+| [FND-ASSAULT-022](../findings/FND-ASSAULT-022.md) | Handlers for modes 1 to 8, 16 and 17 set the state block, start a wandering effect with flag 0x40 or a direct effect with flag 0x10 | recorded |
+| [FND-ASSAULT-023](../findings/FND-ASSAULT-023.md) | The mode-12 handler aims at the stored destination, rounds to a cardinal and starts a direct movement effect | recorded |
+| [FND-ASSAULT-024](../findings/FND-ASSAULT-024.md) | The hit and death handlers compare the stored target's health with the actor's reduced health before starting the hit effect | recorded |
+| [FND-ASSAULT-025](../findings/FND-ASSAULT-025.md) | The mode-9 and mode-10 handler walks away from the stored target at one and a half times the descriptor step, without rounding to a cardinal | recorded |
+| [FND-ASSAULT-026](../findings/FND-ASSAULT-026.md) | A combatant's death path copies its death state, and after that effect it is removed and the hostiles counted, with no reward | recorded |
+| [FND-ASSAULT-027](../findings/FND-ASSAULT-027.md) | The mode-11 strike handler checks reach against the combat row, with a close case that skips the ray, and doubles the effect interval for rows 23 and 24 | recorded |
+| [FND-ASSAULT-028](../findings/FND-ASSAULT-028.md) | The effect scheduler advances an effect only after strictly more than its interval, applies strike damage at the last tick, and rethinks the actor at once | recorded |
+| [FND-ASSAULT-029](../findings/FND-ASSAULT-029.md) | A movement tick rotates the step by the heading, tests the next cell only outside the band -0x59 to 0x59, and changes cell only beyond 0x80 | recorded |
+| [FND-ASSAULT-030](../findings/FND-ASSAULT-030.md) | When an actor changes cell, the scheduler puts back the block it covered and installs itself in the new cell before the next effect runs | recorded |
+| [FND-ASSAULT-031](../findings/FND-ASSAULT-031.md) | The damage routine checks reach, rolls a hit chance from both skills, then rolls the combat row's dice against armour | recorded |
+| [FND-ASSAULT-032](../findings/FND-ASSAULT-032.md) | Combat rows are 25 records of 28 bytes in the executable's data, whose first dwords are dice, sides, penetration, a swing divisor and a reach | recorded |
+| [FND-ASSAULT-033](../findings/FND-ASSAULT-033.md) | The player's combatant skill is strength plus dexterity plus twice sword experience, and health is strength plus stamina plus honour | recorded |
+| [FND-ASSAULT-034](../findings/FND-ASSAULT-034.md) | The state copier puts one of an actor's four state blocks into its map cell, keeping its colour selector, and the effect it starts ends in a rethink | recorded |
+| [FND-ASSAULT-035](../findings/FND-ASSAULT-035.md) | Pointer dispatch gives selected friendlies a destination first, then toggles selection, targets enemies, or acts on objects | recorded |
+| [FND-ASSAULT-036](../findings/FND-ASSAULT-036.md) | The object action dispatcher switches on block word +0x48, and cases 5, 7, 9 and 10 give wealth, healing, armour and bolts | recorded |
+| [FND-ASSAULT-037](../findings/FND-ASSAULT-037.md) | Placed pickups use interaction selectors 5, 7, 9 and 10 with fixed arguments | recorded |
+| [FND-ASSAULT-038](../findings/FND-ASSAULT-038.md) | An accepted object action replaces the block at once with its state target, and 1,086 placed doors carry the action bit | recorded |
+| [FND-ASSAULT-039](../findings/FND-ASSAULT-039.md) | The loader recolours actors: friendlies take the player's colour family, and a hostile that shares it takes another | recorded |
+| [FND-ASSAULT-040](../findings/FND-ASSAULT-040.md) | The foreground weapon swing picks a target and start point by combat-row family and moves at a speed set by the row's divisor | recorded |
+| [FND-ASSAULT-041](../findings/FND-ASSAULT-041.md) | A strike shows one of two blood effects, chosen by whether the target dies, and the effect advances once per drawn frame | recorded |
+| [FND-ASSAULT-042](../findings/FND-ASSAULT-042.md) | Scene loading reads 0x40-byte effect descriptors from SFXDEFS, and the constructor and scheduler use their fields | recorded |
+| [FND-ASSAULT-043](../findings/FND-ASSAULT-043.md) | A missed contact of the player's weapon breaks it on a zero draw from 200 plus 50 times the row's penetration, except for row 0 | recorded |
+| [FND-ASSAULT-044](../findings/FND-ASSAULT-044.md) | After the weapon range check, a block with behaviour bit 0x20 is replaced at once by its state target | recorded |
+| [FND-ASSAULT-045](../findings/FND-ASSAULT-045.md) | A table maps each weapon item to a combat row, and the two crossbows use rows 23 and 24 | recorded |
+| [FND-ASSAULT-046](../findings/FND-ASSAULT-046.md) | A combatant's armour is the dword at offset 0x3C, read beside its health at 0x40 | recorded |
+| [RULE-ASSAULT-001](../rules/RULE-ASSAULT-001.md) | Retainer cap for a campaign castle assault | supported |
+| [RULE-ASSAULT-002](../rules/RULE-ASSAULT-002.md) | Load the combatants of a scene and remove retainers above the cap | supported |
+| [RULE-ASSAULT-003](../rules/RULE-ASSAULT-003.md) | Soldiers lost with the retainers who died | supported |
+| [RULE-ASSAULT-004](../rules/RULE-ASSAULT-004.md) | Retainer orders from the command strip | supported |
+| [RULE-ASSAULT-005](../rules/RULE-ASSAULT-005.md) | Pointer clicks in the first-person view | supported |
+| [RULE-ASSAULT-006](../rules/RULE-ASSAULT-006.md) | Actor thinker pass | supported |
+| [RULE-ASSAULT-007](../rules/RULE-ASSAULT-007.md) | State decision for one actor | supported |
+| [RULE-ASSAULT-008](../rules/RULE-ASSAULT-008.md) | Mode transition tables and the test and handler of each mode | supported |
+| [RULE-ASSAULT-009](../rules/RULE-ASSAULT-009.md) | Friend or enemy in the 3 by 3 cells around an actor | supported |
+| [RULE-ASSAULT-010](../rules/RULE-ASSAULT-010.md) | Acquire the nearest visible enemy | supported |
+| [RULE-ASSAULT-011](../rules/RULE-ASSAULT-011.md) | Acquire the nearest visible friend | supported |
+| [RULE-ASSAULT-012](../rules/RULE-ASSAULT-012.md) | Contact tests of pursuit and regrouping | supported |
+| [RULE-ASSAULT-013](../rules/RULE-ASSAULT-013.md) | Destination, rally and follow tests, and the test of the strike and hit modes | supported |
+| [RULE-ASSAULT-014](../rules/RULE-ASSAULT-014.md) | Standing and wandering handlers | supported |
+| [RULE-ASSAULT-015](../rules/RULE-ASSAULT-015.md) | Direct approach and go-to handlers | supported |
+| [RULE-ASSAULT-016](../rules/RULE-ASSAULT-016.md) | Escape handler | supported |
+| [RULE-ASSAULT-017](../rules/RULE-ASSAULT-017.md) | One movement tick of an actor | supported |
+| [RULE-ASSAULT-018](../rules/RULE-ASSAULT-018.md) | Effect scheduling, tick timing, strike completion and rethink | supported |
+| [RULE-ASSAULT-019](../rules/RULE-ASSAULT-019.md) | An actor takes its new cell | supported |
+| [RULE-ASSAULT-020](../rules/RULE-ASSAULT-020.md) | Strike handler | supported |
+| [RULE-ASSAULT-021](../rules/RULE-ASSAULT-021.md) | Using a door or picking up an object | supported |
+| [RULE-ASSAULT-022](../rules/RULE-ASSAULT-022.md) | Hits, deaths and removal of the dead | supported |
+| [RULE-ASSAULT-023](../rules/RULE-ASSAULT-023.md) | Damage of one blow | supported |
+| [RULE-ASSAULT-024](../rules/RULE-ASSAULT-024.md) | The player's skill and health in an assault | supported |
+| [RULE-ASSAULT-025](../rules/RULE-ASSAULT-025.md) | Actor colours follow the player's colour | supported |
+| [RULE-ASSAULT-026](../rules/RULE-ASSAULT-026.md) | The player's foreground weapon swing | supported |
+| [RULE-ASSAULT-027](../rules/RULE-ASSAULT-027.md) | Combatant and effect values whose layout or computation is not recorded | unknown |
+| [RULE-ASSAULT-028](../rules/RULE-ASSAULT-028.md) | Blood effect of a strike | supported |
+| [RULE-ASSAULT-029](../rules/RULE-ASSAULT-029.md) | Change an actor's look | supported |
+| [RULE-ASSAULT-030](../rules/RULE-ASSAULT-030.md) | Which retainer the loader removes above the cap | unknown |
+| [RULE-ASSAULT-031](../rules/RULE-ASSAULT-031.md) | The player's weapon breaking on a miss | supported |
 
 ## VIEW
 
-None.
+| ID | Title | Status |
+|---|---|---|
+| [FMT-VIEW-001](../formats/FMT-VIEW-001.md) | Scene block definition, one record of the Blocks resource | supported |
+| [FMT-VIEW-002](../formats/FMT-VIEW-002.md) | Scene map, the Map resource | supported |
+| [FND-VIEW-001](../findings/FND-VIEW-001.md) | Every combat scene archive holds its blocks as 96-byte records ending in 0xCC 0xCC with a 16-byte label at offset 78 | recorded |
+| [FND-VIEW-002](../findings/FND-VIEW-002.md) | Every combat scene map is 128 by 128 block numbers stored column by column | recorded |
+| [FND-VIEW-003](../findings/FND-VIEW-003.md) | The heading helper folds the vector into octants around floor(0x20 * minor / major), and callers pass (-dy, dx) | recorded |
+| [FND-VIEW-004](../findings/FND-VIEW-004.md) | Sine, cosine and rotation use a 64-entry signed 1.15 quarter-wave table and round each product with (p + 0x3FFF) >> 15 | recorded |
+| [FND-VIEW-005](../findings/FND-VIEW-005.md) | The first-person view starts with elevation 0x80, horizon at half the view height, and the view width as ray width | recorded |
+| [FND-VIEW-006](../findings/FND-VIEW-006.md) | The raycaster forms its ray from a fixed forward basis and a lateral basis from the view column, and returns the first opaque candidate | recorded |
+| [FND-VIEW-007](../findings/FND-VIEW-007.md) | The traversal walks at most 64 wrapped map steps, probing cells in a fixed order and following state targets of pass-through blocks | recorded |
+| [FND-VIEW-008](../findings/FND-VIEW-008.md) | The candidate helper keeps at most 31 contacts, and a switch table gives each block kind its shape | recorded |
+| [FND-VIEW-009](../findings/FND-VIEW-009.md) | For a kind-4 block the raycaster uses the block centre's forward distance as depth and chooses a sprite angle from its heading | recorded |
+| [FND-VIEW-010](../findings/FND-VIEW-010.md) | The pixel test reads a block texture by its width, width shift and height, and treats palette index 0 as transparent | recorded |
+| [FND-VIEW-011](../findings/FND-VIEW-011.md) | Distance shading picks one of the scene's colour maps from the depth, less a per-block offset | recorded |
+| [RULE-VIEW-001](../rules/RULE-VIEW-001.md) | Heading from one map point to another | supported |
+| [RULE-VIEW-002](../rules/RULE-VIEW-002.md) | Integer sine, cosine and rotation | supported |
+| [RULE-VIEW-003](../rules/RULE-VIEW-003.md) | Cast a ray through the scene and find the first opaque surface at a view row | supported |
+| [RULE-VIEW-004](../rules/RULE-VIEW-004.md) | Surface intersection, depth and pixel test inside the raycaster | unknown |
 
 ## JOUST
 
@@ -70,4 +170,6 @@ None.
 
 ## RNG
 
-None.
+| ID | Title | Status |
+|---|---|---|
+| [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number routine | unknown |

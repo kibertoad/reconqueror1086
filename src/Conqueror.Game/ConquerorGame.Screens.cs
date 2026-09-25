@@ -343,8 +343,10 @@ public sealed partial class ConquerorGame
             selected.FlipHorizontally);
     }
 
+    // RULE-ASSAULT-029: an actor's look is the block stateOffset after its base block.
     private DynamixSceneBlock ActorStateBlock(DynamixSceneBlock initial, int stateOffset)
     {
+        // PLACEHOLDER: RULE-ASSAULT-029. Falling back to the base block when the look block is missing or does not match is a guess.
         if (_siegeVisuals is null || initial.Index + stateOffset >= _siegeVisuals.Scene.Blocks.Count) return initial;
         var state = _siegeVisuals.Scene.Blocks[initial.Index + stateOffset];
         return state.Kind == 4 && state.Name.Equals(initial.Name, StringComparison.OrdinalIgnoreCase) && state.Surface0 >= 0

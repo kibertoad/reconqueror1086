@@ -101,9 +101,9 @@ public sealed partial class SiegeSession
 
     private void AdvanceDefendOrder(SiegeRetainer retainer)
     {
-        // Friendly mode tables begin at object-1 offsets 0x3E43C (kind 0)
-        // and 0x3E480 (kind 1). Like 0x4F49C, evaluate one predicate and
-        // invoke only the selected mode handler during this thinker pass.
+        // RULE-ASSAULT-007 and RULE-ASSAULT-008: use the kind 0 and kind 1 mode
+        // tables, evaluate one test and run only the selected mode's handler
+        // during this thinker pass.
         switch (retainer.ActorMode)
         {
             case 1:
@@ -160,6 +160,7 @@ public sealed partial class SiegeSession
                 break;
             case 8:
             {
+                // PLACEHOLDER: RULE-ASSAULT-008. Kind-1 actors use modes 11 and 6 from the kind-0 table; the kind-1 entries for mode 8 were not read.
                 var opponent = retainer.OrderedTarget is { Health: > 0 } pursued
                     ? ModeEightContactTarget(retainer, pursued)
                     : null;
@@ -169,8 +170,8 @@ public sealed partial class SiegeSession
             }
             case 9:
             {
-                // Both kind tables use 0x4E758: same-side acquisition keeps
-                // mode 9, while failure returns to attack wandering mode 6.
+                // RULE-ASSAULT-008: in both kind tables a same-side acquisition
+                // keeps mode 9, while failure returns to wandering mode 6.
                 var ally = RetreatFormationTarget(retainer);
                 if (ally is not null) StoreFriendlyTarget(retainer, ally);
                 retainer.ActorMode = ally is null ? 6 : 9;
@@ -197,8 +198,8 @@ public sealed partial class SiegeSession
         switch (retainer.ActorMode)
         {
             case 16:
-                // Predicate 0x4F8B0 is evaluated, but transition 0x4E7CA
-                // records mode 17 for both success and failure.
+                // RULE-ASSAULT-012 and RULE-ASSAULT-008: the contact test runs,
+                // but the table gives mode 17 for both success and failure.
                 _ = FollowModeSixteenHasContact(retainer);
                 retainer.ActorMode = 17;
                 break;
@@ -206,6 +207,7 @@ public sealed partial class SiegeSession
                 retainer.ActorMode = FollowPlayerIsVisible(retainer) ? 16 : 17;
                 break;
             default:
+                // PLACEHOLDER: RULE-ASSAULT-008. Entering mode 16 from any other mode is a guess at how the Follow order starts.
                 retainer.ActorMode = 16;
                 retainer.OrderedTarget = PlayerActor;
                 break;
@@ -226,6 +228,7 @@ public sealed partial class SiegeSession
             }
             case 8:
             {
+                // PLACEHOLDER: RULE-ASSAULT-008. Kind-1 actors use modes 11 and 6 from the kind-0 table; the kind-1 entries for mode 8 were not read.
                 var target = retainer.OrderedTarget is { Health: > 0 } aimed
                     ? ModeEightContactTarget(retainer, aimed)
                     : null;
@@ -234,14 +237,17 @@ public sealed partial class SiegeSession
                 break;
             }
             case 11:
+                // PLACEHOLDER: RULE-ASSAULT-008. Mode 11 is kept; its table entries for kinds 0 and 1 were not read.
                 break;
             default:
+                // PLACEHOLDER: RULE-ASSAULT-008. Falling back to mode 6 for any other mode is a guess.
                 retainer.ActorMode = 6;
                 break;
         }
         BeginFriendlyMode(retainer);
     }
 
+    // RULE-ASSAULT-008 handlers for friendly actors; RULE-ASSAULT-014 wandering.
     private void BeginFriendlyMode(SiegeRetainer retainer)
     {
         retainer.MovementWanders = false;
@@ -249,6 +255,7 @@ public sealed partial class SiegeSession
         {
             case 5:
             case 6:
+                // PLACEHOLDER: RULE-ASSAULT-014. The rule does not record which target fields wandering clears; this clears the ordered target.
                 retainer.OrderedTarget = null;
                 retainer.MovementWanders = true;
                 retainer.MovementActive = true;
@@ -283,6 +290,7 @@ public sealed partial class SiegeSession
                 }
                 break;
             case 17:
+                // PLACEHOLDER: RULE-ASSAULT-014. The rule does not record which target fields wandering clears; this clears the ordered target.
                 retainer.OrderedTarget = null;
                 retainer.MovementWanders = true;
                 retainer.MovementActive = true;

@@ -1,8 +1,7 @@
 namespace Conqueror.Game;
 
-// CONQUER.EXE 0x552FB-0x55395 advances this four-frame effect once per
-// foreground render. The siege loop at 0x5841F has no timing gate, so 70 ms
-// is an explicit compatibility policy rather than an original-game formula.
+// RULE-ASSAULT-028 blood effect. DEV-ASSAULT-003: each of the four frames
+// shows for 70 ms of simulation time.
 public sealed class SiegeHitEffect
 {
     public const double CompatibilityStepSeconds = 0.07;

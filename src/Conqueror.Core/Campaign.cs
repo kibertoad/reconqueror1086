@@ -494,6 +494,7 @@ public sealed partial class Campaign
         ArgumentNullException.ThrowIfNull(layout);
         if (!State.PendingDrogoEncounter || State.Player.Debt <= 0)
             throw new InvalidOperationException("Drogo is not waiting to collect a debt.");
+        // PLACEHOLDER: RULE-ASSAULT-001. This fight uses a retainer cap of 0, where the rule gives at least 1.
         return new SiegeSession(State.Player, new Army(), garrison: 0,
             State.Date.DayOfYear + State.Date.Year, layout, includeRetainers: false);
     }

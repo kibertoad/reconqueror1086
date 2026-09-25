@@ -10,17 +10,17 @@ public static class OriginalCombatantTemplates
     // its current map cell while the scheduler swaps its underlying block.
     public const int PlacedActorBehavior = 0x87;
 
-    // CONQUER.EXE object 2 offset 0xCE10 is initialized as ten 0x44-byte
-    // combatant templates. Attack skill, armor, and health occupy offsets
-    // 0x34, 0x3c, and 0x40.
+    // Ten FMT-ASSAULT-001 combatant templates that RULE-ASSAULT-002 copies into
+    // each placed actor. Attack skill, armor and health are fields 0x34, 0x3c and 0x40.
+    // PLACEHOLDER: RULE-ASSAULT-002. The skill, armour and health values are not recorded in the spec.
     private static readonly OriginalCombatantTemplate[] Templates =
     [
         new(50, 7, 12), new(70, 8, 15), new(60, 5, 10), new(50, 6, 10), new(50, 6, 10),
         new(50, 6, 10), new(50, 6, 10), new(50, 5, 10), new(70, 8, 15), new(85, 10, 20)
     ];
 
-    // The same initializer writes current/requested/previous actor modes at
-    // offsets +0x18/+0x1c/+0x20 in each 0x44-byte template.
+    // RULE-ASSAULT-008: the current, requested and previous mode of each template
+    // (FMT-ASSAULT-001 fields 0x18, 0x1c and 0x20).
     private static readonly OriginalActorModeProfile[] ModeProfiles =
     [
         new(4, 4, 4), new(4, 4, 4), new(4, 4, 4), new(6, 8, 6), new(4, 10, 6),
@@ -47,8 +47,8 @@ public static class OriginalCombatantTemplates
 
     public static bool IsPlacedSceneTemplate(int template) => template is 0 or 1 or 2 or 3 or 5 or 8 or 9;
 
-    // CONQUER.EXE 0x542F8 initializes the actor-kind selector for templates
-    // 0-9 in this order. The selector chooses the transition table at 0x4E5F0.
+    // RULE-ASSAULT-008: the actor kind of templates 0-9, which chooses the
+    // actor's mode transition table.
     public static int ActorKindForSceneTemplate(int template) => template switch
     {
         0 or 1 => 0,

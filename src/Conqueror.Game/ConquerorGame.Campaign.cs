@@ -487,8 +487,8 @@ public sealed partial class ConquerorGame
         if (pointerHit?.TargetCell is { } targetCell &&
             _siege.CommandSelectedRetainersTo(targetCell.X, targetCell.Y))
         {
-            // Primary pointer dispatch 0x555AB-0x55688 consumes a hit for
-            // selected friendly actors before actor/object-specific actions.
+            // RULE-ASSAULT-005: with friendly actors selected, the click sets
+            // their destination before any actor or object action.
         }
         else if (pointerHit?.Actor is SiegeRetainer clickedRetainer)
             _siege.ToggleRetainerSelection(clickedRetainer);
@@ -653,6 +653,7 @@ public sealed partial class ConquerorGame
     {
         if (_siege is null || _siegeVisuals is null) return null;
         var viewport = SiegeViewport();
+        // PLACEHOLDER: RULE-ASSAULT-005. The pointer is scaled to the rendered view width and the ray cast there; the rule does not record the pointer position the view uses.
         var localX = centeredPointer.X * viewport.Width / SiegeCombatPresentation.Viewport.Width;
         var localY = centeredPointer.Y * viewport.Height / SiegeCombatPresentation.Viewport.Height;
         if (localX < 0 || localY < 0 || localX >= viewport.Width || localY >= viewport.Height)

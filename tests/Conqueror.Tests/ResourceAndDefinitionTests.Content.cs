@@ -10,7 +10,7 @@ namespace Conqueror.Tests;
 
 public sealed partial class ResourceAndDefinitionTests
 {
-    [Fact]
+    [Fact] // Covers FMT-VIEW-001, RULE-ASSAULT-002.
     public void ImportedSceneLayoutUsesOriginalBehaviorClassesBeforeNames()
     {
         var source = SyntheticScene();
@@ -239,7 +239,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(0, Assert.Single(siege.Objects).State);
     }
 
-    [Fact]
+    [Fact] // Covers FMT-ASSAULT-002, RULE-ASSAULT-005.
     public void SiegeContactUsesTheOriginalWeaponRowDistance()
     {
         var tiles = new SiegeTile[6, 3];
@@ -375,7 +375,7 @@ public sealed partial class ResourceAndDefinitionTests
         }
     }
 
-    [Fact]
+    [Fact] // Covers RULE-ASSAULT-002, RULE-ASSAULT-024.
     public void OriginalCombatantTemplatesRetainExecutableSkillArmorAndHealth()
     {
         Assert.Equal(new OriginalCombatantTemplate(50, 7, 12), OriginalCombatantTemplates.For(0));
