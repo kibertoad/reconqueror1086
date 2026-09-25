@@ -47,7 +47,7 @@ define step_direct(s):
         f.dest_y = INT32(f.y)
         f.active = 0
         let o = properties[f.origin]
-        o.garrison = UINT8(o.garrison + f.swordsmen + f.halberdiers + f.knights)
+        o.garrison = UINT8(o.garrison + f.halberdiers + f.swordsmen + f.knights)
         return 0xFFFF
     let w = terrain_speed(kind)
     f.x = FLOAT32(f.x + f.dir_x * 0.9 * w * strategic_speed)

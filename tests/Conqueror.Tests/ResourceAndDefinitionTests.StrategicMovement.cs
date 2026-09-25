@@ -36,8 +36,8 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(0x0C, OriginalStrategicMovement.PathCompleteOffset);
         Assert.Equal(0x14, OriginalStrategicMovement.TargetMovementSlotOffset);
         Assert.Equal(0x18, OriginalStrategicMovement.WaypointCountOffset);
-        Assert.Equal(0x1C, OriginalStrategicMovement.SwordsmenOffset);
-        Assert.Equal(0x20, OriginalStrategicMovement.HalberdiersOffset);
+        Assert.Equal(0x1C, OriginalStrategicMovement.HalberdiersOffset);
+        Assert.Equal(0x20, OriginalStrategicMovement.SwordsmenOffset);
         Assert.Equal(0x24, OriginalStrategicMovement.KnightsOffset);
         Assert.Equal(0x28, OriginalStrategicMovement.OriginLocationOffset);
         Assert.Equal(0x2C, OriginalStrategicMovement.LordOffset);

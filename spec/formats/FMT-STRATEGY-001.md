@@ -9,7 +9,7 @@ byte_order: little
 size: 280
 text: false
 definition: fmt_strategy_001.ksy
-evidence: [FND-STRATEGY-003, FND-STRATEGY-006, FND-STRATEGY-007, FND-STRATEGY-008, FND-STRATEGY-009, FND-STRATEGY-010, FND-STRATEGY-011, FND-STRATEGY-019, FND-STRATEGY-020, FND-STRATEGY-021, FND-STRATEGY-023, FND-STRATEGY-024, FND-STRATEGY-025, FND-STRATEGY-026, FND-STRATEGY-029, FND-STRATEGY-030, FND-STRATEGY-032, FND-STRATEGY-033, FND-STRATEGY-034]
+evidence: [FND-STRATEGY-003, FND-STRATEGY-006, FND-STRATEGY-007, FND-STRATEGY-008, FND-STRATEGY-009, FND-STRATEGY-010, FND-STRATEGY-011, FND-STRATEGY-019, FND-STRATEGY-020, FND-STRATEGY-021, FND-STRATEGY-023, FND-STRATEGY-024, FND-STRATEGY-025, FND-STRATEGY-026, FND-STRATEGY-029, FND-STRATEGY-030, FND-STRATEGY-032, FND-STRATEGY-033, FND-STRATEGY-034, FND-STRATEGY-038]
 conflicting: []
 split_with: []
 related: []
@@ -29,8 +29,8 @@ A structure the game keeps only in memory, in three lists: the six `player_force
 | `0x10` | 4 | `INT32LE` | `reversed` | 1 when the route file was loaded in reverse order. | supported | FND-STRATEGY-007 |
 | `0x14` | 4 | `INT32LE` | `target` | Hostile force: the player record a pursuit hunts. Player record: 0, or a hostile force index with `0x1000` or a brigand force index with `0x10000`. | supported | FND-STRATEGY-006, FND-STRATEGY-020, FND-STRATEGY-026 |
 | `0x18` | 4 | `INT32LE` | `count` | Number of route points. | supported | FND-STRATEGY-007, FND-STRATEGY-026 |
-| `0x1C` | 4 | `INT32LE` | `swordsmen` | Swordsmen of a hostile or brigand force. | supported | FND-STRATEGY-008, FND-STRATEGY-032 |
-| `0x20` | 4 | `INT32LE` | `halberdiers` | Halberdiers. | supported | FND-STRATEGY-008, FND-STRATEGY-032 |
+| `0x1C` | 4 | `INT32LE` | `halberdiers` | Halberdiers of a hostile or brigand force. | supported | FND-STRATEGY-008, FND-STRATEGY-032, FND-STRATEGY-038 |
+| `0x20` | 4 | `INT32LE` | `swordsmen` | Swordsmen. | supported | FND-STRATEGY-008, FND-STRATEGY-032, FND-STRATEGY-038 |
 | `0x24` | 4 | `INT32LE` | `knights` | Knights. | supported | FND-STRATEGY-008, FND-STRATEGY-032 |
 | `0x28` | 4 | `INT32LE` | `origin` | Index in `properties` of the property the force came from. | supported | FND-STRATEGY-006, FND-STRATEGY-007 |
 | `0x2C` | 4 | `INT32LE` | `lord` | Index in `persons` of the origin's lord. | supported | FND-STRATEGY-006, FND-STRATEGY-021 |

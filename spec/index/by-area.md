@@ -176,9 +176,10 @@ Entries by area.
 | ID | Title | Status |
 |---|---|---|
 | [BUG-STRATEGY-001](../bugs/BUG-STRATEGY-001.md) | The rare pursuit branch of the hostile generator tests a stale property | supported |
-| [BUG-STRATEGY-002](../bugs/BUG-STRATEGY-002.md) | A small pursuit keeps the halberdiers and knights of the slot's previous force | supported |
+| [BUG-STRATEGY-002](../bugs/BUG-STRATEGY-002.md) | A small pursuit keeps the swordsmen and knights of the slot's previous force | supported |
 | [BUG-STRATEGY-003](../bugs/BUG-STRATEGY-003.md) | A battle against a hostile force counts its result twice | supported |
 | [BUG-STRATEGY-004](../bugs/BUG-STRATEGY-004.md) | Hostile forces lost to water or a dropped route are never uncounted | supported |
+| [BUG-STRATEGY-005](../bugs/BUG-STRATEGY-005.md) | The spy report shows the swordsmen count in place of all three troop counts | supported |
 | [FMT-STRATEGY-001](../formats/FMT-STRATEGY-001.md) | Strategic movement record, one force on the strategic map | supported |
 | [FMT-STRATEGY-002](../formats/FMT-STRATEGY-002.md) | Property record, one castle of the strategic map | supported |
 | [FMT-STRATEGY-003](../formats/FMT-STRATEGY-003.md) | Person record, one character of the strategic map | supported |
@@ -222,6 +223,7 @@ Entries by area.
 | [FND-STRATEGY-035](../findings/FND-STRATEGY-035.md) | A spy costs 80, only one is out at a time, and its report lists every active hostile force | recorded |
 | [FND-STRATEGY-036](../findings/FND-STRATEGY-036.md) | The strategic action hook 0x00021EEC turns conversation variables into map events | recorded |
 | [FND-STRATEGY-037](../findings/FND-STRATEGY-037.md) | Two conversation groups set variables 43 and 93 when the player accepts a raid | recorded |
+| [FND-STRATEGY-038](../findings/FND-STRATEGY-038.md) | The spy report names +0x1C the halberdiers and shows one converted number three times | recorded |
 | [RULE-STRATEGY-001](../rules/RULE-STRATEGY-001.md) | Strategic pass and the yearly orders | supported |
 | [RULE-STRATEGY-002](../rules/RULE-STRATEGY-002.md) | Hostile pass and arrival | supported |
 | [RULE-STRATEGY-003](../rules/RULE-STRATEGY-003.md) | Hostile generator and reactive finder | supported |

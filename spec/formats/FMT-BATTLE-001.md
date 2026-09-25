@@ -57,6 +57,3 @@ Read against the constructor, the unit pass, the pointer and key handling, and t
 ## Open questions
 
 - What reads `value`, if anything.
-- Whether the naming of the hostile force's counts in FMT-STRATEGY-001 or the category identities here
-  is the one to change: the hostile count at `+0x1C` of that record, named `swordsmen` there, fills
-  category 0 here (FND-BATTLE-001, FND-BATTLE-007).

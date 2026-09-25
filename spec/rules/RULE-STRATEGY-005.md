@@ -40,8 +40,8 @@ define size_force(s):
     let f = hostile_forces[s]
     let q = persons[properties[f.origin].lord].rating / 4
     let n = household_of(f.origin) + q / 3
-    f.swordsmen = n
     f.halberdiers = n
+    f.swordsmen = n
     f.knights = n
     if 3 * n < 1:
         f.knights = 1
@@ -57,10 +57,10 @@ define size_pursuit(s, t):
         support = min(household_of(o), 30)
     let c = d + support
     if c <= 3:
-        f.swordsmen = 3
+        f.halberdiers = 3
     else:
-        f.swordsmen = c / 3
         f.halberdiers = c / 3
+        f.swordsmen = c / 3
         f.knights = c / 3
     properties[o].garrison = UINT8(g - d)
 
@@ -86,7 +86,7 @@ The three troop counts of the record, and the origin's garrison for a pursuit.
 
 ## Edge cases
 
-In the small pursuit case only `swordsmen` is written, so `halberdiers` and `knights` keep what the
+In the small pursuit case only `halberdiers` is written, so `swordsmen` and `knights` keep what the
 record held before (BUG-STRATEGY-002). London's household is every person not on the person list.
 
 ## What the sources say

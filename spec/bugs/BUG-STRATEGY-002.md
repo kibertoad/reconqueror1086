@@ -1,6 +1,6 @@
 ---
 id: BUG-STRATEGY-002
-title: A small pursuit keeps the halberdiers and knights of the slot's previous force
+title: A small pursuit keeps the swordsmen and knights of the slot's previous force
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
@@ -15,7 +15,7 @@ related: [RULE-STRATEGY-005]
 
 ## Symptom
 
-A pursuit of three troops or fewer can carry halberdiers and knights left over from the last force
+A pursuit of three troops or fewer can carry swordsmen and knights left over from the last force
 that used the same hostile record.
 
 ## Trigger conditions
@@ -24,7 +24,7 @@ A pursuit whose garrison share plus support comes to 3 or less.
 
 ## Mechanism
 
-The sizing writes only the swordsmen count, 3, in the small case, and nothing clears the other two
+The sizing writes only the halberdiers count, 3, in the small case, and nothing clears the other two
 counts when a record is freed or reused (FND-STRATEGY-008).
 
 ## Frequency

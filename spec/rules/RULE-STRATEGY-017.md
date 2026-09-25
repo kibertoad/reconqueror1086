@@ -75,7 +75,7 @@ define fight_brigand(i, d):
     set_attr(0, 5, attr(0, 5) + 1)
     # saves the screen and shows the message that the army meets brigands
     fn_0003CED8()
-    let counts = [fn_00029E58(i, 1), fn_00029E58(i, 0), fn_00029E58(i, 2), b.swordsmen, b.halberdiers, b.knights]
+    let counts = [fn_00029E58(i, 1), fn_00029E58(i, 0), fn_00029E58(i, 2), b.halberdiers, b.swordsmen, b.knights]
     f.target = 0
     let e = resolve_encounter(counts, 0, 0)
     # puts the brigand counts first and the pools back in their own order
@@ -96,8 +96,8 @@ define fight_brigand(i, d):
         e = 0
     if e == 1:
         fn_00029DE0(i, counts[3], counts[4], counts[5])
-    b.swordsmen = counts[0]
-    b.halberdiers = counts[1]
+    b.halberdiers = counts[0]
+    b.swordsmen = counts[1]
     b.knights = counts[2]
     # plays a sound and restores the screen
     f.count = 0

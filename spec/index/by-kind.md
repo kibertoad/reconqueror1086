@@ -137,7 +137,7 @@ Entries by kind.
 
 ## findings
 
-147 entries.
+148 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -259,6 +259,7 @@ Entries by kind.
 | [FND-STRATEGY-035](../findings/FND-STRATEGY-035.md) | A spy costs 80, only one is out at a time, and its report lists every active hostile force | recorded |
 | [FND-STRATEGY-036](../findings/FND-STRATEGY-036.md) | The strategic action hook 0x00021EEC turns conversation variables into map events | recorded |
 | [FND-STRATEGY-037](../findings/FND-STRATEGY-037.md) | Two conversation groups set variables 43 and 93 when the player accepts a raid | recorded |
+| [FND-STRATEGY-038](../findings/FND-STRATEGY-038.md) | The spy report names +0x1C the halberdiers and shows one converted number three times | recorded |
 | [FND-TOURNEY-001](../findings/FND-TOURNEY-001.md) | Each month the game picks a tournament site different from the last one | recorded |
 | [FND-TOURNEY-002](../findings/FND-TOURNEY-002.md) | The tournament tent picks five distinct opponents from rows 1 to 14, never row 8 | recorded |
 | [FND-TOURNEY-003](../findings/FND-TOURNEY-003.md) | The tent allows three jousts and one melee between clears of its counts, and rewards wins through 0x0009DC40 | recorded |
@@ -295,7 +296,7 @@ Entries by kind.
 
 ## bugs
 
-8 entries.
+9 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -303,9 +304,10 @@ Entries by kind.
 | [BUG-BATTLE-002](../bugs/BUG-BATTLE-002.md) | A unit still turning toward its target turns toward another unit | supported |
 | [BUG-JOUST-001](../bugs/BUG-JOUST-001.md) | The dragon lance frame scan reads past its table when the lance is above y 92 | supported |
 | [BUG-STRATEGY-001](../bugs/BUG-STRATEGY-001.md) | The rare pursuit branch of the hostile generator tests a stale property | supported |
-| [BUG-STRATEGY-002](../bugs/BUG-STRATEGY-002.md) | A small pursuit keeps the halberdiers and knights of the slot's previous force | supported |
+| [BUG-STRATEGY-002](../bugs/BUG-STRATEGY-002.md) | A small pursuit keeps the swordsmen and knights of the slot's previous force | supported |
 | [BUG-STRATEGY-003](../bugs/BUG-STRATEGY-003.md) | A battle against a hostile force counts its result twice | supported |
 | [BUG-STRATEGY-004](../bugs/BUG-STRATEGY-004.md) | Hostile forces lost to water or a dropped route are never uncounted | supported |
+| [BUG-STRATEGY-005](../bugs/BUG-STRATEGY-005.md) | The spy report shows the swordsmen count in place of all three troop counts | supported |
 | [BUG-TOURNEY-001](../bugs/BUG-TOURNEY-001.md) | The tournament melee always loads a scene whose two digits repeat the site digit | supported |
 
 ## screens

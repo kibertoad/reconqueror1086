@@ -56,7 +56,7 @@ define hostile_pass():
                             return
                     if properties[f.origin].state == a:
                         let o = properties[f.origin]
-                        o.garrison = UINT8(o.garrison + f.swordsmen + f.halberdiers + f.knights)
+                        o.garrison = UINT8(o.garrison + f.halberdiers + f.swordsmen + f.knights)
                         destroy_hostile(s)
                     else:
                         retarget(s)

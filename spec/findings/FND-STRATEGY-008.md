@@ -42,7 +42,7 @@ reads `0xFF`, and returns the number of steps.
 An ordinary force is the lord's household plus a twelfth of the lord's rating in each troop type,
 with a single knight when that comes to nothing. London's household is everyone not on the person
 list. A pursuit takes up to the hunted player force's size plus three from the garrison. In the
-small case only the swordsmen are written, so the other two counts keep the values the slot held
+small case only the halberdiers are written, so the other two counts keep the values the slot held
 before.
 
 ## Alternatives

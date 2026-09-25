@@ -4,7 +4,7 @@ title: Spies
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-STRATEGY-003, FND-STRATEGY-015, FND-STRATEGY-035]
+evidence: [FND-STRATEGY-003, FND-STRATEGY-015, FND-STRATEGY-035, FND-STRATEGY-038]
 conflicting: []
 split_with: []
 related: [RULE-PERSON-001]
@@ -62,7 +62,7 @@ define spy_report():
         if f.active != 0:
             any = true
             if properties[f.origin].state != 0:
-                # shows the force's swordsmen, halberdiers and knights and the property's name
+                # shows the lord's name and the force's swordsmen count three times, labelled swordsmen, knights and halberdiers (BUG-STRATEGY-005)
                 continue
     if any:
         spy_out = 0

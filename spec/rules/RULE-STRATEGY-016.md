@@ -74,8 +74,8 @@ define create_brigand(desc):
     f.mode = MOVE_ROUTED
     f.active = 1
     f.origin = o.origin
-    f.swordsmen = random_inclusive(1)
-    f.halberdiers = random_inclusive(1) + 1
+    f.halberdiers = random_inclusive(1)
+    f.swordsmen = random_inclusive(1) + 1
     f.knights = 0
     o.active = 1
     o.fought = 0
@@ -125,7 +125,7 @@ define raid_wales():
 
 ## Outputs
 
-A new brigand force with 0 or 1 swordsmen and 1 or 2 halberdiers, its order, and the king's pending
+A new brigand force with 0 or 1 halberdiers and 1 or 2 swordsmen, its order, and the king's pending
 order. The two orders are message boxes.
 
 ## Edge cases

@@ -105,13 +105,13 @@ define stage_battle(i, j):
     # attribute 5 is HONOR
     let morale = (attr(0, 6) + attr(0, 5) + b) / 6
     let h = hostile_forces[j]
-    let total = h.swordsmen + h.halberdiers + h.knights
+    let total = h.halberdiers + h.swordsmen + h.knights
     if total > 60:
         let r = (total - 60) / 3
-        if r + 1 < h.swordsmen:
-            h.swordsmen = h.swordsmen - r
         if r + 1 < h.halberdiers:
             h.halberdiers = h.halberdiers - r
+        if r + 1 < h.swordsmen:
+            h.swordsmen = h.swordsmen - r
         if r + 1 < h.knights:
             h.knights = h.knights - r
     let p = [fn_00029E58(i, 0), fn_00029E58(i, 1), fn_00029E58(i, 2)]
@@ -128,7 +128,7 @@ define stage_battle(i, j):
                 if r + 1 < p[k]:
                     p[k] = p[k] - r
                     kept[k] = r
-    let counts = [p[1], p[0], p[2], h.swordsmen, h.halberdiers, h.knights]
+    let counts = [p[1], p[0], p[2], h.halberdiers, h.swordsmen, h.knights]
     let e = resolve_encounter(counts, morale, 0)
     # puts the hostile counts first and the pools back in their own order
     counts = [counts[3], counts[4], counts[5], counts[1], counts[0], counts[2]]
@@ -136,8 +136,8 @@ define stage_battle(i, j):
         set_attr(0, 24, attr(0, 24) + 1)
     else:
         set_attr(0, 25, attr(0, 25) + 1)
-    h.swordsmen = counts[0]
-    h.halberdiers = counts[1]
+    h.halberdiers = counts[0]
+    h.swordsmen = counts[1]
     h.knights = counts[2]
     for k in 0..3:
         p[k] = counts[3 + k]

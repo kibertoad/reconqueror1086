@@ -19,9 +19,9 @@ seq:
     type: s4
   - id: count
     type: s4
-  - id: swordsmen
-    type: s4
   - id: halberdiers
+    type: s4
+  - id: swordsmen
     type: s4
   - id: knights
     type: s4

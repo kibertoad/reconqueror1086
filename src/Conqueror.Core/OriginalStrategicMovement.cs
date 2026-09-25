@@ -64,8 +64,9 @@ public static partial class OriginalStrategicMovement
     public const int PathCompleteOffset = 0x0C;
     public const int TargetMovementSlotOffset = 0x14;
     public const int WaypointCountOffset = 0x18;
-    public const int SwordsmenOffset = 0x1C;
-    public const int HalberdiersOffset = 0x20;
+    // FMT-STRATEGY-001: halberdiers at +0x1C, swordsmen at +0x20.
+    public const int HalberdiersOffset = 0x1C;
+    public const int SwordsmenOffset = 0x20;
     public const int KnightsOffset = 0x24;
     public const int OriginLocationOffset = 0x28;
     public const int LordOffset = 0x2C;
