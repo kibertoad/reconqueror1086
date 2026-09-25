@@ -24,6 +24,7 @@ public sealed class DynamixSceneColorMaps
         : throw new ArgumentOutOfRangeException(nameof(index));
 }
 
+// FMT-VIEW-007 colour map.
 public static class DynamixSceneColorMapDecoder
 {
     public static DynamixSceneColorMap Decode(string resourceName, ReadOnlySpan<byte> payload)
@@ -41,8 +42,8 @@ public static class DynamixSceneColorMapDecoder
 
 public static class DynamixSceneColorMapGenerator
 {
-    // CONQUER.EXE 0x47914-0x47A84 blends RGB channels, rounds half-up,
-    // and resolves the result through the lowest-index Manhattan match.
+    // RULE-VIEW-006: blend each channel toward the fade colour, round half up,
+    // and take the lowest-index nearest palette entry.
     public static DynamixSceneColorMaps RegenerateFirstFamily(
         DynamixSceneColorMaps stored, ReadOnlySpan<byte> palette, DynamixSceneColorMapping parameters)
     {
@@ -87,8 +88,8 @@ public static class DynamixSceneColorMapGenerator
 
     private static byte Nearest(ReadOnlySpan<byte> palette, int red, int green, int blue)
     {
-        // The original initializes the maximum possible RGB distance and only
-        // replaces it on a strict improvement, preserving the first tied index.
+        // RULE-VIEW-006 starts from index 1 at distance 0x2FD and replaces it
+        // only on a strict improvement, so the first tied index wins.
         var bestDistance = 0x2fd;
         var bestIndex = 1;
         for (var candidate = 0; candidate < IndexedPalette.ColorCount; candidate++)

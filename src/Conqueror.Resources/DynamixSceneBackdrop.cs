@@ -4,6 +4,7 @@ namespace Conqueror.Resources;
 
 public sealed record DynamixSceneBackdrop(int Width, int Height, int Horizon, int Mode, byte[] Indices);
 
+// FMT-VIEW-005 descriptor and FMT-VIEW-006 pixels.
 public static class DynamixSceneBackdropDecoder
 {
     public const int DescriptorSize = 24;

@@ -113,6 +113,7 @@ public static class SiegeCombatPresentation
 
     public static SiegeFrameRun BloodFramesFor(bool fatal) => fatal ? FatalHitBlood : WoundingHitBlood;
 
+    // RULE-VIEW-005 for a cardinal facing.
     public static SiegeBackdropSlice BackdropSlice(
         Facing facing, int width, int height, int imageHorizon, int headingScale)
     {

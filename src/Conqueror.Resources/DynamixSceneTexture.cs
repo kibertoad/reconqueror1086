@@ -2,6 +2,7 @@ namespace Conqueror.Resources;
 
 public sealed record DynamixSceneTexture(int Index, int Width, int Height, byte[] Indices);
 
+// FMT-VIEW-008 texture.
 public static class DynamixSceneTextureDecoder
 {
     public const int MaximumDimension = 4096;

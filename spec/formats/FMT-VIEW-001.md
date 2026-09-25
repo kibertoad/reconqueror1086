@@ -9,7 +9,7 @@ byte_order: little
 size: 96
 text: false
 definition: fmt_view_001.ksy
-evidence: [FND-VIEW-001, FND-VIEW-006, FND-VIEW-007, FND-VIEW-008, FND-VIEW-009, FND-VIEW-010, FND-VIEW-011, FND-ASSAULT-001, FND-ASSAULT-004, FND-ASSAULT-022, FND-ASSAULT-029, FND-ASSAULT-034, FND-ASSAULT-035, FND-ASSAULT-036, FND-ASSAULT-037, FND-ASSAULT-038, FND-ASSAULT-039, FND-ASSAULT-002, FND-ASSAULT-003, FND-ASSAULT-008, FND-ASSAULT-027, FND-ASSAULT-044]
+evidence: [FND-VIEW-001, FND-VIEW-006, FND-VIEW-007, FND-VIEW-008, FND-VIEW-009, FND-VIEW-010, FND-VIEW-011, FND-ASSAULT-001, FND-ASSAULT-004, FND-ASSAULT-022, FND-ASSAULT-029, FND-ASSAULT-034, FND-ASSAULT-035, FND-ASSAULT-036, FND-ASSAULT-037, FND-ASSAULT-038, FND-ASSAULT-039, FND-ASSAULT-002, FND-ASSAULT-003, FND-ASSAULT-008, FND-ASSAULT-027, FND-ASSAULT-044, FND-VIEW-019, FND-VIEW-021]
 conflicting: []
 split_with: []
 related: [RULE-VIEW-003, RULE-ASSAULT-021]
@@ -50,8 +50,8 @@ use this layout for the blocks the game copies and changes while the scene runs.
 | `0x2C` | 2 | `INT16LE` | `surface0` | North face texture, or -1; on kind 4, the first texture of the current state. | supported | FND-VIEW-001, FND-VIEW-006, FND-VIEW-009, FND-ASSAULT-034 |
 | `0x2E` | 2 | `INT16LE` | `effect` | Effect descriptor started when the block's state begins (FMT-ASSAULT-003); -1 with a -1 north face. | supported | FND-ASSAULT-004, FND-ASSAULT-027, FND-ASSAULT-034 |
 | `0x30` | 4 | `INT32LE` | `surface1` | East face texture, or -1. | supported | FND-VIEW-001, FND-VIEW-006 |
-| `0x34` | 4 | `INT32LE` | `surface2` | South face texture, or -1; on kind 4, the number of stored angles. | supported | FND-VIEW-001, FND-VIEW-006, FND-VIEW-009 |
-| `0x38` | 4 | `INT32LE` | `surface3` | West face texture, or -1; on kind 4, the heading the sprite faces. | supported | FND-VIEW-001, FND-VIEW-006, FND-VIEW-009 |
+| `0x34` | 4 | `INT32LE` | `surface2` | South face texture, or -1; on kind 4, the number of angles. | supported | FND-VIEW-001, FND-VIEW-006, FND-VIEW-009, FND-VIEW-019, FND-VIEW-021 |
+| `0x38` | 4 | `INT32LE` | `surface3` | West face texture, or -1; on kind 4, the heading the sprite faces. | supported | FND-VIEW-001, FND-VIEW-006, FND-VIEW-009, FND-VIEW-019 |
 | `0x3C` | 4 | `BYTE[4]` | `unk_3C` | Purpose unknown. | supported | FND-VIEW-001 |
 | `0x40` | 4 | `INT32LE` | `state_target` | Block that replaces this one when it is used, opened or left, and that a chained ray follows. | supported | FND-VIEW-007, FND-ASSAULT-038 |
 | `0x44` | 2 | `BYTE[2]` | `unk_44` | Purpose unknown. | supported | FND-VIEW-001 |

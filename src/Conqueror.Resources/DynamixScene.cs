@@ -149,8 +149,8 @@ public sealed class DynamixScene
 
 public static class DynamixSceneDecoder
 {
-    public const int ViewerSize = 108;
-    public const int ScenarioSize = 568;
+    public const int ViewerSize = 108; // FMT-VIEW-003
+    public const int ScenarioSize = 568; // FMT-VIEW-004
     public const int MapSize = DynamixScene.MapWidth * DynamixScene.MapHeight * sizeof(ushort);
     public const int BlockSize = 96;
     private const int BlockNameOffset = 78;

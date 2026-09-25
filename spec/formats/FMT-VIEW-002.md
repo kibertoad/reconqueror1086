@@ -9,7 +9,7 @@ byte_order: little
 size: 32768
 text: false
 definition: fmt_view_002.ksy
-evidence: [FND-VIEW-002, FND-VIEW-007]
+evidence: [FND-VIEW-002, FND-VIEW-007, FND-VIEW-020]
 conflicting: []
 split_with: []
 related: []
@@ -35,7 +35,7 @@ None known.
 
 ## Coverage
 
-Checked against the `Map` resource of all 42 `MELEE*` and `DEFEND*` archives.
+Checked against the `Map` resource of all 42 `MELEE*` and `DEFEND*` archives. The maps also hold cells the `Viewer` cannot reach (FND-VIEW-020).
 
 ## Open questions
 

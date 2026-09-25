@@ -13,7 +13,7 @@ public static class SiegeColorMapping
             || parameters.DistanceShift is < 2 or > 30)
             throw new ArgumentOutOfRangeException(nameof(parameters));
 
-        // CONQUER.EXE 0x4581F-0x45854 selects:
+        // RULE-VIEW-007 selects:
         // clamp((8.8 fixed-point depth >> (Scenario.DistanceShift - 2))
         //       - block offset, 0, Scenario.MapCount - 1).
         var scale = Math.Pow(2, 10 - parameters.DistanceShift);

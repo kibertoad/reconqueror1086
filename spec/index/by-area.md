@@ -96,6 +96,13 @@ Entries by area.
 |---|---|---|
 | [FMT-VIEW-001](../formats/FMT-VIEW-001.md) | Scene block definition, one record of the Blocks resource | supported |
 | [FMT-VIEW-002](../formats/FMT-VIEW-002.md) | Scene map, the Map resource | supported |
+| [FMT-VIEW-003](../formats/FMT-VIEW-003.md) | Scene start position, the Viewer resource | supported |
+| [FMT-VIEW-004](../formats/FMT-VIEW-004.md) | Scene settings, the Scenario resource | supported |
+| [FMT-VIEW-005](../formats/FMT-VIEW-005.md) | Backdrop descriptor, the Backdrop resource | supported |
+| [FMT-VIEW-006](../formats/FMT-VIEW-006.md) | Backdrop pixels, the BackImage resource | supported |
+| [FMT-VIEW-007](../formats/FMT-VIEW-007.md) | Colour map, one of the Pal0 to Pal127 resources | supported |
+| [FMT-VIEW-008](../formats/FMT-VIEW-008.md) | Scene texture, a TEX resource | supported |
+| [FMT-VIEW-009](../formats/FMT-VIEW-009.md) | Combat palette, 256 colours of three bytes | supported |
 | [FND-VIEW-001](../findings/FND-VIEW-001.md) | Every combat scene archive holds its blocks as 96-byte records ending in 0xCC 0xCC with a 16-byte label at offset 78 | recorded |
 | [FND-VIEW-002](../findings/FND-VIEW-002.md) | Every combat scene map is 128 by 128 block numbers stored column by column | recorded |
 | [FND-VIEW-003](../findings/FND-VIEW-003.md) | The heading helper folds the vector into octants around floor(0x20 * minor / major), and callers pass (-dy, dx) | recorded |
@@ -107,10 +114,23 @@ Entries by area.
 | [FND-VIEW-009](../findings/FND-VIEW-009.md) | For a kind-4 block the raycaster uses the block centre's forward distance as depth and chooses a sprite angle from its heading | recorded |
 | [FND-VIEW-010](../findings/FND-VIEW-010.md) | The pixel test reads a block texture by its width, width shift and height, and treats palette index 0 as transparent | recorded |
 | [FND-VIEW-011](../findings/FND-VIEW-011.md) | Distance shading picks one of the scene's colour maps from the depth, less a per-block offset | recorded |
+| [FND-VIEW-012](../findings/FND-VIEW-012.md) | Every Viewer resource is 108 bytes and starts with x, y, elevation and heading | recorded |
+| [FND-VIEW-013](../findings/FND-VIEW-013.md) | The Scenario resource is 568 bytes; its dwords at 20, 24 and 28 count textures, blocks and effects, and 40 to 52 set up the colour maps | recorded |
+| [FND-VIEW-014](../findings/FND-VIEW-014.md) | The Backdrop resource is 24 bytes giving a 1,088 by 200 panorama with horizon 199 and heading scale 3, and BackImage holds its pixels row by row | recorded |
+| [FND-VIEW-015](../findings/FND-VIEW-015.md) | The backdrop blitter copies BackImage rows from column heading * scale, wrapping, and aligns the backdrop horizon with the view horizon | recorded |
+| [FND-VIEW-016](../findings/FND-VIEW-016.md) | Each scene archive has 128 colour maps Pal0 to Pal127 of 256 bytes, in four families of 32 that fade from identity | recorded |
+| [FND-VIEW-017](../findings/FND-VIEW-017.md) | The colour map generator blends every palette colour towards one entry by i / count and picks the nearest palette colour by RGB distance | recorded |
+| [FND-VIEW-018](../findings/FND-VIEW-018.md) | Scene textures are headerless TEX resources named with their index, width and height, one byte per pixel | recorded |
+| [FND-VIEW-019](../findings/FND-VIEW-019.md) | The world renderer computes a kind-4 block's texture column and angle the same way as the raycaster | recorded |
+| [FND-VIEW-020](../findings/FND-VIEW-020.md) | The combat maps hold an unreachable gallery of door and passage blocks apart from the area around the Viewer | recorded |
+| [FND-VIEW-021](../findings/FND-VIEW-021.md) | Actor sprite blocks point to texture runs of 15, 9, 3 and 8 images with 8, 4, 4 and 2 angles | recorded |
 | [RULE-VIEW-001](../rules/RULE-VIEW-001.md) | Heading from one map point to another | supported |
 | [RULE-VIEW-002](../rules/RULE-VIEW-002.md) | Integer sine, cosine and rotation | supported |
 | [RULE-VIEW-003](../rules/RULE-VIEW-003.md) | Cast a ray through the scene and find the first opaque surface at a view row | supported |
 | [RULE-VIEW-004](../rules/RULE-VIEW-004.md) | Surface intersection, depth and pixel test inside the raycaster | unknown |
+| [RULE-VIEW-005](../rules/RULE-VIEW-005.md) | Draw the backdrop | supported |
+| [RULE-VIEW-006](../rules/RULE-VIEW-006.md) | Build a scene's distance colour maps | supported |
+| [RULE-VIEW-007](../rules/RULE-VIEW-007.md) | Colour map of a drawn surface | supported |
 
 ## JOUST
 
