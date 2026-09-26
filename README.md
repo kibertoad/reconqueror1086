@@ -60,14 +60,14 @@ mode.
 
 The campaign can be played from character creation through estate management,
 tournaments, field battles, castle assaults, and either major ending. It is a
-hybrid migration, not a parity claim: executable-confirmed subsystems coexist
+hybrid migration, not a parity claim: subsystems rebuilt from the executable coexist
 with older recreation adapters while the remaining original paths are recovered
 and integrated. Original media import, modern saves, controller input, and
 cross-platform packaging are operational.
 
-The tables below distinguish playable features from evidence-backed parity.
-`parity/STRATEGY.md` lists how much of the strategic map the rebuild
-implements; the daily campaign adapter still awaits its full replacement.
+The table below lists what can be played now. [`PARITY.md`](PARITY.md) says,
+for every rule, format and screen recovered from the original, how much of it
+the rebuild implements and where it still guesses.
 
 ### Implemented and usable now
 
@@ -82,14 +82,14 @@ implements; the daily campaign adapter still awaits its full replacement.
 | Required original content | Read-only import with hash/provenance validation; decoded PCX/PCC/HAT/CSF scenes, conversations, `.666` audio, CD music, and direct Smacker playback. Startup verifies the supported GOG release and every manifest-owned file before the title screen. |
 | Saves and input | Five atomic manual slots with backups, a separate autosave, schema migration, settings recovery, keyboard/mouse controls, controller navigation and virtual pointer, pause, reduced motion, and aspect/integer scaling. |
 
-### Still missing or provisional before a parity claim
+### Still missing before a parity claim
+
+Gameplay, combat, strategic, presentation and sound parity are tracked per
+area in [`PARITY.md`](PARITY.md): every row that is not `complete` says what
+is missing or guessed. Beyond that:
 
 | Area | Remaining work |
 |---|---|
-| Exact gameplay parity | Remaining economy interpolation, construction costs, character edge cases, tournament records, world tables, political simulation, quest boundaries, and native random-number consumption still require executable-backed confirmation. |
-| Combat parity | Critical-hit behavior, stair transitions, enemy food use, later formation choices, and some presentation sequencing remain open. `parity/ASSAULT.md` and `parity/VIEW.md` list the rules the rebuild implements only in part. |
-| Strategic runtime | The yearly brigand order, the orders from the king, and property ownership must still be wired before the dated campaign adapter can be removed (`parity/STRATEGY.md`). Marker palette identity remains corroborated rather than confirmed. Generated routing, garrisons, tournament movement, field-battle coefficients, captain battle rules, and opponent behavior also still need fixed original-game traces. |
-| Visual and audio parity | Some palettes, Sierra payloads, conversation entry points, `.666` events, Smacker triggers/seeking, font metrics, status fields, terrain composition, and exact hit regions remain unmapped. |
 | Platform polish | Installers are unsigned. Native installer QA, macOS notarization, customizable bindings, and broader accessibility work remain. |
 | Save compatibility | Recreation saves are versioned and migrated, but their final post-1.0 compatibility policy is not yet set. Original DOS save import/export is not supported. |
 

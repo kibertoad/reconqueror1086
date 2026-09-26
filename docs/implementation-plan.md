@@ -555,6 +555,18 @@ The decoded provider now drives a mutable physical-slot-order pass for all three
 
 Strategic contact handoff correction: in the original the player pass runs the encounter before the hostile scheduler, in the same pass (RULE-STRATEGY-011). The replacement's interactive resolver opens on a later UI update, so a pass that emits a new player/enemy encounter defers its hostile scheduler and preserves the captured combatants for the modal's live-snapshot validation. Existing modal and unavailable-fallback guards still apply; a focused regression covers the deferral.
 
+## Host policies
+
+These are the rebuild's own choices where no original behaviour is mapped yet. `PARITY.md` lists how far each area follows the original.
+
+- The strategic encounter screen and the older `FieldBattleSession` adapter need `BATTLE.PCX` and `MEN8.CSF`, the estate map needs the seasonal `ICA`/`ICS`/`ICW` atlas, and the dragon encounter needs `DRJSTWIN.PCX` and `LANCE1.CSF`. Each fails explicitly when its asset is missing and never builds substitute art.
+- `FieldBattleSession` is the older replacement overhead battle. Its grid placement, formation mechanics, mouse buttons (`FieldBattlePointerControls`) and ground destinations are host policy. Its 450 ms tick consumes every elapsed interval and keeps the remainder, and a destination moves the formation one cell per tick around occupied cells.
+- The tournament screen's lance meter and keyboard labels are host policy; the meter advances 120 source units per second of elapsed time.
+- Village Tournament availability uses the rebuild's location and month test (`IsTournamentHere`) instead of the original's gate (FND-UI-005).
+- Generic UI text uses `PixelFont` on the current layouts; `CONFONT.CSF` is drawn where a screen's original typesetting is mapped (RULE-MEDIA-002).
+- Without imported dialogue state the prototype courtship ladder of `Balance.Courtships` runs; with it, the ladies' scripts own the rewards (FND-TALK-011). The dragon moor stays hidden until conversation variable 2 is set, and without dialogue data Anna Lisa's second courtship win sets it.
+- The map panel's travel labels and commands are host policy.
+
 ## Optional post-fidelity rendering enhancements
 
 These are future opt-in presentation features, not compatibility requirements and not substitutes for completing the original rendering path. The default compatibility profile must retain the recovered 64-cell ray traversal and its gameplay consequences. In every enhanced profile, AI acquisition, combat range, pointer picking, interaction, and gameplay occlusion must continue to use the original gameplay ray and thresholds.

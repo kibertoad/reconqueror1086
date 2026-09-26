@@ -108,6 +108,7 @@ public sealed class CampaignSaveSlots
         return Path.Combine(_root, $"campaign-{number}.json");
     }
 
+    // Loading falls back to this copy where the original stops the program (DEV-SAVE-001).
     public string BackupPath(int number)
     {
         Validate(number);

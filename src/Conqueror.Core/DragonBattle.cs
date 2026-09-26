@@ -86,6 +86,7 @@ public sealed class DragonBattleSession
         }
     }
 
+    // The original has no way out of the run (DEV-DRAGON-001).
     public void Withdraw()
     {
         if (Outcome != DragonBattleOutcome.InProgress) return;
