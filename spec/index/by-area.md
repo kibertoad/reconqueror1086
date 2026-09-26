@@ -437,7 +437,29 @@ Entries by area.
 
 ## MEDIA
 
-None.
+| ID | Title | Status |
+|---|---|---|
+| [FMT-MEDIA-001](../formats/FMT-MEDIA-001.md) | CSF sprite file | supported |
+| [FMT-MEDIA-002](../formats/FMT-MEDIA-002.md) | CSF frame | supported |
+| [FMT-MEDIA-003](../formats/FMT-MEDIA-003.md) | PCX picture as the game reads it | supported |
+| [FMT-MEDIA-004](../formats/FMT-MEDIA-004.md) | Stored palette, a PAL entry | supported |
+| [FMT-MEDIA-005](../formats/FMT-MEDIA-005.md) | Cached skirmish screen, a raw picture entry | supported |
+| [FMT-MEDIA-006](../formats/FMT-MEDIA-006.md) | Smacker 2 movie header | supported |
+| [FND-MEDIA-001](../findings/FND-MEDIA-001.md) | CSF sprite files load through 0x00018430, which checks the two bytes 2J and builds a frame table and row tables | recorded |
+| [FND-MEDIA-002](../findings/FND-MEDIA-002.md) | The release holds 66 CSF sprite files with 3,262 frames, all of the same layout | recorded |
+| [FND-MEDIA-003](../findings/FND-MEDIA-003.md) | Sprite frames are drawn by three row blitters: a copy, a clipped copy and a one-colour mask | recorded |
+| [FND-MEDIA-004](../findings/FND-MEDIA-004.md) | Text is drawn with CONFONT.CSF: each byte selects its frame, drawn in the caller colour, and moves x by the frame width | recorded |
+| [FND-MEDIA-005](../findings/FND-MEDIA-005.md) | Pictures are drawn by 0x00040ED0, which decodes PCX rows straight to the screen and can load the trailing palette | recorded |
+| [FND-MEDIA-006](../findings/FND-MEDIA-006.md) | All 192 PCX and PCC entries of C1086.GOB are version 5 8-bit pictures with a palette trailer | recorded |
+| [FND-MEDIA-007](../findings/FND-MEDIA-007.md) | SKIRMISH.RES keeps its screens as raw 320x200 pictures that the game builds from PCX files when they are missing | recorded |
+| [FND-MEDIA-008](../findings/FND-MEDIA-008.md) | The CD holds 2,131 Smacker movies, all SMK2, most 196x204 at 100 ms with one 22,050 Hz track | recorded |
+| [FND-MEDIA-009](../findings/FND-MEDIA-009.md) | Movies play through a Smacker wrapper at 0x0002FCB0 and a frame loop at 0x0002FCF0 that a callback can stop | recorded |
+| [FND-MEDIA-010](../findings/FND-MEDIA-010.md) | Owner screenshots match FLUFF.PCX, V66_1111.PCX, INNPEOPL.PCX and COMSCRN1.PCX, and the executable names the inn patrons | recorded |
+| [RULE-MEDIA-001](../rules/RULE-MEDIA-001.md) | Loading a CSF sprite file | supported |
+| [RULE-MEDIA-002](../rules/RULE-MEDIA-002.md) | Drawing a sprite frame and a line of text | supported |
+| [RULE-MEDIA-003](../rules/RULE-MEDIA-003.md) | Drawing a PCX picture | supported |
+| [RULE-MEDIA-004](../rules/RULE-MEDIA-004.md) | Loading a skirmish screen from SKIRMISH.RES | supported |
+| [RULE-MEDIA-005](../rules/RULE-MEDIA-005.md) | Playing a Smacker movie | supported |
 
 ## SOUND
 

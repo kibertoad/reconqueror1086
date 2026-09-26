@@ -28,7 +28,7 @@ Entries by status.
 
 ## supported
 
-170 entries.
+181 entries.
 
 | ID | Title |
 |---|---|
@@ -51,6 +51,12 @@ Entries by status.
 | [FMT-ASSAULT-003](../formats/FMT-ASSAULT-003.md) | Scene effect descriptor, one record of the SFXDEFS resource |
 | [FMT-BATTLE-001](../formats/FMT-BATTLE-001.md) | Field battle unit, one troop in an interactive field battle |
 | [FMT-BATTLE-002](../formats/FMT-BATTLE-002.md) | Pointer event, one entry of the pointer queue |
+| [FMT-MEDIA-001](../formats/FMT-MEDIA-001.md) | CSF sprite file |
+| [FMT-MEDIA-002](../formats/FMT-MEDIA-002.md) | CSF frame |
+| [FMT-MEDIA-003](../formats/FMT-MEDIA-003.md) | PCX picture as the game reads it |
+| [FMT-MEDIA-004](../formats/FMT-MEDIA-004.md) | Stored palette, a PAL entry |
+| [FMT-MEDIA-005](../formats/FMT-MEDIA-005.md) | Cached skirmish screen, a raw picture entry |
+| [FMT-MEDIA-006](../formats/FMT-MEDIA-006.md) | Smacker 2 movie header |
 | [FMT-PERSON-001](../formats/FMT-PERSON-001.md) | Character table, CHARACTR.DAT and saved copies |
 | [FMT-PERSON-002](../formats/FMT-PERSON-002.md) | Youth dilemma, DILEM0.DAT to DILEM29.DAT |
 | [FMT-RES-001](../formats/FMT-RES-001.md) | Resource container, a GOB, RES or LOW file |
@@ -133,6 +139,11 @@ Entries by status.
 | [RULE-JOUST-001](../rules/RULE-JOUST-001.md) | Lance motion and sprite frame |
 | [RULE-JOUST-002](../rules/RULE-JOUST-002.md) | Practice joust pass |
 | [RULE-JOUST-003](../rules/RULE-JOUST-003.md) | Dragon run |
+| [RULE-MEDIA-001](../rules/RULE-MEDIA-001.md) | Loading a CSF sprite file |
+| [RULE-MEDIA-002](../rules/RULE-MEDIA-002.md) | Drawing a sprite frame and a line of text |
+| [RULE-MEDIA-003](../rules/RULE-MEDIA-003.md) | Drawing a PCX picture |
+| [RULE-MEDIA-004](../rules/RULE-MEDIA-004.md) | Loading a skirmish screen from SKIRMISH.RES |
+| [RULE-MEDIA-005](../rules/RULE-MEDIA-005.md) | Playing a Smacker movie |
 | [RULE-PERSON-001](../rules/RULE-PERSON-001.md) | Character attributes |
 | [RULE-PERSON-002](../rules/RULE-PERSON-002.md) | Loading and saving the character table |
 | [RULE-PERSON-003](../rules/RULE-PERSON-003.md) | Character generation, the pre-generated knights and dubbing |
@@ -221,7 +232,7 @@ Entries by status.
 
 ## recorded
 
-196 entries.
+206 entries.
 
 | ID | Title |
 |---|---|
@@ -309,6 +320,16 @@ Entries by status.
 | [FND-JOUST-009](../findings/FND-JOUST-009.md) | The dragon run succeeds when 26 times (lance experience - 20 + item bonus) beats both error totals |
 | [FND-JOUST-010](../findings/FND-JOUST-010.md) | The dragon lance moves by the practice formula with pull 256 per 10 pixels and an upward jerk of 5,000 |
 | [FND-JOUST-011](../findings/FND-JOUST-011.md) | The dragon lance frame scan has no end check and reads past its five thresholds when the lance is above y 92 |
+| [FND-MEDIA-001](../findings/FND-MEDIA-001.md) | CSF sprite files load through 0x00018430, which checks the two bytes 2J and builds a frame table and row tables |
+| [FND-MEDIA-002](../findings/FND-MEDIA-002.md) | The release holds 66 CSF sprite files with 3,262 frames, all of the same layout |
+| [FND-MEDIA-003](../findings/FND-MEDIA-003.md) | Sprite frames are drawn by three row blitters: a copy, a clipped copy and a one-colour mask |
+| [FND-MEDIA-004](../findings/FND-MEDIA-004.md) | Text is drawn with CONFONT.CSF: each byte selects its frame, drawn in the caller colour, and moves x by the frame width |
+| [FND-MEDIA-005](../findings/FND-MEDIA-005.md) | Pictures are drawn by 0x00040ED0, which decodes PCX rows straight to the screen and can load the trailing palette |
+| [FND-MEDIA-006](../findings/FND-MEDIA-006.md) | All 192 PCX and PCC entries of C1086.GOB are version 5 8-bit pictures with a palette trailer |
+| [FND-MEDIA-007](../findings/FND-MEDIA-007.md) | SKIRMISH.RES keeps its screens as raw 320x200 pictures that the game builds from PCX files when they are missing |
+| [FND-MEDIA-008](../findings/FND-MEDIA-008.md) | The CD holds 2,131 Smacker movies, all SMK2, most 196x204 at 100 ms with one 22,050 Hz track |
+| [FND-MEDIA-009](../findings/FND-MEDIA-009.md) | Movies play through a Smacker wrapper at 0x0002FCB0 and a frame loop at 0x0002FCF0 that a callback can stop |
+| [FND-MEDIA-010](../findings/FND-MEDIA-010.md) | Owner screenshots match FLUFF.PCX, V66_1111.PCX, INNPEOPL.PCX and COMSCRN1.PCX, and the executable names the inn patrons |
 | [FND-PERSON-001](../findings/FND-PERSON-001.md) | Character attributes are read by 0x00015EF0 and written by 0x00015F0C, which limits the first 15 to 0..20 |
 | [FND-PERSON-002](../findings/FND-PERSON-002.md) | CHARACTR.DAT lists 15 characters and 30 attributes |
 | [FND-PERSON-003](../findings/FND-PERSON-003.md) | CHARACTR.DAT is parsed by 0x00015920 and 0x00016124, which shift row 0 by up to 8 on each of the first 15 fields |
@@ -450,6 +471,8 @@ Entries whose Open questions section says more than None known.
 | [FMT-ASSAULT-004](../formats/FMT-ASSAULT-004.md) | Live effect record, one of the 64 effects the scheduler runs | unknown |
 | [FMT-BATTLE-001](../formats/FMT-BATTLE-001.md) | Field battle unit, one troop in an interactive field battle | supported |
 | [FMT-BATTLE-002](../formats/FMT-BATTLE-002.md) | Pointer event, one entry of the pointer queue | supported |
+| [FMT-MEDIA-003](../formats/FMT-MEDIA-003.md) | PCX picture as the game reads it | supported |
+| [FMT-MEDIA-005](../formats/FMT-MEDIA-005.md) | Cached skirmish screen, a raw picture entry | supported |
 | [FMT-PERSON-001](../formats/FMT-PERSON-001.md) | Character table, CHARACTR.DAT and saved copies | supported |
 | [FMT-PERSON-002](../formats/FMT-PERSON-002.md) | Youth dilemma, DILEM0.DAT to DILEM29.DAT | supported |
 | [FMT-RES-001](../formats/FMT-RES-001.md) | Resource container, a GOB, RES or LOW file | supported |
@@ -527,6 +550,10 @@ Entries whose Open questions section says more than None known.
 | [RULE-JOUST-001](../rules/RULE-JOUST-001.md) | Lance motion and sprite frame | supported |
 | [RULE-JOUST-002](../rules/RULE-JOUST-002.md) | Practice joust pass | supported |
 | [RULE-JOUST-003](../rules/RULE-JOUST-003.md) | Dragon run | supported |
+| [RULE-MEDIA-002](../rules/RULE-MEDIA-002.md) | Drawing a sprite frame and a line of text | supported |
+| [RULE-MEDIA-003](../rules/RULE-MEDIA-003.md) | Drawing a PCX picture | supported |
+| [RULE-MEDIA-004](../rules/RULE-MEDIA-004.md) | Loading a skirmish screen from SKIRMISH.RES | supported |
+| [RULE-MEDIA-005](../rules/RULE-MEDIA-005.md) | Playing a Smacker movie | supported |
 | [RULE-PERSON-001](../rules/RULE-PERSON-001.md) | Character attributes | supported |
 | [RULE-PERSON-002](../rules/RULE-PERSON-002.md) | Loading and saving the character table | supported |
 | [RULE-PERSON-003](../rules/RULE-PERSON-003.md) | Character generation, the pre-generated knights and dubbing | supported |

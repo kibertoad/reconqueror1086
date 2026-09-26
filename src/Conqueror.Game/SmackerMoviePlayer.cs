@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Conqueror.Game;
 
+// RULE-MEDIA-005. PLACEHOLDER: RULE-MEDIA-005 repeat counts, DIG_SPEECH and the 320x200 full-screen mode are not modelled.
 public sealed class SmackerMoviePlayer : IDisposable
 {
     private readonly SmackerMovieStream _source;

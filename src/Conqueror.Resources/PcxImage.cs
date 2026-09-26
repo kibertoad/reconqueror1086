@@ -27,6 +27,7 @@ public record IndexedImage(int Width, int Height, byte[] Indices, byte[] Palette
 public sealed record PcxImage(int Width, int Height, byte[] Indices, byte[] PaletteRgb)
     : IndexedImage(Width, Height, Indices, PaletteRgb);
 
+// FMT-MEDIA-005 skirmish screens are 320x200 with a FMT-MEDIA-004 palette.
 public static class RawIndexedImageDecoder
 {
     public static IndexedImage Decode(
@@ -47,6 +48,8 @@ public static class RawIndexedImageDecoder
     }
 }
 
+// FMT-MEDIA-003, RULE-MEDIA-003. PLACEHOLDER: RULE-MEDIA-003 draws an odd width rounded up to even
+// with the stored padding column; this decoder keeps the header width.
 public static class PcxDecoder
 {
     private const int HeaderSize = 128;

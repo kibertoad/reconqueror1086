@@ -26,6 +26,7 @@ public sealed record CsfFrame(int Width, int Height, byte[] Indices, byte[] Alph
     }
 }
 
+// FMT-MEDIA-001 file layout; RULE-MEDIA-001 builds the same frame offsets.
 /// <summary>Structural reader for the observed CSF chunk-sequence container.</summary>
 public sealed class CsfSequence
 {
@@ -73,6 +74,7 @@ public sealed class CsfSequence
         return new CsfDimensionHeader(width, height);
     }
 
+    // FMT-MEDIA-002 rows. The original treats any operation other than 0 and 2 as a skip (RULE-MEDIA-002).
     /// <summary>Decodes the observed scanline segment stream into palette indices and an opacity mask.</summary>
     public CsfFrame DecodeFrame(CsfChunk chunk, int maximumPixels = 16_777_216)
     {

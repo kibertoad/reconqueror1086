@@ -39,6 +39,7 @@ public static class OriginalUiFontDefinition
 /// deliberately ignored because the runtime text color is supplied by each caller; the original
 /// screen-specific palette association has not yet been recovered.
 /// </summary>
+// RULE-MEDIA-002 draw_text: one CONFONT.CSF frame per byte, drawn as a mask, advancing by its width.
 internal sealed class OriginalUiFont : IDisposable
 {
     // The existing canvas has a two-thirds conversion from the source's nominal nine-pixel

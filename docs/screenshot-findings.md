@@ -17,16 +17,6 @@ Local reference filenames:
 - `village-scotts-keep.png`
 - `inn-screen.png`
 
-## Observed screens
-
-| Screen | Direct observations | Resource correlation | Confidence |
-| --- | --- | --- | --- |
-| Campaign briefing | After character selection, a full-screen parchment explains the conquest and tournament/dragon campaign routes before normal estate play. | Decoded `FLUFF.PCX` reproduces the supplied 640×480 screen, including the complete parchment, decoration, and text; normalized screenshot RMSE is 0.07360 despite capture scaling/color variation. `MESSAGE.PCX` is visibly a different blank writing screen. | Sequence, presentation, and resource association Confirmed from controlled observation and direct image comparison. |
-| Village exterior | A village is a full-screen location scene. Named destinations are written on the bottom scroll, and Travel is an in-world sign hotspot. The supplied example is Sabine's Keep and includes inn and blacksmith signs around a church. | A normalized pixel comparison over all decoded village images selected `V66_1111.PCX` with RMSE 0.05645, far ahead of the next candidate at 0.16899; direct inspection confirms the scene match. The destination caption is a runtime overlay. | Scene/resource association Confirmed; the wider village-to-location mapping remains Provisional. |
-| Village variation | Scott's Keep uses a different street composition while retaining the bottom name scroll, in-world business signs, sword cursor, and Travel sign. | This confirms location-dependent village backgrounds and rules out reusing the Sabine's Keep bitmap globally. Its exact decoded PCX identifier still needs population comparison. | Visual variation Confirmed; resource identity Provisional. |
-| Inn interior | Inns are populated full-screen rooms with multiple character hotspots, an exit area, sword cursor, and the bottom hover-label scroll used by other visual locations. | Decoded `INNPEOPL.PCX` reproduces the supplied populated inn exactly. `VINN.HAT` screen 12 names that image and defines ten occupant rectangles plus overlapping bottom regions 10 and 11. A contiguous executable catalog supplies Frederick, Gerard, Barkeep, Otto, Hugh, Gilbert, Nellie, Richard, Ivo, Albert, and Exit in action-region order; each patron has a matching named PCC portrait. `INN.CSF` contains two small face patches, but their timing and placement semantics are not yet established. | Background, patron identities/portraits, ten action regions, Exit, and footer Confirmed; dialogue and CSF animation bindings require tracing. |
-| Blacksmith dialogue | Selecting the smith opens a framed portrait/conversation screen: portrait and speaker label at upper left, response at upper right, and player choices across the lower panel. The separate Buy/Sell hotspot opens inventory. | `COMSCRN1.PCX` is the exact empty frame; `BLACKSMI.PCC` is the named portrait candidate. `VSMITH.666` is a two-sample sound bank, not dialogue, so the text/choice source remains unidentified. | Frame and observed navigation split Confirmed; portrait binding Corroborated; dialogue source unknown. |
-
 ## Implementation follow-ups
 
 ### Youth dilemma

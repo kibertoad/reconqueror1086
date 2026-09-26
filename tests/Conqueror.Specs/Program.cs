@@ -101,12 +101,14 @@ Check(Encoding.ASCII.GetString(DynamixCompression.DecodeKind1(compressedKind1, 2
 Check(DynamixCompression.ExpectedKind1BlockCount(32_769) == 3 && DynamixCompression.ExpectedKind1BlockSize(32_769, 2) == 1, "Dynamix kind-1 output divides into 16 KiB slices");
 Check(Throws<InvalidDataException>(() => DynamixCompression.ReadKind1Blocks([4, 0, 1, 2])), "Dynamix kind-1 framing rejects truncated blocks");
 Check(Throws<InvalidDataException>(() => DynamixCompression.ReadKind1Blocks([1, 0, 0x20])), "Dynamix kind-1 framing rejects unknown block markers");
+// Covers FMT-MEDIA-003, RULE-MEDIA-003.
 var pcx = PcxDecoder.Decode(CreateSyntheticPcx());
 Check(pcx.Width == 3 && pcx.Height == 1 && pcx.Indices.SequenceEqual(new byte[] { 1, 1, 2 }), "indexed PCX dimensions, RLE, and row padding decode");
 Check(pcx.ToRgba().SequenceEqual(new byte[] { 10, 20, 30, 255, 10, 20, 30, 255, 40, 50, 60, 255 }), "indexed PCX palette expands to RGBA");
 Check(Throws<InvalidDataException>(() => new PcxImage(2, 2, [1], new byte[768]).ToRgba()), "indexed PCX rejects inconsistent decoded buffers");
 var brokenPcx = CreateSyntheticPcx(); brokenPcx[^769] = 0;
 Check(Throws<InvalidDataException>(() => PcxDecoder.Decode(brokenPcx)), "indexed PCX rejects a missing palette marker");
+// Covers FMT-MEDIA-001, FMT-MEDIA-002, RULE-MEDIA-001.
 var csf = new CsfSequence(CreateSyntheticCsf());
 Check(csf.Chunks.SequenceEqual([new CsfChunk(0, 14, 3), new CsfChunk(1, 17, 2)]) && csf.ReadChunk(csf.Chunks[1]).SequenceEqual(new byte[] { 4, 5 }), "CSF chunk table and payload boundaries decode");
 var dimensionCsf = new CsfSequence(CreateSyntheticCsf([80, 0, 90, 0]));
@@ -121,6 +123,7 @@ var malformedFrameCsf = new CsfSequence(CreateSyntheticCsf([1, 0, 1, 0, 1, 1, 2,
 Check(Throws<InvalidDataException>(() => malformedFrameCsf.DecodeFrame(malformedFrameCsf.Chunks[0])), "CSF decoder rejects scanlines beyond declared width");
 var brokenCsf = CreateSyntheticCsf(); BinaryPrimitives.WriteUInt32LittleEndian(brokenCsf.AsSpan(10, 4), 20);
 Check(Throws<InvalidDataException>(() => new CsfSequence(brokenCsf)), "CSF rejects chunks outside the resource");
+// Covers FMT-MEDIA-004.
 var palette = IndexedPaletteDecoder.Decode(Enumerable.Range(0, IndexedPalette.ByteSize).Select(x => (byte)x).ToArray());
 Check(palette.Rgb.Length == 768 && palette.Rgb[767] == 255, "indexed RGB palette decodes 256 colors");
 Check(Throws<InvalidDataException>(() => IndexedPaletteDecoder.Decode(new byte[767])), "indexed RGB palette requires exact length");

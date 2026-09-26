@@ -31,6 +31,7 @@ public sealed record SmackerMovie(
     IReadOnlyList<SmackerAudioTrack> AudioTracks,
     IReadOnlyList<SmackerFrame> Frames);
 
+// FMT-MEDIA-006 header and tables.
 public static class SmackerMovieDecoder
 {
     private const uint Smk2Magic = 0x324B4D53;

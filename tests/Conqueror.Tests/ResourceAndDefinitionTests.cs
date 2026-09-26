@@ -635,7 +635,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.True(state.HasItem(15));
     }
 
-    [Fact]
+    [Fact] // Covers FMT-MEDIA-006.
     public void SmackerMovieHeaderAndFrameIndexAreBounded()
     {
         var movie = SmackerMovieDecoder.Decode(SyntheticSmacker());
