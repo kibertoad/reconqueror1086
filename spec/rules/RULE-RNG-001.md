@@ -4,10 +4,10 @@ title: The game's random number generator
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-RNG-002, FND-RNG-003, FND-ASSAULT-031]
+evidence: [FND-RNG-002, FND-RNG-003, FND-ASSAULT-031, FND-SAVE-004, FND-SOUND-003]
 conflicting: []
 split_with: []
-related: [RULE-TALK-001]
+related: [RULE-TALK-001, RULE-SOUND-002]
 ---
 
 ## Summary
@@ -19,9 +19,16 @@ to `n`, and `dice(count, sides)` adds `count` rolls of 1 to `sides`.
 
 ## When it runs
 
-`draw()` runs wherever a rule draws. The routine at `0x00029FF4` calls `seed_random` once, at the
-start of a session, and `show_prompt` of RULE-TALK-001 calls it with `fn_0006B3B4(0)` before drawing
-a prompt variant.
+`draw()` runs wherever a rule draws, including the sound mixer's choice of a voice to stop when all
+ten are busy (RULE-SOUND-002). `seed_random` is called at two places, and nowhere else:
+
+- once at the start of a session, from the routine at `0x00024C20`, which the session set-up at
+  `0x00029FF4` calls as its first instruction;
+- by `show_prompt` of RULE-TALK-001, at `0x0001A173`, before it draws one of a node's prompt
+  variants, when the node has more than one.
+
+The state is not written to a saved game, so loading a game keeps the state the session already
+had.
 
 ## Parameters
 
@@ -59,7 +66,8 @@ define dice(count, sides):
 ## Outputs
 
 `random` and `random_inclusive` return an `INT32`. At the start of a session the game runs
-`seed_random(UINT32(fn_0006B3B4(0)) >> 1)`.
+`seed_random(UINT32(fn_0006B3B4(0)) >> 1)`. Before a prompt variant is drawn it runs
+`seed_random(fn_0006B3B4(0))`, with no shift.
 
 ## Edge cases
 
@@ -77,4 +85,5 @@ None known.
 
 ## Open questions
 
-- What `fn_0006B3B4` returns; it is likely the C library's `time`.
+- What `fn_0006B3B4` returns; it is likely the C library's `time`. If it is, two prompts drawn in
+  the same second get the same variant, and every draw after a prompt follows from the clock.
