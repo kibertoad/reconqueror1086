@@ -4,7 +4,7 @@ title: Using a door or picking up an object
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-ASSAULT-036, FND-ASSAULT-037, FND-ASSAULT-038, FND-VIEW-002, FND-ASSAULT-001]
+evidence: [FND-ASSAULT-036, FND-ASSAULT-037, FND-ASSAULT-038, FND-VIEW-002, FND-ASSAULT-001, FND-ASSAULT-047]
 conflicting: []
 split_with: []
 related: [RULE-RNG-001, FMT-ASSAULT-001, FMT-VIEW-001, FMT-VIEW-002]
@@ -18,7 +18,11 @@ equipment bit, and bolts add ammunition, whether or not the player gains anythin
 
 ## When it runs
 
-When the player clicks a block marked `actionable` closer than `0x280` (RULE-ASSAULT-005).
+- When the player clicks a block marked `actionable` closer than `0x280` (RULE-ASSAULT-005).
+- When the player presses the action key and the block one cell ahead of the player is marked
+  `actionable`, at any distance.
+- When the player's move is stopped by a cell, or the player enters a new cell, and the block in
+  that cell is marked `opens_on_contact` (FND-ASSAULT-047). This is how an exit or a gate opens.
 
 ## Parameters
 
@@ -72,7 +76,8 @@ None known.
 ## Open questions
 
 - The order in which the dispatcher and the map replacement run for one click is not recorded.
-- The 16 other cases of the dispatcher are not described.
+- The 15 other cases of the dispatcher are not described. Interaction 0, which exits and gates
+  have, changes nothing before the replacement (FND-ASSAULT-047).
 - The feedback callback the accepted action calls is not recorded.
 - Whether food adds to the player's combatant health or to another copy of it is not
   recorded.

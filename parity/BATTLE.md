@@ -11,7 +11,7 @@
 | `RULE-BATTLE-005` | Field battle contact | supported | partial | None | None | supported | Adds a third of the morale where the original adds the remainder by 3, returns at once on a filtered contact, and makes no sound draw. |
 | `RULE-BATTLE-006` | Field battle turning | supported | complete | None | None | implemented | None |
 | `RULE-BATTLE-007` | Field battle idle update | supported | partial | None | None | supported | The automatic branch writes the source's x into the chosen unit where the original copies the chosen unit's destination; acquisition stops at a miss only after a first-corner hit; a unit already at its destination on one axis probes instead of stopping; BUG-BATTLE-002 is not reproduced. |
-| `RULE-BATTLE-008` | Field battle pointer handling | supported | partial | None | None | supported | The retreat question is a host dialog answered with Enter or Escape. |
+| `RULE-BATTLE-008` | Field battle pointer handling | supported | partial | None | None | supported | The retreat question is a host dialog answered with Enter or Escape. `FieldBattlePointerControls` gives the replacement overhead battle mouse selection and visible order buttons that do not follow the original's pointer handling. |
 | `RULE-BATTLE-009` | Field battle keys | supported | partial | None | None | supported | The host maps its own keys to the original codes. |
 | `RULE-BATTLE-010` | Battle clock | supported | partial | None | None | supported | Both clocks are derived from host time at the original rates. |
 | `RULE-BATTLE-011` | Field battle drawing | supported | complete | None | None | implemented | None |

@@ -26,4 +26,7 @@ None known. Some of its claims have not been checked against the executable yet,
 that cover them list them in their Open questions sections: that building the same
 productivity buildings in a different order can give 90% instead of 95%, and that Chaunce
 Norman's attributes and wealth are random. It gives each unit kind's price and upkeep at 50% and 100% productivity; the executable holds the same two sets and picks between them by FAME (RULE-ESTATE-001). Its weapon lengths are values measured in play, and
-the rules for reach and damage come from the executable's combat rows instead.
+the rules for reach and damage come from the executable's combat rows instead. Its store prices
+match `WEAPONS.DAT` (FMT-UI-004) and its 75% resale matches RULE-UI-004 apart from rounding. Its armour
+values, crossbows being usable only in castles, weapons breaking, and the gambeson adding five
+armour under other body armour have not been checked against the executable.

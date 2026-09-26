@@ -261,7 +261,7 @@ Entries by status.
 
 ## recorded
 
-222 entries.
+226 entries.
 
 | ID | Title |
 |---|---|
@@ -311,6 +311,8 @@ Entries by status.
 | [FND-ASSAULT-044](../findings/FND-ASSAULT-044.md) | After the weapon range check, a block with behaviour bit 0x20 is replaced at once by its state target |
 | [FND-ASSAULT-045](../findings/FND-ASSAULT-045.md) | A table maps each weapon item to a combat row, and the two crossbows use rows 23 and 24 |
 | [FND-ASSAULT-046](../findings/FND-ASSAULT-046.md) | A combatant's armour is the dword at offset 0x3C, read beside its health at 0x40 |
+| [FND-ASSAULT-047](../findings/FND-ASSAULT-047.md) | Walking into a block with behaviour bit 0x40 uses it, and in the shipped scenes only the exit or gate cell of each melee has that bit |
+| [FND-ASSAULT-048](../findings/FND-ASSAULT-048.md) | The moneylender's scene places the player and four hostile thugs |
 | [FND-BATTLE-001](../findings/FND-BATTLE-001.md) | The field battle resolver takes the player's three counts, the foe's three, and two morale values |
 | [FND-BATTLE-002](../findings/FND-BATTLE-002.md) | The automatic battle compares totals plus the remainder of each morale value by 3 |
 | [FND-BATTLE-003](../findings/FND-BATTLE-003.md) | The battle choice gate offers five rectangles and maps the first four to formation codes 2, 3, 1 and 0 |
@@ -442,6 +444,8 @@ Entries by status.
 | [FND-TALK-007](../findings/FND-TALK-007.md) | The conversation partner picks the root node, set from the stands, the inn and the blacksmith |
 | [FND-TALK-008](../findings/FND-TALK-008.md) | After a conversation variable 6 becomes the debt and five variables set the marriage |
 | [FND-TALK-009](../findings/FND-TALK-009.md) | The joust settlement writes variable 3 with 2 for a win and 1 for a loss |
+| [FND-TALK-010](../findings/FND-TALK-010.md) | The action trees hold 689 groups, one redirect to a missing node and one item test outside the item table |
+| [FND-TALK-011](../findings/FND-TALK-011.md) | What the decoded conversations show about the inn, the priests, the lair variable, the lady variable and item gifts |
 | [FND-TOURNEY-001](../findings/FND-TOURNEY-001.md) | Each month the game picks a tournament site different from the last one |
 | [FND-TOURNEY-002](../findings/FND-TOURNEY-002.md) | The tournament tent picks five distinct opponents from rows 1 to 14, never row 8 |
 | [FND-TOURNEY-003](../findings/FND-TOURNEY-003.md) | The tent allows three jousts and one melee between clears of its counts, and rewards wins through 0x0009DC40 |

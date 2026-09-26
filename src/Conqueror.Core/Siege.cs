@@ -436,7 +436,7 @@ public sealed partial class SiegeSession
         if (!forward) { dx = -dx; dy = -dy; }
         var nx = PlayerX + dx; var ny = PlayerY + dy;
         var tile = TileAt(nx, ny);
-        if (tile == SiegeTile.Exit)
+        if (tile == SiegeTile.Exit) // PLACEHOLDER: RULE-ASSAULT-021. The original opens the exit into floor; what ends the melee is not traced.
         {
             LastMessage = "You leave the battle.";
             return SiegeAction.Exited;

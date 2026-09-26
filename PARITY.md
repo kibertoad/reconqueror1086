@@ -8,17 +8,17 @@ How much of the spec in `spec/` the rebuild does. The rows are in `parity/`, one
 |---|---|
 | unknown | 4 |
 | sourced | 4 |
-| supported | 137 |
+| supported | 138 |
 | established | 0 |
 | disputed | 0 |
-| implemented | 55 |
+| implemented | 54 |
 | validated | 0 |
 
 | Code | Rows |
 |---|---|
 | missing | 22 |
-| partial | 123 |
-| complete | 55 |
+| partial | 124 |
+| complete | 54 |
 
 ## Areas
 

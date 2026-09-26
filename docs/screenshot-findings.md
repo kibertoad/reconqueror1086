@@ -1,6 +1,6 @@
-# Original-screen observations and follow-ups
+# Screen implementation follow-ups
 
-This document records presentation facts visible in original-game screenshots supplied by the owner on 2026-09-08. Local copies are preserved under the Git-ignored `analysis/original/screenshots/` directory for later layout and visual comparison. They are behavioral references and must not be committed or redistributed with the project.
+This document lists the rebuild's screen work that follows from twelve screenshots of the original supplied by the owner on 2026-09-08. What the screenshots show about the original is FND-MEDIA-010. Local copies are preserved under the Git-ignored `analysis/original/screenshots/` directory for later layout and visual comparison. They are behavioral references and must not be committed or redistributed with the project.
 
 Local reference filenames:
 
@@ -48,7 +48,7 @@ Local reference filenames:
 
 ### Campaign briefing
 
-- **Implemented:** register screenshot-confirmed `FLUFF.PCX` as the campaign briefing and show it once for newly selected pregenerated characters or after a custom character completes all youth dilemmas.
+- **Implemented:** register `FLUFF.PCX` (FND-MEDIA-010) as the campaign briefing and show it once for newly selected pregenerated characters or after a custom character completes all youth dilemmas.
 - **Implemented:** continue on keyboard or click to the estate/travel view; loaded campaigns resume directly and do not replay the one-time briefing.
 - **Superseded:** startup now rejects missing official media, so no clean-room briefing substitute is supported.
 
@@ -56,7 +56,7 @@ Local reference filenames:
 
 - **Implemented:** split the previous overloaded Home handler into a castle office and section-aware Castle, Village, Farm, and Forest management variants; use `TACTICAL.PCX` and the shared `FIEFMGMT.PCX` shell when installed.
 - **Implemented:** source each management variant's OK/Cancel, terrain, and visible Full Screen regions from its own HAT descriptor. Management mutations are staged as a bounded session: OK/Enter commits, while Cancel/Escape restores wealth, fief development, army counts, and the associated journal entries.
-- **Implemented:** route Village to the screenshot-confirmed populated inn; source ten patron actions, Exit, and the label scroll from `VINN.HAT`; and bind the executable-ordered names and matching PCC portraits. Patron selection enters its confirmed `ALL.CIF`/`ALL.CBF` selector root, opens the original generic conversation frame, renders the node's portrait/speaker/prompt and all declared responses, follows response and timed continuation edges, and executes redirects plus typed character and named-item mutations.
+- **Implemented:** route Village to the populated inn (FND-MEDIA-010); source ten patron actions, Exit, and the label scroll from `VINN.HAT`; and bind the executable-ordered names and matching PCC portraits. Patron selection enters its confirmed `ALL.CIF`/`ALL.CBF` selector root, opens the original generic conversation frame, renders the node's portrait/speaker/prompt and all declared responses, follows response and timed continuation edges, and executes redirects plus typed character and named-item mutations.
 - **Implemented:** render the executable-recovered Castle (17), Village (17), Farm (4), and Forest (7) label catalogs in HAT row geometry; expose supported construction/development rows as transactional mouse targets and allow the 17-entry Village catalog to scroll through its 14 visible rows. Unsupported labels remain display-only.
 - **Implemented:** insert the original `FORGESMI.PCX` workshop between Village and the store, with the smith hotspot sourced from `VSMITH.HAT`.
 - **Implemented:** the ten Home regions follow SCR-UI-009; `JUMP!!` stays visible but inactive, and the original `F_OVER.PCX` and `WARPLAN.PCX` backgrounds are active for the corresponding destinations.

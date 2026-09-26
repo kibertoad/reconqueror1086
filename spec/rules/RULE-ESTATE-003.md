@@ -4,7 +4,7 @@ title: Loans and the July collection
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-ESTATE-003, FND-PERSON-001, FND-STRATEGY-001, FND-STRATEGY-019, FND-STRATEGY-021, FND-STRATEGY-033, FND-STRATEGY-036, FND-TOURNEY-001, FND-TOURNEY-004, SRC-MANUAL, SRC-GAMEFAQS-66730, FND-TALK-006]
+evidence: [FND-ESTATE-003, FND-PERSON-001, FND-STRATEGY-001, FND-STRATEGY-019, FND-STRATEGY-021, FND-STRATEGY-033, FND-STRATEGY-036, FND-TOURNEY-001, FND-TOURNEY-004, SRC-MANUAL, SRC-GAMEFAQS-66730, FND-TALK-006, FND-ASSAULT-048]
 conflicting: []
 split_with: []
 related: [RULE-ESTATE-002, RULE-PERSON-001, RULE-STRATEGY-019]
@@ -13,7 +13,8 @@ related: [RULE-ESTATE-002, RULE-PERSON-001, RULE-STRATEGY-019]
 ## Summary
 
 A loan is repaid in July with half again as interest. When the fief's wealth covers the amount the
-player may pay it; otherwise, or on a refusal, the player fights Drogo in `MONEY.RES`. Losing kills
+player may pay it; otherwise, or on a refusal, the player fights Drogo in `MONEY.RES`, alone against four hostile
+combatants (FND-ASSAULT-048). Losing kills
 the player. Winning after the player could not pay clears the debt, but winning after a refusal
 leaves it (BUG-ESTATE-003).
 

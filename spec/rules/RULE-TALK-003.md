@@ -4,7 +4,7 @@ title: Script functions and conversation variables
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-TALK-005, FND-TALK-006, FND-PERSON-001, FND-PERSON-002, FND-PERSON-007, FND-TALK-002]
+evidence: [FND-TALK-005, FND-TALK-006, FND-PERSON-001, FND-PERSON-002, FND-PERSON-007, FND-TALK-002, FND-TALK-010]
 conflicting: []
 split_with: []
 related: [FMT-TALK-008, RULE-PERSON-001]
@@ -125,5 +125,7 @@ None known.
 ## Open questions
 
 - Which item each entry of `script_item_slots` names; the table is content, and how many entries
-  it has is not known.
+  it has is not known. The scripts use items 0 to 23 and, in one test, 161 (FND-TALK-010).
+- What a redirect to a node missing from the index does; one script names node 5011, which is
+  missing (FND-TALK-010).
 - What `args[0]` of functions 7 to 9 holds; the handlers ignore it.

@@ -201,9 +201,7 @@ public static class ImportedSiegeLayouts
     private static SiegeTile TileFor(DynamixSceneBlock block)
     {
         var name = block.Name;
-        // Across the owned MELEE*/DEFEND* population, behavior 83 is used only
-        // by placed exit/gate markers. They are scene boundaries, not
-        // members of the mask-19 actionable-door family.
+        // Behaviour 0x53 is the placed exit or gate of each melee (FND-ASSAULT-047).
         if (block.Behavior == 83) return SiegeTile.Exit;
         if (IsActor(block)) return SiegeTile.Floor;
         if (IsDestructible(block)) return SiegeTile.Destructible;

@@ -22,7 +22,7 @@
 | `RULE-STRATEGY-012` | New game, joining armies and field placement | supported | complete | None | None | implemented | None |
 | `RULE-STRATEGY-013` | Map clicks and drawn routes | supported | complete | None | None | implemented | None |
 | `RULE-STRATEGY-014` | Strategic grid, projection and camera | supported | partial | None | None | supported | The cell test is a symmetric diamond, so some points find another cell; panning moves both axes in one call and does not hold back the hostile pass. |
-| `RULE-STRATEGY-015` | Terrain, markers and the route preview | supported | complete | None | None | implemented | None |
+| `RULE-STRATEGY-015` | Terrain, markers and the route preview | supported | partial | None | None | supported | PLACEHOLDER: the markers are drawn with the campaign-shell palette; the palette the original installs for them is not traced. |
 | `RULE-STRATEGY-016` | Brigand orders, raids and orders from the king | supported | partial | None | None | supported | Only the two raids are created; the yearly brigand order along the `br_` routes and the order from the king are missing. |
 | `RULE-STRATEGY-017` | Brigand pass and brigand movement | supported | partial | None | None | supported | BATTLE_WON and BATTLE_LOST are not kept, and the honour penalty for an unfought yearly order never applies because that order is never created. |
 | `RULE-STRATEGY-018` | Spies | supported | partial | None | None | supported | The spy is part of the dated campaign model and reports the first active force only; the rule reports every live force, needs a hostile force before it returns, and repeats the swordsmen count in all three places. |

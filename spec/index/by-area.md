@@ -58,6 +58,8 @@ Entries by area.
 | [FND-ASSAULT-044](../findings/FND-ASSAULT-044.md) | After the weapon range check, a block with behaviour bit 0x20 is replaced at once by its state target | recorded |
 | [FND-ASSAULT-045](../findings/FND-ASSAULT-045.md) | A table maps each weapon item to a combat row, and the two crossbows use rows 23 and 24 | recorded |
 | [FND-ASSAULT-046](../findings/FND-ASSAULT-046.md) | A combatant's armour is the dword at offset 0x3C, read beside its health at 0x40 | recorded |
+| [FND-ASSAULT-047](../findings/FND-ASSAULT-047.md) | Walking into a block with behaviour bit 0x40 uses it, and in the shipped scenes only the exit or gate cell of each melee has that bit | recorded |
+| [FND-ASSAULT-048](../findings/FND-ASSAULT-048.md) | The moneylender's scene places the player and four hostile thugs | recorded |
 | [RULE-ASSAULT-001](../rules/RULE-ASSAULT-001.md) | Retainer cap for a campaign castle assault | supported |
 | [RULE-ASSAULT-002](../rules/RULE-ASSAULT-002.md) | Load the combatants of a scene and remove retainers above the cap | supported |
 | [RULE-ASSAULT-003](../rules/RULE-ASSAULT-003.md) | Soldiers lost with the retainers who died | supported |
@@ -347,6 +349,8 @@ Entries by area.
 | [FND-TALK-007](../findings/FND-TALK-007.md) | The conversation partner picks the root node, set from the stands, the inn and the blacksmith | recorded |
 | [FND-TALK-008](../findings/FND-TALK-008.md) | After a conversation variable 6 becomes the debt and five variables set the marriage | recorded |
 | [FND-TALK-009](../findings/FND-TALK-009.md) | The joust settlement writes variable 3 with 2 for a win and 1 for a loss | recorded |
+| [FND-TALK-010](../findings/FND-TALK-010.md) | The action trees hold 689 groups, one redirect to a missing node and one item test outside the item table | recorded |
+| [FND-TALK-011](../findings/FND-TALK-011.md) | What the decoded conversations show about the inn, the priests, the lair variable, the lady variable and item gifts | recorded |
 | [RULE-TALK-001](../rules/RULE-TALK-001.md) | Conversation walk | supported |
 | [RULE-TALK-002](../rules/RULE-TALK-002.md) | Action-tree interpreter | supported |
 | [RULE-TALK-003](../rules/RULE-TALK-003.md) | Script functions and conversation variables | supported |

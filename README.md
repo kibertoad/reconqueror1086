@@ -159,14 +159,15 @@ specifications without requiring a graphics device. [Validation](docs/VALIDATION
 describes that gate, the documentation standard check, and what CI runs.
 Packaging scripts for Windows, Linux, and macOS are under `tools`.
 
-Technical claims are graded as Confirmed, Corroborated, or Provisional in the
-[original findings register](docs/original-findings.md). The full delivery
-sequence and proof gates are in the
-[implementation plan](docs/implementation-plan.md), current limits are in the
-[fidelity ledger](docs/fidelity.md), and decoded formats are documented in
-[resource formats](docs/resource-formats.md). These records map each formula or
-behavior to its original evidence and to the corresponding implementation and
-tests where available.
+Claims about the original game are recorded in [`spec/`](spec/README.md) under the
+[documentation standard](https://dinorefurb.com/documentation-standard/):
+findings, rules, formats, screens and bugs, each with its evidence and status.
+[`spec/index/`](spec/index/) lists them by area, kind and status, and
+[`PARITY.md`](PARITY.md) says how far the rebuild implements each one and
+where it guesses. [`deviations/`](deviations/) records where the rebuild
+departs from the original on purpose. The delivery sequence and proof gates are
+in the [implementation plan](docs/implementation-plan.md), and the rebuild's
+resource decoders are described in [resource formats](docs/resource-formats.md).
 
 The resource importer also supports `--verify`, `--repair`, and `--uninstall`.
 See [original analysis](docs/original-analysis.md) for the read-only inspection
@@ -182,11 +183,10 @@ reason this recreation exists.
 Special thanks to **mikel123456** for the extensive
 [*Conqueror 1086 A.D.* FAQ](https://gamefaqs.gamespot.com/pc/574792-conqueror-1086-ad/faqs/66730).
 It is an important, generally trusted starting point for mechanics, routes, and
-observed behavior. Its claims are still corroborated against the owned
-executable, decoded resources, original documentation, or controlled play
-before exact formulas and values are labeled Confirmed. The current comparison
-is maintained in the
-[GameFAQs consistency audit](docs/original-findings.md#gamefaqs-secondary-source-consistency-audit).
+observed behavior. Its claims are checked against the owned executable, decoded
+resources, the manual or controlled play before the spec relies on them; the
+spec's source entry `SRC-GAMEFAQS-66730` lists where it disagrees, and each
+rule's What the sources say section records what it reports.
 
 This project copies no original source code and redistributes no copyrighted
 resources. Players are expected to buy and own a legal copy, such as the

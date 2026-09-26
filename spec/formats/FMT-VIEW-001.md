@@ -9,7 +9,7 @@ byte_order: little
 size: 96
 text: false
 definition: fmt_view_001.ksy
-evidence: [FND-VIEW-001, FND-VIEW-006, FND-VIEW-007, FND-VIEW-008, FND-VIEW-009, FND-VIEW-010, FND-VIEW-011, FND-ASSAULT-001, FND-ASSAULT-004, FND-ASSAULT-022, FND-ASSAULT-029, FND-ASSAULT-034, FND-ASSAULT-035, FND-ASSAULT-036, FND-ASSAULT-037, FND-ASSAULT-038, FND-ASSAULT-039, FND-ASSAULT-002, FND-ASSAULT-003, FND-ASSAULT-008, FND-ASSAULT-027, FND-ASSAULT-044, FND-VIEW-019, FND-VIEW-021]
+evidence: [FND-VIEW-001, FND-VIEW-006, FND-VIEW-007, FND-VIEW-008, FND-VIEW-009, FND-VIEW-010, FND-VIEW-011, FND-ASSAULT-001, FND-ASSAULT-004, FND-ASSAULT-022, FND-ASSAULT-029, FND-ASSAULT-034, FND-ASSAULT-035, FND-ASSAULT-036, FND-ASSAULT-037, FND-ASSAULT-038, FND-ASSAULT-039, FND-ASSAULT-002, FND-ASSAULT-003, FND-ASSAULT-008, FND-ASSAULT-027, FND-ASSAULT-044, FND-VIEW-019, FND-VIEW-021, FND-ASSAULT-047]
 conflicting: []
 split_with: []
 related: [RULE-VIEW-003, RULE-ASSAULT-021]
@@ -31,7 +31,7 @@ use this layout for the blocks the game copies and changes while the scene runs.
 | `0x04 bits 3..4` | | `bits[1]` | `chained` | Set with `see_through`: a ray follows `state_target` in the same cell. | supported | FND-VIEW-007 |
 | `0x04 bits 4..5` | | `bits[1]` | `actionable` | Set: the player can act on the block (a door or a pickup). | supported | FND-ASSAULT-035, FND-ASSAULT-038 |
 | `0x04 bits 5..6` | | `bits[1]` | `weapon_contact` | Set: the player's weapon replaces the block by its `state_target` when it reaches it. | supported | FND-ASSAULT-044 |
-| `0x04 bits 6..7` | | `bits[1]` | `unk_04_6` | Purpose unknown. | supported | FND-VIEW-001 |
+| `0x04 bits 6..7` | | `bits[1]` | `opens_on_contact` | Set: when the player walks into the cell, the block is used as if acted on (RULE-ASSAULT-021). Only the exit and gate blocks of the melee scenes have it. | supported | FND-ASSAULT-047 |
 | `0x04 bits 7..8` | | `bits[1]` | `actor` | Set, with `interaction` 1: the block is a combatant. | supported | FND-ASSAULT-001 |
 | `0x05` | 1 | `UINT8` | `marks` | Marks set while the scene runs. | supported | FND-ASSAULT-008 |
 | `0x05 bits 0..1` | | `bits[1]` | `selected` | Set: the combatant is selected for orders. | supported | FND-ASSAULT-008, FND-ASSAULT-035 |
@@ -90,7 +90,7 @@ checked field by field.
 
 ## Open questions
 
-- The purpose of `unk_04_6`, `unk_05_1`, `unk_06`, `unk_0A`, `unk_3C` and `unk_44` is unknown.
+- The purpose of `unk_05_1`, `unk_06`, `unk_0A`, `unk_3C` and `unk_44` is unknown.
 - Which diagonal `BLOCK_DIAGONAL_A` and `BLOCK_DIAGONAL_B` run along is not recorded.
 - `interaction` values other than 1, 5, 7, 9 and 10, and the 20 cases of the dispatcher that
   they select, are not described.

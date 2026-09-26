@@ -90,9 +90,8 @@ public static class ImportedAnimations
         new("Shop.Items", ":swords.csf", "Shop.Inventory"),
         new("Shop.Controls", ":buysell.csf", "Shop.Inventory"),
         new("Interface.Cursor", ":ffmouse.csf", "Estate.Shell"),
-        // `0x12A4C` confirms the two CSF names. The strategic map's active
-        // palette at this load site is not yet recovered, so retain the
-        // campaign shell palette as a separately documented corroboration.
+        // PLACEHOLDER: RULE-STRATEGY-015. The palette the original installs for
+        // the map markers is not traced; the campaign shell palette stands in.
         new("Strategic.Map.Markers", ":icon_men.csf", "Estate.Shell"),
         new("Strategic.Map.MarkerOverlay", ":marker.csf", "Estate.Shell"),
         new("Combat.FirstPerson", ":skirmish.csf", "", ":SKIRMISH.PAL"),

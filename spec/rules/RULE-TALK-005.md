@@ -4,7 +4,7 @@ title: Joust result for the conversations
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-TALK-009, FND-TOURNEY-004, FND-TOURNEY-005, FND-PERSON-001, FND-PERSON-002]
+evidence: [FND-TALK-009, FND-TOURNEY-004, FND-TOURNEY-005, FND-PERSON-001, FND-PERSON-002, FND-TALK-011]
 conflicting: []
 split_with: []
 related: [RULE-TALK-003, RULE-PERSON-001]
@@ -14,7 +14,8 @@ related: [RULE-TALK-003, RULE-PERSON-001]
 
 The joust settles its stake and records the result in the wins and losses of both knights, and in
 conversation variable 3: 2 after a win, 1 after a loss, for the scripts to read. No code outside
-the scripts reads or writes variable 42, so whatever it records is script content.
+the scripts reads or writes variable 42; the lady scripts use it for whose colours the player
+wears (FND-TALK-011). The joust gives no item; the ladies' gifts come from their scripts.
 
 ## When it runs
 

@@ -127,5 +127,5 @@ For numeric action-tree inspection, `--action-groups=1101,2011` writes an ignore
 - Hash the executable before analysis and compare it with the reference hash above.
 - Record virtual addresses and independently described behavior, not copied machine-code bytes.
 - Confirm recovered algorithms against original resource populations and synthetic malformed inputs.
-- Keep uncertain interpretations marked Provisional until static evidence or controlled observation resolves them.
-- Put stable format facts in `resource-formats.md`, gameplay findings in `original-findings.md`, and status changes in `implementation-plan.md`.
+- Record each observation as a finding in `spec/findings/`, and the formats, rules and screens it supports in `spec/`, with the status the evidence allows and the uncertain part in Open questions.
+- Put status changes of the rebuild in `implementation-plan.md` and the parity rows in `parity/`.

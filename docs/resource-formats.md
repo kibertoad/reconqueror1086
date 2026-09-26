@@ -1,8 +1,6 @@
-# Original resource format specification
+# Resource decoders
 
-This document is the clean-room, byte-level specification for formats observed in the legally owned GOG release identified in [`original-findings.md`](original-findings.md). It contains structural facts and independently derived descriptions only—never extracted dialogue, images, audio, video, or binary payloads.
-
-Confidence terms have the same meaning as the evidence register: **Confirmed** is directly measured across the named sample, **Corroborated** combines local evidence with independent documentation, **Provisional** remains a working hypothesis, and **Disproved** records a rejected interpretation.
+This document describes how the rebuild reads, validates and uses the original's resource formats. The formats themselves are defined in `spec/formats/`, and the build they come from in `spec/builds/BLD-GOG-EN.md`. Nothing here copies dialogue, images, audio, video or binary payloads.
 
 ## Container reader
 
@@ -24,11 +22,11 @@ Actor sprites use the texture runs of FND-VIEW-021. Runtime enemies keep a cardi
 
 The raycaster walks the wrapped 128-cell source map (RULE-VIEW-003), not only the cropped `SiegeLayout`, so the rebuild's acquisition alpha testing must retain decoded sources for all structural face selectors and every sector reachable from kind-4 `Surface0` plus the heading-sector formula, including mirrored sectors. `RaycastTextureReferences` supplies this complete source-only dependency set; `ActivateSiegeVisuals` keeps it separate from the smaller GPU/render set. Omitting the distinction caused practice melee acquisition to request an unloaded but valid texture 11.
 
-The dependency closure is over placed map blocks and their executable-eligible state-target chains, not every definition in the 0x80-block table. Unplaced templates in `MELEE0.RES` reference texture numbers such as 3 that the archive intentionally does not carry; they cannot enter the ray traversal. `SiegeTextureDependencies.AcquisitionTextures` starts from the 128x128 map population and follows a state target only for the behavior/kind combinations accepted by the ray traversal. This fixes the false startup requirement for textures 3/4/6 while retaining every source that a live ray can alpha-test.
+`SiegeTextureDependencies.AcquisitionTextures` starts from the placed blocks of the 128x128 map and follows a state target only for the behaviour and kind combinations the ray traversal accepts. Block definitions that no placed block reaches can name textures the archive does not hold, so the rebuild does not require them.
 
-The owned-resource census further shows that individual `MELEE*`/`DEFEND*` scene archives are sparse overlays and need not contain all three normalized walk families. `CONQUER/DEFEND2.RES` is the supported high-resolution archive containing the complete actor texture span 64-138. Runtime texture resolution therefore uses that archive as the common combat actor atlas and replaces matching slots with the active scene archive. The normalized slot identities follow RULE-ASSAULT-025; the complete-atlas identity and sparse-overlay relationship are **Corroborated** by the owned archive census. `LoadCombatTextureSources` validates the resulting closure before graphics use. Actor, object, wall, backdrop, and combat-shell procedural fallbacks have been removed: imported siege rendering now has one supported, verified original-art path and reports a precise missing dependency instead of drawing rectangles.
+The rebuild normalizes actor textures to three walk families (RULE-ASSAULT-025) numbered 64 to 138. `CONQUER/DEFEND2.RES` is the only scene archive that holds all of 64 to 138, so runtime texture resolution uses it as a common combat actor atlas and replaces matching slots with the active scene archive's textures. `LoadCombatTextureSources` validates the resulting closure before graphics use. Actor, object, wall, backdrop, and combat-shell procedural fallbacks have been removed: imported siege rendering now has one supported, verified original-art path and reports a precise missing dependency instead of drawing rectangles.
 
-Runtime upload preserves source index zero as transparent and emits premultiplied `(0,0,0,0)` for MonoGame's default alpha blend; CSF alpha planes are premultiplied by the same rule. Retaining palette RGB under alpha zero caused the combat atlas's transparent border to blend as a white rectangle. Actor/object horizontal placement now inverts the confirmed viewer basis directly as `screen = center + lateral / forward`; the earlier conventional 60-degree FOV approximation is **Disproved**. Actor width is one projected 8.8 cell and vertical bounds use block `LowerElevation`/`UpperElevation`, viewer elevation `0x80`, viewport width, and live actor depth, matching RULE-VIEW-003. Render sector selection now uses the same confirmed `actor heading - viewer heading` byte-turn input as acquisition instead of the former actor-to-viewer bearing approximation. Keyboard attack compatibility targets the resulting billboard center; pointer attacks retain the exact centered cursor contact.
+Runtime upload preserves source index zero as transparent and emits premultiplied `(0,0,0,0)` for MonoGame's default alpha blend; CSF alpha planes are premultiplied by the same rule. Retaining palette RGB under alpha zero caused the combat atlas's transparent border to blend as a white rectangle. Actor/object horizontal placement inverts the viewer basis of RULE-VIEW-003 directly as `screen = center + lateral / forward`. Actor width is one projected 8.8 cell and vertical bounds use block `LowerElevation`/`UpperElevation`, viewer elevation `0x80`, viewport width, and live actor depth, matching RULE-VIEW-003. Render sector selection now uses the same confirmed `actor heading - viewer heading` byte-turn input as acquisition instead of the former actor-to-viewer bearing approximation. Keyboard attack compatibility targets the resulting billboard center; pointer attacks retain the exact centered cursor contact.
 
 ## Smacker movie container
 
@@ -68,25 +66,25 @@ For owner-local catalog reconciliation, the inspector accepts `--weapon-text=0,1
 
 ## Conversation database
 
-The bounded recursive decoder validates all 689 groups, 2,267 unique actions, 10,373 unique expressions, and 13,352 unique values, rejecting invalid counts, offsets, kinds, arities, flags, operators, excessive depth, and cycles. Every distinct conversation action ID resolves except `5011`, which is retained and reported as an anomaly in the original data. The adapter maps produced or consumed item selectors `0` through `23` to named campaign inventory. The only other item operand is a producer-less `161` check in Victoria's final shield-offer gate; it is retained as raw original state rather than assigned a speculative identity.
+The bounded recursive decoder reads the whole action-tree population of FND-TALK-010, rejecting invalid counts, offsets, kinds, arities, flags, operators, excessive depth, and cycles. It keeps the redirect to the missing node 5011 and reports it. The adapter maps items `0` through `23` to named campaign inventory and keeps the test of item `161` as raw state.
 
-The executable maps those conversation item selectors to physical possession slots through a little-endian 16-bit table at object 2 `+0xA938`: helper `0x2250C` reads the high word of the dword at `+0xA936 + 2 * selector`, then passes that slot to increment helper `0x43100`. `0x2252C` and `0x2254C` use the same lookup for clearing and testing. The 24 supported selector-to-slot values, in selector order, are **Confirmed** from the hashed executable:
+`OriginalConversationBindings.Items`, `OriginalDragonRunScore` and `Campaign.BeginDragonBattle` use the item table of FND-TALK-005, which gives these possession slots in item order:
 
-| Selectors | Physical possession slots |
+| Items | Possession slots |
 | --- | --- |
 | 0–7 | 65, 17, 10, 19, 21, 49, 18, 9 |
 | 8–15 | 20, 53, 54, 55, 15, 6, 58, 59 |
 | 16–23 | 14, 61, 6, 63, 64, 67, 68, 69 |
 
-The possession array uses eight bytes per slot at object 2 `+0xC6C4`: the dword at `+0x04` is the live count. `0x43100` increments it, `0x4310C` tests nonzero, and `0x43124` clears it. Enumerator `0x430B0` bounds the array at `0x230` bytes, or 70 slots. Selector 10 is Dragon Slaying Lance and maps to slot `0x36`; selector 15 is Shield of St. George and maps to `0x3B`; selector 20 is Dragon Slaying Armor and maps to `0x40`. These are exactly the three slots tested by dragon worker `0x1B5DA`–`0x1B614`. Name identities come from the existing executable item-name catalog and decoded conversation rewards; the slot relation comes directly from the table and helper control flow. `OriginalConversationBindings.Items`, `OriginalDragonRunScore`, and `Campaign.BeginDragonBattle` retain the mapping. The anomalous selector 161 is outside this 24-entry mapping and remains raw.
-
 `DynamixConversationDecoder` bounds the node population and every record extent, validates IDs, offsets, markers, ASCII strings, response counts, and graph targets, and exposes typed prompt variants and responses without copying original prose into the repository. `conversation-report.txt` contains only aggregate structural counts.
 
 ## Imported-content manifest
 
+An import of BLD-GOG-EN extracts every byte-stored, kind-1 and kind-2 entry of the GOB and the 99 scene archives through one codec registry and lists 29,226 files. Extensions are hints; each known format is validated before runtime decoding.
+
 `UserContent/manifest.json` is a version-2 UTF-8 JSON document with the XXH3-128 of the source disc image and an asset array. Every asset records a stable source identifier, root-relative generated path, runtime kind, exact byte length, and lowercase XXH3-128. A manifest of any other version fails verification, so an import made before the move to XXH3-128 is imported again. Identifiers and paths must be nonempty and case-insensitively unique; paths must be relative and resolve beneath `UserContent`; sizes must be non-negative; both digests must contain exactly 32 hexadecimal characters.
 
-The source-image digest `b915491c5bdce934ca216d2ceebec0ce` identifies the supported GOG English release (**Confirmed** from the owned installation). The importer announces that match before extraction and emits a warning for other hashes while continuing through the same bounded decoders rather than rejecting a potentially compatible legal copy.
+The source-image digest `b915491c5bdce934ca216d2ceebec0ce` identifies the supported GOG English release, BLD-GOG-EN. The importer announces that match before extraction and emits a warning for other hashes while continuing through the same bounded decoders rather than rejecting a potentially compatible legal copy.
 
 `Conqueror.Import --verify` checks those structural invariants and then requires every listed file to exist with the declared size and digest. The install and repair paths run the same verification after writing the manifest. Generated files and the manifest use same-directory temporary files plus atomic replacement; byte-identical destinations are retained rather than rewritten. `--uninstall` prevalidates all manifest paths before removing only those files and the manifest, preserving everything unlisted. These manifest rules describe independently authored importer metadata, not an original-game format.
 
@@ -136,7 +134,7 @@ The raw-sector bounds, ISO directory traversal, cue timestamps, and WAV sample p
 - `sound-bank-report.txt`: bank provenance, sample counts, distinct rates, and aggregate payload sizes without exporting audio.
 - `artifact-hashes.txt`, `string-hits.txt`, and `executable-disassembly-report.txt`: provenance and targeted executable evidence.
 
-The reports are regenerated from the user's installation and must never be committed. Stable conclusions belong here and confidence-scoped gameplay conclusions belong in [`original-findings.md`](original-findings.md).
+The reports are regenerated from the user's installation and must never be committed. Conclusions about the original go into `spec/` as findings, formats and rules.
 
 ## Open questions
 

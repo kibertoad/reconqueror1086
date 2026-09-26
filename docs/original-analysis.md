@@ -41,13 +41,13 @@ The importer and runtime catalog are format-neutral: assets are addressed by ori
 
 `scene-res-report.txt` repeats the same bounded inventory directly from all 99 scene containers in the ISO without writing their payloads. `scene-texture-report.txt` validates all 12,982 `TEXnnn width height` entries as exact headerless `width * height` byte planes and records only counts and distinct dimensions. `scene-scenario-report.txt` validates all 90 Scenario-bearing containers and records only color-map parameters, block-offset populations, and whether each stored active family exactly matches executable-confirmed regeneration under `SKIRMISH.PAL`. `resource-extension-report.txt` aggregates storage kinds, and `stored-image-report.txt` validates stored, kind-1, and kind-2 PCX-compatible images using dimensions and pixel-index hashes. It identifies 192 strict PCX payloads, including `richard.pcc`, `fftitle.pcx`, `engmap1.pcx`, and all four kind-2 PCX entries. The runtime catalog decodes installed PCX-compatible assets into bounded indexed pixels and RGBA data without creating a graphics device.
 
-`sound-bank-report.txt` validates every `.666` bank and records only provenance, sample counts, rates, and aggregate byte sizes; the results are FND-SOUND-001. `ALL.CIF` and `ALL.CBF` are the actual indexed conversation-node family: all 1,311 nodes, 2,062 prompt variants, 2,696 response branches, and 63 zero-response continuation slots validate structurally. The ten inn patron selector roots and their first named nodes are confirmed; their decoded action conditions, mutations, redirects, typed character selectors, and named item bindings now run in the imported conversation session.
+`sound-bank-report.txt` validates every `.666` bank and records only provenance, sample counts, rates, and aggregate byte sizes; the results are FND-SOUND-001. `ALL.CIF` and `ALL.CBF` are the actual indexed conversation-node family: all 1,311 nodes, 2,062 prompt variants, 2,696 response branches, and 63 zero-response continuation slots validate structurally. The ten inn patron roots and their first named nodes are listed in FND-TALK-011; their decoded action conditions, mutations, redirects, typed character selectors, and named item bindings now run in the imported conversation session.
 
 `smacker-report.txt` validates the fixed header, frame tables, tree extent, exact aligned frame extents, palette updates, audio packets, and video decoding of every `.SMK` without exporting movie content. Its population results are FND-MEDIA-008; the stateful four-tree video decoder records stable final-frame hashes, and direct decoding needs no installation-time transcoding dependency. The runtime activates `TITLE.SMK`, `CREDITZZ.SMK`, and the item previews named by `WEAPONS.DAT` through the MonoGame adapter, reusing its texture and image buffers and handing decoded audio packets to a dynamic mono sound instance. All 23 store records that name a movie have an exact installed disc-file match; the other 17 use `#` for no preview. A seekable reader keeps only the index/tree prefix and one compressed frame in memory. CD music pauses around event movies and starts only after the opening movie ends or is skipped.
 
 For scene semantics, `--scene-blocks` emits the ignored `scene-block-report.txt` and stops before the expensive movie population pass. The report records bounded block fields and map-placement counts for owned `MELEE*`, `DEFEND*`, and `MONEY.*` archives; it is local analysis material and must not be committed.
 
-Installation and activation remain separate states. A successful import means the owned source files were inventoried and supported archive entries were decoded into ignored local storage; it does not imply support for every media format. The runtime now activates the strict PCX decodes of `fftitle.pcx`, `engmap1.pcx`, and `richard.pcc`. Their payload structure and dimensions are **Confirmed for the hashed release** and their runtime roles are **Corroborated** by local visual inspection. Users with an older manifest must rerun the installer once to receive these newly supported decoded files.
+Installation and activation remain separate states. A successful import means the owned source files were inventoried and supported archive entries were decoded into ignored local storage; it does not imply support for every media format. The runtime activates the strict PCX decodes of `fftitle.pcx`, `engmap1.pcx`, and `richard.pcc`, with the roles the UI screens of `spec/screens/` give them. Users with an older manifest must rerun the installer once to receive these newly supported decoded files.
 
 Runtime media selection is definition-driven. `ImportedArt.Definitions` maps stable presentation roles to an imported kind and original identifier suffix; loading and disposal are generic. Active art roles include the title, character-options, pre-generated-character, screenshot-confirmed `FLUFF.PCX` campaign briefing, load-game, estate/travel, England-map, Home/farm, populated inn and its ten patron portraits, the shared conversation frame, blacksmith workshop/portrait/store, and tournament portraits. `ImportedMovies.Definitions` similarly binds the opening and credits presentations to disc-file suffixes; item preview names come directly from the decoded store table. This distinction matters because archive-entry identifiers use `:name.ext`, while raw disc-file identifiers use `/name.ext`.
 
@@ -61,17 +61,15 @@ The inspector's `--disassemble=0xADDRESS,...` option maps LE objects/pages and u
 
 Use `--xref-block-flags=0x20` to inventory comparisons and bit operations against selected byte flags in the scene block field at offset 4. The ignored `executable-block-flag-xrefs.txt` report covers the complete mapped code object and is intended to locate state-specific interaction paths before focused disassembly.
 
-Use `--weapon-combat-table` to emit the 25 seven-dword combat rows at data-object offset `0xCE14` into ignored `weapon-combat-table-report.txt`. Column 4 begins at `0xCE24` and supplies contact distance. This preserves the original numeric row values as reproducible local evidence without exporting executable bytes.
+Use `--weapon-combat-table` to emit the 25 combat rows of FMT-ASSAULT-002 into ignored `weapon-combat-table-report.txt`. This preserves the original numeric row values as reproducible local evidence without exporting executable bytes.
 
 Use `--xref-code=0xADDRESS,...` to find direct branch/call references and internal LE relocations to code addresses. The latter expose callback registrations whose targets never appear in a direct call instruction. Its ignored output is `executable-code-xrefs.txt`.
 
 Use `--xref-call-context=0xADDRESS` to write the three preceding decoded instructions for every direct call to one code address in ignored `executable-call-context-report.txt`. It is useful for identifying literal setter arguments without retaining executable bytes.
 
-The selected marker palette remains Corroborated pending a direct palette-install trace.
-
 Use `--resource-strings=NAME` to emit printable strings from one named decoded GOB entry into ignored `resource-string-report.txt`. The option rejects resources larger than 64 KiB; use its offsets as local analysis leads and record only reviewed, compact facts in documentation because the report can contain source text.
 
-That workflow found a reference to data offset `0x8020` (`TITLE.HAT`) in code at virtual address `0x4FF4F`. The surrounding routine copies the name and calls the common resource loader. The 64-byte `TITLE.HAT` record identifies `FFTITLE.PCX` and a 640x480 presentation. Resource inspection then distinguishes the static title from the first interactive `CHAR_OPS.PCX` screen. `CGOPTS.HAT` and `PREGEN.HAT` now confirm the clickable geometry; exact navigation timing and region-action dispatch still require further executable tracing.
+That workflow found the title screen's `TITLE.HAT` and the screens that follow it (SCR-UI-001 to SCR-UI-005). Exact navigation timing and region-action dispatch still require further executable tracing.
 
 `hat-layout-report.txt` reproducibly decodes every supported HAT descriptor into its resource filename, screen identifier, origin, dimensions, background name, unknown three-byte tag, and ordered region records. Preserving the filename exposed an earlier false association: `FOPTS.HAT`, not `FCASTLE.HAT`, describes the `TACTICAL.PCX` Home office. The inspector's `--xref-data=` option now combines mapped-instruction operand scanning with a bounded parser for the LE fixup page/record tables and writes address-only derived metadata plus nearby relocation context for follow-up disassembly. The parser resolves 17,908 internal fixups in the hashed executable and rejects malformed table bounds, page ranges, source types, objects, and truncated records.
 
@@ -81,14 +79,14 @@ Generated manifests, reports, and artifacts under `analysis/original` are ignore
 
 ## Evidence workflow
 
-- Record a discovered fact in `docs/fidelity.md`, stating whether it is confirmed, externally documented, or inferred.
+- Record a discovered fact as a spec entry, with the status its evidence supports, and update the parity row in `parity/`.
 - Put tunable values in a typed definition in `Balance.cs`; do not hard-code them in event or UI branches.
 - Add a specification that exercises the definition through the campaign interpreter.
-- Keep uncertain values labeled provisional until a table, code path, save-state experiment, or repeated controlled observation confirms them.
+- Mark code that uses an uncertain value with `PLACEHOLDER: <ID>` until a table, code path, save-state experiment, or repeated controlled observation settles it.
 
 The inspector currently establishes that the disc contains a 919,107-byte DOS `CONQUER.EXE`.
 
-Tracked conclusions, evidence offsets, and confidence grades are maintained in [`original-findings.md`](original-findings.md). Generated reports are evidence inputs; that reviewed register is the source of truth for what the project considers factual.
+Tracked conclusions and their evidence are the entries in `spec/`, which `spec/index/` lists. Generated reports are evidence inputs; the spec is the source of truth for what the project considers factual.
 
 ## Windows sandbox and Git ownership
 

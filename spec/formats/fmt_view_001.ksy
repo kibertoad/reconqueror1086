@@ -28,9 +28,9 @@ seq:
   - id: weapon_contact
     type: b1
     doc: Set, the player's weapon replaces the block by its state_target when it reaches it.
-  - id: unk_04_6
+  - id: opens_on_contact
     type: b1
-    doc: Purpose unknown.
+    doc: Set, the block is used when the player walks into its cell.
   - id: actor
     type: b1
     doc: Set, with interaction 1, the block is a combatant.

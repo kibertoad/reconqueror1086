@@ -4,7 +4,7 @@ title: Store purchase and sale
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-UI-014, FND-UI-007, FND-PERSON-001, FND-PERSON-007]
+evidence: [FND-UI-014, FND-UI-007, FND-PERSON-001, FND-PERSON-007, SRC-GAMEFAQS-66730]
 conflicting: []
 split_with: []
 related: [RULE-UI-003, RULE-PERSON-001, SCR-UI-007]
@@ -57,7 +57,8 @@ sellable at once.
 
 ## What the sources say
 
-None of the sources describe this.
+SRC-GAMEFAQS-66730 says the store buys equipment back at 75% of its price. `price - price / 4` is
+75% of the price rounded up.
 
 ## Differences between builds
 
