@@ -97,6 +97,7 @@ public sealed class ImportedConversationActionState(CampaignState campaign) : ID
                 campaign.Player.Inventory.Items.Add(name);
     }
 
+    // The original read and write also accept an index equal to the count (DEV-TALK-001).
     public bool TryGetVariable(int scope, int index, out int value)
     {
         value = 0;

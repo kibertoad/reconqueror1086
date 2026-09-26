@@ -639,6 +639,7 @@ public static class OriginalStrategicInteractiveEncounter
         unit.TargetUnitIndex = targetUnitIndex;
         if (unit.TargetUnitIndex != -1)
         {
+            // The original faces the index its corner search left instead (DEV-BATTLE-002).
             AdvanceMappedTargetHeading(units, unitIndex);
             return true;
         }

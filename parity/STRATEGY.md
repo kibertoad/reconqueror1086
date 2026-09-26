@@ -10,8 +10,8 @@
 | `FMT-STRATEGY-006` | Brigand order, the descriptor of one brigand force | supported | partial | None | None | supported | Only the two raid descriptors exist; slot 0, the yearly brigand order, is never created. |
 | `RULE-STRATEGY-001` | Strategic pass and the yearly orders | supported | partial | None | None | supported | The yearly brigand order, the order from the king and the planting notice are not issued. |
 | `RULE-STRATEGY-002` | Hostile pass and arrival | supported | complete | None | None | implemented | None |
-| `RULE-STRATEGY-003` | Hostile generator and reactive finder | supported | partial | None | None | supported | The rare pursuit branch runs only after a detection in the same pass, instead of testing the stale property (BUG-STRATEGY-001). |
-| `RULE-STRATEGY-004` | Hostile force construction and removal | supported | partial | None | None | supported | The live count is the number of active slots, so forces lost to water or a dropped route free their capacity (BUG-STRATEGY-004 is not reproduced). |
+| `RULE-STRATEGY-003` | Hostile generator and reactive finder | supported | complete | None | `DEV-STRATEGY-001` | implemented | None |
+| `RULE-STRATEGY-004` | Hostile force construction and removal | supported | complete | None | `DEV-STRATEGY-002` | implemented | None |
 | `RULE-STRATEGY-005` | Hostile force size | supported | complete | None | None | implemented | None |
 | `RULE-STRATEGY-006` | Direct and pursuit movement | supported | complete | None | None | implemented | None |
 | `RULE-STRATEGY-007` | Routed movement | supported | complete | None | None | implemented | None |
@@ -25,5 +25,5 @@
 | `RULE-STRATEGY-015` | Terrain, markers and the route preview | supported | partial | None | None | supported | PLACEHOLDER: the markers are drawn with the campaign-shell palette; the palette the original installs for them is not traced. |
 | `RULE-STRATEGY-016` | Brigand orders, raids and orders from the king | supported | partial | None | None | supported | Only the two raids are created; the yearly brigand order along the `br_` routes and the order from the king are missing. |
 | `RULE-STRATEGY-017` | Brigand pass and brigand movement | supported | partial | None | None | supported | BATTLE_WON and BATTLE_LOST are not kept, and the honour penalty for an unfought yearly order never applies because that order is never created. |
-| `RULE-STRATEGY-018` | Spies | supported | partial | None | None | supported | The spy is part of the dated campaign model and reports the first active force only; the rule reports every live force, needs a hostile force before it returns, and repeats the swordsmen count in all three places. |
+| `RULE-STRATEGY-018` | Spies | supported | partial | None | `DEV-STRATEGY-003` | supported | The spy is part of the dated campaign model and reports the first active force only; the rule reports every live force and needs a hostile force before it returns. |
 | `RULE-STRATEGY-019` | Map events from conversation variables | supported | partial | None | None | supported | The raid requests from variables 43 and 93 are implemented; the bar scenes and the melee from variable 0x80 are not matched against the rule. |

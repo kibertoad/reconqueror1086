@@ -520,6 +520,7 @@ public sealed partial class Campaign
         {
             State.DrogoDefeated = true;
             State.PendingDrogoEncounter = false;
+            // The original keeps the debt after a refused payment (DEV-ESTATE-001).
             State.Player.Debt = 0;
             Log("You killed Drogo. The moneylender will not bother you again.");
             return true;

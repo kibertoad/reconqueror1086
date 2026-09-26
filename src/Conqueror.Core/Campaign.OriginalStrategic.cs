@@ -152,8 +152,8 @@ public static class OriginalStrategicEncounterStaging
     /// <summary>
     /// Reproduces RULE-BATTLE-001, the automatic branch used
     /// when its prior interactive choice dialog returns zero. The caller owns
-    /// the two score modifiers (RULE-STRATEGY-011). PLACEHOLDER: RULE-BATTLE-001.
-    /// The original adds the remainder of each modifier by 3; this adds a third.
+    /// the two score modifiers (RULE-STRATEGY-011). The original adds the
+    /// remainder of each modifier by 3; this adds a third (DEV-BATTLE-001).
     /// </summary>
     public static OriginalStrategicAutomaticEncounterResult ResolveAutomatic(
         OriginalStrategicEncounterPreparation preparation,
@@ -540,6 +540,7 @@ public sealed partial class Campaign
             removed, requiresModal);
     }
 
+    // The original shows the swordsmen count in all three places (DEV-STRATEGY-003).
     private StrategicSpyReport? CaptureOriginalStrategicSpyReport(
         OriginalStrategicCampaignState strategic)
     {

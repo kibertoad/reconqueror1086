@@ -67,7 +67,8 @@ public static class VillageSceneCatalogDecoder
     private static VillageSceneHotspot ParseHotspot(string line)
     {
         // The verified source catalog has three separator typos. Repair only
-        // these exact spellings; arbitrary malformed records still fail.
+        // these exact spellings; arbitrary malformed records still fail. The
+        // original reads the lender row only up to its first space (DEV-UI-001).
         line = line.TrimStart() switch
         {
             var value when value.StartsWith("1,,539,374,100,59 ; Map", StringComparison.Ordinal)

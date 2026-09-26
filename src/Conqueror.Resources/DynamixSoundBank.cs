@@ -15,7 +15,7 @@ public sealed record DynamixSoundSample(int Index, int SampleRate, byte[] Sample
 public sealed record DynamixSoundBank(IReadOnlyList<DynamixSoundSample> Samples);
 
 // FMT-SOUND-001 bank layout. The original never checks the tag and plays the 11,050 Hz samples with a
-// stale rate step (BUG-SOUND-001); the rebuild plays every sample at its own rate.
+// stale rate step (BUG-SOUND-001); the rebuild plays every sample at its own rate (DEV-SOUND-001).
 public static class DynamixSoundBankDecoder
 {
     public const uint Magic = 0x004A5031;

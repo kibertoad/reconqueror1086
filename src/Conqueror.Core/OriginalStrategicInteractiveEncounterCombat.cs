@@ -65,7 +65,8 @@ public static class OriginalStrategicInteractiveEncounterCombat
     /// target. <paramref name="contactSideFilter"/> preserves global
     /// <c>battle_contact_filter</c>: one suppresses contacts against the player lane and
     /// minus one suppresses contacts against the enemy lane; zero permits
-    /// both. PLACEHOLDER: RULE-BATTLE-005: adds morale / 3 for % 3, skips the rest on a filter, draws no sound.
+    /// both. Adds morale / 3 for % 3 (DEV-BATTLE-001).
+    /// PLACEHOLDER: RULE-BATTLE-005: skips the rest on a filter, draws no sound.
     /// </summary>
     public static OriginalStrategicInteractiveEncounterContactResult ApplyMappedResolvedContact(
         IReadOnlyList<OriginalStrategicInteractiveEncounterUnit> units,
