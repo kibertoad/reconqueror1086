@@ -88,7 +88,7 @@ jobs:
 
       # The toolkit publishes no tags, and its setup guide pins a commit on its main branch.
       - name: Check the documentation standard
-        uses: kibertoad/refurbished-dinosaurs-toolkit/actions/check-documentation@6fe1e4133585d82458a83c5dac519720ae33adb5 # zizmor: ignore[stale-action-refs]
+        uses: kibertoad/refurbished-dinosaurs-toolkit/actions/check-documentation@6e3cad31b6d61280a4649a873cf890377b402a75 # zizmor: ignore[stale-action-refs]
         with:
           # The narrative docs cite spec IDs, which must exist and not be superseded.
           references: docs

@@ -16,10 +16,40 @@ This page describes the checks a change has to pass before it is committed, loca
    to do with the documentation standard's `spec/` directory.
 
 The builds use `-m:1` and no shared compiler. The gate needs no graphics device and no original
-game files: the tests build their inputs from synthetic data.
+game files: the tests build their inputs from synthetic data, except the tests described under
+[Tests against the original](#tests-against-the-original), which skip without them.
 
 The gate needs the .NET 10 SDK and Node.js 20 or newer on `PATH`. CI runs the same steps as
 separate jobs in `.github/workflows/ci.yml` on every push to `main` and every pull request.
+
+## Tests against the original
+
+A test listed in a parity row compares the rebuild with evidence from the original. Most such
+tests replay a committed fixture and run in CI like any other test. A test whose evidence cannot
+be committed, such as a format test that decodes every shipped file or a screen test compared with
+a capture, reads the original's files from the directory named by the `GAME_DIR` environment
+variable: one directory per build, named by its build ID (`GAME_DIR/BLD-GOG-EN/...`), and
+`GAME_DIR/captures/` for captures and saves named by their hash. Such a test skips when the file is
+absent, and its file carries the comment `// needs: GAME_DIR`. The documentation check fails a
+listed test file that mentions `GAME_DIR` without the comment. No current test reads the original.
+
+CI never has the original's files, so the marked tests skip there. They run on a maintainer's
+machine with `GAME_DIR` set to the owned copy. After a run of `Run Tests.bat` in which every test in
+every marked test file of a `validated` row passed and none was skipped, record the run and commit
+the `VALIDATION.md` it writes at the repository root:
+
+```powershell
+$env:GAME_DIR = 'D:\conqueror-evidence'
+& '.\Run Tests.bat'
+./tools/Check-Documentation.ps1 -RecordValidation BLD-GOG-EN
+git add VALIDATION.md
+```
+
+`VALIDATION.md` holds the commit, the date, the builds and the hash of each marked test file of a
+`validated` row. The check, in CI as well, fails a `validated` row whose marked test file is missing
+from the record or has changed since it was recorded, so a change to such a test needs a new local
+run before it merges. A change to code a marked test exercises needs one too, which the check
+cannot see.
 
 ## Repository policy
 
@@ -38,7 +68,8 @@ pinned to a full commit SHA, on every push to `main` and every pull request. It 
 `parity/` and `deviations/` against the standard's list of
 [checks](https://dinorefurb.com/documentation-standard/#checks), compiles each `.ksy` file with
 the Kaitai Struct compiler, checks that every spec and deviation ID cited in `src/`, `tests/`, `tools/`
-and `docs/` exists and is not superseded, and fails when `spec/index/` or `PARITY.md` is stale. It
+and `docs/` exists and is not superseded, fails when `spec/index/` or `PARITY.md` is stale, and
+fails a `validated` row whose marked tests are not in `VALIDATION.md` as they are now. It
 fetches the full history so it can fail a pull request that deletes a spec ID, area or deviation
 that exists on `main`. The toolkit's
 [setup guide](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/blob/main/docs/documentation-standard-check.md)

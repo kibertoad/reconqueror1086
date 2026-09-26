@@ -2,7 +2,10 @@
 param(
     [string] $RepositoryRoot,
     # Rewrite spec/index/ and PARITY.md instead of failing when they are stale.
-    [switch] $Write
+    [switch] $Write,
+    # Write VALIDATION.md for the marked tests of the validated rows, naming the builds the local
+    # run used. Only after every test in those files passed against the original's files.
+    [string[]] $RecordValidation
 )
 
 $ErrorActionPreference = 'Stop'
@@ -36,7 +39,10 @@ if (-not (Test-Path -LiteralPath $script)) {
 }
 
 $arguments = @($script, '--root', $root, '--references', 'docs')
-if (-not $Write) {
+if ($RecordValidation) {
+    $arguments += @('--record-validation', ($RecordValidation -join ','))
+}
+elseif (-not $Write) {
     $arguments += '--check'
 }
 

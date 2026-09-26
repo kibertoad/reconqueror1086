@@ -26,7 +26,10 @@ follows the [documentation standard](https://dinorefurb.com/documentation-standa
 
 Run `tools/Check-Documentation.ps1 -Write` after changing `spec/`, `parity/` or
 `deviations/`, and commit the indexes and `PARITY.md` it writes
-(`docs/VALIDATION.md` describes the check).
+(`docs/VALIDATION.md` describes the check). A test that reads the original's
+files finds them through `GAME_DIR`, skips without them, and carries the
+comment `// needs: GAME_DIR`; CI never has them, so record a passing local run
+in `VALIDATION.md` as `docs/VALIDATION.md` describes.
 
 Keep proprietary bytes and generated analysis artifacts out of Git. Commit only
 independently authored technical descriptions, compact facts, hashes, and legal
