@@ -27,7 +27,6 @@ These hashes identify the evidence source and are not claims that every retail o
 
 | Finding | Evidence | Confidence |
 | --- | --- | --- |
-| The configured original supports a `WAR_MODE` setting and the shipped CD configuration uses `640`. | Extracted `CONQUER.INI` in the hashed disc image. | Confirmed for this disc configuration |
 
 ## Resource archive findings
 

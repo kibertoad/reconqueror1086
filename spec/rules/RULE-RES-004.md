@@ -7,7 +7,7 @@ superseded_by: []
 evidence: [FND-RES-006, FND-RES-002]
 conflicting: []
 split_with: []
-related: [RULE-RES-001]
+related: [RULE-RES-001, RULE-CONFIG-002]
 ---
 
 ## Summary
@@ -27,21 +27,21 @@ None.
 
 ## Inputs
 
-`fn_00062EA0`, which returns the value `CONQUER.INI` gives a key, or 0.
+`ini_value` (RULE-CONFIG-002), which returns the value `CONQUER.INI` gives a key, or 0.
 
 ## Procedure
 
 ```text
 define set_archive_paths():
-    let data = fn_00062EA0(sprintf("DATA"))
+    let data = ini_value(sprintf("DATA"))
     if data == 0:
         data = sprintf(".\\DATA\\")
     data_gob_path = sprintf("%sC1086ad.GOB", data)
-    let cd = fn_00062EA0(sprintf("CD_PATH"))
+    let cd = ini_value(sprintf("CD_PATH"))
     if cd == 0:
         cd = sprintf(".\\CD_PATH\\")
     cd_path = sprintf("%s", cd)
-    let gob = fn_00062EA0(sprintf("GOB"))
+    let gob = ini_value(sprintf("GOB"))
     if gob == 0:
         gob = sprintf(".\\GOB\\")
     gob_path = sprintf("%sC1086.GOB", gob)
@@ -84,6 +84,5 @@ None known.
 
 ## Open questions
 
-- What `fn_00062EA0` returns for each key; `CONQUER.INI` is the CONFIG area's.
 - Whether any call loads a picture, layout, song or sound with mode 0.
 - Whether the shipped game ever reads a `.LOW` file.

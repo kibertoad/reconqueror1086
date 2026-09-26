@@ -62,7 +62,7 @@ public sealed class OriginalStrategicInteractiveEncounterViewport
     /// Reproduces resolver setup RULE-BATTLE-001's mapping from its
     /// already-resolved display-width global (<c>battle_mode_width</c>) to the separate
     /// control-strip margin global (<c>battle_control_margin</c>). The preceding
-    /// <c>WAR_MODE</c> display-selection and capability probes are deliberately
+    /// <c>WAR_MODE</c> display-selection and capability probes (RULE-CONFIG-004) are deliberately
     /// not modeled here: the source only makes these two nonzero assignments
     /// after a successful display-mode change.
     /// </summary>

@@ -480,7 +480,20 @@ Entries by area.
 
 ## CONFIG
 
-None.
+| ID | Title | Status |
+|---|---|---|
+| [BUG-CONFIG-001](../bugs/BUG-CONFIG-001.md) | A CONQUER.INI without DELAYVGA makes the game compare memory at address 0 with ON | supported |
+| [FMT-CONFIG-001](../formats/FMT-CONFIG-001.md) | CONQUER.INI, the settings file | supported |
+| [FMT-CONFIG-002](../formats/FMT-CONFIG-002.md) | Setting node, one key and value of the loaded CONQUER.INI | supported |
+| [FND-CONFIG-001](../findings/FND-CONFIG-001.md) | Startup finds CONQUER.INI in four places and loads it into a list of keys and values | recorded |
+| [FND-CONFIG-002](../findings/FND-CONFIG-002.md) | Keys match case-sensitively, and a write rewrites every stored line of CONQUER.INI | recorded |
+| [FND-CONFIG-003](../findings/FND-CONFIG-003.md) | The other keys: CD_PATH at eleven sites, the view window size, SLOWMACHINE, USE_CYBERMAN, FULL_MOVIE, DELAYVGA and an unused GRAPHICS | recorded |
+| [FND-CONFIG-004](../findings/FND-CONFIG-004.md) | WAR_MODE 640 keeps the field battle at 640 by 480; any other value or none tries 1024 by 768 first | recorded |
+| [FND-CONFIG-005](../findings/FND-CONFIG-005.md) | The disc and the installation ship different CONQUER.INI files, written by two setup programs | recorded |
+| [RULE-CONFIG-001](../rules/RULE-CONFIG-001.md) | Finding and loading CONQUER.INI | supported |
+| [RULE-CONFIG-002](../rules/RULE-CONFIG-002.md) | Reading and writing a setting | supported |
+| [RULE-CONFIG-003](../rules/RULE-CONFIG-003.md) | View, controller and movie settings | supported |
+| [RULE-CONFIG-004](../rules/RULE-CONFIG-004.md) | Field battle display mode from WAR_MODE | supported |
 
 ## SAVE
 

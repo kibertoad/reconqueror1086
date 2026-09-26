@@ -3,6 +3,8 @@ using Conqueror.Resources;
 
 namespace Conqueror.Game;
 
+// RULE-CONFIG-002. PLACEHOLDER: the original keeps these switches in CONQUER.INI (FMT-CONFIG-001);
+// this JSON store, its volumes and its backup file are the rebuild's own.
 public sealed record GameSettings
 {
     public int Version { get; init; } = GameSettingsStore.CurrentVersion;

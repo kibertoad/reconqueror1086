@@ -7,7 +7,7 @@ superseded_by: []
 evidence: [FND-SOUND-004, FND-SOUND-005, FND-RES-006, FND-SOUND-006, FND-UI-012, FND-SOUND-003]
 conflicting: []
 split_with: []
-related: [RULE-RES-001, RULE-RES-004, RULE-SOUND-001]
+related: [RULE-RES-001, RULE-RES-004, RULE-SOUND-001, RULE-CONFIG-002]
 ---
 
 ## Summary
@@ -28,18 +28,18 @@ each.
 
 ## Inputs
 
-`fn_00062EA0`, the value of a `CONQUER.INI` key.
+`ini_value` (RULE-CONFIG-002), the value of a `CONQUER.INI` key.
 
 ## Procedure
 
 ```text
 define read_sound_options():
     # absent keys leave the flags at 1
-    if fn_00062EA0("CDMUSIC") != 0 and fn_00062EA0("CDMUSIC") != "ON":
+    if ini_value("CDMUSIC") != 0 and ini_value("CDMUSIC") != "ON":
         cd_music_on = 0
-    if fn_00062EA0("SOUND_EFFECTS") != 0 and fn_00062EA0("SOUND_EFFECTS") != "ON":
+    if ini_value("SOUND_EFFECTS") != 0 and ini_value("SOUND_EFFECTS") != "ON":
         sound_effects_on = 0
-    if fn_00062EA0("MIDIMUSIC") != 0 and fn_00062EA0("MIDIMUSIC") != "ON":
+    if ini_value("MIDIMUSIC") != 0 and ini_value("MIDIMUSIC") != "ON":
         midi_music_on = 0
     # MOVIE, ANIMATIONS, CREDITS and DIG_SPEECH are read the same way into their own flags
     if sound_effects_on != 0:
@@ -51,7 +51,7 @@ define init_digital_sound():
     if digital_ready != 0:
         return
     for key in ["SOUND_DEVICE", "SOUND_PORT", "SOUND_DMA", "SOUND_IRQ"]:
-        if fn_00062EA0(key) == 0:
+        if ini_value(key) == 0:
             # the game stops with "Error..Sound System not configured...Aborting."
             return
     digital_ready = 1
@@ -63,7 +63,7 @@ define init_midi():
     if midi_ready != 0:
         return
     for key in ["MIDI_DEVICE", "MIDI_PORT"]:
-        if fn_00062EA0(key) == 0:
+        if ini_value(key) == 0:
             # the game stops with "Error..Midi System not configured...Aborting."
             return
     # the MIDI driver is loaded from AUD_DRV, a 32 KB song buffer is taken from DOS memory,
@@ -115,5 +115,4 @@ None known.
 
 ## Open questions
 
-- `fn_00062EA0` finds a key in `CONQUER.INI`; how was not traced.
 - The HMI driver calls inside `init_digital_sound`, `init_midi`, `play_music` and `stop_music`.

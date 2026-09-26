@@ -18,8 +18,11 @@ Buy *Conqueror A.D. 1086* from GOG and install it (GOG game ID `2110944433`, bui
 `game.gog` with the cue sheet `game.ins`, XXH3-128 `b915491c5bdce934ca216d2ceebec0ce` for
 `game.gog`. `CD:VERSION.TXT` on the disc names the game as version 1.0, Sierra On-Line, 1995.
 
-The GOG DOSBox configuration mounts the install directory as `C:` and the disc image as `D:`.
-`CONQUER.BAT` runs `D:\CONQUER.EXE`, so the executable is the disc's copy. The installed
+The GOG DOSBox configuration mounts the install directory as `C:` and the disc image as `D:`,
+and emulates an S3 SVGA card with 16 MB of memory. `dosbox_ad1086_single.conf` runs
+`CONQUER.BAT`, which runs `D:\CONQUER.EXE` with up to two arguments, so the executable is the disc's
+copy. `dosbox_ad1086_settings.conf` runs `CONFIG.BAT`, which runs the disc's setup program
+`D:\config.exe`. The installed
 `CONQUER.INI` sets `GOB=C:\`, `CD_PATH=D:\CONQUER\` and `AUD_DRV=D:\`: the game reads the
 installed `C1086.GOB` and takes its Smacker movies, `.RES` and `.LOW` files from `CD:CONQUER/`.
 The disc holds a byte-identical copy of `C1086.GOB` (same size and hash), which this

@@ -23,7 +23,7 @@ Entries by kind.
 
 ## formats
 
-46 entries.
+48 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -33,6 +33,8 @@ Entries by kind.
 | [FMT-ASSAULT-004](../formats/FMT-ASSAULT-004.md) | Live effect record, one of the 64 effects the scheduler runs | unknown |
 | [FMT-BATTLE-001](../formats/FMT-BATTLE-001.md) | Field battle unit, one troop in an interactive field battle | supported |
 | [FMT-BATTLE-002](../formats/FMT-BATTLE-002.md) | Pointer event, one entry of the pointer queue | supported |
+| [FMT-CONFIG-001](../formats/FMT-CONFIG-001.md) | CONQUER.INI, the settings file | supported |
+| [FMT-CONFIG-002](../formats/FMT-CONFIG-002.md) | Setting node, one key and value of the loaded CONQUER.INI | supported |
 | [FMT-MEDIA-001](../formats/FMT-MEDIA-001.md) | CSF sprite file | supported |
 | [FMT-MEDIA-002](../formats/FMT-MEDIA-002.md) | CSF frame | supported |
 | [FMT-MEDIA-003](../formats/FMT-MEDIA-003.md) | PCX picture as the game reads it | supported |
@@ -76,7 +78,7 @@ Entries by kind.
 
 ## rules
 
-114 entries.
+118 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -123,6 +125,10 @@ Entries by kind.
 | [RULE-BATTLE-010](../rules/RULE-BATTLE-010.md) | Battle clock | supported |
 | [RULE-BATTLE-011](../rules/RULE-BATTLE-011.md) | Field battle drawing | supported |
 | [RULE-BATTLE-012](../rules/RULE-BATTLE-012.md) | Pointer events | supported |
+| [RULE-CONFIG-001](../rules/RULE-CONFIG-001.md) | Finding and loading CONQUER.INI | supported |
+| [RULE-CONFIG-002](../rules/RULE-CONFIG-002.md) | Reading and writing a setting | supported |
+| [RULE-CONFIG-003](../rules/RULE-CONFIG-003.md) | View, controller and movie settings | supported |
+| [RULE-CONFIG-004](../rules/RULE-CONFIG-004.md) | Field battle display mode from WAR_MODE | supported |
 | [RULE-DRAGON-001](../rules/RULE-DRAGON-001.md) | Dragon encounter | supported |
 | [RULE-DRAGON-002](../rules/RULE-DRAGON-002.md) | Crown ending | supported |
 | [RULE-ESTATE-001](../rules/RULE-ESTATE-001.md) | War Planning armies, companies and prices | supported |
@@ -197,7 +203,7 @@ Entries by kind.
 
 ## findings
 
-213 entries.
+218 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -267,6 +273,11 @@ Entries by kind.
 | [FND-BATTLE-018](../findings/FND-BATTLE-018.md) | The resolver reads WAR_MODE and loads BATTLE.PCX and MEN8.CSF | recorded |
 | [FND-BATTLE-019](../findings/FND-BATTLE-019.md) | The renderer sorts dead units first then by y and x, and picks frames by lane, category, heading and phase | recorded |
 | [FND-BATTLE-020](../findings/FND-BATTLE-020.md) | Pointer events are queued with a timer count and classified into eight codes | recorded |
+| [FND-CONFIG-001](../findings/FND-CONFIG-001.md) | Startup finds CONQUER.INI in four places and loads it into a list of keys and values | recorded |
+| [FND-CONFIG-002](../findings/FND-CONFIG-002.md) | Keys match case-sensitively, and a write rewrites every stored line of CONQUER.INI | recorded |
+| [FND-CONFIG-003](../findings/FND-CONFIG-003.md) | The other keys: CD_PATH at eleven sites, the view window size, SLOWMACHINE, USE_CYBERMAN, FULL_MOVIE, DELAYVGA and an unused GRAPHICS | recorded |
+| [FND-CONFIG-004](../findings/FND-CONFIG-004.md) | WAR_MODE 640 keeps the field battle at 640 by 480; any other value or none tries 1024 by 768 first | recorded |
+| [FND-CONFIG-005](../findings/FND-CONFIG-005.md) | The disc and the installation ship different CONQUER.INI files, written by two setup programs | recorded |
 | [FND-DRAGON-001](../findings/FND-DRAGON-001.md) | The dragon encounter wrapper limits lance experience to 0..20, stores it back after the run, and reports failure for results 1 and 2 | recorded |
 | [FND-DRAGON-002](../findings/FND-DRAGON-002.md) | The dragon media routine adds 2 to the lance copy on a win and plays the win or loss movie | recorded |
 | [FND-DRAGON-003](../findings/FND-DRAGON-003.md) | After a won dragon run the lair shows the victory text and plays champl30.smk | recorded |
@@ -421,12 +432,13 @@ Entries by kind.
 
 ## bugs
 
-15 entries.
+16 entries.
 
 | ID | Title | Status |
 |---|---|---|
 | [BUG-BATTLE-001](../bugs/BUG-BATTLE-001.md) | Morale adds the remainder by 3 instead of a third | supported |
 | [BUG-BATTLE-002](../bugs/BUG-BATTLE-002.md) | A unit still turning toward its target turns toward another unit | supported |
+| [BUG-CONFIG-001](../bugs/BUG-CONFIG-001.md) | A CONQUER.INI without DELAYVGA makes the game compare memory at address 0 with ON | supported |
 | [BUG-ESTATE-001](../bugs/BUG-ESTATE-001.md) | Removing a company refunds its price only after the committed companies of its kind are used up | supported |
 | [BUG-ESTATE-002](../bugs/BUG-ESTATE-002.md) | Removing a company gives back population that raising it did not take | supported |
 | [BUG-ESTATE-003](../bugs/BUG-ESTATE-003.md) | Killing Drogo after refusing to pay leaves the debt | supported |

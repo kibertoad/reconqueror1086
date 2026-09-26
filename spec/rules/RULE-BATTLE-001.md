@@ -4,10 +4,10 @@ title: Field battle resolution
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-BATTLE-001, FND-BATTLE-002, FND-BATTLE-003, FND-BATTLE-004, FND-BATTLE-005, FND-BATTLE-008, FND-BATTLE-012, FND-BATTLE-015, FND-BATTLE-016, FND-BATTLE-017, FND-BATTLE-018, FND-STRATEGY-029]
+evidence: [FND-BATTLE-001, FND-BATTLE-002, FND-BATTLE-003, FND-BATTLE-004, FND-BATTLE-005, FND-BATTLE-008, FND-BATTLE-012, FND-BATTLE-015, FND-BATTLE-016, FND-BATTLE-017, FND-BATTLE-018, FND-STRATEGY-029, FND-CONFIG-004]
 conflicting: []
 split_with: []
-related: [RULE-BATTLE-002, RULE-BATTLE-003, RULE-BATTLE-008, RULE-BATTLE-011, RULE-RNG-001, RULE-STRATEGY-011, RULE-STRATEGY-017, FMT-BATTLE-001]
+related: [RULE-BATTLE-002, RULE-BATTLE-003, RULE-BATTLE-008, RULE-BATTLE-011, RULE-RNG-001, RULE-STRATEGY-011, RULE-STRATEGY-017, FMT-BATTLE-001, RULE-CONFIG-004]
 ---
 
 ## Summary
@@ -31,7 +31,7 @@ keeps, the player's counts of categories 0, `0x78` and `0xF0` and then the foe's
 
 ## Inputs
 
-`battle_choice_region`, `war_mode_width`, `player_ends_survey` and `screen_height`.
+`battle_choice_region`, `player_ends_survey` and `screen_height`.
 
 ## Procedure
 
@@ -55,8 +55,8 @@ define resolve_encounter(counts, morale, foe_morale):
         return auto_resolve(counts)
     battle_formation = [2, 3, 1, 0][region - 1]
     battle_selection = []
-    # reads WAR_MODE, switches the display mode, and loads BATTLE.PCX and men8_image
-    battle_mode_width = war_mode_width
+    # loads BATTLE.PCX, switches the display mode, and loads men8_image
+    battle_mode_width = select_battle_display()
     build_units(counts)
     if battle_mode_width == 1024:
         battle_control_margin = 160
@@ -141,5 +141,5 @@ None known.
 - What the gate `0x000256FC` returns when the player leaves it without picking a region, and how it
   reads the pointer.
 - What the callers at `0x0002A80B` and `0x00042363` are.
-- Which display modes `WAR_MODE` selects, and how the resolver draws the backdrop in each.
+- How the resolver draws the backdrop in each display mode.
 - What an automatic battle with a foe total of 0 does on the original machine.

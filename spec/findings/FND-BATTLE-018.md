@@ -21,8 +21,8 @@ environment: null
 ## Observation
 
 The resolver names `BATTLE.PCX`, `MEN8.CSF` and `WAR_MODE` at object-2 offsets `0x3250`, `0x32CC`
-and `0x32C0`. It reads `WAR_MODE` as a number and tries a display mode only when it is present and
-not 640, storing 1024 or 800 in `0x000A9CC8` on success. `BATTLE.PCX` decodes to a 1024 by 728
+and `0x32C0`. It reads `WAR_MODE` as a number and tries a larger display mode unless it is 640, a
+missing key included, storing 1024 or 800 in `0x000A9CC8` on success (FND-CONFIG-004). `BATTLE.PCX` decodes to a 1024 by 728
 image and `MEN8.CSF` to 723 frames: 720 of 90 by 90, then 9 by 9, 39 by 13 and 57 by 14. The interactive
 path at `0x00025A89` allocates `0x000A9C70 + 1` bytes at `0x000A9C84` and stores 0 in the first. After
 the constructor, `0x00025F08` sets `0x000A9C74` to 160 when `0x000A9CC8` is 1024 and to 80 when it is

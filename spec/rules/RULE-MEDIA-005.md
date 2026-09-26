@@ -7,7 +7,7 @@ superseded_by: []
 evidence: [FND-MEDIA-009, FND-MEDIA-008, FND-RES-006, FND-BATTLE-015, FND-JOUST-002, FND-JOUST-006]
 conflicting: []
 split_with: []
-related: [FMT-MEDIA-006]
+related: [FMT-MEDIA-006, RULE-CONFIG-002]
 ---
 
 ## Summary
@@ -38,7 +38,7 @@ Conversation, store, transition, title and full-screen movies; `play_movie` has 
 
 ```text
 define open_movie(path: char[], flags: UINT32, extra: INT32) -> movie:
-    let speech = fn_00062EA0("DIG_SPEECH")
+    let speech = ini_value("DIG_SPEECH")
     if speech != 0 and speech == "OFF":
         flags = flags & 0xFFFF01FF
     return fn_0006C287(path, flags, extra)
@@ -67,7 +67,7 @@ define play_movie(m: movie, x: INT32, y: INT32, repeats: INT32, set_palette: INT
 
 define play_movie_fullscreen(name: char[]):
     # the display switches to 320 by 200
-    let dir = fn_00062EA0("CD_PATH")
+    let dir = ini_value("CD_PATH")
     if dir == 0:
         dir = ".\CD\"
     let m = open_movie(sprintf("%s%s", dir, name), 0x200, -1)
@@ -76,7 +76,7 @@ define play_movie_fullscreen(name: char[]):
         return
     play_movie(m, (320 - movie_width) / 2, (200 - movie_height) / 2, 1, 1, stop_on_input, 1)
     fn_00072119(1)
-    if fn_00062EA0("DELAYVGA") == "ON":
+    if ini_value("DELAYVGA") == "ON":
         fn_00072119(3)
     # the display switches back to 640 by 480; a failure stops the game with
     # "Conq-Vid: Initializing video system. Aborting."
@@ -111,4 +111,3 @@ None known.
 - The input event codes 3 and 7.
 - What `fn_00072119` does with 1 and 3.
 - The meaning of the open flags `0x200` and `0x80` inside the library, which `fn_0006C287` opens with.
-- How `fn_00062EA0` finds a key in `CONQUER.INI`.
