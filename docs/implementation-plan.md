@@ -638,7 +638,7 @@ The resource-decoding sprint is first because it unlocks exact dialogue, screen 
 4. In progress: bind menu CSF sequences to verified palettes and roles. `OPTION.CSF` ON/OFF held/released and Resume frames use `OPTFIN.PCX`; `SWORDS.CSF` item art and `BUYSELL.CSF` control states use `SWDTEMP.PCX`; all six `FFMOUSE.CSF` frames are classified and contextual travel/talk/target/pressed-hand selection is active. Exact cursor timing, hourglass dispatch, and other menu sequences still require evidence.
 5. [Completed 2026-09-10] Add legal-boundary automation that fails if imported media or generated analysis artifacts enter Git, then add Windows x64, Linux x64, macOS arm64, and macOS x64 CI restore/build/test/publish coverage plus native installer checks. `tools/Verify-Repository.ps1` interprets the data-only `repository-policy.json`; the local test launcher and every GitHub Actions package workflow enforce it before compiling.
 6. In progress: `ICA`/`ICS`/`ICW` are decoded and active as seasonal 337-frame estate atlases using the `ICONTEMP.PCX` palette. Recover the executable's exact terrain/frame table plus roads, shield, cursor, and layout data; current semantic frame assignments remain provisional.
-7. In progress: unsigned 8-bit mono PCM is confirmed; all imported samples are eagerly converted into a retained startup cache and the shared 2,159-byte interface sample is active. Trace and bind the remaining 101 sample event identifiers; `VSMITH.666` is audio, not the blacksmith dialogue database.
+7. In progress: all imported samples are eagerly converted into a retained startup cache and the shared click is active. Bind the remaining samples to the callers of RULE-SOUND-002.
 
 ## Combat rendering notes
 

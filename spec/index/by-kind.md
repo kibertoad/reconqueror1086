@@ -23,7 +23,7 @@ Entries by kind.
 
 ## formats
 
-45 entries.
+46 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -45,6 +45,7 @@ Entries by kind.
 | [FMT-RES-002](../formats/FMT-RES-002.md) | Container directory record | supported |
 | [FMT-RES-003](../formats/FMT-RES-003.md) | Kind-1 stream, the stored bytes of a kind-1 entry | supported |
 | [FMT-RES-004](../formats/FMT-RES-004.md) | Kind-2 stream, the stored bytes of a kind-2 entry | supported |
+| [FMT-SOUND-001](../formats/FMT-SOUND-001.md) | Sound bank, a .666 entry | supported |
 | [FMT-STRATEGY-001](../formats/FMT-STRATEGY-001.md) | Strategic movement record, one force on the strategic map | supported |
 | [FMT-STRATEGY-002](../formats/FMT-STRATEGY-002.md) | Property record, one castle of the strategic map | supported |
 | [FMT-STRATEGY-003](../formats/FMT-STRATEGY-003.md) | Person record, one character of the strategic map | supported |
@@ -75,7 +76,7 @@ Entries by kind.
 
 ## rules
 
-110 entries.
+114 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -149,6 +150,10 @@ Entries by kind.
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |
 | [RULE-RES-004](../rules/RULE-RES-004.md) | Archive paths and which archive is open | supported |
 | [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number generator | supported |
+| [RULE-SOUND-001](../rules/RULE-SOUND-001.md) | Loading and freeing a sound bank | supported |
+| [RULE-SOUND-002](../rules/RULE-SOUND-002.md) | Playing a sample | supported |
+| [RULE-SOUND-003](../rules/RULE-SOUND-003.md) | Starting the sound systems and playing MIDI music | supported |
+| [RULE-SOUND-004](../rules/RULE-SOUND-004.md) | Playing CD music | supported |
 | [RULE-STRATEGY-001](../rules/RULE-STRATEGY-001.md) | Strategic pass and the yearly orders | supported |
 | [RULE-STRATEGY-002](../rules/RULE-STRATEGY-002.md) | Hostile pass and arrival | supported |
 | [RULE-STRATEGY-003](../rules/RULE-STRATEGY-003.md) | Hostile generator and reactive finder | supported |
@@ -192,7 +197,7 @@ Entries by kind.
 
 ## findings
 
-207 entries.
+213 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -311,6 +316,12 @@ Entries by kind.
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |
+| [FND-SOUND-001](../findings/FND-SOUND-001.md) | The release holds 26 .666 sound banks with 102 unsigned 8-bit samples at 11,025, 11,050 and 22,050 Hz | recorded |
+| [FND-SOUND-002](../findings/FND-SOUND-002.md) | Sound banks load through 0x0005B584, only when SOUND_EFFECTS is on, from the open archive by index | recorded |
+| [FND-SOUND-003](../findings/FND-SOUND-003.md) | Samples play through 0x0005B3B0 on ten voices, with rate factors for 11,025, 22,050 and 44,100 Hz only | recorded |
+| [FND-SOUND-004](../findings/FND-SOUND-004.md) | CONQUER.INI switches the sound systems and names an HMI SOS driver setup; the digital driver runs at 22,050 Hz | recorded |
+| [FND-SOUND-005](../findings/FND-SOUND-005.md) | MIDI music plays one HMP song at a time through 0x0005B0D4; the release holds 12 songs | recorded |
+| [FND-SOUND-006](../findings/FND-SOUND-006.md) | CD music plays tracks 2 to 6 of the disc through MSCDEX requests and loops by replaying the range | recorded |
 | [FND-STRATEGY-001](../findings/FND-STRATEGY-001.md) | The strategic pass at 0x0003C290 runs brigands, the spy, the player forces and then the hostile pass | recorded |
 | [FND-STRATEGY-002](../findings/FND-STRATEGY-002.md) | Routine 0x0003B9F4 issues a brigand order or an order from the king | recorded |
 | [FND-STRATEGY-003](../findings/FND-STRATEGY-003.md) | The hostile pass at 0x0003C088 generates first, then moves slots 0 to 4 and resolves each arrival | recorded |
@@ -410,7 +421,7 @@ Entries by kind.
 
 ## bugs
 
-14 entries.
+15 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -420,6 +431,7 @@ Entries by kind.
 | [BUG-ESTATE-002](../bugs/BUG-ESTATE-002.md) | Removing a company gives back population that raising it did not take | supported |
 | [BUG-ESTATE-003](../bugs/BUG-ESTATE-003.md) | Killing Drogo after refusing to pay leaves the debt | supported |
 | [BUG-JOUST-001](../bugs/BUG-JOUST-001.md) | The dragon lance frame scan reads past its table when the lance is above y 92 | supported |
+| [BUG-SOUND-001](../bugs/BUG-SOUND-001.md) | Samples at 11,050 Hz play with the last step their voice used | supported |
 | [BUG-STRATEGY-001](../bugs/BUG-STRATEGY-001.md) | The rare pursuit branch of the hostile generator tests a stale property | supported |
 | [BUG-STRATEGY-002](../bugs/BUG-STRATEGY-002.md) | A small pursuit keeps the swordsmen and knights of the slot's previous force | supported |
 | [BUG-STRATEGY-003](../bugs/BUG-STRATEGY-003.md) | A battle against a hostile force counts its result twice | supported |

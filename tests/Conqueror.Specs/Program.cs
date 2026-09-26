@@ -63,6 +63,7 @@ var cueTracks = CueSheet.Tracks(syntheticCue);
 Check(CueSheet.DataTrackSectors(syntheticCue) == 150 && cueTracks.Length == 3 && cueTracks[2].StartSector == 235, "cue sheet parses data and audio boundaries");
 Check(Throws<InvalidDataException>(() => CueSheet.Tracks(["not a cue sheet"])), "invalid cue sheet fails cleanly");
 
+// Covers FMT-SOUND-001.
 var soundBankFixture = new byte[15];
 BinaryPrimitives.WriteUInt32LittleEndian(soundBankFixture, DynamixSoundBankDecoder.Magic);
 BinaryPrimitives.WriteUInt32LittleEndian(soundBankFixture.AsSpan(4), 3);

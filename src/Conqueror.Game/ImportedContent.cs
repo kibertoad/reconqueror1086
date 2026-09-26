@@ -114,6 +114,7 @@ public static class ImportedFonts
     ];
 }
 
+// RULE-SOUND-001, RULE-SOUND-002: sample 0 of GAMEOPTS.666 is the click most hotspots play at offset 4.
 public static class ImportedSounds
 {
     public static IReadOnlyList<ImportedSoundDefinition> Definitions { get; } =

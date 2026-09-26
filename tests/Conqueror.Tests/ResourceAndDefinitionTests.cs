@@ -780,7 +780,7 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Throws<InvalidDataException>(() => DynamixCompression.DecodeKind2(basic, 7, 6));
     }
 
-    [Fact]
+    [Fact] // Covers FMT-SOUND-001.
     public void DynamixSoundBankParsesBoundedRateTaggedSamples()
     {
         var bytes = new byte[4 + 8 + 3 + 8 + 2];

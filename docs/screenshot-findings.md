@@ -64,7 +64,7 @@ Local reference filenames:
 - **Implemented:** keep the smith and Buy/Sell hotspots distinct. The smith opens the conversation frame; the weapon-rack region opens inventory.
 - **Implemented:** render `SWDTEMP.PCX` as the store shell; parse `WEAPONS.DAT`; bind each shop definition to its original record; render the selected `SWORDS.CSF` frame, local description, and exact price; and route previous, next, transaction, and exit through typed 640x480 controls.
 - Map the village-image suffixes to world locations before activating `V66_1111.PCX` outside its confirmed Sabine's Keep role.
-- Locate the actual blacksmith dialogue-node source and bind it to `COMSCRN1.PCX`, `BLACKSMI.PCC`, scroll regions, and choices through the generic dialogue interpreter planned in Phase 1.2. Do not repeat the disproved `VSMITH.666` text hypothesis.
+- Locate the actual blacksmith dialogue-node source and bind it to `COMSCRN1.PCX`, `BLACKSMI.PCC`, scroll regions, and choices through the generic dialogue interpreter planned in Phase 1.2.
 - **Implemented:** render `BUYSELL.CSF` through the store palette using data-driven overlay definitions: hide/show View from the record's movie marker and switch Purchase/Sell from current ownership. Exact mouse-down timing remains to be traced.
 - Recover exact path interaction, original lord-record scheduling, enemy detachment/arrival behavior, and captain battle rules for the now-active independently fielded divisions and autonomous enemy movements. Recover behavior/cost semantics for currently display-only management rows and replace the provisional terrain fill with editable tiles. The former `JUMP!!` effect gap is closed: executable callback registration proves the region has no action.
 

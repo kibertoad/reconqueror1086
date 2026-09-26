@@ -309,6 +309,7 @@ public static class ResourceHash
         && value.All(character => character is >= '0' and <= '9' or >= 'a' and <= 'f' or >= 'A' and <= 'F');
 }
 
+// Reads game.ins, whose audio tracks 2 to 6 are the ones RULE-SOUND-004 plays (FND-SOUND-006).
 public static class CueSheet
 {
     public static int DataTrackSectors(IEnumerable<string> lines)

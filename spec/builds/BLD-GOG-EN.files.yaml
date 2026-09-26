@@ -11,6 +11,10 @@ files:
     format: data
     size: 368
     xxh3: ce33fdaa75fd3ba8ad80122bfea47972
+  - path: game.ins
+    format: data
+    size: 275
+    xxh3: d1916a460156254f18357a90e17a4920
   - path: CD:CONQUER.INI
     format: data
     size: 314
@@ -19,6 +23,18 @@ files:
     format: MZ
     size: 236848
     xxh3: 1a8dc11fdd903a1c1e3994d6cba341e4
+  - path: CD:HMIDET.386
+    format: data
+    size: 81956
+    xxh3: 97f706f8830099eb0faa7b99648845ec
+  - path: CD:HMIDRV.386
+    format: data
+    size: 261305
+    xxh3: 35b400df699ea5fadc39b9e8b6c18913
+  - path: CD:HMIMDRV.386
+    format: data
+    size: 111928
+    xxh3: 9da88699119eb25c8860b4522fd99c08
   - path: CD:CONQUER/1101.SMK
     format: data
     size: 63592

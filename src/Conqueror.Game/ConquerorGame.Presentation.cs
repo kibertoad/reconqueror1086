@@ -150,6 +150,8 @@ public sealed partial class ConquerorGame
         PlayNextEventMovie();
     }
 
+    // PLACEHOLDER: RULE-SOUND-004. The original plays track 2 for the opening, 3 for the title, 4 in
+    // field battles, 5 in game options and 6 for the credits; the rebuild loops track 2 everywhere.
     private void StartMusic()
     {
         if (!_cdMusicEnabled || _titleMovie is { IsComplete: false }
@@ -158,6 +160,8 @@ public sealed partial class ConquerorGame
         else if (_musicInstance.State == SoundState.Stopped) _musicInstance.Play();
     }
 
+    // PLACEHOLDER: RULE-SOUND-002. One host voice per call with no ten-voice limit, and the effects
+    // volume in place of the caller's level.
     private void PlayOriginalSound(string role)
     {
         if (_originalSounds.TryGetValue(role, out var sound))

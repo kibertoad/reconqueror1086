@@ -463,7 +463,20 @@ Entries by area.
 
 ## SOUND
 
-None.
+| ID | Title | Status |
+|---|---|---|
+| [BUG-SOUND-001](../bugs/BUG-SOUND-001.md) | Samples at 11,050 Hz play with the last step their voice used | supported |
+| [FMT-SOUND-001](../formats/FMT-SOUND-001.md) | Sound bank, a .666 entry | supported |
+| [FND-SOUND-001](../findings/FND-SOUND-001.md) | The release holds 26 .666 sound banks with 102 unsigned 8-bit samples at 11,025, 11,050 and 22,050 Hz | recorded |
+| [FND-SOUND-002](../findings/FND-SOUND-002.md) | Sound banks load through 0x0005B584, only when SOUND_EFFECTS is on, from the open archive by index | recorded |
+| [FND-SOUND-003](../findings/FND-SOUND-003.md) | Samples play through 0x0005B3B0 on ten voices, with rate factors for 11,025, 22,050 and 44,100 Hz only | recorded |
+| [FND-SOUND-004](../findings/FND-SOUND-004.md) | CONQUER.INI switches the sound systems and names an HMI SOS driver setup; the digital driver runs at 22,050 Hz | recorded |
+| [FND-SOUND-005](../findings/FND-SOUND-005.md) | MIDI music plays one HMP song at a time through 0x0005B0D4; the release holds 12 songs | recorded |
+| [FND-SOUND-006](../findings/FND-SOUND-006.md) | CD music plays tracks 2 to 6 of the disc through MSCDEX requests and loops by replaying the range | recorded |
+| [RULE-SOUND-001](../rules/RULE-SOUND-001.md) | Loading and freeing a sound bank | supported |
+| [RULE-SOUND-002](../rules/RULE-SOUND-002.md) | Playing a sample | supported |
+| [RULE-SOUND-003](../rules/RULE-SOUND-003.md) | Starting the sound systems and playing MIDI music | supported |
+| [RULE-SOUND-004](../rules/RULE-SOUND-004.md) | Playing CD music | supported |
 
 ## CONFIG
 

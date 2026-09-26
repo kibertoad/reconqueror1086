@@ -42,23 +42,7 @@ Because every shipped movie is `SMK2` (FND-MEDIA-008), the rebuild decodes them 
 
 ## Dynamix `.666` sound banks
 
-All 26 decoded `.666` resources use the same rate-tagged sample sequence:
-
-| Offset | Size | Type | Meaning |
-| ---: | ---: | --- | --- |
-| `0x00` | 4 | `UINT32LE` | Magic `0x004A5031` |
-| `0x04` | 4 | `UINT32LE` | First sample byte length |
-| `0x08` | 4 | `UINT32LE` | First sample rate in hertz |
-| `0x0C` | declared length | bytes | First sample payload |
-| next | repeated | same three fields | Further samples until exact end of resource |
-
-The GOB and scene population contains 26 banks and 102 sample payloads. Observed rates are 11,025, 11,050, and 22,050 Hz; every bank consumes its decoded resource exactly, including kind-2 `CONFIGIT.666`. `VSMITH.666` contains two samples (32,132 payload bytes total at 11,025 and 22,050 Hz), so the earlier hypothesis that it contains blacksmith dialogue nodes is **Disproved**.
-
-The framing, lengths, sample counts, and rates are **Confirmed for the hashed release**. Payload analysis confirms unsigned 8-bit mono PCM: the shared 2,159-byte interface sample has mean 127.51, begins with quiet values around 127-128, spans 36-242, and contains no zero-valued silence. Interpreting those bytes as signed PCM would create a near-full-scale DC offset. At game startup the runtime decodes every installed bank once, converts every sample once to signed 16-bit little-endian PCM with `(value - 128) << 8`, and retains the ready buffers for the session. This preserves the full source range without clipping and keeps conversion out of the input/playback path.
-
-That same 2,159-byte payload (XXH3-128 `7b1ce5e094e0526e7c8ecc16b35eeb1d`) occurs bit-for-bit in 17 screen-specific banks, always at 11,025 Hz: `ICONMAP`, `MONYLNDR`, `FOPTS`, `TOPTS`, `VINN`, `VOPTS`, `VSMITH`, `WAR`, `CGOPTS`, `CHARGEN`, `DKING`, `FIEFMGMT`, `FOVIEW`, `FWARPLAN`, `GAMEOPTS`, `TENTS`, and `UTILITY`. Its reuse and position as the sole `GAMEOPTS.666` sample identify it as a shared interface activation sound with **Corroborated** confidence. Exact event bindings for the other 101 samples remain **Provisional**.
-
-`DynamixSoundBankDecoder` limits a bank to 64 MiB, a sample to 16 MiB, a bank to 4,096 samples, and rates to 1,000-192,000 Hz. It rejects bad magic, incomplete metadata, invalid rates or lengths, excessive counts, and trailing partial records before exposing sample bytes.
+`DynamixSoundBankDecoder` reads the layout of FMT-SOUND-001. It limits a bank to 64 MiB, a sample to 16 MiB, a bank to 4,096 samples, and rates to 1,000-192,000 Hz. It rejects bad magic, incomplete metadata, invalid rates or lengths, excessive counts, and trailing partial records before exposing sample bytes. At game startup the runtime decodes every installed bank once, converts every sample once to signed 16-bit little-endian PCM with `(value - 128) << 8`, and retains the ready buffers for the session. This preserves the full source range without clipping and keeps conversion out of the input/playback path.
 
 ## Indexed PCX images
 
@@ -157,6 +141,6 @@ The reports are regenerated from the user's installation and must never be commi
 ## Open questions
 
 1. Specify nested chunk headers and the exact compression selector used inside decoded resources.
-2. Associate CSF sequences and scene textures with their palettes, confirm `.666` event bindings, and specify the remaining scene `Viewer`/`Scenario`, non-property-route RAT, and FNT semantics as each decoder is validated.
+2. Associate CSF sequences and scene textures with their palettes, bind the remaining sample offsets of RULE-SOUND-002, and specify the remaining scene `Viewer`/`Scenario`, non-property-route RAT, and FNT semantics as each decoder is validated.
 
 Presentation binding (2026-09-23): `OriginalUiFontDefinition.MaskPixel` expands each decoded `CONFONT.CSF` mask intensity into premultiplied RGBA, matching MonoGame `SpriteBatch` alpha blending and preventing solid glyph rectangles. Generic replacement-screen text is drawn by `PixelFont` for a legible 5x7 grid on the current layouts. Its host-authored punctuation set covers the date, names, counters, and control hints; typographic quotes and dashes normalize to their grid counterparts, while unsupported printable symbols appear as question marks rather than disappearing. The imported source font is retained and validated for screens whose original typesetting can be mapped. The map notice is drawn only in its right information panel.
