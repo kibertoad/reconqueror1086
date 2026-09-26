@@ -12,7 +12,7 @@
 | `RULE-STRATEGY-002` | Hostile pass and arrival | supported | complete | None | None | implemented | None |
 | `RULE-STRATEGY-003` | Hostile generator and reactive finder | supported | complete | None | `DEV-STRATEGY-001` | implemented | None |
 | `RULE-STRATEGY-004` | Hostile force construction and removal | supported | complete | None | `DEV-STRATEGY-002` | implemented | None |
-| `RULE-STRATEGY-005` | Hostile force size | supported | complete | None | None | implemented | None |
+| `RULE-STRATEGY-005` | Hostile force size | supported | complete | None | `DEV-STRATEGY-004` | implemented | None |
 | `RULE-STRATEGY-006` | Direct and pursuit movement | supported | complete | None | None | implemented | None |
 | `RULE-STRATEGY-007` | Routed movement | supported | complete | None | None | implemented | None |
 | `RULE-STRATEGY-008` | Retargeting after arrival | supported | complete | None | None | implemented | None |

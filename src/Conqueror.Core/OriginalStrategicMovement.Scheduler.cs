@@ -286,7 +286,7 @@ public static partial class OriginalStrategicMovement
             : Math.Min(HouseholdCount(state, slot.OriginProperty), 30);
         var total = checked(detached + household);
         if (total <= 3)
-            slot.Swordsmen = 3;
+            slot.Halberdiers = 3;
         else
             slot.Swordsmen = slot.Halberdiers = slot.Knights = total / 3;
         origin.Garrison = checked((byte)(origin.Garrison - detached));
@@ -447,6 +447,7 @@ public static partial class OriginalStrategicMovement
         slot.Active = false;
     }
 
+    // The original keeps the troop counts of the slot's previous force (DEV-STRATEGY-004).
     private static void ResetSlot(OriginalStrategicMovementSlot slot)
     {
         var index = slot.Slot;

@@ -65,6 +65,36 @@ public sealed partial class ResourceAndDefinitionTests
         Assert.Equal(1, state.GenerationAccumulator);
     }
 
+    [Fact] // Covers RULE-STRATEGY-005, DEV-STRATEGY-004.
+    public void SmallPursuitWritesThreeHalberdiersAndClearsTheSlotsEarlierCounts()
+    {
+        var state = RuntimeState();
+        state.Properties[0].Garrison = 1;
+        var group = state.Persons[state.Properties[0].Lord].Group;
+        foreach (var person in state.Persons.Skip(1).Where(person => person.Group == group).Skip(2))
+            person.Assignment = 0;
+        state.MovementSlots[0].Swordsmen = 7;
+        state.MovementSlots[0].Knights = 5;
+        var targets = SchedulerTargets();
+        targets[1] = new OriginalStrategicPursuitTarget(
+            true, 20_000, 2_000, 12, 30, Swordsmen: 2, Halberdiers: 3, Knights: 4);
+        var input = SchedulerInput(targets) with
+        {
+            ReactiveDetection = new OriginalStrategicReactiveDetection(0, 1)
+        };
+
+        var result = OriginalStrategicMovement.AdvanceSchedulerPass(
+            state, new StubStrategicResources(), input, new QueueStrategicRandom(2));
+
+        var construction = Assert.Single(result.Constructions);
+        Assert.Equal((0, OriginalStrategicMovement.PursuitMode), (construction.Slot, construction.Mode));
+        Assert.Equal(0, state.Properties[0].Garrison);
+        Assert.Equal((0, 3, 0),
+            (state.MovementSlots[0].Swordsmen,
+                state.MovementSlots[0].Halberdiers,
+                state.MovementSlots[0].Knights));
+    }
+
     [Fact]
     public void ReactiveFinderUsesStrictNearAndApproachGatesAndAlertsOnlyOnce()
     {
