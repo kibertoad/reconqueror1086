@@ -8,7 +8,7 @@ resolution: 640x480
 evidence: [FND-UI-001, FND-UI-002, FND-UI-003, FND-UI-010, FND-UI-012]
 conflicting: []
 split_with: []
-related: [SCR-UI-003, SCR-UI-008, SCR-UI-012]
+related: [SCR-UI-003, SCR-UI-008, SCR-UI-012, SCR-SAVE-001, SCR-SAVE-002]
 ---
 
 ## Drawn elements
@@ -30,8 +30,8 @@ related: [SCR-UI-003, SCR-UI-008, SCR-UI-012]
 | region 3 | (15, 243, 255, 253) | Always | Resets the game and switches to SCR-UI-003. | FND-UI-012 |
 | region 4 | (160, 0, 120, 85) | Always | Toggles the `CDMUSIC` setting and draws its switch (FND-UI-012). and starts or stops the CD music. | FND-UI-012 |
 | region 5 | (340, 0, 145, 230) | Always | Switches to SCR-UI-008. | FND-UI-012 |
-| region 6 | (310, 233, 100, 55) | Always | Runs `0x0004B9EC`; when it returns 1, switches to SCR-UI-012. | FND-UI-012 |
-| region 7 | (411, 233, 100, 55) | Always | Runs `0x0004B4E4` and redraws the screen. | FND-UI-012 |
+| region 6 | (310, 233, 100, 55) | Always | Runs SCR-SAVE-001; when it returns 1, switches to SCR-UI-012. | FND-UI-012 |
+| region 7 | (411, 233, 100, 55) | Always | Runs SCR-SAVE-002 and redraws the screen. | FND-UI-012 |
 | region 8 | (290, 320, 140, 175) | Always | Toggles the `CREDITS` setting and draws its switch (FND-UI-012). | FND-UI-012 |
 | region 9 | (430, 320, 150, 175) | Always | Toggles the `MOVIE` setting and draws its switch (FND-UI-012). | FND-UI-012 |
 | region 10 | (510, 15, 90, 70) | Always | Toggles the `MIDIMUSIC` setting and draws its switch (FND-UI-012). It needs `0x0009DBB4`. | FND-UI-012 |
@@ -66,6 +66,4 @@ None known.
 
 ## Open questions
 
-- How `0x0004B9EC` and `0x0004B4E4` list, load and save the five games (`SAVEGAME\\~~1.SAV` to
-  `~~5.SAV`).
 - When the byte at `0x0009ADFC` is 1, and what shows region 11's frame.

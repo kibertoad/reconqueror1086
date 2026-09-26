@@ -51,7 +51,6 @@ Across the GOB and 99 imported `.RES`/`.LOW` scene archives, the installer extra
 
 | Finding | Evidence | Confidence |
 | --- | --- | --- |
-| `LOADGAME.PCX` is a distinct five-slot Load Game screen with a Resume control. The executable names `SAVEGAME\\`, `~~1.SAV` through `~~5.SAV`, `CONQ`, and `.SAV`. | Exact decoded resource, local pixel inspection, and printable strings in the hashed executable. | Confirmed five-slot structure and filenames; exact dispatch/timing remains Corroborated |
 
 ### Runtime coverage
 

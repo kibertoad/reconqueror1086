@@ -28,7 +28,7 @@ Entries by status.
 
 ## supported
 
-194 entries.
+210 entries.
 
 | ID | Title |
 |---|---|
@@ -39,6 +39,8 @@ Entries by status.
 | [BUG-ESTATE-002](../bugs/BUG-ESTATE-002.md) | Removing a company gives back population that raising it did not take |
 | [BUG-ESTATE-003](../bugs/BUG-ESTATE-003.md) | Killing Drogo after refusing to pay leaves the debt |
 | [BUG-JOUST-001](../bugs/BUG-JOUST-001.md) | The dragon lance frame scan reads past its table when the lance is above y 92 |
+| [BUG-SAVE-001](../bugs/BUG-SAVE-001.md) | A saved game without temp.jap stops the program when loaded |
+| [BUG-SAVE-002](../bugs/BUG-SAVE-002.md) | The title editor cannot be cancelled and types Esc and Backspace into the title |
 | [BUG-SOUND-001](../bugs/BUG-SOUND-001.md) | Samples at 11,050 Hz play with the last step their voice used |
 | [BUG-STRATEGY-001](../bugs/BUG-STRATEGY-001.md) | The rare pursuit branch of the hostile generator tests a stale property |
 | [BUG-STRATEGY-002](../bugs/BUG-STRATEGY-002.md) | A small pursuit keeps the swordsmen and knights of the slot's previous force |
@@ -67,6 +69,14 @@ Entries by status.
 | [FMT-RES-002](../formats/FMT-RES-002.md) | Container directory record |
 | [FMT-RES-003](../formats/FMT-RES-003.md) | Kind-1 stream, the stored bytes of a kind-1 entry |
 | [FMT-RES-004](../formats/FMT-RES-004.md) | Kind-2 stream, the stored bytes of a kind-2 entry |
+| [FMT-SAVE-001](../formats/FMT-SAVE-001.md) | Saved game, SAVEGAME\CONQn.SAV |
+| [FMT-SAVE-002](../formats/FMT-SAVE-002.md) | Strategic map state, TROOPS.SAV |
+| [FMT-SAVE-003](../formats/FMT-SAVE-003.md) | Properties, persons, items and variables, PROPERTY.SAV |
+| [FMT-SAVE-004](../formats/FMT-SAVE-004.md) | Calendar block, ~~2.SAV |
+| [FMT-SAVE-005](../formats/FMT-SAVE-005.md) | Home fief, ~~3.SAV |
+| [FMT-SAVE-006](../formats/FMT-SAVE-006.md) | Armies, ~~4.SAV |
+| [FMT-SAVE-007](../formats/FMT-SAVE-007.md) | Tournament, ~~5.SAV |
+| [FMT-SAVE-008](../formats/FMT-SAVE-008.md) | Starting persons and properties, default.dat |
 | [FMT-SOUND-001](../formats/FMT-SOUND-001.md) | Sound bank, a .666 entry |
 | [FMT-STRATEGY-001](../formats/FMT-STRATEGY-001.md) | Strategic movement record, one force on the strategic map |
 | [FMT-STRATEGY-002](../formats/FMT-STRATEGY-002.md) | Property record, one castle of the strategic map |
@@ -163,6 +173,10 @@ Entries by status.
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding |
 | [RULE-RES-004](../rules/RULE-RES-004.md) | Archive paths and which archive is open |
 | [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number generator |
+| [RULE-SAVE-001](../rules/RULE-SAVE-001.md) | Load and save screens |
+| [RULE-SAVE-002](../rules/RULE-SAVE-002.md) | Writing a saved game |
+| [RULE-SAVE-003](../rules/RULE-SAVE-003.md) | Reading a saved game |
+| [RULE-SAVE-004](../rules/RULE-SAVE-004.md) | Starting values for a new game, default.dat |
 | [RULE-SOUND-001](../rules/RULE-SOUND-001.md) | Loading and freeing a sound bank |
 | [RULE-SOUND-002](../rules/RULE-SOUND-002.md) | Playing a sample |
 | [RULE-SOUND-003](../rules/RULE-SOUND-003.md) | Starting the sound systems and playing MIDI music |
@@ -206,6 +220,8 @@ Entries by status.
 | [RULE-VIEW-005](../rules/RULE-VIEW-005.md) | Draw the backdrop |
 | [RULE-VIEW-006](../rules/RULE-VIEW-006.md) | Build a scene's distance colour maps |
 | [RULE-VIEW-007](../rules/RULE-VIEW-007.md) | Colour map of a drawn surface |
+| [SCR-SAVE-001](../screens/SCR-SAVE-001.md) | Load game |
+| [SCR-SAVE-002](../screens/SCR-SAVE-002.md) | Save game |
 | [SCR-UI-001](../screens/SCR-UI-001.md) | Title screen |
 | [SCR-UI-002](../screens/SCR-UI-002.md) | Game options |
 | [SCR-UI-003](../screens/SCR-UI-003.md) | Character options |
@@ -245,7 +261,7 @@ Entries by status.
 
 ## recorded
 
-217 entries.
+222 entries.
 
 | ID | Title |
 |---|---|
@@ -368,6 +384,11 @@ Entries by status.
 | [FND-RES-008](../findings/FND-RES-008.md) | Kind-1 blocks are neither the LSB-first LZW of other Dynamix files nor classic LH1 |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
+| [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |
+| [FND-SAVE-002](../findings/FND-SAVE-002.md) | A save writes ten temporary files and packs them with a title and version into one resource container |
+| [FND-SAVE-003](../findings/FND-SAVE-003.md) | A load checks VERSION 2.1, unpacks the entries and runs the component loaders; temp.jap must be present |
+| [FND-SAVE-004](../findings/FND-SAVE-004.md) | What the saved files hold: forces, properties, persons, items, conversation variables, fief 0, armies, calendar and tournament |
+| [FND-SAVE-005](../findings/FND-SAVE-005.md) | Startup writes default.dat from the pristine person and property tables, and a new game reads it back |
 | [FND-SOUND-001](../findings/FND-SOUND-001.md) | The release holds 26 .666 sound banks with 102 unsigned 8-bit samples at 11,025, 11,050 and 22,050 Hz |
 | [FND-SOUND-002](../findings/FND-SOUND-002.md) | Sound banks load through 0x0005B584, only when SOUND_EFFECTS is on, from the open archive by index |
 | [FND-SOUND-003](../findings/FND-SOUND-003.md) | Samples play through 0x0005B3B0 on ten voices, with rate factors for 11,025, 22,050 and 44,100 Hz only |
@@ -486,6 +507,8 @@ Entries whose Open questions section says more than None known.
 | [BUG-BATTLE-001](../bugs/BUG-BATTLE-001.md) | Morale adds the remainder by 3 instead of a third | supported |
 | [BUG-CONFIG-001](../bugs/BUG-CONFIG-001.md) | A CONQUER.INI without DELAYVGA makes the game compare memory at address 0 with ON | supported |
 | [BUG-ESTATE-001](../bugs/BUG-ESTATE-001.md) | Removing a company refunds its price only after the committed companies of its kind are used up | supported |
+| [BUG-SAVE-001](../bugs/BUG-SAVE-001.md) | A saved game without temp.jap stops the program when loaded | supported |
+| [BUG-SAVE-002](../bugs/BUG-SAVE-002.md) | The title editor cannot be cancelled and types Esc and Backspace into the title | supported |
 | [BUG-SOUND-001](../bugs/BUG-SOUND-001.md) | Samples at 11,050 Hz play with the last step their voice used | supported |
 | [BUG-STRATEGY-001](../bugs/BUG-STRATEGY-001.md) | The rare pursuit branch of the hostile generator tests a stale property | supported |
 | [BUG-STRATEGY-004](../bugs/BUG-STRATEGY-004.md) | Hostile forces lost to water or a dropped route are never uncounted | supported |
@@ -504,6 +527,10 @@ Entries whose Open questions section says more than None known.
 | [FMT-PERSON-002](../formats/FMT-PERSON-002.md) | Youth dilemma, DILEM0.DAT to DILEM29.DAT | supported |
 | [FMT-RES-001](../formats/FMT-RES-001.md) | Resource container, a GOB, RES or LOW file | supported |
 | [FMT-RES-002](../formats/FMT-RES-002.md) | Container directory record | supported |
+| [FMT-SAVE-001](../formats/FMT-SAVE-001.md) | Saved game, SAVEGAME\CONQn.SAV | supported |
+| [FMT-SAVE-002](../formats/FMT-SAVE-002.md) | Strategic map state, TROOPS.SAV | supported |
+| [FMT-SAVE-004](../formats/FMT-SAVE-004.md) | Calendar block, ~~2.SAV | supported |
+| [FMT-SAVE-005](../formats/FMT-SAVE-005.md) | Home fief, ~~3.SAV | supported |
 | [FMT-STRATEGY-001](../formats/FMT-STRATEGY-001.md) | Strategic movement record, one force on the strategic map | supported |
 | [FMT-STRATEGY-002](../formats/FMT-STRATEGY-002.md) | Property record, one castle of the strategic map | supported |
 | [FMT-STRATEGY-003](../formats/FMT-STRATEGY-003.md) | Person record, one character of the strategic map | supported |
@@ -593,6 +620,8 @@ Entries whose Open questions section says more than None known.
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-004](../rules/RULE-RES-004.md) | Archive paths and which archive is open | supported |
 | [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number generator | supported |
+| [RULE-SAVE-001](../rules/RULE-SAVE-001.md) | Load and save screens | supported |
+| [RULE-SAVE-002](../rules/RULE-SAVE-002.md) | Writing a saved game | supported |
 | [RULE-SOUND-001](../rules/RULE-SOUND-001.md) | Loading and freeing a sound bank | supported |
 | [RULE-SOUND-002](../rules/RULE-SOUND-002.md) | Playing a sample | supported |
 | [RULE-SOUND-003](../rules/RULE-SOUND-003.md) | Starting the sound systems and playing MIDI music | supported |

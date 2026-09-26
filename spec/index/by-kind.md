@@ -23,7 +23,7 @@ Entries by kind.
 
 ## formats
 
-48 entries.
+56 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -47,6 +47,14 @@ Entries by kind.
 | [FMT-RES-002](../formats/FMT-RES-002.md) | Container directory record | supported |
 | [FMT-RES-003](../formats/FMT-RES-003.md) | Kind-1 stream, the stored bytes of a kind-1 entry | supported |
 | [FMT-RES-004](../formats/FMT-RES-004.md) | Kind-2 stream, the stored bytes of a kind-2 entry | supported |
+| [FMT-SAVE-001](../formats/FMT-SAVE-001.md) | Saved game, SAVEGAME\CONQn.SAV | supported |
+| [FMT-SAVE-002](../formats/FMT-SAVE-002.md) | Strategic map state, TROOPS.SAV | supported |
+| [FMT-SAVE-003](../formats/FMT-SAVE-003.md) | Properties, persons, items and variables, PROPERTY.SAV | supported |
+| [FMT-SAVE-004](../formats/FMT-SAVE-004.md) | Calendar block, ~~2.SAV | supported |
+| [FMT-SAVE-005](../formats/FMT-SAVE-005.md) | Home fief, ~~3.SAV | supported |
+| [FMT-SAVE-006](../formats/FMT-SAVE-006.md) | Armies, ~~4.SAV | supported |
+| [FMT-SAVE-007](../formats/FMT-SAVE-007.md) | Tournament, ~~5.SAV | supported |
+| [FMT-SAVE-008](../formats/FMT-SAVE-008.md) | Starting persons and properties, default.dat | supported |
 | [FMT-SOUND-001](../formats/FMT-SOUND-001.md) | Sound bank, a .666 entry | supported |
 | [FMT-STRATEGY-001](../formats/FMT-STRATEGY-001.md) | Strategic movement record, one force on the strategic map | supported |
 | [FMT-STRATEGY-002](../formats/FMT-STRATEGY-002.md) | Property record, one castle of the strategic map | supported |
@@ -78,7 +86,7 @@ Entries by kind.
 
 ## rules
 
-118 entries.
+122 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -156,6 +164,10 @@ Entries by kind.
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |
 | [RULE-RES-004](../rules/RULE-RES-004.md) | Archive paths and which archive is open | supported |
 | [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number generator | supported |
+| [RULE-SAVE-001](../rules/RULE-SAVE-001.md) | Load and save screens | supported |
+| [RULE-SAVE-002](../rules/RULE-SAVE-002.md) | Writing a saved game | supported |
+| [RULE-SAVE-003](../rules/RULE-SAVE-003.md) | Reading a saved game | supported |
+| [RULE-SAVE-004](../rules/RULE-SAVE-004.md) | Starting values for a new game, default.dat | supported |
 | [RULE-SOUND-001](../rules/RULE-SOUND-001.md) | Loading and freeing a sound bank | supported |
 | [RULE-SOUND-002](../rules/RULE-SOUND-002.md) | Playing a sample | supported |
 | [RULE-SOUND-003](../rules/RULE-SOUND-003.md) | Starting the sound systems and playing MIDI music | supported |
@@ -203,7 +215,7 @@ Entries by kind.
 
 ## findings
 
-218 entries.
+223 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -327,6 +339,11 @@ Entries by kind.
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |
+| [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV | recorded |
+| [FND-SAVE-002](../findings/FND-SAVE-002.md) | A save writes ten temporary files and packs them with a title and version into one resource container | recorded |
+| [FND-SAVE-003](../findings/FND-SAVE-003.md) | A load checks VERSION 2.1, unpacks the entries and runs the component loaders; temp.jap must be present | recorded |
+| [FND-SAVE-004](../findings/FND-SAVE-004.md) | What the saved files hold: forces, properties, persons, items, conversation variables, fief 0, armies, calendar and tournament | recorded |
+| [FND-SAVE-005](../findings/FND-SAVE-005.md) | Startup writes default.dat from the pristine person and property tables, and a new game reads it back | recorded |
 | [FND-SOUND-001](../findings/FND-SOUND-001.md) | The release holds 26 .666 sound banks with 102 unsigned 8-bit samples at 11,025, 11,050 and 22,050 Hz | recorded |
 | [FND-SOUND-002](../findings/FND-SOUND-002.md) | Sound banks load through 0x0005B584, only when SOUND_EFFECTS is on, from the open archive by index | recorded |
 | [FND-SOUND-003](../findings/FND-SOUND-003.md) | Samples play through 0x0005B3B0 on ten voices, with rate factors for 11,025, 22,050 and 44,100 Hz only | recorded |
@@ -432,7 +449,7 @@ Entries by kind.
 
 ## bugs
 
-16 entries.
+18 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -443,6 +460,8 @@ Entries by kind.
 | [BUG-ESTATE-002](../bugs/BUG-ESTATE-002.md) | Removing a company gives back population that raising it did not take | supported |
 | [BUG-ESTATE-003](../bugs/BUG-ESTATE-003.md) | Killing Drogo after refusing to pay leaves the debt | supported |
 | [BUG-JOUST-001](../bugs/BUG-JOUST-001.md) | The dragon lance frame scan reads past its table when the lance is above y 92 | supported |
+| [BUG-SAVE-001](../bugs/BUG-SAVE-001.md) | A saved game without temp.jap stops the program when loaded | supported |
+| [BUG-SAVE-002](../bugs/BUG-SAVE-002.md) | The title editor cannot be cancelled and types Esc and Backspace into the title | supported |
 | [BUG-SOUND-001](../bugs/BUG-SOUND-001.md) | Samples at 11,050 Hz play with the last step their voice used | supported |
 | [BUG-STRATEGY-001](../bugs/BUG-STRATEGY-001.md) | The rare pursuit branch of the hostile generator tests a stale property | supported |
 | [BUG-STRATEGY-002](../bugs/BUG-STRATEGY-002.md) | A small pursuit keeps the swordsmen and knights of the slot's previous force | supported |
@@ -455,10 +474,12 @@ Entries by kind.
 
 ## screens
 
-20 entries.
+22 entries.
 
 | ID | Title | Status |
 |---|---|---|
+| [SCR-SAVE-001](../screens/SCR-SAVE-001.md) | Load game | supported |
+| [SCR-SAVE-002](../screens/SCR-SAVE-002.md) | Save game | supported |
 | [SCR-UI-001](../screens/SCR-UI-001.md) | Title screen | supported |
 | [SCR-UI-002](../screens/SCR-UI-002.md) | Game options | supported |
 | [SCR-UI-003](../screens/SCR-UI-003.md) | Character options | supported |

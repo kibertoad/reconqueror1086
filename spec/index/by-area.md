@@ -497,7 +497,29 @@ Entries by area.
 
 ## SAVE
 
-None.
+| ID | Title | Status |
+|---|---|---|
+| [BUG-SAVE-001](../bugs/BUG-SAVE-001.md) | A saved game without temp.jap stops the program when loaded | supported |
+| [BUG-SAVE-002](../bugs/BUG-SAVE-002.md) | The title editor cannot be cancelled and types Esc and Backspace into the title | supported |
+| [FMT-SAVE-001](../formats/FMT-SAVE-001.md) | Saved game, SAVEGAME\CONQn.SAV | supported |
+| [FMT-SAVE-002](../formats/FMT-SAVE-002.md) | Strategic map state, TROOPS.SAV | supported |
+| [FMT-SAVE-003](../formats/FMT-SAVE-003.md) | Properties, persons, items and variables, PROPERTY.SAV | supported |
+| [FMT-SAVE-004](../formats/FMT-SAVE-004.md) | Calendar block, ~~2.SAV | supported |
+| [FMT-SAVE-005](../formats/FMT-SAVE-005.md) | Home fief, ~~3.SAV | supported |
+| [FMT-SAVE-006](../formats/FMT-SAVE-006.md) | Armies, ~~4.SAV | supported |
+| [FMT-SAVE-007](../formats/FMT-SAVE-007.md) | Tournament, ~~5.SAV | supported |
+| [FMT-SAVE-008](../formats/FMT-SAVE-008.md) | Starting persons and properties, default.dat | supported |
+| [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV | recorded |
+| [FND-SAVE-002](../findings/FND-SAVE-002.md) | A save writes ten temporary files and packs them with a title and version into one resource container | recorded |
+| [FND-SAVE-003](../findings/FND-SAVE-003.md) | A load checks VERSION 2.1, unpacks the entries and runs the component loaders; temp.jap must be present | recorded |
+| [FND-SAVE-004](../findings/FND-SAVE-004.md) | What the saved files hold: forces, properties, persons, items, conversation variables, fief 0, armies, calendar and tournament | recorded |
+| [FND-SAVE-005](../findings/FND-SAVE-005.md) | Startup writes default.dat from the pristine person and property tables, and a new game reads it back | recorded |
+| [RULE-SAVE-001](../rules/RULE-SAVE-001.md) | Load and save screens | supported |
+| [RULE-SAVE-002](../rules/RULE-SAVE-002.md) | Writing a saved game | supported |
+| [RULE-SAVE-003](../rules/RULE-SAVE-003.md) | Reading a saved game | supported |
+| [RULE-SAVE-004](../rules/RULE-SAVE-004.md) | Starting values for a new game, default.dat | supported |
+| [SCR-SAVE-001](../screens/SCR-SAVE-001.md) | Load game | supported |
+| [SCR-SAVE-002](../screens/SCR-SAVE-002.md) | Save game | supported |
 
 ## RNG
 

@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-PERSON-002, FND-PERSON-003]
+evidence: [FND-PERSON-002, FND-PERSON-003, FND-SAVE-002]
 conflicting: []
 split_with: []
 related: [RULE-PERSON-002]
@@ -17,8 +17,8 @@ related: [RULE-PERSON-002]
 
 ## Layout
 
-The `CHARACTR.DAT` entry of `C1086.GOB`, and the character file a saved game writes, are 8-bit
-text read a line at a time with `fgets` into a 256-byte buffer, so a longer line is read as more
+The `CHARACTR.DAT` entry of `C1086.GOB`, and `~~1.SAV`, the character file a saved game writes
+and stores in its container (FND-SAVE-002), are 8-bit text read a line at a time with `fgets` into a 256-byte buffer, so a longer line is read as more
 than one. Some reads skip lines: they pass over any line whose first byte is a space, `#`, CR or
 LF, so those lines are comments and blank lines. The other reads take the very next line. Numbers
 are read with `atoi`, split on spaces, tabs and commas. Case matters in the markers. A missing
@@ -53,5 +53,3 @@ The `CHARACTR.DAT` entry of the GOG archive: 15 characters and 30 attributes [FN
 ## Open questions
 
 - Whether anything removes the line end that `strncpy` copies into a name.
-- The name of the file a saved game writes, and what the save and load around `0x0004AA5D` and
-  `0x0004B0E3` do with it.

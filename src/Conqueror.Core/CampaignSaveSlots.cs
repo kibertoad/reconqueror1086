@@ -9,6 +9,8 @@ public sealed record CampaignSaveSlot(
     string? Error,
     bool RecoveredFromBackup = false);
 
+// RULE-SAVE-001, RULE-SAVE-002, RULE-SAVE-003. PLACEHOLDER: the original saves to SAVEGAME\CONQn.SAV
+// containers (FMT-SAVE-001) with a typed title; these JSON files, backups and the autosave are the rebuild's own.
 public sealed class CampaignSaveSlots
 {
     public const int SlotCount = 5;
