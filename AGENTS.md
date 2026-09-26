@@ -3,22 +3,36 @@
 ## Original technical-design documentation
 
 The final reimplementation deliverable includes a documented technical map of
-the original game, not only working replacement code. As implementation work
-progresses, update the relevant files under `docs/` with:
+the original game, not only working replacement code. It lives in `spec/` and
+follows the [documentation standard](https://dinorefurb.com/documentation-standard/);
+`spec/README.md` lists the areas. As implementation work progresses:
 
-- original executable/resource addresses, fields, table layouts, state
-  transitions, and subsystem relationships discovered during analysis;
-- recovered formulas and values, labeled Confirmed, Corroborated, Provisional,
-  or Disproved;
-- the source of each original-game claim, such as executable control flow,
-  decoded resource data, the owned manual, or controlled observation;
-- the corresponding reimplementation types, methods, definitions, and tests so
-  readers can trace original behavior into the new architecture.
+- record each observation of the original (executable control flow at an
+  address, decoded resource data, the owned manual, a controlled observation)
+  as a finding in `spec/findings/`, and the formats, rules, screens and bugs it
+  supports in `spec/formats/`, `spec/rules/`, `spec/screens/` and `spec/bugs/`;
+- give each entry the status its evidence supports, as the standard's Status
+  section defines, and put the uncertain part in its Open questions;
+- write addresses as the standard's Notation section requires, and name
+  globals, record fields and modes in `spec/glossary/`;
+- never name the rebuild's types, methods, files or tests in `spec/`. Trace
+  original behaviour into the rebuild through the parity rows in `parity/`,
+  spec IDs cited in code comments and tests, and `PLACEHOLDER: <ID>` comments
+  wherever the code guesses;
+- record every deliberate departure from the original in `deviations/`;
+- keep narrative docs in `docs/` about the rebuild and the research process.
+  Where they need a claim about the original, they cite its spec ID instead of
+  restating it.
+
+Run `tools/Check-Documentation.ps1 -Write` after changing `spec/`, `parity/` or
+`deviations/`, and commit the indexes and `PARITY.md` it writes
+(`docs/VALIDATION.md` describes the check).
 
 Keep proprietary bytes and generated analysis artifacts out of Git. Commit only
 independently authored technical descriptions, compact facts, hashes, and legal
-fixtures. A gameplay batch is not complete until its new technical mappings and
-evidence have been documented alongside the implementation.
+fixtures. Never commit disassembly or decompiler output. A gameplay batch is not
+complete until its new findings, rules and parity rows have been written
+alongside the implementation.
 
 ## Git push destination
 

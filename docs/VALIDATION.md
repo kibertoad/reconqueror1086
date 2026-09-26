@@ -37,8 +37,8 @@ action from
 pinned to a full commit SHA, on every push to `main` and every pull request. It checks `spec/`,
 `parity/` and `deviations/` against the standard's list of
 [checks](https://dinorefurb.com/documentation-standard/#checks), compiles each `.ksy` file with
-the Kaitai Struct compiler, checks that every spec and deviation ID cited in `src/`, `tests/` and
-`tools/` exists and is not superseded, and fails when `spec/index/` or `PARITY.md` is stale. It
+the Kaitai Struct compiler, checks that every spec and deviation ID cited in `src/`, `tests/`, `tools/`
+and `docs/` exists and is not superseded, and fails when `spec/index/` or `PARITY.md` is stale. It
 fetches the full history so it can fail a pull request that deletes a spec ID, area or deviation
 that exists on `main`. The toolkit's
 [setup guide](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/blob/main/docs/documentation-standard-check.md)
@@ -46,9 +46,9 @@ lists its inputs.
 
 `tools/Check-Documentation.ps1` runs the same check locally. It reads the toolkit commit from the
 workflow, downloads that commit's `tools/check-documentation.mjs` into the ignored `artifacts/`
-directory once, and runs it with `--check`. The check writes `spec/index/` and `PARITY.md`, and
-nobody edits them by hand. After changing the spec, `parity/` or `deviations/`, regenerate them
-and commit what the check writes:
+directory once, and runs it with `--references docs` and `--check`. The check writes `spec/index/`
+and `PARITY.md`, and nobody edits them by hand. After changing the spec, `parity/` or
+`deviations/`, regenerate them and commit what the check writes:
 
 ```powershell
 ./tools/Check-Documentation.ps1 -Write

@@ -35,7 +35,7 @@ if (-not (Test-Path -LiteralPath $script)) {
     Move-Item -LiteralPath $partial -Destination $script -Force
 }
 
-$arguments = @($script, '--root', $root)
+$arguments = @($script, '--root', $root, '--references', 'docs')
 if (-not $Write) {
     $arguments += '--check'
 }
