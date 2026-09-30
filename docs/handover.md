@@ -1,69 +1,51 @@
-# Reimplementation handover
+﻿# Reimplementation handover
 
-## Baseline
+## Current state
 
-The active implementation branch is `reimplementation-full-migration`. Before the current hostile-formation batch its verified remote tip was `6d1130a` (`Restore hostile actor pursuit and morale`); use Git and the full gate below as authority rather than assuming this note names the newest commit.
+The restoration template/toolkit migration is implemented and locally validated.
+Its scope, pinned revisions, adaptations and retained game-specific behavior are
+in [template-migration-plan.md](template-migration-plan.md). The existing gameplay
+implementation and package identities are retained. Template prerequisite audits
+are not evidence that gameplay fidelity is complete; consult [PARITY.md](../PARITY.md)
+and the individual parity rows.
 
-The authoritative gate is:
+## Validation
 
-```powershell
-& '.\Run Tests.bat'
-```
+Run the canonical fast gate with `./tools/Invoke-Validation.ps1` or `Run Tests.bat`.
+See [VALIDATION.md](VALIDATION.md) for dependencies, filters, evidence-dependent
+tests and observed results. On 2026-09-30 the gate, offline documentation checks,
+Kaitai compilation, workflow lint and Windows packaging/installer compilation
+passed. Windows native diagnostics were checked with bounded waits and actual
+GUI exit codes. Linux/macOS installer execution and remote signing were not
+exercised locally. No release or push was performed.
 
-## Latest completed combat recovery
+## Prerequisite for original executable analysis
 
-Strategic player/enemy contact reaches the field battle of the spec area BATTLE: `ConquerorGame.StrategicEncounter` holds the captured contact, blocks later scheduler work, and settles only through the `Campaign` resolver methods. `parity/BATTLE.md` lists what differs from the original. The older `FieldBattle` screen is a separate provisional combat mode whose grid formation mechanics and command HUD are host-owned replacement policy and a priority fidelity gap.
+[SOURCE-EDITIONS.md](SOURCE-EDITIONS.md) records the known owned build and missing
+latest-official-patch provenance. Do not mark `patchStatusEstablished` true
+without evidence. `./tools/Verify-Configuration.ps1 -RequireAnalysisReady` must
+pass before original executable analysis; it currently rejects this unresolved
+prerequisite. Independent builds and synthetic validation remain available.
 
-The latest sequence of commits is:
+## Gameplay continuation
 
-- `6c776de` follows explicit scene state targets rather than adjacent records.
-- `e9a95b2` limits state-target validation to reachable actionable objects.
-- `273b214` restores the 25-row weapon dice/penetration calculation and ten combatant-template armor/health pairs.
-- `fc69434` decodes each actor's scene-selected combat row and uses it for successful enemy damage.
-- `1fef117` uses the same executable contact-distance column for player and enemy reach, including clear-lane ranged actors.
+Resume [implementation-plan.md](implementation-plan.md) after satisfying the
+source prerequisite for any analysis it needs. Existing priorities include the
+unread actor transition entries in RULE-ASSAULT-008, the order-reset mode in
+RULE-ASSAULT-004, and actor-ray view selection in RULE-ASSAULT-010. Consult
+[ASSAULT parity](../parity/ASSAULT.md) for gaps and [BATTLE parity](../parity/BATTLE.md)
+for the provisional field-battle behavior.
 
-## Exact continuation point
+Strategic schema-two preparation remains dormant; do not activate it before the
+remaining motion, event, presentation and save/load integration is complete.
+Follow the implementation plan and existing rule/parity entries for the next
+batch. Put original-game observations in `spec/`, and deliberate departures in
+`deviations/`, alongside the implementation and parity changes.
 
-Continue priority 1 in `implementation-plan.md` with broader actor AI. The first-person combat mapping is in `spec/` (area ASSAULT, with the raycaster in VIEW), and `parity/ASSAULT.md` lists what the rebuild still lacks. The largest open items are the transition-table entries RULE-ASSAULT-008 lists as not read, the mode value the orders reset to (RULE-ASSAULT-004), and the view row the actor rays test (RULE-ASSAULT-010).
+## Local task state
 
-The ignored `executable-data-xrefs.txt` was most recently regenerated for `player_index` (`0x0009D4D0`). Promising references include `0x0005191B`, `0x0005192A`, `0x000550D8`, and the `0x000573xx`/`0x00057Fxx` families. A follow-up inspector run targeting `0x51880,0x55080,0x572E0,0x57F40` was interrupted; treat its output as incomplete and rerun only the focused addresses needed.
-
-Example owner-local command:
-
-```powershell
-$env:NUGET_PACKAGES='C:\Users\kiber\.nuget\packages'
-dotnet run --project tools\Conqueror.Inspect --no-restore -- 'C:\GOG Games\Conqueror AD1086' 'analysis\original' --disassemble=0x51880,0x55080
-```
-
-## Remaining high-priority gaps
-
-1. Click-selected world-object targeting remains part of broader mouse-command recovery (RULE-ASSAULT-005). Keyboard actions keep the nearest projected target as an accessibility fallback.
-2. Continue actor movement and broader AI recovery from evidence, starting with the transition entries that RULE-ASSAULT-008 lists as not read and the later friendly formation outcomes.
-3. Continue exact route recovery and bind spies to autonomous enemy-army movement, then continue estate tile mapping and remaining sound/event bindings as ordered in the migration plan. Spy cost and lifetime follow RULE-STRATEGY-018, and `JUMP!!` has no routine (SCR-UI-009).
-
-## Combat rendering notes
-
-The actor ray can traverse 64 wrapped source-map cells beyond the cropped runtime layout, and pass-through/state-target candidates may therefore use textures that are not currently rendered. The runtime now retains decoded CPU texture sources for every structural face and every possible kind-4 heading sector in the imported scene, while creating GPU textures only for visible layout/actor/object requirements. This closes the subsequent melee-training failure on texture 11 without inflating the render texture set. `DynamixSceneBlock.RaycastTextureReferences` and its structural, unmirrored, and mirrored-sector regression preserve that acquisition-source closure.
-
-The follow-up texture-3 failure exposed two separate assumptions. Acquisition dependencies must originate in placed map blocks and only follow ray-eligible state targets; unused definitions can legally name textures absent from the active archive. Separately, the rebuild's actor colour normalization selects walk families 64/96/128, and `CONQUER/DEFEND2.RES` is the only scene archive holding all of textures 64 to 138, so it serves as the common actor atlas with active scene entries layered over it. `SiegeTextureDependencies` and `LoadCombatTextureSources` implement and test both rules. Imported siege drawing no longer has rectangle, flat-color wall, synthetic backdrop, or substitute-shell fallbacks; missing original art is a startup error on the single supported path.
-
-The first atlas-enabled run exposed renderer-only white borders, placement, pose, and backdrop errors. Scene/CSF transparent pixels now upload as premultiplied zero rather than palette RGB with alpha zero. `ProjectActors`/`ProjectObjects` use the recovered viewport-width lateral basis, imported actor layout uses one projected 8.8 cell plus decoded lower/upper elevations, and render sectors use actor heading minus viewer heading. This also gives keyboard attacks the projected actor center. `BackdropSlice` implements the backdrop of RULE-VIEW-005. The 200 ms movement descriptor ticks were not changed: they already use elapsed time, strict deadlines, retained offsets, and an 800 ms sustained straight-cell cadence rather than CPU throughput.
-
-An optional enhanced renderer may eventually supersample the viewport or improve presentation filtering, but it should retain the original 64-step compatibility ray for visibility, picking, occlusion, and AI. Extending the ray is not presently recommended: the source lookup wraps within the authored 128-cell map and could expose duplicated or unauthored space. This is a post-fidelity option, not a change to original-game claims.
-
-## Home `JUMP!!` checkpoint: 2026-09-14
-
-The schema-2 replacement shape and settlement boundary are implemented but deliberately dormant. `OriginalStrategicCampaignState` deep-copies all 14 properties and 176 people, owns five indexed enemy slots plus six player movement records, and persists both motion families with generator/reactive counters, speed, profile, camera, list heads, and unique full-dword terrain mutations. `StrategicSchemaTwoMigration.Prepare` settles dated columns in slot order, returning complete forces to valid still-hostile schema-1 origins or journaling dispersal, then clears the incompatible roster. Schema 1 cannot supply a starting-home selection, so migrated state uses explicit sentinel `-1`; its missing camera uses deterministic `(0,0)`. Focused tests cover copied definitions, non-aliasing, complete JSON round-trip, settlement order/outcome, validation failures, and the fact that the schema version remains 1.
-
-The route/grid provider gate is now closed. Core's `IOriginalStrategicResources` exposes immutable signed route points and projected full-dword cells; Game's `ImportedOriginalStrategicResources` eagerly decodes and caches forward/reverse forms of all 97 executable-selected paths plus `icon.jp`, failing startup on malformed input. `ConquerorGame` binds it to the initial campaign, both new-character routes, and loaded saves. Prepared replacement state is validated at binding, including exact waypoint-count agreement with the decoded route. Do not activate migration yet. Next drive the five slots from this provider on the fixed update, replace `AdvanceDays`' dated calls, and advance the schema only after load/save/runtime tests pass.
-
-Do not wire named campaign locations as live player records; the six records of `player_forces` (RULE-STRATEGY-010) are persisted and executable. Next bind the yearly brigand order and the orders from the king (RULE-STRATEGY-016), fixed updates, and presentation before schema 2 activation. Do not push later continuation work to `main` without a new explicit request.
-
-## Safety and repository rules
-
-- The original installation at `C:\GOG Games\Conqueror AD1086` is read-only reference material.
-- The desktop game supports only a verified extraction from the supported official GOG release. `ImportedContentCatalog.LoadRequired` verifies the source hash, every manifest file, and all mapped runtime dependencies before the graphics loop; do not restore assetless or placeholder gameplay.
-- Never commit `analysis/original/`, imported `UserContent`, decoded media, screenshots from proprietary assets, or extracted executables.
-- Keep compiled C# files at or below 1,000 lines. `tools/Conqueror.Inspect/Program.cs` and `tests/Conqueror.Tests/ResourceAndDefinitionTests.cs` are already exactly at that limit; split new work instead of extending them.
-- Use `apply_patch` for source edits, run `git diff --check`, then run the full gate before committing.
-- Preserve unrelated worktree changes and use explicit paths when staging.
+Migration validation has finished. Post-commit audits found no confirmed orphaned
+repository processes to stop. Generated analysis and validation artifacts remain
+ignored local working material. Preserve them and unrelated processes; reusable
+MSBuild workers are expected. Pushes require an explicit owner request and the
+canonical-remote check in [AGENTS.md](../AGENTS.md).
