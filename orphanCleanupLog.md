@@ -14,3 +14,5 @@
   `dotnet` MSBuild nodes using `/nodeReuse:true` were deliberately left running;
   active Ghidra and inspector jobs targeting other game repositories were also
   left running because they do not belong to this work.
+
+- 2026-09-30T17:43:15+03:00: stopped PID 32228 (DOSBox), started 2026-09-30T17:43:11.9480208+03:00 for documentation-audit-runtime. The bounded capability probe finished and its owned process did not exit on window close; no further work depended on it. Unrelated processes were left running.

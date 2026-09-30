@@ -70,6 +70,7 @@ None known.
 ## Open questions
 
 - What `fn_0001B584` does beyond RULE-JOUST-003; it returns 0 when `dragon_succeeds()` is true and 2
-  otherwise.
+  otherwise. (Q-DRAGON-001)
+
 - Whether anything outside the five-cell test keeps the player from the lair before the lair is
-  disclosed in conversation.
+  disclosed in conversation. (Q-DRAGON-002)

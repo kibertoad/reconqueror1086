@@ -80,4 +80,4 @@ None known.
 ## Open questions
 
 - The products are written in the default 32-bit width. Whether the original forms any of
-  them in 64 bits is not recorded; the values the game passes keep them within 32 bits.
+  them in 64 bits is not recorded; the values the game passes keep them within 32 bits. (Q-VIEW-012)

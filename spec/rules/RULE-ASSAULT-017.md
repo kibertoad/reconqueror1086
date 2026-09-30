@@ -102,8 +102,11 @@ None known.
 
 - The order in which the two axes are tested, and whether a refused axis under flag `0x10`
   still lets the other axis move in the same tick, is not recorded; the procedure takes x first
-  and stops the whole tick.
+  and stops the whole tick. (Q-ASSAULT-049)
+
 - Whether the scheduler writes `x` and `y` at each tick is not recorded; the procedure keeps
-  them at the cell centre plus the offset, which the tests that read them need.
-- What the neighbouring-cell lookup reads outside the map is not recorded.
-- Where `scene_blocks` and `scene_map` are kept is not recorded.
+  them at the cell centre plus the offset, which the tests that read them need. (Q-ASSAULT-050)
+
+- What the neighbouring-cell lookup reads outside the map is not recorded. (Q-ASSAULT-051)
+
+- Where `scene_blocks` and `scene_map` are kept is not recorded. (Q-ASSAULT-052)

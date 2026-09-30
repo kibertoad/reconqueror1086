@@ -62,7 +62,9 @@ None known.
 ## Open questions
 
 - The offsets of kind, template, row, armour, heading, the in-play mark and the block in the
-  combatant record (FMT-ASSAULT-001).
+  combatant record (FMT-ASSAULT-001). (Q-ASSAULT-081)
+
 - The offsets of the effect record's fields apart from `active`, `deadline`, `moving_block` and
-  `covered_block` (FMT-ASSAULT-004).
-- How `0x0004CEA0` resolves a block to a combatant.
+  `covered_block` (FMT-ASSAULT-004). (Q-ASSAULT-082)
+
+- How `0x0004CEA0` resolves a block to a combatant. (Q-ASSAULT-083)

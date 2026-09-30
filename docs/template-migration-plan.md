@@ -118,8 +118,38 @@ reconfiguration. The global sync skill and repository/template guidance no longe
 require a second explicit plan approval. Both repositories now keep changing
 inventory totals out of narrative prose.
 
-Latest official patch provenance remains unestablished and blocks original
+At the initial migration checkpoint, latest official patch provenance was
+unestablished and blocked original
 executable analysis, not this independent infrastructure migration. Linux/macOS
 installer execution and remote signing are left to their platform CI workflows.
 No original executable analysis, release, push or proprietary-content import was
 performed during migration.
+
+## Latest inventory contract
+
+Adopt template main `e0325e0b063735e94b7e3ac94b0b8b89d0a38a79`:
+committed inventory verification now rejects identity, mapping, destination and
+metadata mismatches, with explicit evidence required for a retained legacy path.
+The shared inventory/report modules and synthetic evidence regressions are
+adopted together. Reconqueror retains its LE mapping adapter because the generic
+source loader supports MZ/FBOV, not its DOS/16M-bound LE image. Acceptance is the
+shared evidence suite and the local committed-inventory check; no gameplay
+behavior or evidence status changes through this tooling adoption.
+
+## Documentation audit closure
+
+SRC-PATCH-CATALOG now establishes public official-version provenance for the
+owned build; SOURCE-EDITIONS and the strict analysis configuration gate agree.
+The runtime capability assessment distinguishes verified startup/client capture
+from unverified game input and gameplay-state control. All spec areas have stable
+queues linked from existing Open questions. Coverage contains fingerprinted LE
+function metadata, with loader provenance and limits, rather than a stub census.
+Research tracking and committed inventory checks run in the canonical gate.
+Current workflow skills are adopted and the plan records Survey's remaining
+research requirements without claiming those questions are answered.
+
+Shared defects are submitted upstream: Standard PR 28 and toolkit PR 20 for
+executable file-data locations, template PR 35 for isolated client capture, and
+template PR 36 for queue tracking. The reviewed Standard/checker branch
+commits are pinned explicitly while those PRs await review. No evidence-status
+promotion or gameplay change follows from this audit.

@@ -178,4 +178,4 @@ None known.
 
 ## Open questions
 
-- Whether `cell_person` wraps or rejects a row or column outside the grid.
+- Whether `cell_person` wraps or rejects a row or column outside the grid. (Q-STRATEGY-027)

@@ -74,5 +74,6 @@ Read against the constructors, the three movement handlers, the player routines 
 
 ## Open questions
 
-- The purpose of `unk_08`, `unk_4C` and `unk_114` is unknown.
-- `points` has room for 20 pairs; what the player routines read past the 20th is not recorded.
+- The purpose of `unk_08`, `unk_4C` and `unk_114` is unknown. (Q-STRATEGY-003)
+
+- `points` has room for 20 pairs; what the player routines read past the 20th is not recorded. (Q-STRATEGY-004)

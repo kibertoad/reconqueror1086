@@ -53,6 +53,7 @@ Read against the person helpers and the save routine.
 
 ## Open questions
 
-- The purpose of bit 1 of `flags` and of `unk_0E` is unknown.
+- The purpose of bit 1 of `flags` and of `unk_0E` is unknown. (Q-STRATEGY-006)
+
 - How `rating` changes apart from the two writes in the new-game setup and the encounter is not
-  recorded.
+  recorded. (Q-STRATEGY-007)

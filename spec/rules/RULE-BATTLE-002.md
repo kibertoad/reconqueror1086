@@ -128,5 +128,6 @@ None known.
 
 ## Open questions
 
-- What `x` and `y` hold for the player's units before a formation writes them, for a code above 3.
-- What the four formations look like on the choice screen.
+- What `x` and `y` hold for the player's units before a formation writes them, for a code above 3. (Q-BATTLE-008)
+
+- What the four formations look like on the choice screen. (Q-BATTLE-009)

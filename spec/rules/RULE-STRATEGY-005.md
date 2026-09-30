@@ -99,4 +99,4 @@ None known.
 
 ## Open questions
 
-- What `fn_00029E58` returns beyond a player army's pool of one troop type.
+- What `fn_00029E58` returns beyond a player army's pool of one troop type. (Q-STRATEGY-013)

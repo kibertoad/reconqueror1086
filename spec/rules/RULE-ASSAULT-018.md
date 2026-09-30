@@ -90,9 +90,13 @@ None known.
 
 ## Open questions
 
-- The clock `now` reads is not recorded, and neither is its resolution.
-- Whether the comparison with the interval is signed or unsigned is not recorded.
+- The clock `now` reads is not recorded, and neither is its resolution. (Q-ASSAULT-053)
+
+- Whether the comparison with the interval is signed or unsigned is not recorded. (Q-ASSAULT-054)
+
 - The layout of the effect record apart from `active` and `deadline` is not recorded; the rule
-  reaches the rest through the functions of RULE-ASSAULT-027.
-- What the constructor does when no slot is free is not recorded.
-- Where `combatants` and `effects` are kept is not recorded.
+  reaches the rest through the functions of RULE-ASSAULT-027. (Q-ASSAULT-055)
+
+- What the constructor does when no slot is free is not recorded. (Q-ASSAULT-056)
+
+- Where `combatants` and `effects` are kept is not recorded. (Q-ASSAULT-057)

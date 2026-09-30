@@ -45,4 +45,4 @@ The GOG entry, 320,016 bytes.
 
 ## Open questions
 
-- The purpose of the top byte of a cell is unknown.
+- The purpose of the top byte of a cell is unknown. (Q-STRATEGY-008)

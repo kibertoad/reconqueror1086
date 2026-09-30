@@ -47,4 +47,4 @@ None known.
 
 ## Open questions
 
-- Whether a save and reload, which store the count, ever lower it.
+- Whether a save and reload, which store the count, ever lower it. (Q-STRATEGY-002)

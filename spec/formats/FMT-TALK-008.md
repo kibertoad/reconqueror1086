@@ -47,4 +47,4 @@ Read against the loader `0x00062610`; the GOG archive holds 190 variables of 4 b
 
 ## Open questions
 
-- What separates the kinds of each pair; the copy is the same for both.
+- What separates the kinds of each pair; the copy is the same for both. (Q-TALK-007)

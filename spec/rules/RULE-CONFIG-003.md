@@ -102,6 +102,8 @@ None known.
 
 ## Open questions
 
-- What the four values at `0x0009CDBC` to `0x0009CDC8` are.
-- What the block `slow_machine` skips draws.
-- What `cyberman_present` asks the mouse driver.
+- What the four values at `0x0009CDBC` to `0x0009CDC8` are. (Q-CONFIG-005)
+
+- What the block `slow_machine` skips draws. (Q-CONFIG-006)
+
+- What `cyberman_present` asks the mouse driver. (Q-CONFIG-007)

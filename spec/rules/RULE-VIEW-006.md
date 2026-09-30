@@ -69,5 +69,6 @@ None known.
 
 ## Open questions
 
-- Where the game keeps `combat_palette` and `scene_scenario` is not recorded.
-- The game blends with floating-point weights, adding 0.5 and truncating; `blend_channel` does the same in integers. Whether the two ever differ is not recorded; they agree on `SKIRMISH.PAL`, where the built maps match the stored ones.
+- Where the game keeps `combat_palette` and `scene_scenario` is not recorded. (Q-VIEW-023)
+
+- The game blends with floating-point weights, adding 0.5 and truncating; `blend_channel` does the same in integers. Whether the two ever differ is not recorded; they agree on `SKIRMISH.PAL`, where the built maps match the stored ones. (Q-VIEW-024)

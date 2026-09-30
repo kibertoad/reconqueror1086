@@ -47,5 +47,6 @@ None known.
 
 ## Open questions
 
-- How the driver treats a step of 0.
-- Whether the samples were meant to be 11,025 Hz.
+- How the driver treats a step of 0. (Q-SOUND-001)
+
+- Whether the samples were meant to be 11,025 Hz. (Q-SOUND-002)

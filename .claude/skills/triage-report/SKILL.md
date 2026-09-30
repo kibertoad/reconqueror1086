@@ -57,3 +57,5 @@ under no goal. One research batch per report:
    it closed) and `Report: R-NNN` trailers.
 4. Tell the reporter what happened, naming the IDs, and print the status
    block from `research-item` with `Batch: report R-NNN`.
+
+Do not send a report outcome to another person unless the owner explicitly requests it. Recording the result in this repository and reporting it to the owner is sufficient.

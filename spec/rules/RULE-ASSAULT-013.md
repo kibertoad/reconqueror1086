@@ -71,9 +71,12 @@ None known.
 
 ## Open questions
 
-- `acquisition_row`, the view row the actor rays are tested at, is not recorded.
+- `acquisition_row`, the view row the actor rays are tested at, is not recorded. (Q-ASSAULT-037)
+
 - `fn_0004F89B` is named only by its address, and how it reaches the comparison the hit
-  handlers make is not recorded.
+  handlers make is not recorded. (Q-ASSAULT-040)
+
 - Which cell `at_destination` compares, the one under the live position or the one the actor
-  occupies, is not recorded; the procedure uses the live position.
-- Where `combatants` is kept is not recorded.
+  occupies, is not recorded; the procedure uses the live position. (Q-ASSAULT-041)
+
+- Where `combatants` is kept is not recorded. (Q-ASSAULT-029)

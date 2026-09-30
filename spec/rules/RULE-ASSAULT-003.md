@@ -65,7 +65,9 @@ None known.
 ## Open questions
 
 - `fn_00029E58`, `fn_00029E80` and `fn_00029D24` are named only by their addresses; their
-  arguments are not recorded.
+  arguments are not recorded. (Q-ASSAULT-016)
+
 - Whether an army with other unit types left is also removed when the first three reach 0 is
-  not recorded.
-- Where `retainer_shares` is kept is not recorded.
+  not recorded. (Q-ASSAULT-017)
+
+- Where `retainer_shares` is kept is not recorded. (Q-ASSAULT-010)

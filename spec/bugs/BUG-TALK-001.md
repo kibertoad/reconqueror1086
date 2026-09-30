@@ -43,4 +43,4 @@ None known.
 
 ## Open questions
 
-Whether any shipped script names variable 190.
+Whether any shipped script names variable 190. (Q-TALK-001)

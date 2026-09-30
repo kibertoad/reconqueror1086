@@ -51,4 +51,4 @@ Read against the node reader `0x000163B8` and the copy `0x00016684`; the GOG arc
 
 ## Open questions
 
-- The purpose of `unk_009`, `unk_049`, `unk_330` and `unk_344`.
+- The purpose of `unk_009`, `unk_049`, `unk_330` and `unk_344`. (Q-TALK-003)

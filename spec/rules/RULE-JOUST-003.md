@@ -80,6 +80,8 @@ None known.
 
 ## Open questions
 
-- Where the game keeps the error totals and the lance state is not recorded beyond their being the worker's own.
-- The nonzero values the worker returns on failure are not recorded.
-- Where the game keeps the character table behind `lance_experience` and the possession table behind `possession_counts` is not recorded.
+- Where the game keeps the error totals and the lance state is not recorded beyond their being the worker's own. (Q-JOUST-004)
+
+- The nonzero values the worker returns on failure are not recorded. (Q-JOUST-005)
+
+- Where the game keeps the character table behind `lance_experience` and the possession table behind `possession_counts` is not recorded. (Q-JOUST-006)

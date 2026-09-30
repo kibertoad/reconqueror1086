@@ -179,8 +179,12 @@ None known.
 ## Open questions
 
 - What `fn_00029DE0`, `fn_000106C0`, `fn_0005B3B0`, `g_0009AEFC` and `fn_0001146C`
-  do beyond what the findings record.
-- What `fn_0001BF54` does.
-- What `fn_00029D24` does.
-- What `fn_00029E58` does.
-- What `fn_0003CED8` does.
+  do beyond what the findings record. (Q-STRATEGY-018)
+
+- What `fn_0001BF54` does. (Q-STRATEGY-019)
+
+- What `fn_00029D24` does. (Q-STRATEGY-020)
+
+- What `fn_00029E58` does. (Q-STRATEGY-021)
+
+- What `fn_0003CED8` does. (Q-STRATEGY-022)

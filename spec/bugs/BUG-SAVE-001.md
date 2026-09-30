@@ -44,4 +44,4 @@ None known.
 
 ## Open questions
 
-- Whether normal play can reach the save screen before `temp.jap` is written.
+- Whether normal play can reach the save screen before `temp.jap` is written. (Q-SAVE-001)

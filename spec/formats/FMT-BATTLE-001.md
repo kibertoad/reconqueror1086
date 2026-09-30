@@ -56,4 +56,4 @@ Read against the constructor, the unit pass, the pointer and key handling, and t
 
 ## Open questions
 
-- What reads `value`, if anything.
+- What reads `value`, if anything. (Q-BATTLE-002)

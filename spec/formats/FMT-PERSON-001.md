@@ -52,4 +52,4 @@ The `CHARACTR.DAT` entry of the GOG archive: 15 characters and 30 attributes [FN
 
 ## Open questions
 
-- Whether anything removes the line end that `strncpy` copies into a name.
+- Whether anything removes the line end that `strncpy` copies into a name. (Q-PERSON-001)

@@ -58,5 +58,6 @@ None known.
 
 ## Open questions
 
-- Which outcomes count as a miss, and what the game does with a broken weapon.
-- Where `combatants` is kept is not recorded.
+- Which outcomes count as a miss, and what the game does with a broken weapon. (Q-ASSAULT-088)
+
+- Where `combatants` is kept is not recorded. (Q-ASSAULT-029)

@@ -47,4 +47,4 @@ entry starts where the previous one ends, apart from one 1,236-byte gap in `SKIR
 
 ## Open questions
 
-- What, if anything, the 1,236 bytes before `FNT6.PCX` in `SKIRMISH.RES` held.
+- What, if anything, the 1,236 bytes before `FNT6.PCX` in `SKIRMISH.RES` held. (Q-RES-001)

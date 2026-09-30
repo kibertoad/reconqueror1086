@@ -82,6 +82,8 @@ press a key or button and a message, then waits for a click or key:
 | 0 or 2 | below 0 | below 0 | right and low |
 | 0 or 2 | 0 | 0 | none |
 
+The wording of the messages is content of the game and is left out.
+
 ## Edge cases
 
 The contact window counts passes, so the error totals grow with the number of passes the loop makes on frames 80 to 82, which depends on the processor. `lance1.csf` is drawn with the palette of the movie (FND-JOUST-007).
@@ -96,4 +98,4 @@ None known.
 
 ## Open questions
 
-- The wording of the messages is content of the game and is left out.
+None.

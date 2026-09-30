@@ -53,10 +53,10 @@ The second command prints headless-analyzer usage and exits with code 1 when no 
 The owned reference executable is generated locally by the inspector at:
 
 ```text
-C:\GOG Games\reimp\analysis\original\artifacts\CONQUER.EXE
+C:\sources\reconqueror\analysis\original\artifacts\CONQUER.EXE
 ```
 
-Reference facts:
+Source identity for BLD-GOG-EN:
 
 - source installation: `C:\GOG Games\Conqueror AD1086`
 - byte length: 919,107
@@ -70,7 +70,7 @@ Reference facts:
 If the artifact is absent, regenerate it without modifying the original installation:
 
 ```powershell
-$env:DOTNET_CLI_HOME = 'C:\GOG Games\reimp\.dotnet-home'
+$env:DOTNET_CLI_HOME = Join-Path $PWD '.dotnet-home'
 $artifactPath = Join-Path $env:TEMP ('reconqueror-inspect-' + [guid]::NewGuid().ToString('N'))
 dotnet run --project tools\Conqueror.Inspect --artifacts-path $artifactPath -- `
   'C:\GOG Games\Conqueror AD1086' 'analysis\original'
@@ -87,14 +87,14 @@ $projectRoot = Join-Path $env:TEMP ('reconqueror-ghidra-' + [guid]::NewGuid().To
 New-Item -ItemType Directory -Path $projectRoot | Out-Null
 & "$env:GHIDRA_HOME\support\analyzeHeadless.bat" `
   $projectRoot ConquerorAnalysis `
-  -import 'C:\GOG Games\reimp\analysis\original\artifacts\CONQUER.EXE' `
+  -import (Join-Path $PWD 'analysis/original/artifacts/CONQUER.EXE') `
   -overwrite
 ```
 
 Ghidra's automatic importer sees the outer DOS MZ executable and does not automatically map the embedded LE objects correctly. Do not treat that default disassembly as authoritative. For reproducible address-level work, use the repository inspector's LE mapper and Iced decoder:
 
 ```powershell
-$env:DOTNET_CLI_HOME = 'C:\GOG Games\reimp\.dotnet-home'
+$env:DOTNET_CLI_HOME = Join-Path $PWD '.dotnet-home'
 $env:NUGET_PACKAGES = 'C:\Users\kiber\.nuget\packages'
 $artifactPath = Join-Path $env:TEMP ('reconqueror-disassembly-' + [guid]::NewGuid().ToString('N'))
 dotnet run --project tools\Conqueror.Inspect --artifacts-path $artifactPath -- `
@@ -133,8 +133,7 @@ For numeric action-tree inspection, `--action-groups=1101,2011` writes an ignore
 ## Template infrastructure migration
 
 Existing procedure and local installation facts remain in [original-analysis.md](original-analysis.md).
-Build identity is BLD-GOG-EN; latest official patch provenance is unestablished,
-as [SOURCE-EDITIONS.md](SOURCE-EDITIONS.md) records. Before executable analysis,
+Build identity is BLD-GOG-EN; latest official patch provenance is established by SRC-PATCH-CATALOG, as [SOURCE-EDITIONS.md](SOURCE-EDITIONS.md) records. Before executable analysis,
 run `tools/Verify-Configuration.ps1 -RequireAnalysisReady`.
 
 Template helpers under `tools/ghidra/` guard broad exports to local-only output.
@@ -142,4 +141,35 @@ Do not commit decompiler output, disassembly or analysis databases. The bounded
 evidence reporter has its own pinned license and synthetic regression suite;
 [BOUNDED-EVIDENCE-REPORTERS.md](BOUNDED-EVIDENCE-REPORTERS.md) describes its
 supported image models. Its MZ/raw-image support does not establish a loader
-for this game's protected-mode LE image. No original analysis was run in migration.
+for this game's protected-mode LE image. The documentation audit independently verified the source fingerprint and mapped LE object extents (FND-RES-009); it did not change gameplay evidence statuses.
+
+## Verified LE inventory mapping
+
+The ordinary executable import can analyze only the outer MZ loader. Do not use
+that project's function list as protected-mode coverage. Import the identified
+executable into a disposable BinaryLoader project with `x86:LE:32:default` and
+run `MapConquerorLe.java` before auto-analysis. Its fingerprint guard and mapping
+follow BLD-GOG-EN and FND-RES-009. The script replaces blocks in that disposable
+project; never run it over an existing research project. Its required seed file may be empty, or contain documented entry addresses
+within the code object, one hexadecimal number per line without `0x` or `fn_`.
+Run `DescribeInventorySource.java` and `ExportFunctionInventory.java` afterward,
+with exports in an ignored local analysis directory. The provenance and limits
+of the committed metadata are in [coverage/README.md](../coverage/README.md).
+Raw fixup operands remain unrelocated, so indirect targets remain uncertain.
+
+For large memory maps use `ReportMemoryBlocks.java` with an explicit offset and
+limit, or an exact block name, instead of exporting a whole map. Reports state
+their selected scope and cap output. Before headless analysis, set the child
+JVM's error, replay and heap-dump destinations to the ignored analysis directory:
+
+```powershell
+$diagnosticRoot = Join-Path $PWD 'analysis/ghidra-diagnostics'
+New-Item -ItemType Directory -Force -Path $diagnosticRoot | Out-Null
+$env:JAVA_TOOL_OPTIONS = '-XX:ErrorFile="' + $diagnosticRoot + '/hs_err_pid%p.log" ' +
+    '-XX:ReplayDataFile="' + $diagnosticRoot + '/replay_pid%p.log" ' +
+    '-XX:HeapDumpPath="' + $diagnosticRoot + '"'
+```
+
+Restore the prior `JAVA_TOOL_OPTIONS` after the task. JVM diagnostics may contain
+original memory and local environment data; ignore and repository-policy checks
+keep them local even if force-staged.

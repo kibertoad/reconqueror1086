@@ -68,6 +68,8 @@ None known.
 ## Open questions
 
 - Which colour each value of `player_color` is; the procedure's red, green and blue for 0, 1 and
-  2 is a guess.
-- Whether the loader writes the actors' own blocks or their base blocks is not recorded.
-- Where `combatants` and `scene_blocks` are kept is not recorded.
+  2 is a guess. (Q-ASSAULT-075)
+
+- Whether the loader writes the actors' own blocks or their base blocks is not recorded. (Q-ASSAULT-076)
+
+- Where `combatants` and `scene_blocks` are kept is not recorded. (Q-ASSAULT-020)

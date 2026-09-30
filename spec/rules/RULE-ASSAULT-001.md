@@ -62,7 +62,9 @@ None known.
 ## Open questions
 
 - `fn_00029E58` is named only by its address: what it reads, and in what order its arguments
-  are passed, is not recorded.
-- Where `retainer_shares` is kept is not recorded.
+  are passed, is not recorded. (Q-ASSAULT-009)
+
+- Where `retainer_shares` is kept is not recorded. (Q-ASSAULT-010)
+
 - Another caller passes a count divided by 50 to the same setup (FND-ASSAULT-005); which
-  assault that is has not been identified.
+  assault that is has not been identified. (Q-ASSAULT-011)

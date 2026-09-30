@@ -86,4 +86,4 @@ None known.
 
 ## Open questions
 
-- What `fn_0005CA70` does; it likely leaves the tent.
+- What `fn_0005CA70` does; it likely leaves the tent. (Q-TOURNEY-004)

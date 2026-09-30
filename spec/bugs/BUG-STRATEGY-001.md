@@ -47,4 +47,4 @@ None known.
 
 ## Open questions
 
-- What the local holds at the start of a session.
+- What the local holds at the start of a session. (Q-STRATEGY-001)

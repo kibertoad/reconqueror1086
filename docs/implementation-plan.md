@@ -4,6 +4,21 @@
 
 Complete a clean-room MonoGame reimplementation of *Conqueror: A.D. 1086* that preserves the original campaign features and balance while requiring a verified local extraction from the supported official GOG release. The project never distributes original assets: a legal owner supplies them through the local resource importer, and startup fails clearly when they are missing, incomplete, damaged, or unsupported.
 
+## Current protocol stage
+
+Stage: Survey. Intake identifies the owned edition and current patch provenance
+(BLD-GOG-EN, SRC-PATCH-CATALOG); Runtime access is assessed in [RUNTIME.md](RUNTIME.md).
+Area queues and the inventory for the executable already studied are present.
+Survey remains open until the complete installation/media listing, coverage of
+every manifest data family and all manual-mentioned screens are reconciled.
+Existing implemented slices remain in the milestone table; their implementation
+does not prove Survey complete or promote any evidence status.
+
+The next implementation slice remains strategic schema-2 runtime integration,
+with the exact player inputs, fixed-update scheduler and presentation wired
+before removing the dated adapter. Research uses the area queues; gameplay
+changes and evidence-status promotions are outside this documentation batch.
+
 ## Delivery principles
 
 The current template/toolkit infrastructure migration is specified in
@@ -546,15 +561,15 @@ M5 correction (2026-09-22): the desktop Drogo-refusal route requires and decodes
 
 M6 correction (2026-09-22): `OriginalUiFont` draws `CONFONT.CSF` as RULE-MEDIA-002 describes, keeping the relative advances, alpha-mask shapes and caller colour while fitting the host canvas. Recover the active screen-palette mapping and remaining vertical/layout rules plus cursor timing/hourglass behavior.
 
-## Schema-2 replacement-state checkpoint: 2026-09-17
+## Schema-2 replacement-state
 
-`OriginalStrategicCampaignState` provides the non-aliased mutable replacement specified by `architecture.md`: all 14 properties, all 176 people, five exact enemy slots, six exact player records, route identities/cursors, integer and floating movement state, generator/reactive counters, bounded speed, month-derived profile, persisted camera, list heads, and sparse full-dword terrain mutations. `StrategicSchemaTwoMigration.Prepare` implements deterministic slot-ordered schema-1 settlement, returning complete columns only to valid still-hostile origins and journaling all return/dispersal outcomes before clearing the dated roster. Complete JSON round-trip and structural rejection tests pass. The decoded resource provider and both movement shells are now implemented; schema activation still waits for exact player command construction, application fixed-update/presentation wiring, and dated-adapter replacement.
+`OriginalStrategicCampaignState` provides the non-aliased mutable replacement specified by `architecture.md`: all 176 people, five exact enemy slots, six exact player records, route identities/cursors, integer and floating movement state, generator/reactive counters, bounded speed, month-derived profile, persisted camera, list heads, and sparse full-dword terrain mutations. `StrategicSchemaTwoMigration.Prepare` implements deterministic slot-ordered schema-1 settlement, returning complete columns only to valid still-hostile origins and journaling all return/dispersal outcomes before clearing the dated roster. Complete JSON round-trip and structural rejection tests pass. The decoded resource provider and both movement shells are now implemented; schema activation still waits for exact player command construction, application fixed-update/presentation wiring, and dated-adapter replacement.
 
-## Strategic motion-kernel checkpoint: 2026-09-17
+## Strategic motion-kernel
 
-The decoded provider now drives a mutable physical-slot-order pass for all three original movement modes. `AdvanceMovementPass` implements the direct, routed and pursuit handlers of RULE-STRATEGY-006 and RULE-STRATEGY-007. Sparse saved terrain mutations override `icon.jp` during the same lookup. Six focused tests cover physical slot order, exact-boundary crossing, byte wrap, route tolerance/completion, corrupt-direction teardown, live pursuit, target disappearance, and fallback. Schema and dated campaign behavior remain unchanged; next integrate generator-first dispatch, completion contacts/encounters, and live player-army targets before activating fixed updates and schema 2.
+The decoded provider now drives a mutable physical-slot-order pass for all three original movement modes. `AdvanceMovementPass` implements the direct, routed and pursuit handlers of RULE-STRATEGY-006 and RULE-STRATEGY-007. Sparse saved terrain mutations override `icon.jp` during the same lookup. Focused tests cover physical slot order, exact-boundary crossing, byte wrap, route tolerance/completion, corrupt-direction teardown, live pursuit, target disappearance, and fallback. Schema and dated campaign behavior remain unchanged; next integrate generator-first dispatch, completion contacts/encounters, and live player-army targets before activating fixed updates and schema 2.
 
-## Strategic scheduler-shell checkpoint: 2026-09-17
+## Strategic scheduler-shell
 
 `AdvanceSchedulerPass` now surrounds the motion kernel with the executable's generator-first, first-free-slot construction and per-slot completion interleaving. It implements both timed and reactive branches, ordinary and pursuit constructors, the corrected ordinary force expression `household + floor(floor(lord rating / 4) / 3)`, reactive detachment/support arithmetic, direct grid-person lookup, five-probe contact precedence, encounter handoff, byte-garrison reinforcement, teardown, and exact first-nearby-army/player/origin retargeting. Tests prove a newly generated record can move in the same pass and that an encounter stops later physical slots. The original's uninitialized finder-output read is documented and replaced with an explicit-current-detection safety policy. The next checkpoint supplies these inputs from live campaign state, preserves spy reporting before the pass, wires the scheduler to the fixed update and encounter presentation, activates schema 2, and removes the dated adapter.
 
@@ -659,25 +674,20 @@ The resource-decoding sprint is first because it unlocks exact dialogue, screen 
 
 ## Combat rendering notes
 
-Runtime correction (2026-09-18): acquisition traverses the complete wrapped source map, not only the cropped visible layout. Scene activation now retains CPU-decoded sources for every structural face and all kind-4 heading sectors while allocating GPU textures only for the render set. This fixes melee practice failing when a valid off-layout ray candidate selected texture 11; focused closure coverage locks ordinary faces plus mirrored and unmirrored billboards.
+Acquisition traverses the complete wrapped source map, not only the cropped visible layout. Scene activation now retains CPU-decoded sources for every structural face and all kind-4 heading sectors while allocating GPU textures only for the render set. This fixes melee practice failing when a valid off-layout ray candidate selected texture 11; focused closure coverage locks ordinary faces plus mirrored and unmirrored billboards.
 
-Art-path correction (2026-09-18): dependency enumeration begins with placed map blocks and follows only state-target edges eligible for ray traversal, so unused block definitions do not create requirements for textures the archive lacks. `CONQUER/DEFEND2.RES`, the only scene archive holding textures 64 to 138, serves as a common combat actor atlas; active scene slots override it, supplying normalized walk families 64/96/128 without losing scene-specific states. `SiegeTextureDependencies` and `LoadCombatTextureSources` preflight this layered closure. All procedural siege actor, object, wall, backdrop, and shell fallbacks are removed, leaving one supported original-resource rendering path.
+Dependency enumeration begins with placed map blocks and follows only state-target edges eligible for ray traversal, so unused block definitions do not create requirements for textures the archive lacks. `CONQUER/DEFEND2.RES`, the only scene archive holding textures 64 to 138, serves as a common combat actor atlas; active scene slots override it, supplying normalized walk families 64/96/128 without losing scene-specific states. `SiegeTextureDependencies` and `LoadCombatTextureSources` preflight this layered closure. All procedural siege actor, object, wall, backdrop, and shell fallbacks are removed, leaving one supported original-resource rendering path.
 
-Projection/blend correction (2026-09-18): indexed scene and CSF uploads now premultiply transparent pixels for MonoGame, removing the atlas-colored rectangles around actors and foregrounds. Runtime actor/object placement uses the `center + lateral/forward` viewer basis of RULE-VIEW-003; actor width, lower/upper elevations, actor-minus-viewer heading sector, and keyboard strike target use the same fixed-depth billboard geometry as pointer acquisition. The 1088x200 `BackImage` is treated as four overlapping 320x200 views at stride 256, and the exact `(26,24,167,117)` combat aperture is selected rather than compressing a 640-pixel strip. Movement timing stays processor-independent and follows the ASSAULT movement rules.
+Indexed scene and CSF uploads now premultiply transparent pixels for MonoGame, removing the atlas-colored rectangles around actors and foregrounds. Runtime actor/object placement uses the `center + lateral/forward` viewer basis of RULE-VIEW-003; actor width, lower/upper elevations, actor-minus-viewer heading sector, and keyboard strike target use the same fixed-depth billboard geometry as pointer acquisition. The 1088x200 `BackImage` is treated as four overlapping 320x200 views at stride 256, and the exact `(26,24,167,117)` combat aperture is selected rather than compressing a 640-pixel strip. Movement timing stays processor-independent and follows the ASSAULT movement rules.
 
 Potential higher-powered-machine presentation work should be opt-in and observational: viewport supersampling and filtering can be explored after fidelity completion, while visibility, picking, occlusion, interaction, and AI retain the original 64-step ray. A longer ray is not planned because source lookup wraps in the 128-cell authored map and could reveal duplicated or unauthored scenery.
 
-## Home checkpoint: 2026-09-14 inactive `JUMP!!` region
+## Home inactive `JUMP!!` region
 
 `SceneHotspot.Interactive` now expresses that distinction: Home retains all ten HAT bounds and hover labels, while activation ignores `JUMP!!`, which has no routine in the original (SCR-UI-009). A focused test pins region 7 as the only inactive Home hotspot.
 
-## Session checkpoint: 2026-09-10
 
-The current migration branch builds with zero warnings under the enforced 1,000-line source limit. The xUnit suite and executable specifications pass. The Inno Setup 7.1.0 package compiles, installs into an isolated directory, launches through its generated **ReConqueror A.D. 1086** Start-menu shortcut, and removes that shortcut during uninstall. Repository policy passes with the expanded proprietary-image boundary.
-
-First-person combat now uses the required original `SKIRMISH.PCX` shell, exact viewport and panel geometry, scene-driven walls and actors, animated foreground weapons, and blood effects. Surfaces, the weapon-to-combat-row permutation, break rolls, dice, penetration, reach, actor templates, state-completion gates, pointer coordinates and the foreground trajectory follow the ASSAULT and VIEW rules; doors and pickups follow RULE-ASSAULT-021. The original four render-counted blood steps have no stable hardware-independent duration, so the runtime preserves their order through a monotonic compatibility timer. `docs/handover.md` continues with defeated-enemy loot, retainers, siege consequences, and broader AI rules. Official imported assets are a verified launch requirement; no placeholder gameplay path is supported.
-
-## Strategic reactive-finder checkpoint: 2026-09-17
+## Strategic reactive-finder
 
 The reactive finder of RULE-STRATEGY-003 is implemented inside the scheduler rather than supplied by the application. The full gate passes.
 

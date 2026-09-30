@@ -90,7 +90,9 @@ checked field by field.
 
 ## Open questions
 
-- The purpose of `unk_05_1`, `unk_06`, `unk_0A`, `unk_3C` and `unk_44` is unknown.
-- Which diagonal `BLOCK_DIAGONAL_A` and `BLOCK_DIAGONAL_B` run along is not recorded.
+- The purpose of `unk_05_1`, `unk_06`, `unk_0A`, `unk_3C` and `unk_44` is unknown. (Q-VIEW-001)
+
+- Which diagonal `BLOCK_DIAGONAL_A` and `BLOCK_DIAGONAL_B` run along is not recorded. (Q-VIEW-002)
+
 - `interaction` values other than 1, 5, 7, 9 and 10, and the 20 cases of the dispatcher that
-  they select, are not described.
+  they select, are not described. (Q-VIEW-003)

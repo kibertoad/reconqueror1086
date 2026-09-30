@@ -41,4 +41,4 @@ Read against the lookup at `0x0006A950`; the GOG archive holds 689 records.
 
 ## Open questions
 
-- What `unk_00` holds.
+- What `unk_00` holds. (Q-TALK-004)

@@ -197,11 +197,18 @@ None known.
 
 ## Open questions
 
-- What `fn_000628AC` does with conversation variables, and what reads variables 44 and 97.
-- What `fn_000106C0` does.
-- What `fn_0001BF54` does.
-- What `fn_00029D24` does.
-- What `fn_00029DE0` does.
-- What `fn_00029E58` does.
-- What `fn_0003CED8` does.
-- What `g_0009A928` holds.
+- What `fn_000628AC` does with conversation variables, and what reads variables 44 and 97. (Q-STRATEGY-033)
+
+- What `fn_000106C0` does. (Q-STRATEGY-034)
+
+- What `fn_0001BF54` does. (Q-STRATEGY-019)
+
+- What `fn_00029D24` does. (Q-STRATEGY-020)
+
+- What `fn_00029DE0` does. (Q-STRATEGY-035)
+
+- What `fn_00029E58` does. (Q-STRATEGY-021)
+
+- What `fn_0003CED8` does. (Q-STRATEGY-022)
+
+- What `g_0009A928` holds. (Q-STRATEGY-036)

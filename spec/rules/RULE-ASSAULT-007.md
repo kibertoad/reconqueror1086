@@ -72,8 +72,10 @@ None known.
 ## Open questions
 
 - The condition under which the state routine removes a combatant whose death effect has
-  finished is not recorded; the procedure uses `health <= 0`.
+  finished is not recorded; the procedure uses `health <= 0`. (Q-ASSAULT-030)
+
 - What counts as a change of state for `take_transition`, and so when the previous effect is
-  cancelled, is not recorded; the procedure uses a change of mode.
+  cancelled, is not recorded; the procedure uses a change of mode. (Q-ASSAULT-031)
+
 - How the routine treats the mode value the retainer orders reset to (RULE-ASSAULT-004) is not
-  recorded.
+  recorded. (Q-ASSAULT-032)

@@ -107,8 +107,12 @@ None known.
 ## Open questions
 
 - What `fn_000596C0(6, ...)` opens, and whether screen 6 runs `dub_knight`, which is registered as
-  a callback at `0x00019A51`.
-- What `fn_0005B2C0` and `g_0009AAC4` do here.
-- Which items 9, 23, 32, 28 and 16 are.
-- What the Choose Character Name control writes, and the limit of 20 letters.
-- Which region of the pre-generated screen each knight's shield is, beyond region 0.
+  a callback at `0x00019A51`. (Q-PERSON-008)
+
+- What `fn_0005B2C0` and `g_0009AAC4` do here. (Q-PERSON-009)
+
+- Which items 9, 23, 32, 28 and 16 are. (Q-PERSON-010)
+
+- What the Choose Character Name control writes, and the limit of 20 letters. (Q-PERSON-011)
+
+- Which region of the pre-generated screen each knight's shield is, beyond region 0. (Q-PERSON-012)

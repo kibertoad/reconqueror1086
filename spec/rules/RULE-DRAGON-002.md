@@ -61,5 +61,6 @@ None known.
 
 ## Open questions
 
-- What `fn_0001BF54` does with 4, and what `g_0009ADB8` holds.
-- What else the siege routine does after a won siege of another person.
+- What `fn_0001BF54` does with 4, and what `g_0009ADB8` holds. (Q-DRAGON-003)
+
+- What else the siege routine does after a won siege of another person. (Q-DRAGON-004)

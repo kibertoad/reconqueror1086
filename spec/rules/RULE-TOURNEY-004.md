@@ -106,7 +106,9 @@ None known.
 
 ## Open questions
 
-- Whether anything clears the joust and melee counts each day. The refusal messages speak of today, but the only clears found are the monthly reset, `0x0005C520`, `0x00010FF0` and the village map exit while a tournament is in town (RULE-UI-002).
+- Whether anything clears the joust and melee counts each day. The refusal messages speak of today, but the only clears found are the monthly reset, `0x0005C520`, `0x00010FF0` and the village map exit while a tournament is in town (RULE-UI-002). (Q-TOURNEY-006)
+
 - What the value `fn_0002C20C` returns and `fn_0002C218` stores
-  stands for.
-- How `fn_0005877C` uses its arguments; `side_a` and `side_b` are likely the two side sizes.
+  stands for. (Q-TOURNEY-008)
+
+- How `fn_0005877C` uses its arguments; `side_a` and `side_b` are likely the two side sizes. (Q-TOURNEY-009)

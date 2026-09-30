@@ -52,5 +52,6 @@ equal sizes do not mean kind 0.
 
 ## Open questions
 
-- What `unk_24` was meant to hold.
-- The format of kind 3.
+- What `unk_24` was meant to hold. (Q-RES-002)
+
+- The format of kind 3. (Q-RES-003)

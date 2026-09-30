@@ -65,4 +65,4 @@ None known.
 
 ## Open questions
 
-- What `fn_0003FCA8` does before the settlement, and what `fn_0002C20C` and `fn_0002C218` hold.
+- What `fn_0003FCA8` does before the settlement, and what `fn_0002C20C` and `fn_0002C218` hold. (Q-TALK-018)

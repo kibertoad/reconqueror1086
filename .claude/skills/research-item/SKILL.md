@@ -47,7 +47,7 @@ only the lines the link gives, and never a section already read this session.
    claim-relevant checks and synthetic examples in `docs/EVIDENCE-REVIEW.md`
    before treating a reading as complete; these add no statuses or schema.
 4. **Gather evidence statically**: data files, then a static reading
-   (procedure in `docs/GHIDRA.md`). Settle statically whatever a static
+   (procedure in `docs/ghidra.md`). Settle statically whatever a static
    reading can settle, even where a run could too. Keep neutral names
    (`fn_00478CD0`) until evidence shows what a thing does. Keep decompiler
    output, listings and dumps in ignored local storage, and read bounded
@@ -117,7 +117,7 @@ only the lines the link gives, and never a section already read this session.
    memory nothing wrote, timing, or the operating system. List its findings in
    the entry's `complete_reading`. The standard's
    [Complete readings](../../../docs/upstream/documentation-standard.md#complete-readings) (lines 137-181)
-   and [Findings](../../../docs/upstream/documentation-standard.md#findings) (lines 413-461)
+   and [Findings](../../../docs/upstream/documentation-standard.md#findings) (lines 413-463)
    sections list what that covers; the parts most often missed are the
    segment each access actually goes through, every part of a stored call
    target, the other byte of a word written a byte at a time, allocation

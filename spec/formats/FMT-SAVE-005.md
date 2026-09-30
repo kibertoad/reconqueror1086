@@ -46,4 +46,4 @@ Not checked against a save from the original; the layout comes from the code tha
 
 ## Open questions
 
-- What the nodes of each chain are.
+- What the nodes of each chain are. (Q-SAVE-006)

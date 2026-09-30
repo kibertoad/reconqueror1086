@@ -139,7 +139,10 @@ None known.
 ## Open questions
 
 - What the gate `0x000256FC` returns when the player leaves it without picking a region, and how it
-  reads the pointer.
-- What the callers at `0x0002A80B` and `0x00042363` are.
-- How the resolver draws the backdrop in each display mode.
-- What an automatic battle with a foe total of 0 does on the original machine.
+  reads the pointer. (Q-BATTLE-004)
+
+- What the callers at `0x0002A80B` and `0x00042363` are. (Q-BATTLE-005)
+
+- How the resolver draws the backdrop in each display mode. (Q-BATTLE-006)
+
+- What an automatic battle with a foe total of 0 does on the original machine. (Q-BATTLE-007)

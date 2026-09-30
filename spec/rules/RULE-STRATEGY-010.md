@@ -177,6 +177,7 @@ None known.
 
 ## Open questions
 
-- What `fn_0003CED8`, `fn_0005B2C0`, `fn_0001BF54`, `fn_00024CA0` and `g_0009AAC4` are.
+- What `fn_0003CED8`, `fn_0005B2C0`, `fn_0001BF54`, `fn_00024CA0` and `g_0009AAC4` are. (Q-STRATEGY-016)
+
 - What `pick_cell` leaves in the second probe's cell when the probe finds no cell; the procedure
-  treats it as passable.
+  treats it as passable. (Q-STRATEGY-017)

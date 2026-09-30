@@ -1,13 +1,15 @@
 # Customization guide
 
-This repository ships as a template. Everything that ties it to one specific
-game is either a `{{PLACEHOLDER}}` token, a value in `tools/project-config.json`,
-or a decision recorded in the documents listed under "Decisions that stay
-manual".
+Reconqueror is already configured. Its identity is recorded in
+`tools/project-config.json`; existing solution/importer paths and package IDs
+are intentional adaptations. Routine work uses `Verify-Configuration.ps1`.
+Do not run the new-project bootstrap sequence over this checkout. The contract
+below describes bootstrap for a fresh template and explicit reconfiguration;
+manual research decisions stay in the documents listed below.
 
-## Establish facts, then one command
+## Bootstrap contract for a fresh template
 
-1. Fill in `docs/IMPLEMENTATION-PLAN.md`.
+1. Fill in `docs/implementation-plan.md`.
 2. Establish the latest official patch/version once, patch and fingerprint the
    legally owned analysis copy, and record the evidence and matching versions in
    `tools/project-config.json` and `docs/SOURCE-EDITIONS.md`. Bootstrap refuses an

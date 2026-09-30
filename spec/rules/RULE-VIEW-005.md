@@ -66,4 +66,4 @@ None known.
 
 ## Open questions
 
-- Where the game keeps `backdrop`, `back_image`, `view_height`, `view_pixels` and `view_width` is not recorded.
+- Where the game keeps `backdrop`, `back_image`, `view_height`, `view_pixels` and `view_width` is not recorded. (Q-VIEW-022)

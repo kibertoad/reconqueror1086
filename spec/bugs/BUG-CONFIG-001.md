@@ -45,4 +45,4 @@ None known.
 
 ## Open questions
 
-- Whether a DOS extender that does not map address 0 would stop the game here.
+- Whether a DOS extender that does not map address 0 would stop the game here. (Q-CONFIG-001)

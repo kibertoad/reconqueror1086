@@ -47,4 +47,4 @@ Checked against the `Scenario` resource of all 90 archives that have one: size, 
 
 ## Open questions
 
-- The purpose of `unk_00`, `unk_20` and `unk_38` is unknown.
+- The purpose of `unk_00`, `unk_20` and `unk_38` is unknown. (Q-VIEW-006)

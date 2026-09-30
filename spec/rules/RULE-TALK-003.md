@@ -125,7 +125,9 @@ None known.
 ## Open questions
 
 - Which item each entry of `script_item_slots` names; the table is content, and how many entries
-  it has is not known. The scripts use items 0 to 23 and, in one test, 161 (FND-TALK-010).
+  it has is not known. The scripts use items 0 to 23 and, in one test, 161 (FND-TALK-010). (Q-TALK-012)
+
 - What a redirect to a node missing from the index does; one script names node 5011, which is
-  missing (FND-TALK-010).
-- What `args[0]` of functions 7 to 9 holds; the handlers ignore it.
+  missing (FND-TALK-010). (Q-TALK-013)
+
+- What `args[0]` of functions 7 to 9 holds; the handlers ignore it. (Q-TALK-014)

@@ -46,6 +46,6 @@ every session sees the claim; where sessions cannot push, only one goal runs
 at a time. `Dead ends` records tools and approaches that failed across the
 whole goal, in a line or two each, so a resumed session does not repeat them;
 what a research attempt tried on a question goes under its queue item's
-`Tried:`. `Handover` holds what `docs/HANDOVER.md` holds, for this goal only,
+`Tried:`. `Handover` holds what `docs/handover.md` holds, for this goal only,
 and is rewritten at the end of every session under the goal. Progress is not
 written here: the queue and the commits show it.

@@ -88,4 +88,4 @@ None known.
 
 ## Open questions
 
-- What `fn_0003AFB4` does.
+- What `fn_0003AFB4` does. (Q-STRATEGY-010)

@@ -84,5 +84,6 @@ None known.
 
 ## Open questions
 
-- Whether any call loads a picture, layout, song or sound with mode 0.
-- Whether the shipped game ever reads a `.LOW` file.
+- Whether any call loads a picture, layout, song or sound with mode 0. (Q-RES-005)
+
+- Whether the shipped game ever reads a `.LOW` file. (Q-RES-006)

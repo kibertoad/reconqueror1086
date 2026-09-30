@@ -106,4 +106,4 @@ None known.
 
 ## Open questions
 
-- How the slot picked by the pointer is read; the procedure writes slot 1 for it.
+- How the slot picked by the pointer is read; the procedure writes slot 1 for it. (Q-SAVE-007)

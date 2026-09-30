@@ -97,5 +97,6 @@ None known.
 ## Open questions
 
 - How `cd_track_starts`, `cd_track_count` and `cd_adjust` are filled, and the address conversion
-  the game does with `0x00083BB0` and `0x00083C10`.
-- What sets `cd_paused`.
+  the game does with `0x00083BB0` and `0x00083C10`. (Q-SOUND-007)
+
+- What sets `cd_paused`. (Q-SOUND-008)

@@ -198,6 +198,6 @@ assets locally.
 Copyright (C) 2026 kibertoad.
 
 The original code in this repository is licensed under the
-[GNU General Public License v3.0](LICENSE). The license does not cover or grant
+[GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html). The license does not cover or grant
 rights to the original *Conqueror: A.D. 1086* assets, which are not distributed
 by this project.

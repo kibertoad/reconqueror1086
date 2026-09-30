@@ -146,4 +146,4 @@ None known.
 
 ## Open questions
 
-- What `issue_order` returns after a brigand order and after showing the king's order.
+- What `issue_order` returns after a brigand order and after showing the king's order. (Q-STRATEGY-032)

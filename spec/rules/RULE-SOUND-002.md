@@ -87,5 +87,6 @@ None known.
 
 - `fn_0006E0F3` returns non-zero when the voice has finished; `fn_00064BCF` stops a voice and
   returns an error code; `fn_000645C0` starts a request and returns its handle. All three take the
-  driver handle at `0x0009DAB0` first; their insides were not traced.
-- What `a` means.
+  driver handle at `0x0009DAB0` first; their insides were not traced. (Q-SOUND-004)
+
+- What `a` means. (Q-SOUND-005)

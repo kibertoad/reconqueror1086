@@ -72,6 +72,8 @@ None known.
 
 ## Open questions
 
-- Which tile set the game picks, and when.
-- What sets `0x0009AEF0` and `0x0009AEF4`.
-- What the right-button report `0x0001265C` offers for the selected army.
+- Which tile set the game picks, and when. (Q-UI-019)
+
+- What sets `0x0009AEF0` and `0x0009AEF4`. (Q-UI-020)
+
+- What the right-button report `0x0001265C` offers for the selected army. (Q-UI-021)

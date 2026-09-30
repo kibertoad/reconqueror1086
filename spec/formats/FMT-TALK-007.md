@@ -48,4 +48,4 @@ Read against `0x0006A9E0`, which reads the record into a `0x90`-byte buffer.
 
 ## Open questions
 
-- The largest argument count the `0x90`-byte buffer allows is 32; whether a longer list is checked was not read.
+- The largest argument count the `0x90`-byte buffer allows is 32; whether a longer list is checked was not read. (Q-TALK-006)

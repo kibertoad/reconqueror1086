@@ -116,5 +116,6 @@ None known.
 
 ## Open questions
 
-- What `fn_000120E4` sets for the first route point beyond the destination and direction.
-- What `remove_route_point` does with no point left; the procedure assumes it removes nothing.
+- What `fn_000120E4` sets for the first route point beyond the destination and direction. (Q-STRATEGY-025)
+
+- What `remove_route_point` does with no point left; the procedure assumes it removes nothing. (Q-STRATEGY-026)

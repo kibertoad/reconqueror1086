@@ -64,4 +64,4 @@ Both shipped files: `CD:CONQUER.INI` (20 lines) and the installed `CONQUER.INI` 
 
 ## Open questions
 
-- Which setup program writes `GOB`, `AUD_DRV`, `CD_PATH` and `WAR_MODE`.
+- Which setup program writes `GOB`, `AUD_DRV`, `CD_PATH` and `WAR_MODE`. (Q-CONFIG-002)

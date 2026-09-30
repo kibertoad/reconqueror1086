@@ -118,6 +118,8 @@ None known.
 ## Open questions
 
 - What `fn_0001A91C`, `fn_0001ACEC` and `fn_0001A3B8` do beyond showing the prompt, waiting and
-  reading the choice, and what `flag` changes.
-- What `fn_0006B3B4` returns; it is likely the C library's `time`.
-- What the dwords at `0x330` and `0x344` of a node are for (FMT-TALK-002).
+  reading the choice, and what `flag` changes. (Q-TALK-008)
+
+- What `fn_0006B3B4` returns; it is likely the C library's `time`. (Q-TALK-009)
+
+- What the dwords at `0x330` and `0x344` of a node are for (FMT-TALK-002). (Q-TALK-010)

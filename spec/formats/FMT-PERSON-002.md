@@ -58,7 +58,9 @@ All 30 dilemma entries of the GOG archive [FND-PERSON-010].
 
 - The order in which the executable's parser `0x00019302` reads the sections: it checks `!`, `&`,
   `%`, `*` and `?` in that order of calls, which may mean it reads each kind of section for all
-  three choices in turn.
+  three choices in turn. (Q-PERSON-002)
+
 - Which field the loader gives `NONE`, and how it turns names into fields; it receives
-  `attribute_names` and `attribute_count`.
-- What the arguments 3, 3, 2 and 5 of `0x00018B60` limit.
+  `attribute_names` and `attribute_count`. (Q-PERSON-003)
+
+- What the arguments 3, 3, 2 and 5 of `0x00018B60` limit. (Q-PERSON-004)

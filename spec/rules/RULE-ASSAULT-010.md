@@ -82,5 +82,6 @@ None known.
 
 ## Open questions
 
-- `acquisition_row`, the view row the actor rays are tested at, is not recorded.
-- Where `combatants` and `hit_depth` are kept is not recorded.
+- `acquisition_row`, the view row the actor rays are tested at, is not recorded. (Q-ASSAULT-037)
+
+- Where `combatants` and `hit_depth` are kept is not recorded. (Q-ASSAULT-038)

@@ -43,4 +43,4 @@ None known.
 
 ## Open questions
 
-- How the font draws the control characters.
+- How the font draws the control characters. (Q-SAVE-002)

@@ -71,4 +71,4 @@ None known.
 
 ## Open questions
 
-- Whether the calendar, estate and tournament blocks always exist once a campaign runs.
+- Whether the calendar, estate and tournament blocks always exist once a campaign runs. (Q-SAVE-008)

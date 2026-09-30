@@ -59,4 +59,4 @@ padding byte per row, which the game draws.
 ## Open questions
 
 - Whether the palette values are sent to the display as they are or scaled; the path from the
-  palette buffer to the hardware was not traced.
+  palette buffer to the hardware was not traced. (Q-MEDIA-001)

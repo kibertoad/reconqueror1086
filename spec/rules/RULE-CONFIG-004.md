@@ -71,4 +71,4 @@ None known.
 ## Open questions
 
 - What table `fn_0006FF50` searches and under which name; it is written as returning -1 when it
-  finds nothing.
+  finds nothing. (Q-CONFIG-008)

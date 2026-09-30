@@ -64,6 +64,7 @@ None known.
 
 ## Open questions
 
-- Which code writes attributes without `set_attr`; the load shift of RULE-PERSON-002 is one.
+- Which code writes attributes without `set_attr`; the load shift of RULE-PERSON-002 is one. (Q-PERSON-005)
+
 - How the executable turns a value into the rank words it shows, such as those on the
-  pre-generated screen.
+  pre-generated screen. (Q-PERSON-006)

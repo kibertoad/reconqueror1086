@@ -78,4 +78,4 @@ None known.
 ## Open questions
 
 - Whether the multiplication by `0x20` can overflow for the largest differences the game passes
-  is not recorded; differences of positions within the 128 by 128 map stay far below it.
+  is not recorded; differences of positions within the 128 by 128 map stay far below it. (Q-VIEW-011)

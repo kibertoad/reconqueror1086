@@ -84,4 +84,4 @@ None known.
 
 ## Open questions
 
-- What `fn_00039900` does when a force meets a person.
+- What `fn_00039900` does when a force meets a person. (Q-STRATEGY-011)

@@ -138,5 +138,6 @@ None known.
 
 ## Open questions
 
-- What `fn_0005B3B0` does beyond what the findings record.
-- What `g_000A9C80` does beyond what the findings record.
+- What `fn_0005B3B0` does beyond what the findings record. (Q-BATTLE-012)
+
+- What `g_000A9C80` does beyond what the findings record. (Q-BATTLE-013)

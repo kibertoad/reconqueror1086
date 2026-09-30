@@ -75,5 +75,6 @@ None known.
 
 ## Open questions
 
-- The step by which the two buttons change `strategic_speed`; only the limits 1 and 15 are recorded.
-- What `g_0009ADB8` holds.
+- The step by which the two buttons change `strategic_speed`; only the limits 1 and 15 are recorded. (Q-STRATEGY-014)
+
+- What `g_0009ADB8` holds. (Q-STRATEGY-015)

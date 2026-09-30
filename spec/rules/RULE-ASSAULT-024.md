@@ -54,5 +54,6 @@ None known.
 
 ## Open questions
 
-- `max_health`, which caps healing, is not shown to be set from the same sum.
-- Where `character_honour`, `character_sword_experience` and `combatants` are kept is not recorded.
+- `max_health`, which caps healing, is not shown to be set from the same sum. (Q-ASSAULT-073)
+
+- Where `character_honour`, `character_sword_experience` and `combatants` are kept is not recorded. (Q-ASSAULT-074)

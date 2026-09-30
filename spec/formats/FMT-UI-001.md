@@ -50,5 +50,6 @@ The 27 HAT entries of the GOG archive: in each, `region_count` equals the count 
 
 ## Open questions
 
-- The purpose of `unk_25`, which the game never reads.
-- Whether anything reads `origin_x`, `origin_y`, `width` and `height` after the loader stores them.
+- The purpose of `unk_25`, which the game never reads. (Q-UI-002)
+
+- Whether anything reads `origin_x`, `origin_y`, `width` and `height` after the loader stores them. (Q-UI-003)

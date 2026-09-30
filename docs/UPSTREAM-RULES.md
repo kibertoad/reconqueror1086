@@ -68,8 +68,7 @@ builds and captures continue to use the Standard's XXH3-128 hashes.
 
 ## Configuration-test prerequisites
 
-The upstream tests require Git, Node.js 22+ and PowerShell 7+ (`pwsh`), including
-on Windows. Their scratch copy includes tracked files and non-ignored untracked
+The upstream tests require Git, Node.js 22+ and PowerShell (`pwsh`, or Windows PowerShell on Windows). Their scratch copy includes tracked files and non-ignored untracked
 files, then excludes the existing local-output directories. Deleted tracked files
 are skipped. Ignored dependencies and caches are not copied.
 
@@ -77,3 +76,16 @@ Like the canonical repository checks, validation requires a Git checkout. For a
 ZIP download, initialize a repository with `git init` before validating; the
 non-ignored files are then visible as untracked. There is no recursive-copy
 fallback that would reintroduce ignored local content.
+
+## Audit fixes under upstream review
+
+The executable file-data location extension is pinned to Standard PR
+[28](https://github.com/kibertoad/refurbished-dinosaurs/pull/28) and toolkit PR
+[20](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/pull/20). Those
+reviewable commits distinguish shipped metadata offsets from code addresses;
+they do not waive location bounds or alter Standard v1 evidence statuses.
+Selected-window capture isolation is submitted in template PR
+[35](https://github.com/kibertoad/refurbished-dinosaurs-template/pull/35).
+
+Queue tracking is submitted in template PR
+[36](https://github.com/kibertoad/refurbished-dinosaurs-template/pull/36).

@@ -59,5 +59,6 @@ None known.
 
 - How the lady conversations decide on colours, prizes and marriage; that is script content run
   by RULE-TALK-002 and RULE-TALK-003. The executable's own part is RULE-TALK-004, which sets
-  field 28 (MARRIED) of row 0 to the code of the lady whose marriage variable a conversation set.
-- The conditions and rewards for each lady, which are content.
+  field 28 (MARRIED) of row 0 to the code of the lady whose marriage variable a conversation set. (Q-PERSON-016)
+
+- The conditions and rewards for each lady, which are content. (Q-PERSON-017)

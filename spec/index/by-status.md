@@ -261,7 +261,7 @@ Entries by status.
 
 ## recorded
 
-226 entries.
+227 entries.
 
 | ID | Title |
 |---|---|
@@ -384,6 +384,7 @@ Entries by status.
 | [FND-RES-006](../findings/FND-RES-006.md) | The game builds three archive paths from CONQUER.INI and reopens C1086.GOB after reading any other archive |
 | [FND-RES-007](../findings/FND-RES-007.md) | The fifteen two-digit MELEE scenes are three families of five that share textures and differ in layout and colour maps |
 | [FND-RES-008](../findings/FND-RES-008.md) | Kind-1 blocks are neither the LSB-first LZW of other Dynamix files nor classic LH1 |
+| [FND-RES-009](../findings/FND-RES-009.md) | The bound LE payload maps initialized code and data separately from its data zero-fill |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |
@@ -609,7 +610,6 @@ Entries whose Open questions section says more than None known.
 | [RULE-ESTATE-005](../rules/RULE-ESTATE-005.md) | Crop and forest revenue | sourced |
 | [RULE-ESTATE-006](../rules/RULE-ESTATE-006.md) | Population, food, housing and taxes | sourced |
 | [RULE-JOUST-001](../rules/RULE-JOUST-001.md) | Lance motion and sprite frame | supported |
-| [RULE-JOUST-002](../rules/RULE-JOUST-002.md) | Practice joust pass | supported |
 | [RULE-JOUST-003](../rules/RULE-JOUST-003.md) | Dragon run | supported |
 | [RULE-MEDIA-002](../rules/RULE-MEDIA-002.md) | Drawing a sprite frame and a line of text | supported |
 | [RULE-MEDIA-003](../rules/RULE-MEDIA-003.md) | Drawing a PCX picture | supported |
@@ -645,7 +645,6 @@ Entries whose Open questions section says more than None known.
 | [RULE-STRATEGY-017](../rules/RULE-STRATEGY-017.md) | Brigand pass and brigand movement | supported |
 | [RULE-STRATEGY-019](../rules/RULE-STRATEGY-019.md) | Map events from conversation variables | supported |
 | [RULE-TALK-001](../rules/RULE-TALK-001.md) | Conversation walk | supported |
-| [RULE-TALK-002](../rules/RULE-TALK-002.md) | Action-tree interpreter | supported |
 | [RULE-TALK-003](../rules/RULE-TALK-003.md) | Script functions and conversation variables | supported |
 | [RULE-TALK-004](../rules/RULE-TALK-004.md) | Conversation entry and its aftermath | supported |
 | [RULE-TALK-005](../rules/RULE-TALK-005.md) | Joust result for the conversations | supported |

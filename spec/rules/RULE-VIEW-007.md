@@ -55,5 +55,6 @@ None known.
 
 ## Open questions
 
-- How the step combines with the block's `color_family` to name one of the 128 maps is not recorded.
-- Where the game keeps `scene_scenario` is not recorded.
+- How the step combines with the block's `color_family` to name one of the 128 maps is not recorded. (Q-VIEW-025)
+
+- Where the game keeps `scene_scenario` is not recorded. (Q-VIEW-026)

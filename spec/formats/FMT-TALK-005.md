@@ -47,4 +47,4 @@ Read against `0x0006AEAC`.
 
 ## Open questions
 
-- What branch count kind 3 needs; the shipped actions of kind 3 have 0.
+- What branch count kind 3 needs; the shipped actions of kind 3 have 0. (Q-TALK-005)

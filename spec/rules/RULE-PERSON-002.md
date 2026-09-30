@@ -79,4 +79,4 @@ None known.
 
 ## Open questions
 
-- The name of the file `save_characters` writes, and what else the save and load do.
+- The name of the file `save_characters` writes, and what else the save and load do. (Q-PERSON-007)

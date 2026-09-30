@@ -60,4 +60,4 @@ fields named here.
 ## Open questions
 
 - The purpose of `unk_00`, `unk_10`, `unk_24` and the flag bits other than `0x10` and `0x40` is
-  unknown. The shipped actor descriptors have flags `0x142` (movement) and 5 (state changes).
+  unknown. The shipped actor descriptors have flags `0x142` (movement) and 5 (state changes). (Q-ASSAULT-006)

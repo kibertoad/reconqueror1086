@@ -73,7 +73,10 @@ None known.
 
 ## Open questions
 
-- Whether the reach comparison is strict is not recorded.
-- How "within one cell of the player" is measured is not recorded (`within_one_cell`).
-- Whether a hit with 0 damage still reaches `apply_hit` is not recorded.
-- Where `combatants` is kept is not recorded.
+- Whether the reach comparison is strict is not recorded. (Q-ASSAULT-070)
+
+- How "within one cell of the player" is measured is not recorded (`within_one_cell`). (Q-ASSAULT-071)
+
+- Whether a hit with 0 damage still reaches `apply_hit` is not recorded. (Q-ASSAULT-072)
+
+- Where `combatants` is kept is not recorded. (Q-ASSAULT-029)

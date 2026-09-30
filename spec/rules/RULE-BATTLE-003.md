@@ -107,4 +107,4 @@ None known.
 
 ## Open questions
 
-- What `battle_last_pass` holds when the first battle of a session starts.
+- What `battle_last_pass` holds when the first battle of a session starts. (Q-BATTLE-010)

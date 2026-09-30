@@ -39,4 +39,4 @@ Read against the lookup at `0x000165EC`; the GOG archive holds 1,311 records [FN
 
 ## Open questions
 
-- Whether two records with the same node number ever occur; the search would return either.
+- Whether two records with the same node number ever occur; the search would return either. (Q-TALK-002)

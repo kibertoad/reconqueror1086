@@ -78,6 +78,8 @@ None known.
 
 ## Open questions
 
-- `acquisition_row`, the view row the actor rays are tested at, is not recorded.
-- What the handler does when the ray hits no combatant is not recorded; the procedure returns.
-- Where `combatants`, `effect_defs`, `hit_depth` and `scene_blocks` are kept is not recorded.
+- `acquisition_row`, the view row the actor rays are tested at, is not recorded. (Q-ASSAULT-037)
+
+- What the handler does when the ray hits no combatant is not recorded; the procedure returns. (Q-ASSAULT-059)
+
+- Where `combatants`, `effect_defs`, `hit_depth` and `scene_blocks` are kept is not recorded. (Q-ASSAULT-060)

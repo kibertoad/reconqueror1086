@@ -48,4 +48,4 @@ Read against the helpers that read and write each field and the save routine.
 
 ## Open questions
 
-- What `state` values other than 0 stand for is not recorded.
+- What `state` values other than 0 stand for is not recorded. (Q-STRATEGY-005)

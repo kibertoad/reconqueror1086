@@ -139,6 +139,10 @@ define evaluate_value(offset):
 
 The effects of the script functions the actions call.
 
+`failure()` and `success(x)` build the result that `evaluate_expression`, `evaluate_value` and
+  `call_function` give; how the original passes it (a return code and an out-parameter) has no
+  effect on the outcome.
+
 ## Edge cases
 
 Every operand is evaluated, so AND and OR run the functions on both sides. A comparison gives 1 or 0.
@@ -155,6 +159,4 @@ None known.
 
 ## Open questions
 
-- `failure()` and `success(x)` build the result that `evaluate_expression`, `evaluate_value` and
-  `call_function` give; how the original passes it (a return code and an out-parameter) has no
-  effect on the outcome.
+None.

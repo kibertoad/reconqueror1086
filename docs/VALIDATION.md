@@ -80,7 +80,7 @@ action from
 [refurbished-dinosaurs-toolkit](https://github.com/kibertoad/refurbished-dinosaurs-toolkit),
 pinned to a full commit SHA, on every push to `main` and every pull request. It checks `spec/`,
 `parity/` and `deviations/` against the standard's list of
-[checks](upstream/documentation-standard.md#checks) (lines 780-831), compiles each `.ksy` file with
+[checks](upstream/documentation-standard.md#checks) (lines 782-833), compiles each `.ksy` file with
 the Kaitai Struct compiler, checks that every spec and deviation ID cited in `src/`, `tests/`, `tools/`
 exists and is not superseded, fails when `spec/index/` or `PARITY.md` is stale, and
 fails a `validated` row whose marked tests are not in `VALIDATION.md` as they are now. It
@@ -118,3 +118,23 @@ The local documentation check and Kaitai compilation passed using the toolkit's
 checksum-pinned compiler. CI and release workflows passed actionlint, and the
 Windows portable package and Inno Setup installer passed their local checks.
 Linux/macOS installer execution and remote signing were not exercised locally.
+
+## Documentation audit verification
+
+The 2026-09-30 canonical fast gate passed after the documentation audit: source
+readiness, pinned bytes, spec/index checks with Kaitai, narrative references,
+area queues, committed LE inventory identity, synthetic reporter and capture
+regressions, solution build, xUnit and executable specifications. See
+[documentation-audit.md](documentation-audit.md) for the requirement-by-requirement
+record and upstream fixes. The canonical tests used synthetic inputs and read no
+original files. Separately, the source inspector and fingerprint-guarded LE mapping
+read the owned executable for the coverage inventory (BLD-GOG-EN, FND-RES-009).
+Those generated analysis outputs remain ignored; only compact inventory metadata
+and independently authored findings are committed. The bounded runtime assessment
+and its limits are recorded in [RUNTIME.md](RUNTIME.md).
+
+`Check-Documentation.ps1` also runs `Check-ResearchTracking.mjs` and the
+Conqueror-specific `Check-Coverage.mjs`. These enforce structural consistency;
+they do not prove complete research or promote a spec/parity status. The changed
+CI workflow passes actionlint. Packaging and platform installers were not
+rerun for this research-only audit; their prior migration results remain above.

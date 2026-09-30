@@ -45,4 +45,4 @@ None known.
 
 ## Open questions
 
-- Whether the designers meant a third.
+- Whether the designers meant a third. (Q-BATTLE-001)

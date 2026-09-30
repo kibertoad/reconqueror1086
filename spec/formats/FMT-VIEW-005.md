@@ -43,4 +43,4 @@ Checked against the `Backdrop` resource of the 42 `MELEE*` and `DEFEND*` archive
 
 ## Open questions
 
-- The purpose of `unk_04`, and what other `kind` values would do, is unknown.
+- The purpose of `unk_04`, and what other `kind` values would do, is unknown. (Q-VIEW-007)

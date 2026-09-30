@@ -89,8 +89,11 @@ None known.
 ## Open questions
 
 - `swing_side_x`, which picks the left or right start from the target's x and mirrors the frame
-  for the left side, is not recorded in detail.
+  for the left side, is not recorded in detail. (Q-ASSAULT-077)
+
 - Which side of the `H / 3` line counts as below it is not recorded; the procedure takes larger
-  y, lower on the screen.
-- The order of the two random draws in each branch is not recorded; the procedure draws x first.
-- Where `combatants`, `swing_frame_height`, `swing_frame_width`, `swing_start_x`, `swing_start_y`, `swing_target_x`, `swing_target_y`, `swing_vx`, `swing_vy`, `swing_x` and `swing_y` are kept is not recorded.
+  y, lower on the screen. (Q-ASSAULT-078)
+
+- The order of the two random draws in each branch is not recorded; the procedure draws x first. (Q-ASSAULT-079)
+
+- Where `combatants`, `swing_frame_height`, `swing_frame_width`, `swing_start_x`, `swing_start_y`, `swing_target_x`, `swing_target_y`, `swing_vx`, `swing_vy`, `swing_x` and `swing_y` are kept is not recorded. (Q-ASSAULT-080)

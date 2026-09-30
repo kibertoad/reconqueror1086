@@ -78,7 +78,9 @@ None known.
 
 - The value the handlers reset `mode` to is not recorded; the procedure writes 0. How the next
   state decision treats that value for Defend and Follow, which do not call the transition
-  helper, is not recorded.
+  helper, is not recorded. (Q-ASSAULT-018)
+
 - Which result the Attack and Retreat handlers pass to the helper is not recorded; the
-  procedure passes true.
-- Where `combatants` and `scene_blocks` are kept is not recorded.
+  procedure passes true. (Q-ASSAULT-019)
+
+- Where `combatants` and `scene_blocks` are kept is not recorded. (Q-ASSAULT-020)

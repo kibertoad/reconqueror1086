@@ -71,5 +71,6 @@ None known.
 ## Open questions
 
 - The order of two units with the same key: the original sorts with the C library, whose order of
-  equal elements this procedure does not reproduce.
-- How the backdrop and the control strip are drawn around the units.
+  equal elements this procedure does not reproduce. (Q-BATTLE-021)
+
+- How the backdrop and the control strip are drawn around the units. (Q-BATTLE-022)

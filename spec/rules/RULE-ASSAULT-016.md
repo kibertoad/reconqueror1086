@@ -61,7 +61,9 @@ None known.
 
 ## Open questions
 
-- The x87 control word in effect when the steps are converted is not recorded.
+- The x87 control word in effect when the steps are converted is not recorded. (Q-ASSAULT-047)
+
 - FND-ASSAULT-025 records the resulting flags as `0x112`; whether the handler rewrites the low
-  byte as the other direct handlers do or stores `0x112` outright is not recorded.
-- Where `combatants`, `effect_defs` and `scene_blocks` are kept is not recorded.
+  byte as the other direct handlers do or stores `0x112` outright is not recorded. (Q-ASSAULT-048)
+
+- Where `combatants`, `effect_defs` and `scene_blocks` are kept is not recorded. (Q-ASSAULT-046)

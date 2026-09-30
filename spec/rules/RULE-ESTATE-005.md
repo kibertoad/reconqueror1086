@@ -65,8 +65,11 @@ None known.
 ## Open questions
 
 - How the executable computes revenue from productivity; the monthly steps of RULE-ESTATE-002 are
-  expected to hold it.
-- Which of the fief record's lists hold the crops and the forest industries.
-- How `scale_by_productivity` grows a value above 50%; the guide gives the 50% values only.
+  expected to hold it. (Q-ESTATE-017)
+
+- Which of the fief record's lists hold the crops and the forest industries. (Q-ESTATE-018)
+
+- How `scale_by_productivity` grows a value above 50%; the guide gives the 50% values only. (Q-ESTATE-019)
+
 - Where the executable keeps `fief_crops`, `fief_forest`, `crop_monthly_revenue`,
-  `crop_harvest_revenue` and `forest_revenue`.
+  `crop_harvest_revenue` and `forest_revenue`. (Q-ESTATE-020)

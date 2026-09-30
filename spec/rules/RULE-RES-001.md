@@ -177,4 +177,4 @@ None known.
 
 - What `fn_000491D4` decodes, and what `fn_00048090`, `fn_0004830C` and `fn_00049124` produce beyond
   the formats FMT-RES-003 and FMT-RES-004 give; the encoders' choices between equal encodings are
-  not recorded.
+  not recorded. (Q-RES-004)

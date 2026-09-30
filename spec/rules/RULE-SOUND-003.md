@@ -115,4 +115,4 @@ None known.
 
 ## Open questions
 
-- The HMI driver calls inside `init_digital_sound`, `init_midi`, `play_music` and `stop_music`.
+- The HMI driver calls inside `init_digital_sound`, `init_midi`, `play_music` and `stop_music`. (Q-SOUND-006)

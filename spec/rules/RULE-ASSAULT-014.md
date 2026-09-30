@@ -58,5 +58,6 @@ None known.
 ## Open questions
 
 - The wandering handler clears the target fields; which fields and to what value is not
-  recorded, and no test reads them before setting them again.
-- Where `effect_defs` and `scene_blocks` are kept is not recorded.
+  recorded, and no test reads them before setting them again. (Q-ASSAULT-042)
+
+- Where `effect_defs` and `scene_blocks` are kept is not recorded. (Q-ASSAULT-043)

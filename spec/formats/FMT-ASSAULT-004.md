@@ -47,6 +47,7 @@ Not checked as a whole; the fields named here come from the code that uses them.
 - The record also holds the values the constructor copies from the descriptor (FMT-ASSAULT-003),
   the tick counter, and the combatant or block that owns the effect. Their offsets are not
   recorded; the rules name them `tick_count`, `interval`, `flags`, `step_x`, `step_y`, `ticks`
-  and `owner`.
+  and `owner`. (Q-ASSAULT-007)
+
 - FND-ASSAULT-030 names `+0x24` and `+0x28` of "the record the scheduler moves"; whether that
-  is this record or the combatant record is not settled.
+  is this record or the combatant record is not settled. (Q-ASSAULT-008)

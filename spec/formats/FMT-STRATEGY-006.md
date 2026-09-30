@@ -46,4 +46,4 @@ Read against the creator, the brigand pass and the two fixed creators.
 
 ## Open questions
 
-- The purpose of `unk_00` and `unk_0C` is unknown.
+- The purpose of `unk_00` and `unk_0C` is unknown. (Q-STRATEGY-009)

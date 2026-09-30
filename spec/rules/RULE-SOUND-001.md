@@ -77,4 +77,4 @@ None known.
 ## Open questions
 
 - `fn_0007AB20` allocates DOS memory in 16-byte paragraphs and returns 0 when there is none; its
-  inside was not traced.
+  inside was not traced. (Q-SOUND-003)

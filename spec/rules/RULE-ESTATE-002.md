@@ -136,9 +136,12 @@ None known.
 
 - What `fn_0002DE60`, `fn_0002D9E8`, `fn_0002DA48`, `fn_0002E588`, `fn_0002E628` and `fn_0002E150`
   do each month, and `fn_0002E3B8`, `fn_0002DEAC`, `fn_0002DDFC`, `fn_0002DD3C` and `fn_0002DD94` in
-  July; they are expected to hold the revenue, tax, population and harvest rules.
+  July; they are expected to hold the revenue, tax, population and harvest rules. (Q-ESTATE-006)
+
 - The layout of the rows of the four lists. In the `list_28` and `list_2C` sums the second word lies
   in the next row, and the last row's reaches past the list; what the original reads there is not
-  known.
-- What `fn_0002CCD4` does beyond the message, and what `fn_0005C550` and `fn_0005C5CC` do.
-- What `fiefs[0]` field `+0x14`, which `0x0002D5D4` reads capped at 100, holds.
+  known. (Q-ESTATE-007)
+
+- What `fn_0002CCD4` does beyond the message, and what `fn_0005C550` and `fn_0005C5CC` do. (Q-ESTATE-008)
+
+- What `fiefs[0]` field `+0x14`, which `0x0002D5D4` reads capped at 100, holds. (Q-ESTATE-009)

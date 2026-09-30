@@ -104,7 +104,10 @@ None known.
 
 ## Open questions
 
-- Where `blit_tile` puts a tile relative to its position.
-- Which coordinate of the figure's marker can come from the selected record.
-- Whether the figure's offsets or the ridden army's win when `ridden_force` is 5.
-- What `fn_00011CC0` does in full: its error term, the dot spacing and the counter.
+- Where `blit_tile` puts a tile relative to its position. (Q-STRATEGY-028)
+
+- Which coordinate of the figure's marker can come from the selected record. (Q-STRATEGY-029)
+
+- Whether the figure's offsets or the ridden army's win when `ridden_force` is 5. (Q-STRATEGY-030)
+
+- What `fn_00011CC0` does in full: its error term, the dot spacing and the counter. (Q-STRATEGY-031)

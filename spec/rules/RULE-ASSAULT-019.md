@@ -59,5 +59,6 @@ None known.
 ## Open questions
 
 - FND-ASSAULT-030 names `+0x24` and `+0x28` of the record the scheduler moves; the rule reads
-  them as fields of the effect record (FMT-ASSAULT-004), which is not settled.
-- Where `scene_blocks` and `scene_map` are kept is not recorded.
+  them as fields of the effect record (FMT-ASSAULT-004), which is not settled. (Q-ASSAULT-058)
+
+- Where `scene_blocks` and `scene_map` are kept is not recorded. (Q-ASSAULT-052)

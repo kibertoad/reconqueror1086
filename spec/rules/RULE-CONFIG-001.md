@@ -97,5 +97,6 @@ None known.
 
 ## Open questions
 
-- How the search walks `PATH` after its first directory, and the flags of the existence test.
-- Whether an empty file makes the list start at an unfilled node.
+- How the search walks `PATH` after its first directory, and the flags of the existence test. (Q-CONFIG-003)
+
+- Whether an empty file makes the list start at an unfilled node. (Q-CONFIG-004)

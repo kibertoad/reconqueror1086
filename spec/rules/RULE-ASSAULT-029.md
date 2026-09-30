@@ -67,5 +67,6 @@ None known.
 - Which fields the copier takes from the state block apart from the texture at `surface0`, and
   which it keeps apart from `color_family`, is not recorded. The procedure also keeps
   `offset_x`, `offset_y`, `state_target` and `selected`, which movement, cell occupancy and
-  selection need.
-- Where `scene_blocks` is kept is not recorded.
+  selection need. (Q-ASSAULT-085)
+
+- Where `scene_blocks` is kept is not recorded. (Q-ASSAULT-086)

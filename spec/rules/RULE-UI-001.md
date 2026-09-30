@@ -84,6 +84,8 @@ None known.
 
 ## Open questions
 
-- What calendar field `fn_00038678` returns.
-- What `fn_0005B2C0`, `g_0009AAC4`, `g_0009DED8`, `g_0009DEF8` and `g_0009DF04` are.
-- What the four digits after `_` in a background name mean, and whether the game checks them.
+- What calendar field `fn_00038678` returns. (Q-UI-007)
+
+- What `fn_0005B2C0`, `g_0009AAC4`, `g_0009DED8`, `g_0009DEF8` and `g_0009DF04` are. (Q-UI-008)
+
+- What the four digits after `_` in a background name mean, and whether the game checks them. (Q-UI-009)

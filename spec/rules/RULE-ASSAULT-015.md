@@ -67,7 +67,9 @@ None known.
 
 ## Open questions
 
-- The go-to handler clears `target`; the value it writes is not recorded.
+- The go-to handler clears `target`; the value it writes is not recorded. (Q-ASSAULT-044)
+
 - Which cell the go-to handler subtracts, the one under the live position or the one the actor
-  occupies, is not recorded; the procedure uses the live position.
-- Where `combatants`, `effect_defs` and `scene_blocks` are kept is not recorded.
+  occupies, is not recorded; the procedure uses the live position. (Q-ASSAULT-045)
+
+- Where `combatants`, `effect_defs` and `scene_blocks` are kept is not recorded. (Q-ASSAULT-046)

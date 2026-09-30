@@ -50,4 +50,4 @@ None known.
 ## Open questions
 
 - How the draw picks the retainer, how many draws a removal makes, and how the removed
-  combatant leaves the map.
+  combatant leaves the map. (Q-ASSAULT-087)

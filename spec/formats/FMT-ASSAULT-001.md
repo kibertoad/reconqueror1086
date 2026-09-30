@@ -79,7 +79,9 @@ A memory structure: checked against the code that reads and writes it, listed in
 - The record also keeps the combatant's actor kind, template, combat row, whether it is live,
   which map block is its own, and its heading. Where it keeps them is not recorded; they
   lie in `unk_00`, `unk_14` or `unk_38`, or in the combatant's block. The rules reach them
-  through the functions of RULE-ASSAULT-027.
+  through the functions of RULE-ASSAULT-027. (Q-ASSAULT-001)
+
 - The object action dispatcher tests the player's dword at offset 4 inside its cases
-  (FND-ASSAULT-036); what it holds is not recorded.
-- The purpose of `unk_00`, `unk_14` and `unk_38` is otherwise unknown.
+  (FND-ASSAULT-036); what it holds is not recorded. (Q-ASSAULT-002)
+
+- The purpose of `unk_00`, `unk_14` and `unk_38` is otherwise unknown. (Q-ASSAULT-003)

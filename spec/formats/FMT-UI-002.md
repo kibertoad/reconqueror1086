@@ -49,4 +49,4 @@ to 6 of `VSMITH.HAT` are 0; the rest are 1. The ids of `CHARGEN.HAT` are out of 
 
 ## Open questions
 
-- What reads `id` and `enabled` when the pointer moves was not traced.
+- What reads `id` and `enabled` when the pointer moves was not traced. (Q-UI-004)

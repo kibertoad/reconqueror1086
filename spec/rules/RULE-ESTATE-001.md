@@ -219,9 +219,12 @@ None known.
 ## Open questions
 
 - What `fn_00063050`, `fn_000386CC` and `fn_000386A0` do when the screen opens, and what
-  `fn_00059760` does when it closes.
-- Whether `planning_joined` is set anywhere else, and what reads it.
+  `fn_00059760` does when it closes. (Q-ESTATE-002)
+
+- Whether `planning_joined` is set anywhere else, and what reads it. (Q-ESTATE-003)
+
 - Whether any army record ever holds a count in unit rows 3 to 5, and whether anything reads
-  `brigand_orders[0].unk_00` after the opening copy writes it.
+  `brigand_orders[0].unk_00` after the opening copy writes it. (Q-ESTATE-004)
+
 - The values of `unit_price_sets` and `unit_upkeep_sets` are designer data and are left in the
-  executable.
+  executable. (Q-ESTATE-005)

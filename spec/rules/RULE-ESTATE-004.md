@@ -68,8 +68,11 @@ None known.
 ## Open questions
 
 - How the executable computes productivity; the monthly steps of RULE-ESTATE-002 are expected to hold
-  it, and `fiefs[0]` field `+0x14`, which the executable reads capped at 100, may be it.
-- Whether the order effect the guide reports is real, and what causes it.
-- Whether productivity is limited to 0 to 100.
+  it, and `fiefs[0]` field `+0x14`, which the executable reads capped at 100, may be it. (Q-ESTATE-013)
+
+- Whether the order effect the guide reports is real, and what causes it. (Q-ESTATE-014)
+
+- Whether productivity is limited to 0 to 100. (Q-ESTATE-015)
+
 - Where the executable keeps `fief_improvements`, `improvement_bonus`, `fief_has_staff`,
-  `fief_has_servant_room`, `fief_bean_tiles`, `fief_food_tiles` and `fief_houses`.
+  `fief_has_servant_room`, `fief_bean_tiles`, `fief_food_tiles` and `fief_houses`. (Q-ESTATE-016)

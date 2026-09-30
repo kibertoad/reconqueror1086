@@ -14,12 +14,13 @@ Entries by kind.
 
 ## sources
 
-2 entries.
+3 entries.
 
 | ID | Title | Status |
 |---|---|---|
 | [SRC-GAMEFAQS-66730](../sources/SRC-GAMEFAQS-66730.md) | Conqueror 1086 A.D. FAQ by mikel123456, GameFAQs FAQ 66730 | None |
 | [SRC-MANUAL](../sources/SRC-MANUAL.md) | Conqueror A.D. 1086 manual, as shipped with the GOG release | None |
+| [SRC-PATCH-CATALOG](../sources/SRC-PATCH-CATALOG.md) | GOG public build catalog and Sierra Help patch catalog | None |
 
 ## formats
 
@@ -215,7 +216,7 @@ Entries by kind.
 
 ## findings
 
-227 entries.
+228 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -338,6 +339,7 @@ Entries by kind.
 | [FND-RES-006](../findings/FND-RES-006.md) | The game builds three archive paths from CONQUER.INI and reopens C1086.GOB after reading any other archive | recorded |
 | [FND-RES-007](../findings/FND-RES-007.md) | The fifteen two-digit MELEE scenes are three families of five that share textures and differ in layout and colour maps | recorded |
 | [FND-RES-008](../findings/FND-RES-008.md) | Kind-1 blocks are neither the LSB-first LZW of other Dynamix files nor classic LH1 | recorded |
+| [FND-RES-009](../findings/FND-RES-009.md) | The bound LE payload maps initialized code and data separately from its data zero-fill | recorded |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |

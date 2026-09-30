@@ -38,4 +38,4 @@ Checked against all 128 maps of the 42 `MELEE*` and `DEFEND*` archives, and maps
 
 ## Open questions
 
-- Whether the game loads the stored maps or builds them with RULE-VIEW-006 when a scene starts is not recorded; the two agree for maps 0 to 31.
+- Whether the game loads the stored maps or builds them with RULE-VIEW-006 when a scene starts is not recorded; the two agree for maps 0 to 31. (Q-VIEW-008)

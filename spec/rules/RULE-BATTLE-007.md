@@ -222,4 +222,4 @@ None known.
 
 ## Open questions
 
-- Whether `0x00063EC0` makes the distance truncate, as the procedure assumes.
+- Whether `0x00063EC0` makes the distance truncate, as the procedure assumes. (Q-BATTLE-014)

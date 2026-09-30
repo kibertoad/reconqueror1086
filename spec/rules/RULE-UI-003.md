@@ -66,4 +66,4 @@ None known.
 
 ## Open questions
 
-- How the store screen uses the owned entries after `store_offer_count`.
+- How the store screen uses the owned entries after `store_offer_count`. (Q-UI-011)

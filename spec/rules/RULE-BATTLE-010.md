@@ -64,7 +64,10 @@ None known.
 
 ## Open questions
 
-- When the game registers the 250 Hz callback, and whether it ever removes it.
-- Whether the accumulator subtracts `0x10000` or keeps only its low 16 bits; the two agree.
-- The order in which the timer service runs the callback and the chain on one tick.
-- Where the game keeps `bios_chain_accumulator`.
+- When the game registers the 250 Hz callback, and whether it ever removes it. (Q-BATTLE-017)
+
+- Whether the accumulator subtracts `0x10000` or keeps only its low 16 bits; the two agree. (Q-BATTLE-018)
+
+- The order in which the timer service runs the callback and the chain on one tick. (Q-BATTLE-019)
+
+- Where the game keeps `bios_chain_accumulator`. (Q-BATTLE-020)

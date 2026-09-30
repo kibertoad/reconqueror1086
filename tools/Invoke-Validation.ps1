@@ -48,8 +48,10 @@ try {
     Invoke-Node @('tools/upstream.mjs', 'links')
     Invoke-Node @('--test', 'tests/evidence/evidence.test.mjs', 'tests/evidence/vendor.test.mjs',
         'tests/evidence/bridge.test.mjs', 'tests/upstream/upstream.test.mjs', 'tests/upstream/narrative.test.mjs',
-        'tests/upstream/gui-exit.test.mjs')
-    & python -B -m unittest discover -s tests/evidence -p test_x86.py
+        'tests/upstream/gui-exit.test.mjs', 'tests/upstream/research-tracking.test.mjs',
+        'tests/upstream/diagnostics.test.mjs', 'tests/upstream/memory-blocks.test.mjs',
+        'tests/upstream/capture-window.test.mjs')
+    & python -B -m unittest discover -s tests/evidence -p 'test_*.py'
     if ($LASTEXITCODE -ne 0) { throw 'Synthetic x86 evidence tests failed.' }
     $build = @('--artifacts-path', $ArtifactsPath, "-maxCpuCount:$MaxCpuCount", '-nodeReuse:true', '-p:UseSharedCompilation=false', '-v:minimal')
     Invoke-Dotnet (@('build', 'Conqueror1086.slnx') + $build)

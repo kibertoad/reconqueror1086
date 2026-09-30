@@ -97,7 +97,9 @@ None known.
 
 ## Open questions
 
-- The field `unlisted_field` gives for `NONE`.
+- The field `unlisted_field` gives for `NONE`. (Q-PERSON-013)
+
 - Which dilemma numbers, choices and outcomes `dilemma_item_grants` covers in each of the three
-  handlers.
-- What `fn_000596C0(6, ...)` opens, and what `fn_0005B2C0` and `g_0009AAC4` do here.
+  handlers. (Q-PERSON-014)
+
+- What `fn_000596C0(6, ...)` opens, and what `fn_0005B2C0` and `g_0009AAC4` do here. (Q-PERSON-015)

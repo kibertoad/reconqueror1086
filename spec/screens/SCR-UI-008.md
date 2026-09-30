@@ -53,4 +53,4 @@ None known.
 
 ## Open questions
 
-- How the army sizes of the practice battle are drawn.
+- How the army sizes of the practice battle are drawn. (Q-UI-016)

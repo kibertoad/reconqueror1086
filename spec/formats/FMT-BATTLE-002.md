@@ -42,4 +42,4 @@ Read against the mouse callback, the queue pop and the classifier.
 
 ## Open questions
 
-- The purpose of `unk_10` is unknown.
+- The purpose of `unk_10` is unknown. (Q-BATTLE-003)

@@ -186,13 +186,17 @@ None known.
 
 - `intersect_face`, `contact_x`, `contact_y`, `wall_depth`, `view_forward`, `view_across` and
   `pixel_opaque` are specified only in outline (RULE-VIEW-004). What contact point a kind-4
-  candidate reports is not recorded.
+  candidate reports is not recorded. (Q-VIEW-013)
+
 - What the original does when `depth` is 0 or negative, where the two projections divide by
-  it, is not recorded.
+  it, is not recorded. (Q-VIEW-014)
+
 - Where the game keeps `scene_map`, `scene_blocks`, `view_width`, `horizon`, `view_elevation`,
-  `hit_block`, `hit_depth`, `hit_x`, `hit_y`, `hit_cell_x` and `hit_cell_y` is not recorded.
+  `hit_block`, `hit_depth`, `hit_x`, `hit_y`, `hit_cell_x` and `hit_cell_y` is not recorded. (Q-VIEW-015)
+
 - When the two ray components have the same magnitude the procedure takes y as the major
-  axis; the original's choice for that tie is not recorded.
+  axis; the original's choice for that tie is not recorded. (Q-VIEW-016)
+
 - The procedure reads the probe cell's block once and follows state targets in place; whether
   the original keeps the probe cell's offsets or the target block's own while it follows the
-  chain is not recorded.
+  chain is not recorded. (Q-VIEW-017)

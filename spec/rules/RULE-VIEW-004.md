@@ -56,8 +56,11 @@ None known.
 ## Open questions
 
 - How `0x00044A28` computes the contact point for each shape, including rounding, which face a
-  diagonal reports, and whether the contact includes the block's offsets.
-- How the depth of a wall contact is measured (along the ray or along the view direction).
+  diagonal reports, and whether the contact includes the block's offsets. (Q-VIEW-018)
+
+- How the depth of a wall contact is measured (along the ray or along the view direction). (Q-VIEW-019)
+
 - How `0x000447C4` rotates a kind-4 block's centre by the negative view heading, which gives
-  `view_forward` and `view_across`.
-- Which texture row `0x000444E8` reads for a view row between `top` and `bottom`.
+  `view_forward` and `view_across`. (Q-VIEW-020)
+
+- Which texture row `0x000444E8` reads for a view row between `top` and `bottom`. (Q-VIEW-021)

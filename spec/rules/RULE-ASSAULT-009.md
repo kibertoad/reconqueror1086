@@ -75,5 +75,6 @@ None known.
 ## Open questions
 
 - What the scan reads for a cell outside the map is not recorded; actors are never placed on
-  the edge of a shipped map.
-- Where `combatants` and `scene_map` are kept is not recorded.
+  the edge of a shipped map. (Q-ASSAULT-035)
+
+- Where `combatants` and `scene_map` are kept is not recorded. (Q-ASSAULT-036)

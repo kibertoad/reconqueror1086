@@ -100,5 +100,6 @@ None known.
 ## Open questions
 
 - What `fn_0005B2C0`, `g_0009AAC4`, `g_0009DED8`, `g_0009DEF8`, `g_0009DEDC` and `g_0009DF04` do on
-  the screens that follow.
-- What calendar field `fn_00038678` returns.
+  the screens that follow. (Q-UI-010)
+
+- What calendar field `fn_00038678` returns. (Q-UI-007)

@@ -95,6 +95,8 @@ None known.
 ## Open questions
 
 - What `fn_0003FCA8` does with the wager, JOUST_WON and JOUST_LOST, and what its other arguments,
-  a value of 99 and the addresses of the two lance values, are for.
-- Whether anything clears the joust and melee counts each day. The refusal messages speak of today, but the only clears found are the monthly reset, `0x0005C520`, `0x00010FF0` and the village map exit while a tournament is in town (RULE-UI-002).
-- What `fn_0003FB28`, `fn_000628AC` and `g_0009A928` are.
+  a value of 99 and the addresses of the two lance values, are for. (Q-TOURNEY-005)
+
+- Whether anything clears the joust and melee counts each day. The refusal messages speak of today, but the only clears found are the monthly reset, `0x0005C520`, `0x00010FF0` and the village map exit while a tournament is in town (RULE-UI-002). (Q-TOURNEY-006)
+
+- What `fn_0003FB28`, `fn_000628AC` and `g_0009A928` are. (Q-TOURNEY-007)

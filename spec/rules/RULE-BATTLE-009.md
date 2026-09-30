@@ -99,5 +99,6 @@ None known.
 
 ## Open questions
 
-- What `g_000B0C36`, `g_000B0C2A` and `g_000B0C38` hold; they are likely states of shift keys.
-- What the caller of the resolver does with `map_session_over` after Alt+X.
+- What `g_000B0C36`, `g_000B0C2A` and `g_000B0C38` hold; they are likely states of shift keys. (Q-BATTLE-015)
+
+- What the caller of the resolver does with `map_session_over` after Alt+X. (Q-BATTLE-016)

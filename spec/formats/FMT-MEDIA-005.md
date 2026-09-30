@@ -41,4 +41,4 @@ The eight entries `MELEE2`, `SK_START`, `BRAWL`, `SKIRMCUR`, `SKIRMISH`, `HELP`,
 
 ## Open questions
 
-- The layout of the 9,216-byte `FNT6.PCX`.
+- The layout of the 9,216-byte `FNT6.PCX`. (Q-MEDIA-002)

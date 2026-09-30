@@ -156,4 +156,4 @@ None known.
 
 ## Open questions
 
-- The value `generator_property` holds before its first write in a session.
+- The value `generator_property` holds before its first write in a session. (Q-STRATEGY-012)

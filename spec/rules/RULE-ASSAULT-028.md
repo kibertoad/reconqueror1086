@@ -59,4 +59,4 @@ None known.
 
 ## Open questions
 
-- Where `blood_frame` and `blood_step` are kept is not recorded.
+- Where `blood_frame` and `blood_step` are kept is not recorded. (Q-ASSAULT-084)

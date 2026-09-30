@@ -38,4 +38,4 @@ Checked against the size of all 12,982 `TEX` resources in the 99 archives.
 
 ## Open questions
 
-- The order of the pixels, row by row or column by column, is not recorded.
+- The order of the pixels, row by row or column by column, is not recorded. (Q-VIEW-009)

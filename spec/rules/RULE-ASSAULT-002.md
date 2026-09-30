@@ -92,8 +92,11 @@ None known.
 ## Open questions
 
 - How the loader derives `side` from the block's colour group, and how it gives each combatant
-  its own live block, is not recorded (`side_of_block`, RULE-ASSAULT-027).
+  its own live block, is not recorded (`side_of_block`, RULE-ASSAULT-027). (Q-ASSAULT-012)
+
 - The templates' health, skill and armour are set by the same initializer and are not
-  recorded.
-- Which retainer `prune_one_retainer` removes is not recorded (RULE-ASSAULT-030).
-- Where `combatants`, `scene_blocks` and `scene_map` are kept is not recorded.
+  recorded. (Q-ASSAULT-013)
+
+- Which retainer `prune_one_retainer` removes is not recorded (RULE-ASSAULT-030). (Q-ASSAULT-014)
+
+- Where `combatants`, `scene_blocks` and `scene_map` are kept is not recorded. (Q-ASSAULT-015)

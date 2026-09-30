@@ -53,5 +53,6 @@ None known.
 
 ## Open questions
 
-- Which keys pick a response.
-- What the name window shows.
+- Which keys pick a response. (Q-UI-022)
+
+- What the name window shows. (Q-UI-023)

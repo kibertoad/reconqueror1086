@@ -75,10 +75,14 @@ None known.
 
 ## Open questions
 
-- The order in which the dispatcher and the map replacement run for one click is not recorded.
+- The order in which the dispatcher and the map replacement run for one click is not recorded. (Q-ASSAULT-061)
+
 - The 15 other cases of the dispatcher are not described. Interaction 0, which exits and gates
-  have, changes nothing before the replacement (FND-ASSAULT-047).
-- The feedback callback the accepted action calls is not recorded.
+  have, changes nothing before the replacement (FND-ASSAULT-047). (Q-ASSAULT-062)
+
+- The feedback callback the accepted action calls is not recorded. (Q-ASSAULT-063)
+
 - Whether food adds to the player's combatant health or to another copy of it is not
-  recorded.
-- Where `combatants` and `scene_map` are kept is not recorded.
+  recorded. (Q-ASSAULT-064)
+
+- Where `combatants` and `scene_map` are kept is not recorded. (Q-ASSAULT-036)

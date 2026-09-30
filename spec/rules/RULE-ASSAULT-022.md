@@ -87,9 +87,13 @@ None known.
 
 ## Open questions
 
-- How a combatant that survives a hit enters mode 14 is not recorded.
+- How a combatant that survives a hit enters mode 14 is not recorded. (Q-ASSAULT-065)
+
 - How the comparison in the hit handlers reaches the next decision, and what else the mode-15
-  handler does, is not recorded.
-- Whether the hostile count skips the ten templates is not recorded; the procedure skips them.
-- Where `hostiles_left` is kept is not recorded, and neither is how the assault uses it to end.
-- Where `combatants`, `effect_defs`, `scene_blocks` and `scene_map` are kept is not recorded.
+  handler does, is not recorded. (Q-ASSAULT-066)
+
+- Whether the hostile count skips the ten templates is not recorded; the procedure skips them. (Q-ASSAULT-067)
+
+- Where `hostiles_left` is kept is not recorded, and neither is how the assault uses it to end. (Q-ASSAULT-068)
+
+- Where `combatants`, `effect_defs`, `scene_blocks` and `scene_map` are kept is not recorded. (Q-ASSAULT-069)

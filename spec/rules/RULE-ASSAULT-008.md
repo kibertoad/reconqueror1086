@@ -124,6 +124,7 @@ None known.
 - The entries marked 0 have not been read: all kinds' mode 12, modes 11 of kinds 0 and 1, modes
   8, 14 and 15 of kind 1, modes 16 and 17 of kinds 2 and 4, and all of kinds 3, 5 and 6 apart
   from modes 9 and 10. The procedure leaves the pair unchanged for them; what the original
-  writes there is not known.
+  writes there is not known. (Q-ASSAULT-033)
+
 - `fn_0004F89B`, the test of modes 11, 14 and 15, is named only by its address. Its result
-  decides between mode 11 and mode 13 (RULE-ASSAULT-013).
+  decides between mode 11 and mode 13 (RULE-ASSAULT-013). (Q-ASSAULT-034)

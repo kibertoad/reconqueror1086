@@ -100,11 +100,13 @@ require explicit authorization.
 
 ## Template workflow
 
-The infrastructure follows template main 3e8805ea474c60e7c3234213a108cb85a9e86265
-and toolkit main c2b21ee62fc404391e8dcfafd7029185f81241a9. Existing project
+The infrastructure follows template main e0325e0b063735e94b7e3ac94b0b8b89d0a38a79
+and toolkit checker revision 42ee3d64797dc1abcc7a5da527445ece79c534b5 (PR 20).
+The instruction reporter remains pinned to 926e287a4134512d59fe021efe6507c933da03f1. Existing project
 identities and importer paths are intentional adaptations. Before any executable
 analysis, `tools/Verify-Configuration.ps1 -RequireAnalysisReady` must pass; the
-latest official patch status is currently unestablished.
+latest public official patch status is established by SRC-PATCH-CATALOG and the
+owned source verification recorded in docs/SOURCE-EDITIONS.md.
 
 ## The local copy of the standard
 
@@ -128,7 +130,8 @@ reference to those pages in this repository points at that copy.
   section again once it is in context. The lines include the section's
   subsections, so a link to a subsection inside one already read adds
   nothing. The upstream tests keep every range right; after a refresh,
-  `node tools/upstream.mjs links --write` rewrites them.
+
+ode tools/upstream.mjs links --write` rewrites them.
 - Skills and summaries in this repository are enough to do the work. Open a
   linked section only when a step leaves a question it answers.
 - Checking whether a newer version has been published, and refreshing the
@@ -142,7 +145,7 @@ Work is planned, tracked and handed on under the
 that page differ, the page wins.
 
 - The project moves through the stages Intake, Runtime access, Survey, Slices
-  and Audit, and `docs/IMPLEMENTATION-PLAN.md` records which one it is in.
+  and Audit, and `docs/implementation-plan.md` records which one it is in.
   `docs/RUNTIME.md` records what can be done with the original running, and
   whether an agent, only a person, or nobody can do it.
 - Survey lists the installation and the media the game reads in full, and
@@ -242,7 +245,7 @@ that page differ, the page wins.
   Circumstantial evidence never raises a status. Contradicting evidence makes
   it `disputed`, and a wrong claim is superseded, never deleted. The
   protocol's "The life of a claim" section has the details.
-- `docs/HANDOVER.md` is the current state of work outside any goal, at most
+- `docs/handover.md` is the current state of work outside any goal, at most
   200 lines, rewritten at the end of every session that works under no goal,
   and names items and entries by ID without saying what research found.
   `docs/goals/` holds one file per running goal, which claims its areas and
@@ -323,7 +326,7 @@ Never silently promote a plausible interpretation.
 
 A complete reading also covers what the standard's
 [Complete readings](docs/upstream/documentation-standard.md#complete-readings) (lines 137-181)
-and [Findings](docs/upstream/documentation-standard.md#findings) (lines 413-461) sections
+and [Findings](docs/upstream/documentation-standard.md#findings) (lines 413-463) sections
 list, among them: two addresses are the same storage only where the reading
 shows the segment each is formed in and accessed through (a BP offset read
 through DS is the caller's stack only where DS equals SS there); a stored
@@ -360,7 +363,7 @@ per-item statistics a designer filled in, with a table of more than 64 values in
 a value file. It never keeps a substantial copy of the game's writing (dialogue,
 descriptions, messages, the manual's prose; quote a short passage at most and
 refer to the rest by resource), its art (images, sounds, music, video, maps), or
-a meaningful slice of its code or scripts. Tool procedure stays in `docs/GHIDRA.md`. Never commit broad
+a meaningful slice of its code or scripts. Tool procedure stays in `docs/ghidra.md`. Never commit broad
 decompiler, instruction, or Version Tracking exports. The function inventories
 in `coverage/` are the one export that is committed, and only with the columns
 the planning section above allows.

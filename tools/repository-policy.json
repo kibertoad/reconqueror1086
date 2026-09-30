@@ -5,6 +5,7 @@
     "analysis/",
     "reference/original/"
   ],
+  "deniedFileNamePatterns": ["^hs_err_pid.*\\.log$", "^replay_pid.*\\.log$", "\\.hprof$"],
   "restrictedExtensions": [
     ".666",
     ".bmp",

@@ -67,6 +67,7 @@ None known.
 ## Open questions
 
 - How the executable computes growth and taxes; the monthly and July steps of RULE-ESTATE-002 are
-  expected to hold them.
+  expected to hold them. (Q-ESTATE-021)
+
 - Where the executable keeps `fief_houses`, `fief_food_tiles`, `fief_tax_rate` and the bands of
-  `growth_band_rate`, and how `scale_by_productivity` scales the rate.
+  `growth_band_rate`, and how `scale_by_productivity` scales the rate. (Q-ESTATE-022)

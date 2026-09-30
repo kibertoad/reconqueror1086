@@ -62,4 +62,4 @@ None known.
 
 ## Open questions
 
-- Whether the background drawn is the catalog record's picture or `TOWN_Y.PCX`; the entry routine was not traced that far.
+- Whether the background drawn is the catalog record's picture or `TOWN_Y.PCX`; the entry routine was not traced that far. (Q-UI-014)

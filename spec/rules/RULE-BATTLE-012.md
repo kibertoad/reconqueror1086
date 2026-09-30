@@ -99,5 +99,6 @@ None known.
 
 ## Open questions
 
-- Whether the callback discards an event or overwrites one when the queue is full.
-- When `pointer_clock` starts counting.
+- Whether the callback discards an event or overwrites one when the queue is full. (Q-BATTLE-023)
+
+- When `pointer_clock` starts counting. (Q-BATTLE-024)

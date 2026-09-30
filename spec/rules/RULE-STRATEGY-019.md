@@ -83,10 +83,16 @@ None known.
 
 ## Open questions
 
-- What `fn_00021E28`, `fn_0005B0D4`, `fn_00059760` and `fn_00062828` do.
-- What makes conversation nodes 2439 and 2593 reachable.
-- What `fn_00024CA0` does.
-- What `fn_0005877C` does.
-- What `fn_0005B2C0` does.
-- What `fn_000628AC` does.
-- What `g_0009A928` holds.
+- What `fn_00021E28`, `fn_0005B0D4`, `fn_00059760` and `fn_00062828` do. (Q-STRATEGY-037)
+
+- What makes conversation nodes 2439 and 2593 reachable. (Q-STRATEGY-038)
+
+- What `fn_00024CA0` does. (Q-STRATEGY-039)
+
+- What `fn_0005877C` does. (Q-STRATEGY-040)
+
+- What `fn_0005B2C0` does. (Q-STRATEGY-041)
+
+- What `fn_000628AC` does. (Q-STRATEGY-042)
+
+- What `g_0009A928` holds. (Q-STRATEGY-036)

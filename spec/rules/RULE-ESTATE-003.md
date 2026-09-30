@@ -96,7 +96,9 @@ None known.
 
 ## Open questions
 
-- Where the loan is taken, and whether the executable enforces the 20 to 200 range the manual gives.
-- What conversation variables 1 and 6 of `g_0009A928` hold, and what `fn_000628AC` does with them.
+- Where the loan is taken, and whether the executable enforces the 20 to 200 range the manual gives. (Q-ESTATE-010)
+
+- What conversation variables 1 and 6 of `g_0009A928` hold, and what `fn_000628AC` does with them. (Q-ESTATE-011)
+
 - What `fn_00059CDC`, `fn_0003CED8` and `fn_0001070C` do around the fight, and what `fn_000106C0` and
-  `fn_0001BF54` do when the player dies.
+  `fn_0001BF54` do when the player dies. (Q-ESTATE-012)

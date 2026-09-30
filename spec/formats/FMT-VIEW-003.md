@@ -42,5 +42,6 @@ Checked against the `Viewer` resource of the 42 `MELEE*` and `DEFEND*` archives:
 
 ## Open questions
 
-- How the 16-bit `heading` becomes the byte heading the view uses is not recorded.
-- The purpose of `unk_10` is unknown.
+- How the 16-bit `heading` becomes the byte heading the view uses is not recorded. (Q-VIEW-004)
+
+- The purpose of `unk_10` is unknown. (Q-VIEW-005)

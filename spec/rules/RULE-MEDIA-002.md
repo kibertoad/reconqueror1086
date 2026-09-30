@@ -104,6 +104,8 @@ None known.
 
 ## Open questions
 
-- The clipped path through `0x0007DC00` and the clip rectangle at `0x000B0810`.
-- What the variant `0x00064524` adds with `0x0006E0B0` and `0x000633D0`.
-- What `fn_0006DF90` does with the rectangle after it is recorded.
+- The clipped path through `0x0007DC00` and the clip rectangle at `0x000B0810`. (Q-MEDIA-003)
+
+- What the variant `0x00064524` adds with `0x0006E0B0` and `0x000633D0`. (Q-MEDIA-004)
+
+- What `fn_0006DF90` does with the rectangle after it is recorded. (Q-MEDIA-005)

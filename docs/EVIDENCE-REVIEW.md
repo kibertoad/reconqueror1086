@@ -13,6 +13,14 @@ model. A game's request for reporter behaviour stays open until the reporter
 passes that request's own case; synthetic examples and adopted guidance alone
 do not close it.
 
+The verification record names the request, case, source fingerprint, tool
+revision, input assumptions, expected observation and observed outcome in the
+researcher's words. State which results depend on an unread callee returning or
+preserving state. Keep access candidates after such stops separate from traced
+reads and writes; do not use them to claim a negative search result. Near calls
+preceded by a CS push need their return width, stack balance and returned segment
+checked. Unknown flags from different producers remain independent predicates.
+
 ## Locations and complete readings
 
 Identify the build and manifest file before interpreting a location. Distinguish

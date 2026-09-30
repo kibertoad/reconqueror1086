@@ -100,5 +100,6 @@ None known.
 
 ## Open questions
 
-- How `palette_buffer` reaches the display, and whether its 8-bit values are scaled there.
-- What `fn_0006DF90` does with the rectangle after it is recorded.
+- How `palette_buffer` reaches the display, and whether its 8-bit values are scaled there. (Q-MEDIA-006)
+
+- What `fn_0006DF90` does with the rectangle after it is recorded. (Q-MEDIA-005)

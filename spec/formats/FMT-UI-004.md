@@ -46,4 +46,4 @@ is never read [FND-UI-007].
 
 ## Open questions
 
-- Whether the game reads the descriptions of the owned items for anything besides display.
+- Whether the game reads the descriptions of the owned items for anything besides display. (Q-UI-006)

@@ -83,5 +83,6 @@ None known.
 
 ## Open questions
 
-- What `a` and `b` mean to `fn_00040CE4`.
-- What loads `MELEE2.PCX`, which no caller of this routine names.
+- What `a` and `b` mean to `fn_00040CE4`. (Q-MEDIA-007)
+
+- What loads `MELEE2.PCX`, which no caller of this routine names. (Q-MEDIA-008)

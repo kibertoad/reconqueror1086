@@ -66,4 +66,4 @@ None known.
 
 ## Open questions
 
-- When the byte at `0x0009ADFC` is 1, and what shows region 11's frame.
+- When the byte at `0x0009ADFC` is 1, and what shows region 11's frame. (Q-UI-012)

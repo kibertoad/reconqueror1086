@@ -108,6 +108,8 @@ None known.
 
 ## Open questions
 
-- The input event codes 3 and 7.
-- What `fn_00072119` does with 1 and 3.
-- The meaning of the open flags `0x200` and `0x80` inside the library, which `fn_0006C287` opens with.
+- The input event codes 3 and 7. (Q-MEDIA-009)
+
+- What `fn_00072119` does with 1 and 3. (Q-MEDIA-010)
+
+- The meaning of the open flags `0x200` and `0x80` inside the library, which `fn_0006C287` opens with. (Q-MEDIA-011)

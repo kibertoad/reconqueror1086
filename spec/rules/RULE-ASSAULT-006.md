@@ -64,6 +64,8 @@ None known.
 ## Open questions
 
 - The index the cursor wraps to is not recorded; the procedure uses 10, the first placed
-  combatant.
-- Whether the count `visits` has a lower limit of 1 is not recorded.
-- Where `combatants` is kept is not recorded.
+  combatant. (Q-ASSAULT-027)
+
+- Whether the count `visits` has a lower limit of 1 is not recorded. (Q-ASSAULT-028)
+
+- Where `combatants` is kept is not recorded. (Q-ASSAULT-029)

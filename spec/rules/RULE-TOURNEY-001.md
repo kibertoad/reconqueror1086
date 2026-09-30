@@ -70,6 +70,8 @@ None known.
 
 ## Open questions
 
-- Which routine runs at `0x0002B1DE`, and when.
-- What `fn_0004377C`, `fn_000628AC` and `g_0009A928` are.
-- When `0x0005C520` and `0x00010FF0`, which also clear the counts and `tournament_wins`, run.
+- Which routine runs at `0x0002B1DE`, and when. (Q-TOURNEY-001)
+
+- What `fn_0004377C`, `fn_000628AC` and `g_0009A928` are. (Q-TOURNEY-002)
+
+- When `0x0005C520` and `0x00010FF0`, which also clear the counts and `tournament_wins`, run. (Q-TOURNEY-003)

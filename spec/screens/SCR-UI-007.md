@@ -70,4 +70,4 @@ None known.
 
 ## Open questions
 
-- Where the description window is placed.
+- Where the description window is placed. (Q-UI-015)

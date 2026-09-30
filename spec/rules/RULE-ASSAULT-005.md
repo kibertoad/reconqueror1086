@@ -110,12 +110,17 @@ None known.
 ## Open questions
 
 - The pointer position the view uses relative to the screen, and whether the click row and
-  column are those of the view, are not recorded.
+  column are those of the view, are not recorded. (Q-ASSAULT-021)
+
 - How the ordered combatants' requested modes 12 and 8 are installed, since the pointer path
-  does not call the transition helper, is not recorded.
+  does not call the transition helper, is not recorded. (Q-ASSAULT-022)
+
 - Whether the weapon path compares the depth with the reach plus `0x40` strictly, and in what
-  order it starts the swing, applies the damage and starts the blood effect, is not recorded.
-- The crossbow's use of `ammunition` on this path is not recorded in full.
+  order it starts the swing, applies the damage and starts the blood effect, is not recorded. (Q-ASSAULT-023)
+
+- The crossbow's use of `ammunition` on this path is not recorded in full. (Q-ASSAULT-024)
+
 - Whether a block marked `weapon_contact` also starts the swing, and whether the weapon path
-  reaches it for a block marked `actionable` as well, is not recorded.
-- Where `scene_blocks`, `scene_map`, `view_heading`, `view_x` and `view_y` are kept is not recorded.
+  reaches it for a block marked `actionable` as well, is not recorded. (Q-ASSAULT-025)
+
+- Where `scene_blocks`, `scene_map`, `view_heading`, `view_x` and `view_y` are kept is not recorded. (Q-ASSAULT-026)

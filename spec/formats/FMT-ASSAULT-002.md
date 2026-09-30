@@ -43,8 +43,9 @@ None known.
 
 Checked against the code that reads rows 0 to 24 in the one build.
 
+Which combat row each weapon uses is set by the weapon store's data and is described with
+  the store.
+
 ## Open questions
 
-- The purpose of `unk_14` is unknown.
-- Which combat row each weapon uses is set by the weapon store's data and is described with
-  the store.
+- The purpose of `unk_14` is unknown. (Q-ASSAULT-004)

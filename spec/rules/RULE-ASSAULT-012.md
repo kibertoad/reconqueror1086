@@ -28,6 +28,9 @@ None. The rule defines `enemy_in_reach(c)`, `friend_in_front(c)` and `ray_hit_to
 
 `combat_rows` and `acquisition_row`.
 
+Where `combat_rows` is kept is recorded; its per-row values are the game's content and stay in
+  the executable.
+
 ## Procedure
 
 ```text
@@ -71,7 +74,6 @@ None known.
 
 ## Open questions
 
-- `acquisition_row`, the view row the actor rays are tested at, is not recorded.
-- Where `combat_rows` is kept is recorded; its per-row values are the game's content and stay in
-  the executable.
-- Where `combatants` is kept is not recorded.
+- `acquisition_row`, the view row the actor rays are tested at, is not recorded. (Q-ASSAULT-037)
+
+- Where `combatants` is kept is not recorded. (Q-ASSAULT-029)

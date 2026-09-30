@@ -225,5 +225,6 @@ None known.
 
 ## Open questions
 
-- What value `new_strategic_game` stores in `place_person`.
-- Whether the reset routine clears the freed route pointers.
+- What value `new_strategic_game` stores in `place_person`. (Q-STRATEGY-023)
+
+- Whether the reset routine clears the freed route pointers. (Q-STRATEGY-024)

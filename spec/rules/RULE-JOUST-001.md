@@ -87,5 +87,6 @@ None known.
 
 ## Open questions
 
-- Where the game keeps `movie_frame_ms` is not recorded.
-- The loop runs passes as fast as the processor allows, so how many passes fall on one movie frame is not fixed.
+- Where the game keeps `movie_frame_ms` is not recorded. (Q-JOUST-001)
+
+- The loop runs passes as fast as the processor allows, so how many passes fall on one movie frame is not fixed. (Q-JOUST-002)

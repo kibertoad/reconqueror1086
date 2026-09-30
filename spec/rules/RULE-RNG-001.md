@@ -86,4 +86,4 @@ None known.
 ## Open questions
 
 - What `fn_0006B3B4` returns; it is likely the C library's `time`. If it is, two prompts drawn in
-  the same second get the same variant, and every draw after a prompt follows from the clock.
+  the same second get the same variant, and every draw after a prompt follows from the clock. (Q-RNG-001)

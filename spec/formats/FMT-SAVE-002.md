@@ -62,4 +62,4 @@ Not checked against a save from the original; the layout comes from the code tha
 
 ## Open questions
 
-- What `unk_AB0C8`, `unk_AB0C0`, `unk_A7540` and `unk_AB170` hold.
+- What `unk_AB0C8`, `unk_AB0C0`, `unk_A7540` and `unk_AB170` hold. (Q-SAVE-004)

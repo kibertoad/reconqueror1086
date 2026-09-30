@@ -38,4 +38,4 @@ Checked against `SKIRMISH.PAL` through RULE-VIEW-006, which reproduces the store
 
 ## Open questions
 
-- The range of the channel values the game sends to the display is not recorded.
+- The range of the channel values the game sends to the display is not recorded. (Q-VIEW-010)

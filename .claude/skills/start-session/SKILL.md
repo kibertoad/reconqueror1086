@@ -17,7 +17,7 @@ This skill is the procedure; where they differ, the protocol wins.
    the goal's file in `docs/goals/`; read the whole file. With no goal it is
    `docs/handover.md`. If the user gave a goal with no file, write the file
    first (see `docs/goals/README.md`), check that no other goal file claims
-   the same areas, and commit it on the working branch before the first batch; push only when explicitly requested.
+   the same areas, and get it onto the main branch before the first batch.
    An implementation session reads no research goal files.
 3. Compare the handover with reality: `git status`, `git log --oneline -10`,
    the current branch, and any `wip/` branch the handover names. Anything

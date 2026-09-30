@@ -84,7 +84,9 @@ None known.
 ## Open questions
 
 - What `fn_00059D50`, `fn_000596C0`, `fn_0002C250`, `g_0009DEA8` and `g_0009A934` do
-  or hold beyond what is described here.
-- What the two other writers of `conversation_partner`, at `0x00060D85` and `0x00060DE5`, are.
+  or hold beyond what is described here. (Q-TALK-015)
+
+- What the two other writers of `conversation_partner`, at `0x00060D85` and `0x00060DE5`, are. (Q-TALK-016)
+
 - Where rumours come from: no code of their own was found, so they are presumably conversation
-  content.
+  content. (Q-TALK-017)

@@ -57,6 +57,8 @@ None known.
 
 ## Open questions
 
-- What writes AGE after dubbing; no immediate write of field 18 was found.
-- What `g_0009ADC0`, `g_0009AABC`, `fn_00024CA0` and `g_0009ADB8` hold or do here.
-- What the routine does after the movie, what it returns, and what calls it.
+- What writes AGE after dubbing; no immediate write of field 18 was found. (Q-PERSON-018)
+
+- What `g_0009ADC0`, `g_0009AABC`, `fn_00024CA0` and `g_0009ADB8` hold or do here. (Q-PERSON-019)
+
+- What the routine does after the movie, what it returns, and what calls it. (Q-PERSON-020)
