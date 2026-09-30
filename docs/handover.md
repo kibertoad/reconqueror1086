@@ -1,51 +1,33 @@
-﻿# Reimplementation handover
+# Reimplementation handover
 
 ## Current state
 
-The restoration template/toolkit migration is implemented and locally validated.
-Its scope, pinned revisions, adaptations and retained game-specific behavior are
-in [template-migration-plan.md](template-migration-plan.md). The existing gameplay
-implementation and package identities are retained. Template prerequisite audits
-are not evidence that gameplay fidelity is complete; consult [PARITY.md](../PARITY.md)
-and the individual parity rows.
+The documentation migration audit is closed; its requirements, evidence and
+upstream PRs are in [documentation-audit.md](documentation-audit.md).
+Template main e0325e0 is adopted. The reviewed file-data Standard/checker fixes
+are pinned while upstream review continues. Existing spec identities, evidence
+statuses, gameplay and package identities are preserved.
 
-## Validation
+## Next work
 
-Run the canonical fast gate with `./tools/Invoke-Validation.ps1` or `Run Tests.bat`.
-See [VALIDATION.md](VALIDATION.md) for dependencies, filters, evidence-dependent
-tests and observed results. On 2026-09-30 the gate, offline documentation checks,
-Kaitai compilation, workflow lint and Windows packaging/installer compilation
-passed. Windows native diagnostics were checked with bounded waits and actual
-GUI exit codes. Linux/macOS installer execution and remote signing were not
-exercised locally. No release or push was performed.
+Survey remains open for full installation/media, data-family and manual-screen
+reconciliation. Choose research from the area queues. Source provenance is
+established in SRC-PATCH-CATALOG; the strict analysis-readiness gate passes.
+[RUNTIME.md](RUNTIME.md) records verified capabilities and remaining limits.
 
-## Prerequisite for original executable analysis
+The next implementation slice is strategic schema-two runtime integration.
+Keep it dormant until the remaining inputs, events, presentation and save/load
+integration are complete. Follow [implementation-plan.md](implementation-plan.md)
+and the parity rows; audit completion does not establish gameplay fidelity.
 
-[SOURCE-EDITIONS.md](SOURCE-EDITIONS.md) records the known owned build and missing
-latest-official-patch provenance. Do not mark `patchStatusEstablished` true
-without evidence. `./tools/Verify-Configuration.ps1 -RequireAnalysisReady` must
-pass before original executable analysis; it currently rejects this unresolved
-prerequisite. Independent builds and synthetic validation remain available.
+## Verification and local state
 
-## Gameplay continuation
+The canonical fast gate, documentation/Kaitai, pinned bytes, source readiness,
+research tracking, coverage metadata, local links and changed workflow checks
+pass. See [VALIDATION.md](VALIDATION.md). Packaging was not rerun for this
+research-only batch.
 
-Resume [implementation-plan.md](implementation-plan.md) after satisfying the
-source prerequisite for any analysis it needs. Existing priorities include the
-unread actor transition entries in RULE-ASSAULT-008, the order-reset mode in
-RULE-ASSAULT-004, and actor-ray view selection in RULE-ASSAULT-010. Consult
-[ASSAULT parity](../parity/ASSAULT.md) for gaps and [BATTLE parity](../parity/BATTLE.md)
-for the provisional field-battle behavior.
-
-Strategic schema-two preparation remains dormant; do not activate it before the
-remaining motion, event, presentation and save/load integration is complete.
-Follow the implementation plan and existing rule/parity entries for the next
-batch. Put original-game observations in `spec/`, and deliberate departures in
-`deviations/`, alongside the implementation and parity changes.
-
-## Local task state
-
-Migration validation has finished. Post-commit audits found no confirmed orphaned
-repository processes to stop. Generated analysis and validation artifacts remain
-ignored local working material. Preserve them and unrelated processes; reusable
-MSBuild workers are expected. Pushes require an explicit owner request and the
-canonical-remote check in [AGENTS.md](../AGENTS.md).
+Post-commit audits found no confirmed task orphans. Original captures, source
+extraction and Ghidra artifacts remain ignored locally. Preserve unrelated
+processes and reusable MSBuild workers. Push through the verified canonical
+remote as [AGENTS.md](../AGENTS.md) requires.
