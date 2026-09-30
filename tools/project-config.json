@@ -1,0 +1,30 @@
+{
+  "configured": true,
+  "projectName": "Conqueror",
+  "displayName": "ReConqueror A.D. 1086",
+  "gameId": "reconqueror-ad-1086",
+  "packageId": "Conqueror1086",
+  "appDataDirectory": "ReConquerorAD1086",
+  "appId": "{7AECE907-C51D-4E11-B0A2-E43BA5C8EB62}",
+  "bundleId": "io.github.kibertoad.reconqueror1086",
+  "shortcutName": "Conqueror 1086",
+  "sourceEnvironmentVariable": "CONQUEROR_SOURCE_PATH",
+  "publisher": "kibertoad",
+  "copyrightHolder": "ReConqueror contributors",
+  "copyrightYear": 2026,
+  "repositoryUrl": "https://github.com/kibertoad/reconqueror1086",
+  "summary": "Clean-room recreation of Conqueror A.D. 1086 requiring verified owner-imported media.",
+  "solution": "Conqueror1086.slnx",
+  "extractorProject": "tools/Conqueror.Import/Conqueror.Import.csproj",
+  "original": {
+    "title": "Conqueror A.D. 1086",
+    "developer": "Software Sorcery",
+    "publisher": "Sierra On-Line",
+    "releaseYear": "1995",
+    "genre": "Strategy and role-playing",
+    "latestOfficialVersion": "",
+    "analysisVersion": "1.0",
+    "patchStatusEvidence": "BLD-GOG-EN identifies the owned GOG version 1.0; latest official patch provenance remains unestablished.",
+    "patchStatusEstablished": false
+  }
+}

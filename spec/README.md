@@ -16,7 +16,7 @@ per-unit statistics) stay in the player's copy of the game; the spec gives their
 ## Standard version
 
 This spec follows version 1 of the
-[documentation standard](https://dinorefurb.com/documentation-standard/).
+[documentation standard](../docs/upstream/documentation-standard.md).
 
 ## Areas
 

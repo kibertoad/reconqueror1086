@@ -63,6 +63,10 @@ if ($LASTEXITCODE -ne 0) { throw 'Importer publish failed.' }
 Remove-Item -LiteralPath $buildRoot -Recurse -Force
 
 Copy-Item -LiteralPath (Join-Path $repositoryRoot 'README.md') -Destination $packageRoot
+Copy-Item -LiteralPath (Join-Path $repositoryRoot 'NOTICE') -Destination $packageRoot
+New-Item -ItemType Directory -Force -Path (Join-Path $packageRoot 'vendor/template') | Out-Null
+Copy-Item -LiteralPath (Join-Path $repositoryRoot 'vendor/template/LICENSE') `
+    -Destination (Join-Path $packageRoot 'vendor/template/LICENSE')
 if (Test-Path -LiteralPath (Join-Path $packageRoot 'UserContent')) {
     throw 'The portable package contains a UserContent directory.'
 }

@@ -14,7 +14,9 @@ if (operation == "--uninstall")
     return UninstallContent(uninstallRoot);
 }
 var positionalOffset = operation == "--repair" ? 1 : 0;
-var install = args.Length > positionalOffset ? Path.GetFullPath(args[positionalOffset]) : @"C:\GOG Games\Conqueror AD1086";
+var install = args.Length > positionalOffset
+    ? Path.GetFullPath(args[positionalOffset])
+    : Path.GetFullPath(Environment.GetEnvironmentVariable("CONQUEROR_SOURCE_PATH") ?? @"C:\GOG Games\Conqueror AD1086");
 var output = args.Length > positionalOffset + 1 ? Path.GetFullPath(args[positionalOffset + 1]) : Path.GetFullPath("UserContent");
 var imagePath = Path.Combine(install, "game.gog");
 var cuePath = Path.Combine(install, "game.ins");

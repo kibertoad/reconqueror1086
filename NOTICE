@@ -1,0 +1,19 @@
+Reusable infrastructure was adapted from:
+
+https://github.com/kibertoad/refurbished-dinosaurs-template
+Revision: 3e8805ea474c60e7c3234213a108cb85a9e86265
+License retained in vendor/template/LICENSE.
+
+The documentation checker and bounded evidence reporter were adopted from:
+
+https://github.com/kibertoad/refurbished-dinosaurs-toolkit
+Revision: c2b21ee62fc404391e8dcfafd7029185f81241a9
+Copyright (c) 2026 Igor Savin.
+Licenses retained in vendor/LICENSE and tools/evidence/x86-reporter/LICENSE.
+
+The Standard, Methodology and work protocol have their source revision and
+digests recorded in tools/upstream-lock.json, and license in docs/upstream/LICENSE.
+
+These notices cover the adopted infrastructure and do not grant rights to the
+original game or its content. Original content and generated analysis artifacts
+are not distributed in this repository or its packages.

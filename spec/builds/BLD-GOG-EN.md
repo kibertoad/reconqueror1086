@@ -65,3 +65,7 @@ The disc also holds the Sierra installer and setup files (`INST.EXE`, `INSTALL.*
 which appears to hold client files for Sierra's ImagiNation Network service. The manifest lists the
 disc's setup program `CD:CONFIG.EXE` and its configuration program `CD:CONQUER/CONCFG.EXE`
 because the CONFIG area describes the settings they write.
+
+## Code ranges
+
+None.

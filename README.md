@@ -160,7 +160,7 @@ describes that gate, the documentation standard check, and what CI runs.
 Packaging scripts for Windows, Linux, and macOS are under `tools`.
 
 Claims about the original game are recorded in [`spec/`](spec/README.md) under the
-[documentation standard](https://dinorefurb.com/documentation-standard/):
+[documentation standard](docs/upstream/documentation-standard.md):
 findings, rules, formats, screens and bugs, each with its evidence and status.
 [`spec/index/`](spec/index/) lists them by area, kind and status, and
 [`PARITY.md`](PARITY.md) says how far the rebuild implements each one and

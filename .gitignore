@@ -48,3 +48,13 @@ src/Conqueror.Game/saves/
 ~$*
 *~
 CodeCoverage/
+
+# Original evidence and generated analysis remain local-only
+analysis/
+reference/original/
+__pycache__/
+*.pyc
+
+# The pinned reporter's Python package is source, not an x86 build output.
+!tools/evidence/x86-reporter/x86/
+!tools/evidence/x86-reporter/x86/**

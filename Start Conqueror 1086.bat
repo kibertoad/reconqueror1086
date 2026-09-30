@@ -25,6 +25,16 @@ if errorlevel 1 (
     exit /b 1
 )
 
+"%DOTNET_EXE%" run --project "tools\Conqueror.Import\Conqueror.Import.csproj" -- --verify "%RECONQUEROR_USER_CONTENT%"
+if errorlevel 1 (
+    echo Run Install Original Resources.bat to install or repair your owned resources.
+    pause
+    exit /b 1
+)
+"%DOTNET_EXE%" run --no-build --project "src\Conqueror.Game\Conqueror.Game.csproj" -- --smoke-test
+if errorlevel 1 exit /b 1
+"%DOTNET_EXE%" run --no-build --project "src\Conqueror.Game\Conqueror.Game.csproj" -- --platform-smoke-test
+if errorlevel 1 exit /b 1
 echo Starting Conqueror A.D. 1086...
 "%DOTNET_EXE%" run --no-build --project "src\Conqueror.Game\Conqueror.Game.csproj" -- %*
 if errorlevel 1 (

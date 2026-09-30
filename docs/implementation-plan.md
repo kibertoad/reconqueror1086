@@ -6,9 +6,14 @@ Complete a clean-room MonoGame reimplementation of *Conqueror: A.D. 1086* that p
 
 ## Delivery principles
 
+The current template/toolkit infrastructure migration is specified in
+[template-migration-plan.md](template-migration-plan.md). Its concrete scope is
+approved by the owner on 2026-09-30. Plans document authorized work and do not
+require a separate explicit approval before implementation or tooling proceeds.
+
 - Keep gameplay rules in typed definitions and generic interpreters rather than screen-specific conditionals.
 - Keep simulation code independent of MonoGame so it remains deterministic and testable without a graphics device.
-- Record every claim about the original in `spec/` as the [documentation standard](https://dinorefurb.com/documentation-standard/) describes, and cite spec IDs from code, tests and these docs.
+- Record every claim about the original in `spec/` as the [documentation standard](upstream/documentation-standard.md) describes, and cite spec IDs from code, tests and these docs.
 - Define every inspected container, compression stream and decoded resource family as a `spec/formats/` entry, and describe the rebuild's decoders in `docs/resource-formats.md`.
 - Give every spec entry the status its evidence supports, and list what is still uncertain in its Open questions.
 - Do not raise a status without executable or resource evidence, controlled observation, or an agreeing source. Mark code that guesses with `PLACEHOLDER: <ID>` and list it in `PARITY.md`.
@@ -50,7 +55,7 @@ The repository currently provides:
 - The `TITLE.HAT`/`FFTITLE.PCX` title load (SCR-UI-001) followed by a character-options flow whose exact geometry comes from installed `CGOPTS.HAT` and `PREGEN.HAT`.
 - Self-contained Windows x64, Linux x64, macOS arm64, and macOS x64 packaging automation, with a smart ownership-aware Windows installer and a pinned four-artifact release workflow.
 - A repository-wide 1,000-line compiled-source ceiling; the game shell and resource regression suite are split into focused partial modules so the limit passes without exemptions.
-- 540 xUnit test cases and 146 broader executable specifications passing without a graphics device through the isolated Windows test launcher.
+- Automated xUnit behavior tests and executable specifications that run without a graphics device through the canonical validation gate.
 
 Practice joust: the replacement follows RULE-JOUST-001 and RULE-JOUST-002, advancing once per movie frame (DEV-JOUST-001); parity/JOUST.md lists what remains.
 
@@ -668,12 +673,12 @@ Potential higher-powered-machine presentation work should be opt-in and observat
 
 ## Session checkpoint: 2026-09-10
 
-The current migration branch builds with zero warnings under the enforced 1,000-line source limit. All 329 xUnit cases and 146 executable specifications pass. The Inno Setup 7.1.0 package compiles, installs into an isolated directory, launches through its generated **ReConqueror A.D. 1086** Start-menu shortcut, and removes that shortcut during uninstall. Repository policy passes with the expanded proprietary-image boundary.
+The current migration branch builds with zero warnings under the enforced 1,000-line source limit. The xUnit suite and executable specifications pass. The Inno Setup 7.1.0 package compiles, installs into an isolated directory, launches through its generated **ReConqueror A.D. 1086** Start-menu shortcut, and removes that shortcut during uninstall. Repository policy passes with the expanded proprietary-image boundary.
 
 First-person combat now uses the required original `SKIRMISH.PCX` shell, exact viewport and panel geometry, scene-driven walls and actors, animated foreground weapons, and blood effects. Surfaces, the weapon-to-combat-row permutation, break rolls, dice, penetration, reach, actor templates, state-completion gates, pointer coordinates and the foreground trajectory follow the ASSAULT and VIEW rules; doors and pickups follow RULE-ASSAULT-021. The original four render-counted blood steps have no stable hardware-independent duration, so the runtime preserves their order through a monotonic compatibility timer. `docs/handover.md` continues with defeated-enemy loot, retainers, siege consequences, and broader AI rules. Official imported assets are a verified launch requirement; no placeholder gameplay path is supported.
 
 ## Strategic reactive-finder checkpoint: 2026-09-17
 
-The reactive finder of RULE-STRATEGY-003 is implemented inside the scheduler rather than supplied by the application. The full gate passes 362 xUnit cases and 146 specifications.
+The reactive finder of RULE-STRATEGY-003 is implemented inside the scheduler rather than supplied by the application. The full gate passes.
 
-The six-record player update, command construction, bootstrap, join/leave exchange, and field-record lifecycle are recovered and implemented. `OriginalStrategicPlayerMovementSlot` persists exact route/target, cursor, state-8, grid, cooldown, terrain, position, and direction state for five army records plus avatar slot 5. `AdvancePlayerMovementPass`, `AdvancePlayerPass`, `OriginalStrategicPlayerCommands` and `CreateForNewGame` implement RULE-STRATEGY-010, RULE-STRATEGY-012 and RULE-STRATEGY-013. The full gate passes 391 xUnit cases and 146 specifications. Next bind temporary force inputs, fixed updates and presentation, then activate schema 2 and remove the dated adapter.
+The six-record player update, command construction, bootstrap, join/leave exchange, and field-record lifecycle are recovered and implemented. `OriginalStrategicPlayerMovementSlot` persists exact route/target, cursor, state-8, grid, cooldown, terrain, position, and direction state for five army records plus avatar slot 5. `AdvancePlayerMovementPass`, `AdvancePlayerPass`, `OriginalStrategicPlayerCommands` and `CreateForNewGame` implement RULE-STRATEGY-010, RULE-STRATEGY-012 and RULE-STRATEGY-013. The full gate passes. Next bind temporary force inputs, fixed updates and presentation, then activate schema 2 and remove the dated adapter.

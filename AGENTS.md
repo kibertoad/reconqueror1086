@@ -4,7 +4,7 @@
 
 The final reimplementation deliverable includes a documented technical map of
 the original game, not only working replacement code. It lives in `spec/` and
-follows the [documentation standard](https://dinorefurb.com/documentation-standard/);
+follows the [documentation standard](docs/upstream/documentation-standard.md);
 `spec/README.md` lists the areas. As implementation work progresses:
 
 - record each observation of the original (executable control flow at an
@@ -90,3 +90,431 @@ append an entry to `orphanCleanupLog.md` containing:
 - any related process deliberately left running and why.
 
 If the audit finds nothing to stop, no log entry is required.
+
+## Planning authorization
+
+Plans document authorized work. A user request authorizes work within its scope
+without a separate explicit implementation-plan approval. Ask only for missing
+owner decisions that block the requested scope. Publishing and pushes still
+require explicit authorization.
+
+## Template workflow
+
+The infrastructure follows template main 3e8805ea474c60e7c3234213a108cb85a9e86265
+and toolkit main c2b21ee62fc404391e8dcfafd7029185f81241a9. Existing project
+identities and importer paths are intentional adaptations. Before any executable
+analysis, `tools/Verify-Configuration.ps1 -RequireAnalysisReady` must pass; the
+latest official patch status is currently unestablished.
+
+## The local copy of the standard
+
+`docs/upstream/` holds the methodology, the documentation standard and the
+work protocol exactly as published at dinorefurb.com, and
+`tools/upstream-lock.json` names the commit they were copied from. Every
+reference to those pages in this repository points at that copy.
+
+- Read the local copy. Do not fetch dinorefurb.com, or the website's source
+  repository, to read the methodology, the standard or the protocol, and do
+  not go online because the published rules might have changed.
+- Assume the local copy is up to date and rely on it. The template is updated
+  when the website changes; until then the copy is the rules.
+- Links inside the copy are the site's own: `/work-protocol/#emulated-calls`
+  is `docs/upstream/work-protocol.md#emulated-calls`, and the same for
+  `/methodology/` and `/documentation-standard/`. Only links to other pages of
+  the site lead outside the copy.
+- A link to a section gives its lines, such as
+  `work-protocol.md#batches (lines 137-183)`. Read only those lines (with an
+  offset and a limit), never the whole page for one section, and never a
+  section again once it is in context. The lines include the section's
+  subsections, so a link to a subsection inside one already read adds
+  nothing. The upstream tests keep every range right; after a refresh,
+  `node tools/upstream.mjs links --write` rewrites them.
+- Skills and summaries in this repository are enough to do the work. Open a
+  linked section only when a step leaves a question it answers.
+- Checking whether a newer version has been published, and refreshing the
+  copy, is always started by a person. Do it only when the owner asks for it
+  in the current task, and then follow `docs/UPSTREAM-RULES.md`.
+
+## Planning and tracking work
+
+Work is planned, tracked and handed on under the
+[work protocol](docs/upstream/work-protocol.md); where this section and
+that page differ, the page wins.
+
+- The project moves through the stages Intake, Runtime access, Survey, Slices
+  and Audit, and `docs/IMPLEMENTATION-PLAN.md` records which one it is in.
+  `docs/RUNTIME.md` records what can be done with the original running, and
+  whether an agent, only a person, or nobody can do it.
+- Survey lists the installation and the media the game reads in full, and
+  records how the listing was made. Every path in that listing is in the
+  build's manifest, which holds every file the game uses, studied or not, or
+  in the build entry's Other files section with the reason it is left out
+  (in `BLD-<alias>.other-files.yaml` beside the manifest when the list is
+  long). A file whose use is unknown stays in the manifest. Checking the
+  format definitions against the few files whose hashes identify the release
+  does not end Survey; until every path is accounted for, the plan says what
+  is missing.
+- Static analysis comes first, and runs of the original are the last resort
+  for each question: an `Agent run` or `Live session` item is taken up only
+  after its own static attempt is under `Tried:`, or when it asks for the run
+  that confirms a static reading. Runs take their place in the order of work
+  (a run that blocks the current slice comes before static work that does
+  not), and within each step of it `Static` items come first, then
+  `Emulated call` items.
+- An emulated call runs one function of the original in the Unicorn harness
+  in `tools/emu/`, with no window, timer or input, and needs no run lock. It
+  is an experiment with `starting_state: emulated-call`, names arguments and
+  memory by parameter, field path or glossary name, and establishes an entry
+  only when its cases reach every branch the entry describes and the reading
+  of the function's callers and inputs is complete. It never confirms what
+  depends on interrupts (`# may run:`), timing, the operating system or the
+  hardware. Every import, interrupt or port access the function reaches has
+  an explicit stub, anything else stops the run with an error naming it, and
+  an experiment names in its Setup every stub, port model and video memory
+  mapped as ordinary RAM, and gives each port value by its glossary name. A
+  copy into video memory that ran to the end shows the bytes written, never
+  the pixels. Any
+  agent may build the harness and make emulated calls, whatever
+  `docs/RUNTIME.md` says about runs of the game and whatever this file adds
+  to keep agents from running the original: such limits cover runs of the
+  game only, and emulated calls need no decision from the owner.
+- Several agents work on different games on the same machine at once, under
+  one account or several. Run an original only while holding the machine's
+  run lock, whose path `docs/RUNTIME.md` gives; take it with an exclusive
+  create that fails if the file exists, and delete only a lock you created or
+  one the protocol calls abandoned. If another agent holds it, do not wait.
+  Outside a live session, never attach to, send input to or stop a process
+  you did not start.
+- Evidence from runs comes mostly from people. Runs an agent drives are the
+  most fragile evidence there is, so they are scripted, start from a fixed
+  state and are kept to questions nothing else answers.
+- Where `docs/RUNTIME.md` says an agent can start the original without a
+  person, read its memory and set breakpoints, runs are recorded runs: a
+  script (the probe) records the seed and every draw from the random number
+  generator under the ID of the rule whose function made it, with its bound
+  and result, and a test replays the run against the rebuild draw by draw.
+  No address of the original reaches a fixture or a test. The probe reaches
+  its state by memory writes to `supported` or `established` fields and
+  waits on a state it can read, never on a fixed time. A divergence is
+  explained by a copy of memory at the draw that differs, kept in
+  `GAME_DIR/captures/` and never committed, and the finding changes the
+  entry; the rebuild follows the entry, never the recording. In a live
+  session only the draw recording and memory copies apply.
+- People test the rebuild when they happen to and report in words and
+  screenshots. Never wait for a report or plan around one. Record one at once
+  in `docs/reports/` with the `triage-report` skill; a research session
+  triages it into a `Defect (R-...)` parity note, a queue item or a finding.
+  Screenshots are never committed: the rebuild's go in `GAME_DIR/reports/`,
+  the original's in `GAME_DIR/captures/`, the durable local reference store.
+- Competing readings of an open question are written in the entry's Open
+  questions section with the evidence for and against each, never kept only
+  in a session, and never implemented until an entry says them.
+- A run that needs a person is a live session, requested in a file in
+  `docs/live-sessions/` that the owner answers there. Never wait idle for one.
+- Open research questions live in `queue/<AREA>.md`, grouped by the evidence
+  they need, in the area of the first entry they name, each with an ID
+  (`Q-COMBAT-012`) that everything outside the queue refers to it by. An item
+  is closed by recording its answer in `spec/` and deleting it in the same
+  commit. An item is taken up again only with new evidence, a new tool or a
+  new reading, and when that second attempt ends in the same place it moves
+  to the section of the evidence that would settle it, or to `Blocked` when
+  that evidence is out of reach.
+- A batch is one commit, and is research, implementation or tooling, never
+  more than one. A session keeps to one side of the clean room. An
+  implementation batch works from the spec alone, never opens analysis output
+  or `queue/`, and under `spec/` only adds open questions and `unknown`
+  entries; a gap becomes a `Spec gap:` note on the parity row, which the next
+  research session turns into a queue item and removes once it is answered. A research batch makes the parity
+  and citation changes the documentation check requires of what it did to
+  the spec, and changes no other code apart from `tools/`. A tooling batch
+  (extractor, Ghidra scripts, inventory export, the emulator harness in
+  `tools/emu/`, live session measurements, headless runner, fixture harness)
+  needs no decision.
+- Commit messages end with a `Spec:` trailer naming the entries created or
+  changed, any commit that changes a row's status adds `Parity:`, and any
+  that closes queue items adds `Queue:` with their IDs.
+- A claim moves from an `unknown` listing (or `sourced` from a document),
+  through competing readings kept in its entry's Open questions, each with a
+  queue item, to a description at `supported` once direct evidence (the code
+  that produces the behaviour) settles it, then `established` by a complete
+  reading of the code, or, only where it depends on something the code does
+  not decide, when a run or a tester's capture of the original agrees.
+  Circumstantial evidence never raises a status. Contradicting evidence makes
+  it `disputed`, and a wrong claim is superseded, never deleted. The
+  protocol's "The life of a claim" section has the details.
+- `docs/HANDOVER.md` is the current state of work outside any goal, at most
+  200 lines, rewritten at the end of every session that works under no goal,
+  and names items and entries by ID without saying what research found.
+  `docs/goals/` holds one file per running goal, which claims its areas and
+  has a handover of its own for sessions under it. `docs/DECISIONS.md`
+  records the owner's decisions and moves its oldest entries to
+  `docs/decisions/` before it passes 1,000 lines. A session ends by
+  committing its handover on its own; push only when the owner explicitly asks; half-done work
+  never goes into a batch commit.
+- Progress is what scripts compute: parity totals, entries by status,
+  executable and file coverage, queue sizes. Never a hand-written percentage.
+  Executable coverage is measured against the function inventories,
+  `coverage/<build ID>/<manifest path>.tsv` (a `CD:` prefix becomes an `@CD`
+  directory), one for each file the analysis reads. An inventory holds only each function's start address, its size, and
+  optionally a name the researcher gave it and why it is out of scope, never
+  code, bytes, strings, constants or names that came from the original, so it
+  is committed.
+
+The procedures are skills in `.claude/skills/`: `runtime-access`,
+`plan-work`, `start-session`, `research-item`, `implement-rows`,
+`triage-report`, `live-session` and `end-session`. For a `/goal`, write the goal file with
+`plan-work`, keep to its scope, and end every batch with the status block the
+skills print.
+
+## Rules that never bend
+
+- **No original content in Git, ever.** No assets, executables, archives,
+  screenshots, video or audio captures, or data extracted from them, and no save
+  or recording that holds any of the game's content. `UserContent/`,
+  `analysis/original/`, and `reference/original/` are local-only, and
+  `tools/Verify-Repository.ps1` enforces this. Synthetic fixtures go under
+  `tests/fixtures/synthetic/`.
+- **Clean room.** Do not copy original source, decompiler output, disassembly,
+  byte dumps, or analysis databases into this repository. Describe behavior and
+  data formats in your own words in `spec/`, and write the implementation from
+  that description. Do not translate the original machine code into matching
+  source, and do not patch the original executable one function at a time.
+- **Evidence before claims.** Every spec entry cites the findings, experiments,
+  and sources its status requires. Evidence from the original that contradicts
+  an entry makes it `disputed`, with both sides cited, until new evidence
+  settles it.
+- **CI never needs proprietary content.** Every packaging check, and every test
+  that does not compare against the original, passes on a machine with no copy
+  of the game. Tests that read the original find it through `GAME_DIR`,
+  report themselves skipped when it is absent, and carry the comment
+  `// needs: GAME_DIR`. They run on a maintainer's machine, and the run is
+  recorded in `VALIDATION.md` (`docs/VALIDATION.md`).
+- **Parse defensively.** Original files are untrusted input: bound every length,
+  reject path traversal, and fail with a diagnosable error instead of throwing
+  from deep inside a reader.
+
+## Reverse-engineering discipline
+
+The project follows the [methodology](docs/upstream/methodology.md) and
+the [documentation standard](docs/upstream/documentation-standard.md). This
+section and the next two summarize them; where they differ, the pages win.
+
+Start with one narrow player-visible question. The executable has the final word
+on what the shipped game does. The manual says what the designers intended and
+is often wrong about what shipped, and FAQs, wikis, and other fans' tools are
+leads to credit and re-check. For a non-trivial rule: state the question, locate
+evidence, form competing hypotheses, seek falsifying evidence, corroborate
+against the original running, then implement it with a deterministic test.
+
+An experiment starts from a saved state, usually a save patch, changes one
+input, and records what follows. It is repeated from the same state with the
+random number generator's state varied between runs. Anything random gets
+enough repetitions for a recorded distribution, because a formula inferred from
+one roll is a guess.
+
+Use the standard's statuses and no other scale. Rules, formats, screens, and
+bugs are `unknown`, `sourced` (outside sources only), `supported` (one kind of
+direct evidence from the original), `established` (a complete reading of the
+code, or a reading and a run of the original that agree where the code does
+not decide the outcome), `disputed`, or `superseded`. Findings and experiments are
+`recorded`, `reproduced`, or `superseded`. A part of an entry that is less
+certain than the rest goes in its own entry or in its Open questions section.
+Never silently promote a plausible interpretation.
+
+A complete reading also covers what the standard's
+[Complete readings](docs/upstream/documentation-standard.md#complete-readings) (lines 137-181)
+and [Findings](docs/upstream/documentation-standard.md#findings) (lines 413-461) sections
+list, among them: two addresses are the same storage only where the reading
+shows the segment each is formed in and accessed through (a BP offset read
+through DS is the caller's stack only where DS equals SS there); a stored
+call target is followed through every part it carries, such as an object
+adjustment or two words that form one far pointer; a byte stored into a word
+read whole names what writes the other byte; an allocation keeps apart the
+bytes requested, the width they are computed in, the allocator's unit, the
+header's size and the range later written, and a failed request may leave
+state changed; the number of outputs a procedure can produce is bounded on
+its own, apart from each input's bound; a return value is followed into each
+caller at the width it is tested; cleanup is read once per path into it; and
+an error passed back through recursion is traced to what can produce it. A
+finding that a function has no other callers checks the analyzer's list with
+a second search that does not depend on function boundaries, and one about a
+dispatch table reads how the input becomes an index and what bounds it before
+naming which input selects which entry. An `offset` into overlay code lies
+wholly inside a row of its build's Code ranges section.
+
+Unidentified functions, globals, fields, and scripts keep neutral names
+(`fn_00478CD0`, `g_004C1F20`, `unk_2A`) until a finding or experiment shows what
+they do, because a wrong name given early steers every later reading. Decompiler
+output is not source: inferred names, types, signedness, casts, and control flow
+can be wrong, so inspect bounded instruction context when the distinction
+matters.
+
+Durable findings go in `spec/`, one entry per file named after its ID, and not
+in conversation history or large retained dumps. IDs are never reused or
+renumbered, and an entry that turns out wrong becomes `superseded`. The spec
+describes the original only and never names a class, file, or setting from this
+repository. It holds names, numbers, formulas, and tables in full, as a strategy
+guide would: the names of concepts and of the things a designer made (an
+enumeration value may be named `UNIT_ARCHER`), constants, and the per-unit or
+per-item statistics a designer filled in, with a table of more than 64 values in
+a value file. It never keeps a substantial copy of the game's writing (dialogue,
+descriptions, messages, the manual's prose; quote a short passage at most and
+refer to the rest by resource), its art (images, sounds, music, video, maps), or
+a meaningful slice of its code or scripts. Tool procedure stays in `docs/GHIDRA.md`. Never commit broad
+decompiler, instruction, or Version Tracking exports. The function inventories
+in `coverage/` are the one export that is committed, and only with the columns
+the planning section above allows.
+
+## Fidelity
+
+The spec records the original exactly, bugs included. The rebuild keeps the
+rules, balance, content, AI, and pacing, including asymmetries, rounding,
+ordering, timing, overflow behavior, and quirks players built strategies
+around. Crashes, corrupted saves, game speed tied to the CPU clock, and logic
+that plainly does not do what it was written to do may be fixed. An interface
+change may add information or remove friction, and may not change what the
+player can do or what the rules produce. Screens match the original pixel for
+pixel except where a documented interface change draws something new. When a
+bug cannot be told from a design decision, the original behavior stays and any
+fix becomes a setting.
+
+Every departure from the spec is a `DEV-AREA-NNN` file in `deviations/`,
+with a Default of `off`, `on` or `mandatory`. A deviation may be `on` or
+`mandatory` when its Justification argues that the rebuild's behavior is
+strictly better, or that it is a small judgement call that makes the game
+better to play, such as keeping precision the original threw away or pacing by
+a fixed clock where the original followed the speed of the machine, and that
+touches nothing players build strategies around. A change some players would
+reasonably prefer the original's way, as a matter of taste or because it
+changes results players notice, gets a setting that starts `off`, with the
+original's behavior. A deviation with no setting is `mandatory`, and its
+Justification also says why the original's behavior is not worth a setting.
+The fix of an unintended bug that players do not rely on is `on` without one.
+A quirk that may be deliberate or that players rely on never qualifies, so its
+deviation starts `off`. The validation suite runs with every setting
+switched off, and a test that reaches a mandatory deviation cites its ID and
+allows for it. Rebalancing and new features belong in a separate mode or
+project.
+
+## Citing the spec
+
+Code comments and tests cite the spec IDs they implement or check, so a search
+for an ID finds everything that depends on it. A placeholder in the code, such
+as a guessed formula, carries a `PLACEHOLDER: <spec ID>` comment, and the
+parity row for that ID cannot be `complete` while it does. The parity matrix
+(`PARITY.md` for the totals, `parity/` for the rows) has one row per rule,
+format, and screen entry that is not superseded, so behavior
+without a spec entry gets an `unknown` entry before any code. Manual play never
+counts as a test.
+
+## Durable narrative documentation
+
+Keep changing inventory totals out of narrative documentation: test-case, file,
+line and imported-asset counts belong in generated reports or validation logs.
+Keep numbers that define behavior, constrain validation, support evidence or
+justify a decision. A dated measurement belongs in prose only when that context
+needs it. Refer to the generating command instead of maintaining a copied total.
+
+## Context and process hygiene
+
+Treat logs, analysis listings, and experiments as a temporary working set.
+Summarize reusable conclusions into durable documentation, record remaining
+unknowns, then discard obsolete intermediate state. Avoid unrelated refactors
+during evidence-driven work. After commands that start games, servers, analyzers,
+or compiler services, check for orphaned processes and stop only the processes
+created by the current task.
+
+## Architecture boundaries
+
+- `Conqueror.Core`: deterministic rules and serializable state. No MonoGame, no
+  file-format parsing, no I/O.
+- `Conqueror.Resources`: bounded binary parsing and original-content contracts.
+  No MonoGame.
+- `Conqueror.Game`: MonoGame DesktopGL presentation, and the only project that
+  may depend on both of the above.
+- `Conqueror.Import`: separately runnable licensed-source verification and
+  transactional asset extraction over `Resources`.
+- `Conqueror.Inspect`: read-only tooling over `Resources`.
+- `Conqueror.Tests`: architecture, safety, and behavioral tests.
+
+**Rules live in `Core`; screens map them.** Every decision the original makes —
+a flag cascade, a gate, a branch table, an outcome selector, a state
+transition — lives in `Core` as a pure function of the serializable state and
+its inputs, even when only `Game` calls it. `Game` translates those decisions
+into screens, art, input, and timing; a rule may not have `Game` as its only
+home, and a rule already written inline in a screen handler is extracted the
+first time it is touched. The placement test: if demonstrating a behavior needs a
+window, a graphics device, or the asset pack, the rule is not in `Core` yet.
+
+Implement each entry's branch table whole: every branch the entry describes
+is handled by its Core function and has its own test, including the branches
+`Game` cannot reach yet and the "impossible" arms of a guard. The branch that
+lives only in a code comment is the one that gets implemented inverted. A
+branch no entry describes is never a guess: it becomes a question in the
+entry's Open questions and a `Spec gap:` note on the parity row, as the
+`implement-rows` skill says.
+
+Where `Core` computes a rule with a different algorithm from the entry's
+procedure, tests compare the state and outputs a later call reads, not only
+the result: for a search with a work queue, a node queued twice, a stored
+score that improves while an older queue entry waits, and a search stopped at
+its step limit and resumed. Wiring a rule into `Game` is tested through its
+intermediate states: one shared value followed through input, `Core`
+updates, presentation, and a save and restore, with distinct values per axis;
+what a second actor sees at each `# visible:` point; reservations across a
+table refresh and a save; a requester's rejection apart from a failed route.
+A checkpoint or replay API states what its identity covers (every field and
+behaviour-driving resource that decides how play continues, hashed in a
+stated, versioned encoding), rejects a mismatched checkpoint without changing
+the host, says whether a snapshot may be restored more than once, and never
+drops unsaved state such as a paused path search silently. These tests
+compare the rebuild with the spec or with itself, so none of them validates a
+parity row; see the protocol's
+[Implementation batches](docs/upstream/work-protocol.md#implementation-batches) (lines 158-174)
+and [Checkpoints and replay](docs/upstream/work-protocol.md#checkpoints-and-replay) (lines 182-190).
+
+Each rule ships with fast-gate tests over synthetic state. The rule itself is
+usually a static class over the serializable state type, called by `Game`.
+When a bug is traced to branch logic in `Game`, extract the rule into `Core`,
+pin every branch with a test, and fix it there.
+
+Determinism is a feature: identical commands and seed must produce identical
+state, because saves, replays, and parity validation depend on it. The
+generator takes the ID of the rule making each draw and offers a hook that
+lets a test observe every draw; nothing but tests uses the hook. Every
+compiled C# file is limited to 1,000 lines; split responsibilities instead of
+raising the limit.
+
+## Commands
+
+```powershell
+./tools/Verify-Configuration.ps1   # placeholders and template leftovers
+./tools/Verify-Repository.ps1      # original-content and large-file policy
+./tools/Invoke-Validation.ps1      # policy checks plus build and tests (fast gate)
+dotnet build Conqueror1086.slnx        # full solution
+dotnet run --project src/Conqueror.Game -- --smoke-test
+```
+
+`Invoke-Validation.ps1` is the canonical local validation entry point. Its
+default fast gate skips tests tagged `Category=LongRunning`; run
+`-IncludeLongRunningTests` only when the user asks for it or a change to that
+coverage needs it. Add `-TestFilter` to narrow a run and `-MinimumExpectedTests`
+to fail when discovery drops below an expected count.
+
+## Definition of done
+
+A change is finished when the solution builds, `./tools/Invoke-Validation.ps1` passes, new
+behavior has tests that exercise every branch its entry describes directly,
+not only the branches a play session reaches, the spec entries it relies on
+exist with the status their evidence supports, the documents that assert status
+(`README.md`, `PARITY.md`, `parity/`, `deviations/`) match reality, and
+`queue/` has been updated with whatever the work settled or newly raised.
+
+Commits describe the change and its evidence, not the tooling that produced it.
+
+## Evidence review and offline rules
+
+Apply the claim-relevant procedure in [EVIDENCE-REVIEW](docs/EVIDENCE-REVIEW.md)
+before asserting a complete reading. How the local copy of the standard is
+verified and, when the owner asks, refreshed is in
+[UPSTREAM-RULES](docs/UPSTREAM-RULES.md). These procedures keep Standard v1.

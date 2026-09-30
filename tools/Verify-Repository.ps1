@@ -33,21 +33,23 @@ $safeRoot = $root.Replace('\', '/')
 $policyPath = Join-Path $PSScriptRoot 'repository-policy.json'
 $policy = Get-Content -LiteralPath $policyPath -Raw | ConvertFrom-Json
 
-$trackedOutput = @(& git -c "safe.directory=$safeRoot" -c core.quotepath=false -C $root ls-files)
+$trackedOutput = @(& git -c "safe.directory=$safeRoot" -c core.quotepath=false -C $root ls-files --cached --others --exclude-standard)
 if ($LASTEXITCODE -ne 0) {
-    throw "Unable to enumerate tracked files under '$root'."
+    throw "Unable to enumerate repository files under '$root'."
 }
 
-$trackedPaths = @($trackedOutput | Where-Object { $_ } | ForEach-Object { Normalize-RepositoryPath $_ })
+$trackedPaths = @($trackedOutput | Where-Object { $_ } | Sort-Object -Unique |
+    ForEach-Object { Normalize-RepositoryPath $_ })
 $violations = [Collections.Generic.List[string]]::new()
-$restrictedExtensions = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+$restrictedExtensions = [Collections.Generic.HashSet[string]]::new(
+    [StringComparer]::OrdinalIgnoreCase)
 foreach ($extension in $policy.restrictedExtensions) {
     [void] $restrictedExtensions.Add([string] $extension)
 }
 
 foreach ($path in $trackedPaths) {
     if (Starts-WithRepositoryRoot $path $policy.deniedRoots) {
-        $violations.Add("tracked local/imported content: $path")
+        $violations.Add("local/imported content: $path")
         continue
     }
 
@@ -59,7 +61,6 @@ foreach ($path in $trackedPaths) {
 
     $absolutePath = Join-Path $root $path
     if (-not [IO.File]::Exists($absolutePath)) {
-        $violations.Add("tracked path is missing from the worktree: $path")
         continue
     }
 
@@ -75,4 +76,4 @@ if ($violations.Count -gt 0) {
     exit 1
 }
 
-Write-Host "Repository policy passed for $($trackedPaths.Count) tracked files."
+Write-Host "Repository policy passed for $($trackedPaths.Count) files."

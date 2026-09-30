@@ -129,3 +129,17 @@ For numeric action-tree inspection, `--action-groups=1101,2011` writes an ignore
 - Confirm recovered algorithms against original resource populations and synthetic malformed inputs.
 - Record each observation as a finding in `spec/findings/`, and the formats, rules and screens it supports in `spec/`, with the status the evidence allows and the uncertain part in Open questions.
 - Put status changes of the rebuild in `implementation-plan.md` and the parity rows in `parity/`.
+
+## Template infrastructure migration
+
+Existing procedure and local installation facts remain in [original-analysis.md](original-analysis.md).
+Build identity is BLD-GOG-EN; latest official patch provenance is unestablished,
+as [SOURCE-EDITIONS.md](SOURCE-EDITIONS.md) records. Before executable analysis,
+run `tools/Verify-Configuration.ps1 -RequireAnalysisReady`.
+
+Template helpers under `tools/ghidra/` guard broad exports to local-only output.
+Do not commit decompiler output, disassembly or analysis databases. The bounded
+evidence reporter has its own pinned license and synthetic regression suite;
+[BOUNDED-EVIDENCE-REPORTERS.md](BOUNDED-EVIDENCE-REPORTERS.md) describes its
+supported image models. Its MZ/raw-image support does not establish a loader
+for this game's protected-mode LE image. No original analysis was run in migration.

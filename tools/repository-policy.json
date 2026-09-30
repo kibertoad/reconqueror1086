@@ -1,7 +1,9 @@
 {
   "deniedRoots": [
     "UserContent/",
-    "analysis/original/"
+    "analysis/original/",
+    "analysis/",
+    "reference/original/"
   ],
   "restrictedExtensions": [
     ".666",

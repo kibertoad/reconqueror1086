@@ -4,23 +4,37 @@ This page describes the checks a change has to pass before it is committed, loca
 
 ## Local gate
 
-`Run Tests.bat` is the canonical local gate. It runs, in order, and stops at the first failure:
+`tools/Invoke-Validation.ps1` is the canonical local gate. `Run Tests.bat` discovers
+the SDK and delegates to it. The gate takes an exclusive checkout-specific lock
+and stops at the first failure:
 
 1. `tools/Verify-Repository.ps1`, the repository policy described below.
-2. `tools/Check-Documentation.ps1`, the documentation standard check described under
-   [Spec checks](#spec-checks).
-3. A build of `tests/Conqueror.Tests` into an isolated temporary directory, then the xUnit suite
-   in it.
-4. A build of `tests/Conqueror.Specs`, then its executable specifications. These are the
+2. Configuration, infrastructure, pinned-documentation and narrative-reference checks.
+3. Synthetic Node and Python infrastructure tests and section-link checks.
+4. A build of `Conqueror1086.slnx` into `artifacts/validation`, then the xUnit suite.
+5. The executable specifications from that isolated build. These are the
    rebuild's own behaviour checks, written as plain assertions in `Program.cs`. They have nothing
    to do with the documentation standard's `spec/` directory.
 
-The builds use `-m:1` and no shared compiler. The gate needs no graphics device and no original
+The builds use two MSBuild workers by default, keep node reuse enabled, and disable
+the shared compiler. The gate does not stop games or unrelated services. It needs no graphics device and no original
 game files: the tests build their inputs from synthetic data, except the tests described under
 [Tests against the original](#tests-against-the-original), which skip without them.
 
-The gate needs the .NET 10 SDK and Node.js 20 or newer on `PATH`. CI runs the same steps as
-separate jobs in `.github/workflows/ci.yml` on every push to `main` and every pull request.
+The gate needs the .NET 10 SDK, Node.js 22 or newer, Python 3.12 or newer and the
+pinned Capstone dependency on `PATH`. Install the Python dependency with
+`python -m pip install -r tools/evidence/x86-reporter/requirements.txt`. CI runs
+the same gate in `.github/workflows/ci.yml` on every push to `main` and every pull request.
+
+The default fast gate excludes `Category=LongRunning`. Use `-TestFilter` to narrow
+the suite or `-IncludeLongRunningTests` when that coverage is needed. Override
+`-MinimumExpectedTests` for a deliberately narrowed run; the default discovery floor
+is 98. The gate always runs the executable specification suite.
+
+Configuration checks distinguish build identity from analysis readiness. Builds
+can proceed while latest-patch provenance is unknown. Before executable analysis,
+`tools/Verify-Configuration.ps1 -RequireAnalysisReady` must pass. See
+[SOURCE-EDITIONS.md](SOURCE-EDITIONS.md).
 
 ## Tests against the original
 
@@ -66,18 +80,20 @@ action from
 [refurbished-dinosaurs-toolkit](https://github.com/kibertoad/refurbished-dinosaurs-toolkit),
 pinned to a full commit SHA, on every push to `main` and every pull request. It checks `spec/`,
 `parity/` and `deviations/` against the standard's list of
-[checks](https://dinorefurb.com/documentation-standard/#checks), compiles each `.ksy` file with
+[checks](upstream/documentation-standard.md#checks) (lines 780-831), compiles each `.ksy` file with
 the Kaitai Struct compiler, checks that every spec and deviation ID cited in `src/`, `tests/`, `tools/`
-and `docs/` exists and is not superseded, fails when `spec/index/` or `PARITY.md` is stale, and
+exists and is not superseded, fails when `spec/index/` or `PARITY.md` is stale, and
 fails a `validated` row whose marked tests are not in `VALIDATION.md` as they are now. It
 fetches the full history so it can fail a pull request that deletes a spec ID, area or deviation
 that exists on `main`. The toolkit's
 [setup guide](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/blob/main/docs/documentation-standard-check.md)
 lists its inputs.
 
-`tools/Check-Documentation.ps1` runs the same check locally. It reads the toolkit commit from the
-workflow, downloads that commit's `tools/check-documentation.mjs` into the ignored `artifacts/`
-directory once, and runs it with `--references docs` and `--check`. The check writes `spec/index/`
+`tools/Check-Documentation.ps1` runs the same checker locally from `vendor/`, after
+`tools/upstream.mjs` verifies its digest and agreement with the CI action pin.
+It needs no network download. `tools/Check-NarrativeReferences.mjs` separately checks
+project narrative docs locally and in CI, excluding the immutable upstream text
+and generic workflow examples, whose IDs are illustrative. The check writes `spec/index/`
 and `PARITY.md`, and nobody edits them by hand. After changing the spec, `parity/` or
 `deviations/`, regenerate them and commit what the check writes:
 
@@ -92,3 +108,13 @@ prints a warning. The script does not check some items on the standard's list, s
 fixture schema and the hashes of saves and recordings; its guide lists them, and reviewers check
 those by hand. A save-patch write is given as a byte offset and value in the experiment's Setup
 section.
+
+## Migration verification
+
+On 2026-09-30 the canonical fast gate passed, including the xUnit suite,
+executable specifications, Node infrastructure tests and Python evidence tests.
+The solution built with zero warnings and zero errors. No original files were read.
+The local documentation check and Kaitai compilation passed using the toolkit's
+checksum-pinned compiler. CI and release workflows passed actionlint, and the
+Windows portable package and Inno Setup installer passed their local checks.
+Linux/macOS installer execution and remote signing were not exercised locally.

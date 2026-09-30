@@ -46,16 +46,16 @@ locations:
     offset: 0x00..0x112
   - build: BLD-GOG-EN
     file: CD:track02
-    offset: 0x00..0x45B31F
+    offset: 0x00..0x45B220
   - build: BLD-GOG-EN
     file: CD:track03
     offset: 0x00..0x9729BF
   - build: BLD-GOG-EN
     file: CD:track04
-    offset: 0x00..0x15F9A2F
+    offset: 0x00..0x15F99F0
   - build: BLD-GOG-EN
     file: CD:track05
-    offset: 0x00..0x2648A0F
+    offset: 0x00..0x2648310
   - build: BLD-GOG-EN
     file: CD:track06
     offset: 0x00..0xE0A9BF

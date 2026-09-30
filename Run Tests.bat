@@ -17,40 +17,6 @@ set "DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1"
 set "DOTNET_CLI_TELEMETRY_OPTOUT=1"
 set "DOTNET_ADD_GLOBAL_TOOLS_TO_PATH=0"
 set "TESTINGPLATFORM_TELEMETRY_OPTOUT=1"
-set "TEST_ARTIFACTS=%TEMP%\reconqueror1086-tests-%RANDOM%-%RANDOM%"
-
-powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File tools\Verify-Repository.ps1
-if errorlevel 1 goto failed
-
-powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File tools\Check-Documentation.ps1
-if errorlevel 1 goto failed
-
-"%DOTNET_EXE%" build tests\Conqueror.Tests\Conqueror.Tests.csproj --artifacts-path "%TEST_ARTIFACTS%" -m:1 -p:UseSharedCompilation=false -v:minimal
-if errorlevel 1 goto failed
-if not exist "%TEST_ARTIFACTS%\bin\Conqueror.Tests\debug\Conqueror.Tests.dll" (
-  echo Test build did not produce Conqueror.Tests.dll.
-  goto failed
-)
-
-"%DOTNET_EXE%" "%TEST_ARTIFACTS%\bin\Conqueror.Tests\debug\Conqueror.Tests.dll" -reporter verbose -noColor
-if errorlevel 1 goto failed
-
-"%DOTNET_EXE%" build tests\Conqueror.Specs\Conqueror.Specs.csproj --artifacts-path "%TEST_ARTIFACTS%" -m:1 -p:UseSharedCompilation=false -v:minimal
-if errorlevel 1 goto failed
-if not exist "%TEST_ARTIFACTS%\bin\Conqueror.Specs\debug\Conqueror.Specs.dll" (
-  echo Specification build did not produce Conqueror.Specs.dll.
-  goto failed
-)
-
-"%DOTNET_EXE%" "%TEST_ARTIFACTS%\bin\Conqueror.Specs\debug\Conqueror.Specs.dll"
-if errorlevel 1 goto failed
-
-echo.
-echo Tests passed. Isolated build files are in:
-echo %TEST_ARTIFACTS%
-exit /b 0
-
-:failed
-echo.
-echo Tests failed with exit code %ERRORLEVEL%.
+for %%D in ("%DOTNET_EXE%") do set "PATH=%%~dpD;%PATH%"
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File tools\Invoke-Validation.ps1 %*
 exit /b %ERRORLEVEL%

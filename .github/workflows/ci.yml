@@ -46,20 +46,19 @@ jobs:
         with:
           dotnet-version: 10.0.400
 
-      - name: Restore
-        run: dotnet restore Conqueror1086.slnx
-
-      - name: Build without original media
-        run: dotnet build Conqueror1086.slnx --no-restore -v minimal
-
-      - name: Run xUnit suite
-        run: dotnet test --project tests/Conqueror.Tests/Conqueror.Tests.csproj --no-restore --no-progress --minimum-expected-tests 98 -v minimal
-
-      - name: Run executable specifications
-        run: dotnet run --project tests/Conqueror.Specs/Conqueror.Specs.csproj --no-restore
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r tools/evidence/x86-reporter/requirements.txt
+      - name: Run canonical fast validation
+        shell: pwsh
+        run: ./tools/Invoke-Validation.ps1
 
       - name: Publish assetless game
-        run: dotnet publish src/Conqueror.Game/Conqueror.Game.csproj --no-restore -c Release --output artifacts/assetless-game -v minimal
+        run: dotnet publish src/Conqueror.Game/Conqueror.Game.csproj --artifacts-path artifacts/validation -c Release --output artifacts/assetless-game -v minimal
 
       - name: Verify proprietary media boundary
         shell: pwsh
@@ -87,11 +86,15 @@ jobs:
           fetch-depth: 0
 
       # The toolkit publishes no tags, and its setup guide pins a commit on its main branch.
-      - name: Check the documentation standard
-        uses: kibertoad/refurbished-dinosaurs-toolkit/actions/check-documentation@6e3cad31b6d61280a4649a873cf890377b402a75 # zizmor: ignore[stale-action-refs]
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
-          # The narrative docs cite spec IDs, which must exist and not be superseded.
-          references: docs
+          node-version: 22
+      - name: Verify pinned offline tooling
+        run: node tools/upstream.mjs verify
+      - uses: kibertoad/refurbished-dinosaurs-toolkit/actions/check-documentation@c2b21ee62fc404391e8dcfafd7029185f81241a9 # zizmor: ignore[stale-action-refs]
+
+      - name: Check narrative references
+        run: node tools/Check-NarrativeReferences.mjs
 
   package-windows:
     name: Windows installer
@@ -139,6 +142,11 @@ jobs:
           }
           "INNO_COMPILER=$compilerRoot\ISCC.exe" | Out-File -FilePath $env:GITHUB_ENV -Append
 
+      - name: Provision software OpenGL for hosted Windows smoke tests
+        shell: pwsh
+        run: |
+          $driver = ./tools/Install-MesaSoftwareGL.ps1 -DestinationPath (Join-Path $env:RUNNER_TEMP 'software-opengl')
+          "PLATFORM_SMOKE_TEST_GL_DRIVER=$driver" | Out-File -FilePath $env:GITHUB_ENV -Append
       - name: Build Windows installer
         shell: pwsh
         run: ./tools/Build-WindowsInstaller.ps1 -Compiler "$env:INNO_COMPILER"
@@ -163,10 +171,22 @@ jobs:
             $nativePath = Join-Path (Split-Path -Parent $link.TargetPath) $nativeLibrary
             if (-not [IO.File]::Exists($nativePath)) { throw "Installed native library is missing: $nativePath" }
           }
-          $game = Start-Process -FilePath $link.TargetPath `
-            -ArgumentList '--platform-smoke-test' -WorkingDirectory $link.WorkingDirectory `
-            -Wait -PassThru -WindowStyle Hidden
-          if ($game.ExitCode -ne 0) { throw "Packaged game returned $($game.ExitCode)." }
+          $smokeArguments = @('--platform-smoke-test')
+          if ($env:PLATFORM_SMOKE_TEST_GL_DRIVER) { $smokeArguments += '--software-renderer' }
+          $smokeOut = Join-Path $env:RUNNER_TEMP 'platform-smoke-out.txt'
+          $smokeErr = Join-Path $env:RUNNER_TEMP 'platform-smoke-err.txt'
+          $game = Start-Process -FilePath $link.TargetPath -ArgumentList $smokeArguments `
+            -WorkingDirectory $link.WorkingDirectory -PassThru -WindowStyle Hidden `
+            -RedirectStandardOutput $smokeOut -RedirectStandardError $smokeErr
+          if (-not $game.WaitForExit(120000)) {
+            Get-Content $smokeOut, $smokeErr -ErrorAction SilentlyContinue | Write-Host
+            $game.Kill($true)
+            throw 'Installed native-platform check timed out.'
+          }
+          if ($game.ExitCode -ne 0) {
+            Get-Content $smokeOut, $smokeErr -ErrorAction SilentlyContinue | Write-Host
+            throw "Installed native-platform check returned $($game.ExitCode)."
+          }
           $uninstall = Start-Process -FilePath (Join-Path $testRoot 'unins000.exe') `
             -ArgumentList @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART') `
             -Wait -PassThru -WindowStyle Hidden

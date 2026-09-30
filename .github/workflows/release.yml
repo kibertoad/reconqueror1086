@@ -1,19 +1,33 @@
 name: Release installers
-
 on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Version tag to create, for example 0.1.0
+        description: Semantic version to tag, for example 0.1.0
         required: true
         type: string
-
+      installers:
+        description: Installer platforms to build
+        required: true
+        default: all
+        type: choice
+        options:
+          - windows
+          - no-mac-x64
+          - all
+      signed_release:
+        description: Installer platforms to sign; macOS installers are never signed
+        required: true
+        default: none
+        type: choice
+        options:
+          - none
+          - Windows
+          - Windows/Linux
 permissions: {}
-
 concurrency:
   group: release-${{ github.workflow }}-${{ inputs.tag }}
   cancel-in-progress: false
-
 jobs:
   prepare:
     name: Validate release
@@ -21,34 +35,23 @@ jobs:
     permissions:
       contents: read
     outputs:
-      commit: ${{ steps.version.outputs.commit }}
-      tag: ${{ steps.version.outputs.tag }}
       version: ${{ steps.version.outputs.version }}
+      commit: ${{ steps.version.outputs.commit }}
     steps:
-      - name: Check out main
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: main
           fetch-depth: 0
           persist-credentials: false
-
-      - name: Validate version tag
-        id: version
+      - id: version
         shell: pwsh
         env:
           RELEASE_TAG: ${{ inputs.tag }}
         run: |
-          if ($env:RELEASE_TAG -notmatch '^(\d+\.\d+\.\d+)$') {
-            throw "Tag '$env:RELEASE_TAG' must look like 0.1.0."
-          }
-          $existing = git ls-remote --tags origin "refs/tags/$env:RELEASE_TAG"
-          if ($existing) { throw "Tag '$env:RELEASE_TAG' already exists." }
-          $commit = git rev-parse HEAD
-          if ($LASTEXITCODE -ne 0) { throw 'Unable to resolve the release commit.' }
-          "commit=$commit" >> $env:GITHUB_OUTPUT
-          "tag=$env:RELEASE_TAG" >> $env:GITHUB_OUTPUT
+          if ($env:RELEASE_TAG -notmatch '^(\d+\.\d+\.\d+)$') { throw 'Tag must be x.y.z.' }
+          if (git ls-remote --tags origin "refs/tags/$env:RELEASE_TAG") { throw 'Tag already exists.' }
           "version=$($Matches[1])" >> $env:GITHUB_OUTPUT
-
+          "commit=$(git rev-parse HEAD)" >> $env:GITHUB_OUTPUT
   test:
     name: Test release commit
     needs: prepare
@@ -56,46 +59,55 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Check out release commit
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.prepare.outputs.commit }}
           persist-credentials: false
-
-      - name: Set up .NET
-        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: 10.0.400
-
-      - name: Verify legal boundary and tests
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r tools/evidence/x86-reporter/requirements.txt
+      - name: Verify repository, build, and test
         shell: pwsh
-        run: |
-          ./tools/Verify-Repository.ps1
-          dotnet test --project tests/Conqueror.Tests/Conqueror.Tests.csproj `
-            --no-progress --minimum-expected-tests 98 -v minimal
-          if ($LASTEXITCODE -ne 0) { throw 'xUnit suite failed.' }
-          dotnet run --project tests/Conqueror.Specs/Conqueror.Specs.csproj
-          if ($LASTEXITCODE -ne 0) { throw 'Executable specifications failed.' }
-
-  build-windows:
+        run: ./tools/Invoke-Validation.ps1
+  windows:
     name: Build Windows x64 installer
     needs: [prepare, test]
     runs-on: windows-latest
+    # An empty name means "no environment", so an unsigned run does not wait on the signing
+    # environment's protection rules or need its secrets.
+    environment: ${{ inputs.signed_release != 'none' && 'release-signing' || '' }}
     permissions:
       contents: read
     steps:
-      - name: Check out release commit
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.prepare.outputs.commit }}
           persist-credentials: false
-
-      - name: Set up .NET
-        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: 10.0.400
-
-      - name: Install Inno Setup 7.1.0
+      - name: Verify eSigner configuration
+        if: ${{ inputs.signed_release != 'none' }}
+        shell: pwsh
+        env:
+          ES_USERNAME: ${{ secrets.ES_USERNAME }}
+          ES_PASSWORD: ${{ secrets.ES_PASSWORD }}
+          CREDENTIAL_ID: ${{ secrets.CREDENTIAL_ID }}
+          ES_TOTP_SECRET: ${{ secrets.ES_TOTP_SECRET }}
+        run: |
+          $missing = @('ES_USERNAME', 'ES_PASSWORD', 'CREDENTIAL_ID', 'ES_TOTP_SECRET') |
+            Where-Object { -not [Environment]::GetEnvironmentVariable($_) }
+          if ($missing.Count -ne 0) {
+            throw "Missing release-signing environment secret(s): $($missing -join ', ')."
+          }
+      - name: Install pinned installer compiler
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
@@ -106,7 +118,9 @@ jobs:
             --repo jrsoftware/issrc `
             --pattern 'innosetup-7.1.0-x64.exe' `
             --dir $env:RUNNER_TEMP
+          if ($LASTEXITCODE -ne 0) { throw 'Could not download the pinned Inno Setup installer.' }
           gh release verify-asset $installer --repo jrsoftware/issrc
+          if ($LASTEXITCODE -ne 0) { throw 'Attestation verification failed for the pinned Inno Setup installer.' }
           $signature = Get-AuthenticodeSignature -LiteralPath $installer
           if ($signature.Status -ne 'Valid' -or
               $signature.SignerCertificate.Subject -notlike '*Pyrsys B.V.*') {
@@ -119,87 +133,219 @@ jobs:
             throw "Inno Setup installation returned $($install.ExitCode)."
           }
           "INNO_COMPILER=$compilerRoot\ISCC.exe" | Out-File -FilePath $env:GITHUB_ENV -Append
-
-      - name: Build installer
+      - name: Provision software OpenGL for the platform smoke test
+        shell: pwsh
+        run: |
+          # Keep the pinned diagnostic driver outside the distributable package.
+          try {
+            $driver = ./tools/Install-MesaSoftwareGL.ps1 `
+              -DestinationPath (Join-Path $env:RUNNER_TEMP 'software-opengl')
+            "PLATFORM_SMOKE_TEST_GL_DRIVER=$driver" | Out-File -FilePath $env:GITHUB_ENV -Append
+            Write-Host "Software OpenGL driver provisioned at $driver"
+          }
+          catch {
+            Write-Warning ("Software OpenGL is unavailable, so the platform smoke tests will run " +
+              "against the runner's own driver and are expected to fail: $($_.Exception.Message)")
+          }
+      - name: Build Windows package
+        shell: pwsh
+        run: ./tools/Publish-Windows.ps1 -SkipArchive
+      - name: Install SSL.com CodeSignTool
+        if: ${{ inputs.signed_release != 'none' }}
+        shell: pwsh
+        run: |
+          $toolPath = ./tools/Install-CodeSignTool.ps1 `
+            -DestinationPath (Join-Path $env:RUNNER_TEMP 'CodeSignTool-1.3.2')
+          "CODESIGNTOOL_PATH=$toolPath" | Out-File -FilePath $env:GITHUB_ENV -Append
+      - name: Stage executables for signing
+        if: ${{ inputs.signed_release != 'none' }}
+        shell: pwsh
+        run: |
+          $packageRoot = 'artifacts/Conqueror1086-win-x64'
+          $signingInput = 'artifacts/esigner-input'
+          $executables = @(Get-ChildItem -LiteralPath $packageRoot -Recurse -File -Filter 'Conqueror*.exe')
+          if ($executables.Count -eq 0) { throw "No project executables were found below '$packageRoot'." }
+          $duplicates = $executables | Group-Object Name | Where-Object Count -gt 1
+          if ($duplicates) { throw "Executable names must be unique for signing: $($duplicates.Name -join ', ')." }
+          New-Item -ItemType Directory -Path $signingInput -Force | Out-Null
+          $executables | Copy-Item -Destination $signingInput
+      - name: Sign Windows executables with SSL.com eSigner
+        if: ${{ inputs.signed_release != 'none' }}
+        shell: pwsh
+        env:
+          ES_USERNAME: ${{ secrets.ES_USERNAME }}
+          ES_PASSWORD: ${{ secrets.ES_PASSWORD }}
+          CREDENTIAL_ID: ${{ secrets.CREDENTIAL_ID }}
+          ES_TOTP_SECRET: ${{ secrets.ES_TOTP_SECRET }}
+        run: |
+          ./tools/Invoke-ESigner.ps1 `
+            -CodeSignToolPath $env:CODESIGNTOOL_PATH `
+            -InputDirectory (Join-Path $PWD 'artifacts/esigner-input') `
+            -OutputDirectory (Join-Path $PWD 'artifacts/esigner-output')
+      - name: Install and verify signed executables
+        if: ${{ inputs.signed_release != 'none' }}
+        shell: pwsh
+        run: |
+          $packageRoot = 'artifacts/Conqueror1086-win-x64'
+          $expected = @(Get-ChildItem 'artifacts/esigner-input' -File -Filter '*.exe' | Select-Object -ExpandProperty Name)
+          $signed = @(Get-ChildItem 'artifacts/esigner-output' -File -Filter '*.exe')
+          $difference = @(Compare-Object $expected @($signed | Select-Object -ExpandProperty Name))
+          if ($difference.Count -ne 0) { throw "eSigner output did not match staged executables." }
+          foreach ($file in $signed) {
+            $destinations = @(Get-ChildItem $packageRoot -Recurse -File -Filter $file.Name)
+            if ($destinations.Count -ne 1) { throw "Expected one destination for '$($file.Name)'." }
+            Copy-Item $file.FullName $destinations[0].FullName -Force
+            $signature = Get-AuthenticodeSignature $destinations[0].FullName
+            if ($signature.Status -ne 'Valid' -or -not $signature.TimeStamperCertificate) {
+              throw "Invalid or untimestamped signature on '$($destinations[0].FullName)'."
+            }
+          }
+      - name: Build installer from verified package
         shell: pwsh
         env:
           RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
-        run: ./tools/Build-WindowsInstaller.ps1 -Version $env:RELEASE_VERSION -Compiler "$env:INNO_COMPILER"
-
-      - name: Smoke-test installer
+        run: ./tools/Build-WindowsInstaller.ps1 -Version $env:RELEASE_VERSION -Compiler "$env:INNO_COMPILER" -SkipPackage
+      - name: Sign Windows installer with SSL.com eSigner
+        if: ${{ inputs.signed_release != 'none' }}
+        shell: pwsh
+        env:
+          ES_USERNAME: ${{ secrets.ES_USERNAME }}
+          ES_PASSWORD: ${{ secrets.ES_PASSWORD }}
+          CREDENTIAL_ID: ${{ secrets.CREDENTIAL_ID }}
+          ES_TOTP_SECRET: ${{ secrets.ES_TOTP_SECRET }}
+          RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          ./tools/Invoke-ESigner.ps1 `
+            -CodeSignToolPath $env:CODESIGNTOOL_PATH `
+            -InputFile (Join-Path $PWD "artifacts/ReConqueror1086-Setup-$env:RELEASE_VERSION.exe")
+      - name: Verify signed installer
+        if: ${{ inputs.signed_release != 'none' }}
         shell: pwsh
         env:
           RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
         run: |
-          $testRoot = Join-Path $env:RUNNER_TEMP 'ReConqueror-installer-test'
           $installer = "artifacts/ReConqueror1086-Setup-$env:RELEASE_VERSION.exe"
-          $setup = Start-Process -FilePath $installer `
-            -ArgumentList @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/NOIMPORT=1', "/DIR=`"$testRoot`"") `
-            -Wait -PassThru -WindowStyle Hidden
-          if ($setup.ExitCode -ne 0) { throw "Installer returned $($setup.ExitCode)." }
-          $shortcut = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs\ReConqueror A.D. 1086\ReConqueror A.D. 1086.lnk'
-          if (-not [IO.File]::Exists($shortcut)) { throw "Installer did not create $shortcut." }
-          $link = (New-Object -ComObject WScript.Shell).CreateShortcut($shortcut)
-          $expectedTarget = [IO.Path]::GetFullPath((Join-Path $testRoot 'Game/Conqueror.Game.exe'))
-          if ([IO.Path]::GetExtension($link.TargetPath) -ne '.exe' -or
-              [IO.Path]::GetFullPath($link.TargetPath) -ne $expectedTarget) {
-            throw "Shortcut target '$($link.TargetPath)' is not '$expectedTarget'."
+          $signature = Get-AuthenticodeSignature $installer
+          if ($signature.Status -ne 'Valid' -or -not $signature.TimeStamperCertificate) {
+            throw "Invalid or untimestamped signature on '$installer'."
           }
-          foreach ($nativeLibrary in @('SDL2.dll', 'openal.dll')) {
-            $nativePath = Join-Path (Split-Path -Parent $link.TargetPath) $nativeLibrary
-            if (-not [IO.File]::Exists($nativePath)) { throw "Installed native library is missing: $nativePath" }
-          }
-          $game = Start-Process -FilePath $link.TargetPath `
-            -ArgumentList '--platform-smoke-test' -WorkingDirectory $link.WorkingDirectory `
-            -Wait -PassThru -WindowStyle Hidden
-          if ($game.ExitCode -ne 0) { throw "Packaged game returned $($game.ExitCode)." }
-          $uninstall = Start-Process -FilePath (Join-Path $testRoot 'unins000.exe') `
-            -ArgumentList @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART') `
-            -Wait -PassThru -WindowStyle Hidden
-          if ($uninstall.ExitCode -ne 0) { throw "Uninstaller returned $($uninstall.ExitCode)." }
-          if ([IO.File]::Exists($shortcut)) { throw 'Uninstaller left the Start menu shortcut behind.' }
-
-      - name: Upload installer
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: release-windows-x64
-          path: artifacts/ReConqueror1086-Setup-*.exe
-          if-no-files-found: error
-
-  build-linux:
-    name: Build Linux x64 installer
-    needs: [prepare, test]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Check out release commit
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ needs.prepare.outputs.commit }}
-          persist-credentials: false
-
-      - name: Set up .NET
-        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
-        with:
-          dotnet-version: 10.0.400
-
-      - name: Build installer
+      - name: Smoke-test installed layout and shortcut
         shell: pwsh
         env:
           RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
+          SIGNED_RELEASE: ${{ inputs.signed_release }}
+        run: |
+          $target = Join-Path $env:RUNNER_TEMP 'restoration-release-install-test'
+          $installer = "artifacts/ReConqueror1086-Setup-$env:RELEASE_VERSION.exe"
+          $setup = Start-Process $installer -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/NOIMPORT=1',"/DIR=`"$target`"") -Wait -PassThru -WindowStyle Hidden
+          if ($setup.ExitCode -ne 0) { throw "Installer returned $($setup.ExitCode)." }
+          $shortcut = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs\ReConqueror A.D. 1086\ReConqueror A.D. 1086.lnk'
+          if (-not (Test-Path -LiteralPath $shortcut)) { throw "Start menu shortcut is missing: $shortcut" }
+          $link = (New-Object -ComObject WScript.Shell).CreateShortcut($shortcut)
+          $expectedTarget = [IO.Path]::GetFullPath((Join-Path $target 'Game/Conqueror.Game.exe'))
+          if ($link.TargetPath -ne $expectedTarget) { throw "Shortcut target is invalid: '$($link.TargetPath)'." }
+          if ($env:SIGNED_RELEASE -ne 'none') {
+            $signature = Get-AuthenticodeSignature $link.TargetPath
+            if ($signature.Status -ne 'Valid' -or -not $signature.TimeStamperCertificate) {
+              throw "Installed executable has an invalid or missing timestamped signature."
+            }
+          }
+          # Same as the CI smoke test: bound the wait and surface the reason. Unbounded, a launch
+          # that stops on a dialog nobody can dismiss holds the release job until it times out.
+          $smokeOut = Join-Path $env:RUNNER_TEMP 'platform-smoke-stdout.txt'
+          $smokeErr = Join-Path $env:RUNNER_TEMP 'platform-smoke-stderr.txt'
+          function Write-SmokeDiagnostics {
+            foreach ($file in @($smokeOut, $smokeErr)) {
+              if ((Test-Path -LiteralPath $file) -and (Get-Item -LiteralPath $file).Length -gt 0) {
+                Write-Host "--- $(Split-Path -Leaf $file) ---"
+                Get-Content -LiteralPath $file | Write-Host
+              }
+            }
+            Get-ChildItem -LiteralPath $env:LOCALAPPDATA -Recurse -Depth 3 -Filter 'startup-error.log' `
+              -ErrorAction SilentlyContinue | ForEach-Object {
+                Write-Host "--- $($_.FullName) ---"
+                Get-Content -LiteralPath $_.FullName | Write-Host
+              }
+          }
+          $smokeArguments = @('--platform-smoke-test')
+          if ($env:PLATFORM_SMOKE_TEST_GL_DRIVER) { $smokeArguments += '--software-renderer' }
+          $game = Start-Process $link.TargetPath -ArgumentList $smokeArguments `
+            -WorkingDirectory $link.WorkingDirectory -PassThru -WindowStyle Hidden `
+            -RedirectStandardOutput $smokeOut -RedirectStandardError $smokeErr
+          if (-not $game.WaitForExit(120000)) {
+            Write-SmokeDiagnostics
+            $game.Kill($true)
+            throw 'Installed platform smoke test did not exit within 120 seconds.'
+          }
+          # Surface native-platform smoke diagnostics in the release log.
+          if ((Test-Path -LiteralPath $smokeErr) -and (Get-Item -LiteralPath $smokeErr).Length -gt 0) {
+            Get-Content -LiteralPath $smokeErr | Write-Host
+          }
+          if ($game.ExitCode -ne 0) {
+            Write-SmokeDiagnostics
+            throw "Installed platform smoke test returned $($game.ExitCode)."
+          }
+          $uninstall = Start-Process (Join-Path $target 'unins000.exe') -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART') -Wait -PassThru -WindowStyle Hidden
+          if ($uninstall.ExitCode -ne 0) { throw "Uninstaller returned $($uninstall.ExitCode)." }
+          if (Test-Path -LiteralPath $shortcut) { throw "Uninstaller left the Start menu shortcut behind: $shortcut" }
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-windows-x64
+          path: artifacts/*.exe
+          if-no-files-found: error
+          retention-days: 1
+  linux:
+    name: Build Linux x64 installer
+    needs: [prepare, test]
+    if: ${{ inputs.installers != 'windows' }}
+    runs-on: ubuntu-latest
+    # See the Windows job: an empty name means "no environment".
+    environment: ${{ inputs.signed_release == 'Windows/Linux' && 'release-signing' || '' }}
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.prepare.outputs.commit }}
+          persist-credentials: false
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: 10.0.400
+      - name: Verify OpenPGP configuration
+        if: ${{ inputs.signed_release == 'Windows/Linux' }}
+        shell: pwsh
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_FINGERPRINT: ${{ secrets.GPG_FINGERPRINT }}
+        run: ./tools/Invoke-GpgSigner.ps1 -TestConfiguration
+      - shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
         run: ./tools/Build-LinuxInstaller.ps1 -Version $env:RELEASE_VERSION
-
-      - name: Upload installer
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - name: Sign Linux installer with OpenPGP
+        if: ${{ inputs.signed_release == 'Windows/Linux' }}
+        shell: pwsh
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_FINGERPRINT: ${{ secrets.GPG_FINGERPRINT }}
+          RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          ./tools/Invoke-GpgSigner.ps1 -InputFile (Join-Path $PWD `
+            "artifacts/ReConqueror1086-linux-x64-Setup-$env:RELEASE_VERSION.deb")
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: release-linux-x64
-          path: artifacts/ReConqueror1086-linux-x64-Setup-*.deb
+          path: |
+            artifacts/*.deb
+            artifacts/*.deb.asc
           if-no-files-found: error
-
-  build-macos:
-    name: Build macOS ${{ matrix.arch }} installer
+          retention-days: 1
+  macos:
+    name: Build macOS installer (${{ matrix.runtime }})
     needs: [prepare, test]
+    if: ${{ inputs.installers != 'windows' }}
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
@@ -214,80 +360,91 @@ jobs:
             os: macos-15-intel
             runtime: osx-x64
     steps:
-      - name: Check out release commit
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.prepare.outputs.commit }}
           persist-credentials: false
-
-      - name: Set up .NET
-        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: 10.0.400
-
-      - name: Build installer
+      - if: ${{ matrix.arch != 'x64' || inputs.installers == 'all' }}
         shell: pwsh
         env:
           RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
           TARGET_RUNTIME: ${{ matrix.runtime }}
         run: ./tools/Build-MacInstaller.ps1 -Version $env:RELEASE_VERSION -Runtime $env:TARGET_RUNTIME
-
-      - name: Upload installer
+      - if: ${{ matrix.arch != 'x64' || inputs.installers == 'all' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: release-macos-${{ matrix.arch }}
-          path: artifacts/ReConqueror1086-${{ matrix.runtime }}-Setup-*.pkg
+          path: artifacts/*.pkg
           if-no-files-found: error
-
+          retention-days: 1
   release:
-    name: Create GitHub Release
-    needs: [prepare, build-windows, build-linux, build-macos]
+    name: Publish release
+    needs: [prepare, windows, linux, macos]
+    if: >-
+      ${{
+        always() &&
+        needs.prepare.result == 'success' &&
+        needs.windows.result == 'success' &&
+        (inputs.installers == 'windows' ||
+          (needs.linux.result == 'success' && needs.macos.result == 'success'))
+      }}
     runs-on: ubuntu-latest
     permissions:
       contents: write # Required to create the annotated tag and GitHub Release.
     steps:
-      - name: Check out release commit
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.prepare.outputs.commit }}
           persist-credentials: false
-
-      - name: Download installers
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: release-*
           path: release-assets
           merge-multiple: true
-
+      # The asset count gates tag creation: a tag pushed without a Release blocks
+      # `prepare` from ever re-running this version until someone deletes it by hand.
+      - name: Verify installer assets
+        shell: bash
+        env:
+          RELEASE_INSTALLERS: ${{ inputs.installers }}
+          SIGNED_RELEASE: ${{ inputs.signed_release }}
+        run: |
+          mapfile -t assets < <(find release-assets -type f -print | sort)
+          expected=1
+          if [[ "$RELEASE_INSTALLERS" == no-mac-x64 ]]; then expected=3; fi
+          if [[ "$RELEASE_INSTALLERS" == all ]]; then expected=4; fi
+          if [[ "$SIGNED_RELEASE" == Windows/Linux && "$RELEASE_INSTALLERS" != windows ]]; then ((expected+=1)); fi
+          if (( ${#assets[@]} != expected )); then
+            echo "Expected $expected installer(s), found ${#assets[@]}." >&2
+            exit 1
+          fi
+          printf '%s\n' "${assets[@]}" > "$RUNNER_TEMP/release-assets.txt"
       - name: Create annotated tag
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
+          RELEASE_TAG: ${{ needs.prepare.outputs.version }}
         run: |
           $commit = git rev-parse HEAD
-          if ($LASTEXITCODE -ne 0) { throw 'Unable to resolve release commit.' }
+          if ($LASTEXITCODE -ne 0) { throw 'Could not resolve release commit.' }
           $tagObject = gh api --method POST "repos/$env:GITHUB_REPOSITORY/git/tags" `
-            -f "tag=$env:RELEASE_TAG" `
-            -f "message=Release $env:RELEASE_TAG" `
-            -f "object=$commit" `
-            -f 'type=commit' | ConvertFrom-Json
+            -f "tag=$env:RELEASE_TAG" -f "message=Release $env:RELEASE_TAG" `
+            -f "object=$commit" -f 'type=commit' | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { throw 'Could not create the release tag object.' }
+          if (-not $tagObject.sha) { throw 'Release tag object response contained no sha.' }
           gh api --method POST "repos/$env:GITHUB_REPOSITORY/git/refs" `
-            -f "ref=refs/tags/$env:RELEASE_TAG" `
-            -f "sha=$($tagObject.sha)"
-          if ($LASTEXITCODE -ne 0) { throw 'Unable to create release tag reference.' }
-
+            -f "ref=refs/tags/$env:RELEASE_TAG" -f "sha=$($tagObject.sha)"
+          if ($LASTEXITCODE -ne 0) { throw 'Could not create release tag reference.' }
       - name: Create GitHub Release
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
+          RELEASE_TAG: ${{ needs.prepare.outputs.version }}
         run: |
-          mapfile -t assets < <(find release-assets -type f -print | sort)
-          if (( ${#assets[@]} != 4 )); then
-            echo "Expected four installers, found ${#assets[@]}." >&2
-            exit 1
-          fi
+          mapfile -t assets < "$RUNNER_TEMP/release-assets.txt"
           gh release create "$RELEASE_TAG" "${assets[@]}" \
             --verify-tag \
             --generate-notes \

@@ -2,6 +2,7 @@
 setlocal
 cd /d "%~dp0"
 set "SOURCE=%~1"
+if "%SOURCE%"=="" set "SOURCE=%CONQUEROR_SOURCE_PATH%"
 if "%SOURCE%"=="" set "SOURCE=C:\GOG Games\Conqueror AD1086"
 set "DOTNET_EXE="
 if exist "%USERPROFILE%\.dotnet\dotnet.exe" set "DOTNET_EXE=%USERPROFILE%\.dotnet\dotnet.exe"

@@ -1,16 +1,31 @@
 using Conqueror.Game;
 
-if (args.Contains("--smoke-test", StringComparer.OrdinalIgnoreCase))
-{
-    Console.WriteLine("Conqueror.Game startup check passed.");
-    return 0;
-}
-
 string? userContentRoot = null;
 string? stateRoot = null;
 var platformSmokeTest = args.Contains("--platform-smoke-test", StringComparer.OrdinalIgnoreCase);
 try
 {
+    var softwareRendering = SoftwareRenderer.Evaluate(
+        args.Contains(SoftwareRenderer.Flag, StringComparer.OrdinalIgnoreCase),
+        platformSmokeTest,
+        Environment.GetEnvironmentVariable(SoftwareRenderer.DriverVariable));
+    if (softwareRendering.Rejection is not null)
+    {
+        Console.Error.WriteLine(softwareRendering.Rejection);
+        return 64;
+    }
+    if (args.Contains("--smoke-test", StringComparer.OrdinalIgnoreCase))
+    {
+        Console.WriteLine("Conqueror.Game startup check passed.");
+        return 0;
+    }
+    if (softwareRendering.Enabled) SoftwareRenderer.Apply(softwareRendering.DriverPath!);
+    if (platformSmokeTest)
+    {
+        using var diagnostic = new PlatformSmokeGame();
+        diagnostic.Run();
+        return 0;
+    }
     var contentArgument = Array.FindIndex(args,
         value => value.Equals("--user-content", StringComparison.OrdinalIgnoreCase));
     var configuredContent = Environment.GetEnvironmentVariable("RECONQUEROR_USER_CONTENT") ??
@@ -28,7 +43,6 @@ try
 
     var importedContent = ImportedContentCatalog.LoadRequired(userContentRoot);
     using var game = new ConquerorGame(importedContent, stateRoot);
-    if (platformSmokeTest) return 0;
     game.Run();
     return 0;
 }

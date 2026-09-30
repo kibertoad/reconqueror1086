@@ -6,6 +6,10 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+if ($Version -notmatch '^\d+\.\d+\.\d+$') {
+    throw "Invalid installer version '$Version'; expected x.y.z."
+}
+
 $requiredCompilerVersion = '7.1.0'
 $repositoryRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 if (-not $SkipPackage) {
@@ -37,10 +41,6 @@ $compilerVersion = (& $Compiler --version | Out-String).Trim()
 if ($LASTEXITCODE -ne 0 -or $compilerVersion -ne $requiredCompilerVersion) {
     throw "Inno Setup $requiredCompilerVersion is required; '$Compiler' reports '$compilerVersion'."
 }
-if ($Version -notmatch '^\d+\.\d+\.\d+$') {
-    throw "Invalid installer version '$Version'; expected x.y.z."
-}
-
 $script = Join-Path $repositoryRoot 'packaging/windows/Conqueror1086.iss'
 & $Compiler "/DMyAppVersion=$Version" $script
 if ($LASTEXITCODE -ne 0) { throw 'Inno Setup compilation failed.' }
