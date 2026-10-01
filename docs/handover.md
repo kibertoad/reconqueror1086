@@ -25,8 +25,9 @@ and the parity rows; audit completion does not establish gameplay fidelity.
 
 The 2026-10-01 canonical fast gate, documentation/Kaitai, pinned bytes,
 research tracking, coverage metadata, local links and changed workflow checks
-pass. See [VALIDATION.md](VALIDATION.md). Packaging was not rerun for this
-tooling-only migration.
+pass. Full cross-platform CI and all installer acceptance jobs passed for
+f2ae877; see [VALIDATION.md](VALIDATION.md). The follow-up completeness audit
+found no migration blocker. Local packaging was not repeated.
 
 Post-commit audits found no confirmed task orphans. Original captures, source
 extraction and Ghidra artifacts remain ignored locally. Preserve unrelated
