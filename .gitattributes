@@ -15,3 +15,5 @@ docs/BOUNDED-EVIDENCE-REPORTERS.md -text
 tests/evidence/test_x86.py -text
 tests/evidence/test_pe.py -text
 tests/evidence/bridge.test.mjs -text
+
+.githooks/** text eol=lf

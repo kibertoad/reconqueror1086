@@ -89,3 +89,12 @@ The independent instruction-reporter pin is toolkit
 `7da1b93cdd9ac0d59dbaf82b66b4db95d578ab9d` (PR 22), including contested
 reachability and overlap-proof regressions. Only accepted reachable starts
 support confirmed results; contested paths cannot support a negative search.
+
+## Latest upstream adoption (2026-10-01)
+
+Owner-authorized update: template `8d0eef35ec8f3b1053ba1dd129a7bd75b044cf27`,
+Standard/Protocol `ca39d0750e67c8c3900e8554e66a84083fe67452`,
+and checker/reporters `f8c51bfc5d167c25a04f2b6ddb3f7390714dc45f`.
+Protocol and Methodology bytes are unchanged. This adoption supersedes the
+previous infrastructure baseline above. Game-specific LE coverage, identities,
+source contracts and evidence statuses are retained.

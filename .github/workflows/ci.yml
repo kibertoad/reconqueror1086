@@ -91,7 +91,7 @@ jobs:
           node-version: 22
       - name: Verify pinned offline tooling
         run: node tools/upstream.mjs verify
-      - uses: kibertoad/refurbished-dinosaurs-toolkit/actions/check-documentation@f5e62e083eda1aac202695682f8299dc681e4fd4 # zizmor: ignore[stale-action-refs]
+      - uses: kibertoad/refurbished-dinosaurs-toolkit/actions/check-documentation@f8c51bfc5d167c25a04f2b6ddb3f7390714dc45f # zizmor: ignore[stale-action-refs]
 
       - name: Check narrative references
         run: node tools/Check-NarrativeReferences.mjs

@@ -202,3 +202,23 @@ jobs passed for f2ae877; [VALIDATION.md](VALIDATION.md#full-migration-acceptance
 records exact acceptance coverage and limits. No migration blocker or pending
 acceptance remains. Historical source-provenance wording above is clarified, and
 the main implementation plan records the current adoption.
+
+## Latest upstream refresh (2026-10-01)
+
+Scope: this repository only. Adopt template 8d0eef35, rules ca39d075 and
+all checker/reporter files from toolkit f8c51bfc. The reviewed delta adds
+call-target, boundary, ownership, carry arithmetic, pointer inventory and
+dispatch reports, address-evidence checking, matching local/CI inputs and a
+staged-tree pre-commit hook. Extend the reporter lock to include the latest
+pointer and dispatch dependencies and synthetic tests. No upstream scratch
+binaries or query artifacts are copied. Preserve Windows configuration tests,
+the LE adapter and Conqueror validation and packaging identities.
+
+Acceptance: canonical fast gate, exact snapshot/reporter hashes, regenerated
+links, staged-tree hook, final diff review and canonical explicit-refspec push.
+Risks: new reporter dependencies and stricter checks; exercise the full synthetic
+suites. No gameplay changes, spec promotions or unresolved owner decisions.
+
+Outcome: canonical fast validation passed; exact reporter bytes include the
+latest pointer-inventory and dispatch dependencies. See the dated validation
+record for results and the local Kaitai limit.

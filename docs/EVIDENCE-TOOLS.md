@@ -56,3 +56,18 @@ That adapter supplies the documented LE code-object range and checks build,
 manifest, destination and TSV metadata through the same verifier. Its starts
 are LE virtual addresses, not MZ file offsets. It does not claim that the shared
 MZ/FBOV loader supports LE or that an inventory establishes complete behavior.
+
+Use `x86-target` before citing a far call's target: it keeps the raw operand,
+the relocation or FBOV fixup, the stored descriptor word and decoded index, the
+trampoline and the canonical target, and compares an analyzer's address with
+each instead of replacing them. Use `x86-bounds` and `x86-owner` before joining a
+call to its caller or bounding a reading by an analyzer's size: an analyzer's
+size is a body-byte count and is never added to a start to make an end. Give
+`formatControls` the build's known relocation, descriptor, overlay, fixup and
+trampoline counts so a misread table fails the query. Declare a resident
+segment's bounds from the build's code ranges in `segments` so an incoming
+search over part of it is reported as partial.
+
+The latest toolkit also supplies `x86-pointer-inventory` and instruction-derived
+dispatch recovery. Use the bounded reporter guide for supported source formats
+and contracts; these reporters do not support Conqueror LE code analysis.

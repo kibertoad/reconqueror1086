@@ -54,7 +54,7 @@ test("CLI keeps capped and partial incoming searches explicit", t => {
 });
 
 
-test("FBOV source preserves shifted descriptor and verified trampoline selection", t => {
+function overlayFixture(t) {
   const dir = mkdtempSync(join(tmpdir(), "bounded-overlay-"));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
   const data = Buffer.alloc(592), w = (p, n) => data.writeUInt16LE(n, p), d = (p, n) => data.writeUInt32LE(n, p);
@@ -72,6 +72,11 @@ test("FBOV source preserves shifted descriptor and verified trampoline selection
       { name: "resident", start: 80, end: 86, ip: 16, segment: 4096, entries: [80], evidence: "synthetic resident code" },
       { name: "overlay", start: 528, end: 560, ip: 0, segment: 8192, entries: [528, 532], evidence: "synthetic overlay view" }
     ] };
+  return { dir, data, config };
+}
+
+test("FBOV source preserves shifted descriptor and verified trampoline selection", t => {
+  const { dir, config } = overlayFixture(t);
   const prepared = prepare(config, dir);
   const fixup = prepared.relocations.find(r => r.site === 535);
   assert.equal(fixup.raw, 8); assert.equal(fixup.descriptor, 1); assert.equal(fixup.target, 528);
@@ -94,4 +99,127 @@ test("instruction operand CLI uses source relocation and rejects partial word qu
   assert.equal(result.loadedAddress,"1000:0010");assert.equal(result.relocation.evidence,"source MZ relocation");
   cfg.query.operandSite=66;writeFileSync(path,JSON.stringify(cfg));
   assert.throws(()=>run(["operand",path]),/complete 16-bit immediate/);
+});
+
+
+test("target report keeps the raw word, relocation, descriptor and trampoline of one far call", t => {
+  const { dir, config } = overlayFixture(t);
+  const path = join(dir, "config.json");
+  const query = site => writeFileSync(path, JSON.stringify({ ...config, query: { site } }));
+  query(80);
+  const resident = run(["target", path]);
+  assert.equal(resident.boundary, "entry-path instruction");
+  assert.equal(resident.rawOperand, "000C:0020");
+  assert.equal(resident.kind, "MZ relocation");
+  assert.equal(resident.loadedAddress, "100C:0020");
+  assert.equal(resident.trampoline, 288);
+  assert.equal(resident.canonicalTarget, 528);
+  assert.equal(resident.target.citation, "+0x00000210");
+  query(532);
+  const overlay = run(["target", path]);
+  assert.equal(overlay.kind, "FBOV fixup");
+  assert.equal(overlay.storedWord, 8);
+  assert.equal(overlay.descriptor, 1);
+  assert.equal(overlay.descriptorSegment, 12);
+  assert.equal(overlay.loadedAddress, "100C:0020");
+  assert.equal(overlay.canonicalTarget, 528);
+  assert.deepEqual(overlay.formatTables.counts, { relocations: 1, descriptors: 2, overlays: 1, fixups: 1, trampolines: 1 });
+});
+
+test("target report assigns no target to an unrelocated far call and flags a raw analyzer address", t => {
+  const { dir, data, config } = overlayFixture(t);
+  data.writeUInt16LE(0, 6);
+  writeFileSync(join(dir, "source.bin"), data);
+  const path = join(dir, "config.json");
+  writeFileSync(path, JSON.stringify({ ...config, sha256: createHash("sha256").update(data).digest("hex"),
+    query: { site: 80, analyzerAddress: { segment: 12, offset: 32, evidence: "synthetic analyzer listing" } } }));
+  const result = run(["target", path]);
+  assert.equal(result.relocated, false);
+  assert.equal(result.target, null);
+  assert.equal(result.canonicalTarget, null);
+  assert.deepEqual(result.analyzer.matches, ["raw operand"]);
+  assert.match(result.analyzer.interpretation, /unrelocated/);
+});
+
+test("target report keeps a disagreeing analyzer address beside the derived chain", t => {
+  const { dir, config } = overlayFixture(t);
+  const path = join(dir, "config.json");
+  writeFileSync(path, JSON.stringify({ ...config, query: { site: 532, analyzerAddress: { segment: 0x2000, offset: 0x40, evidence: "synthetic analyzer listing" } } }));
+  const disagree = run(["target", path]);
+  assert.equal(disagree.analyzer.disagrees, true);
+  assert.equal(disagree.canonicalTarget, 528);
+  writeFileSync(path, JSON.stringify({ ...config, query: { site: 532, analyzerAddress: { segment: 0x2000, offset: 0, evidence: "synthetic analyzer listing" } } }));
+  assert.deepEqual(run(["target", path]).analyzer.matches, ["canonical target"]);
+});
+
+test("format controls reject tables whose counts differ before any query", t => {
+  const { dir, config } = overlayFixture(t);
+  assert.equal(prepare({ ...config, formatControls: { overlays: 1, fixups: 1, trampolines: 1 } }, dir).formatTables.controls.overlays, 1);
+  assert.throws(() => prepare({ ...config, formatControls: { fixups: 2 } }, dir), /fixups: expected 2, source tables yield 1/);
+  assert.throws(() => prepare({ ...config, formatControls: { segments: 1 } }, dir), /Unknown format control/);
+  assert.throws(() => prepare({ ...config, targetSelector: { descriptor: 0, trampoline: 288 } }, dir), /resident/);
+  assert.throws(() => prepare({ ...config, sourceKind: "synthetic-raw", formatControls: { fixups: 1 } }, dir), /only to mz sources/);
+  assert.throws(() => prepare({ ...config, formatTables: { counts: {} } }, dir), /cannot be supplied/);
+});
+
+test("overlay regions carry their overlay bounds so a narrower incoming search is partial", t => {
+  const { dir, config } = overlayFixture(t);
+  const path = join(dir, "config.json");
+  const narrow = { ...config, target: 528, controls: [532], searchRegions: ["overlay"],
+    regions: [config.regions[0], { ...config.regions[1], end: 540 }] };
+  writeFileSync(path, JSON.stringify(narrow));
+  const result = run(["incoming", path]);
+  assert.equal(result.partialSearch, true);
+  assert.deepEqual(result.coverage[0].unsearched, [{ start: 540, end: 560 }]);
+  writeFileSync(path, JSON.stringify({ ...narrow, regions: config.regions }));
+  assert.equal(run(["incoming", path]).partialSearch, false);
+});
+
+test('pointer inventory separates exact loaded pairs, aliases and unresolved mappings', t => {
+  const dir = mkdtempSync(join(tmpdir(), 'pointer-inventory-'));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const data = Buffer.alloc(512), w = (p,n) => data.writeUInt16LE(n,p);
+  data.write('MZ'); w(4,1); w(8,4); w(6,3); w(24,28);
+  for (const [table,site] of [[28,82],[32,98],[36,114]]) { w(table,site-64); w(table+2,0); }
+  w(80,32); w(82,1); w(96,48); w(98,0); w(112,0); w(114,50);
+  const path = join(dir,'config.json');
+  const config = { source:join(dir,'source.bin'), sourceKind:'mz',
+    sha256:createHash('sha256').update(data).digest('hex'), query:{segment:4097,offset:32}, controls:[82], limit:100 };
+  writeFileSync(config.source,data); writeFileSync(path,JSON.stringify(config));
+  const r = run(['pointers',path]);
+  assert.equal(r.target,112); assert.equal(r.counts.exactPair,1); assert.equal(r.counts.aliasedTarget,1);
+  assert.equal(r.exactPair[0].segmentOperandSite,82); assert.equal(r.aliasedTarget[0].segmentOperandSite,98);
+  assert.equal(r.exactPair[0].raw,1); assert.equal(r.aliasedTarget[0].raw,0);
+  assert.equal(r.counts.unresolved,1); assert.equal(r.negativeUsable,false);
+  writeFileSync(path,JSON.stringify({...config,limit:1}));
+  const capped=run(['pointers',path]); assert.equal(capped.truncated,true);
+  assert.equal(capped.exactPair.length+capped.aliasedTarget.length+capped.unresolved.length,1);
+  writeFileSync(path,JSON.stringify({...config,controls:[83]}));
+  assert.throws(()=>run(['pointers',path]),/positive control/);
+  writeFileSync(path,JSON.stringify({...config,query:{segment:4097,offset:33}}));
+  assert.equal(run(['pointers',path]).negativeUsable,false);
+  w(6,2); writeFileSync(config.source,data); config.sha256=createHash('sha256').update(data).digest('hex');
+  writeFileSync(path,JSON.stringify({...config,query:{segment:4097,offset:33}}));
+  const negative=run(['pointers',path]); assert.equal(negative.negativeUsable,true);
+  assert.equal(negative.counts.exactPair+negative.counts.aliasedTarget,0);
+  writeFileSync(path,JSON.stringify({...config,formatControls:{relocations:3}}));
+  assert.throws(()=>run(['pointers',path]),/Format control/);
+  // A pair whose loaded segment would pass FFFF is one unresolved row, not a failed inventory.
+  w(6,3); w(114,0xF000); writeFileSync(config.source,data); config.sha256=createHash('sha256').update(data).digest('hex');
+  writeFileSync(path,JSON.stringify(config));
+  const overflow=run(['pointers',path]);
+  assert.equal(overflow.counts.exactPair,1); assert.equal(overflow.negativeUsable,false);
+  assert.ok(overflow.unresolved.some(u=>u.site===114&&/FFFF/.test(u.reason)));
+});
+
+test('pointer inventory retains FBOV descriptor tokens and canonical trampolines', t => {
+  const {dir,config}=overlayFixture(t),path=join(dir,'pointer.json');
+  writeFileSync(path,JSON.stringify({...config,query:{segment:4108,offset:32},controls:[83,535]}));
+  const r=run(['pointers',path]);
+  assert.equal(r.target,528); assert.equal(r.exactPair.length,2);
+  const overlay=r.exactPair.find(p=>p.segmentOperandSite===535);
+  assert.equal(overlay.raw,8); assert.equal(overlay.descriptor,1);
+  assert.equal(Number(overlay.trampoline),288); assert.equal(Number(overlay.canonicalTarget),528);
+  writeFileSync(path,JSON.stringify({...config,sourceKind:'synthetic-raw',query:{segment:4108,offset:32}}));
+  assert.throws(()=>run(['pointers',path]),/requires source-derived/);
 });

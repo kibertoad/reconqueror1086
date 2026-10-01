@@ -80,7 +80,7 @@ action from
 [refurbished-dinosaurs-toolkit](https://github.com/kibertoad/refurbished-dinosaurs-toolkit),
 pinned to a full commit SHA, on every push to `main` and every pull request. It checks `spec/`,
 `parity/` and `deviations/` against the standard's list of
-[checks](upstream/documentation-standard.md#checks) (lines 782-833), compiles each `.ksy` file with
+[checks](upstream/documentation-standard.md#checks) (lines 787-838), compiles each `.ksy` file with
 the Kaitai Struct compiler, checks that every spec and deviation ID cited in `src/`, `tests/`, `tools/`
 exists and is not superseded, fails when `spec/index/` or `PARITY.md` is stale, and
 fails a `validated` row whose marked tests are not in `VALIDATION.md` as they are now. It
@@ -194,3 +194,32 @@ research, high-DPI/mixed-monitor capture characterization and optional release
 signing are outside this migration; no original-content import or signed release
 was performed. Local packaging was not repeated because the committed migration
 passed the platform-specific CI packaging acceptance above.
+
+The check also fails when a code comment gives an address that no entry the
+comment cites records, in its locations or text or in the evidence of an entry
+it cites. A neutral name (`fn_â€¦`, `g_â€¦`) is always an address. A plain `0xâ€¦`
+value is one only inside an image the job gives with the action's `images`
+input, so colours, masks and offsets are left alone; the template cannot know
+the original's image, so `ci.yml` only explains how to add it. Take the base
+and size from the finding that records them. A range larger than `max-range`
+(64 KiB by default), such as a whole section, records only its two ends, nothing
+inside it. When a
+comment fails, cite the finding that records the address, or write one.
+
+
+The pre-commit hook runs `tools/Invoke-NodeChecks.mjs --no-ksy` on the staged tree.
+Enable it with `git config core.hooksPath .githooks`. Local documentation checks
+read the checker inputs from the CI step; command-line options override them.
+
+## Latest upstream refresh verification (2026-10-01)
+
+`tools/Invoke-Validation.ps1` passed after adopting template 8d0eef35,
+rules ca39d075 and toolkit f8c51bfc. Build: no warnings or errors; .NET fast
+tests: 565 passed; executable specifications: 146 passed; Node synthetic
+tests: 67 passed; Python synthetic tests: 144 passed. Snapshot and reporter
+digests, section links, documentation, queue tracking, LE inventory metadata,
+repository policy and configuration checks passed. Kaitai compilation was
+skipped because no local compiler was available; CI retains that compilation.
+Long-running tests and installer packaging were not run for this tooling update.
+The validation runner supplies the vendored Python import path while preserving
+upstream test bytes and restores the previous environment afterward.

@@ -45,13 +45,19 @@ try {
     & (Join-Path $PSScriptRoot 'Test-TemplateInfrastructure.ps1') -RepositoryRoot $root
     if ($LASTEXITCODE -ne 0) { throw 'Infrastructure verification failed.' }
     & (Join-Path $PSScriptRoot 'Check-Documentation.ps1') -RepositoryRoot $root
+    Invoke-Node @('tools/Invoke-NodeChecks.mjs')
     Invoke-Node @('tools/upstream.mjs', 'links')
     Invoke-Node @('--test', 'tests/evidence/evidence.test.mjs', 'tests/evidence/vendor.test.mjs',
         'tests/evidence/bridge.test.mjs', 'tests/upstream/upstream.test.mjs', 'tests/upstream/narrative.test.mjs',
         'tests/upstream/gui-exit.test.mjs', 'tests/upstream/research-tracking.test.mjs',
         'tests/upstream/diagnostics.test.mjs', 'tests/upstream/memory-blocks.test.mjs',
         'tests/upstream/capture-window.test.mjs')
-    & python -B -m unittest discover -s tests/evidence -p 'test_*.py'
+    $previousPythonPath = $env:PYTHONPATH
+    try {
+        $env:PYTHONPATH = (Join-Path $root 'tools/evidence/x86-reporter') + [IO.Path]::PathSeparator + $previousPythonPath
+        & python -B -m unittest discover -s tests/evidence -p 'test_*.py'
+    }
+    finally { $env:PYTHONPATH = $previousPythonPath }
     if ($LASTEXITCODE -ne 0) { throw 'Synthetic x86 evidence tests failed.' }
     $build = @('--artifacts-path', $ArtifactsPath, "-maxCpuCount:$MaxCpuCount", '-nodeReuse:true', '-p:UseSharedCompilation=false', '-v:minimal')
     Invoke-Dotnet (@('build', 'Conqueror1086.slnx') + $build)

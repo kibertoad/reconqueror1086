@@ -1,19 +1,20 @@
 #!/usr/bin/env node
 // Explicit local-checkout adoption; never fetches or refreshes upstream rules.
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, realpathSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
-const files = ["NOTICE.md", "legacy-image.mjs", "report.mjs", "report.py", "requirements.txt",
-  "x86/__init__.py", "x86/image.py", "x86/machine.py", "x86/pe.py", "x86/reports.py", "x86/trace.py", "x86/values.py"];
+const files = ["NOTICE.md", "pointer-inventory.mjs", "legacy-image.mjs", "report.mjs", "report.py", "requirements.txt",
+  "x86/dispatch.py", "x86/__init__.py", "x86/pe.py", "x86/image.py", "x86/machine.py", "x86/reports.py", "x86/trace.py", "x86/values.py"];
 const mapping = [
   ...files.map(f => [`tools/evidence/${f}`, `tools/evidence/x86-reporter/${f}`]),
   ["LICENSE", "tools/evidence/x86-reporter/LICENSE"],
   ["docs/bounded-evidence-reporters.md", "docs/BOUNDED-EVIDENCE-REPORTERS.md"],
   ["tests/evidence/test_x86.py", "tests/evidence/test_x86.py"],
   ["tests/evidence/test_pe.py", "tests/evidence/test_pe.py"],
+  ["tests/evidence/test_dispatch.py", "tests/evidence/test_dispatch.py"],
   ["tests/evidence/bridge.test.mjs", "tests/evidence/bridge.test.mjs"],
 ];
 const hash = bytes => createHash("sha256").update(bytes).digest("hex");
@@ -49,7 +50,9 @@ export function adopt(checkout, base = root) {
   writeFileSync(resolve(base, "tools/evidence/x86-lock.json"), JSON.stringify(lock, null, 2) + "\n");
   return verify(base);
 }
-if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+// Node resolves symlinks for the entry module, so compare real paths; a mismatch would skip the check and exit 0.
+const invokedDirectly = (() => { try { return process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href; } catch { return false; } })();
+if (invokedDirectly) {
   try {
     const args = process.argv.slice(2);
     if (args.length === 1 && args[0] === "--check") console.log(`Reporter pin verified: ${verify().revision}`);

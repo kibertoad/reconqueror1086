@@ -694,3 +694,12 @@ Potential higher-powered-machine presentation work should be opt-in and observat
 The reactive finder of RULE-STRATEGY-003 is implemented inside the scheduler rather than supplied by the application. The full gate passes.
 
 The six-record player update, command construction, bootstrap, join/leave exchange, and field-record lifecycle are recovered and implemented. `OriginalStrategicPlayerMovementSlot` persists exact route/target, cursor, state-8, grid, cooldown, terrain, position, and direction state for five army records plus avatar slot 5. `AdvancePlayerMovementPass`, `AdvancePlayerPass`, `OriginalStrategicPlayerCommands` and `CreateForNewGame` implement RULE-STRATEGY-010, RULE-STRATEGY-012 and RULE-STRATEGY-013. The full gate passes. Next bind temporary force inputs, fixed updates and presentation, then activate schema 2 and remove the dated adapter.
+
+## Latest upstream adoption (2026-10-01)
+
+Owner-authorized update: template `8d0eef35ec8f3b1053ba1dd129a7bd75b044cf27`,
+Standard/Protocol `ca39d0750e67c8c3900e8554e66a84083fe67452`,
+and checker/reporters `f8c51bfc5d167c25a04f2b6ddb3f7390714dc45f`.
+Protocol and Methodology bytes are unchanged. This adoption supersedes the
+previous infrastructure baseline above. Game-specific LE coverage, identities,
+source contracts and evidence statuses are retained.
