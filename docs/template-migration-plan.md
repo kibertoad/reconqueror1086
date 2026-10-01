@@ -192,4 +192,5 @@ main after the title substitution. The reporter files and tests match their
 locked toolkit revision. All delta paths were reviewed: existing project
 plan/handover and validation are adapted rather than replaced by generic scaffold
 state; RNG/SAVE scaffolds are intentionally retained as this game's queues.
-Only the canonical push remains before this migration's delivery is complete.
+The reviewed migration is complete and ready for the explicitly authorized
+canonical push. Git is the authoritative remote synchronization record.

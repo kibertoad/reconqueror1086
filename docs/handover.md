@@ -4,8 +4,9 @@
 
 The documentation migration audit is closed; its requirements, evidence and
 upstream PRs are in [documentation-audit.md](documentation-audit.md).
-Template main e0325e0 is adopted. The reviewed file-data Standard/checker fixes
-are pinned while upstream review continues. Existing spec identities, evidence
+Template main 7b3bbe46 is adopted with website 82deb767, checker f5e62e08
+and reporter 7da1b93. Merged capture, queue and contested-reachability fixes
+are present; current snapshot contents match upstream main. Existing spec identities, evidence
 statuses, gameplay and package identities are preserved.
 
 ## Next work
@@ -22,10 +23,10 @@ and the parity rows; audit completion does not establish gameplay fidelity.
 
 ## Verification and local state
 
-The canonical fast gate, documentation/Kaitai, pinned bytes, source readiness,
+The 2026-10-01 canonical fast gate, documentation/Kaitai, pinned bytes,
 research tracking, coverage metadata, local links and changed workflow checks
 pass. See [VALIDATION.md](VALIDATION.md). Packaging was not rerun for this
-research-only batch.
+tooling-only migration.
 
 Post-commit audits found no confirmed task orphans. Original captures, source
 extraction and Ghidra artifacts remain ignored locally. Preserve unrelated
