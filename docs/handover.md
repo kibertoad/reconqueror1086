@@ -4,10 +4,10 @@
 
 The documentation migration audit is closed; its requirements, evidence and
 upstream PRs are in [documentation-audit.md](documentation-audit.md).
-Template main 7b3bbe46 is adopted with website 82deb767, checker f5e62e08
-and reporter 7da1b93. Merged capture, queue and contested-reachability fixes
-are present; current snapshot contents match upstream main. Existing spec identities, evidence
-statuses, gameplay and package identities are preserved.
+Template main 8d0eef35 is adopted with Standard/Protocol ca39d075 and
+checker/reporters f8c51bfc. Snapshot freshness matches current upstream main.
+The staged-tree pre-commit hook is enabled for this clone. Game identities,
+LE coverage adapters, gameplay and evidence statuses are preserved.
 
 ## Next work
 
@@ -23,11 +23,10 @@ and the parity rows; audit completion does not establish gameplay fidelity.
 
 ## Verification and local state
 
-The 2026-10-01 canonical fast gate, documentation/Kaitai, pinned bytes,
-research tracking, coverage metadata, local links and changed workflow checks
-pass. Full cross-platform CI and all installer acceptance jobs passed for
-f2ae877; see [VALIDATION.md](VALIDATION.md). The follow-up completeness audit
-found no migration blocker. Local packaging was not repeated.
+The 2026-10-01 canonical fast gate passed for the latest upstream refresh;
+see [VALIDATION.md](VALIDATION.md). Local Kaitai compilation was skipped because
+its compiler is unavailable; CI retains that check. Packaging and long-running
+tests were not repeated. No unfinished migration work remains.
 
 Post-commit audits found no confirmed task orphans. Original captures, source
 extraction and Ghidra artifacts remain ignored locally. Preserve unrelated
