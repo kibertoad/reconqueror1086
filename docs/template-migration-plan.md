@@ -66,12 +66,11 @@ The existing plan, architecture, validation guide, CI, importer and packaging
 were inspected. The pre-migration baseline had no `tools/project-config.json`
 and pinned the toolkit checker to `6e3cad31b6d61280a4649a873cf890377b402a75`.
 
-The owned build is documented in BLD-GOG-EN. That establishes build identity,
-but the reviewed material does not conclusively establish the latest official
-patch gate required by the template. Do not invent that provenance or set
-`patchStatusEstablished` to true without evidence. Investigate documentary
-provenance separately if needed; executable analysis stays blocked until the
-gate is established. Report any configuration check blocked by this fact.
+At the initial migration baseline, BLD-GOG-EN established build identity but
+latest-official-patch provenance was not yet established. That prerequisite
+was subsequently closed by SRC-PATCH-CATALOG and SOURCE-EDITIONS; the current
+`Verify-Configuration.ps1 -RequireAnalysisReady` passes. No migration blocker
+remains from that historical prerequisite.
 
 ## Acceptance and synthetic tests
 
@@ -194,3 +193,12 @@ plan/handover and validation are adapted rather than replaced by generic scaffol
 state; RNG/SAVE scaffolds are intentionally retained as this game's queues.
 The reviewed migration is complete and ready for the explicitly authorized
 canonical push. Git is the authoritative remote synchronization record.
+
+### Full acceptance audit
+
+The 2026-10-01 follow-up audit verified every changed template path and retained
+shared module against committed upstream. Full cross-platform CI and all installer
+jobs passed for f2ae877; [VALIDATION.md](VALIDATION.md#full-migration-acceptance-audit-2026-10-01)
+records exact acceptance coverage and limits. No migration blocker or pending
+acceptance remains. Historical source-provenance wording above is clarified, and
+the main implementation plan records the current adoption.

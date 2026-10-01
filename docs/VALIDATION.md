@@ -165,3 +165,32 @@ main. Workflow actionlint and `git diff --check` passed. Project configuration,
 installer GUID and signing wiring passed the canonical infrastructure check.
 Packaging was not rerun because this adoption changes research tooling/guidance
 and the documentation CI pin, with no packaging or gameplay changes.
+
+## Full migration acceptance audit (2026-10-01)
+
+[CI run 36799199015](https://github.com/kibertoad/reconqueror1086/actions/runs/36799199015)
+completed successfully for migration commit `f2ae8779f269235f4ffc8f735e2c7215774195d5`.
+Every job passed: documentation, Windows x64, Linux x64, macOS arm64/x64,
+Windows installer, Linux installer and macOS arm64/x64 installers. Platform
+jobs ran the canonical gate, assetless publish, media-boundary check and published
+entry-point smoke check. Windows also built the portable package and installer,
+installed it, checked shortcut/native-library layout, ran the native graphics
+diagnostic with explicitly provisioned software OpenGL, and uninstalled it.
+Linux checked Debian metadata, extracted layout and executable startup; macOS
+built both packages and checked their expanded executable payloads.
+
+The completeness audit compared every path in the template delta from e0325e0
+to 7b3bbe46 and checked all shared Ghidra/evidence modules. Changed capabilities
+are adopted; game-specific plan, validation, identities, LE adapter and populated
+queues are retained deliberately. The only shared adoption-tool difference is
+reporter file-list ordering; the same complete set is hash-verified. The section
+link tool retains command-scoped Git trust for this checkout. Original spec,
+parity, deviations and gameplay were unchanged by the migration.
+
+Strict analysis readiness, pinned bytes/reporter set, documentation/Kaitai,
+queue/coverage metadata, section links and workflow lint pass on the committed
+migration. No migration acceptance item remains open. Long-running gameplay
+research, high-DPI/mixed-monitor capture characterization and optional release
+signing are outside this migration; no original-content import or signed release
+was performed. Local packaging was not repeated because the committed migration
+passed the platform-specific CI packaging acceptance above.
