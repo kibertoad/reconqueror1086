@@ -111,9 +111,12 @@ The reporter scans every byte of the named `searchRegions` (all regions by
 default), including callers placed at higher addresses than the target's code. It separates relative
 calls, resident relocations and overlay fixups, preserves encoded descriptor
 words and resolved addresses, and distinguishes raw candidates from entry-path
-instructions. Aliases resolve by canonical target. Computed calls, unrelocated
-far calls and prefix-started raw candidates are excluded. Even a zero report
-covers only the declared domain.
+instructions. `confirmed` holds only calls reachable from accepted starts; a call
+reached only through a rejected overlapping start is listed under `contested`,
+counted in `counts.contested`, shares the result `limit`, and makes
+`negativeUsable` false. Aliases resolve by canonical target. Computed calls,
+unrelocated far calls and prefix-started raw candidates are excluded. Even a zero
+report covers only the declared domain.
 
 `dispatch` adds `dispatch.site`, `inputRegister`, `indexRegister`, up to 256 numeric
 `inputs`, `indexEvidence`, and `table` with `start`, `count`, `stride`, `width`,
@@ -245,7 +248,9 @@ limits are negative cases. The legacy 16-bit suite remains mandatory.
 
 Incoming queries follow established instruction entries, retaining overlaps as
 explicit unresolved boundary gaps. A raw E8 candidate inside another instruction
-is never a confirmed hit. The raw scan covers all selected declared regions,
+is never a confirmed hit. Confirmed means reachable from accepted starts: code
+reached only through a rejected start, including a call's return site, is
+`contested`, never confirmed, and `uses` reports its accesses as unverified. The raw scan covers all selected declared regions,
 including later callers; reached prefixed and indirect calls are also reported.
 Unknown calls have explicit gaps and fallthrough assumes they return. Narrower
 regions and exhausted budgets are partial scope, even with zero hits. There is
@@ -253,3 +258,70 @@ no universal call-completeness or native-reachability claim. PE indirect imports
 IAT trampolines, stored callables, exception dispatch and computed targets remain
 unresolved rather than guessed. This initial model implements bounded reports,
 not a solver, loader emulator or whole-program analysis.
+
+
+## Bounded string effects and saved flags
+
+MOVS/STOS/LODS report sequential memory accesses in segmented16 and flat32,
+with operand widths, source overrides, fixed ES destination and modular pointers.
+REP requires a concrete count. `stringIterations` bounds the entire query
+(default 4096, maximum 65536), including reserved iterations of paths that stop.
+Zero count touches no memory and needs no direction assumption. Address-size
+changes and REPNE forms stop with explicit gaps.
+
+DF begins unknown. CLD/STD establish local values; otherwise string effects fork
+conditional forward/backward cases tied to that producer. Optional
+`flags: { "direction": 0 }` (or 1) is a reported starting hypothesis, never native
+state evidence. PUSHF/POPF and their effective 32-bit forms restore arithmetic,
+direction and interrupt provenance only when the complete saved word remains
+intact in local memory. Corrupted words leave arithmetic predicates unresolved;
+DF/IF are extracted from the replacement word. CLI/STI have local flag effects
+only. Unknown returning call models invalidate DF/IF as well as arithmetic flags.
+
+These are memory effects, not pixels, timing or interrupt observations. External IRET,
+interrupt scheduling and hardware presentation remain unsupported. A stopped
+prefix does not establish the behavior of the full caller or helper.
+
+
+## Explicit overlapping entries and local flag-return frames
+
+A direct control-flow edge from an independently verified instruction can prove
+an interior target as an alternate reachable start. Reports retain that edge's
+`overlappingTarget` and `boundaryEvidence`, decode the other continuation too,
+and continue to reject conflicting declared entries and operand-byte raw hits
+without such an edge. A proven start also proves the instructions it falls
+through to or directly reaches, so an interior helper longer than one
+instruction keeps its boundaries. A call's return site is not proven this way,
+because the callee might not return. Every proving step must be reachable from
+the entries without passing through the start it proves. Once rejection settles,
+only instructions reachable from the accepted starts remain established; the
+rest of what rejected starts reached is returned as contested, so a call is
+never confirmed while its proof is refused. This does not prove native
+reachability or arbitrary self-modifying instruction layouts.
+
+An unprefixed segmented16 IRET is modeled only inside a traced push-CS/near-call
+frame built above a locally saved FLAGS word. Stack balance, continuation IP and
+CS are checked; FLAGS consumption uses the same intact/corrupt snapshot rules as
+POPF. This permits a local procedure's encoded flag-restoring continuation;
+it does not simulate an interrupt, privilege transition, asynchronous activity
+or hardware. Root/external IRET, PE32 IRET and unsupported prefixes stop with
+a named gap. Unknown stack aliases can invalidate the frame and stop the path;
+a supplied nonaliasing stack is a query hypothesis, not observed native state.
+
+
+## Instruction-owned segment operand query
+
+`operand` takes `query: { site, operandSite, targetOffset }` (file offsets for
+sites, a 16-bit field offset for targetOffset). It verifies an entry-path MOV or
+PUSH owns that complete 16-bit immediate, then reports instruction/operand
+locations, destination representation, raw token and source-derived MZ/FBOV
+membership. Declared mappings name the descriptor and mapped segment/address;
+undeclared words stay explicitly raw. Wrong widths, partial words, conflicting
+boundaries and mismatched source words fail. Traversal gaps remain separate;
+this query never establishes native reachability, pointer use or a caller's
+argument grouping. Use the ordinary hash-guarded source loader, not supplied
+relocation guesses. The original ten commands remain available.
+
+Effect summaries retain string-operation and flag write/assumption/save/restore
+and local-IRET events alongside ordered writes, so the direction provenance is
+visible in an effects query as well as a full trace.

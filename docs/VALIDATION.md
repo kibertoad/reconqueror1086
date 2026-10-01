@@ -138,3 +138,30 @@ Conqueror-specific `Check-Coverage.mjs`. These enforce structural consistency;
 they do not prove complete research or promote a spec/parity status. The changed
 CI workflow passes actionlint. Packaging and platform installers were not
 rerun for this research-only audit; their prior migration results remain above.
+## Current capture contract
+
+The selected client is rendered with PrintWindow full-content rendering; no
+desktop fallback is permitted. Capture workers have a configurable deadline
+and are stopped on timeout. Physical client pixels are measured in a temporary
+per-monitor DPI context, restored afterwards. Schema-two metadata records
+client size rather than desktop geometry. A failed frame rejects and removes
+the entire checkpoint. Synthetic worker tests cover a stalled UI thread,
+recovery, and right/bottom edge retention with a DPI-unaware caller. Higher-DPI
+and mixed-monitor behavior remains unconfirmed locally.
+
+## Upstream migration verification (2026-10-01)
+
+The canonical fast gate passed after full template `7b3bbe46`, website
+`82deb767`, checker `f5e62e08` and reporter `7da1b93` adoption. It compiled the
+Kaitai definitions, checked queues, inventory metadata and exact upstream bytes,
+ran the Node and Python suites (including worker timeout/DPI capture acceptance),
+built the solution with zero warnings/errors, and passed xUnit and executable
+specifications. The Kaitai archive matched the toolkit SHA-256 before use.
+The gate used portable PowerShell 7 and synthetic data; no original game ran.
+
+`node tools/upstream.mjs check-upstream` confirmed that all pinned snapshot
+contents match current main, including byte-identical checker content on toolkit
+main. Workflow actionlint and `git diff --check` passed. Project configuration,
+installer GUID and signing wiring passed the canonical infrastructure check.
+Packaging was not rerun because this adoption changes research tooling/guidance
+and the documentation CI pin, with no packaging or gameplay changes.

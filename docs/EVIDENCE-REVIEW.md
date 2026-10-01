@@ -29,7 +29,9 @@ resident code retain relocation provenance; for overlays retain descriptor,
 fixup and trampoline provenance. Equivalent runtime aliases share a canonical
 file target. See [evidence tools](EVIDENCE-TOOLS.md). Toolkit PR #11 permits file
 offsets for MZ overlays; COM, NE, PE, LE, LX and ELF executable locations still
-require addresses. Unknown formats require a standard decision, not a guessed
+require addresses for code. Executable bytes read as data use `kind: file-data`
+and a bounded file offset; `unpacked: true` selects the unpacked file only for
+packed executable data. Such locations cannot establish a Code ranges row. Unknown formats require a standard decision, not a guessed
 checker exception. Packed files use their declared unpacked format.
 
 A function entry and an analyzer body are leads. Follow reachable instructions,

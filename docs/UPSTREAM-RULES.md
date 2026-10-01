@@ -77,15 +77,15 @@ ZIP download, initialize a repository with `git init` before validating; the
 non-ignored files are then visible as untracked. There is no recursive-copy
 fallback that would reintroduce ignored local content.
 
-## Audit fixes under upstream review
+## Merged audit fixes and current adoption
 
-The executable file-data location extension is pinned to Standard PR
-[28](https://github.com/kibertoad/refurbished-dinosaurs/pull/28) and toolkit PR
-[20](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/pull/20). Those
-reviewable commits distinguish shipped metadata offsets from code addresses;
-they do not waive location bounds or alter Standard v1 evidence statuses.
-Selected-window capture isolation is submitted in template PR
-[35](https://github.com/kibertoad/refurbished-dinosaurs-template/pull/35).
-
-Queue tracking is submitted in template PR
-[36](https://github.com/kibertoad/refurbished-dinosaurs-template/pull/36).
+The snapshots use website main `82deb767ab64ca9922bb6347d66d9856b7640e91`
+and checker `f5e62e083eda1aac202695682f8299dc681e4fd4`. Standard PRs 28-30
+and toolkit PRs 20-21 are merged: executable file-data offsets remain bounded,
+and a Code ranges finding must contain a code location in that build and file.
+Template main `7b3bbe46b251b163ee02a6539ac0d81559dbe921` includes the merged
+selected-window capture and queue-tracking fixes (PRs 35-36).
+The independent instruction-reporter pin is toolkit
+`7da1b93cdd9ac0d59dbaf82b66b4db95d578ab9d` (PR 22), including contested
+reachability and overlap-proof regressions. Only accepted reachable starts
+support confirmed results; contested paths cannot support a negative search.

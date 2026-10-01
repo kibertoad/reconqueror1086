@@ -14,12 +14,12 @@ that every parity row is validated. The plan remains at Survey.
 | Working documentation links | EVIDENCE-TOOLS exists; project narrative, workflow, queue and coverage file links resolve. Standard section links pass the pinned link checker. |
 | Validation and legal boundary | The canonical fast gate passes with Kaitai compilation, synthetic reporter/tooling regressions, the solution build, xUnit and executable specifications. No gameplay code, evidence statuses or proprietary bytes were added by the migration. |
 
-Shared defects found by the audit are submitted for review:
+Shared defects found by the audit are now merged upstream:
 
 - [Standard PR 28](https://github.com/kibertoad/refurbished-dinosaurs/pull/28)
   and [toolkit PR 20](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/pull/20)
   distinguish physical executable file-data locations from loaded code addresses.
-  Their reviewed branch commits are pinned locally pending upstream review.
+  The merged revisions are pinned locally; see [UPSTREAM-RULES.md](UPSTREAM-RULES.md).
 - [Template PR 35](https://github.com/kibertoad/refurbished-dinosaurs-template/pull/35)
   captures the selected client and rejects blank or unsupported results without
   sampling an occluding application's desktop pixels.

@@ -2,7 +2,8 @@
 from copy import deepcopy
 from capstone.x86 import X86_OP_IMM, X86_OP_REG, X86_OP_MEM
 from .image import integer
-from .machine import State, StopPath, ordinary, predicate, REGISTERS, ALIASES
+from .machine import (State, StopPath, ordinary, predicate, REGISTERS, ALIASES, string_instruction, string_count,
+                      string_effect, check_string_form)
 from .values import const, unknown, sources, op, Value
 
 # Synonymous and complementary branches on one flag producer share a single assumption.
@@ -29,6 +30,7 @@ def call_target(image, site, ins):
 
 
 OVERLAP_REASON = "overlapping entry-path instructions; boundary unresolved"
+CONTESTED_REASON = "reached only through a rejected overlapping start"
 
 
 def unsupported_transfer(image, ins):
@@ -41,6 +43,9 @@ def unsupported_transfer(image, ins):
 def walk(image, entries, limit=10000):
     integer(limit, 1, 100000, "instruction limit")
     pending, seen, gaps, edges = list(entries), {}, [], []
+    # Decoded successors of each instruction, so a proof can be checked for independence below.
+    # A call's return site is reached only if the callee returns, so it never proves an overlapping start.
+    successors, returns = {}, set()
     while pending:
         at = pending.pop()
         if at in seen:
@@ -53,6 +58,7 @@ def walk(image, entries, limit=10000):
             gaps.append({"site": at, "reason": "undecoded or unmapped edge"})
             continue
         seen[at] = ins
+        successors[at] = following_sites = []
         m, following = ins.mnemonic, at + ins.size
         if unsupported_transfer(image, ins):
             gaps.append({"site": at, "reason": "unsupported control-transfer frame encoding"})
@@ -66,23 +72,85 @@ def walk(image, entries, limit=10000):
                 gaps.append({"site": at, "reason": provenance.get("reason", "target outside declared regions")})
             else:
                 pending.append(target)
+                following_sites.append(target)
             if m in ("jmp", "ljmp"):
                 continue
         if m in ("int", "int3", "into", "hlt", "in", "out", "insb", "insw", "outsb", "outsw"):
             gaps.append({"site": at, "reason": "hardware or interrupt boundary"})
             continue
+        if m in ("call", "lcall") and following not in following_sites:
+            returns.add((at, following))
         pending.append(following)
+        following_sites.append(following)
     # An entry into another instruction is not a verified boundary. Retain both
     # interpretations as gaps rather than choosing whichever was visited first.
-    active, conflicts = [], set()
+    active, conflicts, pairs = [], set(), []
     for start, end in sorted((at, at + ins.size) for at, ins in seen.items()):
         active = [(a, b) for a, b in active if b > start]
         for a, b in active:
             conflicts.update((a, start))
+            pairs.append((a, start))
         active.append((start, end))
-    for at in sorted(conflicts):
-        gaps.append({"site": at, "reason": OVERLAP_REASON})
+    # A start is verified when it overlaps nothing, or when a verified instruction
+    # reaches it by a direct edge or by falling through (other than a call's return
+    # site). Each proving step must be reachable from the entries without passing
+    # through the start it proves, so raw candidates and conflicting declared
+    # entries never prove themselves. Rejected starts are excluded and the proof
+    # repeated until nothing changes.
+    rejected, reach = set(), {}
+
+    def reachable(inner=None):
+        # Instructions reachable from the entries without passing through inner or a rejected start.
+        if inner not in reach:
+            stack, visited = [x for x in entries if x != inner and x not in rejected], set()
+            while stack:
+                at = stack.pop()
+                if at in visited or at == inner or at in rejected or at not in successors:
+                    continue
+                visited.add(at)
+                stack.extend(successors[at])
+            reach[inner] = visited
+        return reach[inner]
+
+    def independent(site, inner):
+        return site in reachable(inner)
+
+    while True:
+        reach.clear()
+        verified = {at for at in seen if at not in conflicts and at not in rejected}
+        frontier = list(verified)
+        while frontier:
+            at = frontier.pop()
+            for target in successors[at]:
+                if ((at, target) not in returns and target in seen and target not in verified
+                        and target not in rejected and independent(at, target)):
+                    verified.add(target)
+                    frontier.append(target)
+        unresolved = {at for pair in pairs if pair[1] not in verified for at in pair}
+        if unresolved <= rejected:
+            break
+        rejected |= unresolved
+    # Only what the accepted starts reach is established. An instruction reached only
+    # through a rejected start leaves seen with it, so no report confirms what the proof
+    # above refused to count; it is returned as contested instead of being lost.
+    # The reach cache still holds the final rejected set, as the last pass added nothing.
+    established = reachable()
+    contested = {}
+    for at in sorted(seen):
+        if at in established:
+            continue
+        if at not in unresolved:
+            contested[at] = seen[at]
         del seen[at]
+    # Mark each direct edge from a surviving site that proves a surviving overlapping start.
+    overlapping = {inner for _, inner in pairs} - unresolved
+    for e in edges:
+        if (e["target"] in overlapping and e["site"] in seen and e["site"] in verified
+                and independent(e["site"], e["target"])):
+            e["overlappingTarget"] = True
+            e["boundaryEvidence"] = "direct edge from an independently verified instruction"
+    for at in sorted(unresolved):
+        gaps.append({"site": at, "reason": OVERLAP_REASON})
     intervals = sorted((at, at + ins.size) for at, ins in seen.items())
     undecoded = []
     for r in image.regions:
@@ -95,7 +163,7 @@ def walk(image, entries, limit=10000):
             cursor = max(cursor, end)
         if cursor < r["end"]:
             undecoded.append({"start": cursor, "end": r["end"], "region": r["name"]})
-    return seen, gaps, edges, undecoded
+    return seen, gaps, edges, undecoded, contested
 
 
 def snapshot(state):
@@ -135,8 +203,18 @@ def trace(image, config):
     pending, outputs, global_gaps = [State(entry, image, config)], [], []
     created = 1
     total_steps = 0
+    total_string_steps = 0
+    string_limit = integer(config.get("stringIterations", 4096), 0, 65536, "string iteration budget")
     total_limit = integer(config.get("totalSteps", 20000), 1, 100000, "totalSteps")
     checkpoints = set(config.get("checkpoints", []))
+
+    def string_step(s, ins, count):
+        # Reserve iterations only when they fit, so a rejected request never drains the shared budget.
+        nonlocal total_string_steps
+        remaining = string_limit - total_string_steps
+        if count.number is not None and count.number <= remaining:
+            total_string_steps += count.number
+        string_effect(s, ins, count, remaining)
 
     def finish(s, reason=None, returned=False):
         outputs.append({"returned": returned, "stop": reason, "stopSite": None if returned else s.at, "steps": s.steps,
@@ -164,12 +242,48 @@ def trace(image, config):
                 if at in checkpoints:
                     state.event("checkpoint", registers=snapshot(state))
                 m, following = ins.mnemonic, at + ins.size
-                if 0xf2 in ins.prefix or 0xf3 in ins.prefix:
+                is_string = string_instruction(ins)
+                if (0xf2 in ins.prefix or 0xf3 in ins.prefix) and not is_string:
                     raise StopPath("repeat prefix requires a separate bounded string-operation reading")
                 if 0x66 in ins.prefix and (m in ("call", "lcall", "ret", "retf", "jmp", "ljmp") or m.startswith("j")):
                     raise StopPath("Operand-size control transfer override is outside the selected frame model")
                 if image.flat and m in ("lcall", "ljmp"):
                     raise StopPath("Far transfer is outside the PE32 flat model")
+                if is_string:
+                    # Unsupported forms stop once, before any direction split.
+                    check_string_form(state, ins)
+                    count = string_count(state, ins)
+                    direction = state.direction_flag
+                    if count.number and direction.number is None and count.number <= string_limit - total_string_steps:
+                        key = repr(("direction", direction.term))
+                        if key in state.assumptions:
+                            state.direction_flag = const(state.assumptions[key], 1, at)
+                            state.event("flag-assumption", flag="DF", value=state.direction_flag.report(), producer=direction.report(),
+                                        evidence="conditional outcome of one unresolved direction producer")
+                        else:
+                            # Like a branch, the last case reuses this state, so a path limit never drops it.
+                            for choice in (0, 1):
+                                if choice == 0:
+                                    if created >= max_paths:
+                                        global_gaps.append({"site": at, "reason": "path limit at unknown direction flag"})
+                                        continue
+                                    child = deepcopy(state); created += 1
+                                else:
+                                    child = state
+                                child.assumptions[key] = choice
+                                child.direction_flag = const(choice, 1, at)
+                                child.event("flag-assumption", flag="DF", value=child.direction_flag.report(), producer=direction.report(),
+                                            evidence="conditional outcome of one unresolved direction producer")
+                                if child is not state:
+                                    try:
+                                        string_step(child, ins, count)
+                                        child.at = following
+                                        pending.append(child)
+                                    except StopPath as error:
+                                        finish(child, str(error))
+                    string_step(state, ins, count)
+                    state.at = following
+                    continue
                 if m in ("call", "lcall"):
                     target, provenance = call_target(image, at, ins)
                     indirect_value = None
@@ -214,9 +328,10 @@ def trace(image, config):
                             for r in REGISTERS:
                                 if r not in model.get("preserves", []) and r not in ("esp", "cs"):
                                     child.regs[r] = unknown(f"modeled-call:{at}:{r}", ALIASES[r][2], at)
-                            child.memory.clear()
-                            child.memory_epoch += 1
+                            child.clear_memory()
                             child.forget_flags()
+                            child.direction_flag = unknown(f"modeled-call:{at}:DF:{child.flag_serial}", 1, at)
+                            child.interrupt_flag = unknown(f"modeled-call:{at}:IF:{child.flag_serial}", 1, at)
                             for r, n in case.get("registers", {}).items():
                                 child.setreg(r, const(n, ALIASES[r][2], at), at)
                             child.conditional.append({"site": at, "evidence": model["evidence"],
@@ -238,13 +353,40 @@ def trace(image, config):
                     if m == "lcall":
                         state.push(state.reg("cs"))
                     state.push(const(return_ip, image.bits, at))
+                    flags_frame = False
+                    if push_cs:
+                        # Inspect the word above CS without reporting a read the program never made.
+                        try:
+                            flags_word = state.peek(state.segment("ss"), op("add", state.reg(state.sp), const(4, 16), at), 2)
+                            flags_frame = (16, flags_word.term) in state.saved_flags
+                        except StopPath:
+                            flags_frame = False
                     state.frames.append({"entry": target, "sp": state.reg(state.sp), "returnBytes": 4 if m == "lcall" or push_cs else image.bits // 8,
                                          "frameSource": "push-CS/near-call; matching far return required" if push_cs else m,
                                          "continuation": following, "returnIP": return_ip, "callSite": at,
-                                         "callerCS": state.reg("cs")})
+                                         "callerCS": state.reg("cs"), "localFlagsFrame": flags_frame})
                     if m == "lcall":
                         state.setreg("cs", const(target_region["segment"], 16, at), at)
                     state.at = target
+                    continue
+                if m in ("iret", "iretd"):
+                    if image.flat or 0x66 in ins.prefix or m != "iret":
+                        raise StopPath("IRET requires an unprefixed segmented16 local frame")
+                    frame = state.frames[-1]
+                    if len(state.frames) == 1 or not frame.get("localFlagsFrame"):
+                        raise StopPath("IRET requires a traced local push-CS call above saved FLAGS")
+                    if state.reg(state.sp).term != frame["sp"].term:
+                        raise StopPath("IRET stack balance differs from the local call")
+                    actual_ip, actual_cs = state.pop(2), state.pop(2)
+                    if actual_ip.number != frame["returnIP"] or actual_cs.term != frame["callerCS"].term:
+                        raise StopPath("IRET return target or segment was overwritten or unresolved")
+                    state.setreg("cs", actual_cs, at)
+                    state.restore_flags(16)
+                    state.event("local-iret", continuation=frame["continuation"],
+                                interpretation="local stack/flags transfer only; no interrupt or hardware simulation")
+                    state.frames.pop()
+                    state.event("call-return", callSite=frame["callSite"], registers=snapshot(state), modeled=False)
+                    state.at = frame["continuation"]
                     continue
                 if m in ("ret", "retf"):
                     if image.flat and m == "retf":
@@ -336,5 +478,5 @@ def trace(image, config):
             finish(state, str(error))
     return {"paths": outputs, "gaps": global_gaps,
             "completeWithinModel": not global_gaps and bool(outputs) and all(p["returned"] for p in outputs),
-            "nativeReachability": "unconfirmed", "stepsUsed": total_steps,
+            "nativeReachability": "unconfirmed", "stepsUsed": total_steps, "stringIterationsUsed": total_string_steps,
             "limits": {"steps": max_steps, "paths": max_paths, "depth": max_depth}}

@@ -20,8 +20,8 @@ only the lines the link gives, and never a section already read this session.
 2. **Pick one item** from `queue/<AREA>.md`, or a few about the same entry,
    within the areas your goal claims (an item is taken only if every entry it
    names is in one of them; to take another area, add it to the goal's scope
-   first, only if no other goal file claims it, and commit that on the working
-   branch; push only when explicitly requested). Read the entries it names, their Open questions sections and any
+   first, only if no other goal file claims it, and get that onto the main
+   branch). Read the entries it names, their Open questions sections and any
    `Tried:` note. Take up an item that has a `Tried:` note only with something
    that attempt did not have: new evidence, a new tool, or a reading nobody
    has tried. If that second attempt ends in the same place, move the item to
@@ -47,7 +47,7 @@ only the lines the link gives, and never a section already read this session.
    claim-relevant checks and synthetic examples in `docs/EVIDENCE-REVIEW.md`
    before treating a reading as complete; these add no statuses or schema.
 4. **Gather evidence statically**: data files, then a static reading
-   (procedure in `docs/ghidra.md`). Settle statically whatever a static
+   (procedure in `docs/GHIDRA.md`). Settle statically whatever a static
    reading can settle, even where a run could too. Keep neutral names
    (`fn_00478CD0`) until evidence shows what a thing does. Keep decompiler
    output, listings and dumps in ignored local storage, and read bounded
@@ -128,7 +128,10 @@ only the lines the link gives, and never a section already read this session.
    checked to decode as a call; a dispatch table finding reads how the input
    becomes an index and what bounds it. An `offset` into overlay code lies
    inside a row of its build's Code ranges section, whose finding shows the
-   range holds code. A procedure keeps each call a later decision depends on
+   range holds code with a location that is not `kind: file-data`. Bytes of an
+   executable read as data are located with `kind: file-data` and an `offset`
+   (plus `unpacked: true` for bytes the unpacker writes outside the load image),
+   never to keep code out of the Code ranges check. A procedure keeps each call a later decision depends on
    as its own step, says what a rejected or abandoned call leaves in place,
    and marks with `# visible:` comments where a change becomes visible to
    other actors. An entry that depends on any of those needs
@@ -151,7 +154,9 @@ only the lines the link gives, and never a section already read this session.
    and `docs/RUNTIME.md` allows a run, add an `Agent run` or `Live session`
    item for the experiment that would confirm it; where no run is possible,
    say in the entry's Open questions which observation of the original would
-   confirm it, so that a tester's capture can later.
+   confirm it, so that a tester's capture can later, ending that bullet with
+   `(No item: no run possible)`. Every Open questions bullet cites its item or
+   carries such an exemption with its reason.
    Remove the `Spec gap (Q-...)` note of every item you closed.
 7. **Keep the check passing, and change nothing else outside `spec/`,
    `queue/` and `tools/`:**

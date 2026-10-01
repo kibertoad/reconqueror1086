@@ -6,7 +6,7 @@ const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 // These are immutable external rules or generic workflow examples, not claims
 // about this game's spec. The snapshots are checked by upstream.mjs instead.
 const examples = new Set(['docs/goals/README.md', 'docs/live-sessions/README.md',
-  'docs/reports/README.md', 'docs/CUSTOMIZATION.md', 'docs/BOUNDED-EVIDENCE-REPORTERS.md']);
+  'docs/reports/README.md', 'docs/SPEC-ENTRY-TEMPLATES.md', 'docs/CUSTOMIZATION.md', 'docs/BOUNDED-EVIDENCE-REPORTERS.md']);
 function files(path) {
   if (!existsSync(path)) return [];
   return readdirSync(path, { withFileTypes: true }).flatMap(entry => {

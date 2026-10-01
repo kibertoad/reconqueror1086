@@ -14,7 +14,7 @@ if not (TOOLS / "x86").exists():
 sys.path.insert(0, str(TOOLS))
 from x86.image import Image
 from x86.reports import run_report
-from x86.trace import trace
+from x86.trace import trace, walk, OVERLAP_REASON, CONTESTED_REASON
 from x86.values import const, unknown, op, extract, resize
 
 
@@ -558,6 +558,238 @@ class ReporterTests(unittest.TestCase):
             self.assertEqual(result.returncode, 1)
             self.assertIn("baseline", result.stderr)
 
+
+
+    def test_string_direction_paths_and_explicit_hypothesis(self):
+        code = "b0 07 b9 03 00 bf 00 01 f3 aa c3"
+        for direction, offsets in ((0, [256,257,258]), (1, [256,255,254])):
+            result = report(code, flags={"direction":direction}, registers={"es":0x2000})
+            self.assertTrue(result["completeWithinModel"])
+            self.assertEqual([e["offset"]["value"] for e in events(result,"write")], offsets)
+            self.assertEqual(result["paths"][0]["registers"]["cx"]["value"],0)
+        result=report(code, registers={"es":0x2000})
+        self.assertEqual(len(result["paths"]),2)
+        self.assertEqual(sorted(p["registers"]["di"]["value"] for p in result["paths"]),[253,259])
+        self.assertEqual(len(events(result,"flag-assumption")),2)
+
+    def test_string_zero_unknown_and_budget(self):
+        result=report("b9 00 00 bf 00 01 f3 aa c3")
+        self.assertTrue(result["completeWithinModel"])
+        self.assertFalse(events(result,"write"))
+        self.assertFalse(events(result,"flag-assumption"))
+        for code, options, reason in (("f3 aa c3",{},"count unresolved"),
+                ("b9 03 00 f3 aa c3",{"stringIterations":2},"budget exhausted"),
+                ("67 aa c3",{},"Address-size"), ("f2 aa c3",{},"REPNE")):
+            result=report(code,flags={"direction":0},**options)
+            self.assertFalse(result["completeWithinModel"])
+            self.assertIn(reason,result["paths"][0]["stop"])
+            self.assertFalse(events(result,"write"))
+
+    def test_string_repetition_keeps_register_terms_and_budget_bounded(self):
+        # Many 16-bit pointer updates must not nest the unknown upper register halves.
+        result=report("f3 aa c3",flags={"direction":0},registers={"es":0x2000,"di":0,"cx":4096})
+        self.assertTrue(result["completeWithinModel"])
+        self.assertEqual(result["paths"][0]["registers"]["di"]["value"],4096)
+        # A direction case that cannot fit the budget reserves nothing, so later zero counts still complete.
+        result=report("b9 03 00 bf 00 01 f3 aa b9 00 00 f3 aa c3",stringIterations=5,registers={"es":0x2000})
+        self.assertEqual(sorted(p["returned"] for p in result["paths"]),[False,True])
+        result=report("f2 aa c3")
+        self.assertEqual(len(result["paths"]),1)
+        self.assertFalse(events(result,"flag-assumption"))
+
+    def test_direction_split_at_path_limit_keeps_the_current_path(self):
+        result=report("b9 03 00 bf 00 01 f3 aa c3",registers={"es":0x2000},maxPaths=1)
+        self.assertEqual(len(result["paths"]),1)
+        self.assertTrue(result["paths"][0]["returned"])
+        self.assertEqual(result["gaps"][0]["reason"],"path limit at unknown direction flag")
+        self.assertEqual(result["stringIterationsUsed"],3)
+
+    def test_sse_movsd_is_not_a_string_operation(self):
+        # The modrm/displacement ends in A5; it must not fabricate a string copy.
+        result=report("f2 0f 10 46 a5 c3",flags={"direction":0})
+        self.assertFalse(result["completeWithinModel"])
+        self.assertFalse(events(result,"string-operation"))
+        self.assertFalse(events(result,"write"))
+
+    def test_local_flags_frame_check_reports_no_read(self):
+        result=report("0e e8 01 00 c3 cb","memory",registers={"ss":0x9000,"sp":0x8000})
+        self.assertTrue(result["completeWithinModel"])
+        self.assertEqual([e["role"] for e in events(result,"read")],["pop","pop"])
+
+    def test_string_overlap_is_sequential_and_source_override_distinct(self):
+        result=report("c6 06 00 01 01 c6 06 01 01 02 c6 06 02 01 03 be 00 01 bf 01 01 b9 02 00 fc f3 a4 a0 02 01 c3",
+                      registers={"ds":0x2000,"es":0x2000})
+        self.assertEqual(result["paths"][0]["registers"]["al"]["value"],1)
+        result=report("36 f3 a4 c3",flags={"direction":0},registers={"cx":1,"si":256,"di":512,"ss":0x4000,"ds":0x2000,"es":0x3000})
+        self.assertEqual(events(result,"read")[0]["segment"]["value"],0x4000)
+        self.assertEqual(events(result,"write")[0]["segment"]["value"],0x3000)
+
+    def test_string_operand_width_and_pointer_wrap(self):
+        result=report("66 f3 ab c3",flags={"direction":0},registers={"eax":0x11223344,"cx":2,"di":256,"es":0x2000})
+        self.assertEqual([e["width"] for e in events(result,"write")],[4,4])
+        self.assertEqual(result["paths"][0]["registers"]["di"]["value"],264)
+        result=report("fc aa aa c3",registers={"di":65535,"es":0x2000})
+        self.assertEqual([e["offset"]["value"] for e in events(result,"write")],[65535,0])
+        result=report("fd ac c3",registers={"si":0,"ds":0x2000})
+        self.assertEqual(result["paths"][0]["registers"]["si"]["value"],65535)
+        self.assertEqual(len(events(result,"read")),1)
+
+    def test_saved_flags_restore_direction_and_arithmetic_producer(self):
+        result=report("fd 9c fc b9 03 00 bf 00 01 f3 aa 9d aa c3",registers={"ss":0x9000,"sp":0x8000,"es":0x2000})
+        restore=events(result,"flags-restore")[0]
+        self.assertTrue(restore["intactLocalSnapshot"])
+        self.assertEqual(restore["direction"]["value"],1)
+        self.assertEqual(result["paths"][0]["registers"]["di"]["value"],258)
+        code=Code().emit("31 c0 39 c0 9c 83 f8 01 9d").branch("75","bad").emit("c3").label("bad").emit("b8 01 00 c3")
+        result=report(code,registers={"ss":0x9000,"sp":0x8000})
+        self.assertEqual(len(result["paths"]),1)
+        self.assertEqual(result["paths"][0]["registers"]["ax"]["value"],0)
+
+    def test_saved_flags_corruption_cannot_restore_snapshot(self):
+        result=report("9c 89 e3 36 c7 07 00 04 9d aa c3",registers={"ss":0x9000,"sp":0x8000,"es":0x2000,"di":256})
+        restore=events(result,"flags-restore")[0]
+        self.assertFalse(restore["intactLocalSnapshot"])
+        self.assertEqual(restore["direction"]["value"],1)
+        self.assertEqual(result["paths"][0]["registers"]["di"]["value"],255)
+
+    def test_modeled_call_invalidates_direction(self):
+        result=report("fc e8 00 10 aa c3",registers={"di":256,"es":0x2000},callModels=[{
+            "site":1,"evidence":"synthetic unknown returning service","preserves":["edi","es"],"cases":[{}]}])
+        self.assertEqual(len(result["paths"]),2)
+        self.assertEqual(sorted(p["registers"]["di"]["value"] for p in result["paths"]),[255,257])
+
+
+    def test_explicit_edge_proves_overlapping_iret_and_restores_caller_direction(self):
+        code=Code().emit("fd 9c fc b8 00").label("iret").emit("cf 0e").label("call").branch("e8","iret").emit("aa c3")
+        result=report(code,registers={"ss":0x9000,"sp":0x8000,"es":0x2000,"di":256})
+        self.assertTrue(result["completeWithinModel"])
+        self.assertEqual(result["paths"][0]["registers"]["di"]["value"],255)
+        self.assertEqual(len(events(result,"local-iret")),1)
+        effects=report(code,"effects",registers={"ss":0x9000,"sp":0x8000,"es":0x2000,"di":256})
+        self.assertEqual(len(events(effects,"flags-restore")),1)
+        self.assertEqual(len(events(effects,"string-operation")),1)
+        self.assertEqual(events(result,"flags-restore")[0]["direction"]["value"],1)
+        incoming=report(code,"incoming",target=code.labels["iret"])
+        self.assertIn(code.labels["call"],[e["site"] for e in incoming["confirmed"]])
+        self.assertFalse(any("overlapping" in g["reason"] for g in incoming["gaps"]))
+        self.assertTrue(incoming["confirmed"][0]["overlappingTarget"])
+        self.assertIn("independently verified",incoming["confirmed"][0]["boundaryEvidence"])
+
+    def test_overlapping_entry_cannot_prove_itself_through_its_own_path(self):
+        # Declared entry 1 (jmp 5) overlaps mov ax at 0; the only edge back to 1 is the jmp at 5, reached only from 1.
+        data = bytes.fromhex("b8 eb 02 c3 00 eb fa")
+        cfg = configuration(data, target=1)
+        cfg["regions"][0]["entries"] = [0, 1]
+        r = run_report(data, cfg, "incoming")
+        self.assertEqual({g["site"] for g in r["gaps"] if "overlapping" in g["reason"]}, {0, 1})
+        self.assertFalse(any(e.get("overlappingTarget") for e in r["confirmed"]))
+
+    def test_proven_overlapping_start_carries_its_proof_through_fall_through(self):
+        # The call proves helper (nop); the IRET after it is still inside the MOV immediate and has no edge of its own.
+        code=Code().emit("9c c7 06 00 02").label("helper").emit("90 cf 0e").label("call").branch("e8","helper").emit("c3")
+        incoming=report(code,"incoming",target=code.labels["helper"])
+        self.assertFalse(any("overlapping" in g["reason"] for g in incoming["gaps"]))
+        self.assertEqual([e["site"] for e in incoming["confirmed"]],[code.labels["call"]])
+        self.assertTrue(incoming["confirmed"][0]["overlappingTarget"])
+        operand=report(code,"operand",query={"site":1,"operandSite":5})
+        self.assertEqual(operand["rawToken"],"CF90")
+        # Fall-through from a conflicting declared entry proves nothing.
+        data=bytes.fromhex("b8 90 90 c3")
+        cfg=configuration(data,target=3)
+        cfg["regions"][0]["entries"]=[0,1]
+        result=run_report(data,cfg,"incoming")
+        self.assertEqual({g["site"] for g in result["gaps"] if "overlapping" in g["reason"]},{0,1,2})
+        # A call reached only through a rejected entry proves nothing once that entry is rejected.
+        data=bytes.fromhex("b8 eb 08 90 c7 06 00 02 90 c3 c3 e8 fa ff c3")
+        cfg=configuration(data,target=8)
+        cfg["regions"][0]["entries"]=[0,1]
+        result=run_report(data,cfg,"incoming")
+        self.assertEqual({g["site"] for g in result["gaps"] if "overlapping" in g["reason"]},{0,1,4,8,9})
+
+    def test_call_return_site_does_not_prove_an_overlapping_start(self):
+        # The helper jumps into the call's rel16 and never returns, so the RET after the call is never a start.
+        code=Code().emit("90").label("call").emit("e8 05 00 c3 90 90 90 90").label("helper").emit("eb f8")
+        result=report(code,"incoming",target=code.labels["helper"])
+        self.assertEqual({g["site"] for g in result["gaps"] if "overlapping" in g["reason"]},{1,3,4})
+
+    def test_call_reached_only_through_rejected_start_is_contested_not_confirmed(self):
+        # Entries 0 (mov ax) and 1 (nop) conflict; the call at 3 is reached from both but from no accepted start.
+        data=bytes.fromhex("b8 90 90 e8 04 00 c7 06 00 02 90 c3 c3")
+        cfg=configuration(data,target=10,controls=[])
+        cfg["regions"][0]["entries"]=[0,1]
+        result=run_report(data,cfg,"incoming")
+        self.assertEqual(result["confirmed"],[])
+        self.assertEqual([(e["site"],e["classification"]) for e in result["contested"]],[(3,CONTESTED_REASON)])
+        self.assertEqual(result["counts"]["contested"],1)
+        self.assertFalse(result["negativeUsable"])
+        # No confirmed call vouches for a callee the proof left as gaps.
+        overlap={g["site"] for g in result["gaps"] if g["reason"]==OVERLAP_REASON}
+        self.assertEqual(overlap,{0,1,2,6,10,11})
+        self.assertFalse(any(e["target"] in overlap for e in result["confirmed"]))
+        seen,_,_,undecoded,contested=walk(Image(data,cfg),[0,1])
+        self.assertEqual((sorted(seen),sorted(contested)),([],[3,12]))
+        self.assertEqual(undecoded,[{"start":0,"end":len(data),"region":"synthetic"}])
+
+    def test_jump_target_of_rejected_entry_is_contested(self):
+        # Entry 1 (jmp 5) overlaps entry 0 (mov ax); the self-call at 5 is reached only through entry 1.
+        data=bytes.fromhex("b8 eb 02 c3 90 e8 fd ff")
+        cfg=configuration(data,target=5)
+        cfg["regions"][0]["entries"]=[0,1]
+        result=run_report(data,cfg,"incoming")
+        self.assertEqual(result["confirmed"],[])
+        self.assertEqual([e["site"] for e in result["contested"]],[5])
+        self.assertEqual(result["sections"]["relative"],[])
+        limited=run_report(data,{**cfg,"limit":1,"controls":[]},"incoming")
+        self.assertEqual(len(limited["contested"]),1)
+
+    def test_pruned_instruction_cannot_keep_proving_an_overlapping_start(self):
+        # The jmp at 5 is the only proof of the nop at 11 inside entry 7's MOV immediate; it is
+        # reached only through rejected entry 1, so 11 fails, which in turn rejects entry 7.
+        data=bytes.fromhex("b8 eb 02 c3 90 eb 04 c7 06 00 02 90 c3 c3 c3")
+        cfg=configuration(data)
+        cfg["regions"][0]["entries"]=[0,1,7,14]
+        seen,gaps,edges,_,contested=walk(Image(data,cfg),[0,1,7,14])
+        self.assertEqual({g["site"] for g in gaps if g["reason"]==OVERLAP_REASON},{0,1,7,11,12})
+        self.assertEqual(sorted(seen),[14])
+        self.assertEqual(sorted(contested),[3,5,13])
+        self.assertFalse(any(e.get("overlappingTarget") for e in edges))
+
+    def test_local_iret_requires_saved_frame_and_unmodified_return(self):
+        code=Code().emit("0e").branch("e8","iret").emit("c3").label("iret").emit("cf")
+        result=report(code,registers={"ss":0x9000,"sp":0x8000})
+        self.assertIn("saved FLAGS",result["paths"][0]["stop"])
+        for bytes_,reason in (("cf","traced local"),("66 cf","unprefixed")):
+            result=report(bytes_)
+            self.assertIn(reason,result["paths"][0]["stop"])
+        code=Code().emit("9c 0e").branch("e8","callee").emit("c3").label("callee").emit("89 e3 36 c7 07 00 00 cf")
+        result=report(code,registers={"ss":0x9000,"sp":0x8000})
+        self.assertIn("overwritten",result["paths"][0]["stop"])
+
+    def test_local_iret_corrupted_flags_do_not_restore_old_producer(self):
+        code=Code().emit("fc 9c 0e").branch("e8","callee").emit("aa c3").label("callee").emit("89 e3 36 c7 47 04 00 04 cf")
+        result=report(code,registers={"ss":0x9000,"sp":0x8000,"es":0x2000,"di":256})
+        self.assertTrue(result["completeWithinModel"])
+        self.assertFalse(events(result,"flags-restore")[0]["intactLocalSnapshot"])
+        self.assertEqual(result["paths"][0]["registers"]["di"]["value"],255)
+
+
+    def test_operand_query_verifies_instruction_membership_and_raw_mapping(self):
+        for code,site,word,representation in (("b8 34 12 c3",0,1,"register immediate"),
+                ("c7 06 00 02 34 12 c3",0,4,"stored word"),("68 34 12 c3",0,1,"pushed word")):
+            query={"site":site,"operandSite":word,"targetOffset":10}
+            result=report(code,"operand",query=query,relocations=[{"site":word,"raw":0x1234,"segment":0x2234,"descriptor":None,"evidence":"synthetic relocation"}])
+            self.assertEqual(result["rawToken"],"1234")
+            self.assertEqual(result["loadedAddress"],"2234:000A")
+            self.assertEqual(result["representation"],representation)
+            unresolved=report(code,"operand",query=query)
+            self.assertFalse(unresolved["relocated"])
+            self.assertNotIn("loadedAddress",unresolved)
+        for code,query in (("b8 34 12 c3",{"site":1,"operandSite":2}),
+                ("b8 34 12 c3",{"site":0,"operandSite":2}),
+                ("66 b8 34 12 00 00 c3",{"site":0,"operandSite":2})):
+            with self.assertRaises(ValueError):report(code,"operand",query=query)
+        for query in ([0,1],"site"):
+            with self.assertRaisesRegex(ValueError,"object"):report("b8 34 12 c3","operand",query=query)
 
 if __name__ == "__main__":
     unittest.main()

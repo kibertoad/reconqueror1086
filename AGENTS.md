@@ -100,9 +100,9 @@ require explicit authorization.
 
 ## Template workflow
 
-The infrastructure follows template main e0325e0b063735e94b7e3ac94b0b8b89d0a38a79
-and toolkit checker revision 42ee3d64797dc1abcc7a5da527445ece79c534b5 (PR 20).
-The instruction reporter remains pinned to 926e287a4134512d59fe021efe6507c933da03f1. Existing project
+The infrastructure follows template main 7b3bbe46b251b163ee02a6539ac0d81559dbe921
+and toolkit checker revision f5e62e083eda1aac202695682f8299dc681e4fd4 (PRs 20 and 21).
+The instruction reporter remains pinned to 7da1b93cdd9ac0d59dbaf82b66b4db95d578ab9d. Existing project
 identities and importer paths are intentional adaptations. Before any executable
 analysis, `tools/Verify-Configuration.ps1 -RequireAnalysisReady` must pass; the
 latest public official patch status is established by SRC-PATCH-CATALOG and the
@@ -343,7 +343,11 @@ finding that a function has no other callers checks the analyzer's list with
 a second search that does not depend on function boundaries, and one about a
 dispatch table reads how the input becomes an index and what bounds it before
 naming which input selects which entry. An `offset` into overlay code lies
-wholly inside a row of its build's Code ranges section.
+wholly inside a row of its build's Code ranges section. Bytes in an executable
+that are read as data are located with `kind: file-data` and an `offset` into
+the shipped file; bytes the unpacker writes outside the load image add
+`unpacked: true` and use an offset into the unpacked file. A file-data location
+never locates code and cannot support a Code ranges row.
 
 Unidentified functions, globals, fields, and scripts keep neutral names
 (`fn_00478CD0`, `g_004C1F20`, `unk_2A`) until a finding or experiment shows what

@@ -151,5 +151,45 @@ research requirements without claiming those questions are answered.
 Shared defects are submitted upstream: Standard PR 28 and toolkit PR 20 for
 executable file-data locations, template PR 35 for isolated client capture, and
 template PR 36 for queue tracking. The reviewed Standard/checker branch
-commits are pinned explicitly while those PRs await review. No evidence-status
+commits were initially pinned while those PRs awaited review; the current
+adoption below uses their merged revisions. No evidence-status
 promotion or gameplay change follows from this audit.
+
+## Current upstream migration (2026-10-01)
+
+Owner scope: adopt latest website, template and toolkit changes fully, then
+push the verified result to canonical main. Target remains this repository only.
+
+Reviewed template delta: `e0325e0` to `7b3bbe46b251b163ee02a6539ac0d81559dbe921`.
+Website snapshots: `82deb767ab64ca9922bb6347d66d9856b7640e91`.
+Checker/CI: `f5e62e083eda1aac202695682f8299dc681e4fd4`.
+Reporter: `7da1b93cdd9ac0d59dbaf82b66b4db95d578ab9d`.
+
+| Capability | Adoption and acceptance evidence |
+|---|---|
+| Executable file-data locations | Atomic snapshot refresh, checker/CI pins, agent guidance, research skill and spec-entry templates; verify digests, links and documentation gate. |
+| Overlap proofs and contested reachability | Adopt reporter files, documentation and synthetic Python/Node regressions together through sync-x86; verify lock and canonical gate. |
+| Research queues | Adopt committed template parser and regressions; retain alphanumeric area support and local coverage check. Gate checks every existing queue. |
+| Selected-window capture | Adopt timeout-isolated capture workers, physical DPI-aware sizing, full-content rendering and atomic failed-checkpoint cleanup with both template acceptance tests. Retain project title and runtime limits. |
+| Validation and project identity | Preserve Conqueror solution, importer, package identities, LE adapter and canonical gate; template queue/reporter/capture checks are wired into it. |
+| Guidance and handover | Adopt current workflow semantics and entry templates, regenerate section links, replace pending-review provenance with merged revisions. |
+
+The local template checkout has an unrelated unfinished merge. Adoption reads
+its verified committed origin/main, leaving that checkout untouched. Generic
+RNG/SAVE queue scaffolds do not replace this game's existing area queues.
+No gameplay, evidence status or original-content change is authorized by this
+migration. Acceptance is the complete canonical fast gate, relevant synthetic
+configuration/capture tests, final delta review and a verified canonical push.
+Packaging identities and installer logic are retained; no release is published.
+
+### Verification outcome
+
+The canonical fast gate and workflow lint passed on 2026-10-01; the dated
+[validation record](VALIDATION.md#upstream-migration-verification-2026-10-01)
+names the checks and platform limits. Snapshot freshness matches current upstream
+main content. Capture, queue checker and their tests match committed template
+main after the title substitution. The reporter files and tests match their
+locked toolkit revision. All delta paths were reviewed: existing project
+plan/handover and validation are adapted rather than replaced by generic scaffold
+state; RNG/SAVE scaffolds are intentionally retained as this game's queues.
+Only the canonical push remains before this migration's delivery is complete.

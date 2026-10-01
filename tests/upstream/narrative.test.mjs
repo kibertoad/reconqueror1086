@@ -18,6 +18,7 @@ test('narrative claims are checked without treating pinned examples as game clai
   put('spec/rules/old.md', `---\nid: ${old}\nstatus: superseded\nsuperseded_by: [${active}]\n---\n`);
   put('docs/upstream/documentation-standard.md', missing);
   put('docs/live-sessions/README.md', missing);
+  put('docs/SPEC-ENTRY-TEMPLATES.md', missing);
   put('docs/current.md', active);
   assert.deepEqual(checkNarrative(root), []);
   const deviation = ['DEV', 'DATA', '001'].join('-');
