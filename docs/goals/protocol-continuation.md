@@ -12,7 +12,7 @@ completion of one batch does not complete the objective.
 ## Scope
 
 Areas: project planning, Survey reconciliation, BLD-GOG-EN build inventory, RES inventory findings, formats and queue planning, and shared research tooling.
-Current Survey claim: Q-RES-015 / FMT-RES-013, using the current entry title
+Current Survey claim: Q-RES-016 / FMT-RES-014, using the current entry title
 and file list rather than a copied filename-family label.
 Batches: research and its tooling only. Select concrete Survey research areas
 and record their claims here before changing their entries or queue items.
@@ -29,18 +29,20 @@ None known.
 
 ## Handover
 
-- Stage: Survey. Latest research remains FND-RES-018, FMT-RES-001 and FMT-RES-002.
-  Q-RES-014 is closed; Q-RES-157 remains Static. Q-RES-015 was not taken up yet.
-- Completed tooling: d516817 enforces narrative references in the shared staged
-  check list. The invalid handover citation is corrected; GAP-010 is recorded.
-- Last checks: 2026-10-02 targeted synthetic regressions and full canonical fast
-  gate with Kaitai 0.11 passed. See docs/VALIDATION.md. No parity status changed.
-- Tooling baseline: engine 0.9.1 and toolkit adoption b91cd758.
-- Unfinished: none from this tooling batch. No original file was opened or program
+- Stage: Survey. Latest research: FND-RES-019 / FMT-RES-013.
+  Q-RES-015 is closed; Q-RES-158 through Q-RES-163 remain Static.
+- Last checks: 2026-10-02 documentation regeneration/check with Kaitai 0.11,
+  narrative references, research tracking, coverage metadata and repository policy
+  passed. Complete XXH3/measurement/reconstruction witnesses passed. No parity
+  validation is claimed. See docs/VALIDATION.md.
+- Tooling baseline: engine 0.9.1 and toolkit adoption b91cd758. The full canonical
+  fast gate passed on 2026-10-02 for the preceding tooling batch; research did
+  not repeat it.
+- Unfinished: none from this batch. GAP-006 has a follow-up. No original program
   ran. Audits found no confirmed repository orphans; reusable MSBuild workers
   remain. This session made local commits only.
 - Blockers: none known.
-- Next: Q-RES-015 / FMT-RES-013 and manual-screen reconciliation, then consumer
-  questions Q-RES-124 through Q-RES-157. Inspect the current entry's file list
+- Next: Q-RES-016 / FMT-RES-014 and manual-screen reconciliation, then consumer
+  questions Q-RES-124 through Q-RES-163. Inspect the current entry's file list
   before assigning a family label. Rules snapshots remain unchanged unless the
   owner requests their refresh. Gameplay remains outside this goal's scope.
