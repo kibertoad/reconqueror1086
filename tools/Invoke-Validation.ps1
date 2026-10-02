@@ -48,8 +48,8 @@ try {
     & (Join-Path $PSScriptRoot 'Check-Documentation.ps1') -RepositoryRoot $root
     Invoke-Node @('tools/Invoke-NodeChecks.mjs')
     Invoke-Node @('tools/upstream.mjs', 'links')
-    Invoke-Node @('--test', 'tests/evidence/evidence.test.mjs', 'tests/evidence/vendor.test.mjs',
-        'tests/evidence/bridge.test.mjs', 'tests/upstream/upstream.test.mjs', 'tests/upstream/narrative.test.mjs',
+    Invoke-Node @('--test', 'tests/evidence/evidence.test.mjs', 'tests/evidence/packages.test.mjs',
+        'tests/upstream/upstream.test.mjs', 'tests/upstream/narrative.test.mjs',
         'tests/upstream/gui-exit.test.mjs', 'tests/upstream/research-tracking.test.mjs',
         'tests/upstream/diagnostics.test.mjs', 'tests/upstream/memory-blocks.test.mjs',
         'tests/upstream/capture-window.test.mjs')
@@ -58,13 +58,9 @@ try {
     if (-not $env:PWSH) { $env:PWSH = [Diagnostics.Process]::GetCurrentProcess().MainModule.FileName }
     try { Invoke-Node @('--test', 'tests/upstream/offline-validation.test.mjs') }
     finally { $env:PWSH = $previousPwsh }
-    $previousPythonPath = $env:PYTHONPATH
-    try {
-        $env:PYTHONPATH = (Join-Path $root 'tools/evidence/x86-reporter') + [IO.Path]::PathSeparator + $previousPythonPath
-        & python -B -m unittest discover -s tests/evidence -p 'test_*.py'
-    }
-    finally { $env:PYTHONPATH = $previousPythonPath }
-    if ($LASTEXITCODE -ne 0) { throw 'Synthetic x86 evidence tests failed.' }
+    $python = if ($env:EVIDENCE_PYTHON) { $env:EVIDENCE_PYTHON } else { 'python' }
+    & $python -B -c "import importlib.metadata as m; assert m.version('scientific-method-engine') == '0.4.0'; assert m.version('capstone') == '5.0.7'"
+    if ($LASTEXITCODE -ne 0) { throw 'Install the pinned engine with python -m pip install --require-hashes -r requirements-evidence.txt.' }
     $build = @('--artifacts-path', $ArtifactsPath, "-maxCpuCount:$MaxCpuCount", '-nodeReuse:true', '-p:UseSharedCompilation=false', '-v:minimal')
     if ($NoRestore) {
         Write-Host 'NoRestore: using existing restore state for this checkout; no restore fallback.'

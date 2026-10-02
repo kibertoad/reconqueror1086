@@ -22,8 +22,8 @@ game files: the tests build their inputs from synthetic data, except the tests d
 [Tests against the original](#tests-against-the-original), which skip without them.
 
 The gate needs the .NET 10 SDK, Node.js 22 or newer, Python 3.12 or newer and the
-pinned Capstone dependency on `PATH`. Install the Python dependency with
-`python -m pip install -r tools/evidence/x86-reporter/requirements.txt`. CI runs
+locked toolkit packages. Run `npm ci --ignore-scripts` and
+`python -m pip install --require-hashes -r requirements-evidence.txt` before validation. CI runs
 the same gate in `.github/workflows/ci.yml` on every push to `main` and every pull request.
 
 The default fast gate excludes `Category=LongRunning`. Use `-TestFilter` to narrow
@@ -242,3 +242,22 @@ infrastructure suites passed, together with the two new gate regressions.
 Local Kaitai compilation remains skipped because its compiler is unavailable.
 No original assets, gameplay changes or evidence-status promotions are involved.
 This verifies the NoRestore batch, not the unfinished package migration.
+
+## Toolkit package adoption verification (2026-10-02)
+
+The complete canonical fast gate passed with NoRestore after migrating the
+checker and reporters to reader 0.2.0, checker 0.1.0 and engine 0.4.0. Project
+configuration preserves rule snapshot bytes and npm/Python locks. Regressions
+exercise wrapper forwarding, synthetic return behavior, source hash rejection,
+manifest/integrity/installed-version/action drift, CI checker argument forwarding
+and the packaged Ghidra memory-block helper. The synthetic before/after report
+retains every prior field and value; the new engine adds caller/site and
+return-flow observations. No original source is used.
+
+Rules freshness verified ca39d075 against current website main with unchanged
+bytes. The Python requirements use release-distribution hashes for the engine
+and Capstone, and the npm lock records package distribution integrity. Toolkit
+copy-only tests are removed because the package publisher runs them before release;
+project integration tests remain in the canonical gate. Local Kaitai compilation
+is skipped because the compiler is unavailable. The shared .NET resource migration
+and final template/package acceptance audit are still outstanding.

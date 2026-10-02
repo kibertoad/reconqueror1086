@@ -100,9 +100,12 @@ require explicit authorization.
 
 ## Template workflow
 
-The infrastructure follows template main 8d0eef35ec8f3b1053ba1dd129a7bd75b044cf27
-and toolkit checker revision f8c51bfc5d167c25a04f2b6ddb3f7390714dc45f (current main).
-The instruction reporter is pinned to f8c51bfc5d167c25a04f2b6ddb3f7390714dc45f. Existing project
+The current infrastructure migration targets template main 79d18a20cb4d97c7153e74e5695cbb80e7ebf73e
+and toolkit main 0b4694df7edb621c19171dd79718458378c811a2. Toolkit dependencies
+are pinned in package-lock.json and requirements-evidence.txt; the adoption record
+is tools/toolkit-packages.json. Install them before validation with
+`npm ci --ignore-scripts` and
+`python -m pip install --require-hashes -r requirements-evidence.txt`. Existing project
 identities and importer paths are intentional adaptations. Before any executable
 analysis, `tools/Verify-Configuration.ps1 -RequireAnalysisReady` must pass; the
 latest public official patch status is established by SRC-PATCH-CATALOG and the

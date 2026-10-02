@@ -52,7 +52,8 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.12'
-      - run: python -m pip install -r tools/evidence/x86-reporter/requirements.txt
+      - run: npm ci --ignore-scripts
+      - run: python -m pip install --require-hashes -r requirements-evidence.txt
       - name: Run canonical fast validation
         shell: pwsh
         run: ./tools/Invoke-Validation.ps1
@@ -89,9 +90,10 @@ jobs:
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22
+      - run: npm ci --ignore-scripts
       - name: Verify pinned offline tooling
         run: node tools/upstream.mjs verify
-      - uses: kibertoad/refurbished-dinosaurs-toolkit/actions/check-documentation@f8c51bfc5d167c25a04f2b6ddb3f7390714dc45f # zizmor: ignore[stale-action-refs]
+      - uses: kibertoad/refurbished-dinosaurs-toolkit/actions/check-documentation@0b4694df7edb621c19171dd79718458378c811a2 # zizmor: ignore[stale-action-refs]
 
       - name: Check narrative references
         run: node tools/Check-NarrativeReferences.mjs

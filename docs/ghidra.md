@@ -173,3 +173,15 @@ $env:JAVA_TOOL_OPTIONS = '-XX:ErrorFile="' + $diagnosticRoot + '/hs_err_pid%p.lo
 Restore the prior `JAVA_TOOL_OPTIONS` after the task. JVM diagnostics may contain
 original memory and local environment data; ignore and repository-policy checks
 keep them local even if force-staged.
+
+## Shared script package
+
+Install the locked engine with
+`python -m pip install --require-hashes -r requirements-evidence.txt`.
+`python -m scientific_method_engine ghidra-scripts` prints the directory of
+shared headless scripts, including function inventory and memory-block reports.
+Pass that directory and the local `tools/ghidra` directory to Ghidra's
+`-scriptPath`, separated by `;`. The local directory retains the LE mapper,
+source description, jump-table helper and guarded edition/version-tracking
+exports. Common helper copies have been removed; their packaged counterparts
+provide the same inventory safety and bounded memory-map selection.

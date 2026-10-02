@@ -1,6 +1,6 @@
 #!/bin/sh
 # Runs the node checks of the fast gate (tools/Invoke-NodeChecks.mjs, which
-# tools/Invoke-Validation.ps1 also runs) before a commit, so a spec, queue or reporter-pin problem
+# tools/Invoke-Validation.ps1 also runs) before a commit, so a spec, queue or dependency problem
 # fails here instead of in CI. The documentation check runs with --no-ksy, so .ksy compilation is
 # left to the gate and CI. Enable once per clone with:
 #   git config core.hooksPath .githooks
@@ -19,5 +19,7 @@ staged=$(mktemp -d)
 trap 'rm -rf "$staged"' EXIT
 trap 'exit 1' HUP INT TERM
 git checkout-index --all --prefix="$staged/"
+# Restore the staged dependency lock from the local npm cache; no install scripts or network.
+npm ci --prefix "$staged" --ignore-scripts --offline --no-audit --no-fund
 export GIT_DIR="$git_dir" GIT_WORK_TREE="$staged"
 node "$staged/tools/Invoke-NodeChecks.mjs" --no-ksy

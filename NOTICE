@@ -4,12 +4,12 @@ https://github.com/kibertoad/refurbished-dinosaurs-template
 Revision: 3e8805ea474c60e7c3234213a108cb85a9e86265
 License retained in vendor/template/LICENSE.
 
-The documentation checker and bounded evidence reporter were adopted from:
+The documentation checker, executable reader and instruction engine are dependencies from:
 
 https://github.com/kibertoad/refurbished-dinosaurs-toolkit
-Revision: c2b21ee62fc404391e8dcfafd7029185f81241a9
-Copyright (c) 2026 Igor Savin.
-Licenses retained in vendor/LICENSE and tools/evidence/x86-reporter/LICENSE.
+Copyright (c) 2026 Igor Savin. MIT license retained in docs/licenses/scientific-method-MIT.txt.
+Exact npm and Python release pins and distribution hashes are in package-lock.json
+and requirements-evidence.txt; tools/toolkit-packages.json records the upstream adoption.
 
 The Standard, Methodology and work protocol have their source revision and
 digests recorded in tools/upstream-lock.json, and license in docs/upstream/LICENSE.

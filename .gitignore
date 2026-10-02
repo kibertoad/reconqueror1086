@@ -63,3 +63,6 @@ __pycache__/
 hs_err_pid*.log
 replay_pid*.log
 *.hprof
+
+# Installed toolkit packages are restored from package-lock.json.
+node_modules/

@@ -1,7 +1,7 @@
-import { verify as verifyReporter } from "../../tools/evidence/sync-x86.mjs";
+import { verifyToolkitPackages } from "../../tools/Verify-ToolkitPackages.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, cpSync, rmSync, existsSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, cpSync, rmSync, existsSync, symlinkSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import { resolve, dirname } from "node:path";
@@ -16,13 +16,14 @@ const lock = JSON.parse(readFileSync(resolve(root, "tools/upstream-lock.json")))
 function fixture(t) {
   const dir = mkdtempSync(resolve(tmpdir(), "v1-snapshot-"));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
-  for (const path of [...lock.files.map(f => f.path), "tools/upstream-lock.json", ".github/workflows/ci.yml"]) {
+  for (const path of [...lock.files.map(f => f.path), "tools/upstream-lock.json", ".github/workflows/ci.yml", "tools/toolkit-packages.json", "package.json", "package-lock.json", "requirements-evidence.txt"]) {
     mkdirSync(dirname(resolve(dir, path)), { recursive: true }); cpSync(resolve(root, path), resolve(dir, path));
   }
+  symlinkSync(resolve(root, "node_modules"), resolve(dir, "node_modules"), "junction");
   return dir;
 }
-test("pinned bytes and active CI action agree offline", () => assert.equal(verifySnapshot(root).standardVersion, 1));
-test("edited source or checker is rejected before execution", t => {
+test("pinned rule bytes verify offline independently of package adoption", () => assert.equal(verifySnapshot(root).standardVersion, 1));
+test("edited rule source is rejected before execution", t => {
   const dir = fixture(t); writeFileSync(resolve(dir, lock.files[0].path), "edited");
   assert.throws(() => verifySnapshot(dir), /digest mismatch/);
 });
@@ -35,9 +36,9 @@ test("v2, duplicate mappings, traversal, short commits and inconsistent revision
 });
 test("CI drift is rejected", t => {
   const dir = fixture(t), path = resolve(dir, ".github/workflows/ci.yml");
-  const sha = lock.files.find(f => f.path.includes("check-documentation")).revision;
+  const sha = JSON.parse(readFileSync(resolve(root, "tools/toolkit-packages.json"))).revision;
   writeFileSync(path, readFileSync(path, "utf8").replace(sha, "b".repeat(40)));
-  assert.throws(() => verifySnapshot(dir), /CI checker revision/);
+  assert.throws(() => verifyToolkitPackages(dir), /CI checker revision/);
 });
 test("local runs take the checker inputs the CI step gives", () => {
   const step = `      - uses: kibertoad/refurbished-dinosaurs-toolkit/actions/check-documentation@${"a".repeat(40)}\n`;
@@ -59,19 +60,19 @@ test("docs passes CI's images to the checker, and a command-line value wins", as
   writeFileSync(resolve(dir, "src/Bad.cs"), "// The entry point is at 0x00401000.\nclass Bad {}\n");
   const run = (...args) => main(["docs", "--check", "--no-ksy", ...args], dir);
   assert.equal(await run(), 0);
-  writeFileSync(ci, readFileSync(ci, "utf8").replace(/(check-documentation@[0-9a-f]{40}.*\n)/, "$1        with:\n          images: 0x00400000..0x004C9000\n"));
+  writeFileSync(ci, readFileSync(ci, "utf8").replace(/(check-documentation@[0-9a-f]{40}[^\n]*\n)/, "$1        with:\n          images: 0x00400000..0x004C9000\n"));
   assert.notEqual(await run(), 0);
   assert.equal(await run("--images", ""), 0);
 });
 test("refresh stages exact explicit revisions and rejects lost v1 declaration or failed download", async () => {
-  const rules = "a".repeat(40), toolkit = "b".repeat(40);
+  const rules = "a".repeat(40);
   const fetcher = async url => Buffer.from(url.endsWith("documentation-standard.md") ? "follows version 1" : "synthetic");
-  const result = await prepareSnapshot(rules, toolkit, fetcher);
-  assert.equal(result.staged.length, 6); validateLock(result.lock);
-  assert.equal(result.lock.files.at(-1).revision, toolkit);
-  await assert.rejects(prepareSnapshot("main", toolkit, fetcher), /full/);
-  await assert.rejects(prepareSnapshot(rules, toolkit, async () => Buffer.from("version 2")), /Standard v1/);
-  await assert.rejects(prepareSnapshot(rules, toolkit, async () => { throw Error("offline"); }), /offline/);
+  const result = await prepareSnapshot(rules, fetcher);
+  assert.equal(result.staged.length, 4); validateLock(result.lock);
+  assert.equal(result.lock.files.at(-1).revision, rules);
+  await assert.rejects(prepareSnapshot("main", fetcher), /full/);
+  await assert.rejects(prepareSnapshot(rules, async () => Buffer.from("version 2")), /Standard v1/);
+  await assert.rejects(prepareSnapshot(rules, async () => { throw Error("offline"); }), /offline/);
   verifySnapshot(root);
 });
 test("freshness distinguishes unchanged bytes, changed content and unavailable network", async t => {
@@ -87,14 +88,14 @@ test("freshness distinguishes unchanged bytes, changed content and unavailable n
   await assert.rejects(checkUpstream(dir, async () => { throw Error("network unavailable"); }), /network unavailable/);
   verifySnapshot(dir);
 });
-test("project configuration preserves upstream and reporter bytes and licenses", t => {
+test("project configuration preserves rule snapshots and dependency locks", t => {
   const dir = fixture(t);
   copyWorkingTree(root, dir);
   // Upstream currently has no replaceable tokens. Make the scratch snapshots
   // sensitive to configuration without changing the real pinned files.
   const scratchLockPath = resolve(dir, "tools/upstream-lock.json");
   const scratchLock = JSON.parse(readFileSync(scratchLockPath));
-  for (const path of ["docs/upstream/documentation-standard.md", "vendor/LICENSE"]) {
+  for (const path of ["docs/upstream/documentation-standard.md", "docs/upstream/LICENSE"]) {
     const target = resolve(dir, path);
     const bytes = Buffer.concat([readFileSync(target), Buffer.from("\n{{DISPLAY_NAME}}\n")]);
     writeFileSync(target, bytes);
@@ -102,16 +103,9 @@ test("project configuration preserves upstream and reporter bytes and licenses",
   }
   writeFileSync(scratchLockPath, JSON.stringify(scratchLock));
   verifySnapshot(dir);
-  const reporterLockPath = resolve(dir, "tools/evidence/x86-lock.json");
-  const reporterLock = JSON.parse(readFileSync(reporterLockPath));
-  for (const path of ["tools/evidence/x86-reporter/NOTICE.md", "docs/BOUNDED-EVIDENCE-REPORTERS.md"]) {
-    const target = resolve(dir, path);
-    const bytes = Buffer.concat([readFileSync(target), Buffer.from("\n{{DISPLAY_NAME}}\n")]);
-    writeFileSync(target, bytes);
-    reporterLock.files.find(f => f.path === path).sha256 = createHash("sha256").update(bytes).digest("hex");
-  }
-  writeFileSync(reporterLockPath, JSON.stringify(reporterLock));
-  verifyReporter(dir);
+  const dependencyFiles = ["package.json", "package-lock.json", "requirements-evidence.txt", "tools/toolkit-packages.json"];
+  const before = dependencyFiles.map(path => readFileSync(resolve(dir, path), "utf8"));
+  verifyToolkitPackages(dir);
   const configured = spawnSync(process.platform === "win32" ? "powershell.exe" : "pwsh", ["-NoProfile", "-File", resolve(dir, "tools/Configure-Project.ps1"),
     "-ProjectName", "EvidenceSample", "-DisplayName", "Evidence Sample", "-AppId", "00000000-0000-0000-0000-000000000001",
     "-CopyrightYear", "2026", "-Force"], { cwd: dir, encoding: "utf8" });
@@ -121,7 +115,8 @@ test("project configuration preserves upstream and reporter bytes and licenses",
   assert.equal(configuredIdentity.solution, "EvidenceSample1086.slnx");
   assert.equal(configuredIdentity.extractorProject, "tools/EvidenceSample.Import/EvidenceSample.Import.csproj");
   verifySnapshot(dir);
-  verifyReporter(dir);
+  verifyToolkitPackages(dir);
+  assert.deepEqual(dependencyFiles.map(path => readFileSync(resolve(dir, path), "utf8")), before);
 });
 
 test("configuration copy includes Git-visible files and excludes ignored or local output", t => {
@@ -177,7 +172,7 @@ test("link check reports misplaced, missing or stale ranges and rewrites them", 
 });
 
 test("the gate and the pre-commit hook run one list of node checks", () => {
-  assert.deepEqual(checks().map(([, script]) => script), ["tools/upstream.mjs", "tools/Check-ResearchTracking.mjs", "tools/evidence/sync-x86.mjs"]);
+  assert.deepEqual(checks().map(([, script]) => script), ["tools/upstream.mjs", "tools/Check-ResearchTracking.mjs", "tools/Verify-ToolkitPackages.mjs"]);
   assert.deepEqual(checks(true)[0][2], ["docs", "--check", "--no-ksy"]);
   assert.throws(() => runNodeChecks(["--check"]), /Usage/);
   assert.match(readFileSync(resolve(root, "tools/Invoke-Validation.ps1"), "utf8"), /tools\/Invoke-NodeChecks\.mjs'\)/);

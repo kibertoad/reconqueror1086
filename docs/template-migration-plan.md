@@ -240,3 +240,26 @@ automatically restoring build rather than adding a competing restore path.
 Acceptance exercises default restore behavior, explicit no-restore consumers,
 unchanged checks and test filters, and failed builds without restore fallback.
 Package migration and the complete template delta audit remain pending.
+
+### Package tooling adoption
+
+The tooling batch replaces vendored checker/reporters with reader 0.2.0, checker
+0.1.0 and engine 0.4.0, locked with npm integrity and Python distribution hashes.
+CI and release validation install the same dependencies. The staged-tree hook
+uses its staged npm lock and the local cache. Rules snapshots remain unchanged
+and their freshness command now covers only the four rules/license files.
+
+Conqueror's existing wrapper, defensive MZ/inventory/review tests and LE adapter
+remain. Shared Ghidra scripts come from the engine distribution; the local LE
+mapper and game-specific edition/version-tracking exports remain. The synthetic
+memory-map acceptance test now loads the packaged Java helper. Toolkit-only
+tests and copied guide are removed; project wrapper and lock-drift regressions
+replace copy-only verification. The retained template license remains immutable.
+
+A synthetic return report retained every pre-migration field and value; the
+new engine additionally reports caller/site and return-flow observations. The
+canonical fast gate and package integration tests pass. This tooling batch does
+not establish final migration acceptance: comparison found that the toolkit media
+APIs originate in the local PCX/Smacker readers, so adopting the shared .NET
+readers is the next infrastructure batch. The importer release identity, XXH3
+manifest schema and transactional asset contract remain game-specific.

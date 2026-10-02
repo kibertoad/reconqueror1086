@@ -16,8 +16,8 @@ not proof of a complete reading, all callers or instruction identity.
 ## Reusable reports
 
 `tools/evidence/report.mjs` implements bounded flow/table reports and the
-MZ/FBOV identity and inventory resolver. `tools/evidence/x86-reporter/report.mjs`
-is the separately pinned toolkit instruction-derived reporter. Its supported
+MZ/FBOV identity and inventory resolver. `@scientific-method/executable-reader`
+is the separately locked toolkit package instruction-derived reporter. Its supported
 formats and query contracts are in
 [BOUNDED-EVIDENCE-REPORTERS.md](BOUNDED-EVIDENCE-REPORTERS.md).
 Keep unsupported formats and unresolved calls explicit; synthetic acceptance of

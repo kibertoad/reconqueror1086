@@ -703,3 +703,14 @@ and checker/reporters `f8c51bfc5d167c25a04f2b6ddb3f7390714dc45f`.
 Protocol and Methodology bytes are unchanged. This adoption supersedes the
 previous infrastructure baseline above. Game-specific LE coverage, identities,
 source contracts and evidence statuses are retained.
+
+## Current package migration
+
+The current owner-authorized target and remaining acceptance requirements are in
+[template-migration-plan.md](template-migration-plan.md) and
+[latest-infrastructure.md](goals/latest-infrastructure.md). Shared tooling now
+uses reader 0.2.0, checker 0.1.0 and engine 0.4.0 at toolkit 0b4694df; the
+template target is 79d18a20. Rules snapshots remain ca39d075. Shared resource
+library adoption and the final template acceptance audit remain pending. This
+migration preserves gameplay and evidence statuses. Push to canonical main is
+authorized after the full migration is done and verified.

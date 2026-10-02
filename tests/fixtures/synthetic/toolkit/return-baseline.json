@@ -1,0 +1,929 @@
+{
+  "schema": "bounded-x86-v1",
+  "decoder": "capstone 5.0.7",
+  "sourceIdentity": {
+    "size": 4,
+    "sha256": "e26807846248e3d1ea2d9dc0980c4329e7b4638db148879849c725e57de64559"
+  },
+  "status": "Conditional static report; never promotes an evidence entry",
+  "instructionModel": {
+    "bits": 16,
+    "addressModel": "segmented16",
+    "flatAssumption": null
+  },
+  "sourceMapping": null,
+  "formatTables": null,
+  "declaredRegions": [
+    {
+      "name": "synthetic",
+      "start": 0,
+      "end": 4,
+      "segment": 4096,
+      "ip": 0,
+      "entries": [
+        0
+      ],
+      "evidence": "synthetic test"
+    }
+  ],
+  "indirectJumpDeclarations": [],
+  "paths": [
+    {
+      "returned": true,
+      "stop": null,
+      "stopSite": null,
+      "steps": 2,
+      "instructionPath": [
+        0,
+        3
+      ],
+      "guards": [],
+      "events": [
+        {
+          "kind": "return",
+          "site": 3,
+          "entry": 0,
+          "depth": 0,
+          "order": 0,
+          "registers": {
+            "eax": {
+              "bits": 32,
+              "expression": [
+                "join",
+                [
+                  [
+                    "constant",
+                    52
+                  ],
+                  [
+                    "constant",
+                    18
+                  ],
+                  [
+                    "extract",
+                    [
+                      "unknown",
+                      "initial:eax"
+                    ],
+                    16,
+                    8,
+                    32
+                  ],
+                  [
+                    "extract",
+                    [
+                      "unknown",
+                      "initial:eax"
+                    ],
+                    24,
+                    8,
+                    32
+                  ]
+                ]
+              ],
+              "value": null,
+              "producers": [
+                0
+              ]
+            },
+            "ax": {
+              "bits": 16,
+              "expression": [
+                "constant",
+                4660
+              ],
+              "value": 4660,
+              "producers": [
+                0
+              ]
+            },
+            "ebx": {
+              "bits": 32,
+              "expression": [
+                "unknown",
+                "initial:ebx"
+              ],
+              "value": null,
+              "producers": []
+            },
+            "bx": {
+              "bits": 16,
+              "expression": [
+                "extract",
+                [
+                  "unknown",
+                  "initial:ebx"
+                ],
+                0,
+                16,
+                32
+              ],
+              "value": null,
+              "producers": []
+            },
+            "ecx": {
+              "bits": 32,
+              "expression": [
+                "unknown",
+                "initial:ecx"
+              ],
+              "value": null,
+              "producers": []
+            },
+            "cx": {
+              "bits": 16,
+              "expression": [
+                "extract",
+                [
+                  "unknown",
+                  "initial:ecx"
+                ],
+                0,
+                16,
+                32
+              ],
+              "value": null,
+              "producers": []
+            },
+            "edx": {
+              "bits": 32,
+              "expression": [
+                "unknown",
+                "initial:edx"
+              ],
+              "value": null,
+              "producers": []
+            },
+            "dx": {
+              "bits": 16,
+              "expression": [
+                "extract",
+                [
+                  "unknown",
+                  "initial:edx"
+                ],
+                0,
+                16,
+                32
+              ],
+              "value": null,
+              "producers": []
+            },
+            "esi": {
+              "bits": 32,
+              "expression": [
+                "unknown",
+                "initial:esi"
+              ],
+              "value": null,
+              "producers": []
+            },
+            "si": {
+              "bits": 16,
+              "expression": [
+                "extract",
+                [
+                  "unknown",
+                  "initial:esi"
+                ],
+                0,
+                16,
+                32
+              ],
+              "value": null,
+              "producers": []
+            },
+            "edi": {
+              "bits": 32,
+              "expression": [
+                "unknown",
+                "initial:edi"
+              ],
+              "value": null,
+              "producers": []
+            },
+            "di": {
+              "bits": 16,
+              "expression": [
+                "extract",
+                [
+                  "unknown",
+                  "initial:edi"
+                ],
+                0,
+                16,
+                32
+              ],
+              "value": null,
+              "producers": []
+            },
+            "ebp": {
+              "bits": 32,
+              "expression": [
+                "unknown",
+                "initial:ebp"
+              ],
+              "value": null,
+              "producers": []
+            },
+            "bp": {
+              "bits": 16,
+              "expression": [
+                "extract",
+                [
+                  "unknown",
+                  "initial:ebp"
+                ],
+                0,
+                16,
+                32
+              ],
+              "value": null,
+              "producers": []
+            },
+            "esp": {
+              "bits": 32,
+              "expression": [
+                "join",
+                [
+                  [
+                    "extract",
+                    [
+                      "unknown",
+                      "entry:sp"
+                    ],
+                    0,
+                    8,
+                    16
+                  ],
+                  [
+                    "extract",
+                    [
+                      "unknown",
+                      "entry:sp"
+                    ],
+                    8,
+                    8,
+                    16
+                  ],
+                  [
+                    "extract",
+                    [
+                      "zeroExtend",
+                      [
+                        "unknown",
+                        "entry:sp"
+                      ],
+                      16,
+                      32
+                    ],
+                    16,
+                    8,
+                    32
+                  ],
+                  [
+                    "extract",
+                    [
+                      "zeroExtend",
+                      [
+                        "unknown",
+                        "entry:sp"
+                      ],
+                      16,
+                      32
+                    ],
+                    24,
+                    8,
+                    32
+                  ]
+                ]
+              ],
+              "value": null,
+              "producers": []
+            },
+            "sp": {
+              "bits": 16,
+              "expression": [
+                "unknown",
+                "entry:sp"
+              ],
+              "value": null,
+              "producers": []
+            },
+            "cs": {
+              "bits": 16,
+              "expression": [
+                "constant",
+                4096
+              ],
+              "value": 4096,
+              "producers": []
+            },
+            "ds": {
+              "bits": 16,
+              "expression": [
+                "unknown",
+                "initial:ds"
+              ],
+              "value": null,
+              "producers": []
+            },
+            "es": {
+              "bits": 16,
+              "expression": [
+                "unknown",
+                "initial:es"
+              ],
+              "value": null,
+              "producers": []
+            },
+            "ss": {
+              "bits": 16,
+              "expression": [
+                "unknown",
+                "initial:ss"
+              ],
+              "value": null,
+              "producers": []
+            },
+            "fs": {
+              "bits": 16,
+              "expression": [
+                "unknown",
+                "initial:fs"
+              ],
+              "value": null,
+              "producers": []
+            },
+            "gs": {
+              "bits": 16,
+              "expression": [
+                "unknown",
+                "initial:gs"
+              ],
+              "value": null,
+              "producers": []
+            },
+            "al": {
+              "bits": 8,
+              "expression": [
+                "constant",
+                52
+              ],
+              "value": 52,
+              "producers": [
+                0
+              ]
+            },
+            "ah": {
+              "bits": 8,
+              "expression": [
+                "constant",
+                18
+              ],
+              "value": 18,
+              "producers": [
+                0
+              ]
+            },
+            "bl": {
+              "bits": 8,
+              "expression": [
+                "extract",
+                [
+                  "unknown",
+                  "initial:ebx"
+                ],
+                0,
+                8,
+                32
+              ],
+              "value": null,
+              "producers": []
+            },
+            "bh": {
+              "bits": 8,
+              "expression": [
+                "extract",
+                [
+                  "unknown",
+                  "initial:ebx"
+                ],
+                8,
+                8,
+                32
+              ],
+              "value": null,
+              "producers": []
+            },
+            "cl": {
+              "bits": 8,
+              "expression": [
+                "extract",
+                [
+                  "unknown",
+                  "initial:ecx"
+                ],
+                0,
+                8,
+                32
+              ],
+              "value": null,
+              "producers": []
+            },
+            "ch": {
+              "bits": 8,
+              "expression": [
+                "extract",
+                [
+                  "unknown",
+                  "initial:ecx"
+                ],
+                8,
+                8,
+                32
+              ],
+              "value": null,
+              "producers": []
+            },
+            "dl": {
+              "bits": 8,
+              "expression": [
+                "extract",
+                [
+                  "unknown",
+                  "initial:edx"
+                ],
+                0,
+                8,
+                32
+              ],
+              "value": null,
+              "producers": []
+            },
+            "dh": {
+              "bits": 8,
+              "expression": [
+                "extract",
+                [
+                  "unknown",
+                  "initial:edx"
+                ],
+                8,
+                8,
+                32
+              ],
+              "value": null,
+              "producers": []
+            }
+          },
+          "cleanupBytes": 0,
+          "resultContracts": []
+        }
+      ],
+      "registers": {
+        "eax": {
+          "bits": 32,
+          "expression": [
+            "join",
+            [
+              [
+                "constant",
+                52
+              ],
+              [
+                "constant",
+                18
+              ],
+              [
+                "extract",
+                [
+                  "unknown",
+                  "initial:eax"
+                ],
+                16,
+                8,
+                32
+              ],
+              [
+                "extract",
+                [
+                  "unknown",
+                  "initial:eax"
+                ],
+                24,
+                8,
+                32
+              ]
+            ]
+          ],
+          "value": null,
+          "producers": [
+            0
+          ]
+        },
+        "ax": {
+          "bits": 16,
+          "expression": [
+            "constant",
+            4660
+          ],
+          "value": 4660,
+          "producers": [
+            0
+          ]
+        },
+        "ebx": {
+          "bits": 32,
+          "expression": [
+            "unknown",
+            "initial:ebx"
+          ],
+          "value": null,
+          "producers": []
+        },
+        "bx": {
+          "bits": 16,
+          "expression": [
+            "extract",
+            [
+              "unknown",
+              "initial:ebx"
+            ],
+            0,
+            16,
+            32
+          ],
+          "value": null,
+          "producers": []
+        },
+        "ecx": {
+          "bits": 32,
+          "expression": [
+            "unknown",
+            "initial:ecx"
+          ],
+          "value": null,
+          "producers": []
+        },
+        "cx": {
+          "bits": 16,
+          "expression": [
+            "extract",
+            [
+              "unknown",
+              "initial:ecx"
+            ],
+            0,
+            16,
+            32
+          ],
+          "value": null,
+          "producers": []
+        },
+        "edx": {
+          "bits": 32,
+          "expression": [
+            "unknown",
+            "initial:edx"
+          ],
+          "value": null,
+          "producers": []
+        },
+        "dx": {
+          "bits": 16,
+          "expression": [
+            "extract",
+            [
+              "unknown",
+              "initial:edx"
+            ],
+            0,
+            16,
+            32
+          ],
+          "value": null,
+          "producers": []
+        },
+        "esi": {
+          "bits": 32,
+          "expression": [
+            "unknown",
+            "initial:esi"
+          ],
+          "value": null,
+          "producers": []
+        },
+        "si": {
+          "bits": 16,
+          "expression": [
+            "extract",
+            [
+              "unknown",
+              "initial:esi"
+            ],
+            0,
+            16,
+            32
+          ],
+          "value": null,
+          "producers": []
+        },
+        "edi": {
+          "bits": 32,
+          "expression": [
+            "unknown",
+            "initial:edi"
+          ],
+          "value": null,
+          "producers": []
+        },
+        "di": {
+          "bits": 16,
+          "expression": [
+            "extract",
+            [
+              "unknown",
+              "initial:edi"
+            ],
+            0,
+            16,
+            32
+          ],
+          "value": null,
+          "producers": []
+        },
+        "ebp": {
+          "bits": 32,
+          "expression": [
+            "unknown",
+            "initial:ebp"
+          ],
+          "value": null,
+          "producers": []
+        },
+        "bp": {
+          "bits": 16,
+          "expression": [
+            "extract",
+            [
+              "unknown",
+              "initial:ebp"
+            ],
+            0,
+            16,
+            32
+          ],
+          "value": null,
+          "producers": []
+        },
+        "esp": {
+          "bits": 32,
+          "expression": [
+            "join",
+            [
+              [
+                "extract",
+                [
+                  "unknown",
+                  "entry:sp"
+                ],
+                0,
+                8,
+                16
+              ],
+              [
+                "extract",
+                [
+                  "unknown",
+                  "entry:sp"
+                ],
+                8,
+                8,
+                16
+              ],
+              [
+                "extract",
+                [
+                  "zeroExtend",
+                  [
+                    "unknown",
+                    "entry:sp"
+                  ],
+                  16,
+                  32
+                ],
+                16,
+                8,
+                32
+              ],
+              [
+                "extract",
+                [
+                  "zeroExtend",
+                  [
+                    "unknown",
+                    "entry:sp"
+                  ],
+                  16,
+                  32
+                ],
+                24,
+                8,
+                32
+              ]
+            ]
+          ],
+          "value": null,
+          "producers": []
+        },
+        "sp": {
+          "bits": 16,
+          "expression": [
+            "unknown",
+            "entry:sp"
+          ],
+          "value": null,
+          "producers": []
+        },
+        "cs": {
+          "bits": 16,
+          "expression": [
+            "constant",
+            4096
+          ],
+          "value": 4096,
+          "producers": []
+        },
+        "ds": {
+          "bits": 16,
+          "expression": [
+            "unknown",
+            "initial:ds"
+          ],
+          "value": null,
+          "producers": []
+        },
+        "es": {
+          "bits": 16,
+          "expression": [
+            "unknown",
+            "initial:es"
+          ],
+          "value": null,
+          "producers": []
+        },
+        "ss": {
+          "bits": 16,
+          "expression": [
+            "unknown",
+            "initial:ss"
+          ],
+          "value": null,
+          "producers": []
+        },
+        "fs": {
+          "bits": 16,
+          "expression": [
+            "unknown",
+            "initial:fs"
+          ],
+          "value": null,
+          "producers": []
+        },
+        "gs": {
+          "bits": 16,
+          "expression": [
+            "unknown",
+            "initial:gs"
+          ],
+          "value": null,
+          "producers": []
+        },
+        "al": {
+          "bits": 8,
+          "expression": [
+            "constant",
+            52
+          ],
+          "value": 52,
+          "producers": [
+            0
+          ]
+        },
+        "ah": {
+          "bits": 8,
+          "expression": [
+            "constant",
+            18
+          ],
+          "value": 18,
+          "producers": [
+            0
+          ]
+        },
+        "bl": {
+          "bits": 8,
+          "expression": [
+            "extract",
+            [
+              "unknown",
+              "initial:ebx"
+            ],
+            0,
+            8,
+            32
+          ],
+          "value": null,
+          "producers": []
+        },
+        "bh": {
+          "bits": 8,
+          "expression": [
+            "extract",
+            [
+              "unknown",
+              "initial:ebx"
+            ],
+            8,
+            8,
+            32
+          ],
+          "value": null,
+          "producers": []
+        },
+        "cl": {
+          "bits": 8,
+          "expression": [
+            "extract",
+            [
+              "unknown",
+              "initial:ecx"
+            ],
+            0,
+            8,
+            32
+          ],
+          "value": null,
+          "producers": []
+        },
+        "ch": {
+          "bits": 8,
+          "expression": [
+            "extract",
+            [
+              "unknown",
+              "initial:ecx"
+            ],
+            8,
+            8,
+            32
+          ],
+          "value": null,
+          "producers": []
+        },
+        "dl": {
+          "bits": 8,
+          "expression": [
+            "extract",
+            [
+              "unknown",
+              "initial:edx"
+            ],
+            0,
+            8,
+            32
+          ],
+          "value": null,
+          "producers": []
+        },
+        "dh": {
+          "bits": 8,
+          "expression": [
+            "extract",
+            [
+              "unknown",
+              "initial:edx"
+            ],
+            8,
+            8,
+            32
+          ],
+          "value": null,
+          "producers": []
+        }
+      },
+      "conditionalModels": []
+    }
+  ],
+  "gaps": [],
+  "completeWithinModel": true,
+  "nativeReachability": "unconfirmed",
+  "stepsUsed": 2,
+  "stringIterationsUsed": 0,
+  "limits": {
+    "steps": 512,
+    "paths": 64,
+    "depth": 8
+  }
+}
