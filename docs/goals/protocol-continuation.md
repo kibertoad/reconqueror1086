@@ -12,7 +12,8 @@ completion of one batch does not complete the objective.
 ## Scope
 
 Areas: project planning, Survey reconciliation, BLD-GOG-EN build inventory, RES inventory findings, formats and queue planning, and shared research tooling.
-Current Survey claim: Q-RES-011 / FMT-RES-009 and the CD-root bitmap candidate.
+Current Survey claim: Q-RES-012 / FMT-RES-010, using the current entry title
+and file list rather than a copied filename-family label.
 Batches: research and its tooling only. Select concrete Survey research areas
 and record their claims here before changing their entries or queue items.
 Only this goal runs locally while publication is not authorized.
@@ -30,16 +31,15 @@ None known.
 
 - Stage: Survey. Latest research batch: FND-RES-015 / FMT-RES-009 and
   SRC-BMP-REFERENCE. Q-RES-011 is closed; Q-RES-135 through Q-RES-137 remain Static.
-- Last checks: 2026-10-02 documentation regeneration/check with Kaitai 0.11,
-  narrative references, research tracking, coverage metadata and repository policy
-  passed. The generated whole-file schema witness passed; no parity validation
-  is claimed. See docs/VALIDATION.md.
-- Tooling baseline: engine 0.7.0 and toolkit adoption 98395df; its canonical
-  fast gate passed on 2026-10-02. Research did not repeat it.
-- Unfinished: none from research. GAP-007 is recorded. No original program ran.
-  Process audits found no confirmed repository orphans; reusable MSBuild workers
-  remain. No push made.
+- Completed tooling: engine 0.9.1, toolkit adoption and CI action b91cd758.
+  Other toolkit packages were latest; decoder pins satisfy engine requirements.
+- Last checks: 2026-10-02 full canonical fast gate with Kaitai 0.11, hash-required
+  downloads and actionlint passed. See docs/VALIDATION.md. No original files were
+  opened in the tooling session and no parity status changed.
+- Unfinished: none from the requested update. GAP-007 remains recorded. No original
+  program ran. Audits found no confirmed repository orphans; reusable MSBuild
+  workers remain. No push made.
 - Blockers: none known.
-- Next: the owner requested latest toolkit versions again. Open a separate tooling
-  session to check releases and validate any update, then return to Q-RES-012 /
-  FMT-RES-010 and manual-screen reconciliation. Rules snapshots remain unchanged.
+- Next: Q-RES-012 / FMT-RES-010 and manual-screen reconciliation, then consumer
+  questions Q-RES-124 through Q-RES-137. Rules snapshots remain unchanged unless
+  the owner requests their refresh. Gameplay remains outside this goal's scope.
