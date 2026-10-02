@@ -11,7 +11,7 @@ completion of one batch does not complete the objective.
 
 ## Scope
 
-Areas: project planning, Survey reconciliation and shared research tooling.
+Areas: project planning, Survey reconciliation, BLD-GOG-EN build inventory and shared research tooling.
 Batches: research and its tooling only. Select concrete Survey research areas
 and record their claims here before changing their entries or queue items.
 Only this goal runs locally while publication is not authorized.
