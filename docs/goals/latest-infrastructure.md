@@ -20,7 +20,7 @@ Original content, gameplay rules, spec claims, queue items, unrelated sibling wo
 ## Handover
 
 - Stage: Survey; this goal handles tooling migration only.
-- Last gate: 2026-10-02, pre-migration canonical fast gate passed; local Kaitai compiler unavailable.
-- Unfinished: migrate vendored checker/reporters to packages; incorporate template NoRestore and audit all newer template paths; compare current toolkit .NET and Ghidra capabilities with local implementations.
+- Last gate: 2026-10-02, canonical fast gate passed both normally before the batch and with NoRestore after it; local Kaitai compiler unavailable.
+- Unfinished: migrate vendored checker/reporters to packages and audit all newer template paths; compare current toolkit .NET and Ghidra capabilities with local implementations. NoRestore is adopted and tested. No half-done edits remain.
 - Blockers: none. Registry versions verified: reader 0.2.0, checker 0.1.0, engine 0.4.0.
-- Next: add dependency locks, migrate toolkit callers/tests/CI and remove superseded copies; validate against package behavior and reviewed upstream commits.
+- Next: follow toolkit docs/migrating-to-scientific-method.md at 0b4694df (already read); add dependency locks, migrate toolkit callers/tests/CI and shared Ghidra paths, remove superseded copies, compare .NET capabilities, and audit the complete template delta. Git contains the reviewed upstream commits. The renamed toad-discovery-center-template main resolves to the same template commit. No original execution is needed.
