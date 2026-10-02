@@ -14,10 +14,11 @@ Entries by kind.
 
 ## sources
 
-3 entries.
+4 entries.
 
 | ID | Title | Status |
 |---|---|---|
+| [SRC-BMP-REFERENCE](../sources/SRC-BMP-REFERENCE.md) | Microsoft bitmap file header, information header and palette reference | None |
 | [SRC-GAMEFAQS-66730](../sources/SRC-GAMEFAQS-66730.md) | Conqueror 1086 A.D. FAQ by mikel123456, GameFAQs FAQ 66730 | None |
 | [SRC-MANUAL](../sources/SRC-MANUAL.md) | Conqueror A.D. 1086 manual, as shipped with the GOG release | None |
 | [SRC-PATCH-CATALOG](../sources/SRC-PATCH-CATALOG.md) | GOG public build catalog and Sierra Help patch catalog | None |
@@ -52,7 +53,7 @@ Entries by kind.
 | [FMT-RES-006](../formats/FMT-RES-006.md) | Installed disc-image cue sheet | supported |
 | [FMT-RES-007](../formats/FMT-RES-007.md) | Counted record containers in the three CD-root .386 files | supported |
 | [FMT-RES-008](../formats/FMT-RES-008.md) | Empty and ASCII text framing of CD-root batch files | supported |
-| [FMT-RES-009](../formats/FMT-RES-009.md) | Unidentified .BMP data candidates in CD root | unknown |
+| [FMT-RES-009](../formats/FMT-RES-009.md) | Owned autoplay indexed bitmap layout | supported |
 | [FMT-RES-010](../formats/FMT-RES-010.md) | Unidentified .CFG data candidates in CD root | unknown |
 | [FMT-RES-011](../formats/FMT-RES-011.md) | Unidentified .DAT data candidates in CD root | unknown |
 | [FMT-RES-012](../formats/FMT-RES-012.md) | Unidentified .GOB data candidates in CD root | unknown |
@@ -328,7 +329,7 @@ Entries by kind.
 
 ## findings
 
-233 entries.
+234 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -457,6 +458,7 @@ Entries by kind.
 | [FND-RES-012](../findings/FND-RES-012.md) | The raw carrier has a cue-delimited data span with duplicate and zero padding records | recorded |
 | [FND-RES-013](../findings/FND-RES-013.md) | The three CD-root .386 candidates share counted variable-length record framing | recorded |
 | [FND-RES-014](../findings/FND-RES-014.md) | CD-root batch candidates are empty files or short ASCII text with differing endings | recorded |
+| [FND-RES-015](../findings/FND-RES-015.md) | AUTOPLAY.BMP contains an 8-bit indexed bitmap with exact palette and row boundaries | recorded |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |

@@ -452,3 +452,19 @@ passed. The fast gate was not repeated for this research-only batch; no runtime
 implementation or executable tooling changed. Q-RES-010 is closed; consumer
 questions remain Q-RES-132 through Q-RES-134. No parity validation is claimed.
 GAP-006 records a synthetic-fixture suggestion for shared tooling.
+
+## Autoplay bitmap file layout (2026-10-02)
+
+FND-RES-015's complete bounded palette/row traversal passed against the owned
+file and matched its manifest length and whole-file fingerprint. The generated
+FMT-RES-009 Python schema consumed the file exactly and reconstructed all header,
+palette and pixel bytes. No image was rendered or exported. The official format
+reference is recorded as SRC-BMP-REFERENCE; it supplies field roles rather than
+proof of a shipped reader's behavior.
+
+Documentation regeneration/check with the local Kaitai 0.11 compiler, narrative
+references, research tracking, coverage metadata and repository policy passed.
+The fast gate was not repeated for this research-only batch; no implementation
+or executable tooling changed. Q-RES-011 is closed; Q-RES-135 through Q-RES-137
+retain consumer questions. No original program ran or parity validation is
+claimed. GAP-007 records the corrected plan/handover label mismatch.

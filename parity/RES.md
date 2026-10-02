@@ -10,7 +10,7 @@
 | `FMT-RES-006` | Installed disc-image cue sheet | supported | missing | None | None | supported | Observed shipped text syntax only; wrapper parsing remains open under Q-RES-118 and Q-RES-119. |
 | `FMT-RES-007` | Counted record containers in the three CD-root .386 files | supported | missing | None | None | supported | Stored framing supported; consumers and payload syntax remain open. |
 | `FMT-RES-008` | Empty and ASCII text framing of CD-root batch files | supported | missing | None | None | supported | Stored framing supported; interpreter and runtime use remain open. |
-| `FMT-RES-009` | Unidentified .BMP data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
+| `FMT-RES-009` | Owned autoplay indexed bitmap layout | supported | missing | None | None | supported | Complete stored layout supported; consumer behavior remains open. |
 | `FMT-RES-010` | Unidentified .CFG data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
 | `FMT-RES-011` | Unidentified .DAT data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
 | `FMT-RES-012` | Unidentified .GOB data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |

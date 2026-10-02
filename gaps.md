@@ -116,3 +116,22 @@ consumer behavior as a separate research question.
 Local handling: FMT-RES-008 distinguishes the stored cases and the local witness
 reconstructed each complete file. Q-RES-132 through Q-RES-134 retain consumer
 questions. No upstream submission has been made.
+
+## GAP-007: Valid queue IDs can carry stale human-readable area labels
+
+Recorded: 2026-10-02. Audience: template and shared-documentation-tooling authors.
+
+The plan and goal handover described Q-RES-011 / FMT-RES-009 as configuration
+candidates, while the authoritative entry named the bitmap candidate. The clean
+start-session documentation checks passed: the references existed, but their
+human-readable labels were wrong. This did not invalidate file evidence, but
+could misdirect the next research session.
+
+Suggestion: derive displayed item/entry labels from authoritative metadata when
+possible, or add a focused handover review that compares the named ID's title
+with its prose label. An ID resolving is distinct from its description agreeing.
+Avoid a general semantic checker that would reject legitimate paraphrases.
+
+Local resolution: the plan and active goal label are corrected after inspecting
+the current entry. Research used FMT-RES-009's file list rather than the stale
+label. No upstream submission has been made.

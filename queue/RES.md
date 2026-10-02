@@ -1,8 +1,18 @@
 # RES
 
-Next ID: Q-RES-135
+Next ID: Q-RES-138
 
 ## Static
+
+- Q-RES-135. FMT-RES-009: Which shipped consumer reads AUTOPLAY.BMP, and is that path reachable?
+  Settles it: trace filename references from the shipped media entry points through the bitmap reader. Blocks: Survey data-family reconciliation.
+
+- Q-RES-136. FMT-RES-009: Which bitmap header and extent constraints does the consumer check, and what is its malformed-input behavior?
+  Settles it: read every relevant guard, access and error path in that consumer. Blocks: Survey data-family reconciliation.
+
+- Q-RES-137. FMT-RES-009: How does the consumer position and orient the decoded image?
+  Settles it: trace storage-to-display mapping, coordinate inputs and presentation calls. Blocks: Survey data-family reconciliation.
+
 
 - Q-RES-132. FMT-RES-008: Which shipped interpreter or wrapper consumes the CD-root batch files, and which paths are reachable?
   Settles it: trace the installation/media entry points and their batch-file accesses. Blocks: Survey data-family reconciliation.
@@ -67,11 +77,6 @@ Next ID: Q-RES-135
   it: read the relevant branch and its callers from the entry's cited findings, following data
   provenance, call effects and every exit relevant to this question. Blocks: none.
 
-
-- Q-RES-011. FMT-RES-009: What layout, if any, is shared by these listed candidates?
-  Settles it: inspect bounded file signatures and the relevant readers; record the
-  parsing syntax or field layout, splitting the entry if the files differ before
-  making claims about them. Blocks: Survey data-family reconciliation.
 
 - Q-RES-012. FMT-RES-010: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the
