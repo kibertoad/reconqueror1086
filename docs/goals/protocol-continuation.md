@@ -27,18 +27,16 @@ None known.
 
 ## Handover
 
-- Stage: Survey. BLD-GOG-EN inventory and the seeded RES format rows remain
-  current. The latest research batch is FND-RES-011 / FMT-RES-006.
-- Last checks: 2026-10-02 documentation regeneration/check, narrative references,
-  research tracking, coverage metadata, repository policy and staged checks
-  passed. Independent cue-sheet data checks passed. Kaitai compilation skipped
-  (compiler unavailable); fast gate not rerun for this research-only batch.
-- Unfinished: none. Q-RES-008 is closed; Q-RES-118 and Q-RES-119 remain Static
-  questions. No original program ran. Process audits found no confirmed
-  repository orphans. GAP-003 remains the metadata-schema concern.
+- Stage: Survey. The latest research batch is FND-RES-012, FMT-RES-005 and
+  FMT-RES-116. Q-RES-007 is closed; Q-RES-120 through Q-RES-123 remain Static.
+- Last checks: 2026-10-02 full documentation regeneration/check with the existing
+  Kaitai 0.11 compiler, narrative references, research tracking, coverage metadata,
+  repository policy and staged checks passed. Generated sector-schema witnesses
+  passed against the owned carrier. No parity validation is claimed.
+- Unfinished: none from research. GAP-004 is recorded. No original program ran.
+  Process audits found no confirmed repository orphans.
 - Blockers: none known.
-- Next: Q-RES-007 / FMT-RES-005, then Q-RES-009 / FMT-RES-007.
-  Reconcile manual-mentioned screens afterward. Q-RES-118 and Q-RES-119 retain
-  their own consumer readings; do not infer answers from file-data arithmetic.
-  Archive-member formats and auxiliary-media runtime-use review remain Survey
-  work. No new implementation or parity validation was claimed.
+- Next: the owner requested latest toolkit dependencies on 2026-10-02. Open a
+  separate tooling session for that update and its canonical fast gate before
+  returning to Q-RES-009 / FMT-RES-007 and manual-screen reconciliation.
+  Rules snapshots remain unchanged unless the owner requests their refresh.
