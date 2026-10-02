@@ -261,7 +261,7 @@ Entries by status.
 
 ## recorded
 
-227 entries.
+228 entries.
 
 | ID | Title |
 |---|---|
@@ -385,6 +385,7 @@ Entries by status.
 | [FND-RES-007](../findings/FND-RES-007.md) | The fifteen two-digit MELEE scenes are three families of five that share textures and differ in layout and colour maps |
 | [FND-RES-008](../findings/FND-RES-008.md) | Kind-1 blocks are neither the LSB-first LZW of other Dynamix files nor classic LH1 |
 | [FND-RES-009](../findings/FND-RES-009.md) | The bound LE payload maps initialized code and data separately from its data zero-fill |
+| [FND-RES-010](../findings/FND-RES-010.md) | Owned installation and raw disc directory listing include auxiliary media paths |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |

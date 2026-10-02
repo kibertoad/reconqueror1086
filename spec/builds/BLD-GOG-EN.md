@@ -52,19 +52,29 @@ CD is not known.
 
 ## Other files
 
-The installation adds GOG's DOSBox and its configuration files (`dosbox_ad1086*.conf`),
-`CONQUER.BAT` and `CONFIG.BAT` launchers, `Manual.pdf` (see SRC-MANUAL), icons, the GOG
-metadata files `goggame-2110944433.*`, `EULA.txt`, `webcache.zip` and the uninstaller
-`unins000.*`. The install directory also holds the empty `SAVEGAME` directory where the game
-writes its saves.
+FND-RES-010 records the complete owned installation/media listing and its
+independent path/size comparisons. The installation was enumerated recursively,
+without following reparse points and with inaccessible paths treated as errors.
+The source image's ISO data track was traversed recursively from its root
+directory; every file payload was hashed. The cue sheet bounded each raw audio
+track for hashing. The source image itself is also in the manifest.
 
-The disc also holds the Sierra installer and setup files (`INST.EXE`, `INSTALL.*`, `SETUP.EXE`,
-`SETUP.SOL`, `SIERRA.INF`, `LANGUAGE.INF`, `RESOURCE.CFG`), the Windows autoplay program
-(`AUTOPLAY.*`, `AUTORUN.INF`), `BOOTDISK.EXE`, the HMI sound drivers (`HMIDET.386`,
-`HMIDRV.386`, `HMIMDRV.386`), `VESA/UNIVESA.*`, readme files, icons, `DEMOS/` with demos of other Sierra games, and `INN/`,
-which appears to hold client files for Sierra's ImagiNation Network service. The manifest lists the
-disc's setup program `CD:CONFIG.EXE` and its configuration program `CD:CONQUER/CONCFG.EXE`
-because the CONFIG area describes the settings they write.
+Every listed file or audio track occurs either in the manifest or in
+`BLD-GOG-EN.other-files.yaml`, whose explicit paths each give an exclusion reason.
+That list accounts for the installed DOSBox wrapper, host launch/configuration
+files, distributor metadata, documentation and uninstaller. `Manual.pdf` is the
+owned source SRC-MANUAL. The empty `SAVEGAME` directory has no file to list.
+
+Previously omitted disc paths, including `DEMOS/`, `INN/`, `VESA/`, root auxiliary
+files and the disc copy of `C1086.GOB`, remain in the manifest conservatively.
+This inventory does not prove that every such path is a gameplay dependency;
+exclusion awaits a reading that establishes its lack of game-native use.
+The HMI drivers and both configuration executables remain accounted for.
+
+Traversal entered the raw image's ISO filesystem and identified the raw audio
+tracks. It did not enter the installation's `webcache.zip`, the DOSBox source
+archive, or archives embedded in disc files. Resource archives in the manifest
+still need member-format coverage; path accounting does not complete Survey.
 
 ## Code ranges
 

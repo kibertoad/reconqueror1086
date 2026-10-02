@@ -8979,3 +8979,2379 @@ files:
     format: cdda
     size: 14723520
     xxh3: 038277ff99c2b44e6f0a5e35bbc58fa4
+  - path: "CD:AUTOPLAY.BMP"
+    format: data
+    size: 308278
+    xxh3: 3e2dcb4e6d5d50eb97e2dea47a5cfc6c
+  - path: "CD:AUTOPLAY.EXE"
+    format: PE
+    size: 26624
+    xxh3: 5c9151ffd62240fb286751ebbe5f3fcc
+  - path: "CD:AUTOPLAY.ICO"
+    format: data
+    size: 1078
+    xxh3: 211573abe5fae0d4fa88a8d805f4e9ba
+  - path: "CD:AUTORUN.INF"
+    format: data
+    size: 734
+    xxh3: c207fa939dec11b352676a50b73d9e36
+  - path: "CD:BOOTDISK.EXE"
+    format: MZ
+    size: 36597
+    xxh3: e60f677065a1a14ab71dab34c8b23fe6
+  - path: "CD:C1086.GOB"
+    format: data
+    size: 35361714
+    xxh3: 741826412e307510f394d5e774519320
+  - path: "CD:CONFIG.BAT"
+    format: data
+    size: 0
+    xxh3: 99aa06d3014798d86001c324468d497f
+  - path: "CD:CONQCFG.ICO"
+    format: data
+    size: 766
+    xxh3: 293e66def58eac7dea9321ee4bfd53e5
+  - path: "CD:CONQUER.BAT"
+    format: data
+    size: 0
+    xxh3: 99aa06d3014798d86001c324468d497f
+  - path: "CD:CONQUER.ICO"
+    format: data
+    size: 766
+    xxh3: c609490572ed38680343c3a3a4a518d9
+  - path: "CD:CONQUER.INF"
+    format: data
+    size: 57
+    xxh3: d1cb8388fff6c22f15c82852d40d3257
+  - path: "CD:DEMOS/MOVIES/COMMAND.AVI"
+    format: data
+    size: 14049336
+    xxh3: ea44ada46b97cee2e32ddeea4c810354
+  - path: "CD:DEMOS/MOVIES/ES2CDTRL.AVI"
+    format: data
+    size: 12163006
+    xxh3: 8ba3ab554c332f1db5ec1366dc5cacef
+  - path: "CD:DEMOS/MOVIES/PHANTAS.AVI"
+    format: data
+    size: 6699062
+    xxh3: 3876be82601dd98e6620bd053951feb8
+  - path: "CD:DEMOS/MOVIES/SHDWEND.AVI"
+    format: data
+    size: 13720508
+    xxh3: bedaa3c86656a488b9e1caf6051375ec
+  - path: "CD:DEMOS/SHIVERS/15014.WAV"
+    format: data
+    size: 42924
+    xxh3: 6f8128821d69fda236d9e0b1ee69fcca
+  - path: "CD:DEMOS/SHIVERS/15018.WAV"
+    format: data
+    size: 88492
+    xxh3: 4b2581e6000e6d2fa19c7dc686c2eab8
+  - path: "CD:DEMOS/SHIVERS/15026.WAV"
+    format: data
+    size: 53452
+    xxh3: e80b9aeef3c734e7b30a7d796731eac9
+  - path: "CD:DEMOS/SHIVERS/15027.WAV"
+    format: data
+    size: 65068
+    xxh3: bfe81b9f1b1ca55fa13b4db28d3dd2df
+  - path: "CD:DEMOS/SHIVERS/20402.AUD"
+    format: data
+    size: 1093384
+    xxh3: 68182b8ac063b0ad417ab13fc09ed926
+  - path: "CD:DEMOS/SHIVERS/20605.AUD"
+    format: data
+    size: 114574
+    xxh3: e9588a2d0381f9568c86fd58d3b3f47c
+  - path: "CD:DEMOS/SHIVERS/35010.WAV"
+    format: data
+    size: 359724
+    xxh3: 38a3c8097ff74b15c57a02103f3d7a2f
+  - path: "CD:DEMOS/SHIVERS/607.WAV"
+    format: data
+    size: 758616
+    xxh3: e68991fdf6f2779041d4edc1c796f63d
+  - path: "CD:DEMOS/SHIVERS/7112.AUD"
+    format: data
+    size: 1549249
+    xxh3: 8b2b377acc46883fb543cfa859fb7096
+  - path: "CD:DEMOS/SHIVERS/LANGUAGE.INF"
+    format: data
+    size: 958
+    xxh3: ce405f7e5c35f4b17bd2342ea97a06a2
+  - path: "CD:DEMOS/SHIVERS/RESMAP.000"
+    format: data
+    size: 1186
+    xxh3: e3282697b45b94752f3086fe1d6b2560
+  - path: "CD:DEMOS/SHIVERS/RESMDT.000"
+    format: data
+    size: 1186
+    xxh3: 0cc9b65cc24a0a355c3aedb1c39cd229
+  - path: "CD:DEMOS/SHIVERS/RESOURCE.WIN"
+    format: data
+    size: 335
+    xxh3: 381dc9228b44b93a3c8ff75a80b84de5
+  - path: "CD:DEMOS/SHIVERS/RESSCI.000"
+    format: data
+    size: 10505469
+    xxh3: 58d418208f98470b252e3a5b920f5127
+  - path: "CD:DEMOS/SHIVERS/SCIDLL.DLL"
+    format: NE
+    size: 142934
+    xxh3: f3a9428ae5f4e5e055880616d9a5b6d9
+  - path: "CD:DEMOS/SHIVERS/SETUP.EXE"
+    format: NE
+    size: 26016
+    xxh3: 8cfe947bd1e9e1209337815f32c67e87
+  - path: "CD:DEMOS/SHIVERS/SETUP.SOL"
+    format: data
+    size: 314080
+    xxh3: 199179ce5372d77853f936044a2d5232
+  - path: "CD:DEMOS/SHIVERS/SHIVERS.ICO"
+    format: data
+    size: 766
+    xxh3: b6d1d2435e5ea41dc072aa612e398563
+  - path: "CD:DEMOS/SHIVERS/SIERRA.ERR"
+    format: data
+    size: 8475
+    xxh3: 494d4d184955f3ef9a4e7a72d0706a6c
+  - path: "CD:DEMOS/SHIVERS/SIERRA.INF"
+    format: data
+    size: 1294
+    xxh3: 92f2bb7ffae6f7e3e1f97d40f29da1ab
+  - path: "CD:DEMOS/SHIVERS/SIERRAW.EXE"
+    format: NE
+    size: 785378
+    xxh3: 830c50f0830ac1bba5ddd2a4a24fb634
+  - path: "CD:DEMOS/SWAT/ADL.DRV"
+    format: data
+    size: 10445
+    xxh3: cdaa3f135c38c4eb3906d6434d232531
+  - path: "CD:DEMOS/SWAT/DACBLAST.DRV"
+    format: data
+    size: 4319
+    xxh3: 10326baae671a78bf739d684997309df
+  - path: "CD:DEMOS/SWAT/DACPRO.DRV"
+    format: data
+    size: 2802
+    xxh3: ca50f3d496c241d4b836bf87043c7fdd
+  - path: "CD:DEMOS/SWAT/DACPRO16.DRV"
+    format: data
+    size: 2726
+    xxh3: ac6e09532461d36168f0bee283b159a6
+  - path: "CD:DEMOS/SWAT/DACPRO8.DRV"
+    format: data
+    size: 2584
+    xxh3: 63eff28ab8047199701d187ebe6adf20
+  - path: "CD:DEMOS/SWAT/GENMIDI.DRV"
+    format: data
+    size: 3388
+    xxh3: 405ce214e1adb3474c50e02cb43b95fa
+  - path: "CD:DEMOS/SWAT/INSTALL.EXE"
+    format: MZ
+    size: 77191
+    xxh3: c12038fae60547d3037028a3a7b0060a
+  - path: "CD:DEMOS/SWAT/INSTALL.HLP"
+    format: data
+    size: 20892
+    xxh3: c0ce95094fbd92d74d21ed101d8a5dd0
+  - path: "CD:DEMOS/SWAT/INSTALL.SCR"
+    format: data
+    size: 1087
+    xxh3: e4211cf8304005f7ba0c0464da180d3e
+  - path: "CD:DEMOS/SWAT/INSTALL.TXT"
+    format: data
+    size: 9501
+    xxh3: 729bf1c6b83502bdd3ab485891114262
+  - path: "CD:DEMOS/SWAT/LANGUAGE.INF"
+    format: data
+    size: 1646
+    xxh3: 0ee404e50ad368a3ea65e9d8ac24a1ab
+  - path: "CD:DEMOS/SWAT/MIDITEST.MID"
+    format: data
+    size: 3714
+    xxh3: a07aaa3188a2d8c3b4b99941719dd953
+  - path: "CD:DEMOS/SWAT/MT32.DRV"
+    format: data
+    size: 3352
+    xxh3: 8d408a16ce22bbf8e4e51bcd2cbe6ba1
+  - path: "CD:DEMOS/SWAT/PATCHES/0.HEP"
+    format: data
+    size: 2280
+    xxh3: 39ce93b966f798629f16c56682f2a7aa
+  - path: "CD:DEMOS/SWAT/PATCHES/0.SCR"
+    format: data
+    size: 5112
+    xxh3: c50e670b496d4e5095c220df8a59a857
+  - path: "CD:DEMOS/SWAT/PATCHES/12.HEP"
+    format: data
+    size: 640
+    xxh3: 4cb170fb8afd0f6c4baadbc283e1ed0e
+  - path: "CD:DEMOS/SWAT/PATCHES/12.SCR"
+    format: data
+    size: 1066
+    xxh3: 22043a446d593c1d813a4b5cf3402216
+  - path: "CD:DEMOS/SWAT/PROAUDIO.DRV"
+    format: data
+    size: 11411
+    xxh3: f09c74ddbfa1e70e825ff6d9998dac1b
+  - path: "CD:DEMOS/SWAT/README.TXT"
+    format: data
+    size: 1243
+    xxh3: 855fe9a839408835ca20e2209d135639
+  - path: "CD:DEMOS/SWAT/RESOURCE.000"
+    format: data
+    size: 3676175
+    xxh3: 030208fc36e0d34ac8ff98bfd3a5a86c
+  - path: "CD:DEMOS/SWAT/RESOURCE.CFG"
+    format: data
+    size: 220
+    xxh3: 6290f184f8155d4afcdd45cd148f3df7
+  - path: "CD:DEMOS/SWAT/RESOURCE.MAP"
+    format: data
+    size: 1648
+    xxh3: c2dbfc69e6fe5e2a8fb753a3272aa54c
+  - path: "CD:DEMOS/SWAT/RESOURCE.MDT"
+    format: data
+    size: 1648
+    xxh3: c2f154f1540ca2678ed9db8eb7f647aa
+  - path: "CD:DEMOS/SWAT/RESOURCE.SFX"
+    format: data
+    size: 751592
+    xxh3: f462f93dfdca6c4c92b401e8c8af91bf
+  - path: "CD:DEMOS/SWAT/RESOURCE.WIN"
+    format: data
+    size: 209
+    xxh3: a643f7e24935b7c8c59c5da9e8ed88d5
+  - path: "CD:DEMOS/SWAT/ROBOTS/11.RBT"
+    format: data
+    size: 5856449
+    xxh3: 92014bb6a36757d47a0686055273b596
+  - path: "CD:DEMOS/SWAT/ROBOTS/12.RBT"
+    format: data
+    size: 2260990
+    xxh3: c1aa631de71376f458fa006865f832a0
+  - path: "CD:DEMOS/SWAT/SADL.DRV"
+    format: data
+    size: 10429
+    xxh3: 08413affafa5fb279086be8e2ce4fe18
+  - path: "CD:DEMOS/SWAT/SBPRO.DRV"
+    format: data
+    size: 10970
+    xxh3: 647ca5738ea46d31079a4c478496aa2f
+  - path: "CD:DEMOS/SWAT/SCIDLL.DLL"
+    format: NE
+    size: 142934
+    xxh3: f3a9428ae5f4e5e055880616d9a5b6d9
+  - path: "CD:DEMOS/SWAT/SETUP.EXE"
+    format: NE
+    size: 25856
+    xxh3: 14fd82a1784c0cad9774df09d6e5c4d5
+  - path: "CD:DEMOS/SWAT/SETUP.HLP"
+    format: data
+    size: 73032
+    xxh3: 4d617861af0598de61bf34fdb1bde02c
+  - path: "CD:DEMOS/SWAT/SETUP.SOL"
+    format: data
+    size: 309572
+    xxh3: bd3b745ca4331a9624c8463e73bd0789
+  - path: "CD:DEMOS/SWAT/SIERRA.ERR"
+    format: data
+    size: 8475
+    xxh3: 494d4d184955f3ef9a4e7a72d0706a6c
+  - path: "CD:DEMOS/SWAT/SIERRA.EXE"
+    format: MZ
+    size: 926681
+    xxh3: 847a82ab80b6cca19d9fc182a804833b
+  - path: "CD:DEMOS/SWAT/SIERRA.INF"
+    format: data
+    size: 1255
+    xxh3: 2a39e198f4e5787010045c939bb11620
+  - path: "CD:DEMOS/SWAT/SIERRAW.EXE"
+    format: NE
+    size: 801460
+    xxh3: 2829868dcba06a7d9faff39cbb192f92
+  - path: "CD:DEMOS/SWAT/SIERRAW.ICO"
+    format: data
+    size: 766
+    xxh3: 3d0277c61c1163799040baf583c7f5cb
+  - path: "CD:DEMOS/SWAT/VERSION"
+    format: data
+    size: 11
+    xxh3: 1d70d6e0f18ad40d5ede150773938744
+  - path: "CD:DEMOS/SWAT/VESA.DRV"
+    format: data
+    size: 35
+    xxh3: f05493776a479c862acf9b1270a80128
+  - path: "CD:DEMOS/THEXDER/AUTOPLAY.DIB"
+    format: data
+    size: 121078
+    xxh3: 99c4ebeb28fdd545153ed33b12975ea4
+  - path: "CD:DEMOS/THEXDER/AUTOTHEX.ICO"
+    format: data
+    size: 1078
+    xxh3: f5e4c2b12bb1655a4ca179a1fce3b060
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DDHELP.EXE"
+    format: PE
+    size: 16896
+    xxh3: 2cf41090e03f3636e25e99ce14e0b850
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DDRAW.DLL"
+    format: PE
+    size: 113664
+    xxh3: aa62cfe659a616c20b91c74839b269eb
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DDRAW16.DLL"
+    format: NE
+    size: 19808
+    xxh3: 08b888da3a0dbc03343e6bafee33bdd4
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DIRECTX.INF"
+    format: data
+    size: 2308
+    xxh3: e67cb0fdc090c75ab19f5036cfbb8c4c
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DPLAY.DLL"
+    format: PE
+    size: 30208
+    xxh3: 131cd5a9bb51bd7023ba76723978da32
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DPSERIAL.DLL"
+    format: PE
+    size: 54272
+    xxh3: 737d45a5143b65947360dc303345fbcf
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DPWSOCK.DLL"
+    format: PE
+    size: 28160
+    xxh3: 75036dbb07d388fb1828deb1a0210851
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/AZT16.VXD"
+    format: LE
+    size: 26770
+    xxh3: 76110373e5424d79b6edb0211f18109a
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/AZT16C.DRV"
+    format: NE
+    size: 42080
+    xxh3: f3a3ae106405a620f2a403376583d68e
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/AZT16W.DRV"
+    format: NE
+    size: 43664
+    xxh3: 427c9f6b406762a77f8b06de2662091e
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/CDPLAYER.CNT"
+    format: data
+    size: 643
+    xxh3: 5c7fc1b71e1c7fa88e0655b82784bff3
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/CDPLAYER.EXE"
+    format: PE
+    size: 88064
+    xxh3: 046d09e3f280c8bb64c1dc82525b349d
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/CDPLAYER.HLP"
+    format: data
+    size: 20579
+    xxh3: 641948c5718f5b473c1c90e030063e96
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/CSPMAN.DLL"
+    format: NE
+    size: 17776
+    xxh3: ec292e48c1923d21ef8a041e8992d8dc
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/ES1488.DRV"
+    format: NE
+    size: 43936
+    xxh3: 2dd8bde0cf3869cb5c9e39c7aedd532a
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/ES1488.VXD"
+    format: LE
+    size: 20116
+    xxh3: 4b2c4f22fbe6b67219bfcbeb30d4f214
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/ES1688.DRV"
+    format: NE
+    size: 50128
+    xxh3: 9af3b541d6b60c26e6baffac6bcce0a9
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/ES1688.VXD"
+    format: LE
+    size: 25236
+    xxh3: b634ba8cf74cc0c0b1bc90ad6a9696c2
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/ES488.DRV"
+    format: NE
+    size: 36976
+    xxh3: 2a019742073cc9100ee82d96a3c35dfa
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/ES488.VXD"
+    format: LE
+    size: 19603
+    xxh3: bc64cd054af1bc10aec56ce7822a5f69
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/ES688.DRV"
+    format: NE
+    size: 47008
+    xxh3: 3f9d375da98ab4abe8a770ffd41e2dfa
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/ES688.VXD"
+    format: LE
+    size: 22675
+    xxh3: 0557e68fbcfddb05a341647d67d8c086
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/ESSFM.DRV"
+    format: NE
+    size: 17920
+    xxh3: bec5e2e39200df0a2605c5e5ef2f32fc
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/ESSMPORT.DRV"
+    format: NE
+    size: 9904
+    xxh3: a54c343801da4532a0cb46ef402cb007
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/ESSMPU.DRV"
+    format: NE
+    size: 8240
+    xxh3: e4ef343f31e3b44c51d9e04081b5c112
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/FINDMVI.DLL"
+    format: NE
+    size: 5728
+    xxh3: c92efd7bcd7ab280d0c2ceb72b84d89c
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/IMAADP32.ACM"
+    format: PE
+    size: 18944
+    xxh3: 692b517f35b3d0a7153667782336166a
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MMMIXER.DLL"
+    format: NE
+    size: 5152
+    xxh3: f1cbf219d76cf16189e70ae2b2d6aaeb
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MPLAYER.CNT"
+    format: data
+    size: 1042
+    xxh3: a3d28b695b50b4fa48635511c7a02669
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MPLAYER.EXE"
+    format: PE
+    size: 147968
+    xxh3: 4f39c399d6fac1e76f9284bbea2e7a9d
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MPLAYER.HLP"
+    format: data
+    size: 26940
+    xxh3: 00c5bdcb30bad59d8e8f578a59c281d9
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MSADP32.ACM"
+    format: PE
+    size: 17920
+    xxh3: 2a41ae4c6192fec3cebcef0782275a18
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MSG711.ACM"
+    format: PE
+    size: 10240
+    xxh3: d851efcee44d85fc98dd7df1338523ab
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MSGSM32.ACM"
+    format: PE
+    size: 25088
+    xxh3: 328502f88d2e55c62bbe6897922f55e6
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MSJSTICK.DRV"
+    format: NE
+    size: 7744
+    xxh3: c6edc27fe828b265190769c6c728031a
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MSMPU401.DRV"
+    format: NE
+    size: 8704
+    xxh3: a5968e458a124c93688c06876c5211c5
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MSOPL.DRV"
+    format: NE
+    size: 17952
+    xxh3: 5cfe552e21a0bbd3cba2c464993854e9
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MSSBLST.DRV"
+    format: NE
+    size: 40848
+    xxh3: 44bf7d01e237bf8300ba1a86595fbcd4
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MSSBLST.VXD"
+    format: LE
+    size: 21142
+    xxh3: b82a9e53d785951ed856908fcd3dbc7a
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MSSNDSYS.DRV"
+    format: NE
+    size: 39728
+    xxh3: 553da546e3e2e080ac88f4af679be0c8
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MSSNDSYS.VXD"
+    format: LE
+    size: 29932
+    xxh3: 85882b92b14fc013b05d3ba859dbc9ba
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MVI514MX.DRV"
+    format: NE
+    size: 38432
+    xxh3: 88578292225fba381648f76b8a30d3f5
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MVIWAVE.DRV"
+    format: NE
+    size: 19760
+    xxh3: 32c931efb5195df3458c735862556081
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MVMIXER.DRV"
+    format: NE
+    size: 59568
+    xxh3: e94f96c99385e1c722424263160e7d1a
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MVPAS.VXD"
+    format: LE
+    size: 8898
+    xxh3: 0c4acfdf97ebfb4f38d3a4071709218d
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MVPROAUD.DRV"
+    format: NE
+    size: 26128
+    xxh3: 0355d422ddc3b09480654bc63221b7d9
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/PA3DMXD.DRV"
+    format: NE
+    size: 53200
+    xxh3: e3b417e933a36b929f917d1c836a13f6
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/SB16.VXD"
+    format: LE
+    size: 70235
+    xxh3: 69b284f1cf88ddd9ac1f7fc084a43df4
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/SB16SND.DRV"
+    format: NE
+    size: 46000
+    xxh3: a0b407c3336625f1012b4981e87f7876
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/SBAWE.VXD"
+    format: LE
+    size: 42226
+    xxh3: 5f48d042474a15c87fcc6ecda53ae159
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/SBAWE32.DRV"
+    format: NE
+    size: 23216
+    xxh3: 63ef5552b957c8904d630e63c04a41a1
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/SBFM.DRV"
+    format: NE
+    size: 4128
+    xxh3: 4cd09e88c456b024abccce5bf492ae7a
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/SNDREC32.EXE"
+    format: PE
+    size: 105472
+    xxh3: 4a085247d68037263e299929841588d5
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/SNDVOL32.CNT"
+    format: data
+    size: 392
+    xxh3: 162db949ab4c8e7a3945fa442d610344
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/SNDVOL32.EXE"
+    format: PE
+    size: 54784
+    xxh3: 66085944e5459ef13da887f72298b305
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/SNDVOL32.HLP"
+    format: data
+    size: 11120
+    xxh3: f79f7d64bd669be42ffbda3a2c02d45e
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/SOUNDREC.CNT"
+    format: data
+    size: 1023
+    xxh3: 41c9a93eabf4c7b2e9d18f74a995f096
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/SOUNDREC.HLP"
+    format: data
+    size: 24895
+    xxh3: 54c338895d3ae60e676631471f32f8a7
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/SYNTHGM.SBK"
+    format: data
+    size: 34832
+    xxh3: e031e11c0b9dbd4324e626e83b5b2b17
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/TMV1.MPD"
+    format: PE
+    size: 12048
+    xxh3: a519933f98babec21a39cf9af856c8fc
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/TSD32.DLL"
+    format: PE
+    size: 17408
+    xxh3: 52e4b364f0f21c03c5b7b7ff0c7c9081
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/TSSOFT32.ACM"
+    format: PE
+    size: 8704
+    xxh3: ed4159b652f500b8e89802ddb4dce0fe
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/VJOYD.VXD"
+    format: LE
+    size: 20590
+    xxh3: 4d61fca8526bcd12d169b76020e7e8e6
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/VMVID.VXD"
+    format: LE
+    size: 18586
+    xxh3: 575d71083cc192b2f2edb3ea236a3c44
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/VPASD.VXD"
+    format: LE
+    size: 24162
+    xxh3: f02121222cb8227f9da87e87173d36a6
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/WFM0200.ACV"
+    format: NE
+    size: 13456
+    xxh3: c8e6d3b10fe4082754c74b9450790366
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/WFM0200A.CSP"
+    format: data
+    size: 2238
+    xxh3: 4c330feac0db542a29fbcb5b187be7b1
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/WFM0201.ACV"
+    format: NE
+    size: 5184
+    xxh3: ddf363be1f38edda311b8c27f4aeea37
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/WFM0201A.CSP"
+    format: data
+    size: 6776
+    xxh3: bfe8a13e6dda7bc17bccf32e265e2e8c
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/WFM0202.ACV"
+    format: NE
+    size: 9056
+    xxh3: 957bbb60fc7599680d53bff25c0f65be
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/WFM0202A.CSP"
+    format: data
+    size: 9004
+    xxh3: d406cdab1fd238a89d057ca0419db4ac
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/WFM0203.ACV"
+    format: NE
+    size: 9056
+    xxh3: 50516ee91761044a70ac2d6107bc7f2e
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/WFM0203A.CSP"
+    format: data
+    size: 9004
+    xxh3: e487e03969357cf904334826334ef02b
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/MSDSOUND.INF"
+    format: data
+    size: 64453
+    xxh3: 95caaa77aa65acdde0d125762e7c5784
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/MSDSOUND/ISNA.DLL"
+    format: NE
+    size: 6064
+    xxh3: 65075e5aa9b1365993195d86a6e8f198
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/ATI.VXD"
+    format: LE
+    size: 25737
+    xxh3: 7752a6430664eb32f182945e2f26a965
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/ATIM32.DRV"
+    format: NE
+    size: 97952
+    xxh3: 8e3eb85a0488d8058fd27687038b2a00
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/ATIM64.DRV"
+    format: NE
+    size: 70624
+    xxh3: f62d409e80e25d76df9a49949a84b9f8
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/ATIM8.DRV"
+    format: NE
+    size: 128800
+    xxh3: b0e86ff1c72d3d51c1c7414e8bbdd833
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/CDALLOC2.EXE"
+    format: NE
+    size: 5040
+    xxh3: 40a783483ab49c9f22bc3b680b9f9f9d
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/CDD16.DLL"
+    format: NE
+    size: 3808
+    xxh3: d5af993272aafaae1c6810181ac30b8d
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/CDD32.DLL"
+    format: PE
+    size: 22528
+    xxh3: 6fddc1ce62b45f5078d6d64a50d9144e
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/CHIPS.DRV"
+    format: NE
+    size: 28480
+    xxh3: b43b2446b5afafa45eecd2fe3395b20a
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/CHIPS.VXD"
+    format: LE
+    size: 18590
+    xxh3: 7a275f1425ab9e3b84bcc296d6660c87
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/CHTDD16.DLL"
+    format: NE
+    size: 3856
+    xxh3: 5998b6f65480b35811aba22d5e764859
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/CHTDD32.DLL"
+    format: PE
+    size: 7168
+    xxh3: 81e9605e181d3a34813e4663618f45dc
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/CIRRUS.DRV"
+    format: NE
+    size: 65664
+    xxh3: 6a17498787df526f3b76708dcdcf5315
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/CIRRUS.VXD"
+    format: LE
+    size: 17021
+    xxh3: 24480533d0a6d719a2f3eec7675e38e0
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/CIRRUSMM.DRV"
+    format: NE
+    size: 43520
+    xxh3: e5757497ec90d9b69a6ec517e0a25d4d
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/CMMDD16.DLL"
+    format: NE
+    size: 3808
+    xxh3: a23da3f784cf5426c20a66436b90ffd6
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/CMMDD32.DLL"
+    format: PE
+    size: 25600
+    xxh3: bcb0b3d949044b30fcb04e7fe75b9d65
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/CP3.DLL"
+    format: NE
+    size: 8128
+    xxh3: 417fa84b4fce4adec6921dfef20122c2
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/CPX.INI"
+    format: data
+    size: 53
+    xxh3: 3c288294926be9cb6576510a944ebe4a
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/DMSICS64.VXD"
+    format: LE
+    size: 17159
+    xxh3: 70b80b0e734a0686bae31b07ba12e7b5
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/DMSICSS.VXD"
+    format: LE
+    size: 24576
+    xxh3: b7ddf33531b859c47b9a9eeeb114f0cb
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/FBDD16.DLL"
+    format: NE
+    size: 3824
+    xxh3: 53c065dd862ebc4b96ec6dcee9a57347
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/FBDD32.DLL"
+    format: PE
+    size: 7168
+    xxh3: 3fb932fb01dc95450ec1b672464c6c91
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/FRAMEBUF.DRV"
+    format: NE
+    size: 20784
+    xxh3: 28dea905ca1a533b3d4d397d5ee9b773
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/K2V_DIG.INI"
+    format: data
+    size: 38080
+    xxh3: a9da24f7b9bc9e22e3a5d8700ca466dd
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/K2V_HWC.INI"
+    format: data
+    size: 38401
+    xxh3: 8894b676a731e49c5f12c52ae62800fe
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/K2V_SWC.INI"
+    format: data
+    size: 37743
+    xxh3: 04caef8c80f2286b3c4ba72b575300ef
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/M32DD16.DLL"
+    format: NE
+    size: 3808
+    xxh3: 17661312e103493b545231d38f146ba3
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/M32DD32.DLL"
+    format: PE
+    size: 10240
+    xxh3: 2cdb5810c34fab1078f79e498f84e5cb
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/M64DD16.DLL"
+    format: NE
+    size: 3808
+    xxh3: 7c6d26e9795cd362225bdb5e706e9e16
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/M64DD32.DLL"
+    format: PE
+    size: 8192
+    xxh3: 0af95c1ff657011f66caa14bae210777
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/MCIMPEG.DRV"
+    format: NE
+    size: 33968
+    xxh3: 2db257fd0df77cae703915f25c28776f
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/OAK.VXD"
+    format: LE
+    size: 14476
+    xxh3: bbd484a740ee092ea66081799d666e78
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/RFMDD.DLL"
+    format: PE
+    size: 30236
+    xxh3: 1e65730677e390f672dea76bd6e741f3
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/RFMK2V.DLL"
+    format: NE
+    size: 52736
+    xxh3: 58d1fa0448912c276a7221a4a0f37a60
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/RFMK2V.INI"
+    format: data
+    size: 732
+    xxh3: cb3fc6c38b0de2703319dea689c70a62
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/S3.DRV"
+    format: NE
+    size: 62432
+    xxh3: 33138ffeff763ab8e741814e22fa4def
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/S3.VXD"
+    format: LE
+    size: 17084
+    xxh3: 4428ee2047b8ab10f701d64999b39bb3
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/S376DD16.DLL"
+    format: NE
+    size: 3808
+    xxh3: c12fddde9f748bb9939b4b78f079eb9c
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/S376DD32.DLL"
+    format: PE
+    size: 13312
+    xxh3: 94b238eb0770655d06d4640b9fe76c80
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/S3ADE.DLL"
+    format: NE
+    size: 81040
+    xxh3: 8dfbb5d8cf85a556f6c11f5f78f34e90
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/S3DD16.DLL"
+    format: NE
+    size: 3808
+    xxh3: 2027bdc65f543ba4964fc5f38798555a
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/S3DD32.DLL"
+    format: PE
+    size: 8704
+    xxh3: bc588fbdec9bb990df57e68568bbb894
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/S3MPG.DLL"
+    format: NE
+    size: 37904
+    xxh3: 16f91f7e4fe9db23c434aa16abf7ff25
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/S3VDE.DLL"
+    format: NE
+    size: 20112
+    xxh3: 38982d33edb8d5f1a30d83800ebe4cff
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/S3_765.DRV"
+    format: NE
+    size: 72912
+    xxh3: 33996d999416453c62cce150a471a793
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/S3_765.VXD"
+    format: LE
+    size: 18580
+    xxh3: 863226b17da3dffb07e14cdf8db99a19
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/SUPERVGA.DRV"
+    format: NE
+    size: 52320
+    xxh3: cce5d3df69fe4ca0d32c6322942f3374
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/SXCIEXT.DLL"
+    format: NE
+    size: 98144
+    xxh3: cb9e9b4316135751ed9bfd44bb6e6a54
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/TSENG.DRV"
+    format: NE
+    size: 90752
+    xxh3: 6ed1946206dbd9fbad39843fedf13668
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/TSENG.VXD"
+    format: LE
+    size: 14531
+    xxh3: a595e5081db70bdb6e08b95d71a49f66
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/TSNGDD16.DLL"
+    format: NE
+    size: 3824
+    xxh3: 0a479ebc1c4d05d0bd878f61f37762b7
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/TSNGDD32.DLL"
+    format: PE
+    size: 9216
+    xxh3: 7ecdf540ed3292a4fee9143d1b52527f
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/VIDEO7.VXD"
+    format: LE
+    size: 14938
+    xxh3: 85f4e5fd73f0a26125df2e677eab62b5
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/WD.DRV"
+    format: NE
+    size: 21680
+    xxh3: eb6a7ef946204b46f1cca93784182e57
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN/WD.VXD"
+    format: LE
+    size: 18328
+    xxh3: ff40e29abff74cedb6d0df108e647714
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/MSDDRAW.INF"
+    format: data
+    size: 40465
+    xxh3: e00d6a8ea337653fefeb4cdb1c048dc0
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/MSDDRAW/ISS3_765.DLL"
+    format: NE
+    size: 3520
+    xxh3: 37ce85c639f8e5e3e0d9ce968edd0fe1
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/MSDDRAW/S3_CP3CQ.DLL"
+    format: NE
+    size: 4544
+    xxh3: fdea2d52a04e5dfd6ca71a0db9d9029f
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DSOUND.DLL"
+    format: PE
+    size: 69632
+    xxh3: f5bace4c7b026395cf86e24dfebe9ba7
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DSOUND.VXD"
+    format: LE
+    size: 17079
+    xxh3: f382db5ca5c7e0a00a6f186b616fea2d
+  - path: "CD:DEMOS/THEXDER/DIRECTX/DXSETUP.EXE"
+    format: PE
+    size: 12288
+    xxh3: 20c64cf3733c2147e8e82989dce19f37
+  - path: "CD:DEMOS/THEXDER/DIRECTX/LICENSE.TXT"
+    format: data
+    size: 1151
+    xxh3: 2ed6328e696f918bbb40c46c0cc57ebc
+  - path: "CD:DEMOS/THEXDER/DSETUP.DLL"
+    format: PE
+    size: 15872
+    xxh3: 67a73f6973ed34abc2876c7b9cff4e03
+  - path: "CD:DEMOS/THEXDER/DSETUP16.DLL"
+    format: NE
+    size: 33376
+    xxh3: fb00ca6b91a3c621d12c50915f452249
+  - path: "CD:DEMOS/THEXDER/ENGLISH/LANGUAGE.INF"
+    format: data
+    size: 1500
+    xxh3: 5f37306916495be3454430a408931f70
+  - path: "CD:DEMOS/THEXDER/ENGLISH/README.TXT"
+    format: data
+    size: 1524
+    xxh3: 1e3d581d0defb082d8ff9fdf5ba5d50b
+  - path: "CD:DEMOS/THEXDER/MDS/W01L01.MDS"
+    format: data
+    size: 124444
+    xxh3: 1d9b7ed0e81b31fc7b624f697120bf34
+  - path: "CD:DEMOS/THEXDER/MDS/W01L01.MID"
+    format: data
+    size: 35633
+    xxh3: 059db188f733ce22deb194dc68a63ad1
+  - path: "CD:DEMOS/THEXDER/MDS/W01L01GM.MDS"
+    format: data
+    size: 124444
+    xxh3: d661020bd9d38a2246007844f4d2e4da
+  - path: "CD:DEMOS/THEXDER/MDS/W01L01GM.MID"
+    format: data
+    size: 35639
+    xxh3: c46eb5e45ee77e3a46627749e802909c
+  - path: "CD:DEMOS/THEXDER/MDS/W01L04.MDS"
+    format: data
+    size: 124084
+    xxh3: 74f1bf78dbbdc1a28303ba3815bfdbe2
+  - path: "CD:DEMOS/THEXDER/MDS/W01L04.MID"
+    format: data
+    size: 35587
+    xxh3: f6e141fff793c71cf52bbcab70b021af
+  - path: "CD:DEMOS/THEXDER/MDS/W01L04GM.MDS"
+    format: data
+    size: 124084
+    xxh3: de48c2c05bcab71575f09d66f5e28bc1
+  - path: "CD:DEMOS/THEXDER/MDS/W01L04GM.MID"
+    format: data
+    size: 35594
+    xxh3: 942cdcaf77de4f07a68d3f05e0a00fee
+  - path: "CD:DEMOS/THEXDER/MDS/W02L03.MDS"
+    format: data
+    size: 113308
+    xxh3: 785611265a0fb8443c685102fa54134e
+  - path: "CD:DEMOS/THEXDER/MDS/W02L03.MID"
+    format: data
+    size: 35549
+    xxh3: 0cbfbc478335623679622bd91abd8cfe
+  - path: "CD:DEMOS/THEXDER/MDS/W02L03GM.MDS"
+    format: data
+    size: 113320
+    xxh3: 3360883021f6f534b27c3e4ac74bc781
+  - path: "CD:DEMOS/THEXDER/MDS/W02L03GM.MID"
+    format: data
+    size: 29582
+    xxh3: 0fd5880a8f47ce0f22e4ab7d1c02f6b5
+  - path: "CD:DEMOS/THEXDER/MDS/W03L03.MDS"
+    format: data
+    size: 102172
+    xxh3: 8e66798deb8520f5764bde994a717cd5
+  - path: "CD:DEMOS/THEXDER/MDS/W03L03.MID"
+    format: data
+    size: 30361
+    xxh3: 33bea961f6226e03846ba95aec516deb
+  - path: "CD:DEMOS/THEXDER/MDS/W03L03GM.MDS"
+    format: data
+    size: 102172
+    xxh3: 1863af647f55cf48798a489c0a8487b6
+  - path: "CD:DEMOS/THEXDER/MDS/W03L03GM.MID"
+    format: data
+    size: 30361
+    xxh3: 66d1db144f2874da1163e264eaefc9a4
+  - path: "CD:DEMOS/THEXDER/MDS/W06L01.MDS"
+    format: data
+    size: 187000
+    xxh3: 41b39b057a4d43d017fe4bf09f79013e
+  - path: "CD:DEMOS/THEXDER/MDS/W06L01.MID"
+    format: data
+    size: 57680
+    xxh3: f5c8b3a19991519e45a1d975ed813a52
+  - path: "CD:DEMOS/THEXDER/MDS/W06L01GM.MDS"
+    format: data
+    size: 175276
+    xxh3: f1a9ff7af4637c8bce17d895aa2a09ea
+  - path: "CD:DEMOS/THEXDER/MDS/W06L01GM.MID"
+    format: data
+    size: 46128
+    xxh3: 33f0afd41048c0248ac526fad18d24c6
+  - path: "CD:DEMOS/THEXDER/SEG01.THL"
+    format: data
+    size: 95510
+    xxh3: 8cb9006e2b051d111590b6624f870f00
+  - path: "CD:DEMOS/THEXDER/SEG02.THL"
+    format: data
+    size: 95510
+    xxh3: a229be2fef5a4e606575ea23db9be440
+  - path: "CD:DEMOS/THEXDER/SETUP.EXE"
+    format: NE
+    size: 28096
+    xxh3: 8e3074214b49ed45d0bf151a1173ec3f
+  - path: "CD:DEMOS/THEXDER/SETUP.SOL"
+    format: data
+    size: 622667
+    xxh3: 52b98b9924ff6889dc617ced2e955762
+  - path: "CD:DEMOS/THEXDER/SIERRA.INF"
+    format: data
+    size: 3642
+    xxh3: 8655697fc038cc9340cbc42f3bc83a48
+  - path: "CD:DEMOS/THEXDER/THEXDEMO.DLL"
+    format: PE
+    size: 5174784
+    xxh3: e329779a2bf9e2b53919d996aa4fd876
+  - path: "CD:DEMOS/THEXDER/THEXDER.EXE"
+    format: PE
+    size: 450560
+    xxh3: 45e95a7ab722060d9fa7a20a83c7a019
+  - path: "CD:DEMOS/THEXDER/THEXDER.HLP"
+    format: data
+    size: 212826
+    xxh3: d2cb6e6f13d008e16a7d6e6ee20ad2f0
+  - path: "CD:DEMOS/THEXDER/W01L01.THL"
+    format: data
+    size: 95510
+    xxh3: 4af0f020f902603c2bd42188f252bd37
+  - path: "CD:DEMOS/THEXDER/W01L04.THL"
+    format: data
+    size: 95510
+    xxh3: 3560e5b4711dd72e91f7ca0d5ad54daa
+  - path: "CD:DEMOS/THEXDER/W02L03.THL"
+    format: data
+    size: 95510
+    xxh3: d1e5bc839cfc1977553277e16339a9f8
+  - path: "CD:DEMOS/THEXDER/W03L03.THL"
+    format: data
+    size: 95510
+    xxh3: 5d62465a2878a3df239e07daa88a7227
+  - path: "CD:DEMOS/THEXDER/W06L01.THL"
+    format: data
+    size: 95510
+    xxh3: 714cb62435398af4d10aed7ddfe73a1c
+  - path: "CD:DEMOS/THEXDER/WAVE/ACIDAMG4.WAV"
+    format: data
+    size: 52962
+    xxh3: c71e975e9f9d396f5759a1cd26bef9b7
+  - path: "CD:DEMOS/THEXDER/WAVE/ACIDAMG5.WAV"
+    format: data
+    size: 31432
+    xxh3: 1d6d2b86cd999f4d48b157c93e4eb1c7
+  - path: "CD:DEMOS/THEXDER/WAVE/ACIDAMG6.WAV"
+    format: data
+    size: 36044
+    xxh3: 89cbe43fa13799e8095b8e7dd11f3846
+  - path: "CD:DEMOS/THEXDER/WAVE/ACUR8TGT.WAV"
+    format: data
+    size: 23915
+    xxh3: ca332b80e22828d6d7ef811f3901e52e
+  - path: "CD:DEMOS/THEXDER/WAVE/ARMOR.WAV"
+    format: data
+    size: 12014
+    xxh3: a7396d4011d41a979cbbeb820e66debc
+  - path: "CD:DEMOS/THEXDER/WAVE/ASPMISLS.WAV"
+    format: data
+    size: 28151
+    xxh3: 418e71bfb85d65e11d37bedd180f8836
+  - path: "CD:DEMOS/THEXDER/WAVE/BASH13.WAV"
+    format: data
+    size: 39356
+    xxh3: 03604033be52aba62a665afdc37f1f93
+  - path: "CD:DEMOS/THEXDER/WAVE/BASH14.WAV"
+    format: data
+    size: 11084
+    xxh3: 3317f9aff0cc3550a68c3e774b6c71dd
+  - path: "CD:DEMOS/THEXDER/WAVE/BASH3.WAV"
+    format: data
+    size: 9258
+    xxh3: f8a12a3cfd1f4bc5b156706dd2158881
+  - path: "CD:DEMOS/THEXDER/WAVE/BASHIT2.WAV"
+    format: data
+    size: 7302
+    xxh3: 24f4856841815c8de60f3fea51dff621
+  - path: "CD:DEMOS/THEXDER/WAVE/BASHIT2A.WAV"
+    format: data
+    size: 17264
+    xxh3: 52c7c64fc3a078ba47ad866ee3620625
+  - path: "CD:DEMOS/THEXDER/WAVE/BASHIT3.WAV"
+    format: data
+    size: 9326
+    xxh3: b8faf48b42f09e51fc423a12ac86eca9
+  - path: "CD:DEMOS/THEXDER/WAVE/BASHIT3A.WAV"
+    format: data
+    size: 18232
+    xxh3: 605df75ef889ddadb90ff84ba95b3204
+  - path: "CD:DEMOS/THEXDER/WAVE/BASHIT5.WAV"
+    format: data
+    size: 17788
+    xxh3: f89fe8fe491eada99ac1ba8601838105
+  - path: "CD:DEMOS/THEXDER/WAVE/BASHIT6.WAV"
+    format: data
+    size: 27346
+    xxh3: f8e275403daaea74803e2d76735d2bf9
+  - path: "CD:DEMOS/THEXDER/WAVE/BATTERY.WAV"
+    format: data
+    size: 26537
+    xxh3: b55cf149e34fa018aeb17b8dc10a8cff
+  - path: "CD:DEMOS/THEXDER/WAVE/CANNON3.WAV"
+    format: data
+    size: 22070
+    xxh3: 365122ee80a8ac9b7d72f74e0a738620
+  - path: "CD:DEMOS/THEXDER/WAVE/CANNON5.WAV"
+    format: data
+    size: 14916
+    xxh3: 4d0ec274407e058115804804ee76e0f2
+  - path: "CD:DEMOS/THEXDER/WAVE/CHEWSNP1.WAV"
+    format: data
+    size: 17266
+    xxh3: f99bed644f5100d6669edbb093f13178
+  - path: "CD:DEMOS/THEXDER/WAVE/CHOP1.WAV"
+    format: data
+    size: 7836
+    xxh3: 1220a5cfe75630b9d5eb224c0854be56
+  - path: "CD:DEMOS/THEXDER/WAVE/CRAWLNOT.WAV"
+    format: data
+    size: 47112
+    xxh3: fc68e080d23d6d7ae7ace83cadb35832
+  - path: "CD:DEMOS/THEXDER/WAVE/CRUMBL1.WAV"
+    format: data
+    size: 143830
+    xxh3: cbc9405f7553ef06839a4880256b4e53
+  - path: "CD:DEMOS/THEXDER/WAVE/CRUMBL4.WAV"
+    format: data
+    size: 78916
+    xxh3: a50d02128d571a3e0acba0e11aa4eb80
+  - path: "CD:DEMOS/THEXDER/WAVE/CRUNCH1.WAV"
+    format: data
+    size: 19418
+    xxh3: e731733e515582c85331c2a113469772
+  - path: "CD:DEMOS/THEXDER/WAVE/CRUSH3.WAV"
+    format: data
+    size: 33322
+    xxh3: 846e8104fbb360efd123a42392c0f22e
+  - path: "CD:DEMOS/THEXDER/WAVE/DEVMISLS.WAV"
+    format: data
+    size: 30975
+    xxh3: 729b81e3c0e4fe67ab3bfa8e383b7b56
+  - path: "CD:DEMOS/THEXDER/WAVE/DIGDO3.WAV"
+    format: data
+    size: 12282
+    xxh3: e68f2c1c1cf956bffde1c49b78c4604c
+  - path: "CD:DEMOS/THEXDER/WAVE/DIGDO4.WAV"
+    format: data
+    size: 22740
+    xxh3: 07aef11e63e9593f49a9ff3ae82f9dce
+  - path: "CD:DEMOS/THEXDER/WAVE/DONTSHOT.WAV"
+    format: data
+    size: 29361
+    xxh3: a19c0351dbc0f1acc8a652d6b69d6fbe
+  - path: "CD:DEMOS/THEXDER/WAVE/DONTSTND.WAV"
+    format: data
+    size: 29967
+    xxh3: 7ab8ffbc7a0c9968e829b1908910a315
+  - path: "CD:DEMOS/THEXDER/WAVE/DONTSTOP.WAV"
+    format: data
+    size: 26134
+    xxh3: 7772dc8b4ddbf7db8a4db5dbd2ac99c4
+  - path: "CD:DEMOS/THEXDER/WAVE/DONTWAST.WAV"
+    format: data
+    size: 31379
+    xxh3: cd0b03f8d672672912ef0d91b0a67d1e
+  - path: "CD:DEMOS/THEXDER/WAVE/DRILL2.WAV"
+    format: data
+    size: 18036
+    xxh3: f9628dde1fab1fb07f49ffb77f31fe43
+  - path: "CD:DEMOS/THEXDER/WAVE/DRYFIRE.WAV"
+    format: data
+    size: 2334
+    xxh3: 06f07d92939f5a2e40c3fc8094a5fd50
+  - path: "CD:DEMOS/THEXDER/WAVE/ELECFNC1.WAV"
+    format: data
+    size: 7768
+    xxh3: e45b9177f0afcff1baa5b2344933a4ac
+  - path: "CD:DEMOS/THEXDER/WAVE/ENRGCELL.WAV"
+    format: data
+    size: 21293
+    xxh3: 1124433bd8b3468e1aae90621578b2fd
+  - path: "CD:DEMOS/THEXDER/WAVE/ENRGCHGX.WAV"
+    format: data
+    size: 33597
+    xxh3: 9ca33596bfb17c7ec310400536aea43a
+  - path: "CD:DEMOS/THEXDER/WAVE/ENRGCHRG.WAV"
+    format: data
+    size: 26134
+    xxh3: 8075fb0e737ca3bf8b062bafaca8d608
+  - path: "CD:DEMOS/THEXDER/WAVE/ENRGCRIT.WAV"
+    format: data
+    size: 25731
+    xxh3: 9928df4e8bf2605c311b40939d382030
+  - path: "CD:DEMOS/THEXDER/WAVE/ENRGLOW.WAV"
+    format: data
+    size: 23310
+    xxh3: 08a8e5b22f0eb206cf183a7d94cf547b
+  - path: "CD:DEMOS/THEXDER/WAVE/EXCELNT.WAV"
+    format: data
+    size: 16855
+    xxh3: 50c1747623eb0294ed5598a9d9dfa7f5
+  - path: "CD:DEMOS/THEXDER/WAVE/EXPLOD10.WAV"
+    format: data
+    size: 79698
+    xxh3: 095c31f7acb1fe1a963f5271503f8a14
+  - path: "CD:DEMOS/THEXDER/WAVE/EXPLOD11.WAV"
+    format: data
+    size: 73364
+    xxh3: 03bf99948884b179d19edf821ef75ed9
+  - path: "CD:DEMOS/THEXDER/WAVE/EXPLOD12.WAV"
+    format: data
+    size: 40202
+    xxh3: 8b03b19b808cbe4ad5bca81343c7ff56
+  - path: "CD:DEMOS/THEXDER/WAVE/EXPLOD13.WAV"
+    format: data
+    size: 67150
+    xxh3: a77c00d262731e396e60a8fb52d03b11
+  - path: "CD:DEMOS/THEXDER/WAVE/EXPLOD14.WAV"
+    format: data
+    size: 26792
+    xxh3: 9d221243d0f19fb80ef804da0c1f6954
+  - path: "CD:DEMOS/THEXDER/WAVE/EXPLOD15.WAV"
+    format: data
+    size: 50040
+    xxh3: 29cab2fd8db43eea9d5a34e4d243b73e
+  - path: "CD:DEMOS/THEXDER/WAVE/EXPLOD2.WAV"
+    format: data
+    size: 68157
+    xxh3: 686eaea31e326923d162e80f34ccc97f
+  - path: "CD:DEMOS/THEXDER/WAVE/EXPLOD20.WAV"
+    format: data
+    size: 26400
+    xxh3: e56eaf597748b9f9b5ab659761ff4170
+  - path: "CD:DEMOS/THEXDER/WAVE/EXPLOD21.WAV"
+    format: data
+    size: 74251
+    xxh3: c7b40e989b8083934ae02b070207d83e
+  - path: "CD:DEMOS/THEXDER/WAVE/EXPLOD22.WAV"
+    format: data
+    size: 111352
+    xxh3: 278dd1f58a6aeee6def5d65d3aaf3d6e
+  - path: "CD:DEMOS/THEXDER/WAVE/EXPLOD23.WAV"
+    format: data
+    size: 42862
+    xxh3: 63d4d1a3a99dddea617f0c744c7549d9
+  - path: "CD:DEMOS/THEXDER/WAVE/EXPLOD3.WAV"
+    format: data
+    size: 35416
+    xxh3: 397de5d47097503d24ae5c450ac4fb83
+  - path: "CD:DEMOS/THEXDER/WAVE/EXPLOD7.WAV"
+    format: data
+    size: 31684
+    xxh3: 55b3d9545e34ab8c75a34f1656f2322a
+  - path: "CD:DEMOS/THEXDER/WAVE/EXPLOD9.WAV"
+    format: data
+    size: 56532
+    xxh3: d81d640f3701511846d10ccb17430f25
+  - path: "CD:DEMOS/THEXDER/WAVE/FAILMISN.WAV"
+    format: data
+    size: 26941
+    xxh3: b7626c36b336636cf863129021c05791
+  - path: "CD:DEMOS/THEXDER/WAVE/FANFIRE.WAV"
+    format: data
+    size: 34001
+    xxh3: e9f4a13453510a03acf3029140cb2246
+  - path: "CD:DEMOS/THEXDER/WAVE/FANFIRE1.WAV"
+    format: data
+    size: 7300
+    xxh3: 6fb6a694da623e28434b16b6531831dd
+  - path: "CD:DEMOS/THEXDER/WAVE/FANFIRE4.WAV"
+    format: data
+    size: 13036
+    xxh3: 0f6f1f994eb519b936636e77ec5b9fb8
+  - path: "CD:DEMOS/THEXDER/WAVE/FANFIRE5.WAV"
+    format: data
+    size: 11264
+    xxh3: 12c134d1e8332839cc83b0d6d79d524e
+  - path: "CD:DEMOS/THEXDER/WAVE/FIREBAL1.WAV"
+    format: data
+    size: 10672
+    xxh3: 8b60c1974094135b167a9dbe25ba3aac
+  - path: "CD:DEMOS/THEXDER/WAVE/FIREBAL3.WAV"
+    format: data
+    size: 26266
+    xxh3: 5960048490cf9d65eee1719e414b16fc
+  - path: "CD:DEMOS/THEXDER/WAVE/FIREBALS.WAV"
+    format: data
+    size: 22301
+    xxh3: ff67332d3aac75f5f408540c4b135e61
+  - path: "CD:DEMOS/THEXDER/WAVE/FLAK1.WAV"
+    format: data
+    size: 14306
+    xxh3: 532fd3be390b3c8816d105547d151106
+  - path: "CD:DEMOS/THEXDER/WAVE/FLAK2.WAV"
+    format: data
+    size: 13496
+    xxh3: 77af1a2e527bc079fd0c7540faf4ea63
+  - path: "CD:DEMOS/THEXDER/WAVE/FLAK3.WAV"
+    format: data
+    size: 17790
+    xxh3: 2e764d9329ee3030dc382413c228c1a0
+  - path: "CD:DEMOS/THEXDER/WAVE/FLAK4.WAV"
+    format: data
+    size: 13932
+    xxh3: 5e6104e18839782916916a726c2a0662
+  - path: "CD:DEMOS/THEXDER/WAVE/FLAP1.WAV"
+    format: data
+    size: 14488
+    xxh3: 7a1cdae0c1465d7e808bbf77f167ad47
+  - path: "CD:DEMOS/THEXDER/WAVE/FLAP2.WAV"
+    format: data
+    size: 6312
+    xxh3: aa556a52a36874ce797850f9b81861d2
+  - path: "CD:DEMOS/THEXDER/WAVE/FLYNOT.WAV"
+    format: data
+    size: 48726
+    xxh3: a837b1f8df7f46222294a2d430b9e6ab
+  - path: "CD:DEMOS/THEXDER/WAVE/FTSTEP2.WAV"
+    format: data
+    size: 14004
+    xxh3: 27f66d76c6b42f9d841e00a3fdc64e65
+  - path: "CD:DEMOS/THEXDER/WAVE/FTSTEP3.WAV"
+    format: data
+    size: 14010
+    xxh3: fcc2964be15ddad878d356eef7d8502a
+  - path: "CD:DEMOS/THEXDER/WAVE/GETGOING.WAV"
+    format: data
+    size: 18267
+    xxh3: e4d74c192703b1d08af05c60f01bd9e9
+  - path: "CD:DEMOS/THEXDER/WAVE/GLASBRK4.WAV"
+    format: data
+    size: 8986
+    xxh3: aa3153257b36730b6f1b43254f5e9f62
+  - path: "CD:DEMOS/THEXDER/WAVE/GLASBRK5.WAV"
+    format: data
+    size: 27710
+    xxh3: b2f3879ddbef7a0de0b4e2f24f9e2567
+  - path: "CD:DEMOS/THEXDER/WAVE/GLASDIE1.WAV"
+    format: data
+    size: 92480
+    xxh3: 698e121f372acc08c82cb8e421908ab5
+  - path: "CD:DEMOS/THEXDER/WAVE/GLASDIE2.WAV"
+    format: data
+    size: 61900
+    xxh3: b7978f149ced4a120b37c79a401e5c3a
+  - path: "CD:DEMOS/THEXDER/WAVE/GOODHIT.WAV"
+    format: data
+    size: 18872
+    xxh3: 257a750e31084cbafc41b2a27da0502b
+  - path: "CD:DEMOS/THEXDER/WAVE/GOODSHTN.WAV"
+    format: data
+    size: 19276
+    xxh3: 2c9859fd111f781b9e0f3c65a933b2d2
+  - path: "CD:DEMOS/THEXDER/WAVE/GOTOMOVE.WAV"
+    format: data
+    size: 25529
+    xxh3: 65e578c6f411ebb55749f225bb2dd703
+  - path: "CD:DEMOS/THEXDER/WAVE/GREATSHT.WAV"
+    format: data
+    size: 21091
+    xxh3: 21a2f76ecf42647f4bdc6b4306eff785
+  - path: "CD:DEMOS/THEXDER/WAVE/GRENADES.WAV"
+    format: data
+    size: 19881
+    xxh3: 20d40bdd34005b0c124f28dc78b96524
+  - path: "CD:DEMOS/THEXDER/WAVE/GROWL10.WAV"
+    format: data
+    size: 18930
+    xxh3: 757afcfdde4bf3410b92038e9fe2f73b
+  - path: "CD:DEMOS/THEXDER/WAVE/GROWL3.WAV"
+    format: data
+    size: 16632
+    xxh3: 1060131372544a0dfd76b1767357938c
+  - path: "CD:DEMOS/THEXDER/WAVE/GROWL4.WAV"
+    format: data
+    size: 61004
+    xxh3: c15aa4a903c67a6752a8834669069e8d
+  - path: "CD:DEMOS/THEXDER/WAVE/GROWL6.WAV"
+    format: data
+    size: 20511
+    xxh3: 5544e121da7bebb578f284a5f2802f96
+  - path: "CD:DEMOS/THEXDER/WAVE/GUNSHT3.WAV"
+    format: data
+    size: 13722
+    xxh3: a4a432ce0c9b20c108544b5a1cf7c897
+  - path: "CD:DEMOS/THEXDER/WAVE/HIT2.WAV"
+    format: data
+    size: 2753
+    xxh3: bb095a521700a9234c68e061ad457bbe
+  - path: "CD:DEMOS/THEXDER/WAVE/HIT3.WAV"
+    format: data
+    size: 2752
+    xxh3: 1ee3cb67ca622d541e28dec0355c54a3
+  - path: "CD:DEMOS/THEXDER/WAVE/HOVER.WAV"
+    format: data
+    size: 25731
+    xxh3: 64ec3b9bdc473640f33d7b310dc897d7
+  - path: "CD:DEMOS/THEXDER/WAVE/HOWL1.WAV"
+    format: data
+    size: 30854
+    xxh3: 50f04e553ad5ff0cd837027d082b2045
+  - path: "CD:DEMOS/THEXDER/WAVE/HOWL3.WAV"
+    format: data
+    size: 35868
+    xxh3: 3a3aac226f2d5286e260cf8f374b7d07
+  - path: "CD:DEMOS/THEXDER/WAVE/HOWLDIE1.WAV"
+    format: data
+    size: 72772
+    xxh3: a71942da31f69d1fe25bad4e6159d8ff
+  - path: "CD:DEMOS/THEXDER/WAVE/HOWLDIE2.WAV"
+    format: data
+    size: 42544
+    xxh3: dafa9b65db6c38622f7a92d4a8416c07
+  - path: "CD:DEMOS/THEXDER/WAVE/IMPACT2.WAV"
+    format: data
+    size: 7058
+    xxh3: b17da6135d6e57fdbd12ae41becdf8f9
+  - path: "CD:DEMOS/THEXDER/WAVE/IMPACT3.WAV"
+    format: data
+    size: 72772
+    xxh3: 06139ddd926956d694f9eb3f29769df3
+  - path: "CD:DEMOS/THEXDER/WAVE/INTHERE.WAV"
+    format: data
+    size: 51550
+    xxh3: 323e5d9b7becad97f5a9ea89a3fe545f
+  - path: "CD:DEMOS/THEXDER/WAVE/JETENG1.WAV"
+    format: data
+    size: 38152
+    xxh3: 7e9b3fdca330f97277d224fca5075886
+  - path: "CD:DEMOS/THEXDER/WAVE/JETPACK.WAV"
+    format: data
+    size: 20688
+    xxh3: ea286499361b00a164d1f77890275278
+  - path: "CD:DEMOS/THEXDER/WAVE/JMPBOOTS.WAV"
+    format: data
+    size: 19881
+    xxh3: d59177d1982e811279451046692c71d5
+  - path: "CD:DEMOS/THEXDER/WAVE/KEEPMOVN.WAV"
+    format: data
+    size: 23108
+    xxh3: de0c063fc28e056fc6e658646f718c0f
+  - path: "CD:DEMOS/THEXDER/WAVE/KISS3.WAV"
+    format: data
+    size: 13960
+    xxh3: 562b16d699e251f084013f412fcad140
+  - path: "CD:DEMOS/THEXDER/WAVE/KISS5.WAV"
+    format: data
+    size: 7962
+    xxh3: 177f543b478d529e7afc4e46a2467a25
+  - path: "CD:DEMOS/THEXDER/WAVE/LASRAMMO.WAV"
+    format: data
+    size: 22100
+    xxh3: 9065e2b7bf8b8a381196e1ea9d8f9cb6
+  - path: "CD:DEMOS/THEXDER/WAVE/LASRSHT2.WAV"
+    format: data
+    size: 6570
+    xxh3: 361002ba6954bbc0454ab6771bad31b3
+  - path: "CD:DEMOS/THEXDER/WAVE/LASRSHT3.WAV"
+    format: data
+    size: 10264
+    xxh3: 61a658f58c129e238ff917b6a7a205dc
+  - path: "CD:DEMOS/THEXDER/WAVE/LAUNCH2.WAV"
+    format: data
+    size: 22430
+    xxh3: 65f1159aac65a86ca3dedac2132be9e5
+  - path: "CD:DEMOS/THEXDER/WAVE/LAUNCH4.WAV"
+    format: data
+    size: 12024
+    xxh3: 7a9769da7e1bbcc481ee5784bb2b4beb
+  - path: "CD:DEMOS/THEXDER/WAVE/LAUNCH5.WAV"
+    format: data
+    size: 19348
+    xxh3: 8c3b9a33bc18abad709b7712720cee5c
+  - path: "CD:DEMOS/THEXDER/WAVE/LETSGO.WAV"
+    format: data
+    size: 19074
+    xxh3: 0430c06b43b95cfc54a6f97e9ace6ec3
+  - path: "CD:DEMOS/THEXDER/WAVE/LSABRE1.WAV"
+    format: data
+    size: 18570
+    xxh3: c670222f4801c4c7d51851d6cfa0b6b6
+  - path: "CD:DEMOS/THEXDER/WAVE/LSABRE3.WAV"
+    format: data
+    size: 13410
+    xxh3: 8d8f84b416fddf6c2d617b74133a5240
+  - path: "CD:DEMOS/THEXDER/WAVE/MEGARMOR.WAV"
+    format: data
+    size: 24924
+    xxh3: a9b45d10510d3199e76739c905f37825
+  - path: "CD:DEMOS/THEXDER/WAVE/MESSAGE.WAV"
+    format: data
+    size: 40052
+    xxh3: 9b775531f6afb2f7b1d02093bdfe75e0
+  - path: "CD:DEMOS/THEXDER/WAVE/MISNFAIL.WAV"
+    format: data
+    size: 29160
+    xxh3: 0af21b9f1a7ecebb333be94f07a0001d
+  - path: "CD:DEMOS/THEXDER/WAVE/MLAUNCH1.WAV"
+    format: data
+    size: 14038
+    xxh3: 0860bf9e4a330756aff86d8b5b486cc1
+  - path: "CD:DEMOS/THEXDER/WAVE/MLAUNCH2.WAV"
+    format: data
+    size: 10278
+    xxh3: 23b5b5b93d3476f3836e3e4047acf121
+  - path: "CD:DEMOS/THEXDER/WAVE/MOAN1.WAV"
+    format: data
+    size: 18851
+    xxh3: e4658607516bd789403a54df2a488bc8
+  - path: "CD:DEMOS/THEXDER/WAVE/MOAN2.WAV"
+    format: data
+    size: 16775
+    xxh3: db752ceda302b40d4adffac15a3f8f0b
+  - path: "CD:DEMOS/THEXDER/WAVE/MOAN3.WAV"
+    format: data
+    size: 34330
+    xxh3: fb9b4814bbe3e693ba2e6879f87f12b0
+  - path: "CD:DEMOS/THEXDER/WAVE/MOVEIT.WAV"
+    format: data
+    size: 13224
+    xxh3: 3edf152e153eb7c4c426a55fd0f8f53a
+  - path: "CD:DEMOS/THEXDER/WAVE/MOVEON.WAV"
+    format: data
+    size: 18671
+    xxh3: d6f35ddf6ba14ae30012e02360f84c25
+  - path: "CD:DEMOS/THEXDER/WAVE/MOVEOUT.WAV"
+    format: data
+    size: 18872
+    xxh3: 110211f222bfe546f5101976d02116e8
+  - path: "CD:DEMOS/THEXDER/WAVE/MTLBONG4.WAV"
+    format: data
+    size: 12380
+    xxh3: e29f8fa5115133402c0b5810c1c9e200
+  - path: "CD:DEMOS/THEXDER/WAVE/MTLHIT10.WAV"
+    format: data
+    size: 10006
+    xxh3: 10647ea0c2cf0d1d19058145b5798731
+  - path: "CD:DEMOS/THEXDER/WAVE/MTLHIT11.WAV"
+    format: data
+    size: 18188
+    xxh3: 288a4b40fb1ebc3c19e3cbf7c671c029
+  - path: "CD:DEMOS/THEXDER/WAVE/NICESHOT.WAV"
+    format: data
+    size: 21293
+    xxh3: f8773f9560f7cebdeaa7d38aa403d677
+  - path: "CD:DEMOS/THEXDER/WAVE/NOAMMO.WAV"
+    format: data
+    size: 25125
+    xxh3: c12f37a1758ef4c1b987eacf54d4bacf
+  - path: "CD:DEMOS/THEXDER/WAVE/NOTPRDNT.WAV"
+    format: data
+    size: 54576
+    xxh3: c44a7cff94b7275da5ef486cefd60bb1
+  - path: "CD:DEMOS/THEXDER/WAVE/PICKUP1.WAV"
+    format: data
+    size: 2160
+    xxh3: 65c7436151a2e542b520183d99955b2b
+  - path: "CD:DEMOS/THEXDER/WAVE/PLSMBOMB.WAV"
+    format: data
+    size: 26134
+    xxh3: 4f4802e05be0fe39f60f10dfc5c64d5b
+  - path: "CD:DEMOS/THEXDER/WAVE/POKEY1A.WAV"
+    format: data
+    size: 18396
+    xxh3: 1df91b0e7fb91408a7215a2177f3057c
+  - path: "CD:DEMOS/THEXDER/WAVE/POKEY1B.WAV"
+    format: data
+    size: 23884
+    xxh3: 6c217ed019279a5e98ffb301d94a727b
+  - path: "CD:DEMOS/THEXDER/WAVE/POKEY2.WAV"
+    format: data
+    size: 15412
+    xxh3: 53ce22b8a46cfec2d7906c9f4e2d1233
+  - path: "CD:DEMOS/THEXDER/WAVE/POKEY4A.WAV"
+    format: data
+    size: 23336
+    xxh3: 7bb765094c8ac27fc3bd0d1384d78801
+  - path: "CD:DEMOS/THEXDER/WAVE/POKEY5.WAV"
+    format: data
+    size: 23226
+    xxh3: 90ea56a6f84c6b4bee130ded28aea02c
+  - path: "CD:DEMOS/THEXDER/WAVE/POKEY6A.WAV"
+    format: data
+    size: 11104
+    xxh3: a3cb27cdaddf742f3a0e84ac8daa373c
+  - path: "CD:DEMOS/THEXDER/WAVE/POWERUP2.WAV"
+    format: data
+    size: 25672
+    xxh3: 63081cb2ec95a7a63694579211aa3456
+  - path: "CD:DEMOS/THEXDER/WAVE/POWERUP4.WAV"
+    format: data
+    size: 47706
+    xxh3: cbd66c0b4664ba50ac56ea1b5478b7c2
+  - path: "CD:DEMOS/THEXDER/WAVE/POWERUP5.WAV"
+    format: data
+    size: 43384
+    xxh3: 312fe45b31c3f0644aeb023a3ab10b73
+  - path: "CD:DEMOS/THEXDER/WAVE/PRFCTAIM.WAV"
+    format: data
+    size: 20486
+    xxh3: 7dbf06b291041ee608442284e595f154
+  - path: "CD:DEMOS/THEXDER/WAVE/PRFCTMRK.WAV"
+    format: data
+    size: 29765
+    xxh3: cedfabd358142f74ee3cd949c929252d
+  - path: "CD:DEMOS/THEXDER/WAVE/PRFCTSHT.WAV"
+    format: data
+    size: 22906
+    xxh3: 74718357f7992966a4d2d64aa3df4d7c
+  - path: "CD:DEMOS/THEXDER/WAVE/RATLATK2.WAV"
+    format: data
+    size: 11064
+    xxh3: 1687ec3601b19263a552ad349eea78d2
+  - path: "CD:DEMOS/THEXDER/WAVE/RICOCH1A.WAV"
+    format: data
+    size: 11890
+    xxh3: dc5d278874fa4010620c3710f161c008
+  - path: "CD:DEMOS/THEXDER/WAVE/RICOCH2.WAV"
+    format: data
+    size: 15564
+    xxh3: 0066325a41c9786d0fb25a3d21dd317e
+  - path: "CD:DEMOS/THEXDER/WAVE/ROAR10.WAV"
+    format: data
+    size: 50391
+    xxh3: fd65159595ed6042777a4fd8366a8ef6
+  - path: "CD:DEMOS/THEXDER/WAVE/ROAR11.WAV"
+    format: data
+    size: 83548
+    xxh3: 32a2ad27f9cb4ee06d6cb07cc89daa56
+  - path: "CD:DEMOS/THEXDER/WAVE/ROARDIE1.WAV"
+    format: data
+    size: 84676
+    xxh3: 730f48d3bdcc427bc8e8b03197fe88f2
+  - path: "CD:DEMOS/THEXDER/WAVE/ROARDIE2.WAV"
+    format: data
+    size: 54466
+    xxh3: 98f67f3decc1060431c44861b45c7b56
+  - path: "CD:DEMOS/THEXDER/WAVE/ROCKWRM1.WAV"
+    format: data
+    size: 48702
+    xxh3: b9852c11d598faf212df3ba694b57758
+  - path: "CD:DEMOS/THEXDER/WAVE/SCRAPE3.WAV"
+    format: data
+    size: 15556
+    xxh3: e0e074bc8376288924a916c6ffe79328
+  - path: "CD:DEMOS/THEXDER/WAVE/SCRATCH1.WAV"
+    format: data
+    size: 30370
+    xxh3: 0d190f9fdecb2e5381dc5a293606dced
+  - path: "CD:DEMOS/THEXDER/WAVE/SCREAM1.WAV"
+    format: data
+    size: 11906
+    xxh3: 0e102f5118a3d4ac50e7217dbff10db4
+  - path: "CD:DEMOS/THEXDER/WAVE/SCREAM6.WAV"
+    format: data
+    size: 53520
+    xxh3: 99ee4366561fdcaf3416c396079ab5e1
+  - path: "CD:DEMOS/THEXDER/WAVE/SCREAM7.WAV"
+    format: data
+    size: 38425
+    xxh3: 9b16c12010c7986049c146513ba974da
+  - path: "CD:DEMOS/THEXDER/WAVE/SCRMDIE1.WAV"
+    format: data
+    size: 38370
+    xxh3: 5f6ea2c45b21e031e9d4d6d527fd60fb
+  - path: "CD:DEMOS/THEXDER/WAVE/SELWEPN.WAV"
+    format: data
+    size: 34606
+    xxh3: 3c06e577e366a7207c859e64bd75aad4
+  - path: "CD:DEMOS/THEXDER/WAVE/SMLSHTA1.WAV"
+    format: data
+    size: 7458
+    xxh3: 565500f3aa3fca3237e044c5f0015d96
+  - path: "CD:DEMOS/THEXDER/WAVE/SNAPJAW1.WAV"
+    format: data
+    size: 6036
+    xxh3: a45c45f51c4cf471f5c80fa4c55a670d
+  - path: "CD:DEMOS/THEXDER/WAVE/SNRLSNP1.WAV"
+    format: data
+    size: 13396
+    xxh3: 28964d98c718c4d41532578b8d802795
+  - path: "CD:DEMOS/THEXDER/WAVE/SPIT1.WAV"
+    format: data
+    size: 15784
+    xxh3: eae2d7f8adbb5b09630db8975134b896
+  - path: "CD:DEMOS/THEXDER/WAVE/SPIT2.WAV"
+    format: data
+    size: 17152
+    xxh3: ecfd5f7b06ce61c3dbd095814aa1a8fc
+  - path: "CD:DEMOS/THEXDER/WAVE/SPIT3.WAV"
+    format: data
+    size: 12616
+    xxh3: 9a2dd33b604b5939ec17bd150bdac251
+  - path: "CD:DEMOS/THEXDER/WAVE/SPRAY2.WAV"
+    format: data
+    size: 68084
+    xxh3: aaf86ab938a0cca93ec53f3af2af80cd
+  - path: "CD:DEMOS/THEXDER/WAVE/SPRAY3.WAV"
+    format: data
+    size: 22820
+    xxh3: 30df902ea200e8ffc2c16b6b3352ff47
+  - path: "CD:DEMOS/THEXDER/WAVE/STATPOOR.WAV"
+    format: data
+    size: 80597
+    xxh3: 77de28ece203aedf1b56e6e6e76b95f6
+  - path: "CD:DEMOS/THEXDER/WAVE/SUPERAIM.WAV"
+    format: data
+    size: 30168
+    xxh3: 1b29b009d8241c7a291063e60468b530
+  - path: "CD:DEMOS/THEXDER/WAVE/SWITCH.WAV"
+    format: data
+    size: 30168
+    xxh3: e858e6afb049ff98a14a75d392aba86e
+  - path: "CD:DEMOS/THEXDER/WAVE/SWITCH2.WAV"
+    format: data
+    size: 6374
+    xxh3: 5f84fbde2d1daa2fdba53b1c9cdac293
+  - path: "CD:DEMOS/THEXDER/WAVE/TANKSHT1.WAV"
+    format: data
+    size: 9328
+    xxh3: 7ed21e5c9b353b6d1a39c46f5281aff1
+  - path: "CD:DEMOS/THEXDER/WAVE/TANKSHT3.WAV"
+    format: data
+    size: 15042
+    xxh3: 5fff5cb2172f3bb27ac9132d6b33daed
+  - path: "CD:DEMOS/THEXDER/WAVE/TANKSHT4.WAV"
+    format: data
+    size: 6500
+    xxh3: 51be1e183be1a4463c678ba58bc0509a
+  - path: "CD:DEMOS/THEXDER/WAVE/TEKROAR2.WAV"
+    format: data
+    size: 16368
+    xxh3: 4085437be838dacaeb90a626035aa9bc
+  - path: "CD:DEMOS/THEXDER/WAVE/THEXDAM7.WAV"
+    format: data
+    size: 10204
+    xxh3: e6ab7591c426fe6e43068d05c068e156
+  - path: "CD:DEMOS/THEXDER/WAVE/THEXDAM8.WAV"
+    format: data
+    size: 10204
+    xxh3: be41dbd6611055395e1b4a7037419851
+  - path: "CD:DEMOS/THEXDER/WAVE/THEXDAM9.WAV"
+    format: data
+    size: 12758
+    xxh3: 4388b3c612a10bcdf76d40e6dcad2105
+  - path: "CD:DEMOS/THEXDER/WAVE/THEXLSR1.WAV"
+    format: data
+    size: 5398
+    xxh3: 5120980bef485d4590dd895302bb9a46
+  - path: "CD:DEMOS/THEXDER/WAVE/THRMBOMB.WAV"
+    format: data
+    size: 23512
+    xxh3: a007c0140671555bdfe31b606dd40415
+  - path: "CD:DEMOS/THEXDER/WAVE/THROW2.WAV"
+    format: data
+    size: 1188
+    xxh3: ca99b9280511eef617ba9a893aeb13eb
+  - path: "CD:DEMOS/THEXDER/WAVE/THUMP1.WAV"
+    format: data
+    size: 16747
+    xxh3: f3a7307f662c600ca3d9cab8f351a4cd
+  - path: "CD:DEMOS/THEXDER/WAVE/THUMP2.WAV"
+    format: data
+    size: 16374
+    xxh3: c8900fa81d071408b8f990d4b2481a98
+  - path: "CD:DEMOS/THEXDER/WAVE/THUMP3.WAV"
+    format: data
+    size: 22128
+    xxh3: 0d5d7ba9c5441ec3da89a7f36281bc31
+  - path: "CD:DEMOS/THEXDER/WAVE/TINK3.WAV"
+    format: data
+    size: 760
+    xxh3: 47d6f37d6fce3eccacfb9f8e9ee29742
+  - path: "CD:DEMOS/THEXDER/WAVE/TKIROAR3.WAV"
+    format: data
+    size: 32234
+    xxh3: d04532d3313779104ba919cd1b468185
+  - path: "CD:DEMOS/THEXDER/WAVE/TREADS2.WAV"
+    format: data
+    size: 20840
+    xxh3: e9880c71d3233542f39fef878e700a4c
+  - path: "CD:DEMOS/THEXDER/WAVE/TRNSFM1.WAV"
+    format: data
+    size: 42912
+    xxh3: 223c728b433d3cecfef01ac25348420d
+  - path: "CD:DEMOS/THEXDER/WAVE/TRNSPORT.WAV"
+    format: data
+    size: 33396
+    xxh3: 09cf9a8c702b37867fc53114f3d5fde6
+  - path: "CD:DEMOS/THEXDER/WAVE/VW4GRND.WAV"
+    format: data
+    size: 36018
+    xxh3: acc37ab22128836bfb55a7f566baae06
+  - path: "CD:DEMOS/THEXDER/WAVE/VWEXIT.WAV"
+    format: data
+    size: 26941
+    xxh3: 7fe11ae0b83cc2519fa04ec779f5728a
+  - path: "CD:DEMOS/THEXDER/WAVE/VWLEVEL.WAV"
+    format: data
+    size: 21091
+    xxh3: e978b4ba2da5e855ccd357b2243d7146
+  - path: "CD:DEMOS/THEXDER/WAVE/VWOBJECT.WAV"
+    format: data
+    size: 31177
+    xxh3: 16d82dfc1b495d2c3b697a9400114ed5
+  - path: "CD:DEMOS/THEXDER/WAVE/VWSHOOT.WAV"
+    format: data
+    size: 34807
+    xxh3: aeba5009739e25efc3197a9e77350991
+  - path: "CD:DEMOS/THEXDER/WAVE/VWTEKIS.WAV"
+    format: data
+    size: 25932
+    xxh3: 06afd1488638ee8585621f6dca25cb01
+  - path: "CD:DEMOS/THEXDER/WAVE/WELLDONE.WAV"
+    format: data
+    size: 22099
+    xxh3: 0fe21bfa9ed7a11da3866a7499cad703
+  - path: "CD:DEMOS/THEXDER/WAVE/WEPNOT1.WAV"
+    format: data
+    size: 2152
+    xxh3: 865a983b82dd166d5bc792d22aec4906
+  - path: "CD:DEMOS/THEXDER/WAVE/WEPNSEL1.WAV"
+    format: data
+    size: 2390
+    xxh3: da2ee4bb9239896d196ac5eff74f2aa3
+  - path: "CD:DEMOS/THEXDER/WAVE/WEPNSEL2.WAV"
+    format: data
+    size: 2498
+    xxh3: a449f58aff336b56063f0bb5f8873889
+  - path: "CD:DEMOS/THEXDER/WAVE/WEPNXPND.WAV"
+    format: data
+    size: 46709
+    xxh3: 8685083d9b8e9cd730df3a1c1e80dc67
+  - path: "CD:DEMOS/THEXDER/WAVE/WHOOSH1.WAV"
+    format: data
+    size: 33899
+    xxh3: 03d084f55ba5850be10cd57675780065
+  - path: "CD:DEMOS/THEXDER/WAVE/WHOOSH2.WAV"
+    format: data
+    size: 29734
+    xxh3: 81544895204e919dfae3e3b9c58930cd
+  - path: "CD:DEMOS/THEXDER/WAVE/WHOOSH4.WAV"
+    format: data
+    size: 17630
+    xxh3: b09f2aada10fd53b3eb7bfcc94e92df3
+  - path: "CD:DEMOS/THEXDER/WAVE/XLNTARGT.WAV"
+    format: data
+    size: 27546
+    xxh3: 82fed842e81a569bae0b69550f9f3503
+  - path: "CD:DEMOS/THEXDER/WAVE/XLNTMARK.WAV"
+    format: data
+    size: 39447
+    xxh3: 17baede574c5372c5dbeffd8bc99677e
+  - path: "CD:DEMOS/THEXDER/WAVE/XLNTSHOT.WAV"
+    format: data
+    size: 28958
+    xxh3: 151f8fefcc57af78ac2f3b59c9cd8f2c
+  - path: "CD:DEMOS/THEXDER/WAVE/XPORT7.WAV"
+    format: data
+    size: 37536
+    xxh3: 8d1ee953ab9069b7a2b60a6f509bbb85
+  - path: "CD:DEMOS/THEXDER/WAVE/YELP1.WAV"
+    format: data
+    size: 6453
+    xxh3: b5bf83939b60f028362e3744c89a2076
+  - path: "CD:DEMOS/THEXDER/WAVE/ZAP2.WAV"
+    format: data
+    size: 11426
+    xxh3: 3a6b7e25a92eb743149375badf33a00b
+  - path: "CD:DEMOS/THEXDER/WAVE/ZAP5.WAV"
+    format: data
+    size: 22834
+    xxh3: 5b64962f46c0794d8d9b41bd558ee562
+  - path: "CD:DEMOS/THEXDER/WAVE/ZAPPER3.WAV"
+    format: data
+    size: 27960
+    xxh3: a02900b5b04cae23901a619062dc95fd
+  - path: "CD:DEMOS/THEXDER/WAVE/ZAPSHOT1.WAV"
+    format: data
+    size: 3382
+    xxh3: 769c29ecaf68af1d5ab0423c05783e24
+  - path: "CD:EMPTY.TXT"
+    format: data
+    size: 0
+    xxh3: 99aa06d3014798d86001c324468d497f
+  - path: "CD:INN.BAT"
+    format: data
+    size: 30
+    xxh3: 288eff6f09f088e676713eaceb372f1a
+  - path: "CD:INN/FOOTBALL/12.V56"
+    format: data
+    size: 12533
+    xxh3: 4df3831a47c99a7e12db8b37ee9e6995
+  - path: "CD:INN/FOOTBALL/912.SO"
+    format: data
+    size: 29838
+    xxh3: 0deb9adc4571e79256c65170f2772b7d
+  - path: "CD:INN/FOOTBALL/928.SO"
+    format: data
+    size: 213
+    xxh3: dfae3dab2ace9e6f65bafecc3604b5eb
+  - path: "CD:INN/FOOTBALL/DOCLST.EXE"
+    format: MZ
+    size: 7948
+    xxh3: 51474c92c85c9beebc1bfd66c8844a61
+  - path: "CD:INN/FOOTBALL/FBCHECK.DAT"
+    format: data
+    size: 1792
+    xxh3: f4edefb14157f1dc14e0bf083bf20043
+  - path: "CD:INN/FOOTBALL/FBCHECK.EXE"
+    format: MZ
+    size: 19579
+    xxh3: 9d30da52f4a174992843ec0ee0f5ffba
+  - path: "CD:INN/FOOTBALL/FOOTBALL.DOC"
+    format: data
+    size: 85913
+    xxh3: 49b632dc017d0957bb31efd27f4c5cad
+  - path: "CD:INN/FOOTBALL/FOOTBALL.PRG"
+    format: data
+    size: 451
+    xxh3: cabaeeae6fb09544bdcfbafaa1c7fa1c
+  - path: "CD:INN/FOOTBALL/INSTALL.BAT"
+    format: data
+    size: 24
+    xxh3: 17c5bd6ce3dd08ccd064d5d9aee96f25
+  - path: "CD:INN/FOOTBALL/INSTALL.HLP"
+    format: data
+    size: 20003
+    xxh3: 2a58a935f09ca7fb63b42be1efa04b7c
+  - path: "CD:INN/FOOTBALL/INSTALL.SCR"
+    format: data
+    size: 3964
+    xxh3: a00a9b2b1d74b5bf217ec91db5182ad0
+  - path: "CD:INN/FOOTBALL/INSTALL.TXT"
+    format: data
+    size: 9282
+    xxh3: aed331fa99f5f0bb4b88683d6d29d07c
+  - path: "CD:INN/FOOTBALL/INSTFOOT.EXE"
+    format: MZ
+    size: 79488
+    xxh3: 7337112672fccb15ffec50bc3b1728d7
+  - path: "CD:INN/FOOTBALL/MIDNONE.DRV"
+    format: data
+    size: 727
+    xxh3: b7f81cfb656a16beae46a14871ddb30b
+  - path: "CD:INN/FOOTBALL/OK.COM"
+    format: COM
+    size: 294
+    xxh3: d8012f519d5e9049206f9090f2f1ca5d
+  - path: "CD:INN/FOOTBALL/PROAUDIO.DRV"
+    format: data
+    size: 9909
+    xxh3: 95e537e3f21f5bf2a1828105d39ad2b5
+  - path: "CD:INN/FOOTBALL/README"
+    format: data
+    size: 6331
+    xxh3: 1355ccef1437cdaf7414160b970fa33b
+  - path: "CD:INN/FOOTBALL/README.BAT"
+    format: data
+    size: 34
+    xxh3: 9014c09b7a467e262f1ebc0ade7ecebc
+  - path: "CD:INN/FOOTBALL/RESOURCE.000"
+    format: data
+    size: 999750
+    xxh3: 0f40aeb2e45704c4ad26c989dae876ce
+  - path: "CD:INN/FOOTBALL/RESOURCE.001"
+    format: data
+    size: 1449853
+    xxh3: f647601f23d20cbb34f96f4d01a5527d
+  - path: "CD:INN/FOOTBALL/RESOURCE.002"
+    format: data
+    size: 874649
+    xxh3: 91dc9d95e0a374d24ca32ff2d4c6dc9d
+  - path: "CD:INN/FOOTBALL/RESOURCE.CFG"
+    format: data
+    size: 172
+    xxh3: 2e538eecd48c9d4c46240b236db4e982
+  - path: "CD:INN/FOOTBALL/SBPRO.DRV"
+    format: data
+    size: 9766
+    xxh3: 0b9acd813fca97631141a18fbadf4ed0
+  - path: "CD:INN/FOOTBALL/SNDBLAST.DRV"
+    format: data
+    size: 97
+    xxh3: aa64197a9bd547a2f0812163bfae794e
+  - path: "CD:INN/FOOTBALL/TSNPRG.EXE"
+    format: MZ
+    size: 11364
+    xxh3: 9a90c310d44e694f15cb35a00bf6773a
+  - path: "CD:INN/FOOTBALL/UNCHUNK.EXE"
+    format: MZ
+    size: 15955
+    xxh3: cac8e75770d1bd16dabfe216109889f0
+  - path: "CD:INN/FOOTBALL/VERSION.TXT"
+    format: data
+    size: 31
+    xxh3: 50b77b274d90303632e1248fe66fbe81
+  - path: "CD:INN/IE.EXE"
+    format: MZ
+    size: 36374
+    xxh3: 8592f1a929274d234271799583a4c5c5
+  - path: "CD:INN/INN/ADL.DRV"
+    format: data
+    size: 8040
+    xxh3: e0ec9adf29012c3305ec034a2edc12b9
+  - path: "CD:INN/INN/ARPATCH/106.TO"
+    format: data
+    size: 331
+    xxh3: 9b64338ddac1650d54421a5fa6203d2d
+  - path: "CD:INN/INN/ARPATCH/107.TO"
+    format: data
+    size: 205
+    xxh3: 5cff205f5d908e1a2fae5663b8e92422
+  - path: "CD:INN/INN/BOOTDISK.EXE"
+    format: MZ
+    size: 36471
+    xxh3: fb092a39f28155a03f8f69f5be60155e
+  - path: "CD:INN/INN/CCPATCH/106.TO"
+    format: data
+    size: 331
+    xxh3: 9b64338ddac1650d54421a5fa6203d2d
+  - path: "CD:INN/INN/CCPATCH/107.TO"
+    format: data
+    size: 205
+    xxh3: 5cff205f5d908e1a2fae5663b8e92422
+  - path: "CD:INN/INN/CCPATCH/120.SO"
+    format: data
+    size: 31457
+    xxh3: 871f14d4efa95edb1a55ddf1a58b9c36
+  - path: "CD:INN/INN/CCPATCH/50.SO"
+    format: data
+    size: 41957
+    xxh3: 8f377dfe4e4c0435f850075078f90b29
+  - path: "CD:INN/INN/DOCLST.EXE"
+    format: MZ
+    size: 7948
+    xxh3: 51474c92c85c9beebc1bfd66c8844a61
+  - path: "CD:INN/INN/DRIVERS.TXT"
+    format: data
+    size: 960
+    xxh3: 1b512ff4c66453a37b0cdf852ddaa06f
+  - path: "CD:INN/INN/EASYLNK.DRV"
+    format: data
+    size: 8505
+    xxh3: 93c69be142754d8520b1e3394cee23f9
+  - path: "CD:INN/INN/EGA640.DRV"
+    format: data
+    size: 6021
+    xxh3: f43918771321e82f38db25f5537050ff
+  - path: "CD:INN/INN/GAME.CFG"
+    format: data
+    size: 285
+    xxh3: ef4f9fdb336b8903f46560e782d1abe6
+  - path: "CD:INN/INN/GAMELIST.CFG"
+    format: data
+    size: 45
+    xxh3: 3dcdf302981d0b32b9dc8b37d543697b
+  - path: "CD:INN/INN/GAMES.CFG"
+    format: data
+    size: 284
+    xxh3: f44c09836531bfd9f63c60bba0625ff8
+  - path: "CD:INN/INN/HOSTADDR"
+    format: data
+    size: 303
+    xxh3: b7f95df4a016b5e50ef18e562d206772
+  - path: "CD:INN/INN/IBMKBD.DRV"
+    format: data
+    size: 445
+    xxh3: 5b24d8817f0fb469626a9c2ea12e0db6
+  - path: "CD:INN/INN/ID.EXE"
+    format: MZ
+    size: 9771
+    xxh3: 2db9676d037165871720644c1b86ebb8
+  - path: "CD:INN/INN/INN.ICO"
+    format: data
+    size: 766
+    xxh3: be802c261ecd8223a80659ef91070a8f
+  - path: "CD:INN/INN/INN.PIF"
+    format: data
+    size: 545
+    xxh3: 6f914c48b39063e0737a44c94cb29d05
+  - path: "CD:INN/INN/INST24.BAT"
+    format: data
+    size: 23
+    xxh3: a6a1e5378ed64b59e56f424100b3b1b9
+  - path: "CD:INN/INN/INSTALL.BAT"
+    format: data
+    size: 1267
+    xxh3: 60156b971a16dda48d002b1b857a019b
+  - path: "CD:INN/INN/INSTALL.HLP"
+    format: data
+    size: 17449
+    xxh3: b9a0c89e0c66888672be18799f68455f
+  - path: "CD:INN/INN/INSTALL.SCR"
+    format: data
+    size: 11028
+    xxh3: fdc1c521d31ea5d85827dcbf6044bdaa
+  - path: "CD:INN/INN/INSTALL.TXT"
+    format: data
+    size: 9316
+    xxh3: 21e3b91e91200be7f8acc92fc3cb38b4
+  - path: "CD:INN/INN/INSTTSN.EXE"
+    format: MZ
+    size: 77290
+    xxh3: 779b9972ce32b157dae5d5a3bed51b97
+  - path: "CD:INN/INN/INSTTSN.HLP"
+    format: data
+    size: 5562
+    xxh3: 39360bdf894f139e49215fb6fa34a397
+  - path: "CD:INN/INN/INSTTSN.TXT"
+    format: data
+    size: 12379
+    xxh3: 6fcaa47d59b66d48e7758014dd128f3f
+  - path: "CD:INN/INN/LAND.CFG"
+    format: data
+    size: 440
+    xxh3: 46d76fe9e94c317a1e9381d2c4da57df
+  - path: "CD:INN/INN/LICENSE.TXT"
+    format: data
+    size: 11291
+    xxh3: 4ed15f047d1968edfe91998cb255d76d
+  - path: "CD:INN/INN/LLPATCH/106.TO"
+    format: data
+    size: 331
+    xxh3: 9b64338ddac1650d54421a5fa6203d2d
+  - path: "CD:INN/INN/LLPATCH/107.TO"
+    format: data
+    size: 205
+    xxh3: 5cff205f5d908e1a2fae5663b8e92422
+  - path: "CD:INN/INN/LLSYSTEM.DAT"
+    format: data
+    size: 2
+    xxh3: 1ef68584fc39b4c3b25805c594dec06b
+  - path: "CD:INN/INN/LSCI.CFG"
+    format: data
+    size: 74
+    xxh3: 5e1cf602106aa3fe0dc70d25d532cf38
+  - path: "CD:INN/INN/MODEM.DRV"
+    format: data
+    size: 8011
+    xxh3: a385534402de14a1fe73f68c9eedd709
+  - path: "CD:INN/INN/MODEM.TXT"
+    format: data
+    size: 10624
+    xxh3: c3920b7259b532ed94b068a2602e9742
+  - path: "CD:INN/INN/MT32.DRV"
+    format: data
+    size: 1989
+    xxh3: 489ec1a2672074ca1cb43bf641020483
+  - path: "CD:INN/INN/MT32.NL"
+    format: data
+    size: 1918
+    xxh3: aed0ecde6634d8fb0884070d15761b18
+  - path: "CD:INN/INN/NEWPHONE.EXE"
+    format: MZ
+    size: 43197
+    xxh3: b36e20913b064c1c088e6a5be2118c39
+  - path: "CD:INN/INN/NOBRK.DRV"
+    format: data
+    size: 5563
+    xxh3: 7d89e7a5e823bfe12d7826acf2b0349f
+  - path: "CD:INN/INN/OS2READ.TXT"
+    format: data
+    size: 4734
+    xxh3: 885186cc3aed69e14ab88d9424e4ae50
+  - path: "CD:INN/INN/PART.1"
+    format: data
+    size: 7561366
+    xxh3: b397cd5373fbab7675a52ae55e4f0e98
+  - path: "CD:INN/INN/PATCHPIF.EXE"
+    format: MZ
+    size: 9356
+    xxh3: 810129e6b4630d76dab0ff49d60233f4
+  - path: "CD:INN/INN/PHONE.TXT"
+    format: data
+    size: 26144
+    xxh3: 98a1e856073b8efd918cba2e322f4303
+  - path: "CD:INN/INN/RBJOY.EXE"
+    format: MZ
+    size: 19394
+    xxh3: e63463491085e86ecfa59874898b3db4
+  - path: "CD:INN/INN/READ.ME"
+    format: data
+    size: 19761
+    xxh3: 538bdc5e5493d94ea212eca4c7511212
+  - path: "CD:INN/INN/REINST.BAT"
+    format: data
+    size: 129
+    xxh3: 973c8bc7ef96fefab5445dd7fc943587
+  - path: "CD:INN/INN/SLPATCH/106.TO"
+    format: data
+    size: 331
+    xxh3: 9b64338ddac1650d54421a5fa6203d2d
+  - path: "CD:INN/INN/SLPATCH/107.TO"
+    format: data
+    size: 205
+    xxh3: 5cff205f5d908e1a2fae5663b8e92422
+  - path: "CD:INN/INN/SNDBLAST.DRV"
+    format: data
+    size: 9748
+    xxh3: fa476b6bc29d644401913b5e177ecec7
+  - path: "CD:INN/INN/TSN.PRG"
+    format: data
+    size: 1412
+    xxh3: 377ca76c1de4b7754a99ddebffb5825b
+  - path: "CD:INN/INN/TSNVER"
+    format: data
+    size: 4
+    xxh3: 7da5e087f3f82ff12fc0d5bfd2b8705f
+  - path: "CD:INN/INN/TWEAKER.DRV"
+    format: data
+    size: 1468
+    xxh3: c4a1958f1cf012a56eb6203368027011
+  - path: "CD:INN/INN/VGA320.DRV"
+    format: data
+    size: 5831
+    xxh3: 2bcb1139e343bef2d904d4b28709390c
+  - path: "CD:INN/INN/W31READ.TXT"
+    format: data
+    size: 13719
+    xxh3: 20686a25dc2c7f0a16ec40a446994fdc
+  - path: "CD:INN/INN/W95READ.TXT"
+    format: data
+    size: 16788
+    xxh3: 385f0a6836b93e71b58b2fb5410b47b2
+  - path: "CD:INN/INN/_ASLAND.DOC"
+    format: data
+    size: 6728
+    xxh3: 70ffefd633cfb478a7f280b4bf8f213c
+  - path: "CD:INN/INN/_EDBARON.DOC"
+    format: data
+    size: 5838
+    xxh3: edb351880cf044e4f4e8ba6cea718b97
+  - path: "CD:INN/INN/_ENERAL.DOC"
+    format: data
+    size: 19699
+    xxh3: aae45b1747d51c80afd74621eceae537
+  - path: "CD:INN/INN/_IERRLND.DOC"
+    format: data
+    size: 15145
+    xxh3: 5a2cab50048614f27ad1f5be1eb1722b
+  - path: "CD:INN/INN/_LNULL.DLL"
+    format: data
+    size: 185
+    xxh3: 272be02a8c10a49cd05f3a8718237f3d
+  - path: "CD:INN/INN/_LUBHOUS.DOC"
+    format: data
+    size: 17162
+    xxh3: 61040df0d9bdc245c5445ceb22f3c484
+  - path: "CD:INN/INN/_RAPH256.DLL"
+    format: data
+    size: 7921
+    xxh3: 6f168af818b1463d9f7f11e28aab01ac
+  - path: "CD:INN/INN/_RENA.DOC"
+    format: data
+    size: 5626
+    xxh3: fd18627e6ff60c7a4402d3bcdbca3a09
+  - path: "CD:INN/INN/_RSNLADS.DOC"
+    format: data
+    size: 5743
+    xxh3: 8f4e0da924d35ee4d77bd32d540d6b33
+  - path: "CD:INN/INN/_SERBIUS.DOC"
+    format: data
+    size: 23078
+    xxh3: fe00d23144f08a2a9013dd760e1dbc56
+  - path: "CD:INN/INN/__DGOLF.DOC"
+    format: data
+    size: 3841
+    xxh3: b89ff0194e76774cf872e7d674950739
+  - path: "CD:INN/INSTALL.BAT"
+    format: data
+    size: 7539
+    xxh3: 6f4082fe25659d8f2bf444fae0b2010d
+  - path: "CD:INN/TWINION/DOCLST.EXE"
+    format: MZ
+    size: 7948
+    xxh3: 51474c92c85c9beebc1bfd66c8844a61
+  - path: "CD:INN/TWINION/INSTALL.BAT"
+    format: data
+    size: 24
+    xxh3: fc1472611702f9e177f2d907b0e1e3f4
+  - path: "CD:INN/TWINION/INSTALL.HLP"
+    format: data
+    size: 16978
+    xxh3: 90b0e6d97efc42e644d6a409c8c38abf
+  - path: "CD:INN/TWINION/INSTALL.SCR"
+    format: data
+    size: 2695
+    xxh3: abdcf0943f3cb129d2548265fb0cc8b5
+  - path: "CD:INN/TWINION/INSTALL.TXT"
+    format: data
+    size: 8951
+    xxh3: 331b8edf411856b01a2479ab07fe4e3b
+  - path: "CD:INN/TWINION/INSTTSN.HLP"
+    format: data
+    size: 2830
+    xxh3: 74ded2459d78cd09380f3511e7d75c33
+  - path: "CD:INN/TWINION/INSTTSN.TXT"
+    format: data
+    size: 6385
+    xxh3: 9851a4b440c56072db838771df6bbca8
+  - path: "CD:INN/TWINION/INSTTWIN.EXE"
+    format: MZ
+    size: 67472
+    xxh3: 393ed2767a4108ba7babcffc1d234aa9
+  - path: "CD:INN/TWINION/LSCI.CFG"
+    format: data
+    size: 200
+    xxh3: 1f0ce3f4ffd3f49057dbdbdd333c6418
+  - path: "CD:INN/TWINION/PART.1"
+    format: data
+    size: 1203712
+    xxh3: 0ee028ab7cc7982a49f4e8ed66e2a731
+  - path: "CD:INN/TWINION/PART.2"
+    format: data
+    size: 201581
+    xxh3: d8e7d01de0136630940c047144243379
+  - path: "CD:INN/TWINION/TWPATCH/_ATES.EXE"
+    format: data
+    size: 151656
+    xxh3: 27532d9f456854aa0e231cd5cd0571a0
+  - path: "CD:INN/TWINION/TWPATCH/_ELP.DAT"
+    format: data
+    size: 5955
+    xxh3: b400119ea494b9138b0f105e587fc53d
+  - path: "CD:INN/TWINION/TWPATCH/_WGENN.EXE"
+    format: data
+    size: 74968
+    xxh3: 6d7a1390886530676dd08517dd254b7d
+  - path: "CD:INN/TWINION/TWPATCH/_WINION.DOC"
+    format: data
+    size: 25435
+    xxh3: f9a974e2cd4f76a045b3029046c21cf4
+  - path: "CD:INST.EXE"
+    format: MZ
+    size: 87640
+    xxh3: 50c2f5dcc0bba9a475ce3da00a788414
+  - path: "CD:INSTALL.BAT"
+    format: data
+    size: 23
+    xxh3: 8ee284b3358d6809b58c24c608b5ad24
+  - path: "CD:INSTALL.DAT"
+    format: data
+    size: 48603
+    xxh3: 71508e60734f193dfbf2d3f9e3cebb2a
+  - path: "CD:INSTALL.HLP"
+    format: data
+    size: 21747
+    xxh3: 7dd660f1c45378e01d06ae7357b95375
+  - path: "CD:INSTALL.SCR"
+    format: data
+    size: 2135
+    xxh3: 52b5d2931c76fd5675849b69d36c8a3b
+  - path: "CD:INSTALL.TXT"
+    format: data
+    size: 9590
+    xxh3: 88ce30e3c64583987624bd608afc1d06
+  - path: "CD:LANGUAGE.INF"
+    format: data
+    size: 1927
+    xxh3: 9991d2d312d583c1ca554fe99876a297
+  - path: "CD:README.BAT"
+    format: data
+    size: 29
+    xxh3: f688675785d968f0686cb4964a6dcba2
+  - path: "CD:README.TXT"
+    format: data
+    size: 2010
+    xxh3: 0c20398954d99e0ceeb7c11ea39c6fab
+  - path: "CD:README.WRI"
+    format: data
+    size: 2816
+    xxh3: ac9c19fe0f23797f3ce1a9184356ddd5
+  - path: "CD:RESOURCE.CFG"
+    format: data
+    size: 187
+    xxh3: a3008f7032c70552ac22de769d13e126
+  - path: "CD:SETUP.EXE"
+    format: NE
+    size: 28096
+    xxh3: 8e3074214b49ed45d0bf151a1173ec3f
+  - path: "CD:SETUP.SOL"
+    format: data
+    size: 800840
+    xxh3: 465bf78f4932f54f81f764e9955e1412
+  - path: "CD:SIERRA.INF"
+    format: data
+    size: 3439
+    xxh3: a9f51bcff63b8c523a074202c5a3c7ef
+  - path: "CD:VERSION.TXT"
+    format: data
+    size: 43
+    xxh3: 97177e304a5ab6ffa7a758797fe314dd
+  - path: "CD:VESA/UNIVESA.DOC"
+    format: data
+    size: 6263
+    xxh3: 6f34ea6385aff9a4a595300b26366512
+  - path: "CD:VESA/UNIVESA.EXE"
+    format: MZ
+    size: 34032
+    xxh3: 5f78487eea8a2f23632e330dcb23488e
+  - path: "game.gog"
+    format: data
+    size: 667316496
+    xxh3: b915491c5bdce934ca216d2ceebec0ce
