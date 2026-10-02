@@ -326,3 +326,18 @@ and rules ca39d075. Offline snapshot integrity and exact package adoption checks
 passed. The complete semantic delta audit is in template-migration-plan.md.
 This closes the migration goal. No original content, original-game run,
 long-running suite, signing or release publication was involved.
+
+## Survey path-accounting verification (2026-10-02)
+
+The static inventory reconciliation for FND-RES-010 independently traversed the
+owned image's ISO directory records and matched the inspector's path/size pairs.
+The combined listing matched the disjoint union of BLD-GOG-EN's manifest and
+explicit Other files paths, with every manifest size and hash matching the
+listing. This validates path accounting only, not runtime use, internal formats
+or parity. Original files were read without executing an original program.
+
+`Check-Documentation.ps1 -Write`, narrative references, research tracking,
+coverage metadata and repository policy passed. The regenerated indexes were
+committed. Kaitai compilation was skipped because the compiler was unavailable.
+The canonical fast gate was not repeated for this research-only batch; the
+previous tooling batch's passing gate remains recorded above.

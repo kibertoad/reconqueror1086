@@ -9,8 +9,10 @@ Complete a clean-room MonoGame reimplementation of *Conqueror: A.D. 1086* that p
 Stage: Survey. Intake identifies the owned edition and current patch provenance
 (BLD-GOG-EN, SRC-PATCH-CATALOG); Runtime access is assessed in [RUNTIME.md](RUNTIME.md).
 Area queues and the inventory for the executable already studied are present.
-Survey remains open until the complete installation/media listing, coverage of
-every manifest data family and all manual-mentioned screens are reconciled.
+The complete installation/media path accounting is recorded in FND-RES-010 and
+BLD-GOG-EN. Survey remains open until every manifest data family and all
+manual-mentioned screens are reconciled. Conservatively retained auxiliary media
+need runtime-use review and format entries until evidence supports exclusion.
 Existing implemented slices remain in the milestone table; their implementation
 does not prove Survey complete or promote any evidence status.
 

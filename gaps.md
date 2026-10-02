@@ -37,5 +37,6 @@ Synthetic coverage should include a nested wrapper file and the source image.
 
 Local resolution: the inspector now enumerates installation subdirectories,
 skips reparse points, includes the source image path, and offers an inventory-only
-mode. Manifest reconciliation remains separate research work. No upstream
+mode. FND-RES-010 now records complete path accounting against the expanded
+manifest and explicit Other files list; data-family Survey remains open. No upstream
 submission has been made.
