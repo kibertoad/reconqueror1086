@@ -27,15 +27,18 @@ None known.
 
 ## Handover
 
-- Stage: Survey.
-- Last checks: 2026-10-02 canonical fast gate, documentation, narrative,
-  research-tracking, coverage and staged commit checks passed. Build had no
-  warnings or errors. Kaitai compilation skipped (compiler unavailable).
-- Unfinished: none. Recursive inventory-only tooling committed. GAP-002 recorded
-  in gaps.md. Process audits found no confirmed repository orphans.
+- Stage: Survey. BLD-GOG-EN path accounting is committed with FND-RES-010.
+- Last checks: 2026-10-02 documentation regeneration/check, narrative references,
+  research tracking, coverage metadata, repository policy and staged checks
+  passed. Independent static listing and manifest accounting checks passed.
+  Kaitai compilation skipped (compiler unavailable). Fast gate not rerun for
+  the research-only batch; the previous tooling batch's gate passed.
+- Unfinished: none. Local listing remains in
+  analysis/original/survey-complete-2026-10-02/cd-manifest.txt. No original-game
+  execution occurred. Process audits found no confirmed repository orphans.
 - Blockers: none known.
-- Next: claim BLD-GOG-EN in this goal before its research batch; reconcile
-  analysis/original/survey-complete-2026-10-02/cd-manifest.txt with its manifest
-  and explicit Other files entries. The installation portion independently
-  matches the recursive filesystem listing. Survey remains open for data-family
-  and manual-screen reconciliation as well.
+- Next: reconcile every BLD-GOG-EN manifest data family with format entries and
+  seed missing unknown entries/queue items under the plan-work procedure.
+  Conservatively retained auxiliary media need runtime-use review before
+  exclusion. Then reconcile manual-mentioned screens with screen entries.
+  Survey remains open; no parity status was promoted. GAP-002 is updated.
