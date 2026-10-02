@@ -544,3 +544,19 @@ including documentation, infrastructure checks, build, tests and specification
 runner. LongRunning coverage was not requested. No original files were opened,
 no gameplay or parity status changed, and nothing was pushed. GAP-010 records
 the omitted invariant and its local resolution.
+
+## CD-root help-text framing (2026-10-02)
+
+FND-RES-019's complete bounded read matched the manifest length and canonical
+XXH3-128. The local witness verified every character, delimiter, marker remainder,
+whitespace measurement and byte following the lone control byte. It retained
+repeated and whitespace-bearing markers and reconstructed the file exactly.
+No help prose or original artwork was exported.
+
+Documentation regeneration/check with the existing Kaitai 0.11 compiler,
+narrative references, research tracking, coverage metadata and repository policy
+passed. The fast gate was not repeated for this research-only batch; no runtime
+implementation or executable tooling changed. Q-RES-015 is closed; Q-RES-158
+through Q-RES-163 retain reader questions. No original program ran or parity
+validation is claimed. GAP-006 now includes the additional end-of-file fixture
+case suggested by this evidence.

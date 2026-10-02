@@ -117,6 +117,12 @@ Local handling: FMT-RES-008 distinguishes the stored cases and the local witness
 reconstructed each complete file. Q-RES-132 through Q-RES-134 retain consumer
 questions. No upstream submission has been made.
 
+Follow-up (2026-10-02): FND-RES-019 extends these fixture cases to a control
+byte followed by a stored CRLF, rather than occupying the physical last byte.
+Include that distinction and whitespace-bearing duplicate markers in synthetic
+reader fixtures. The local complete-file witness preserves both; consumer
+interpretation remains Q-RES-158 through Q-RES-163.
+
 ## GAP-007: Valid queue IDs can carry stale human-readable area labels
 
 Recorded: 2026-10-02. Audience: template and shared-documentation-tooling authors.

@@ -1,8 +1,27 @@
 # RES
 
-Next ID: Q-RES-158
+Next ID: Q-RES-164
 
 ## Static
+
+- Q-RES-158. FMT-RES-013: Which shipped reader consumes CD-root INSTALL.HLP, and is that path reachable?
+  Settles it: trace filename references from installation/media entry points into the reader. Blocks: Survey data-family reconciliation.
+
+- Q-RES-159. FMT-RES-013: What roles do the backslash-prefixed regions have?
+  Settles it: trace prefix recognition and every dispatch path using the marker remainder. Blocks: Survey data-family reconciliation.
+
+- Q-RES-160. FMT-RES-013: Does marker lookup retain or normalize trailing whitespace?
+  Settles it: read token boundaries and comparison inputs. Blocks: Survey data-family reconciliation.
+
+- Q-RES-161. FMT-RES-013: How does the reader handle repeated complete marker remainders?
+  Settles it: read search order and behavior after a match. Blocks: Survey data-family reconciliation.
+
+- Q-RES-162. FMT-RES-013: How does the reader treat 0x1A and the following CRLF?
+  Settles it: read control-byte recognition and end-of-input branches. Blocks: Survey data-family reconciliation.
+
+- Q-RES-163. FMT-RES-013: How does the reader handle tabs within text regions?
+  Settles it: trace tab recognition through tokenization and presentation decisions. Blocks: Survey data-family reconciliation.
+
 
 - Q-RES-157. FMT-RES-001: Which consumer selects the disc-root C1086.GOB copy
   versus the installed copy? Settles it: trace the archive path construction and
@@ -151,11 +170,6 @@ Next ID: Q-RES-158
   it: read the relevant branch and its callers from the entry's cited findings, following data
   provenance, call effects and every exit relevant to this question. Blocks: none.
 
-
-- Q-RES-015. FMT-RES-013: What layout, if any, is shared by these listed candidates?
-  Settles it: inspect bounded file signatures and the relevant readers; record the
-  parsing syntax or field layout, splitting the entry if the files differ before
-  making claims about them. Blocks: Survey data-family reconciliation.
 
 - Q-RES-016. FMT-RES-014: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the
