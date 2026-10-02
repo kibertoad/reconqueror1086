@@ -135,3 +135,22 @@ Avoid a general semantic checker that would reject legitimate paraphrases.
 Local resolution: the plan and active goal label are corrected after inspecting
 the current entry. Research used FMT-RES-009's file list rather than the stale
 label. No upstream submission has been made.
+
+## GAP-008: Text Survey must not validate strings using raw quote parity
+
+Recorded: 2026-10-02. Audience: shared-tooling and template authors.
+
+FND-RES-017 records an odd raw quote count alongside multiple line-prefix
+classes. This is not evidence of a malformed string: whether comment-shaped
+regions and other line forms affect lexing is unresolved. A raw quote counter
+or prefix-only classifier cannot establish the interpreter's grammar.
+
+Suggestion: reusable text-Survey fixtures should include quotes in comment-shaped
+regions, case variants, non-directive lines, adjacent backslashes and a final
+unterminated region. Preserve all bytes and report unknown lexical state rather
+than repairing quote balance, stripping lines or normalizing casing. This is a
+fixture suggestion, not a reported defect in an adopted reader.
+
+Local handling: FMT-RES-011 retains stored framing only and Q-RES-151 through
+Q-RES-156 keep interpreter questions open. The complete witness reconstructs the
+file without parsing strings or executing directives. No upstream submission made.

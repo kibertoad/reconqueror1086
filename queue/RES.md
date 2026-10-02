@@ -1,8 +1,27 @@
 # RES
 
-Next ID: Q-RES-151
+Next ID: Q-RES-157
 
 ## Static
+
+- Q-RES-151. FMT-RES-011: Which shipped interpreter consumes CD-root INSTALL.DAT, and is that path reachable?
+  Settles it: trace file references from installation/media entry points into the reader. Blocks: Survey data-family reconciliation.
+
+- Q-RES-152. FMT-RES-011: How does the interpreter tokenize at-sign identifiers and match their casing?
+  Settles it: read token boundaries and the dispatch comparison. Blocks: Survey data-family reconciliation.
+
+- Q-RES-153. FMT-RES-011: How does the interpreter recognize double-slash comments and handle quotes within them?
+  Settles it: read comment recognition, extent and interaction with the quote lexer. Blocks: Survey data-family reconciliation.
+
+- Q-RES-154. FMT-RES-011: What quoted-string and backslash grammar does the interpreter use?
+  Settles it: read delimiter, escaping and continuation branches. Blocks: Survey data-family reconciliation.
+
+- Q-RES-155. FMT-RES-011: What grammar handles nonempty regions without at-sign or double-slash prefixes?
+  Settles it: read the paths accepting these regions and their surrounding lexical state. Blocks: Survey data-family reconciliation.
+
+- Q-RES-156. FMT-RES-011: How does the interpreter handle the final unterminated region?
+  Settles it: read final-line consumption and end-of-file success/error branches. Blocks: Survey data-family reconciliation.
+
 
 - Q-RES-138. FMT-RES-010: Which shipped reader consumes CD-root RESOURCE.CFG, and is that path reachable?
   Settles it: trace file references from installation/media entry points through the relevant reader. Blocks: Survey data-family reconciliation.
@@ -127,11 +146,6 @@ Next ID: Q-RES-151
   it: read the relevant branch and its callers from the entry's cited findings, following data
   provenance, call effects and every exit relevant to this question. Blocks: none.
 
-
-- Q-RES-013. FMT-RES-011: What layout, if any, is shared by these listed candidates?
-  Settles it: inspect bounded file signatures and the relevant readers; record the
-  parsing syntax or field layout, splitting the entry if the files differ before
-  making claims about them. Blocks: Survey data-family reconciliation.
 
 - Q-RES-014. FMT-RES-012: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the

@@ -499,3 +499,18 @@ passed. The fast gate was not repeated for this research-only batch; no runtime
 implementation or executable tooling changed. Q-RES-012 is closed; Q-RES-138
 through Q-RES-150 retain reader and independently answerable value questions.
 No original program ran and no parity validation is claimed.
+
+## CD-root installer-text framing (2026-10-02)
+
+FND-RES-017's complete bounded read matched its manifest length and fingerprint.
+The local witness independently checked every character class, line boundary,
+prefix measurement and literal quote/backslash measurement. It retained all line
+classes and the final unterminated region and reconstructed the complete file
+exactly. FMT-RES-011 asserts no interpreter grammar or directive effects.
+
+Documentation regeneration/check with the existing Kaitai 0.11 compiler,
+narrative references, research tracking and coverage metadata passed. Repository
+policy passed. The fast gate was not repeated for this research-only batch; no
+implementation or executable tooling changed. Q-RES-013 is closed; Q-RES-151
+through Q-RES-156 retain consumer questions. No original program ran or parity
+validation is claimed. GAP-008 records a text-Survey fixture suggestion.
