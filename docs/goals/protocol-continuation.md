@@ -40,7 +40,8 @@ None known.
   not repeat it.
 - Unfinished: none from this batch. GAP-006 has a follow-up. No original program
   ran. Audits found no confirmed repository orphans; reusable MSBuild workers
-  remain. This session made local commits only.
+  remain. The owner authorized publication of completed work to main for this wrap-up.
+  Q-RES-016 remains open; preliminary inspection has no durable finding yet.
 - Blockers: none known.
 - Next: Q-RES-016 / FMT-RES-014 and manual-screen reconciliation, then consumer
   questions Q-RES-124 through Q-RES-163. Inspect the current entry's file list
