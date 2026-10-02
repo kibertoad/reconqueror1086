@@ -29,21 +29,18 @@ None known.
 
 ## Handover
 
-- Stage: Survey. Latest research batch: FND-RES-018, FMT-RES-001 and FMT-RES-002;
-  Q-RES-014 is closed; Q-RES-157 remains Static.
-- Last checks: 2026-10-02 documentation regeneration/check with Kaitai 0.11,
-  narrative references, research tracking, coverage metadata and repository policy
-  passed. Complete-copy equality, XXH3 and directory/extent witnesses passed.
-  No parity validation is claimed. See docs/VALIDATION.md.
-- Tooling baseline: engine 0.9.1 and toolkit adoption b91cd758; its canonical fast
-  gate passed on 2026-10-02. This research-only batch did not repeat it.
-- Unfinished: none from this batch. GAP-009 is recorded. No original program ran.
-  Audits found no confirmed repository orphans; reusable MSBuild workers remain.
-- Publication: the owner explicitly requested wrapping this session, committing
-  and pushing completed work to canonical main. This is the exception to the
-  goal's default no-push condition; future pushes still need authorization.
+- Stage: Survey. Latest research remains FND-RES-018, FMT-RES-001 and FMT-RES-002.
+  Q-RES-014 is closed; Q-RES-157 remains Static. Q-RES-015 was not taken up yet.
+- Completed tooling: d516817 enforces narrative references in the shared staged
+  check list. The invalid handover citation is corrected; GAP-010 is recorded.
+- Last checks: 2026-10-02 targeted synthetic regressions and full canonical fast
+  gate with Kaitai 0.11 passed. See docs/VALIDATION.md. No parity status changed.
+- Tooling baseline: engine 0.9.1 and toolkit adoption b91cd758.
+- Unfinished: none from this tooling batch. No original file was opened or program
+  ran. Audits found no confirmed repository orphans; reusable MSBuild workers
+  remain. This session made local commits only.
 - Blockers: none known.
-- Next session: Q-RES-015 / FMT-RES-013 and manual-screen reconciliation, then
-  consumer questions Q-RES-124 through Q-RES-157. Inspect the current entry's file
-  list before assigning a family label. Rules snapshots remain unchanged unless
-  the owner requests their refresh. Gameplay remains outside this goal's scope.
+- Next: Q-RES-015 / FMT-RES-013 and manual-screen reconciliation, then consumer
+  questions Q-RES-124 through Q-RES-157. Inspect the current entry's file list
+  before assigning a family label. Rules snapshots remain unchanged unless the
+  owner requests their refresh. Gameplay remains outside this goal's scope.
