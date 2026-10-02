@@ -12,7 +12,7 @@ completion of one batch does not complete the objective.
 ## Scope
 
 Areas: project planning, Survey reconciliation, BLD-GOG-EN build inventory, RES inventory findings, formats and queue planning, and shared research tooling.
-Current Survey claim: Q-RES-013 / FMT-RES-011, using the current entry title
+Current Survey claim: Q-RES-014 / FMT-RES-012, using the current entry title
 and file list rather than a copied filename-family label.
 Batches: research and its tooling only. Select concrete Survey research areas
 and record their claims here before changing their entries or queue items.
@@ -29,18 +29,19 @@ None known.
 
 ## Handover
 
-- Stage: Survey. Latest research batch: FND-RES-016 / FMT-RES-010.
-  Q-RES-012 is closed; Q-RES-138 through Q-RES-150 remain Static.
+- Stage: Survey. Latest research batch: FND-RES-017 / FMT-RES-011.
+  Q-RES-013 is closed; Q-RES-151 through Q-RES-156 remain Static.
 - Last checks: 2026-10-02 documentation regeneration/check with Kaitai 0.11,
   narrative references, research tracking, coverage metadata and repository policy
-  passed. Complete-file fingerprint and lossless token witnesses passed. No parity
-  validation is claimed. See docs/VALIDATION.md.
-- Tooling baseline: engine 0.9.1 and toolkit adoption b91cd758; the canonical fast
-  gate passed on 2026-10-02. Research did not repeat it.
-- Unfinished: none from this batch. No original program ran. Audits found no
-  confirmed repository orphans; reusable MSBuild workers remain. No push made.
+  passed. Complete-file measurements and lossless framing witnesses passed.
+  No parity validation is claimed. See docs/VALIDATION.md.
+- Tooling baseline: engine 0.9.1 and toolkit adoption b91cd758; the canonical
+  fast gate passed on 2026-10-02. Research did not repeat it.
+- Unfinished: none from this batch. GAP-008 is recorded. No original program ran.
+  Audits found no confirmed repository orphans; reusable MSBuild workers remain.
+  No push made.
 - Blockers: none known.
-- Next: Q-RES-013 / FMT-RES-011 and manual-screen reconciliation, then consumer
-  questions Q-RES-124 through Q-RES-150. Inspect the current entry's file list
+- Next: Q-RES-014 / FMT-RES-012 and manual-screen reconciliation, then consumer
+  questions Q-RES-124 through Q-RES-156. Inspect the current entry's file list
   before assigning a family label. Rules snapshots remain unchanged unless the
   owner requests their refresh. Gameplay remains outside this goal's scope.
