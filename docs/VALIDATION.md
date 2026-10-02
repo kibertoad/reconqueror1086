@@ -284,3 +284,13 @@ local Kaitai Struct 0.11 compiler was then selected through KSC and the complete
 documentation check passed with format compilation enabled. Strict analysis
 configuration also passed. These close the local compiler and licensing checks;
 cross-platform execution remains the acceptance evidence from CI on main.
+
+## Installer license and updater acceptance follow-up
+
+Final inspection found the macOS bundle copied the portable NOTICE but omitted
+its new toolkit license directory. The builder now includes that directory;
+all installer CI jobs compare the distributed MIT notice with the repository
+copy. The workflow security run on ea142a6 reported insufficient Dependabot
+cooldown for both new ecosystems; each now waits seven days before automatic
+updates. No audit suppression is added. Final acceptance follows the new main
+CI and workflow-security runs.

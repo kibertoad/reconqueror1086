@@ -41,6 +41,7 @@ Get-ChildItem -LiteralPath (Join-Path $portableRoot 'Tools') |
 Copy-Item -LiteralPath (Join-Path $portableRoot 'README.md') -Destination $resourcesRoot
 Copy-Item -LiteralPath (Join-Path $portableRoot 'NOTICE') -Destination $resourcesRoot
 Copy-Item -LiteralPath (Join-Path $portableRoot 'vendor') -Destination $resourcesRoot -Recurse
+Copy-Item -LiteralPath (Join-Path $portableRoot 'docs') -Destination $resourcesRoot -Recurse
 
 @"
 <?xml version="1.0" encoding="UTF-8"?>

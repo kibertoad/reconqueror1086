@@ -161,6 +161,11 @@ jobs:
             -ArgumentList @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/NOIMPORT=1', "/DIR=`"$testRoot`"") `
             -Wait -PassThru -WindowStyle Hidden
           if ($setup.ExitCode -ne 0) { throw "Installer returned $($setup.ExitCode)." }
+          $license = Join-Path $testRoot 'docs/licenses/scientific-method-MIT.txt'
+          if (-not (Test-Path -LiteralPath $license) -or
+              (Get-FileHash $license).Hash -ne (Get-FileHash 'docs/licenses/scientific-method-MIT.txt').Hash) {
+            throw 'Windows installer omitted or changed the toolkit license.'
+          }
           $shortcut = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs\ReConqueror A.D. 1086\ReConqueror A.D. 1086.lnk'
           if (-not [IO.File]::Exists($shortcut)) { throw "Installer did not create $shortcut." }
           $link = (New-Object -ComObject WScript.Shell).CreateShortcut($shortcut)
@@ -242,6 +247,11 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Debian package metadata is invalid.' }
           dpkg-deb --extract artifacts/ReConqueror1086-linux-x64-Setup-0.1.0.deb $testRoot
           if ($LASTEXITCODE -ne 0) { throw 'Debian package extraction failed.' }
+          $license = Join-Path $testRoot 'opt/reconqueror-ad-1086/docs/licenses/scientific-method-MIT.txt'
+          if (-not (Test-Path -LiteralPath $license) -or
+              (Get-FileHash $license).Hash -ne (Get-FileHash 'docs/licenses/scientific-method-MIT.txt').Hash) {
+            throw 'Debian installer omitted or changed the toolkit license.'
+          }
           & (Join-Path $testRoot 'opt/reconqueror-ad-1086/Game/Conqueror.Game') --smoke-test
           if ($LASTEXITCODE -ne 0) { throw 'Installed Debian game smoke test failed.' }
 
@@ -301,6 +311,12 @@ jobs:
           $executable = Get-ChildItem -LiteralPath $expanded -Recurse -Filter 'Conqueror.Game' |
             Select-Object -First 1
           if (-not $executable) { throw 'macOS package does not contain the game executable.' }
+          $license = Get-ChildItem -LiteralPath $expanded -Recurse -Filter 'scientific-method-MIT.txt' |
+            Select-Object -First 1
+          if (-not $license -or
+              (Get-FileHash $license.FullName).Hash -ne (Get-FileHash 'docs/licenses/scientific-method-MIT.txt').Hash) {
+            throw 'macOS installer omitted or changed the toolkit license.'
+          }
 
       - name: Upload macOS installer
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
