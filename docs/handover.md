@@ -1,34 +1,36 @@
-# Reimplementation handover
+﻿# Reimplementation handover
 
 ## Current state
 
-The documentation migration audit is closed; its requirements, evidence and
-upstream PRs are in [documentation-audit.md](documentation-audit.md).
-Template main 8d0eef35 is adopted with Standard/Protocol ca39d075 and
-checker/reporters f8c51bfc. Snapshot freshness matches current upstream main.
-The staged-tree pre-commit hook is enabled for this clone. Game identities,
-LE coverage adapters, gameplay and evidence statuses are preserved.
+Stage: Survey. The infrastructure migration goal is complete. Template main
+79d18a20 and toolkit main 0b4694df are adopted; Standard/Methodology/Protocol
+ca39d075 remain verified unchanged. Published toolkit packages replace the
+superseded vendored copies. The completed capability audit is in
+[template-migration-plan.md](template-migration-plan.md).
+The earlier documentation audit is in [documentation-audit.md](documentation-audit.md).
+Game identities, owned-source contracts, LE adapters, gameplay and evidence
+statuses are preserved. The staged-tree pre-commit hook is enabled.
 
 ## Next work
 
 Survey remains open for full installation/media, data-family and manual-screen
-reconciliation. Choose research from the area queues. Source provenance is
-established in SRC-PATCH-CATALOG; the strict analysis-readiness gate passes.
-[RUNTIME.md](RUNTIME.md) records verified capabilities and remaining limits.
+reconciliation. Follow [implementation-plan.md](implementation-plan.md) and the
+area queues. Source provenance is established in SRC-PATCH-CATALOG; strict
+analysis readiness passes. [RUNTIME.md](RUNTIME.md) records runtime capabilities.
 
 The next implementation slice is strategic schema-two runtime integration.
-Keep it dormant until the remaining inputs, events, presentation and save/load
-integration are complete. Follow [implementation-plan.md](implementation-plan.md)
-and the parity rows; audit completion does not establish gameplay fidelity.
+Keep it dormant until its remaining inputs, events, presentation and save/load
+integration are complete; follow the parity rows.
 
 ## Verification and local state
 
-The 2026-10-01 canonical fast gate passed for the latest upstream refresh;
-see [VALIDATION.md](VALIDATION.md). Local Kaitai compilation was skipped because
-its compiler is unavailable; CI retains that check. Packaging and long-running
-tests were not repeated. No unfinished migration work remains.
+The 2026-10-02 canonical fast gates passed normally and with NoRestore.
+Kaitai compilation, strict configuration, workflow lint and local Windows
+packaging passed. Canonical main CI passed all platform and installer jobs;
+the workflow security audit also passed. Exact acceptance runs and limits are
+in [VALIDATION.md](VALIDATION.md). Unfinished migration work: none. Blockers: none.
 
-Post-commit audits found no confirmed task orphans. Original captures, source
-extraction and Ghidra artifacts remain ignored locally. Preserve unrelated
-processes and reusable MSBuild workers. Push through the verified canonical
-remote as [AGENTS.md](../AGENTS.md) requires.
+Post-commit audits found no confirmed task orphans. Preserve unrelated processes
+and reusable MSBuild workers. Original source, captures and analysis artifacts
+remain ignored locally. No original-game run or release publication occurred.
+Push through the verified canonical remote as [AGENTS.md](../AGENTS.md) requires.
