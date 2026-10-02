@@ -7,7 +7,7 @@
 | `FMT-RES-003` | Kind-1 stream, the stored bytes of a kind-1 entry | supported | complete | None | None | implemented | `DynamixCompression.DecodeKind1` accepts only the markers `0x40` and `0x80`, blocks of 16,384 output bytes and copies inside their block, and rejects anything else; the original accepts any marker but `0x80` as compressed and has none of these limits. Every shipped stream passes. |
 | `FMT-RES-004` | Kind-2 stream, the stored bytes of a kind-2 entry | supported | complete | None | None | implemented | `DynamixCompression.DecodeKind2`. |
 | `FMT-RES-005` | Unidentified .GOG data candidates in installation root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
-| `FMT-RES-006` | Unidentified .INS data candidates in installation root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
+| `FMT-RES-006` | Installed disc-image cue sheet | supported | missing | None | None | supported | Observed shipped text syntax only; wrapper parsing remains open under Q-RES-118 and Q-RES-119. |
 | `FMT-RES-007` | Unidentified .386 data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
 | `FMT-RES-008` | Unidentified .BAT data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
 | `FMT-RES-009` | Unidentified .BMP data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |

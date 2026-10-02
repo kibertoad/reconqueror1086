@@ -13,8 +13,8 @@ The complete installation/media path accounting is recorded in FND-RES-010 and
 BLD-GOG-EN. Survey remains open until every manifest data family and all
 manual-mentioned screens are reconciled. Conservatively retained auxiliary media
 need runtime-use review and format entries until evidence supports exclusion.
-Research begins with Q-RES-008 (cue syntax), Q-RES-007 (disc carrier layout) and
-Q-RES-009 (driver candidates). Archive-member format coverage is a separate exit
+Research begins with Q-RES-007 (disc carrier layout) and Q-RES-009 (driver
+candidates); Q-RES-118 and Q-RES-119 track the cue consumer questions. Archive-member format coverage is a separate exit
 criterion from matching an enclosing archive path to a format entry.
 Existing implemented slices remain in the milestone table; their implementation
 does not prove Survey complete or promote any evidence status.

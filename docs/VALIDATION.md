@@ -356,3 +356,16 @@ coverage metadata and repository policy passed. Kaitai compilation was skipped
 because the compiler was unavailable; the fast gate was not rerun for this
 metadata-only planning batch. GAP-003 records the required provisional metadata
 choices and the suggested upstream schema improvement.
+
+## Cue-sheet research verification (2026-10-02)
+
+The source-byte inspection and independent track-span arithmetic checks for
+FND-RES-011 passed against the owned installation. This is file-data evidence
+for FMT-RES-006, not a test of wrapper behavior or parity. Q-RES-118 and
+Q-RES-119 retain the unread consumer questions. No original program ran.
+
+Documentation regeneration/check, research tracking, narrative references,
+coverage metadata and repository policy passed. Generated indexes and PARITY.md
+were regenerated. Kaitai compilation was skipped (compiler unavailable); the
+canonical fast gate was not repeated for this research-only batch. No code or
+CI test was changed and no parity implementation/validation was claimed.

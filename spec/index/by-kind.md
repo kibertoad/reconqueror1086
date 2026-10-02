@@ -49,7 +49,7 @@ Entries by kind.
 | [FMT-RES-003](../formats/FMT-RES-003.md) | Kind-1 stream, the stored bytes of a kind-1 entry | supported |
 | [FMT-RES-004](../formats/FMT-RES-004.md) | Kind-2 stream, the stored bytes of a kind-2 entry | supported |
 | [FMT-RES-005](../formats/FMT-RES-005.md) | Unidentified .GOG data candidates in installation root | unknown |
-| [FMT-RES-006](../formats/FMT-RES-006.md) | Unidentified .INS data candidates in installation root | unknown |
+| [FMT-RES-006](../formats/FMT-RES-006.md) | Installed disc-image cue sheet | supported |
 | [FMT-RES-007](../formats/FMT-RES-007.md) | Unidentified .386 data candidates in CD root | unknown |
 | [FMT-RES-008](../formats/FMT-RES-008.md) | Unidentified .BAT data candidates in CD root | unknown |
 | [FMT-RES-009](../formats/FMT-RES-009.md) | Unidentified .BMP data candidates in CD root | unknown |
@@ -327,7 +327,7 @@ Entries by kind.
 
 ## findings
 
-229 entries.
+230 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -452,6 +452,7 @@ Entries by kind.
 | [FND-RES-008](../findings/FND-RES-008.md) | Kind-1 blocks are neither the LSB-first LZW of other Dynamix files nor classic LH1 | recorded |
 | [FND-RES-009](../findings/FND-RES-009.md) | The bound LE payload maps initialized code and data separately from its data zero-fill | recorded |
 | [FND-RES-010](../findings/FND-RES-010.md) | Owned installation and raw disc directory listing include auxiliary media paths | recorded |
+| [FND-RES-011](../findings/FND-RES-011.md) | The installed cue sheet names one raw image and six track starts | recorded |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |

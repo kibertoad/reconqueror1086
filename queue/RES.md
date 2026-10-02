@@ -1,6 +1,6 @@
 # RES
 
-Next ID: Q-RES-118
+Next ID: Q-RES-120
 
 ## Static
 
@@ -28,11 +28,6 @@ Next ID: Q-RES-118
   provenance, call effects and every exit relevant to this question. Blocks: none.
 
 - Q-RES-007. FMT-RES-005: What layout, if any, is shared by these listed candidates?
-  Settles it: inspect bounded file signatures and the relevant readers; record the
-  parsing syntax or field layout, splitting the entry if the files differ before
-  making claims about them. Blocks: Survey data-family reconciliation.
-
-- Q-RES-008. FMT-RES-006: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the
   parsing syntax or field layout, splitting the entry if the files differ before
   making claims about them. Blocks: Survey data-family reconciliation.
@@ -581,6 +576,16 @@ Next ID: Q-RES-118
   Settles it: inspect bounded file signatures and the relevant readers; record the
   parsing syntax or field layout, splitting the entry if the files differ before
   making claims about them. Blocks: Survey data-family reconciliation.
+
+- Q-RES-118. FMT-RES-006: Does the shipped wrapper convert INDEX timestamps with 75 subdivisions per second?
+  Settles it: statically locate the installed wrapper's cue consumer and read the
+  complete timestamp conversion and its callers, distinguishing observed file
+  arithmetic from the reader's computation. Blocks: complete reading of FMT-RES-006.
+
+- Q-RES-119. FMT-RES-006: Does the shipped wrapper reject INDEX timestamps with seconds 60 or greater?
+  Settles it: read the timestamp parser's bounds and failure paths through its
+  callers; distinguish explicit rejection from unchecked conversion or clamping.
+  Blocks: complete reading of FMT-RES-006.
 
 ## Emulated call
 
