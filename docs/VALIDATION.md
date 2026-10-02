@@ -94,9 +94,12 @@ that exists on `main`. The toolkit's
 [setup guide](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/blob/main/docs/documentation-standard-check.md)
 lists its inputs.
 
-`tools/Check-Documentation.ps1` runs the same checker locally from `vendor/`, after
-`tools/upstream.mjs` verifies its digest and agreement with the CI action pin.
-It needs no network download. `tools/Check-NarrativeReferences.mjs` separately checks
+`tools/Check-Documentation.ps1` runs the installed, lock-pinned
+`@scientific-method/standard-checker` package through `tools/upstream.mjs`, which
+checks package adoption and agreement with the CI action pin. Install dependencies
+first with `npm ci --ignore-scripts` and
+`python -m pip install --require-hashes -r requirements-evidence.txt`;
+the check itself needs no network download. `tools/Check-NarrativeReferences.mjs` separately checks
 project narrative docs locally and in CI, excluding the immutable upstream text
 and generic workflow examples, whose IDs are illustrative. The check writes `spec/index/`
 and `PARITY.md`, and nobody edits them by hand. After changing the spec, `parity/` or

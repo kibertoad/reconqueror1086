@@ -24,8 +24,10 @@ changes and evidence-status promotions are outside this documentation batch.
 The current template/toolkit infrastructure migration is specified in
 [template-migration-plan.md](template-migration-plan.md). Its concrete scope is
 approved by the owner on 2026-09-30 and refreshed with explicit authorization
-on 2026-10-01. The current adoption is template 7b3bbe46, website 82deb767,
-checker f5e62e08 and reporter 7da1b93. Plans document authorized work and do not
+on 2026-10-01. The current adoption is template 79d18a20 and toolkit 0b4694df;
+the rules snapshot remains ca39d075. Package versions and their toolkit revision
+are recorded in `tools/toolkit-packages.json`, with dependency integrity in
+`package-lock.json` and `requirements-evidence.txt`. Plans document authorized work and do not
 require a separate explicit approval before implementation or tooling proceeds.
 
 - Keep gameplay rules in typed definitions and generic interpreters rather than screen-specific conditionals.
