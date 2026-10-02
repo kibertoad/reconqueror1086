@@ -27,18 +27,18 @@ None known.
 
 ## Handover
 
-- Stage: Survey. BLD-GOG-EN inventory is recorded by FND-RES-010. Unknown-format
-  planning is committed in FMT-RES-005 through FMT-RES-115 and their parity rows.
+- Stage: Survey. BLD-GOG-EN inventory and the seeded RES format rows remain
+  current. The latest research batch is FND-RES-011 / FMT-RES-006.
 - Last checks: 2026-10-02 documentation regeneration/check, narrative references,
   research tracking, coverage metadata, repository policy and staged checks
-  passed. The metadata-only manifest path-coverage audit passed. Kaitai compilation
-  skipped (compiler unavailable); fast gate not rerun for this planning batch.
-- Unfinished: none. GAP-003 records the schema constraint on unknown format
-  metadata; provisional values stay explicit and have no implementation.
-  Process audits found no confirmed repository orphans. No original program ran
-  and no original files were opened by this planning batch.
+  passed. Independent cue-sheet data checks passed. Kaitai compilation skipped
+  (compiler unavailable); fast gate not rerun for this research-only batch.
+- Unfinished: none. Q-RES-008 is closed; Q-RES-118 and Q-RES-119 remain Static
+  questions. No original program ran. Process audits found no confirmed
+  repository orphans. GAP-003 remains the metadata-schema concern.
 - Blockers: none known.
-- Next: Q-RES-008 / FMT-RES-006, then Q-RES-007 / FMT-RES-005 and
-  Q-RES-009 / FMT-RES-007. Reconcile manual-mentioned screens afterward.
+- Next: Q-RES-007 / FMT-RES-005, then Q-RES-009 / FMT-RES-007.
+  Reconcile manual-mentioned screens afterward. Q-RES-118 and Q-RES-119 retain
+  their own consumer readings; do not infer answers from file-data arithmetic.
   Archive-member formats and auxiliary-media runtime-use review remain Survey
-  work; unknown file-group entries do not establish their layouts or use.
+  work. No new implementation or parity validation was claimed.
