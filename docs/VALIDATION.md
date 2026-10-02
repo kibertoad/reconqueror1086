@@ -484,3 +484,18 @@ The complete canonical fast gate with Kaitai 0.11 passed: policy, configuration,
 documentation/schemas, infrastructure checks, build, tests and specification
 runner. LongRunning coverage was not requested. No original files were opened
 for this tooling session, no parity status changed and nothing was pushed.
+
+## CD-root configuration syntax (2026-10-02)
+
+FND-RES-016's bounded complete read matched the manifest length and whole-file
+fingerprint. The local line/token witness checked every separator, retained key
+padding and final delimiters, rejected unclassified bytes and reconstructed the
+complete file exactly. FMT-RES-010 records stored syntax only; it does not infer
+consumer behavior from option names or digit tokens.
+
+Documentation regeneration/check with the existing Kaitai 0.11 compiler,
+narrative references, research tracking, coverage metadata and repository policy
+passed. The fast gate was not repeated for this research-only batch; no runtime
+implementation or executable tooling changed. Q-RES-012 is closed; Q-RES-138
+through Q-RES-150 retain reader and independently answerable value questions.
+No original program ran and no parity validation is claimed.

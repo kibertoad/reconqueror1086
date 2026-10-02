@@ -431,7 +431,7 @@ Entries by area.
 | [FMT-RES-007](../formats/FMT-RES-007.md) | Counted record containers in the three CD-root .386 files | supported |
 | [FMT-RES-008](../formats/FMT-RES-008.md) | Empty and ASCII text framing of CD-root batch files | supported |
 | [FMT-RES-009](../formats/FMT-RES-009.md) | Owned autoplay indexed bitmap layout | supported |
-| [FMT-RES-010](../formats/FMT-RES-010.md) | Unidentified .CFG data candidates in CD root | unknown |
+| [FMT-RES-010](../formats/FMT-RES-010.md) | ASCII key/value syntax in CD-root RESOURCE.CFG | supported |
 | [FMT-RES-011](../formats/FMT-RES-011.md) | Unidentified .DAT data candidates in CD root | unknown |
 | [FMT-RES-012](../formats/FMT-RES-012.md) | Unidentified .GOB data candidates in CD root | unknown |
 | [FMT-RES-013](../formats/FMT-RES-013.md) | Unidentified .HLP data candidates in CD root | unknown |
@@ -553,6 +553,7 @@ Entries by area.
 | [FND-RES-013](../findings/FND-RES-013.md) | The three CD-root .386 candidates share counted variable-length record framing | recorded |
 | [FND-RES-014](../findings/FND-RES-014.md) | CD-root batch candidates are empty files or short ASCII text with differing endings | recorded |
 | [FND-RES-015](../findings/FND-RES-015.md) | AUTOPLAY.BMP contains an 8-bit indexed bitmap with exact palette and row boundaries | recorded |
+| [FND-RES-016](../findings/FND-RES-016.md) | CD-root RESOURCE.CFG stores aligned ASCII key/value lines | recorded |
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |

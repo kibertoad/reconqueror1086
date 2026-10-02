@@ -1,8 +1,58 @@
 # RES
 
-Next ID: Q-RES-138
+Next ID: Q-RES-151
 
 ## Static
+
+- Q-RES-138. FMT-RES-010: Which shipped reader consumes CD-root RESOURCE.CFG, and is that path reachable?
+  Settles it: trace file references from installation/media entry points through the relevant reader. Blocks: Survey data-family reconciliation.
+
+- Q-RES-139. FMT-RES-010: Does the reader require fixed key/separator alignment or accept other spacing?
+  Settles it: read its token-boundary and whitespace handling. Blocks: Survey data-family reconciliation.
+
+- Q-RES-140. FMT-RES-010: Does the reader match key casing exactly or without case distinctions?
+  Settles it: read its key comparison and caller-supplied key tokens. Blocks: Survey data-family reconciliation.
+
+- Q-RES-141. FMT-RES-010: How does the consumer interpret the directory value token?
+  Settles it: trace this key through value parsing and every relevant consumer use.
+  Blocks: Survey data-family reconciliation.
+
+- Q-RES-142. FMT-RES-010: How does the consumer interpret the videoDrv value token?
+  Settles it: trace this key through value parsing and every relevant consumer use.
+  Blocks: Survey data-family reconciliation.
+
+- Q-RES-143. FMT-RES-010: How does the consumer interpret the cd value token?
+  Settles it: trace this key through value parsing and every relevant consumer use.
+  Blocks: Survey data-family reconciliation.
+
+- Q-RES-144. FMT-RES-010: How does the consumer interpret the joyDrv value token?
+  Settles it: trace this key through value parsing and every relevant consumer use.
+  Blocks: Survey data-family reconciliation.
+
+- Q-RES-145. FMT-RES-010: How does the consumer interpret the memoryDrv value token?
+  Settles it: trace this key through value parsing and every relevant consumer use.
+  Blocks: Survey data-family reconciliation.
+
+- Q-RES-146. FMT-RES-010: How does the consumer interpret the minCPU value token?
+  Settles it: trace this key through value parsing and every relevant consumer use.
+  Blocks: Survey data-family reconciliation.
+
+- Q-RES-147. FMT-RES-010: How does the consumer interpret the minDOS value token?
+  Settles it: trace this key through value parsing and every relevant consumer use.
+  Blocks: Survey data-family reconciliation.
+
+- Q-RES-148. FMT-RES-010: How does the consumer interpret the mode value token?
+  Settles it: trace this key through value parsing and every relevant consumer use.
+  Blocks: Survey data-family reconciliation.
+
+- Q-RES-149. FMT-RES-010: How does the consumer interpret the mouseDrv value token?
+  Settles it: trace this key through value parsing and every relevant consumer use.
+  Blocks: Survey data-family reconciliation.
+
+- Q-RES-150. FMT-RES-010: How does the consumer interpret the smartDrv value token?
+  Settles it: trace this key through value parsing and every relevant consumer use.
+  Blocks: Survey data-family reconciliation.
+
 
 - Q-RES-135. FMT-RES-009: Which shipped consumer reads AUTOPLAY.BMP, and is that path reachable?
   Settles it: trace filename references from the shipped media entry points through the bitmap reader. Blocks: Survey data-family reconciliation.
@@ -77,11 +127,6 @@ Next ID: Q-RES-138
   it: read the relevant branch and its callers from the entry's cited findings, following data
   provenance, call effects and every exit relevant to this question. Blocks: none.
 
-
-- Q-RES-012. FMT-RES-010: What layout, if any, is shared by these listed candidates?
-  Settles it: inspect bounded file signatures and the relevant readers; record the
-  parsing syntax or field layout, splitting the entry if the files differ before
-  making claims about them. Blocks: Survey data-family reconciliation.
 
 - Q-RES-013. FMT-RES-011: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the
