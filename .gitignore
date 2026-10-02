@@ -55,10 +55,6 @@ reference/original/
 __pycache__/
 *.pyc
 
-# The pinned reporter's Python package is source, not an x86 build output.
-!tools/evidence/x86-reporter/x86/
-!tools/evidence/x86-reporter/x86/**
-
 # JVM diagnostics may contain original-memory and local environment data.
 hs_err_pid*.log
 replay_pid*.log
