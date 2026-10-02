@@ -27,16 +27,17 @@ None known.
 
 ## Handover
 
-- Stage: Survey. The latest research batch is FND-RES-012, FMT-RES-005 and
-  FMT-RES-116. Q-RES-007 is closed; Q-RES-120 through Q-RES-123 remain Static.
-- Last checks: 2026-10-02 full documentation regeneration/check with the existing
-  Kaitai 0.11 compiler, narrative references, research tracking, coverage metadata,
-  repository policy and staged checks passed. Generated sector-schema witnesses
-  passed against the owned carrier. No parity validation is claimed.
-- Unfinished: none from research. GAP-004 is recorded. No original program ran.
-  Process audits found no confirmed repository orphans.
+- Stage: Survey. Research remains at FND-RES-012, FMT-RES-005 and FMT-RES-116.
+  Q-RES-007 is closed; Q-RES-120 through Q-RES-123 remain Static.
+- Completed tooling: 5b18ad6 updates toolkit adoption and CI action to 2390d04,
+  engine to 0.6.0 and adds pypcode 4.0.0. Other toolkit packages were latest.
+  GAP-005 records the replaced duplicated installed-version assertion.
+- Last checks: 2026-10-02 canonical fast gate passed with Kaitai 0.11, along with
+  hash-checked downloads and actionlint. See docs/VALIDATION.md. No parity
+  validation is claimed and no original program ran for this tooling session.
+- Unfinished: none from the dependency update. No push was performed. Process
+  audits found no confirmed repository orphans; reusable MSBuild workers remain.
 - Blockers: none known.
-- Next: the owner requested latest toolkit dependencies on 2026-10-02. Open a
-  separate tooling session for that update and its canonical fast gate before
-  returning to Q-RES-009 / FMT-RES-007 and manual-screen reconciliation.
-  Rules snapshots remain unchanged unless the owner requests their refresh.
+- Next: resume Q-RES-009 / FMT-RES-007 and manual-screen reconciliation in a
+  research session. Rules snapshots remain unchanged unless the owner requests
+  their refresh. Gameplay implementation remains outside this goal's scope.
