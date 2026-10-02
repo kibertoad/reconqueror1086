@@ -6,7 +6,7 @@ Conqueror adopts current template main 79d18a20cb4d97c7153e74e5695cbb80e7ebf73e 
 
 ## Scope
 
-This repository only. Infrastructure, tooling, dependency configuration, CI and migration documentation. No research or gameplay implementation. Preserve project identities, source contracts, LE adapter and evidence statuses. No push or release authorization is inferred from this continuation.
+This repository only. Infrastructure, tooling, dependency configuration, CI and migration documentation. No research or gameplay implementation. Preserve project identities, source contracts, LE adapter and evidence statuses. The owner authorized push to canonical main after completion; no release is authorized.
 
 ## Must not touch
 
@@ -19,8 +19,8 @@ Original content, gameplay rules, spec claims, queue items, unrelated sibling wo
 
 ## Handover
 
-- Stage: Survey; this goal handles tooling migration only.
-- Last gate: 2026-10-02, canonical fast gate passed both normally before the batch and with NoRestore after it; local Kaitai compiler unavailable.
-- Unfinished: migrate vendored checker/reporters to packages and audit all newer template paths; compare current toolkit .NET and Ghidra capabilities with local implementations. NoRestore is adopted and tested. No half-done edits remain.
-- Blockers: none. Registry versions verified: reader 0.2.0, checker 0.1.0, engine 0.4.0.
-- Next: follow toolkit docs/migrating-to-scientific-method.md at 0b4694df (already read); add dependency locks, migrate toolkit callers/tests/CI and shared Ghidra paths, remove superseded copies, compare .NET capabilities, and audit the complete template delta. Git contains the reviewed upstream commits. The renamed toad-discovery-center-template main resolves to the same template commit. No original execution is needed.
+- Stage: Survey; this goal handles infrastructure migration only.
+- Last gate: 2026-10-02, full fast gates passed normally and with NoRestore after package/resource adoption. Kaitai compilation, strict configuration, workflow lint and Windows portable/installer build passed.
+- Unfinished: none in the implementation. Final cross-platform CI verification follows the owner-authorized canonical main push.
+- Blockers: none. Current upstream heads remain template 79d18a20, toolkit 0b4694df and rules ca39d075.
+- Next: push through verified origin with HEAD:main, inspect the CI run for that commit, fix any failures and record acceptance before closing this goal. Shared package versions are reader 0.2.0, checker 0.1.0, engine 0.4.0 and .NET Core/LegacyFormats 0.2.0. Preserve reusable MSBuild workers; audits found no orphans.
