@@ -4,12 +4,12 @@ title: Container directory record
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-files: ["C1086.GOB", "CD:CONQUER/*.RES", "CD:CONQUER/*.LOW"]
+files: ["C1086.GOB", "CD:C1086.GOB", "CD:CONQUER/*.RES", "CD:CONQUER/*.LOW"]
 byte_order: little
 size: 52
 text: false
 definition: fmt_res_002.ksy
-evidence: [FND-RES-001, FND-RES-002, FND-RES-003, FND-RES-004, FND-RES-005]
+evidence: [FND-RES-001, FND-RES-002, FND-RES-003, FND-RES-004, FND-RES-005, FND-RES-018]
 conflicting: []
 split_with: []
 related: [RULE-RES-001]
@@ -49,6 +49,10 @@ None known.
 All 26,762 records of the release [FND-RES-001]: 3,556 have kind 0, 23,201 kind 1 and 5 kind 2.
 Kind 0 records have equal sizes. The two `Pal102` records of `BAR0` have kind 1 and equal sizes, so
 equal sizes do not mean kind 0.
+
+The additional disc-root manifest path is byte-identical to the installed copy;
+its complete directory and stored extents were independently checked
+[FND-RES-018]. This is another copy, not a new container-content variant.
 
 ## Open questions
 

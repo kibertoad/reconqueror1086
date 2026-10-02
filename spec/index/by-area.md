@@ -433,7 +433,7 @@ Entries by area.
 | [FMT-RES-009](../formats/FMT-RES-009.md) | Owned autoplay indexed bitmap layout | supported |
 | [FMT-RES-010](../formats/FMT-RES-010.md) | ASCII key/value syntax in CD-root RESOURCE.CFG | supported |
 | [FMT-RES-011](../formats/FMT-RES-011.md) | ASCII line framing of CD-root INSTALL.DAT | supported |
-| [FMT-RES-012](../formats/FMT-RES-012.md) | Unidentified .GOB data candidates in CD root | unknown |
+| [FMT-RES-012](../formats/FMT-RES-012.md) | Unidentified .GOB data candidates in CD root | superseded |
 | [FMT-RES-013](../formats/FMT-RES-013.md) | Unidentified .HLP data candidates in CD root | unknown |
 | [FMT-RES-014](../formats/FMT-RES-014.md) | Unidentified .ICO data candidates in CD root | unknown |
 | [FMT-RES-015](../formats/FMT-RES-015.md) | Unidentified .INF data candidates in CD root | unknown |
@@ -555,6 +555,7 @@ Entries by area.
 | [FND-RES-015](../findings/FND-RES-015.md) | AUTOPLAY.BMP contains an 8-bit indexed bitmap with exact palette and row boundaries | recorded |
 | [FND-RES-016](../findings/FND-RES-016.md) | CD-root RESOURCE.CFG stores aligned ASCII key/value lines | recorded |
 | [FND-RES-017](../findings/FND-RES-017.md) | INSTALL.DAT stores ASCII directive-shaped lines with a final unterminated line | recorded |
+| [FND-RES-018](../findings/FND-RES-018.md) | The disc and installed C1086.GOB copies are identical and share the documented resource directory | recorded |
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |

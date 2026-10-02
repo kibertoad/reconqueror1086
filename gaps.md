@@ -154,3 +154,21 @@ fixture suggestion, not a reported defect in an adopted reader.
 Local handling: FMT-RES-011 retains stored framing only and Q-RES-151 through
 Q-RES-156 keep interpreter questions open. The complete witness reconstructs the
 file without parsing strings or executing directives. No upstream submission made.
+
+## GAP-009: Superseded unknown inventory entries still require a layout table
+
+Recorded: 2026-10-02. Audience: Standard and shared-checker authors.
+
+Superseding the unknown duplicate FMT-RES-012 with its evidence-backed active
+format caused the checker to reject the former unknown entry for having no
+layout table. Its unknown listing never had a table; the complete layout already
+lives in the replacement entry. Requiring a new layout table on retirement can
+encourage redundant or invented descriptions.
+
+Suggestion: exempt superseded unknown inventory listings from the table
+requirement when they identify their active replacement and cite the reconciliation
+evidence. Preserve the old uncertainty rather than forcing a second layout.
+
+Local handling: a single whole-file table redirects the former listing to
+FMT-RES-001, backed by FND-RES-018. No independent layout is introduced and no
+upstream submission has been made.

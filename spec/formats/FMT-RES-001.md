@@ -4,12 +4,12 @@ title: Resource container, a GOB, RES or LOW file
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-files: ["C1086.GOB", "CD:CONQUER/*.RES", "CD:CONQUER/*.LOW"]
+files: ["C1086.GOB", "CD:C1086.GOB", "CD:CONQUER/*.RES", "CD:CONQUER/*.LOW"]
 byte_order: little
 size: null
 text: false
 definition: fmt_res_001.ksy
-evidence: [FND-RES-001, FND-RES-002, FND-RES-005]
+evidence: [FND-RES-001, FND-RES-002, FND-RES-005, FND-RES-018]
 conflicting: []
 split_with: []
 related: [RULE-RES-001]
@@ -45,6 +45,13 @@ files (26,276 entries). Each file ends exactly at the end of its directory, and 
 entry starts where the previous one ends, apart from one 1,236-byte gap in `SKIRMISH.RES`
 [FND-RES-001]. A file the game writes has the same layout (FND-RES-005).
 
+The additional disc-root manifest path is byte-identical to the installed copy;
+its complete directory and stored extents were independently checked
+[FND-RES-018]. This is another copy, not a new container-content variant.
+
 ## Open questions
 
 - What, if anything, the 1,236 bytes before `FNT6.PCX` in `SKIRMISH.RES` held. (Q-RES-001)
+
+- Which consumer selects the disc-root copy versus the installed copy? Byte
+  identity does not establish runtime selection. (Q-RES-157)

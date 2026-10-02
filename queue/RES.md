@@ -1,8 +1,13 @@
 # RES
 
-Next ID: Q-RES-157
+Next ID: Q-RES-158
 
 ## Static
+
+- Q-RES-157. FMT-RES-001: Which consumer selects the disc-root C1086.GOB copy
+  versus the installed copy? Settles it: trace the archive path construction and
+  every relevant caller through the file-open decision. Blocks: Survey runtime-use
+  reconciliation.
 
 - Q-RES-151. FMT-RES-011: Which shipped interpreter consumes CD-root INSTALL.DAT, and is that path reachable?
   Settles it: trace file references from installation/media entry points into the reader. Blocks: Survey data-family reconciliation.
@@ -146,11 +151,6 @@ Next ID: Q-RES-157
   it: read the relevant branch and its callers from the entry's cited findings, following data
   provenance, call effects and every exit relevant to this question. Blocks: none.
 
-
-- Q-RES-014. FMT-RES-012: What layout, if any, is shared by these listed candidates?
-  Settles it: inspect bounded file signatures and the relevant readers; record the
-  parsing syntax or field layout, splitting the entry if the files differ before
-  making claims about them. Blocks: Survey data-family reconciliation.
 
 - Q-RES-015. FMT-RES-013: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the

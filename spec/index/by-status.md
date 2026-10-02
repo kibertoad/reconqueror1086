@@ -6,12 +6,11 @@ Entries by status.
 
 ## unknown
 
-108 entries.
+107 entries.
 
 | ID | Title |
 |---|---|
 | [FMT-ASSAULT-004](../formats/FMT-ASSAULT-004.md) | Live effect record, one of the 64 effects the scheduler runs |
-| [FMT-RES-012](../formats/FMT-RES-012.md) | Unidentified .GOB data candidates in CD root |
 | [FMT-RES-013](../formats/FMT-RES-013.md) | Unidentified .HLP data candidates in CD root |
 | [FMT-RES-014](../formats/FMT-RES-014.md) | Unidentified .ICO data candidates in CD root |
 | [FMT-RES-015](../formats/FMT-RES-015.md) | Unidentified .INF data candidates in CD root |
@@ -365,15 +364,16 @@ Entries by status.
 
 ## superseded
 
-1 entries.
+2 entries.
 
 | ID | Title |
 |---|---|
+| [FMT-RES-012](../formats/FMT-RES-012.md) | Unidentified .GOB data candidates in CD root |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 
 ## recorded
 
-235 entries.
+236 entries.
 
 | ID | Title |
 |---|---|
@@ -505,6 +505,7 @@ Entries by status.
 | [FND-RES-015](../findings/FND-RES-015.md) | AUTOPLAY.BMP contains an 8-bit indexed bitmap with exact palette and row boundaries |
 | [FND-RES-016](../findings/FND-RES-016.md) | CD-root RESOURCE.CFG stores aligned ASCII key/value lines |
 | [FND-RES-017](../findings/FND-RES-017.md) | INSTALL.DAT stores ASCII directive-shaped lines with a final unterminated line |
+| [FND-RES-018](../findings/FND-RES-018.md) | The disc and installed C1086.GOB copies are identical and share the documented resource directory |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |
@@ -659,7 +660,7 @@ Entries whose Open questions section says more than None known.
 | [FMT-RES-009](../formats/FMT-RES-009.md) | Owned autoplay indexed bitmap layout | supported |
 | [FMT-RES-010](../formats/FMT-RES-010.md) | ASCII key/value syntax in CD-root RESOURCE.CFG | supported |
 | [FMT-RES-011](../formats/FMT-RES-011.md) | ASCII line framing of CD-root INSTALL.DAT | supported |
-| [FMT-RES-012](../formats/FMT-RES-012.md) | Unidentified .GOB data candidates in CD root | unknown |
+| [FMT-RES-012](../formats/FMT-RES-012.md) | Unidentified .GOB data candidates in CD root | superseded |
 | [FMT-RES-013](../formats/FMT-RES-013.md) | Unidentified .HLP data candidates in CD root | unknown |
 | [FMT-RES-014](../formats/FMT-RES-014.md) | Unidentified .ICO data candidates in CD root | unknown |
 | [FMT-RES-015](../formats/FMT-RES-015.md) | Unidentified .INF data candidates in CD root | unknown |

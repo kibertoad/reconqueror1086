@@ -514,3 +514,18 @@ policy passed. The fast gate was not repeated for this research-only batch; no
 implementation or executable tooling changed. Q-RES-013 is closed; Q-RES-151
 through Q-RES-156 retain consumer questions. No original program ran or parity
 validation is claimed. GAP-008 records a text-Survey fixture suggestion.
+
+## Archive-copy reconciliation (2026-10-02)
+
+FND-RES-018's complete disc/installed byte comparison and canonical XXH3-128
+checks passed. Every directory record and stored extent was bounded and checked
+against FMT-RES-001 / FMT-RES-002, including contiguous data and exact final
+directory consumption. No entry content was decoded or exported.
+
+Documentation regeneration/check with Kaitai 0.11, narrative references,
+research tracking, coverage metadata and repository policy passed. Q-RES-014
+is closed; Q-RES-157 retains runtime copy selection. The redundant unknown listing
+is superseded, without promoting the active format or changing implementation.
+No original program ran or parity validation is claimed. The fast gate was not
+repeated for this research-only batch. GAP-009 records the superseded-listing
+checker requirement encountered during reconciliation.
