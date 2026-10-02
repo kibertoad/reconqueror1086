@@ -405,3 +405,18 @@ LongRunning coverage was not requested. The initial attempt exposed a duplicated
 engine-version assertion; GAP-005 records its replacement by lock-derived checks.
 No original content was opened for this tooling batch, no parity status changed,
 and no remote CI or cross-platform verification is claimed for these new pins.
+
+## Engine 0.7.0 follow-up (2026-10-02)
+
+The owner identified engine 0.7.0 after the preceding refresh. Official PyPI
+metadata confirmed 0.7.0, still requiring capstone 5.0.7 and pypcode 4.0.0.
+Requirements now pin its official wheel/source hashes; adoption, reporter-guide
+reference and documentation CI action pin toolkit
+98395df03fab3990bca3a3de5cb1dcd1ae0df3a3.
+
+The hash-required installation and installed-environment check passed. The first
+download lookup did not yet list the new release; a no-cache download using the
+explicit official PyPI index succeeded and verified the wheel hash. Actionlint
+and the full canonical fast gate with Kaitai 0.11 passed. This supersedes the
+preceding refresh's current-version claim; its results remain historical evidence.
+No original content was opened, no parity status changed and nothing was pushed.
