@@ -27,18 +27,18 @@ None known.
 
 ## Handover
 
-- Stage: Survey. BLD-GOG-EN path accounting is committed with FND-RES-010.
+- Stage: Survey. BLD-GOG-EN inventory is recorded by FND-RES-010. Unknown-format
+  planning is committed in FMT-RES-005 through FMT-RES-115 and their parity rows.
 - Last checks: 2026-10-02 documentation regeneration/check, narrative references,
   research tracking, coverage metadata, repository policy and staged checks
-  passed. Independent static listing and manifest accounting checks passed.
-  Kaitai compilation skipped (compiler unavailable). Fast gate not rerun for
-  the research-only batch; the previous tooling batch's gate passed.
-- Unfinished: none. Local listing remains in
-  analysis/original/survey-complete-2026-10-02/cd-manifest.txt. No original-game
-  execution occurred. Process audits found no confirmed repository orphans.
+  passed. The metadata-only manifest path-coverage audit passed. Kaitai compilation
+  skipped (compiler unavailable); fast gate not rerun for this planning batch.
+- Unfinished: none. GAP-003 records the schema constraint on unknown format
+  metadata; provisional values stay explicit and have no implementation.
+  Process audits found no confirmed repository orphans. No original program ran
+  and no original files were opened by this planning batch.
 - Blockers: none known.
-- Next: reconcile every BLD-GOG-EN manifest data family with format entries and
-  seed missing unknown entries/queue items under the plan-work procedure.
-  Conservatively retained auxiliary media need runtime-use review before
-  exclusion. Then reconcile manual-mentioned screens with screen entries.
-  Survey remains open; no parity status was promoted. GAP-002 is updated.
+- Next: Q-RES-008 / FMT-RES-006, then Q-RES-007 / FMT-RES-005 and
+  Q-RES-009 / FMT-RES-007. Reconcile manual-mentioned screens afterward.
+  Archive-member formats and auxiliary-media runtime-use review remain Survey
+  work; unknown file-group entries do not establish their layouts or use.
