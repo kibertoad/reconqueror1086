@@ -29,8 +29,8 @@ None known.
 
 - Stage: Survey. Research remains at FND-RES-012, FMT-RES-005 and FMT-RES-116.
   Q-RES-007 is closed; Q-RES-120 through Q-RES-123 remain Static.
-- Completed tooling: 5b18ad6 updates toolkit adoption and CI action to 2390d04,
-  engine to 0.6.0 and adds pypcode 4.0.0. Other toolkit packages were latest.
+- Completed tooling: 7948e08 updates toolkit adoption and CI action to 98395df,
+  engine to 0.7.0 and adds pypcode 4.0.0. Other toolkit packages were latest.
   GAP-005 records the replaced duplicated installed-version assertion.
 - Last checks: 2026-10-02 canonical fast gate passed with Kaitai 0.11, along with
   hash-checked downloads and actionlint. See docs/VALIDATION.md. No parity
