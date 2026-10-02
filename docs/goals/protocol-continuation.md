@@ -12,6 +12,7 @@ completion of one batch does not complete the objective.
 ## Scope
 
 Areas: project planning, Survey reconciliation, BLD-GOG-EN build inventory, RES inventory findings, formats and queue planning, and shared research tooling.
+Current Survey claim: Q-RES-010 / FMT-RES-008 and the CD-root batch candidates.
 Batches: research and its tooling only. Select concrete Survey research areas
 and record their claims here before changing their entries or queue items.
 Only this goal runs locally while publication is not authorized.
@@ -27,17 +28,18 @@ None known.
 
 ## Handover
 
-- Stage: Survey. Research remains at FND-RES-012, FMT-RES-005 and FMT-RES-116.
-  Q-RES-007 is closed; Q-RES-120 through Q-RES-123 remain Static.
-- Completed tooling: 7948e08 updates toolkit adoption and CI action to 98395df,
-  engine to 0.7.0 and adds pypcode 4.0.0. Other toolkit packages were latest.
-  GAP-005 records the replaced duplicated installed-version assertion.
-- Last checks: 2026-10-02 canonical fast gate passed with Kaitai 0.11, along with
-  hash-checked downloads and actionlint. See docs/VALIDATION.md. No parity
-  validation is claimed and no original program ran for this tooling session.
-- Unfinished: none from the dependency update. No push was performed. Process
-  audits found no confirmed repository orphans; reusable MSBuild workers remain.
+- Stage: Survey. Latest research batch: FND-RES-013 / FMT-RES-007.
+  Q-RES-009 is closed; Q-RES-124 through Q-RES-131 remain Static.
+- Last checks: 2026-10-02 full documentation regeneration/check with Kaitai 0.11,
+  narrative references, research tracking, coverage metadata and repository policy
+  passed. Generated schema witnesses passed against the owned files; no parity
+  validation is claimed. See docs/VALIDATION.md.
+- Tooling baseline: engine 0.7.0 and toolkit adoption 98395df. Its canonical
+  fast gate passed on 2026-10-02; this research-only batch did not repeat it.
+- Unfinished: none from this batch. No original program ran. Process audits found
+  no confirmed repository orphans; reusable MSBuild workers remain. No push made.
 - Blockers: none known.
-- Next: resume Q-RES-009 / FMT-RES-007 and manual-screen reconciliation in a
-  research session. Rules snapshots remain unchanged unless the owner requests
-  their refresh. Gameplay implementation remains outside this goal's scope.
+- Next: Q-RES-010 / FMT-RES-008 and manual-screen reconciliation; then the driver
+  reader and payload questions Q-RES-124 through Q-RES-131. Rules snapshots remain
+  unchanged unless the owner requests their refresh. Gameplay remains outside
+  this goal's scope.
