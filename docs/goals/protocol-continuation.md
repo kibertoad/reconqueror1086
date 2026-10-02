@@ -12,7 +12,7 @@ completion of one batch does not complete the objective.
 ## Scope
 
 Areas: project planning, Survey reconciliation, BLD-GOG-EN build inventory, RES inventory findings, formats and queue planning, and shared research tooling.
-Current Survey claim: Q-RES-010 / FMT-RES-008 and the CD-root batch candidates.
+Current Survey claim: Q-RES-011 / FMT-RES-009 and the CD-root configuration candidates.
 Batches: research and its tooling only. Select concrete Survey research areas
 and record their claims here before changing their entries or queue items.
 Only this goal runs locally while publication is not authorized.
@@ -28,18 +28,18 @@ None known.
 
 ## Handover
 
-- Stage: Survey. Latest research batch: FND-RES-013 / FMT-RES-007.
-  Q-RES-009 is closed; Q-RES-124 through Q-RES-131 remain Static.
-- Last checks: 2026-10-02 full documentation regeneration/check with Kaitai 0.11,
+- Stage: Survey. Latest research batch: FND-RES-014 / FMT-RES-008.
+  Q-RES-010 is closed; Q-RES-132 through Q-RES-134 remain Static.
+- Last checks: 2026-10-02 documentation regeneration/check with Kaitai 0.11,
   narrative references, research tracking, coverage metadata and repository policy
-  passed. Generated schema witnesses passed against the owned files; no parity
-  validation is claimed. See docs/VALIDATION.md.
+  passed. Complete-file fingerprints and lossless framing witnesses passed;
+  no parity validation is claimed. See docs/VALIDATION.md.
 - Tooling baseline: engine 0.7.0 and toolkit adoption 98395df. Its canonical
   fast gate passed on 2026-10-02; this research-only batch did not repeat it.
-- Unfinished: none from this batch. No original program ran. Process audits found
-  no confirmed repository orphans; reusable MSBuild workers remain. No push made.
+- Unfinished: none from this batch. GAP-006 is recorded. No original program or
+  batch file ran. Process audits found no confirmed repository orphans; reusable
+  MSBuild workers remain. No push made.
 - Blockers: none known.
-- Next: Q-RES-010 / FMT-RES-008 and manual-screen reconciliation; then the driver
-  reader and payload questions Q-RES-124 through Q-RES-131. Rules snapshots remain
-  unchanged unless the owner requests their refresh. Gameplay remains outside
-  this goal's scope.
+- Next: Q-RES-011 / FMT-RES-009 and manual-screen reconciliation; then consumer
+  questions Q-RES-124 through Q-RES-134. Rules snapshots remain unchanged unless
+  the owner requests their refresh. Gameplay remains outside this goal's scope.
