@@ -11,6 +11,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export function checks(noKsy = false) {
   return [
     ["Pinned documentation check", "tools/upstream.mjs", ["docs", "--check", ...(noKsy ? ["--no-ksy"] : [])]],
+    ["Narrative references", "tools/Check-NarrativeReferences.mjs", []],
     ["Research queue tracking", "tools/Check-ResearchTracking.mjs", []],
     ["Installed toolkit package versions and CI pin", "tools/Verify-ToolkitPackages.mjs", []],
   ];

@@ -529,3 +529,18 @@ is superseded, without promoting the active format or changing implementation.
 No original program ran or parity validation is claimed. The fast gate was not
 repeated for this research-only batch. GAP-009 records the superseded-listing
 checker requirement encountered during reconciliation.
+
+## Staged narrative-reference gate (2026-10-02)
+
+A clean start-session check rejected the prior handover's retired-entry citation.
+The handover is corrected, and the shared Node checks now run the active
+narrative-reference checker before research tracking and package verification.
+Pre-commit uses that same list on its staged-tree snapshot.
+
+The synthetic handover regression rejects a superseded entry through the real
+shared check runner and accepts its active replacement. Targeted narrative and
+shared-runner tests passed. The canonical fast gate with Kaitai 0.11 passed,
+including documentation, infrastructure checks, build, tests and specification
+runner. LongRunning coverage was not requested. No original files were opened,
+no gameplay or parity status changed, and nothing was pushed. GAP-010 records
+the omitted invariant and its local resolution.

@@ -30,7 +30,7 @@ None known.
 ## Handover
 
 - Stage: Survey. Latest research batch: FND-RES-018, FMT-RES-001 and FMT-RES-002;
-  FMT-RES-012 is superseded. Q-RES-014 is closed; Q-RES-157 remains Static.
+  Q-RES-014 is closed; Q-RES-157 remains Static.
 - Last checks: 2026-10-02 documentation regeneration/check with Kaitai 0.11,
   narrative references, research tracking, coverage metadata and repository policy
   passed. Complete-copy equality, XXH3 and directory/extent witnesses passed.

@@ -172,3 +172,21 @@ evidence. Preserve the old uncertainty rather than forcing a second layout.
 Local handling: a single whole-file table redirects the former listing to
 FMT-RES-001, backed by FND-RES-018. No independent layout is introduced and no
 upstream submission has been made.
+
+## GAP-010: Pre-commit omitted active narrative-reference validation
+
+Recorded: 2026-10-02. Audience: shared-tooling and template authors.
+
+The end-session handover named a superseded entry and passed the pre-commit
+checks. The next clean start-session check rejected it. The shared Node check
+list included spec, queue and package checks, but not the repository's active
+narrative checker; the full documentation command ran that additional check.
+
+Suggestion: include every active documentation-reference invariant in the shared
+staged-tree check list, not only tests of the checker. Exercise an end-session
+handover that names a superseded entry and verify the commit gate rejects it.
+
+Local resolution: remove the retired citation from the current handover and add
+Check-NarrativeReferences.mjs to the shared checks used by pre-commit and the
+canonical gate. A synthetic handover regression proves rejection and successful
+replacement by an active entry. No upstream submission has been made.
