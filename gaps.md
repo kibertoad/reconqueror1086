@@ -40,3 +40,24 @@ skips reparse points, includes the source image path, and offers an inventory-on
 mode. FND-RES-010 now records complete path accounting against the expanded
 manifest and explicit Other files list; data-family Survey remains open. No upstream
 submission has been made.
+
+## GAP-003: Unknown format entries still require a parsing-model and byte-order choice
+
+Recorded: 2026-10-02. Audience: Standard and shared-checker authors.
+
+The Survey procedure requires unknown format entries for unstudied manifest
+files. Standard v1 format metadata requires a text/binary choice and an endian
+value for binary formats. Checker 0.1.0's binary branch requires little or big
+without an exception for unknown entries; only its Kaitai-definition requirement
+has that exception. Thus a truly unstudied file cannot represent both parsing
+model and byte order as unresolved in typed metadata.
+
+Suggestion: allow null parsing-model and byte-order metadata only at unknown,
+and require concrete values before a layout is supported. This would preserve
+explicit uncertainty without forcing a provisional metadata hypothesis.
+
+Local handling: the new unknown inventory entries explicitly mark the required
+binary/little values as provisional hypotheses in comments and Open questions.
+They establish no field layout or parsing behavior, remain unknown, and have no
+implementation. Directory/suffix grouping likewise does not assert a shared
+format; research must split incompatible layouts. No upstream submission made.

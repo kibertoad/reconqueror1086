@@ -341,3 +341,18 @@ coverage metadata and repository policy passed. The regenerated indexes were
 committed. Kaitai compilation was skipped because the compiler was unavailable.
 The canonical fast gate was not repeated for this research-only batch; the
 previous tooling batch's passing gate remains recorded above.
+
+## Survey unknown-entry planning verification (2026-10-02)
+
+A metadata-only audit matched every BLD-GOG-EN data path against active format
+entries using the Standard's wildcard semantics (an asterisk never crosses a
+slash). Every previously uncovered path now matches an unknown entry; all new
+entries remain unknown, with a Static queue question and missing-code parity row.
+This is path coverage only, not layout, archive-member or runtime-use validation.
+No original files were opened by this planning batch.
+
+Documentation regeneration/check, research tracking, narrative references,
+coverage metadata and repository policy passed. Kaitai compilation was skipped
+because the compiler was unavailable; the fast gate was not rerun for this
+metadata-only planning batch. GAP-003 records the required provisional metadata
+choices and the suggested upstream schema improvement.

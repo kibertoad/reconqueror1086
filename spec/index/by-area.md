@@ -426,6 +426,117 @@ Entries by area.
 | [FMT-RES-002](../formats/FMT-RES-002.md) | Container directory record | supported |
 | [FMT-RES-003](../formats/FMT-RES-003.md) | Kind-1 stream, the stored bytes of a kind-1 entry | supported |
 | [FMT-RES-004](../formats/FMT-RES-004.md) | Kind-2 stream, the stored bytes of a kind-2 entry | supported |
+| [FMT-RES-005](../formats/FMT-RES-005.md) | Unidentified .GOG data candidates in installation root | unknown |
+| [FMT-RES-006](../formats/FMT-RES-006.md) | Unidentified .INS data candidates in installation root | unknown |
+| [FMT-RES-007](../formats/FMT-RES-007.md) | Unidentified .386 data candidates in CD root | unknown |
+| [FMT-RES-008](../formats/FMT-RES-008.md) | Unidentified .BAT data candidates in CD root | unknown |
+| [FMT-RES-009](../formats/FMT-RES-009.md) | Unidentified .BMP data candidates in CD root | unknown |
+| [FMT-RES-010](../formats/FMT-RES-010.md) | Unidentified .CFG data candidates in CD root | unknown |
+| [FMT-RES-011](../formats/FMT-RES-011.md) | Unidentified .DAT data candidates in CD root | unknown |
+| [FMT-RES-012](../formats/FMT-RES-012.md) | Unidentified .GOB data candidates in CD root | unknown |
+| [FMT-RES-013](../formats/FMT-RES-013.md) | Unidentified .HLP data candidates in CD root | unknown |
+| [FMT-RES-014](../formats/FMT-RES-014.md) | Unidentified .ICO data candidates in CD root | unknown |
+| [FMT-RES-015](../formats/FMT-RES-015.md) | Unidentified .INF data candidates in CD root | unknown |
+| [FMT-RES-016](../formats/FMT-RES-016.md) | Unidentified .SCR data candidates in CD root | unknown |
+| [FMT-RES-017](../formats/FMT-RES-017.md) | Unidentified .SOL data candidates in CD root | unknown |
+| [FMT-RES-018](../formats/FMT-RES-018.md) | Unidentified .TXT data candidates in CD root | unknown |
+| [FMT-RES-019](../formats/FMT-RES-019.md) | Unidentified .WRI data candidates in CD root | unknown |
+| [FMT-RES-020](../formats/FMT-RES-020.md) | Unidentified .AVI data candidates in CD:DEMOS/MOVIES | unknown |
+| [FMT-RES-021](../formats/FMT-RES-021.md) | Unidentified .000 data candidates in CD:DEMOS/SHIVERS | unknown |
+| [FMT-RES-022](../formats/FMT-RES-022.md) | Unidentified .AUD data candidates in CD:DEMOS/SHIVERS | unknown |
+| [FMT-RES-023](../formats/FMT-RES-023.md) | Unidentified .ERR data candidates in CD:DEMOS/SHIVERS | unknown |
+| [FMT-RES-024](../formats/FMT-RES-024.md) | Unidentified .ICO data candidates in CD:DEMOS/SHIVERS | unknown |
+| [FMT-RES-025](../formats/FMT-RES-025.md) | Unidentified .INF data candidates in CD:DEMOS/SHIVERS | unknown |
+| [FMT-RES-026](../formats/FMT-RES-026.md) | Unidentified .SOL data candidates in CD:DEMOS/SHIVERS | unknown |
+| [FMT-RES-027](../formats/FMT-RES-027.md) | Unidentified .WAV data candidates in CD:DEMOS/SHIVERS | unknown |
+| [FMT-RES-028](../formats/FMT-RES-028.md) | Unidentified .WIN data candidates in CD:DEMOS/SHIVERS | unknown |
+| [FMT-RES-029](../formats/FMT-RES-029.md) | Unidentified .000 data candidates in CD:DEMOS/SWAT | unknown |
+| [FMT-RES-030](../formats/FMT-RES-030.md) | Unidentified .CFG data candidates in CD:DEMOS/SWAT | unknown |
+| [FMT-RES-031](../formats/FMT-RES-031.md) | Unidentified .DRV data candidates in CD:DEMOS/SWAT | unknown |
+| [FMT-RES-032](../formats/FMT-RES-032.md) | Unidentified .ERR data candidates in CD:DEMOS/SWAT | unknown |
+| [FMT-RES-033](../formats/FMT-RES-033.md) | Unidentified .HLP data candidates in CD:DEMOS/SWAT | unknown |
+| [FMT-RES-034](../formats/FMT-RES-034.md) | Unidentified .ICO data candidates in CD:DEMOS/SWAT | unknown |
+| [FMT-RES-035](../formats/FMT-RES-035.md) | Unidentified .INF data candidates in CD:DEMOS/SWAT | unknown |
+| [FMT-RES-036](../formats/FMT-RES-036.md) | Unidentified .MAP data candidates in CD:DEMOS/SWAT | unknown |
+| [FMT-RES-037](../formats/FMT-RES-037.md) | Unidentified .MDT data candidates in CD:DEMOS/SWAT | unknown |
+| [FMT-RES-038](../formats/FMT-RES-038.md) | Unidentified .MID data candidates in CD:DEMOS/SWAT | unknown |
+| [FMT-RES-039](../formats/FMT-RES-039.md) | Unidentified .SCR data candidates in CD:DEMOS/SWAT | unknown |
+| [FMT-RES-040](../formats/FMT-RES-040.md) | Unidentified .SFX data candidates in CD:DEMOS/SWAT | unknown |
+| [FMT-RES-041](../formats/FMT-RES-041.md) | Unidentified .SOL data candidates in CD:DEMOS/SWAT | unknown |
+| [FMT-RES-042](../formats/FMT-RES-042.md) | Unidentified .TXT data candidates in CD:DEMOS/SWAT | unknown |
+| [FMT-RES-043](../formats/FMT-RES-043.md) | Unidentified .WIN data candidates in CD:DEMOS/SWAT | unknown |
+| [FMT-RES-044](../formats/FMT-RES-044.md) | Unidentified without a suffix data candidates in CD:DEMOS/SWAT | unknown |
+| [FMT-RES-045](../formats/FMT-RES-045.md) | Unidentified .HEP data candidates in CD:DEMOS/SWAT/PATCHES | unknown |
+| [FMT-RES-046](../formats/FMT-RES-046.md) | Unidentified .SCR data candidates in CD:DEMOS/SWAT/PATCHES | unknown |
+| [FMT-RES-047](../formats/FMT-RES-047.md) | Unidentified .RBT data candidates in CD:DEMOS/SWAT/ROBOTS | unknown |
+| [FMT-RES-048](../formats/FMT-RES-048.md) | Unidentified .DIB data candidates in CD:DEMOS/THEXDER | unknown |
+| [FMT-RES-049](../formats/FMT-RES-049.md) | Unidentified .HLP data candidates in CD:DEMOS/THEXDER | unknown |
+| [FMT-RES-050](../formats/FMT-RES-050.md) | Unidentified .ICO data candidates in CD:DEMOS/THEXDER | unknown |
+| [FMT-RES-051](../formats/FMT-RES-051.md) | Unidentified .INF data candidates in CD:DEMOS/THEXDER | unknown |
+| [FMT-RES-052](../formats/FMT-RES-052.md) | Unidentified .SOL data candidates in CD:DEMOS/THEXDER | unknown |
+| [FMT-RES-053](../formats/FMT-RES-053.md) | Unidentified .THL data candidates in CD:DEMOS/THEXDER | unknown |
+| [FMT-RES-054](../formats/FMT-RES-054.md) | Unidentified .INF data candidates in CD:DEMOS/THEXDER/DIRECTX | unknown |
+| [FMT-RES-055](../formats/FMT-RES-055.md) | Unidentified .TXT data candidates in CD:DEMOS/THEXDER/DIRECTX | unknown |
+| [FMT-RES-056](../formats/FMT-RES-056.md) | Unidentified .INF data candidates in CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO | unknown |
+| [FMT-RES-057](../formats/FMT-RES-057.md) | Unidentified .CNT data candidates in CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN | unknown |
+| [FMT-RES-058](../formats/FMT-RES-058.md) | Unidentified .CSP data candidates in CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN | unknown |
+| [FMT-RES-059](../formats/FMT-RES-059.md) | Unidentified .HLP data candidates in CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN | unknown |
+| [FMT-RES-060](../formats/FMT-RES-060.md) | Unidentified .SBK data candidates in CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN | unknown |
+| [FMT-RES-061](../formats/FMT-RES-061.md) | Unidentified .INF data candidates in CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY | unknown |
+| [FMT-RES-062](../formats/FMT-RES-062.md) | Unidentified .INI data candidates in CD:DEMOS/THEXDER/DIRECTX/DRIVERS/DISPLAY/BIN | unknown |
+| [FMT-RES-063](../formats/FMT-RES-063.md) | Unidentified .INF data candidates in CD:DEMOS/THEXDER/ENGLISH | unknown |
+| [FMT-RES-064](../formats/FMT-RES-064.md) | Unidentified .TXT data candidates in CD:DEMOS/THEXDER/ENGLISH | unknown |
+| [FMT-RES-065](../formats/FMT-RES-065.md) | Unidentified .MDS data candidates in CD:DEMOS/THEXDER/MDS | unknown |
+| [FMT-RES-066](../formats/FMT-RES-066.md) | Unidentified .MID data candidates in CD:DEMOS/THEXDER/MDS | unknown |
+| [FMT-RES-067](../formats/FMT-RES-067.md) | Unidentified .WAV data candidates in CD:DEMOS/THEXDER/WAVE | unknown |
+| [FMT-RES-068](../formats/FMT-RES-068.md) | Unidentified .BAT data candidates in CD:INN | unknown |
+| [FMT-RES-069](../formats/FMT-RES-069.md) | Unidentified .000 data candidates in CD:INN/FOOTBALL | unknown |
+| [FMT-RES-070](../formats/FMT-RES-070.md) | Unidentified .001 data candidates in CD:INN/FOOTBALL | unknown |
+| [FMT-RES-071](../formats/FMT-RES-071.md) | Unidentified .002 data candidates in CD:INN/FOOTBALL | unknown |
+| [FMT-RES-072](../formats/FMT-RES-072.md) | Unidentified .BAT data candidates in CD:INN/FOOTBALL | unknown |
+| [FMT-RES-073](../formats/FMT-RES-073.md) | Unidentified .CFG data candidates in CD:INN/FOOTBALL | unknown |
+| [FMT-RES-074](../formats/FMT-RES-074.md) | Unidentified .DAT data candidates in CD:INN/FOOTBALL | unknown |
+| [FMT-RES-075](../formats/FMT-RES-075.md) | Unidentified .DOC data candidates in CD:INN/FOOTBALL | unknown |
+| [FMT-RES-076](../formats/FMT-RES-076.md) | Unidentified .DRV data candidates in CD:INN/FOOTBALL | unknown |
+| [FMT-RES-077](../formats/FMT-RES-077.md) | Unidentified .HLP data candidates in CD:INN/FOOTBALL | unknown |
+| [FMT-RES-078](../formats/FMT-RES-078.md) | Unidentified .PRG data candidates in CD:INN/FOOTBALL | unknown |
+| [FMT-RES-079](../formats/FMT-RES-079.md) | Unidentified .SCR data candidates in CD:INN/FOOTBALL | unknown |
+| [FMT-RES-080](../formats/FMT-RES-080.md) | Unidentified .SO data candidates in CD:INN/FOOTBALL | unknown |
+| [FMT-RES-081](../formats/FMT-RES-081.md) | Unidentified .TXT data candidates in CD:INN/FOOTBALL | unknown |
+| [FMT-RES-082](../formats/FMT-RES-082.md) | Unidentified .V56 data candidates in CD:INN/FOOTBALL | unknown |
+| [FMT-RES-083](../formats/FMT-RES-083.md) | Unidentified without a suffix data candidates in CD:INN/FOOTBALL | unknown |
+| [FMT-RES-084](../formats/FMT-RES-084.md) | Unidentified .1 data candidates in CD:INN/INN | unknown |
+| [FMT-RES-085](../formats/FMT-RES-085.md) | Unidentified .BAT data candidates in CD:INN/INN | unknown |
+| [FMT-RES-086](../formats/FMT-RES-086.md) | Unidentified .CFG data candidates in CD:INN/INN | unknown |
+| [FMT-RES-087](../formats/FMT-RES-087.md) | Unidentified .DAT data candidates in CD:INN/INN | unknown |
+| [FMT-RES-088](../formats/FMT-RES-088.md) | Unidentified .DLL data candidates in CD:INN/INN | unknown |
+| [FMT-RES-089](../formats/FMT-RES-089.md) | Unidentified .DOC data candidates in CD:INN/INN | unknown |
+| [FMT-RES-090](../formats/FMT-RES-090.md) | Unidentified .DRV data candidates in CD:INN/INN | unknown |
+| [FMT-RES-091](../formats/FMT-RES-091.md) | Unidentified .HLP data candidates in CD:INN/INN | unknown |
+| [FMT-RES-092](../formats/FMT-RES-092.md) | Unidentified .ICO data candidates in CD:INN/INN | unknown |
+| [FMT-RES-093](../formats/FMT-RES-093.md) | Unidentified .ME data candidates in CD:INN/INN | unknown |
+| [FMT-RES-094](../formats/FMT-RES-094.md) | Unidentified .NL data candidates in CD:INN/INN | unknown |
+| [FMT-RES-095](../formats/FMT-RES-095.md) | Unidentified .PIF data candidates in CD:INN/INN | unknown |
+| [FMT-RES-096](../formats/FMT-RES-096.md) | Unidentified .PRG data candidates in CD:INN/INN | unknown |
+| [FMT-RES-097](../formats/FMT-RES-097.md) | Unidentified .SCR data candidates in CD:INN/INN | unknown |
+| [FMT-RES-098](../formats/FMT-RES-098.md) | Unidentified .TXT data candidates in CD:INN/INN | unknown |
+| [FMT-RES-099](../formats/FMT-RES-099.md) | Unidentified without a suffix data candidates in CD:INN/INN | unknown |
+| [FMT-RES-100](../formats/FMT-RES-100.md) | Unidentified .TO data candidates in CD:INN/INN/ARPATCH | unknown |
+| [FMT-RES-101](../formats/FMT-RES-101.md) | Unidentified .SO data candidates in CD:INN/INN/CCPATCH | unknown |
+| [FMT-RES-102](../formats/FMT-RES-102.md) | Unidentified .TO data candidates in CD:INN/INN/CCPATCH | unknown |
+| [FMT-RES-103](../formats/FMT-RES-103.md) | Unidentified .TO data candidates in CD:INN/INN/LLPATCH | unknown |
+| [FMT-RES-104](../formats/FMT-RES-104.md) | Unidentified .TO data candidates in CD:INN/INN/SLPATCH | unknown |
+| [FMT-RES-105](../formats/FMT-RES-105.md) | Unidentified .1 data candidates in CD:INN/TWINION | unknown |
+| [FMT-RES-106](../formats/FMT-RES-106.md) | Unidentified .2 data candidates in CD:INN/TWINION | unknown |
+| [FMT-RES-107](../formats/FMT-RES-107.md) | Unidentified .BAT data candidates in CD:INN/TWINION | unknown |
+| [FMT-RES-108](../formats/FMT-RES-108.md) | Unidentified .CFG data candidates in CD:INN/TWINION | unknown |
+| [FMT-RES-109](../formats/FMT-RES-109.md) | Unidentified .HLP data candidates in CD:INN/TWINION | unknown |
+| [FMT-RES-110](../formats/FMT-RES-110.md) | Unidentified .SCR data candidates in CD:INN/TWINION | unknown |
+| [FMT-RES-111](../formats/FMT-RES-111.md) | Unidentified .TXT data candidates in CD:INN/TWINION | unknown |
+| [FMT-RES-112](../formats/FMT-RES-112.md) | Unidentified .DAT data candidates in CD:INN/TWINION/TWPATCH | unknown |
+| [FMT-RES-113](../formats/FMT-RES-113.md) | Unidentified .DOC data candidates in CD:INN/TWINION/TWPATCH | unknown |
+| [FMT-RES-114](../formats/FMT-RES-114.md) | Unidentified .EXE data candidates in CD:INN/TWINION/TWPATCH | unknown |
+| [FMT-RES-115](../formats/FMT-RES-115.md) | Unidentified .DOC data candidates in CD:VESA | unknown |
 | [FND-RES-001](../findings/FND-RES-001.md) | All 100 containers share one layout: a header, the entry data packed from offset 8, and a directory of 52-byte records at the end | recorded |
 | [FND-RES-002](../findings/FND-RES-002.md) | One archive is open at a time; the game opens it, finds an entry by name or index, and reads it by its kind | recorded |
 | [FND-RES-003](../findings/FND-RES-003.md) | Kind 1 is a sequence of length-prefixed blocks, each stored or compressed with literals, back-references and runs | recorded |
