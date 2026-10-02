@@ -28,8 +28,8 @@ None known.
 ## Handover
 
 - Stage: Survey.
-- Last gate: inherited 2026-10-02 fast gate; this session's checks pending.
-- Unfinished: operational-documentation reconciliation pending validation.
+- Last checks: 2026-10-02 documentation, narrative, research-tracking and coverage checks passed; staged commit checks passed. Kaitai compilation skipped (compiler unavailable). Fast gate not rerun for this documentation-only batch; prior fast gate is in docs/VALIDATION.md.
+- Unfinished: none. Operational guidance corrected; GAP-001 recorded in gaps.md. Post-commit audits found no confirmed repository orphans.
 - Blockers: none known.
-- Next: validate and commit the documentation correction, then reconcile the
+- Next: reconcile the
   complete installation/media listing against BLD-GOG-EN's manifest and Other files.
