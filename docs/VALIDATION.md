@@ -294,3 +294,21 @@ copy. The workflow security run on ea142a6 reported insufficient Dependabot
 cooldown for both new ecosystems; each now waits seven days before automatic
 updates. No audit suppression is added. Final acceptance follows the new main
 CI and workflow-security runs.
+
+## Current infrastructure migration acceptance (2026-10-02)
+
+Canonical main commit 8ae493d38c5dbd23c1a8a697723ce49efcba281d passed
+[all CI jobs](https://github.com/kibertoad/reconqueror1086/actions/runs/37004707063):
+the documentation standard, fast validation and assetless native smoke checks on
+Windows x64, Linux x64, macOS arm64 and macOS x64, and all four installer jobs.
+Installer checks verified that the distributed toolkit MIT notice matches the
+retained repository copy. Windows additionally passed installed-entry smoke tests;
+Linux and macOS passed their filesystem/package layout checks.
+The [workflow security audit](https://github.com/kibertoad/reconqueror1086/actions/runs/37004707272)
+passed on the same commit after the cooldown fix.
+
+The final upstream-head check still matched template 79d18a20, toolkit 0b4694df
+and rules ca39d075. Offline snapshot integrity and exact package adoption checks
+passed. The complete semantic delta audit is in template-migration-plan.md.
+This closes the migration goal. No original content, original-game run,
+long-running suite, signing or release publication was involved.

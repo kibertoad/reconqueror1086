@@ -225,8 +225,8 @@ record for results and the local Kaitai limit.
 
 ## Current main package migration (2026-10-02)
 
-The active scope and acceptance condition are in
-[latest-infrastructure.md](goals/latest-infrastructure.md). Template main
+The completed scope and acceptance evidence are recorded below and in
+[VALIDATION.md](VALIDATION.md). Template main
 79d18a20 and toolkit main 0b4694df supersede the previous adoption target.
 Rules main remains ca39d075. The latest toolkit publishes the checker, executable
 reader, Python engine and reusable .NET readers as packages; its old vendored
@@ -239,7 +239,7 @@ The template NoRestore option is adapted to the canonical gate's existing
 automatically restoring build rather than adding a competing restore path.
 Acceptance exercises default restore behavior, explicit no-restore consumers,
 unchanged checks and test filters, and failed builds without restore fallback.
-Package migration and the complete template delta audit remain pending.
+Package migration and the complete template delta audit are complete.
 
 ### Package tooling adoption
 
@@ -308,5 +308,7 @@ scripts and .NET media/optical readers additionally follow the current toolkit
 package guide. Configuration tests, strict analysis configuration, workflow lint,
 Kaitai compilation and Windows publish/installer compilation passed.
 
-Local migration work is complete. Cross-platform CI on the authorized main push
-is the remaining verification; no release or original-game run is involved.
+Migration acceptance is complete. Main CI at 8ae493d passed all platform gates
+and Windows, Linux and both macOS installer checks; the workflow security check
+also passed. See [VALIDATION.md](VALIDATION.md) for the exact runs. No release or
+original-game run was involved.

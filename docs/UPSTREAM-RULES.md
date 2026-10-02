@@ -77,5 +77,6 @@ The 2026-10-02 goal targets template 79d18a20cb4d97c7153e74e5695cbb80e7ebf73e
 and toolkit 0b4694df7edb621c19171dd79718458378c811a2. Rules main remains
 ca39d0750e67c8c3900e8554e66a84083fe67452. The package tooling batch installs
 reader 0.2.0, checker 0.1.0 and engine 0.4.0. Shared .NET readers 0.2.0 and the full template delta are adopted and locally
-verified. Final cross-platform CI verification is tracked in
-docs/goals/latest-infrastructure.md.
+verified. Cross-platform CI, all installer checks and workflow security checks
+passed; [VALIDATION.md](VALIDATION.md) records acceptance and
+[template-migration-plan.md](template-migration-plan.md) records the completed audit.
