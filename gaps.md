@@ -61,3 +61,21 @@ binary/little values as provisional hypotheses in comments and Open questions.
 They establish no field layout or parsing behavior, remain unknown, and have no
 implementation. Directory/suffix grouping likewise does not assert a shared
 format; research must split incompatible layouts. No upstream submission made.
+
+## GAP-004: Raw-image validation must retain observed padding exceptions
+
+Recorded: 2026-10-02. Audience: shared optical-tooling and template authors.
+
+FND-RES-012 records a complete scan of the owned carrier: the cue-delimited
+leading span contains a duplicate header-address run and wholly-zero records
+outside the declared ISO volume. Requiring every leading raw record to carry a
+Mode 1 prefix or to encode its physical index plus 150 would reject this source.
+
+Suggestion: raw-reader validation fixtures should distinguish physical indexing,
+stored address components, declared ISO bounds and cue track boundaries. Include
+synthetic duplicate-address and zero-padding cases. Keep strict validation of
+actual file extents while stating which padding/header checks are required.
+
+Local resolution: FMT-RES-005 and FMT-RES-116 preserve the observed framing and
+exceptions, without claiming the shipped wrapper's checks. No implementation
+change or upstream submission is made by this research batch.

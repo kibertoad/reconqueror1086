@@ -369,3 +369,17 @@ coverage metadata and repository policy passed. Generated indexes and PARITY.md
 were regenerated. Kaitai compilation was skipped (compiler unavailable); the
 canonical fast gate was not repeated for this research-only batch. No code or
 CI test was changed and no parity implementation/validation was claimed.
+
+## Disc-carrier research verification (2026-10-02)
+
+The complete record scan and bounded ISO traversal for FND-RES-012 passed against
+the owned carrier. The generated FMT-RES-116 Python parser consumed every leading
+record exactly and reconstructed its stored regions byte-for-byte, including the
+padding exceptions. Carrier boundary arithmetic agreed with FMT-RES-006. These
+are schema/file checks, not parity validation or proof of wrapper behavior.
+
+The existing local Kaitai 0.11 compiler was selected through KSC; both new schemas
+and the full documentation definitions compiled. Documentation regeneration/check,
+research tracking, narrative references, coverage metadata and repository policy
+passed. No original program ran. The fast gate was not rerun for this research-only
+batch; no implementation or CI test changed. GAP-004 records a validation concern.

@@ -1,6 +1,6 @@
 # RES
 
-Next ID: Q-RES-120
+Next ID: Q-RES-124
 
 ## Static
 
@@ -26,11 +26,6 @@ Next ID: Q-RES-120
 - Q-RES-006. RULE-RES-004: Is it true that the shipped game ever reads a `.LOW` file? Settles
   it: read the relevant branch and its callers from the entry's cited findings, following data
   provenance, call effects and every exit relevant to this question. Blocks: none.
-
-- Q-RES-007. FMT-RES-005: What layout, if any, is shared by these listed candidates?
-  Settles it: inspect bounded file signatures and the relevant readers; record the
-  parsing syntax or field layout, splitting the entry if the files differ before
-  making claims about them. Blocks: Survey data-family reconciliation.
 
 - Q-RES-009. FMT-RES-007: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the
@@ -586,6 +581,26 @@ Next ID: Q-RES-120
   Settles it: read the timestamp parser's bounds and failure paths through its
   callers; distinguish explicit rejection from unchecked conversion or clamping.
   Blocks: complete reading of FMT-RES-006.
+
+- Q-RES-120. FMT-RES-005: Does the shipped wrapper reject entirely-zero records before the cue's first audio start?
+  Settles it: read the installed wrapper's raw record reader and its callers,
+  separating physical indexing from header checks and the treatment of the
+  observed zero run. Blocks: complete reading of FMT-RES-005.
+
+- Q-RES-121. FMT-RES-005: What is the sample representation of the cue-labelled audio span?
+  Settles it: trace the shipped wrapper's audio reader and conversion into its
+  output channels, recording widths, ordering and byte order with independent
+  source-data checks. Blocks: Survey audio member-format coverage.
+
+- Q-RES-122. FMT-RES-116: Which stored trailer regions does the shipped wrapper validate?
+  Settles it: follow every trailer read and its error propagation in the raw
+  record consumer; distinguish unused bytes from verified checksums or codes.
+  Blocks: complete reading of FMT-RES-116.
+
+- Q-RES-123. FMT-RES-116: Does the shipped wrapper use stored address components as physical locators?
+  Settles it: read record selection and offset formation in the consumer and its
+  callers, checking how the observed address-repeating block is treated.
+  Blocks: complete reading of FMT-RES-116.
 
 ## Emulated call
 

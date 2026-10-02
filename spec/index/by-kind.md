@@ -24,7 +24,7 @@ Entries by kind.
 
 ## formats
 
-167 entries.
+168 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -48,7 +48,7 @@ Entries by kind.
 | [FMT-RES-002](../formats/FMT-RES-002.md) | Container directory record | supported |
 | [FMT-RES-003](../formats/FMT-RES-003.md) | Kind-1 stream, the stored bytes of a kind-1 entry | supported |
 | [FMT-RES-004](../formats/FMT-RES-004.md) | Kind-2 stream, the stored bytes of a kind-2 entry | supported |
-| [FMT-RES-005](../formats/FMT-RES-005.md) | Unidentified .GOG data candidates in installation root | unknown |
+| [FMT-RES-005](../formats/FMT-RES-005.md) | Raw disc carrier with cue-delimited data and audio spans | supported |
 | [FMT-RES-006](../formats/FMT-RES-006.md) | Installed disc-image cue sheet | supported |
 | [FMT-RES-007](../formats/FMT-RES-007.md) | Unidentified .386 data candidates in CD root | unknown |
 | [FMT-RES-008](../formats/FMT-RES-008.md) | Unidentified .BAT data candidates in CD root | unknown |
@@ -159,6 +159,7 @@ Entries by kind.
 | [FMT-RES-113](../formats/FMT-RES-113.md) | Unidentified .DOC data candidates in CD:INN/TWINION/TWPATCH | unknown |
 | [FMT-RES-114](../formats/FMT-RES-114.md) | Unidentified .EXE data candidates in CD:INN/TWINION/TWPATCH | unknown |
 | [FMT-RES-115](../formats/FMT-RES-115.md) | Unidentified .DOC data candidates in CD:VESA | unknown |
+| [FMT-RES-116](../formats/FMT-RES-116.md) | Leading raw-track record in the owned disc carrier | supported |
 | [FMT-SAVE-001](../formats/FMT-SAVE-001.md) | Saved game, SAVEGAME\CONQn.SAV | supported |
 | [FMT-SAVE-002](../formats/FMT-SAVE-002.md) | Strategic map state, TROOPS.SAV | supported |
 | [FMT-SAVE-003](../formats/FMT-SAVE-003.md) | Properties, persons, items and variables, PROPERTY.SAV | supported |
@@ -327,7 +328,7 @@ Entries by kind.
 
 ## findings
 
-230 entries.
+231 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -453,6 +454,7 @@ Entries by kind.
 | [FND-RES-009](../findings/FND-RES-009.md) | The bound LE payload maps initialized code and data separately from its data zero-fill | recorded |
 | [FND-RES-010](../findings/FND-RES-010.md) | Owned installation and raw disc directory listing include auxiliary media paths | recorded |
 | [FND-RES-011](../findings/FND-RES-011.md) | The installed cue sheet names one raw image and six track starts | recorded |
+| [FND-RES-012](../findings/FND-RES-012.md) | The raw carrier has a cue-delimited data span with duplicate and zero padding records | recorded |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |
