@@ -436,3 +436,19 @@ fast gate is not repeated for this research-only batch: no implementation or
 executable tooling changed. No original program ran. Q-RES-009 is answered by
 the supported framing; independently answerable reader and field questions are
 retained as Q-RES-124 through Q-RES-131.
+
+## CD-root batch text framing (2026-10-02)
+
+The complete bounded reads for FND-RES-014 matched every recorded fingerprint
+and manifest length. The local framing witness retained line regions, CRLF
+separators, unterminated final content and a separate terminal region as
+FMT-RES-008 describes, then reconstructed each complete input exactly. It
+selected every listed candidate once, including zero-length files. No batch
+file or original program was executed.
+
+Documentation regeneration/check with the existing Kaitai 0.11 compiler,
+narrative references, research tracking, coverage metadata and repository policy
+passed. The fast gate was not repeated for this research-only batch; no runtime
+implementation or executable tooling changed. Q-RES-010 is closed; consumer
+questions remain Q-RES-132 through Q-RES-134. No parity validation is claimed.
+GAP-006 records a synthetic-fixture suggestion for shared tooling.

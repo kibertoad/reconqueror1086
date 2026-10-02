@@ -1,15 +1,15 @@
 ---
 id: FMT-RES-008
-title: Unidentified .BAT data candidates in CD root
-status: unknown
+title: Empty and ASCII text framing of CD-root batch files
+status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
 files: ["CD:CONFIG.BAT", "CD:CONQUER.BAT", "CD:INN.BAT", "CD:INSTALL.BAT", "CD:README.BAT"]
-byte_order: little # provisional hypothesis; see Open questions
+byte_order: null
 size: null
-text: false # provisional hypothesis; see Open questions
+text: true
 definition: null
-evidence: []
+evidence: [FND-RES-014]
 conflicting: []
 split_with: []
 related: []
@@ -17,13 +17,30 @@ related: []
 
 ## Layout
 
-None known. This is a provisional inventory group by directory and filename
-suffix, not a finding that its files share one format. No field layout, parsing
-syntax or runtime use is established.
+This entry describes the complete stored framing of the listed owned files,
+not the full language or acceptance policy of a command interpreter.
+CONFIG.BAT and CONQUER.BAT are empty. They contain no encoding evidence.
+Nonempty files contain printable ASCII lines separated by CRLF, with spaces
+between command-like tokens and filename punctuation. Leading at-signs and
+hyphen-prefixed tokens occur; letter casing is mixed. No byte-order mark, NUL,
+tab or byte above 127 occurs [FND-RES-014].
+
+| Key | Type | Name | Meaning | Status | Evidence |
+|---|---|---|---|---|---|
+| Line content | BYTE[] | batch_text_line | Printable ASCII bytes before CRLF or file end; an empty line is allowed by the observed INN.BAT case. | supported | FND-RES-014 |
+| Line delimiter | BYTE[2] | batch_text_separator | Stored CR followed by LF; the last text line need not have this delimiter. | supported | FND-RES-014 |
+| Terminal region | BYTE[] | batch_text_terminal | Either absent or the single final byte 0x1A in README.BAT; runtime interpretation unread. | supported | FND-RES-014 |
+
+INN.BAT has a final empty line followed by CRLF. INSTALL.BAT ends in printable
+text without CRLF. README.BAT has a single 0x1A after its last CRLF. Those cases
+are preserved separately; stripping a terminator or adding a newline changes
+stored content. FND-RES-014 records their complete fingerprints. No command
+sequence or script content is reproduced here.
 
 ## Enumerations and flags
 
-None known.
+None established. The observed leading punctuation is text syntax, not evidence
+of a particular interpreter decision or option meaning.
 
 ## Differences between builds
 
@@ -31,15 +48,18 @@ None known.
 
 ## Coverage
 
-The listed paths occur in BLD-GOG-EN's manifest. No layout definition has been
-checked against them. An enclosing archive's listing does not establish the
-formats of its members.
+Every byte of each listed BLD-GOG-EN file was inspected. The classification is
+limited to these CD-root paths; similarly named installation files and batch
+files below subdirectories are not covered. No interpreter or command target
+has been completely read or run. Supported status applies to stored framing
+only, not to an executable rule or acceptance policy.
 
 ## Open questions
 
-- What layout, if any, is shared by these candidates? (Q-RES-010) The required
-  binary/little metadata values are provisional hypotheses. Text syntax,
-  big-endian fields or multiple unrelated layouts remain possible; the filenames
-  do not settle them. Inspect file signatures and the relevant readers, and split
-  this group before asserting incompatible layouts. No parsing decision follows
-  from this unknown entry.
+- Which shipped interpreter or wrapper consumes these CD-root batch files, and
+  which paths are reachable? Filenames and text alone do not prove runtime use.
+  (Q-RES-132)
+- How does that consumer treat the terminal 0x1A in README.BAT? Its position is
+  observed, but stop/ignore/ordinary-byte behavior remains unresolved. (Q-RES-133)
+- How does that consumer handle INSTALL.BAT's final unterminated line? Its stored
+  existence does not establish execution or error behavior. (Q-RES-134)

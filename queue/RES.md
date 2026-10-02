@@ -1,8 +1,18 @@
 # RES
 
-Next ID: Q-RES-132
+Next ID: Q-RES-135
 
 ## Static
+
+- Q-RES-132. FMT-RES-008: Which shipped interpreter or wrapper consumes the CD-root batch files, and which paths are reachable?
+  Settles it: trace the installation/media entry points and their batch-file accesses. Blocks: Survey data-family reconciliation.
+
+- Q-RES-133. FMT-RES-008: How does the consumer handle the terminal 0x1A in README.BAT?
+  Settles it: read its text termination branch and the caller that supplies this file. Blocks: Survey data-family reconciliation.
+
+- Q-RES-134. FMT-RES-008: How does the consumer handle the final unterminated line in INSTALL.BAT?
+  Settles it: read its line termination and final-line handling with the relevant caller. Blocks: Survey data-family reconciliation.
+
 
 - Q-RES-124. FMT-RES-007: Which loader reads the counted containers and selects records, and what malformed-count/length behavior does it have?
   Settles it: trace filename references through every relevant loader read and selection path. Blocks: Survey data-family reconciliation.
@@ -57,11 +67,6 @@ Next ID: Q-RES-132
   it: read the relevant branch and its callers from the entry's cited findings, following data
   provenance, call effects and every exit relevant to this question. Blocks: none.
 
-
-- Q-RES-010. FMT-RES-008: What layout, if any, is shared by these listed candidates?
-  Settles it: inspect bounded file signatures and the relevant readers; record the
-  parsing syntax or field layout, splitting the entry if the files differ before
-  making claims about them. Blocks: Survey data-family reconciliation.
 
 - Q-RES-011. FMT-RES-009: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the

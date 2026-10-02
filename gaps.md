@@ -97,3 +97,22 @@ Local resolution: Verify-EvidenceEnvironment.py checks every locked distribution
 and the adoption engine version. Synthetic regressions cover future pins, missing
 packages, non-exact requirements and transitive version drift. No upstream
 submission has been made.
+
+## GAP-006: Survey text fixtures should preserve distinct end-of-file cases
+
+Recorded: 2026-10-02. Audience: shared-tooling and template authors.
+
+FND-RES-014 supplies direct file-data evidence for empty content and multiple
+text-ending cases in one provisional inventory family. A text classifier or
+round-trip witness that normalizes endings before reporting cannot distinguish
+those cases. This is a fixture suggestion, not a reported defect in an adopted
+reader or a claim about an interpreter's acceptance policy.
+
+Suggestion: reusable Survey fixtures should include empty files, a blank final
+line with CRLF, an unterminated final printable line and a separate terminal
+control byte. Compare complete reconstruction and fingerprints, and preserve
+consumer behavior as a separate research question.
+
+Local handling: FMT-RES-008 distinguishes the stored cases and the local witness
+reconstructed each complete file. Q-RES-132 through Q-RES-134 retain consumer
+questions. No upstream submission has been made.
