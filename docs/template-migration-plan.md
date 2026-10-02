@@ -263,3 +263,50 @@ not establish final migration acceptance: comparison found that the toolkit medi
 APIs originate in the local PCX/Smacker readers, so adopting the shared .NET
 readers is the next infrastructure batch. The importer release identity, XXH3
 manifest schema and transactional asset contract remain game-specific.
+
+### Shared resource-library adoption
+
+ScientificMethod.LegacyFormats 0.2.0 supplies the PCX, raw indexed image,
+Smacker header/audio/video/stream and cue/bin/raw ISO/CDDA APIs. Shared aliases
+keep consumer names consistent; duplicate implementations are removed. The
+Core project has no new dependency. Existing synthetic parser, importer and
+media tests exercise the shared readers; the existing PCX parity gap and all
+row statuses remain unchanged. The shared cue helper additionally retains
+pregap metadata, so a declared INDEX 00 bounds the data track before INDEX 01.
+This affects host media traversal, not game rules.
+
+Conqueror retains its exact owned-release fingerprint, XXH3 version-two manifest,
+asset IDs, archive extraction, transactional installation, repair and uninstall
+contracts. Toolkit asset manifests use a different source/installed-content
+contract and are not a drop-in replacement for those game-specific APIs.
+The new general OriginalContentSource abstraction is not added as a second
+import pipeline; the importer uses the equivalent shared low-level optical APIs.
+CSF, Dynamix resources and LE fixup/mapping remain game-specific. Publish scripts
+include the toolkit MIT notice beside the retained template notice on all platforms.
+
+### Current-template completion audit
+
+Reviewed the full 8d0eef35-to-79d18a20 template delta and current toolkit package
+migration guide at 0b4694df. The shared implementation is provided by published
+packages rather than copying the template's older vendored reporter pin.
+
+| Changed template paths | Current adoption and proof |
+|---|---|
+| tools/Invoke-Validation.ps1; tests/upstream/offline-validation.test.mjs | NoRestore behavior adapted to the canonical build; command-double regressions and full gates with and without restore passed. |
+| tools/evidence/sync-x86.mjs; tools/evidence/x86-lock.json | Superseded by npm/Python release locks and tools/toolkit-packages.json; no competing vendored path remains. Package lock/action/installed-version drift controls passed. |
+| tools/evidence/x86-reporter/legacy-image.mjs; pointer-inventory.mjs; report.mjs | Executable reader 0.2.0; existing defensive parser/inventory tests and wrapper synthetic before/after witness passed. |
+| tools/evidence/x86-reporter/report.py; x86/dispatch.py; image.py; machine.py; reports.py; trace.py | Engine 0.4.0 includes the current bounded graph, overlap, pointer-provenance, dispatch, effect-order and return-flow capabilities. Prepared protocol and wrapper regression passed. |
+| tests/evidence/bridge.test.mjs; test_dispatch.py; test_x86.py | Package-only tests belong to upstream releases; project wrapper, parser, inventory and lock tests remain locally. Superseded copies removed. |
+| docs/BOUNDED-EVIDENCE-REPORTERS.md; docs/EVIDENCE-TOOLS.md | Project guide links to current upstream contracts and documents the retained LE limitation. |
+| docs/IMPLEMENTATION-PLAN.md; docs/VALIDATION.md; docs/TEMPLATE-CHANGELOG.md | Project migration plan and dated validation records cover the adoption; generic template state/changelog does not replace game-specific planning. |
+
+Template changes outside this delta were adopted in prior batches; project
+identities, installer GUIDs, import paths, source fingerprints, gameplay and
+evidence statuses remain preserved. The global MSBuild worker policy and
+Conqueror's checkout-specific gate remain intentional adaptations. Shared Ghidra
+scripts and .NET media/optical readers additionally follow the current toolkit
+package guide. Configuration tests, strict analysis configuration, workflow lint,
+Kaitai compilation and Windows publish/installer compilation passed.
+
+Local migration work is complete. Cross-platform CI on the authorized main push
+is the remaining verification; no release or original-game run is involved.

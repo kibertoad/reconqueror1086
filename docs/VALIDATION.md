@@ -261,3 +261,26 @@ copy-only tests are removed because the package publisher runs them before relea
 project integration tests remain in the canonical gate. Local Kaitai compilation
 is skipped because the compiler is unavailable. The shared .NET resource migration
 and final template/package acceptance audit are still outstanding.
+
+## Shared .NET resource migration verification (2026-10-02)
+
+The canonical fast gate passed normally after restoring ScientificMethod.LegacyFormats
+0.2.0 and its ScientificMethod.Core 0.2.0 dependency, then passed with NoRestore
+after adopting shared optical APIs. The .NET suite passed 565 tests and the
+executable specifications passed 146 assertions. Existing synthetic PCX, palette,
+Smacker header/packet/audio/video/stream, cue sheet, raw ISO, CDDA and transactional
+import checks now exercise the packaged readers. No proprietary fixtures were used.
+Core has no new package dependency; gameplay and evidence statuses are unchanged.
+
+Workflow lint passed with actionlint 1.7.12. The Windows portable publish passed
+both assetless and native-platform smoke tests and contained both toolkit DLLs.
+Inno Setup 7.1.0 compiled the Windows installer. The publish scripts additionally
+carry the toolkit MIT notice at the path the package NOTICE names. Linux/macOS
+execution and Kaitai compilation remain CI acceptance checks.
+
+The final Windows package/installer rerun passed with the toolkit MIT notice
+included; its bytes match docs/licenses/scientific-method-MIT.txt. The existing
+local Kaitai Struct 0.11 compiler was then selected through KSC and the complete
+documentation check passed with format compilation enabled. Strict analysis
+configuration also passed. These close the local compiler and licensing checks;
+cross-platform execution remains the acceptance evidence from CI on main.

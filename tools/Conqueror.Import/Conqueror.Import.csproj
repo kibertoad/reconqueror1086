@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup><OutputType>Exe</OutputType></PropertyGroup>
   <ItemGroup><ProjectReference Include="../../src/Conqueror.Resources/Conqueror.Resources.csproj" /></ItemGroup>
+  <ItemGroup><Compile Include="../../src/Conqueror.Resources/SharedMediaAliases.cs" Link="SharedMediaAliases.cs" /></ItemGroup>
 </Project>

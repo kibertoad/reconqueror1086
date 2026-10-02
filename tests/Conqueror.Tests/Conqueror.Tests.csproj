@@ -8,4 +8,5 @@
     <ProjectReference Include="../../src/Conqueror.Resources/Conqueror.Resources.csproj" />
     <PackageReference Include="xunit.v3" Version="4.0.0" />
   </ItemGroup>
+  <ItemGroup><Compile Include="../../src/Conqueror.Resources/SharedMediaAliases.cs" Link="SharedMediaAliases.cs" /></ItemGroup>
 </Project>

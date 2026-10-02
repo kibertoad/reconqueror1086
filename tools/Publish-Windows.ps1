@@ -52,6 +52,10 @@ Copy-Item -LiteralPath (Join-Path $repositoryRoot 'packaging/windows/Install Ori
 Copy-Item -LiteralPath (Join-Path $repositoryRoot 'packaging/windows/Manage Original Resources.bat') -Destination $packageRoot
 Copy-Item -LiteralPath (Join-Path $repositoryRoot 'README.md') -Destination $packageRoot
 Copy-Item -LiteralPath (Join-Path $repositoryRoot 'NOTICE') -Destination $packageRoot
+New-Item -ItemType Directory -Force -Path (Join-Path $packageRoot 'docs/licenses') | Out-Null
+Copy-Item -LiteralPath (Join-Path $repositoryRoot 'docs/licenses/scientific-method-MIT.txt') `
+    -Destination (Join-Path $packageRoot 'docs/licenses/scientific-method-MIT.txt')
+
 New-Item -ItemType Directory -Force -Path (Join-Path $packageRoot 'vendor/template') | Out-Null
 Copy-Item -LiteralPath (Join-Path $repositoryRoot 'vendor/template/LICENSE') `
     -Destination (Join-Path $packageRoot 'vendor/template/LICENSE')

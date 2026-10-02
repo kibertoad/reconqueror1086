@@ -711,6 +711,7 @@ The current owner-authorized target and remaining acceptance requirements are in
 [latest-infrastructure.md](goals/latest-infrastructure.md). Shared tooling now
 uses reader 0.2.0, checker 0.1.0 and engine 0.4.0 at toolkit 0b4694df; the
 template target is 79d18a20. Rules snapshots remain ca39d075. Shared resource
-library adoption and the final template acceptance audit remain pending. This
+libraries and the complete current-template delta are adopted and locally verified;
+cross-platform CI on the authorized main push remains to be checked. This
 migration preserves gameplay and evidence statuses. Push to canonical main is
 authorized after the full migration is done and verified.
