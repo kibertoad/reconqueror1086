@@ -115,6 +115,15 @@ The raw-sector bounds, ISO directory traversal, cue timestamps, and WAV sample p
 `tools/Conqueror.Inspect` generates these ignored reports under `analysis/original`:
 
 - `cd-manifest.txt`: ISO paths and byte sizes.
+
+For Survey, run `dotnet run --project tools/Conqueror.Inspect -- <installation>
+<ignored-output-directory> --inventory-only`. This writes only `cd-manifest.txt`,
+with ISO files, raw audio-track hashes and a recursive installation listing,
+including the source image. Installation paths use forward slashes; reparse
+points are skipped and inaccessible paths fail the enumeration. This mode does
+not extract resources or execute original programs. Reconcile its paths against
+the build manifest and explicit Other files entries before claiming Survey
+listing coverage.
 - `gob-directory.txt`: outer GOB directory fields.
 - `gob-compression-report.txt`: kind-1 block counts plus complete kind-1 and kind-2 decoding validation.
 - `scene-res-report.txt`: per-scene entry, storage-kind, and block totals.

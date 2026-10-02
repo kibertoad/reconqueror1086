@@ -37,10 +37,13 @@ internal static class CdInventoryReport
                 }
                 manifest.AppendLine($"{length,12}  {Convert.ToHexStringLower(trackHash.GetCurrentHash())}  CD:track{track.Number:00}");
             }
-        // Files installed next to the disc image, which the DOSBox configuration mounts as C:.
-        foreach (var path in Directory.EnumerateFiles(install).Order(StringComparer.OrdinalIgnoreCase))
-            if (!Path.GetFileName(path).Equals("game.gog", StringComparison.OrdinalIgnoreCase))
-                manifest.AppendLine($"{new FileInfo(path).Length,12}  {ResourceHash.Xxh3(path)}  {Path.GetFileName(path)}");
+        // Enumerate the whole mounted installation, including wrapper subdirectories.
+        // Do not follow links out of the owned installation. The image itself is a path
+        // in the listing as well as the source of the CD: entries above.
+        var options = new EnumerationOptions { RecurseSubdirectories = true,
+            AttributesToSkip = FileAttributes.ReparsePoint, IgnoreInaccessible = false };
+        foreach (var path in Directory.EnumerateFiles(install, "*", options).Order(StringComparer.OrdinalIgnoreCase))
+            manifest.AppendLine($"{new FileInfo(path).Length,12}  {ResourceHash.Xxh3(path)}  {Path.GetRelativePath(install, path).Replace('\\', '/')}");
         return manifest.ToString();
     }
 }

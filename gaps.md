@@ -19,3 +19,23 @@ while allowing them in dated historical validation records.
 Local resolution: corrected the current-use sections of
 `docs/implementation-plan.md` and `docs/VALIDATION.md`. Historical migration
 records remain dated evidence. No upstream submission has been made.
+
+## GAP-002: Survey inventory must include installation subdirectories and the image path
+
+Recorded: 2026-10-02. Audience: template and shared-tooling authors.
+
+The local disc inventory included ISO files and audio tracks but enumerated only
+top-level installation files, excluding the image path. That omitted the DOSBox
+wrapper directory from the listing used for Survey reconciliation. Documentation
+checks accepted the build's broad Other files description without detecting this
+incomplete input listing.
+
+Suggestion: provide a reusable reconciliation gate that checks an explicitly
+complete installation/media listing against manifest paths and Other files paths,
+and makes recursion, symlink handling and archive traversal depth explicit.
+Synthetic coverage should include a nested wrapper file and the source image.
+
+Local resolution: the inspector now enumerates installation subdirectories,
+skips reparse points, includes the source image path, and offers an inventory-only
+mode. Manifest reconciliation remains separate research work. No upstream
+submission has been made.

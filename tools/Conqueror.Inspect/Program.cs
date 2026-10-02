@@ -22,6 +22,8 @@ using var image = new RawMode1Image(imagePath, sectors);
 var iso = new Iso9660(image);
 var files = iso.Files.OrderBy(x => x.Path, StringComparer.OrdinalIgnoreCase).ToArray();
 File.WriteAllText(Path.Combine(output, "cd-manifest.txt"), CdInventoryReport.Build(install, imagePath, cuePath, iso, files, sectors));
+// Survey needs the complete listing without extracting or decoding unrelated resources.
+if (args.Skip(2).Contains("--inventory-only", StringComparer.Ordinal)) return 0;
 
 var artifactRoot = Path.Combine(output, "artifacts");
 var interesting = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".EXE", ".COM", ".INI", ".CFG", ".DAT", ".TXT" };

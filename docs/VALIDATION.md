@@ -80,6 +80,17 @@ local research material only.
 
 ## Spec checks
 
+### Survey inventory tooling verification (2026-10-02)
+
+The canonical fast gate passed after the recursive installation listing and
+inventory-only inspector changes, with no build warnings or errors. Kaitai
+compilation was skipped because the compiler was unavailable in this session.
+Running the newly built inspector against the owned installation wrote only
+`analysis/original/survey-complete-2026-10-02/cd-manifest.txt`. A separate Python
+`Path.rglob` listing matched every installation path and size, including the
+nested DOSBox executable and source image. The report remains ignored locally.
+This verifies listing tooling, not Survey completion or any parity promotion.
+
 The `Documentation standard` job in `.github/workflows/ci.yml` runs the `check-documentation`
 action from
 [refurbished-dinosaurs-toolkit](https://github.com/kibertoad/refurbished-dinosaurs-toolkit),
