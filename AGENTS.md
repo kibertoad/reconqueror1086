@@ -101,7 +101,7 @@ require explicit authorization.
 ## Template workflow
 
 The current infrastructure migration targets template main 79d18a20cb4d97c7153e74e5695cbb80e7ebf73e
-and toolkit main 0b4694df7edb621c19171dd79718458378c811a2. Toolkit dependencies
+and the toolkit revision recorded in `tools/toolkit-packages.json`. Toolkit dependencies
 are pinned in package-lock.json and requirements-evidence.txt; the adoption record
 is tools/toolkit-packages.json. Install them before validation with
 `npm ci --ignore-scripts` and

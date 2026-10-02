@@ -4,10 +4,35 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, copyFileSync, rmSy
 import { tmpdir } from "node:os";
 import { resolve, join, dirname } from "node:path";
 import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
 import { run as packageRun, PREPARED_PROTOCOL } from "@scientific-method/executable-reader";
 import { run } from "../../tools/evidence/report.mjs";
 import { verifyToolkitPackages } from "../../tools/Verify-ToolkitPackages.mjs";
 const root = resolve(import.meta.dirname, "../..");
+
+test("evidence environment follows changed pins and rejects transitive drift", t => {
+  const dir = scratch(t), metadata = join(dir, "metadata");
+  mkdirSync(join(dir, "tools")); mkdirSync(metadata);
+  writeFileSync(join(dir, "tools/toolkit-packages.json"), JSON.stringify({engine:"9.8.7"}));
+  const requirements = "scientific-method-engine==9.8.7\ncapstone==1.2.3\npypcode==4.5.6\n";
+  writeFileSync(join(dir, "requirements-evidence.txt"), requirements);
+  const distribution = (name, version) => {
+    const path = join(metadata, name.replaceAll("-", "_") + "-synthetic.dist-info");
+    mkdirSync(path, {recursive:true});
+    writeFileSync(join(path, "METADATA"), `Metadata-Version: 2.1\nName: ${name}\nVersion: ${version}\n`);
+  };
+  distribution("scientific-method-engine", "9.8.7"); distribution("capstone", "1.2.3"); distribution("pypcode", "4.5.6");
+  const runCheck = () => spawnSync(process.env.EVIDENCE_PYTHON || "python", ["-B", join(root, "tools/Verify-EvidenceEnvironment.py"), "--root", dir],
+    {encoding:"utf8", env:{...process.env, PYTHONPATH:metadata}});
+  let result = runCheck(); assert.equal(result.status, 0, result.error?.message || result.stderr);
+  distribution("pypcode", "4.5.7"); result = runCheck(); assert.notEqual(result.status, 0); assert.match(result.stderr, /pypcode: expected 4\.5\.6, installed 4\.5\.7/);
+  distribution("pypcode", "4.5.6"); writeFileSync(join(dir, "requirements-evidence.txt"), requirements + "synthetic-env-proof==8.0.0\n");
+  result = runCheck(); assert.notEqual(result.status, 0); assert.match(result.stderr, /Missing evidence distribution: synthetic-env-proof==8\.0\.0/);
+  writeFileSync(join(dir, "requirements-evidence.txt"), requirements.replace("capstone==", "capstone>="));
+  result = runCheck(); assert.notEqual(result.status, 0); assert.match(result.stderr, /expected an exact distribution pin/);
+  writeFileSync(join(dir, "requirements-evidence.txt"), requirements.replace("9.8.7", "9.8.8"));
+  result = runCheck(); assert.notEqual(result.status, 0); assert.match(result.stderr, /Engine requirement differs/);
+});
 function scratch(t) { const dir = mkdtempSync(join(tmpdir(), "conqueror-packages-")); t.after(() => rmSync(dir, { recursive: true, force: true })); return dir; }
 test("Conqueror x86 wrapper forwards package reports and retains synthetic return behavior", t => {
   const dir = scratch(t), bytes = Buffer.from([0xb8, 0x34, 0x12, 0xc3]);

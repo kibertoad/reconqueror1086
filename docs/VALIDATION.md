@@ -383,3 +383,25 @@ and the full documentation definitions compiled. Documentation regeneration/chec
 research tracking, narrative references, coverage metadata and repository policy
 passed. No original program ran. The fast gate was not rerun for this research-only
 batch; no implementation or CI test changed. GAP-004 records a validation concern.
+
+## Toolkit dependency refresh (2026-10-02)
+
+Official npm, PyPI and NuGet registries were checked for current releases.
+The engine is updated to 0.6.0 with its required pypcode 4.0.0; capstone remains
+5.0.7 as required by the engine. Executable reader 0.2.0, standard checker 0.1.0
+and LegacyFormats 0.2.0 were already latest. Toolkit adoption and the documentation
+CI action now pin 2390d04ce34797f23a58a5508666d5a84fed22c7.
+
+`npm ci --ignore-scripts` and the hash-required Python installation passed.
+A separate `pip download --require-hashes` verified the local-platform wheels
+against the lock. The installed-environment verifier and its synthetic regressions
+passed, including changed future pins, missing packages and transitive drift.
+Actionlint passed for the changed workflow.
+
+The canonical `Invoke-Validation.ps1` fast gate passed with the existing Kaitai
+0.11 compiler selected through KSC: policy, configuration, documentation and
+schemas, infrastructure checks, build, tests and specification runner passed.
+LongRunning coverage was not requested. The initial attempt exposed a duplicated
+engine-version assertion; GAP-005 records its replacement by lock-derived checks.
+No original content was opened for this tooling batch, no parity status changed,
+and no remote CI or cross-platform verification is claimed for these new pins.

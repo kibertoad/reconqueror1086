@@ -79,3 +79,21 @@ actual file extents while stating which padding/header checks are required.
 Local resolution: FMT-RES-005 and FMT-RES-116 preserve the observed framing and
 exceptions, without claiming the shipped wrapper's checks. No implementation
 change or upstream submission is made by this research batch.
+
+## GAP-005: Installed engine validation duplicated a mutable version pin
+
+Recorded: 2026-10-02. Audience: template and shared-tooling authors.
+
+The canonical gate asserted a literal engine version separately from the adoption
+record and requirements lock. An authorized package update therefore failed even
+when installation matched both updated records. Transitive pinned distributions
+were not all checked by the assertion.
+
+Suggestion: derive installed-version checks from the exact requirements lock,
+cross-check adoption metadata, and cover changed pins and transitive drift with
+synthetic distributions.
+
+Local resolution: Verify-EvidenceEnvironment.py checks every locked distribution
+and the adoption engine version. Synthetic regressions cover future pins, missing
+packages, non-exact requirements and transitive version drift. No upstream
+submission has been made.

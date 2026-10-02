@@ -29,7 +29,7 @@ changes and evidence-status promotions are outside this documentation batch.
 The current template/toolkit infrastructure migration is specified in
 [template-migration-plan.md](template-migration-plan.md). Its concrete scope is
 approved by the owner on 2026-09-30 and refreshed with explicit authorization
-on 2026-10-01. The current adoption is template 79d18a20 and toolkit 0b4694df;
+on 2026-10-01. The current template adoption is 79d18a20;
 the rules snapshot remains ca39d075. Package versions and their toolkit revision
 are recorded in `tools/toolkit-packages.json`, with dependency integrity in
 `package-lock.json` and `requirements-evidence.txt`. Plans document authorized work and do not
@@ -713,11 +713,10 @@ source contracts and evidence statuses are retained.
 
 ## Current package migration
 
-The completed migration and acceptance evidence are in
-[template-migration-plan.md](template-migration-plan.md). Shared tooling now
-uses reader 0.2.0, checker 0.1.0 and engine 0.4.0 at toolkit 0b4694df; the
-template target is 79d18a20. Rules snapshots remain ca39d075. Shared resource
-libraries and the complete current-template delta are adopted and verified locally
-and by cross-platform CI, installer checks and workflow security checks. This
-migration preserves gameplay and evidence statuses and is pushed to canonical main
-under the owner's authorization.
+The completed template migration and its historical acceptance evidence are in
+[template-migration-plan.md](template-migration-plan.md). Current toolkit package
+versions and revision are authoritative in `tools/toolkit-packages.json`; Python
+integrity pins are in `requirements-evidence.txt`. The owner requested the latest
+toolkit dependencies on 2026-10-02. Local verification of that update is recorded
+in [VALIDATION.md](VALIDATION.md); no publication or cross-platform CI result is
+claimed for the new pins. Template 79d18a20 and rules ca39d075 remain unchanged.

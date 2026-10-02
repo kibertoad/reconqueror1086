@@ -59,7 +59,7 @@ try {
     try { Invoke-Node @('--test', 'tests/upstream/offline-validation.test.mjs') }
     finally { $env:PWSH = $previousPwsh }
     $python = if ($env:EVIDENCE_PYTHON) { $env:EVIDENCE_PYTHON } else { 'python' }
-    & $python -B -c "import importlib.metadata as m; assert m.version('scientific-method-engine') == '0.4.0'; assert m.version('capstone') == '5.0.7'"
+    & $python -B (Join-Path $root 'tools/Verify-EvidenceEnvironment.py')
     if ($LASTEXITCODE -ne 0) { throw 'Install the pinned engine with python -m pip install --require-hashes -r requirements-evidence.txt.' }
     $build = @('--artifacts-path', $ArtifactsPath, "-maxCpuCount:$MaxCpuCount", '-nodeReuse:true', '-p:UseSharedCompilation=false', '-v:minimal')
     if ($NoRestore) {
