@@ -1,8 +1,38 @@
 # RES
 
-Next ID: Q-RES-124
+Next ID: Q-RES-132
 
 ## Static
+
+- Q-RES-124. FMT-RES-007: Which loader reads the counted containers and selects records, and what malformed-count/length behavior does it have?
+  Settles it: trace filename references through every relevant loader read and selection path. Blocks: Survey data-family reconciliation.
+
+- Q-RES-125. FMT-RES-007: Does name lookup compare a zero-terminated prefix or the whole stored name region?
+  Settles it: trace the lookup comparison and its length/termination inputs. Blocks: Survey data-family reconciliation.
+
+- Q-RES-126. FMT-RES-007: What is the runtime meaning of driver_unk_00?
+  Settles it: trace every header read of this field and its downstream uses.
+  Blocks: Survey data-family reconciliation.
+
+- Q-RES-127. FMT-RES-007: What is the runtime meaning of driver_unk_28?
+  Settles it: trace every header read of this field and its downstream uses.
+  Blocks: Survey data-family reconciliation.
+
+- Q-RES-128. FMT-RES-007: What is the runtime meaning of driver_unk_record_20?
+  Settles it: trace every record read of this field and its downstream uses.
+  Blocks: Survey data-family reconciliation.
+
+- Q-RES-129. FMT-RES-007: What is the runtime meaning of driver_unk_record_28?
+  Settles it: trace every record read of this field and its downstream uses.
+  Blocks: Survey data-family reconciliation.
+
+- Q-RES-130. FMT-RES-007: What is the runtime meaning of driver_unk_record_2c?
+  Settles it: trace every record read of this field and its downstream uses.
+  Blocks: Survey data-family reconciliation.
+
+- Q-RES-131. FMT-RES-007: Which payload layouts occur in the three containers?
+  Settles it: identify each payload family through its reader or executable mapping,
+  splitting incompatible layouts. Blocks: Survey data-family reconciliation.
 
 - Q-RES-001. FMT-RES-001: What, if anything, occupies the bytes before FNT6.PCX in SKIRMISH.RES?
   Settles it: trace the named record or file through its loader and every relevant consumer,
@@ -27,10 +57,6 @@ Next ID: Q-RES-124
   it: read the relevant branch and its callers from the entry's cited findings, following data
   provenance, call effects and every exit relevant to this question. Blocks: none.
 
-- Q-RES-009. FMT-RES-007: What layout, if any, is shared by these listed candidates?
-  Settles it: inspect bounded file signatures and the relevant readers; record the
-  parsing syntax or field layout, splitting the entry if the files differ before
-  making claims about them. Blocks: Survey data-family reconciliation.
 
 - Q-RES-010. FMT-RES-008: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the

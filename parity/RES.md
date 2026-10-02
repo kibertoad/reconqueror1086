@@ -8,7 +8,7 @@
 | `FMT-RES-004` | Kind-2 stream, the stored bytes of a kind-2 entry | supported | complete | None | None | implemented | `DynamixCompression.DecodeKind2`. |
 | `FMT-RES-005` | Raw disc carrier with cue-delimited data and audio spans | supported | missing | None | None | supported | Stored framing only; consumer behavior and audio representation remain open under Q-RES-120 and Q-RES-121. |
 | `FMT-RES-006` | Installed disc-image cue sheet | supported | missing | None | None | supported | Observed shipped text syntax only; wrapper parsing remains open under Q-RES-118 and Q-RES-119. |
-| `FMT-RES-007` | Unidentified .386 data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
+| `FMT-RES-007` | Counted record containers in the three CD-root .386 files | supported | missing | None | None | supported | Stored framing supported; consumers and payload syntax remain open. |
 | `FMT-RES-008` | Unidentified .BAT data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
 | `FMT-RES-009` | Unidentified .BMP data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
 | `FMT-RES-010` | Unidentified .CFG data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |

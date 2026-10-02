@@ -13,7 +13,8 @@ The complete installation/media path accounting is recorded in FND-RES-010 and
 BLD-GOG-EN. Survey remains open until every manifest data family and all
 manual-mentioned screens are reconciled. Conservatively retained auxiliary media
 need runtime-use review and format entries until evidence supports exclusion.
-Research begins with Q-RES-009 (driver candidates); Q-RES-120 through Q-RES-123
+Research continues with Q-RES-010 (batch candidates); Q-RES-124 through
+Q-RES-131 retain driver-consumer and payload questions; Q-RES-120 through Q-RES-123
 retain disc-consumer and audio questions; Q-RES-118 and Q-RES-119 track the cue consumer questions. Archive-member format coverage is a separate exit
 criterion from matching an enclosing archive path to a format entry.
 Existing implemented slices remain in the milestone table; their implementation

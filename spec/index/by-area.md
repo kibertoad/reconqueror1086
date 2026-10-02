@@ -428,7 +428,7 @@ Entries by area.
 | [FMT-RES-004](../formats/FMT-RES-004.md) | Kind-2 stream, the stored bytes of a kind-2 entry | supported |
 | [FMT-RES-005](../formats/FMT-RES-005.md) | Raw disc carrier with cue-delimited data and audio spans | supported |
 | [FMT-RES-006](../formats/FMT-RES-006.md) | Installed disc-image cue sheet | supported |
-| [FMT-RES-007](../formats/FMT-RES-007.md) | Unidentified .386 data candidates in CD root | unknown |
+| [FMT-RES-007](../formats/FMT-RES-007.md) | Counted record containers in the three CD-root .386 files | supported |
 | [FMT-RES-008](../formats/FMT-RES-008.md) | Unidentified .BAT data candidates in CD root | unknown |
 | [FMT-RES-009](../formats/FMT-RES-009.md) | Unidentified .BMP data candidates in CD root | unknown |
 | [FMT-RES-010](../formats/FMT-RES-010.md) | Unidentified .CFG data candidates in CD root | unknown |
@@ -550,6 +550,7 @@ Entries by area.
 | [FND-RES-010](../findings/FND-RES-010.md) | Owned installation and raw disc directory listing include auxiliary media paths | recorded |
 | [FND-RES-011](../findings/FND-RES-011.md) | The installed cue sheet names one raw image and six track starts | recorded |
 | [FND-RES-012](../findings/FND-RES-012.md) | The raw carrier has a cue-delimited data span with duplicate and zero padding records | recorded |
+| [FND-RES-013](../findings/FND-RES-013.md) | The three CD-root .386 candidates share counted variable-length record framing | recorded |
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |

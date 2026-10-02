@@ -6,12 +6,11 @@ Entries by status.
 
 ## unknown
 
-113 entries.
+112 entries.
 
 | ID | Title |
 |---|---|
 | [FMT-ASSAULT-004](../formats/FMT-ASSAULT-004.md) | Live effect record, one of the 64 effects the scheduler runs |
-| [FMT-RES-007](../formats/FMT-RES-007.md) | Unidentified .386 data candidates in CD root |
 | [FMT-RES-008](../formats/FMT-RES-008.md) | Unidentified .BAT data candidates in CD root |
 | [FMT-RES-009](../formats/FMT-RES-009.md) | Unidentified .BMP data candidates in CD root |
 | [FMT-RES-010](../formats/FMT-RES-010.md) | Unidentified .CFG data candidates in CD root |
@@ -137,7 +136,7 @@ Entries by status.
 
 ## supported
 
-213 entries.
+214 entries.
 
 | ID | Title |
 |---|---|
@@ -180,6 +179,7 @@ Entries by status.
 | [FMT-RES-004](../formats/FMT-RES-004.md) | Kind-2 stream, the stored bytes of a kind-2 entry |
 | [FMT-RES-005](../formats/FMT-RES-005.md) | Raw disc carrier with cue-delimited data and audio spans |
 | [FMT-RES-006](../formats/FMT-RES-006.md) | Installed disc-image cue sheet |
+| [FMT-RES-007](../formats/FMT-RES-007.md) | Counted record containers in the three CD-root .386 files |
 | [FMT-RES-116](../formats/FMT-RES-116.md) | Leading raw-track record in the owned disc carrier |
 | [FMT-SAVE-001](../formats/FMT-SAVE-001.md) | Saved game, SAVEGAME\CONQn.SAV |
 | [FMT-SAVE-002](../formats/FMT-SAVE-002.md) | Strategic map state, TROOPS.SAV |
@@ -373,7 +373,7 @@ Entries by status.
 
 ## recorded
 
-230 entries.
+231 entries.
 
 | ID | Title |
 |---|---|
@@ -500,6 +500,7 @@ Entries by status.
 | [FND-RES-010](../findings/FND-RES-010.md) | Owned installation and raw disc directory listing include auxiliary media paths |
 | [FND-RES-011](../findings/FND-RES-011.md) | The installed cue sheet names one raw image and six track starts |
 | [FND-RES-012](../findings/FND-RES-012.md) | The raw carrier has a cue-delimited data span with duplicate and zero padding records |
+| [FND-RES-013](../findings/FND-RES-013.md) | The three CD-root .386 candidates share counted variable-length record framing |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |
@@ -649,7 +650,7 @@ Entries whose Open questions section says more than None known.
 | [FMT-RES-002](../formats/FMT-RES-002.md) | Container directory record | supported |
 | [FMT-RES-005](../formats/FMT-RES-005.md) | Raw disc carrier with cue-delimited data and audio spans | supported |
 | [FMT-RES-006](../formats/FMT-RES-006.md) | Installed disc-image cue sheet | supported |
-| [FMT-RES-007](../formats/FMT-RES-007.md) | Unidentified .386 data candidates in CD root | unknown |
+| [FMT-RES-007](../formats/FMT-RES-007.md) | Counted record containers in the three CD-root .386 files | supported |
 | [FMT-RES-008](../formats/FMT-RES-008.md) | Unidentified .BAT data candidates in CD root | unknown |
 | [FMT-RES-009](../formats/FMT-RES-009.md) | Unidentified .BMP data candidates in CD root | unknown |
 | [FMT-RES-010](../formats/FMT-RES-010.md) | Unidentified .CFG data candidates in CD root | unknown |

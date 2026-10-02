@@ -420,3 +420,19 @@ explicit official PyPI index succeeded and verified the wheel hash. Actionlint
 and the full canonical fast gate with Kaitai 0.11 passed. This supersedes the
 preceding refresh's current-version claim; its results remain historical evidence.
 No original content was opened, no parity status changed and nothing was pushed.
+
+## Counted driver-container framing (2026-10-02)
+
+The complete bounded traversal for FND-RES-013 reached each file end exactly.
+The generated FMT-RES-007 Python parser consumed all records in all three owned
+files and reconstructed every byte from parsed fields, including nonzero name
+remainders. Source fingerprints and record-boundary measurements are retained
+in the finding. These checks establish stored framing, not payload semantics or
+loader acceptance, and do not validate a parity implementation.
+
+Documentation regeneration/check with the local Kaitai 0.11 compiler passed,
+along with narrative references, research tracking and coverage metadata. The
+fast gate is not repeated for this research-only batch: no implementation or
+executable tooling changed. No original program ran. Q-RES-009 is answered by
+the supported framing; independently answerable reader and field questions are
+retained as Q-RES-124 through Q-RES-131.
