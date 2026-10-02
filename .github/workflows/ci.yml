@@ -93,7 +93,7 @@ jobs:
       - run: npm ci --ignore-scripts
       - name: Verify pinned offline tooling
         run: node tools/upstream.mjs verify
-      - uses: kibertoad/refurbished-dinosaurs-toolkit/actions/check-documentation@98395df03fab3990bca3a3de5cb1dcd1ae0df3a3 # zizmor: ignore[stale-action-refs]
+      - uses: kibertoad/refurbished-dinosaurs-toolkit/actions/check-documentation@b91cd758c25569d4b13be2587000b1846d2002fb # zizmor: ignore[stale-action-refs]
 
       - name: Check narrative references
         run: node tools/Check-NarrativeReferences.mjs

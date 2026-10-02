@@ -468,3 +468,19 @@ The fast gate was not repeated for this research-only batch; no implementation
 or executable tooling changed. Q-RES-011 is closed; Q-RES-135 through Q-RES-137
 retain consumer questions. No original program ran or parity validation is
 claimed. GAP-007 records the corrected plan/handover label mismatch.
+
+## Toolkit engine 0.9.1 refresh (2026-10-02)
+
+Official PyPI metadata identified engine 0.9.1 as latest. Official npm and NuGet
+queries confirmed reader 0.2.0, checker 0.1.0 and LegacyFormats 0.2.0 remain
+latest. Engine dependencies still require capstone 5.0.7 and pypcode 4.0.0.
+The hash lock now pins the official 0.9.1 wheel/source digests. Adoption and the
+CI documentation action pin b91cd758c25569d4b13be2587000b1846d2002fb.
+
+`npm ci --ignore-scripts`, hash-required Python installation and an explicit
+no-cache official-PyPI hash-required download passed. Installed-version checks,
+the synthetic package/wrapper regressions and workflow actionlint passed.
+The complete canonical fast gate with Kaitai 0.11 passed: policy, configuration,
+documentation/schemas, infrastructure checks, build, tests and specification
+runner. LongRunning coverage was not requested. No original files were opened
+for this tooling session, no parity status changed and nothing was pushed.

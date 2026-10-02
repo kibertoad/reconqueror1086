@@ -8,7 +8,7 @@ python -m pip install --require-hashes -r requirements-evidence.txt
 node tools/evidence/report.mjs x86-returns <local-config.json>
 ```
 
-The toolkit's [reporter guide](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/blob/98395df03fab3990bca3a3de5cb1dcd1ae0df3a3/docs/bounded-evidence-reporters.md)
+The toolkit's [reporter guide](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/blob/b91cd758c25569d4b13be2587000b1846d2002fb/docs/bounded-evidence-reporters.md)
 defines the report commands, controls, caps and limitations. The packaged reader
 prepares MZ/FBOV queries and the engine reads instruction paths; the existing
 Conqueror wrapper keeps its own inventory and review contracts.
