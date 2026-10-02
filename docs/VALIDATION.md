@@ -31,6 +31,11 @@ the suite or `-IncludeLongRunningTests` when that coverage is needed. Override
 `-MinimumExpectedTests` for a deliberately narrowed run; the default discovery floor
 is 98. The gate always runs the executable specification suite.
 
+After a normal run has restored packages, use `-NoRestore` to reuse that restore
+state. The build receives `--no-restore`; all checks and test selection still run.
+Missing restore state fails through .NET diagnostics without a restore fallback.
+Normal runs and CI retain automatic restore.
+
 Configuration checks distinguish build identity from analysis readiness. Builds
 can proceed while latest-patch provenance is unknown. Before executable analysis,
 `tools/Verify-Configuration.ps1 -RequireAnalysisReady` must pass. See
@@ -223,3 +228,17 @@ skipped because no local compiler was available; CI retains that compilation.
 Long-running tests and installer packaging were not run for this tooling update.
 The validation runner supplies the vendored Python import path while preserving
 upstream test bytes and restores the previous environment afterward.
+
+## Current-template NoRestore verification (2026-10-02)
+
+The pre-migration canonical fast gate passed with its normal restoring build.
+After adding the template main 79d18a20 NoRestore capability, the complete
+`tools/Invoke-Validation.ps1 -NoRestore` gate passed with the existing restore
+state. Command-double regressions passed for default build restore, explicit
+`--no-restore` consumers, identical policy/tool checks and test filters, and a
+failed build without a restore fallback. The .NET test run passed 565 tests;
+the executable specifications passed 146 assertions. Existing Python and Node
+infrastructure suites passed, together with the two new gate regressions.
+Local Kaitai compilation remains skipped because its compiler is unavailable.
+No original assets, gameplay changes or evidence-status promotions are involved.
+This verifies the NoRestore batch, not the unfinished package migration.

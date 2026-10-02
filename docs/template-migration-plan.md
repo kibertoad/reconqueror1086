@@ -222,3 +222,21 @@ suites. No gameplay changes, spec promotions or unresolved owner decisions.
 Outcome: canonical fast validation passed; exact reporter bytes include the
 latest pointer-inventory and dispatch dependencies. See the dated validation
 record for results and the local Kaitai limit.
+
+## Current main package migration (2026-10-02)
+
+The active scope and acceptance condition are in
+[latest-infrastructure.md](goals/latest-infrastructure.md). Template main
+79d18a20 and toolkit main 0b4694df supersede the previous adoption target.
+Rules main remains ca39d075. The latest toolkit publishes the checker, executable
+reader, Python engine and reusable .NET readers as packages; its old vendored
+checker path no longer exists. Migrate active callers, CI, dependency locks and
+shared Ghidra script paths together; remove superseded copies and copy-only tests.
+Preserve Conqueror's LE mapping, proprietary-source boundaries and game-specific
+contracts. Compare .NET capabilities before replacing local implementations.
+
+The template NoRestore option is adapted to the canonical gate's existing
+automatically restoring build rather than adding a competing restore path.
+Acceptance exercises default restore behavior, explicit no-restore consumers,
+unchanged checks and test filters, and failed builds without restore fallback.
+Package migration and the complete template delta audit remain pending.

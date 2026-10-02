@@ -6,7 +6,8 @@ param(
     [switch] $LongRunningTestsOnly,
     [ValidateRange(1, 100000)][int] $MinimumExpectedTests = 98,
     [switch] $TraceTestOutput,
-    [string] $ArtifactsPath
+    [string] $ArtifactsPath,
+    [switch] $NoRestore
 )
 $ErrorActionPreference = 'Stop'
 if (($TestFilter -and ($IncludeLongRunningTests -or $LongRunningTestsOnly)) -or
@@ -52,6 +53,11 @@ try {
         'tests/upstream/gui-exit.test.mjs', 'tests/upstream/research-tracking.test.mjs',
         'tests/upstream/diagnostics.test.mjs', 'tests/upstream/memory-blocks.test.mjs',
         'tests/upstream/capture-window.test.mjs')
+    # Give the command-double test the PowerShell running this gate.
+    $previousPwsh = $env:PWSH
+    if (-not $env:PWSH) { $env:PWSH = [Diagnostics.Process]::GetCurrentProcess().MainModule.FileName }
+    try { Invoke-Node @('--test', 'tests/upstream/offline-validation.test.mjs') }
+    finally { $env:PWSH = $previousPwsh }
     $previousPythonPath = $env:PYTHONPATH
     try {
         $env:PYTHONPATH = (Join-Path $root 'tools/evidence/x86-reporter') + [IO.Path]::PathSeparator + $previousPythonPath
@@ -60,6 +66,10 @@ try {
     finally { $env:PYTHONPATH = $previousPythonPath }
     if ($LASTEXITCODE -ne 0) { throw 'Synthetic x86 evidence tests failed.' }
     $build = @('--artifacts-path', $ArtifactsPath, "-maxCpuCount:$MaxCpuCount", '-nodeReuse:true', '-p:UseSharedCompilation=false', '-v:minimal')
+    if ($NoRestore) {
+        Write-Host 'NoRestore: using existing restore state for this checkout; no restore fallback.'
+        $build += '--no-restore'
+    }
     Invoke-Dotnet (@('build', 'Conqueror1086.slnx') + $build)
     $test = @('test', '--project', 'tests/Conqueror.Tests/Conqueror.Tests.csproj', '--no-build', '--no-restore',
         '--artifacts-path', $ArtifactsPath, '--no-progress', '--minimum-expected-tests', "$MinimumExpectedTests", '-v:minimal')
