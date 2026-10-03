@@ -93,7 +93,7 @@ public static class ControllerInputBindings
                 foreach (var pair in specific)
                     merged[pair.Key] = merged.TryGetValue(pair.Key, out var common)
                         ? common.Concat(pair.Value) : pair.Value;
-            return new RefurbishedDinosaurs.Core.Input.InputBindings<Keys, Buttons>(merged);
+            return RefurbishedDinosaurs.Core.Input.InputBindings<Keys, Buttons>.Create(merged);
         });
     public static IReadOnlyList<Buttons> ButtonsFor(Keys key, ControllerInputContext context) =>
         SharedContexts.TryGetValue(context, out var bindings)
