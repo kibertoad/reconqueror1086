@@ -83,14 +83,21 @@ public static class ControllerInputBindings
     public static bool SecondaryPointerPressed(GamePadState current, GamePadState previous) =>
         current.Triggers.Left > PointerTriggerThreshold && previous.Triggers.Left <= PointerTriggerThreshold;
 
-    public static IReadOnlyList<Buttons> ButtonsFor(Keys key, ControllerInputContext context)
-    {
-        var result = new List<Buttons>();
-        if (Common.TryGetValue(key, out var common)) result.AddRange(common);
-        if (Contextual.TryGetValue(context, out var bindings) && bindings.TryGetValue(key, out var contextual))
-            result.AddRange(contextual);
-        return result.Distinct().ToArray();
-    }
+    private static readonly IReadOnlyDictionary<ControllerInputContext,
+        RefurbishedDinosaurs.Core.Input.InputBindings<Keys, Buttons>> SharedContexts =
+        Enum.GetValues<ControllerInputContext>().ToDictionary(context => context, context =>
+        {
+            // This game adds contextual alternatives to common buttons rather than replacing them.
+            var merged = Common.ToDictionary(pair => pair.Key, pair => (IEnumerable<Buttons>)pair.Value);
+            if (Contextual.TryGetValue(context, out var specific))
+                foreach (var pair in specific)
+                    merged[pair.Key] = merged.TryGetValue(pair.Key, out var common)
+                        ? common.Concat(pair.Value) : pair.Value;
+            return new RefurbishedDinosaurs.Core.Input.InputBindings<Keys, Buttons>(merged);
+        });
+    public static IReadOnlyList<Buttons> ButtonsFor(Keys key, ControllerInputContext context) =>
+        SharedContexts.TryGetValue(context, out var bindings)
+            ? bindings.ButtonsFor(key) : SharedContexts[ControllerInputContext.General].ButtonsFor(key);
 
     private static IReadOnlyDictionary<Keys, Buttons[]> Bind(params (Keys Key, Buttons Button)[] bindings) =>
         bindings.ToDictionary(binding => binding.Key, binding => new[] { binding.Button });

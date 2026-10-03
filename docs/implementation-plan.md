@@ -727,3 +727,11 @@ integrity pins are in `requirements-evidence.txt`. The owner requested the lates
 toolkit dependencies on 2026-10-02. Local verification of that update is recorded
 in [VALIDATION.md](VALIDATION.md); no publication or cross-platform CI result is
 claimed for the new pins. Template 79d18a20 and rules ca39d075 remain unchanged.
+
+
+## Shared runtime primitives migration
+
+Share JSON recovery and atomic content writes while retaining settings version migration,
+volume clamping and controller context union behavior.
+Candidate package pins remain draft until toolkit publication. Validate synthetic controls and
+the default fast gate; original formats and rules remain local.

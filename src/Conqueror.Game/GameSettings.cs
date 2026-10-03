@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Conqueror.Resources;
+using RefurbishedDinosaurs.Core.Persistence;
 
 namespace Conqueror.Game;
 
@@ -24,44 +24,17 @@ public sealed class GameSettingsStore(string path)
 {
     public const int CurrentVersion = 2;
 
-    private readonly string _path = Path.GetFullPath(path);
-    public string BackupPath => _path + ".bak";
-
-    public GameSettings Load()
+    private readonly JsonSettingsStore<GameSettings> _store = new(path) { MaximumBytes = 4096 };
+    public string BackupPath => _store.BackupPath;
+    public GameSettings Load() => Normalize(_store.Load(() => new GameSettings(), Supported, Migrate));
+    public void Save(GameSettings settings) => _store.Save(settings, Supported, Migrate);
+    private static bool Supported(GameSettings settings) => settings.Version == CurrentVersion;
+    private static GameSettings? Migrate(GameSettings settings) => settings.Version == 1
+        ? settings with { Version = CurrentVersion } : null;
+    private static GameSettings Normalize(GameSettings settings) => settings with
     {
-        if (TryLoad(_path, out var settings) || TryLoad(BackupPath, out settings)) return settings!;
-        return new GameSettings();
-    }
-
-    public void Save(GameSettings settings)
-    {
-        ArgumentNullException.ThrowIfNull(settings);
-        if (settings.Version != CurrentVersion) throw new InvalidDataException("Cannot save an unsupported settings version.");
-        if (TryLoad(_path, out _)) AtomicFile.Copy(_path, BackupPath);
-        AtomicFile.WriteAllText(_path, JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true }));
-    }
-
-    private static bool TryLoad(string path, out GameSettings? settings)
-    {
-        settings = null;
-        if (!File.Exists(path)) return false;
-        try
-        {
-            settings = JsonSerializer.Deserialize<GameSettings>(File.ReadAllText(path));
-            if (settings?.Version == 1) settings = settings with { Version = CurrentVersion };
-            if (settings?.Version != CurrentVersion) return false;
-            settings = settings with
-            {
-                MusicVolume = Math.Clamp(settings.MusicVolume, 0, 1),
-                EffectsVolume = Math.Clamp(settings.EffectsVolume, 0, 1),
-                SpeechVolume = Math.Clamp(settings.SpeechVolume, 0, 1)
-            };
-            return true;
-        }
-        catch (Exception error) when (error is IOException or UnauthorizedAccessException or JsonException
-                                      or NotSupportedException or ArgumentException)
-        {
-            return false;
-        }
-    }
+        MusicVolume = Math.Clamp(settings.MusicVolume, 0, 1),
+        EffectsVolume = Math.Clamp(settings.EffectsVolume, 0, 1),
+        SpeechVolume = Math.Clamp(settings.SpeechVolume, 0, 1)
+    };
 }
