@@ -560,3 +560,11 @@ implementation or executable tooling changed. Q-RES-015 is closed; Q-RES-158
 through Q-RES-163 retain reader questions. No original program ran or parity
 validation is claimed. GAP-006 now includes the additional end-of-file fixture
 case suggested by this evidence.
+
+## Shared runtime media packages
+
+RefurbishedDinosaurs.LegacyFormats and RefurbishedDinosaurs.Media.Smacker 1.0.0 replace the
+ScientificMethod.LegacyFormats runtime dependency. MoviePlayback 1.0.0 owns the playback clock.
+The Game still owns textures, audio devices, pause and skip policy. Catch-up decodes all dependent
+frames in order and uploads the last due frame once. Resource tests use synthetic inputs; no
+owned-media comparison was run for this package migration.

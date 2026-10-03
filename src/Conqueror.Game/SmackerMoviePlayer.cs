@@ -1,4 +1,5 @@
 using Conqueror.Resources;
+using RefurbishedDinosaurs.Media.Playback;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -17,12 +18,12 @@ public sealed class SmackerMoviePlayer : IDisposable
     private readonly DynamicSoundEffectInstance? _audio;
     private byte[] _palette = new byte[768];
     private int _nextFrame;
-    private TimeSpan _elapsed;
+    private readonly MoviePlayback _playback;
     private bool _paused;
     private bool _disposed;
 
     public Texture2D Texture { get; }
-    public bool IsComplete { get; private set; }
+    public bool IsComplete => _playback.IsComplete;
     public int CurrentFrameIndex => _nextFrame - 1;
     public byte[] CurrentPaletteRgb => _palette.ToArray();
 
@@ -43,26 +44,24 @@ public sealed class SmackerMoviePlayer : IDisposable
             _audio = new DynamicSoundEffectInstance(_audioTrack.SampleRate, AudioChannels.Mono);
             _audio.Volume = Math.Clamp(volume, 0, 1);
         }
-        DecodeNextFrame();
+        _playback = new MoviePlayback(_movie.Frames.Count - ((_movie.Flags & 1) != 0 ? 1 : 0), _movie.FrameDuration);
+        _playback.Advance(TimeSpan.Zero, _ => DecodeNextFrame());
+        Texture.SetData(_rgba);
     }
 
     public void Update(TimeSpan elapsed)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         if (IsComplete || _paused || elapsed < TimeSpan.Zero) return;
-        _elapsed += elapsed;
-        while (_elapsed >= _movie.FrameDuration && !IsComplete)
-        {
-            _elapsed -= _movie.FrameDuration;
-            if (_nextFrame < _movie.Frames.Count) DecodeNextFrame();
-            else IsComplete = true;
-        }
+        var prior = _playback.FrameIndex;
+        _playback.Advance(elapsed, _ => DecodeNextFrame());
+        if (_playback.FrameIndex != prior) Texture.SetData(_rgba);
     }
 
     public void Skip()
     {
         if (_disposed) return;
-        IsComplete = true;
+        _playback.Skip();
         _audio?.Stop();
     }
 
@@ -70,6 +69,7 @@ public sealed class SmackerMoviePlayer : IDisposable
     {
         if (_disposed || _paused) return;
         _paused = true;
+        _playback.Pause();
         if (_audio?.State == SoundState.Playing) _audio.Pause();
     }
 
@@ -77,6 +77,7 @@ public sealed class SmackerMoviePlayer : IDisposable
     {
         if (_disposed || !_paused) return;
         _paused = false;
+        _playback.Resume();
         if (_audio is { State: SoundState.Paused }) _audio.Resume();
     }
 
@@ -104,7 +105,6 @@ public sealed class SmackerMoviePlayer : IDisposable
             _rgba[target + 2] = _palette[color + 2];
             _rgba[target + 3] = 255;
         }
-        Texture.SetData(_rgba);
 
         if (_audio is not null)
         {
