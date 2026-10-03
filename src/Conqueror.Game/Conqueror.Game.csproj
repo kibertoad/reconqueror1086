@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup><OutputType>WinExe</OutputType></PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="RefurbishedDinosaurs.Core" Version="1.4.0" />
     <InternalsVisibleTo Include="Conqueror.Tests" />
     <ProjectReference Include="../Conqueror.Core/Conqueror.Core.csproj" />
     <ProjectReference Include="../Conqueror.Resources/Conqueror.Resources.csproj" />

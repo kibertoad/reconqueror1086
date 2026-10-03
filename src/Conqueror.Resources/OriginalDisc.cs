@@ -1,3 +1,4 @@
+using RefurbishedDinosaurs.Core.IO;
 using System.IO.Hashing;
 using System.Text;
 using System.Text.Json;
@@ -84,7 +85,8 @@ public static class GeneratedContentInstaller
         ArgumentNullException.ThrowIfNull(write);
         var target = ResourcePaths.SafeTarget(root, relative);
         Directory.CreateDirectory(Path.GetDirectoryName(target)!);
-        var temporary = AtomicFile.TemporaryPath(target);
+        var temporary = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(target))!,
+            $".{Path.GetFileName(target)}.{Guid.NewGuid():N}.tmp");
         try
         {
             using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None,
@@ -140,54 +142,6 @@ public static class ImportedContentUninstaller
                 if (!Directory.EnumerateFileSystemEntries(directory).Any()) Directory.Delete(directory);
         return removed;
     }
-}
-
-public static class AtomicFile
-{
-    public static void WriteAllText(string path, string contents) => WriteBytes(path,
-        new UTF8Encoding(encoderShouldEmitUTF8Identifier: false).GetBytes(contents));
-
-    public static void WriteBytes(string path, ReadOnlySpan<byte> contents)
-    {
-        var fullPath = Path.GetFullPath(path);
-        Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
-        var temporary = TemporaryPath(fullPath);
-        try
-        {
-            using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None,
-                       128 * 1024, FileOptions.WriteThrough))
-            {
-                stream.Write(contents);
-                stream.Flush(flushToDisk: true);
-            }
-            File.Move(temporary, fullPath, overwrite: true);
-        }
-        finally
-        {
-            if (File.Exists(temporary)) File.Delete(temporary);
-        }
-    }
-
-    public static void Copy(string source, string destination)
-    {
-        var fullPath = Path.GetFullPath(destination);
-        Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
-        var temporary = TemporaryPath(fullPath);
-        try
-        {
-            File.Copy(source, temporary, overwrite: false);
-            using (var stream = File.Open(temporary, FileMode.Open, FileAccess.Write, FileShare.None))
-                stream.Flush(flushToDisk: true);
-            File.Move(temporary, fullPath, overwrite: true);
-        }
-        finally
-        {
-            if (File.Exists(temporary)) File.Delete(temporary);
-        }
-    }
-
-    internal static string TemporaryPath(string destination) => Path.Combine(
-        Path.GetDirectoryName(Path.GetFullPath(destination))!, $".{Path.GetFileName(destination)}.{Guid.NewGuid():N}.tmp");
 }
 
 public sealed record ImportVerificationIssue(string AssetId, string Path, string Reason);
