@@ -28,7 +28,10 @@ The 2026-10-02 canonical fast gates passed normally and with NoRestore.
 Kaitai compilation, strict configuration, workflow lint and local Windows
 packaging passed. Canonical main CI passed all platform and installer jobs;
 the workflow security audit also passed. Exact acceptance runs and limits are
-in [VALIDATION.md](VALIDATION.md). Unfinished migration work: none. Blockers: none.
+in [VALIDATION.md](VALIDATION.md). Shared runtime migration is ready for review: RefurbishedDinosaurs.LegacyFormats, Media.Smacker
+and Media.Playback 1.0.0 replace the old runtime pin and movie clock. The 2026-10-03 canonical
+fast gate passed in this Linux workspace with the pinned evidence engine; Kaitai compilation
+was unavailable. Owned-media comparisons were not run. See VALIDATION.md.
 
 Post-commit audits found no confirmed task orphans. Preserve unrelated processes
 and reusable MSBuild workers. Original source, captures and analysis artifacts

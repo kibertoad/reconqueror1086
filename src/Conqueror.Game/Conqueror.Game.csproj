@@ -4,6 +4,7 @@
     <InternalsVisibleTo Include="Conqueror.Tests" />
     <ProjectReference Include="../Conqueror.Core/Conqueror.Core.csproj" />
     <ProjectReference Include="../Conqueror.Resources/Conqueror.Resources.csproj" />
+    <PackageReference Include="RefurbishedDinosaurs.Media.Playback" Version="1.0.0" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.5.1" />
   </ItemGroup>
   <ItemGroup><Compile Include="../Conqueror.Resources/SharedMediaAliases.cs" Link="SharedMediaAliases.cs" /></ItemGroup>
