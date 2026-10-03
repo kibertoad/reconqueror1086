@@ -37,3 +37,11 @@ Post-commit audits found no confirmed task orphans. Preserve unrelated processes
 and reusable MSBuild workers. Original source, captures and analysis artifacts
 remain ignored locally. No original-game run or release publication occurred.
 Push through the verified canonical remote as [AGENTS.md](../AGENTS.md) requires.
+
+## Shared runtime migration
+
+Branch: `feat/shared-runtime-primitives`. See [migration status](SHARED-RUNTIME-MIGRATION.md).
+Canonical fast gate, synthetic settings/controller controls and runtime specs passed against candidate packages.
+The migration remains draft until toolkit PRs #86–#89 release the required APIs. Replace
+candidate NuGet pins and regenerate locks against nuget.org before marking ready.
+Original-game parity and live-device behavior were not assessed.
