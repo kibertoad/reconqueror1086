@@ -41,7 +41,7 @@ Push through the verified canonical remote as [AGENTS.md](../AGENTS.md) requires
 ## Shared runtime migration
 
 Branch: `feat/shared-runtime-primitives`. See [migration status](SHARED-RUNTIME-MIGRATION.md).
-Canonical fast gate, synthetic settings/controller controls and runtime specs passed against candidate packages.
-The migration remains draft until toolkit PRs #86–#89 release the required APIs. Replace
-candidate NuGet pins and regenerate locks against nuget.org before marking ready.
+Canonical fast gate, synthetic settings/controller controls and runtime specs passed against published 1.4.0 packages.
+The migration uses published 1.4.0 packages and refreshed public NuGet locks.
+Released bindings use InputBindings.Create; canonical validation passes. Ready for review.
 Original-game parity and live-device behavior were not assessed.
