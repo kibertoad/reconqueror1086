@@ -6,12 +6,11 @@ Entries by status.
 
 ## unknown
 
-106 entries.
+105 entries.
 
 | ID | Title |
 |---|---|
 | [FMT-ASSAULT-004](../formats/FMT-ASSAULT-004.md) | Live effect record, one of the 64 effects the scheduler runs |
-| [FMT-RES-014](../formats/FMT-RES-014.md) | Unidentified .ICO data candidates in CD root |
 | [FMT-RES-015](../formats/FMT-RES-015.md) | Unidentified .INF data candidates in CD root |
 | [FMT-RES-016](../formats/FMT-RES-016.md) | Unidentified .SCR data candidates in CD root |
 | [FMT-RES-017](../formats/FMT-RES-017.md) | Unidentified .SOL data candidates in CD root |
@@ -130,7 +129,7 @@ Entries by status.
 
 ## supported
 
-219 entries.
+220 entries.
 
 | ID | Title |
 |---|---|
@@ -179,6 +178,7 @@ Entries by status.
 | [FMT-RES-010](../formats/FMT-RES-010.md) | ASCII key/value syntax in CD-root RESOURCE.CFG |
 | [FMT-RES-011](../formats/FMT-RES-011.md) | ASCII line framing of CD-root INSTALL.DAT |
 | [FMT-RES-013](../formats/FMT-RES-013.md) | Marked ASCII text framing of CD-root INSTALL.HLP |
+| [FMT-RES-014](../formats/FMT-RES-014.md) | Owned disc-root indexed icon container layout |
 | [FMT-RES-116](../formats/FMT-RES-116.md) | Leading raw-track record in the owned disc carrier |
 | [FMT-SAVE-001](../formats/FMT-SAVE-001.md) | Saved game, SAVEGAME\CONQn.SAV |
 | [FMT-SAVE-002](../formats/FMT-SAVE-002.md) | Strategic map state, TROOPS.SAV |
@@ -664,7 +664,7 @@ Entries whose Open questions section says more than None known.
 | [FMT-RES-011](../formats/FMT-RES-011.md) | ASCII line framing of CD-root INSTALL.DAT | supported |
 | [FMT-RES-012](../formats/FMT-RES-012.md) | Unidentified .GOB data candidates in CD root | superseded |
 | [FMT-RES-013](../formats/FMT-RES-013.md) | Marked ASCII text framing of CD-root INSTALL.HLP | supported |
-| [FMT-RES-014](../formats/FMT-RES-014.md) | Unidentified .ICO data candidates in CD root | unknown |
+| [FMT-RES-014](../formats/FMT-RES-014.md) | Owned disc-root indexed icon container layout | supported |
 | [FMT-RES-015](../formats/FMT-RES-015.md) | Unidentified .INF data candidates in CD root | unknown |
 | [FMT-RES-016](../formats/FMT-RES-016.md) | Unidentified .SCR data candidates in CD root | unknown |
 | [FMT-RES-017](../formats/FMT-RES-017.md) | Unidentified .SOL data candidates in CD root | unknown |

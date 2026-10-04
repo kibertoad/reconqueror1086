@@ -68,6 +68,17 @@ The value at payload offset 20 is not uniformly the same inferred span:
 AUTOPLAY / 0 gives 512 + 128, whereas the other larger payloads give 512.
 AUTOPLAY / 1 gives 128 rather than 128 + 64. No consumer was read or run.
 
+Additional inspection (2026-10-05), using SRC-ICO-REFERENCE and
+SRC-BMP-REFERENCE: partitioning each payload into the header, 64-byte palette
+and the two aligned planes consumes it exactly. Every palette fourth byte is
+zero. Unpacking each color byte high nibble first and repacking all indices,
+and unpacking each mask byte most-significant-bit first and repacking every bit,
+reconstructs the complete planes. Repacking headers and joining every directory
+and payload reconstructs each entire file exactly and preserves its canonical
+fingerprint. No bytes are omitted. No consumer or rendered pixel was observed.
+This supplies the complete storage witness; reference semantics do not establish
+a shipped reader's behavior.
+
 ## Interpretation
 
 The counted-directory interpretation fits every listed file and its complete

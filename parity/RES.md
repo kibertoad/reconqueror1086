@@ -14,7 +14,7 @@
 | `FMT-RES-010` | ASCII key/value syntax in CD-root RESOURCE.CFG | supported | missing | None | None | supported | Stored syntax supported; reader and value meanings remain open. |
 | `FMT-RES-011` | ASCII line framing of CD-root INSTALL.DAT | supported | missing | None | None | supported | Stored framing supported; interpreter grammar and runtime behavior remain open. |
 | `FMT-RES-013` | Marked ASCII text framing of CD-root INSTALL.HLP | supported | missing | None | None | supported | Stored framing supported; reader semantics and runtime use remain open. |
-| `FMT-RES-014` | Unidentified .ICO data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
+| `FMT-RES-014` | Owned disc-root indexed icon container layout | supported | missing | None | None | supported | Storage partition recorded; consumer questions Q-RES-164 through Q-RES-167 remain open. |
 | `FMT-RES-015` | Unidentified .INF data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
 | `FMT-RES-016` | Unidentified .SCR data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
 | `FMT-RES-017` | Unidentified .SOL data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |

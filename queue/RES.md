@@ -1,8 +1,21 @@
 # RES
 
-Next ID: Q-RES-164
+Next ID: Q-RES-168
 
 ## Static
+
+- Q-RES-164. FMT-RES-014: Which shipped consumer opens the disc-root icons, and are those paths reachable?
+  Settles it: Trace file-open references from media/application entry points. Blocks: Survey consumer reconciliation.
+
+- Q-RES-165. FMT-RES-014: How does the consumer handle the differing image_size values?
+  Settles it: Read size tests and every copy input, preserving FND-RES-020 variants. Blocks: Survey consumer reconciliation.
+
+- Q-RES-166. FMT-RES-014: How does image selection handle zero directory hints and multiple images?
+  Settles it: Trace display inputs, header interpretation and every fallback. Blocks: Survey consumer reconciliation.
+
+- Q-RES-167. FMT-RES-014: What happens with absent, truncated or inconsistent icon files?
+  Settles it: Read admission and failure paths without inferring them from stored files. Blocks: Survey consumer reconciliation.
+
 
 - Q-RES-158. FMT-RES-013: Which shipped reader consumes CD-root INSTALL.HLP, and is that path reachable?
   Settles it: trace filename references from installation/media entry points into the reader. Blocks: Survey data-family reconciliation.
@@ -170,16 +183,6 @@ Next ID: Q-RES-164
   it: read the relevant branch and its callers from the entry's cited findings, following data
   provenance, call effects and every exit relevant to this question. Blocks: none.
 
-
-- Q-RES-016. FMT-RES-014: What layout, if any, is shared by these listed candidates?
-  Settles it: inspect bounded file signatures and the relevant readers; record the
-  parsing syntax or field layout, splitting the entry if the files differ before
-  making claims about them. Blocks: Survey data-family reconciliation.
-
-  Tried: FND-RES-020 inspected every candidate extent and payload header.
-  The shared directory partition is a lead; consumer field roles and the differing
-  payload size values remain unresolved. Next evidence: a reader or an independent
-  format-source comparison followed by complete payload decoding.
 
 - Q-RES-017. FMT-RES-015: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the

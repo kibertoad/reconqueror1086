@@ -14,12 +14,13 @@ Entries by kind.
 
 ## sources
 
-4 entries.
+5 entries.
 
 | ID | Title | Status |
 |---|---|---|
 | [SRC-BMP-REFERENCE](../sources/SRC-BMP-REFERENCE.md) | Microsoft bitmap file header, information header and palette reference | None |
 | [SRC-GAMEFAQS-66730](../sources/SRC-GAMEFAQS-66730.md) | Conqueror 1086 A.D. FAQ by mikel123456, GameFAQs FAQ 66730 | None |
+| [SRC-ICO-REFERENCE](../sources/SRC-ICO-REFERENCE.md) | Microsoft 1995 icon container and image reference | None |
 | [SRC-MANUAL](../sources/SRC-MANUAL.md) | Conqueror A.D. 1086 manual, as shipped with the GOG release | None |
 | [SRC-PATCH-CATALOG](../sources/SRC-PATCH-CATALOG.md) | GOG public build catalog and Sierra Help patch catalog | None |
 
@@ -58,7 +59,7 @@ Entries by kind.
 | [FMT-RES-011](../formats/FMT-RES-011.md) | ASCII line framing of CD-root INSTALL.DAT | supported |
 | [FMT-RES-012](../formats/FMT-RES-012.md) | Unidentified .GOB data candidates in CD root | superseded |
 | [FMT-RES-013](../formats/FMT-RES-013.md) | Marked ASCII text framing of CD-root INSTALL.HLP | supported |
-| [FMT-RES-014](../formats/FMT-RES-014.md) | Unidentified .ICO data candidates in CD root | unknown |
+| [FMT-RES-014](../formats/FMT-RES-014.md) | Owned disc-root indexed icon container layout | supported |
 | [FMT-RES-015](../formats/FMT-RES-015.md) | Unidentified .INF data candidates in CD root | unknown |
 | [FMT-RES-016](../formats/FMT-RES-016.md) | Unidentified .SCR data candidates in CD root | unknown |
 | [FMT-RES-017](../formats/FMT-RES-017.md) | Unidentified .SOL data candidates in CD root | unknown |
