@@ -8,8 +8,10 @@ The documentation checker, executable reader and instruction engine are dependen
 
 https://github.com/kibertoad/refurbished-dinosaurs-toolkit
 Copyright (c) 2026 Igor Savin. MIT license retained in docs/licenses/scientific-method-MIT.txt.
-Exact npm and Python release pins and distribution hashes are in package-lock.json
-and requirements-evidence.txt; tools/toolkit-packages.json records the upstream adoption.
+Exact npm and Python release pins and distribution hashes are in package.json,
+pnpm-lock.yaml and requirements-evidence.txt; tools/toolkit-packages.json records the
+upstream adoption. The RefurbishedDinosaurs.* NuGet runtime libraries come from the same
+repository under the same license, at the version Directory.Build.props pins.
 
 The Standard, Methodology and work protocol have their source revision and
 digests recorded in tools/upstream-lock.json, and license in docs/upstream/LICENSE.

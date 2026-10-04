@@ -19,7 +19,7 @@ staged=$(mktemp -d)
 trap 'rm -rf "$staged"' EXIT
 trap 'exit 1' HUP INT TERM
 git checkout-index --all --prefix="$staged/"
-# Restore the staged dependency lock from the local npm cache; no install scripts or network.
-npm ci --prefix "$staged" --ignore-scripts --offline --no-audit --no-fund
+# Install the staged dependency lock from the local pnpm store; no install scripts or network.
+pnpm install --dir "$staged" --frozen-lockfile --offline --ignore-scripts --reporter=silent
 export GIT_DIR="$git_dir" GIT_WORK_TREE="$staged"
 node "$staged/tools/Invoke-NodeChecks.mjs" --no-ksy

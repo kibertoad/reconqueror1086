@@ -8,5 +8,8 @@
     <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1900</WarningsNotAsErrors>
     <DefaultItemExcludes>$(DefaultItemExcludes);**/bin/**;**/obj/**</DefaultItemExcludes>
     <RestoreIgnoreFailedSources>true</RestoreIgnoreFailedSources>
+    <!-- The RefurbishedDinosaurs.* runtime packages release together and are pinned exactly. Every
+         project that references one uses this version, so a bump is one edit. -->
+    <RefurbishedDinosaursVersion>2.0.0</RefurbishedDinosaursVersion>
   </PropertyGroup>
 </Project>

@@ -312,3 +312,31 @@ Migration acceptance is complete. Main CI at 8ae493d passed all platform gates
 and Windows, Linux and both macOS installer checks; the workflow security check
 also passed. See [VALIDATION.md](VALIDATION.md) for the exact runs. No release or
 original-game run was involved.
+
+## Template main 39d31fde adoption (2026-10-04)
+
+Owner scope: update to the latest template version. Target: this repository only.
+The reviewed delta is template 79d18a20 to 39d31fdef9d7420e8571ab6d09e3b3026be05010,
+one squashed change that moves the template onto released toolkit packages.
+
+| Capability | Adoption and acceptance evidence |
+|---|---|
+| Standard text c1758fd9 | Copied byte-exact from the template and matched the lock digest. The change numbers the rules and states that numbering changes none of them, so guidance only needed regenerated section ranges (`links --write`). |
+| Checker 0.2.0 at toolkit a260e391 | Template `tools/upstream.mjs` adopted unchanged: the lock's `checker` entry, the CI action pin and `package.json` must agree, and the runner refuses another installed version. The template's new upstream tests are merged into the project's adapted suite. The documentation check passes under 0.2.0 with no spec changes. |
+| pnpm | `package.json`, `pnpm-lock.yaml` and `pnpm-workspace.yaml` follow the template, replacing npm and `package-lock.json`. The project's package check now reads `pnpm-lock.yaml` and requires `tools/toolkit-packages.json` to name the checker the lock pins. The pre-commit hook installs the staged lock offline from the pnpm store. |
+| Reader 1.0.0, engine 1.0.1 | Prepared-config protocol 2 names a source by xxh3. `report.mjs`, the evidence tests and the new `xxh3.mjs` helper follow the template. The engine requirement keeps this repository's hash pins and adds the new `xxhash` dependency. The synthetic return baseline changed only its source identity field. |
+| Capture by xxh3 | Template `Capture-OriginalWindow.ps1` adopted with this game's window title; checkpoints are schema version 3. |
+| RefurbishedDinosaurs 2.0.0 | `RefurbishedDinosaurs.LegacyFormats`, `.Media.Smacker` and `.Media.Playback`, first adopted at 1.0.0 for the media readers and movie clock, now share the 2.0.0 pin `Directory.Build.props` sets; every type kept its name. The game's startup failure reporter delegates to `RefurbishedDinosaurs.Core`'s `StartupFailure`, whose behaviour is the same. |
+| Software OpenGL action | CI and release use the toolkit's `setup-software-opengl` action; the local Mesa installer is removed. |
+| Analysis gate hash | The gate records the executable's xxh3 from its build manifest, verified against the local copy; Ghidra-side SHA-256 checks are unchanged. |
+
+Retained adaptations: the edition manifests, XXH3 asset-pack format, importer and
+installer identities stay game-specific; the template's move to the toolkit's
+`AssetManifest` types targets the template's generic extractor, which this
+repository does not use. Engine requirements stay hash-pinned. The LE mapping
+adapter and its inventory checks are unchanged. No gameplay behaviour, evidence
+status or parity status changes.
+
+Acceptance: the canonical fast gate with Kaitai 0.11, actionlint on both
+workflows, the documentation check and index regeneration, and a pre-commit run
+on the staged tree. Platform CI and installer jobs run when the change is pushed.

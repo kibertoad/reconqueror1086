@@ -24,7 +24,7 @@
                      "genre":  "Strategy and role-playing",
                      "latestOfficialVersion":  "1.0",
                      "analysisVersion":  "1.0",
-                     "patchStatusEvidence":  "SRC-PATCH-CATALOG: public GOG build 50474999570497193 is version 1.0 and matches owned installation metadata; Sierra Help lists no official patch. Verified 2026-09-30. BLD-GOG-EN executable length 919107; SHA-256 5d7231758766204ad061e6b82cf2f0e0cbe28899b35d095f13e4aad75c8b79d6.",
+                     "patchStatusEvidence":  "SRC-PATCH-CATALOG: public GOG build 50474999570497193 is version 1.0 and matches owned installation metadata; Sierra Help lists no official patch. Verified 2026-09-30. BLD-GOG-EN executable length 919107; xxh3 5106f53f8201761cb5112034f6c594d4.",
                      "patchStatusEstablished":  true
                  }
 }

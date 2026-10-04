@@ -2,10 +2,10 @@
 
 ## Current state
 
-Stage: Survey. The infrastructure migration goal is complete. Template main
-79d18a20 and toolkit main 0b4694df are adopted; Standard/Methodology/Protocol
-ca39d075 remain verified unchanged. Published toolkit packages replace the
-superseded vendored copies. The completed capability audit is in
+Stage: Survey. Template main 39d31fde is adopted, with the Standard at rules
+c1758fd9 (rules numbered, still v1), checker 0.2.0 at toolkit a260e391, reader
+1.0.0, engine 1.0.1 and the RefurbishedDinosaurs 2.0.0 runtime packages. Tooling
+installs through pnpm. CI for this adoption has not run yet. The completed capability audit is in
 [template-migration-plan.md](template-migration-plan.md).
 The earlier documentation audit is in [documentation-audit.md](documentation-audit.md).
 Game identities, owned-source contracts, LE adapters, gameplay and evidence
@@ -28,10 +28,9 @@ The 2026-10-02 canonical fast gates passed normally and with NoRestore.
 Kaitai compilation, strict configuration, workflow lint and local Windows
 packaging passed. Canonical main CI passed all platform and installer jobs;
 the workflow security audit also passed. Exact acceptance runs and limits are
-in [VALIDATION.md](VALIDATION.md). Shared runtime migration is ready for review: RefurbishedDinosaurs.LegacyFormats, Media.Smacker
-and Media.Playback 1.0.0 replace the old runtime pin and movie clock. The 2026-10-03 canonical
-fast gate passed in this Linux workspace with the pinned evidence engine; Kaitai compilation
-was unavailable. Owned-media comparisons were not run. See VALIDATION.md.
+in [VALIDATION.md](VALIDATION.md). RefurbishedDinosaurs.LegacyFormats, Media.Smacker,
+Media.Playback and Core 2.0.0 replace the old runtime pin, movie clock and startup
+reporter. Owned-media comparisons were not run.
 
 Post-commit audits found no confirmed task orphans. Preserve unrelated processes
 and reusable MSBuild workers. Original source, captures and analysis artifacts

@@ -11,10 +11,9 @@ then its existing GOG installation default. `GAME_DIR` remains the separate loca
 evidence root for tests against the original, as [VALIDATION.md](VALIDATION.md) describes.
 
 The owned disc was read again through the bounded inspector. Its image fingerprint
-matches BLD-GOG-EN, and the extracted `CD:CONQUER.EXE` is 919,107 bytes with SHA-256
-`5d7231758766204ad061e6b82cf2f0e0cbe28899b35d095f13e4aad75c8b79d6`.
-The SHA-256 is the local-tool input guard; the spec's build fingerprint remains
-XXH3-128. This verification establishes the prerequisite without asserting byte
+matches BLD-GOG-EN, and the extracted `CD:CONQUER.EXE` is 919,107 bytes with xxh3
+`5106f53f8201761cb5112034f6c594d4`, the hash its build manifest gives and the one
+the evidence tools check a source against. This verification establishes the prerequisite without asserting byte
 identity with unowned historical retail pressings.
 
 `tools/project-config.json` now records the evidence and

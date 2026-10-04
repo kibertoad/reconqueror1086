@@ -22,7 +22,7 @@ game files: the tests build their inputs from synthetic data, except the tests d
 [Tests against the original](#tests-against-the-original), which skip without them.
 
 The gate needs the .NET 10 SDK, Node.js 22 or newer, Python 3.12 or newer and the
-locked toolkit packages. Run `npm ci --ignore-scripts` and
+locked toolkit packages. Run `pnpm install --frozen-lockfile` and
 `python -m pip install --require-hashes -r requirements-evidence.txt` before validation. CI runs
 the same gate in `.github/workflows/ci.yml` on every push to `main` and every pull request.
 
@@ -96,7 +96,7 @@ action from
 [refurbished-dinosaurs-toolkit](https://github.com/kibertoad/refurbished-dinosaurs-toolkit),
 pinned to a full commit SHA, on every push to `main` and every pull request. It checks `spec/`,
 `parity/` and `deviations/` against the standard's list of
-[checks](upstream/documentation-standard.md#checks) (lines 787-838), compiles each `.ksy` file with
+[checks](upstream/documentation-standard.md#checks) (lines 947-998), compiles each `.ksy` file with
 the Kaitai Struct compiler, checks that every spec and deviation ID cited in `src/`, `tests/`, `tools/`
 exists and is not superseded, fails when `spec/index/` or `PARITY.md` is stale, and
 fails a `validated` row whose marked tests are not in `VALIDATION.md` as they are now. It
@@ -107,8 +107,8 @@ lists its inputs.
 
 `tools/Check-Documentation.ps1` runs the installed, lock-pinned
 `@scientific-method/standard-checker` package through `tools/upstream.mjs`, which
-checks package adoption and agreement with the CI action pin. Install dependencies
-first with `npm ci --ignore-scripts` and
+checks package adoption and that the CI action pin, the lock's `checker` entry and
+`package.json` agree. Install dependencies first with `pnpm install --frozen-lockfile` and
 `python -m pip install --require-hashes -r requirements-evidence.txt`;
 the check itself needs no network download. `tools/Check-NarrativeReferences.mjs` separately checks
 project narrative docs locally and in CI, excluding the immutable upstream text
@@ -568,3 +568,17 @@ ScientificMethod.LegacyFormats runtime dependency. MoviePlayback 1.0.0 owns the 
 The Game still owns textures, audio devices, pause and skip policy. Catch-up decodes all dependent
 frames in order and uploads the last due frame once. Resource tests use synthetic inputs; no
 owned-media comparison was run for this package migration.
+
+## Template main 39d31fde adoption (2026-10-04)
+
+The canonical fast gate passed with the local Kaitai 0.11 compiler selected
+through KSC: repository and configuration policy, infrastructure checks, the
+documentation check under checker 0.2.0, node checks and synthetic evidence,
+upstream, capture and xxh3 tests, the solution build, the xUnit suite and the
+executable specifications. `pnpm install --frozen-lockfile` and the
+hash-required Python installation of engine 1.0.1 passed, and
+`Verify-EvidenceEnvironment.py` matched every pinned distribution. actionlint
+reported no problems in either workflow. The local `CONQUER.EXE` hashed to the
+xxh3 its BLD-GOG-EN manifest entry gives. Platform CI, installer jobs and remote
+signing were not exercised; LongRunning tests were not requested. No original
+program ran, and no gameplay, evidence or parity status changed.

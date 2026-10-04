@@ -19,7 +19,8 @@ not proof of a complete reading, all callers or instruction identity.
 MZ/FBOV identity and inventory resolver. `@scientific-method/executable-reader`
 is the separately locked toolkit package instruction-derived reporter. Its supported
 formats and query contracts are in
-[BOUNDED-EVIDENCE-REPORTERS.md](BOUNDED-EVIDENCE-REPORTERS.md).
+[BOUNDED-EVIDENCE-REPORTERS.md](BOUNDED-EVIDENCE-REPORTERS.md). Every command
+names its source by the `xxh3` its build entry gives and refuses another file.
 Keep unsupported formats and unresolved calls explicit; synthetic acceptance of
 a tool is never original-game evidence.
 

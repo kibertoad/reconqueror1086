@@ -40,7 +40,10 @@ assessment capture was discarded. [Capture-OriginalWindow.ps1](../tools/Capture-
 now captures only the selected window's client through PrintWindow, with no
 desktop fallback. A uniform frame is rejected because renderer support and state
 cannot be established from it. Unsupported renderers need a verified emulator
-capture path or a person; do not substitute desktop sampling.
+capture path or a person; do not substitute desktop sampling. Its
+`checkpoint.json` (schema version 3) names each frame by the `xxh3` the spec cites
+it by, computed after the burst by `tools/evidence/xxh3.mjs`, so the script checks
+for Node.js and the installed reader package before it captures anything.
 
 Original runs take an exclusive machine lock at
 C:\ProgramData\refurbished-dinosaurs\run.lock on Windows or

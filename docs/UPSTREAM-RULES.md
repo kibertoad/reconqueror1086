@@ -6,18 +6,22 @@ in `docs/upstream/`, with EOL conversion disabled. Configuration never edits the
 Read that local copy during ordinary work as AGENTS.md requires.
 
 The toolkit checker, executable reader and Python engine are installed packages,
-not copied source. Their exact npm versions and distribution integrity are in
-`package-lock.json`; Python versions and distribution hashes are in
-`requirements-evidence.txt`. `tools/toolkit-packages.json` records the reviewed
-upstream commit and release versions. The MIT notice is retained in
-`docs/licenses/scientific-method-MIT.txt`.
+not copied source. Their exact npm versions are in `package.json` and their
+distribution integrity in `pnpm-lock.yaml`; Python versions and distribution
+hashes are in `requirements-evidence.txt`. CI runs the toolkit's
+`check-documentation` action at a full commit SHA, which runs the checker source
+at that commit. The lock's `checker` entry records that commit and the
+`@scientific-method/standard-checker` version it carries, and `package.json` pins
+exactly that version, so the offline run and CI apply the same rules.
+`tools/toolkit-packages.json` records the reviewed toolkit commit and release
+versions. The MIT notice is retained in `docs/licenses/scientific-method-MIT.txt`.
 
 ## Install and verify
 
-Use Node.js 22+, Python 3.12+ and the .NET SDK required by `global.json`:
+Use Node.js 22+ with pnpm, Python 3.12+ and the .NET SDK required by `global.json`:
 
 ```sh
-npm ci --ignore-scripts
+pnpm install --frozen-lockfile
 python -m pip install --require-hashes -r requirements-evidence.txt
 node tools/upstream.mjs verify
 node tools/Verify-ToolkitPackages.mjs
@@ -25,19 +29,24 @@ node tools/upstream.mjs docs --check
 node tools/upstream.mjs links
 ```
 
-Rule verification is offline and checks the four snapshot digests. Package
-verification checks exact manifest/lock/installed versions, npm integrity fields,
-the Python engine requirement and the CI action revision. The CI checker action
-is pinned to a commit carrying the installed checker's version. Package
-installation verifies distribution hashes; the local checker runs the installed
-package and inherits the same checker inputs as CI.
+`verify` is offline: it checks the four snapshot digests, and that the CI action
+pin, the lock's `checker` entry and `package.json` agree. Package verification
+checks exact manifest, `pnpm-lock.yaml` and installed versions, the lock's sha512
+integrity fields, the Python engine requirement, and that
+`tools/toolkit-packages.json` names the checker commit and version the lock pins.
+The documentation runner refuses an installed checker of another version.
+Package installation verifies distribution hashes; the local checker runs the
+installed package and inherits the same checker inputs as CI.
+
+`pnpm-workspace.yaml` exempts the pinned checker and reader releases from pnpm's
+minimum release age, so a release adopted as soon as it is tagged still installs.
 
 `docs` without `--check` regenerates indexes and parity totals. `links --write`
 updates section-line ranges after a rules refresh. The canonical gate runs these
 checks. Kaitai compilation still requires the compiler; installing toolkit
 packages does not install it. The pre-commit hook checks the staged tree after
-restoring its dependency lock from the local npm cache with installation scripts
-disabled; run npm ci first to populate that cache.
+installing its dependency lock from the local pnpm store, offline and with
+installation scripts disabled; run `pnpm install` first to fill that store.
 
 ## Explicit refresh
 
@@ -45,23 +54,32 @@ Only when the owner asks for an upstream update in the current task:
 
 ```sh
 node tools/upstream.mjs check-upstream
-node tools/upstream.mjs refresh --rules <full-40-character-commit>
+node tools/upstream.mjs refresh --rules <full-40-character-commit> --toolkit <full-40-character-commit>
 ```
 
-Freshness compares all four pinned rule files with website main. Exit 0 means
-unchanged bytes, 2 means changed bytes, and 1 means verification or network
-failure. A failed fetch never proves freshness. Refresh downloads everything
-before writing, requires the Standard's v1 declaration, replaces files atomically
-and writes the lock last. An interrupted update fails digest verification.
-Review the rules diff, update affected guidance, regenerate section links and run
-the canonical gate. Do not edit the snapshots or promote evidence claims as a
-side effect of migration.
+`check-upstream` compares the four pinned rule files with the rules repository's
+main commit, and the pinned checker version with the one on the toolkit's main
+branch. Exit 0 means unchanged, 2 means changed, and 1 means verification or
+network failure. A failed fetch never proves freshness.
 
-Toolkit updates are separate: review upstream's package migration guide and
-release versions, update package.json/package-lock.json and the hash-pinned
-Python requirements, then update tools/toolkit-packages.json and the CI action
-pin together. Remove superseded copies and migrate every active caller. Test the
-project wrappers and configuration; package-only tests run upstream before release.
+Refresh downloads everything, and the checker version the toolkit commit
+carries, before writing. The toolkit commit must be the one the toolkit tagged
+`@scientific-method/standard-checker@<version>`: a later commit can carry the
+same version with unreleased checker changes, which CI would run and the
+published package would not. Refresh requires the Standard's v1 declaration,
+updates the CI checker pin, the `package.json` pin and the checker's exemption in
+`pnpm-workspace.yaml`, replaces files atomically and writes the lock last. An
+interrupted update fails digest verification. Run `pnpm install` to update
+`pnpm-lock.yaml`, set `tools/toolkit-packages.json` to the same checker commit
+and version, review the rules diff, update affected guidance, regenerate section
+links and run the canonical gate. Do not edit the snapshots, patch the installed
+checker or promote evidence claims as a side effect of migration.
+
+Reader and engine updates follow the toolkit's package migration guide and
+release versions: update `package.json`, `pnpm-lock.yaml` and the hash-pinned
+Python requirements together with `tools/toolkit-packages.json`. Remove
+superseded copies and migrate every active caller. Test the project wrappers and
+configuration; package-only tests run upstream before release.
 
 ## Configuration-test prerequisites
 
@@ -73,13 +91,12 @@ node_modules. Initialize a ZIP checkout with git init before validation.
 
 ## Current migration target
 
-The template adoption remains 79d18a20cb4d97c7153e74e5695cbb80e7ebf73e.
-Rules main remains ca39d0750e67c8c3900e8554e66a84083fe67452. The owner requested
-latest toolkit dependencies on 2026-10-02; current package versions and toolkit
-revision are recorded in `tools/toolkit-packages.json`. Python integrity pins
-are in `requirements-evidence.txt`, and the validation gate checks every installed
-locked distribution through `tools/Verify-EvidenceEnvironment.py`.
-[VALIDATION.md](VALIDATION.md) records local verification. Historical template
-acceptance and its CI results remain in
-[template-migration-plan.md](template-migration-plan.md); they do not certify the
-new dependency pins on other platforms. Local rules snapshots are unchanged.
+The template adoption is 39d31fdef9d7420e8571ab6d09e3b3026be05010. Rules main is
+c1758fd9c2fd253e28fb4328412061d7e92ce14a, which numbers the Standard's rules
+without changing them. The checker commit is in `tools/upstream-lock.json`;
+package versions and the toolkit revision are in `tools/toolkit-packages.json`.
+Python integrity pins are in `requirements-evidence.txt`, and the validation gate
+checks every installed locked distribution through
+`tools/Verify-EvidenceEnvironment.py`. [VALIDATION.md](VALIDATION.md) records
+local verification, and [template-migration-plan.md](template-migration-plan.md)
+records each adoption's scope and acceptance.

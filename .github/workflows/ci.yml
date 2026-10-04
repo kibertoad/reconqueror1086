@@ -46,14 +46,16 @@ jobs:
         with:
           dotnet-version: 10.0.400
 
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
-        with:
-          node-version: 22
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.12'
-      - run: npm ci --ignore-scripts
       - run: python -m pip install --require-hashes -r requirements-evidence.txt
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.x
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - name: Run canonical fast validation
         shell: pwsh
         run: ./tools/Invoke-Validation.ps1
@@ -86,14 +88,19 @@ jobs:
           # when it deletes a spec ID, area or deviation that exists there.
           fetch-depth: 0
 
-      # The toolkit publishes no tags, and its setup guide pins a commit on its main branch.
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22
-      - run: npm ci --ignore-scripts
+          node-version: 24.x
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - name: Verify pinned offline tooling
         run: node tools/upstream.mjs verify
-      - uses: kibertoad/refurbished-dinosaurs-toolkit/actions/check-documentation@b91cd758c25569d4b13be2587000b1846d2002fb # zizmor: ignore[stale-action-refs]
+      # The action runs the checker source at this toolkit commit. tools/upstream-lock.json records
+      # the commit and the @scientific-method/standard-checker version it carries, which package.json
+      # pins for local runs; `node tools/upstream.mjs refresh` moves all three together. The commit
+      # carries a package release tag rather than an action version, so the pin has no version comment.
+      - uses: kibertoad/refurbished-dinosaurs-toolkit/actions/check-documentation@a260e391fe2dea67f0034d5480e2bb439b0663ac # zizmor: ignore[stale-action-refs,ref-version-mismatch]
 
       - name: Check narrative references
         run: node tools/Check-NarrativeReferences.mjs
@@ -144,11 +151,21 @@ jobs:
           }
           "INNO_COMPILER=$compilerRoot\ISCC.exe" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-      - name: Provision software OpenGL for hosted Windows smoke tests
+      # Hosted runners expose only the GDI generic OpenGL renderer, which has no framebuffer objects,
+      # so MonoGame cannot create a graphics device. The toolkit's action installs checksum-verified
+      # Mesa llvmpipe under RUNNER_TEMP and fails the step if it cannot, so the platform smoke tests
+      # never silently run against the runner's own driver. Toolkit actions are pinned by commit and
+      # carry no version of their own; the commit's only tag names a package release.
+      - name: Provision software OpenGL for the platform smoke test
+        id: software-opengl
+        uses: kibertoad/refurbished-dinosaurs-toolkit/actions/setup-software-opengl@6ab530df7851354c98e833a2beb76dbe0f71e421 # zizmor: ignore[ref-version-mismatch]
+      - name: Hand the driver to the platform smoke test
         shell: pwsh
+        env:
+          DRIVER_PATH: ${{ steps.software-opengl.outputs.driver-path }}
         run: |
-          $driver = ./tools/Install-MesaSoftwareGL.ps1 -DestinationPath (Join-Path $env:RUNNER_TEMP 'software-opengl')
-          "PLATFORM_SMOKE_TEST_GL_DRIVER=$driver" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "PLATFORM_SMOKE_TEST_GL_DRIVER=$env:DRIVER_PATH" | Out-File -FilePath $env:GITHUB_ENV -Append
+          Write-Host "Software OpenGL driver provisioned at $env:DRIVER_PATH"
       - name: Build Windows installer
         shell: pwsh
         run: ./tools/Build-WindowsInstaller.ps1 -Compiler "$env:INNO_COMPILER"
