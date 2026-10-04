@@ -30,8 +30,8 @@ None known.
 
 ## Handover
 
-- Stage: Survey. Latest research: FND-RES-020 / FMT-RES-014.
-  Q-RES-016 is closed; Q-RES-164 through Q-RES-167 remain Static.
+- Stage: Survey. Latest research: FND-RES-021 / FMT-RES-015.
+  Q-RES-017 remains open with a recorded attempt; Q-RES-168 is Static.
 - Last checks: 2026-10-05 offline rules verification and documentation check,
   narrative references, research tracking, coverage metadata and repository policy
   passed. Kaitai compilation was skipped because no compiler was available. No parity
@@ -42,12 +42,13 @@ None known.
 - Unfinished: none from this batch. GAP-006 has a follow-up. No original program
   ran. Audits found no confirmed repository orphans; reusable MSBuild workers
   remain. Current authorization requires local commits without pushing to main.
-  FMT-RES-014 is supported; consumer work remains Q-RES-164 through Q-RES-167.
+  FMT-RES-015 remains unknown; Q-RES-017 and Q-RES-168 name the next evidence.
   Latest research documentation regeneration and repository policy passed.
   No full fast gate was repeated for this research-only batch.
 - Blockers: none known.
 - Upstream reporting: every recorded GAP-001 through GAP-010 has a toolkit
-  submission link in gaps.md. GAP-006 and GAP-008 share issue #231.
+  submission link in gaps.md. GAP-006 and GAP-008 share issue #231, now with
+  the FND-RES-021 follow-up.
   Reporting backlog is cleared; future concerns still require duplicate checks.
   GitHub connector access works; the local gh token is invalid.
 - Next: Q-RES-017 / FMT-RES-015 and manual-screen reconciliation, then consumer
