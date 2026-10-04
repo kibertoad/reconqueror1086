@@ -37,9 +37,12 @@ formats of its members.
 
 ## Open questions
 
-- What layout, if any, is shared by these candidates? (Q-RES-017) The required
-  binary/little metadata values are provisional hypotheses. Text syntax,
-  big-endian fields or multiple unrelated layouts remain possible; the filenames
-  do not settle them. Inspect file signatures and the relevant readers, and split
-  this group before asserting incompatible layouts. No parsing decision follows
-  from this unknown entry.
+- Do these files share a permissive line grammar or require independent formats?
+  FND-RES-021 records distinct complete line shapes: a bracket/key grammar does
+  not account for the plain CONQUER regions or SIERRA's other class. One broad
+  consumer and independent consumers both remain possible. Trace the readers
+  and split the entry before asserting incompatible field layouts. (Q-RES-017)
+- Which encoding interprets AUTORUN's four non-ASCII bytes? Multiple single-byte
+  code pages remain possible; inspect the consuming decoder or a relevant format
+  source rather than normalizing them to ASCII. This is an independently
+  answerable dependency of layout reconciliation. (Q-RES-168)

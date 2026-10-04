@@ -558,6 +558,7 @@ Entries by area.
 | [FND-RES-018](../findings/FND-RES-018.md) | The disc and installed C1086.GOB copies are identical and share the documented resource directory | recorded |
 | [FND-RES-019](../findings/FND-RES-019.md) | INSTALL.HLP preserves marked text regions, whitespace and a control byte followed by CRLF | recorded |
 | [FND-RES-020](../findings/FND-RES-020.md) | Disc-root icon candidates share counted directories but differ in a payload size value | recorded |
+| [FND-RES-021](../findings/FND-RES-021.md) | Disc-root INF candidates have distinct line shapes and one contains non-ASCII bytes | recorded |
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |

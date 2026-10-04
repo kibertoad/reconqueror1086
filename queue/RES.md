@@ -1,8 +1,13 @@
 # RES
 
-Next ID: Q-RES-168
+Next ID: Q-RES-169
 
 ## Static
+
+- Q-RES-168. FMT-RES-015: Which encoding interprets AUTORUN.INF non-ASCII bytes?
+  Settles it: trace the consuming decoder or establish a relevant format source
+  and compare its interpretation with the complete file. Blocks: INF reconciliation.
+  Tried: FND-RES-021 records four high bytes but cannot choose a code page.
 
 - Q-RES-164. FMT-RES-014: Which shipped consumer opens the disc-root icons, and are those paths reachable?
   Settles it: Trace file-open references from media/application entry points. Blocks: Survey consumer reconciliation.
@@ -188,6 +193,10 @@ Next ID: Q-RES-168
   Settles it: inspect bounded file signatures and the relevant readers; record the
   parsing syntax or field layout, splitting the entry if the files differ before
   making claims about them. Blocks: Survey data-family reconciliation.
+
+  Tried: FND-RES-021 checked every file byte and retained all line classes.
+  No single strict bracket/key grammar covers the candidates. Next evidence:
+  consumer references and token handling, or an independent format-source reading.
 
 - Q-RES-018. FMT-RES-016: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the
