@@ -628,3 +628,15 @@ no compiler was available; the declarative definition is not claimed compiled
 or generated-parser tested. The full fast gate was not repeated for this
 research-only change. No parity row is validated by these storage witnesses;
 Q-RES-164 through Q-RES-167 retain consumer behavior.
+
+### INF inventory shape research (2026-10-05)
+
+FND-RES-021 records the complete-file witnesses for FMT-RES-015's candidates.
+The bounded local Python probe matched every manifest size and fingerprint,
+classified every byte and line region, retained the other-line class and
+reconstructed every file with its original CRLF boundaries. Q-RES-017 remains
+open and Q-RES-168 separates encoding. No original reader or program ran, no
+prose or command sequences were committed, and no parity status was promoted.
+Documentation regeneration/check, narrative references, research tracking,
+coverage metadata and repository policy passed. Kaitai compilation was skipped;
+the full fast gate was not repeated for this research-only change.

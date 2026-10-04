@@ -145,6 +145,12 @@ Upstream submission (2026-10-05): duplicate checks found no matching tracker;
 [toolkit issue #231](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/231)
 records this suggestion and synthetic acceptance criteria.
 
+Follow-up (2026-10-05): FND-RES-021 adds unresolved non-ASCII encoding and
+heterogeneous line shapes to the fixture request. After checking the existing
+issue and its comments, added [issue #231 details](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/231#issuecomment-5985687083)
+instead of opening a duplicate. The request preserves high bytes and the other
+line class without inferring a code page or grammar from the suffix.
+
 ## GAP-007: Valid queue IDs can carry stale human-readable area labels
 
 Recorded: 2026-10-02. Audience: template and shared-documentation-tooling authors.
