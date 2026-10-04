@@ -30,8 +30,9 @@ None known.
 
 ## Handover
 
-- Stage: Survey. Latest research: FND-RES-021 / FMT-RES-015.
-  Q-RES-017 remains open with a recorded attempt; Q-RES-168 is Static.
+- Stage: Survey. Latest research: FND-RES-022 / FMT-RES-015.
+  Q-RES-017 remains Static for reader evidence; Q-RES-168 through Q-RES-170
+  retain independent consumer questions.
 - Last checks: 2026-10-05 offline rules verification and documentation check,
   narrative references, research tracking, coverage metadata and repository policy
   passed. Kaitai compilation was skipped because no compiler was available. No parity
@@ -42,7 +43,8 @@ None known.
 - Unfinished: none from this batch. GAP-006 has a follow-up. No original program
   ran. Audits found no confirmed repository orphans; reusable MSBuild workers
   remain. Current authorization requires local commits without pushing to main.
-  FMT-RES-015 remains unknown; Q-RES-017 and Q-RES-168 name the next evidence.
+  FMT-RES-015 remains unknown; Q-RES-017 names the next reader evidence.
+  Its second raw-file attempt is recorded; do not repeat shape counts alone.
   Latest research documentation regeneration and repository policy passed.
   No full fast gate was repeated for this research-only batch.
 - Blockers: none known.
@@ -51,7 +53,8 @@ None known.
   the FND-RES-021 follow-up.
   Reporting backlog is cleared; future concerns still require duplicate checks.
   GitHub connector access works; the local gh token is invalid.
-- Next: Q-RES-017 / FMT-RES-015 and manual-screen reconciliation, then consumer
+- Next: reader identification for Q-RES-017 / FMT-RES-015, then
+  Q-RES-168 through Q-RES-170, manual-screen reconciliation and consumer
   questions Q-RES-124 through Q-RES-163. Inspect the current entry's file list
   before assigning a family label. Rules snapshots remain unchanged unless the
   owner requests their refresh. Gameplay remains outside this goal's scope.
