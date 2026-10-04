@@ -42,7 +42,9 @@ formats of its members.
   not account for the plain CONQUER regions or SIERRA's other class. One broad
   consumer and independent consumers both remain possible. FND-RES-022 adds
   distinct token families and APPEND-shaped equals-bearing left portions.
-  Further byte-shape counts cannot settle the consumer question. Trace the readers
+  FND-RES-023 identifies AUTOPLAY and SETUP filename-occurrence leads, without
+  proving file opens. Further byte-shape counts cannot settle the consumer question.
+  Trace the readers
   and split the entry before asserting incompatible field layouts. (Q-RES-017)
 - Which encoding interprets AUTORUN's four non-ASCII bytes? Multiple single-byte
   code pages remain possible; inspect the consuming decoder or a relevant format

@@ -208,6 +208,9 @@ Next ID: Q-RES-171
   Second attempt: FND-RES-022 adds token-family and repeated-token evidence.
   Remains Static for reader identification; do not repeat raw shape counting without
   new reader evidence.
+  New lead: FND-RES-023 locates AUTORUN/LANGUAGE filename bytes in AUTOPLAY
+  and two SIERRA filename occurrences in SETUP. Trace their executable references
+  independently into file-open inputs; no reachable consumer is proved yet.
 
 - Q-RES-018. FMT-RES-016: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the
