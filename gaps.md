@@ -18,7 +18,11 @@ while allowing them in dated historical validation records.
 
 Local resolution: corrected the current-use sections of
 `docs/implementation-plan.md` and `docs/VALIDATION.md`. Historical migration
-records remain dated evidence. No upstream submission has been made.
+records remain dated evidence.
+
+Upstream submission (2026-10-05): duplicate checks found no matching tracker;
+[toolkit issue #233](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/233)
+records this suggestion and synthetic acceptance criteria.
 
 ## GAP-002: Survey inventory must include installation subdirectories and the image path
 
@@ -38,8 +42,11 @@ Synthetic coverage should include a nested wrapper file and the source image.
 Local resolution: the inspector now enumerates installation subdirectories,
 skips reparse points, includes the source image path, and offers an inventory-only
 mode. FND-RES-010 now records complete path accounting against the expanded
-manifest and explicit Other files list; data-family Survey remains open. No upstream
-submission has been made.
+manifest and explicit Other files list; data-family Survey remains open.
+
+Upstream submission (2026-10-05): duplicate checks found no matching tracker;
+[toolkit issue #232](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/232)
+records this suggestion and synthetic acceptance criteria.
 
 ## GAP-003: Unknown format entries still require a parsing-model and byte-order choice
 
@@ -60,7 +67,7 @@ Local handling: the new unknown inventory entries explicitly mark the required
 binary/little values as provisional hypotheses in comments and Open questions.
 They establish no field layout or parsing behavior, remain unknown, and have no
 implementation. Directory/suffix grouping likewise does not assert a shared
-format; research must split incompatible layouts. No upstream submission made.
+format; research must split incompatible layouts.
 
 Upstream submission (2026-10-05): duplicate searches found no matching tracker;
 [toolkit issue #223](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/223)
@@ -82,8 +89,11 @@ synthetic duplicate-address and zero-padding cases. Keep strict validation of
 actual file extents while stating which padding/header checks are required.
 
 Local resolution: FMT-RES-005 and FMT-RES-116 preserve the observed framing and
-exceptions, without claiming the shipped wrapper's checks. No implementation
-change or upstream submission is made by this research batch.
+exceptions, without claiming the shipped wrapper's checks. No implementation change is made by this research batch.
+
+Upstream submission (2026-10-05): duplicate checks found no matching tracker;
+[toolkit issue #230](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/230)
+records this suggestion and synthetic acceptance criteria.
 
 ## GAP-005: Installed engine validation duplicated a mutable version pin
 
@@ -100,8 +110,7 @@ synthetic distributions.
 
 Local resolution: Verify-EvidenceEnvironment.py checks every locked distribution
 and the adoption engine version. Synthetic regressions cover future pins, missing
-packages, non-exact requirements and transitive version drift. No upstream
-submission has been made.
+packages, non-exact requirements and transitive version drift.
 
 Upstream submission (2026-10-05): duplicate checks found no matching tracker;
 [toolkit issue #229](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/229)
@@ -124,13 +133,17 @@ consumer behavior as a separate research question.
 
 Local handling: FMT-RES-008 distinguishes the stored cases and the local witness
 reconstructed each complete file. Q-RES-132 through Q-RES-134 retain consumer
-questions. No upstream submission has been made.
+questions.
 
 Follow-up (2026-10-02): FND-RES-019 extends these fixture cases to a control
 byte followed by a stored CRLF, rather than occupying the physical last byte.
 Include that distinction and whitespace-bearing duplicate markers in synthetic
 reader fixtures. The local complete-file witness preserves both; consumer
 interpretation remains Q-RES-158 through Q-RES-163.
+
+Upstream submission (2026-10-05): duplicate checks found no matching tracker;
+[toolkit issue #231](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/231)
+records this suggestion and synthetic acceptance criteria.
 
 ## GAP-007: Valid queue IDs can carry stale human-readable area labels
 
@@ -149,7 +162,11 @@ Avoid a general semantic checker that would reject legitimate paraphrases.
 
 Local resolution: the plan and active goal label are corrected after inspecting
 the current entry. Research used FMT-RES-009's file list rather than the stale
-label. No upstream submission has been made.
+label.
+
+Upstream submission (2026-10-05): duplicate checks found no matching tracker;
+[toolkit issue #234](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/234)
+records this suggestion and synthetic acceptance criteria.
 
 ## GAP-008: Text Survey must not validate strings using raw quote parity
 
@@ -168,7 +185,11 @@ fixture suggestion, not a reported defect in an adopted reader.
 
 Local handling: FMT-RES-011 retains stored framing only and Q-RES-151 through
 Q-RES-156 keep interpreter questions open. The complete witness reconstructs the
-file without parsing strings or executing directives. No upstream submission made.
+file without parsing strings or executing directives.
+
+Upstream submission (2026-10-05): duplicate checks found no matching tracker;
+[toolkit issue #231](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/231)
+records this suggestion and synthetic acceptance criteria.
 
 ## GAP-009: Superseded unknown inventory entries still require a layout table
 
@@ -208,7 +229,7 @@ handover that names a superseded entry and verify the commit gate rejects it.
 Local resolution: remove the retired citation from the current handover and add
 Check-NarrativeReferences.mjs to the shared checks used by pre-commit and the
 canonical gate. A synthetic handover regression proves rejection and successful
-replacement by an active entry. No upstream submission has been made.
+replacement by an active entry.
 
 Upstream submission (2026-10-05): duplicate checks found no matching tracker;
 [toolkit issue #228](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/228)
