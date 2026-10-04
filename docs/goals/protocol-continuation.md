@@ -43,8 +43,11 @@ None known.
   ran. Audits found no confirmed repository orphans; reusable MSBuild workers
   remain. Current authorization requires local commits without pushing to main.
   Q-RES-016 remains open; preliminary inspection has no durable finding yet.
+  Latest session completed upstream reporting only; shared Node checks passed.
+  No full fast gate was repeated for these narrative records.
 - Blockers: none known.
-- Upstream reporting: GAP-003 is submitted as toolkit issue #223. Other gaps
+- Upstream reporting: GAP-003, GAP-005, GAP-009 and GAP-010 are submitted as
+  toolkit issues #223, #229, #227 and #228 respectively. Remaining gaps
   still need duplicate checks and submission or relevant existing-issue updates.
   GitHub connector access works; the local gh token is invalid.
 - Next: Q-RES-016 / FMT-RES-014 and manual-screen reconciliation, then consumer
