@@ -40,9 +40,17 @@ formats of its members.
 - Do these files share a permissive line grammar or require independent formats?
   FND-RES-021 records distinct complete line shapes: a bracket/key grammar does
   not account for the plain CONQUER regions or SIERRA's other class. One broad
-  consumer and independent consumers both remain possible. Trace the readers
+  consumer and independent consumers both remain possible. FND-RES-022 adds
+  distinct token families and APPEND-shaped equals-bearing left portions.
+  Further byte-shape counts cannot settle the consumer question. Trace the readers
   and split the entry before asserting incompatible field layouts. (Q-RES-017)
 - Which encoding interprets AUTORUN's four non-ASCII bytes? Multiple single-byte
   code pages remain possible; inspect the consuming decoder or a relevant format
   source rather than normalizing them to ASCII. This is an independently
   answerable dependency of layout reconciliation. (Q-RES-168)
+- How does LANGUAGE handle its repeated InstallDoneTitle token? First-wins,
+  last-wins and multiple-use readings all fit FND-RES-022; read lookup order
+  and continuation after a match. (Q-RES-169)
+- Which SIERRA reader distinguishes command-shaped equals-bearing regions from
+  simple assignments and comma-bearing data? FND-RES-022 records their shapes;
+  trace dispatch and token boundaries to settle the roles. (Q-RES-170)

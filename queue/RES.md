@@ -1,8 +1,16 @@
 # RES
 
-Next ID: Q-RES-169
+Next ID: Q-RES-171
 
 ## Static
+
+- Q-RES-169. FMT-RES-015: How does LANGUAGE handle repeated InstallDoneTitle?
+  Settles it: trace lookup order and continuation after a match. Blocks: INF reconciliation.
+  Tried: FND-RES-022 establishes the repeated token, not lookup semantics.
+
+- Q-RES-170. FMT-RES-015: Which SIERRA reader distinguishes command-shaped equals regions and comma-bearing data?
+  Settles it: identify the reader and trace dispatch/token boundaries. Blocks: INF reconciliation.
+  Tried: FND-RES-022 retains all token classes; raw separators do not settle their roles.
 
 - Q-RES-168. FMT-RES-015: Which encoding interprets AUTORUN.INF non-ASCII bytes?
   Settles it: trace the consuming decoder or establish a relevant format source
@@ -197,6 +205,9 @@ Next ID: Q-RES-169
   Tried: FND-RES-021 checked every file byte and retained all line classes.
   No single strict bracket/key grammar covers the candidates. Next evidence:
   consumer references and token handling, or an independent format-source reading.
+  Second attempt: FND-RES-022 adds token-family and repeated-token evidence.
+  Remains Static for reader identification; do not repeat raw shape counting without
+  new reader evidence.
 
 - Q-RES-018. FMT-RES-016: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the
