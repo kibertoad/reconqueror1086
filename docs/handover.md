@@ -4,7 +4,7 @@
 
 Stage: Survey. Template main 39d31fde is adopted, with the Standard at rules
 c1758fd9 (rules numbered, still v1), checker 0.2.0 at toolkit a260e391, reader
-1.0.0, engine 1.0.1 and the RefurbishedDinosaurs 2.0.0 runtime packages. Tooling
+1.0.0, engine 1.0.1 and the RefurbishedDinosaurs 6.2.0 runtime packages. Tooling
 installs through pnpm. CI for this adoption has not run yet. The completed capability audit is in
 [template-migration-plan.md](template-migration-plan.md).
 The earlier documentation audit is in [documentation-audit.md](documentation-audit.md).
@@ -24,13 +24,19 @@ integration are complete; follow the parity rows.
 
 ## Verification and local state
 
-The 2026-10-02 canonical fast gates passed normally and with NoRestore.
-Kaitai compilation, strict configuration, workflow lint and local Windows
-packaging passed. Canonical main CI passed all platform and installer jobs;
-the workflow security audit also passed. Exact acceptance runs and limits are
-in [VALIDATION.md](VALIDATION.md). RefurbishedDinosaurs.LegacyFormats, Media.Smacker,
-Media.Playback and Core 2.0.0 replace the old runtime pin, movie clock and startup
-reporter. Owned-media comparisons were not run.
+The 2026-10-05 canonical fast gate passed after adopting shared runtime 6.2.0.
+Shared APIs now own import/install helpers, hashing, portable paths, palette and
+PCM conversion, settings recovery, content discovery, viewport scaling and text
+wrapping. Existing game manifest and settings contracts remain in adapters.
+The callback-based generated-file writer and game-specific verification remain
+local. Acceptance details and limits are in [VALIDATION.md](VALIDATION.md).
+Kaitai compilation was skipped because no compiler was available; owned-media
+comparisons and LongRunning tests were not run. No original game ran.
+
+The pinned Python engine is installed in ignored artifacts/validation-python;
+set EVIDENCE_PYTHON to its Scripts/python.exe for this checkout's gate. The
+machine's existing engine 8.1.0 is restored. Tooling dependencies are installed
+from the existing locks. Remote CI has not been exercised for this update.
 
 Post-commit audits found no confirmed task orphans. Preserve unrelated processes
 and reusable MSBuild workers. Original source, captures and analysis artifacts
