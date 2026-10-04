@@ -612,3 +612,19 @@ and content-directory precedence including trailing separators. Kaitai schema
 compilation was skipped because no compiler was available. LongRunning tests,
 owned-media comparisons, original-game runs and publication were not performed;
 no evidence or parity status changed.
+
+### Owned icon storage research (2026-10-05)
+
+FMT-RES-014 / FND-RES-020 now have a complete stored-byte witness. The bounded
+local Python inspection matched each listed file's manifest fingerprint, checked
+all directory extents, unpacked and repacked the complete indexed and mask planes,
+and reconstructed every complete file exactly. Original bytes and the temporary
+probe remain ignored; no original program ran. Field interpretation cites
+SRC-ICO-REFERENCE and SRC-BMP-REFERENCE.
+
+Documentation regeneration/check, narrative references, queue tracking, coverage
+metadata and repository policy passed. Kaitai compilation was skipped because
+no compiler was available; the declarative definition is not claimed compiled
+or generated-parser tested. The full fast gate was not repeated for this
+research-only change. No parity row is validated by these storage witnesses;
+Q-RES-164 through Q-RES-167 retain consumer behavior.

@@ -13,7 +13,8 @@ The complete installation/media path accounting is recorded in FND-RES-010 and
 BLD-GOG-EN. Survey remains open until every manifest data family and all
 manual-mentioned screens are reconciled. Conservatively retained auxiliary media
 need runtime-use review and format entries until evidence supports exclusion.
-Research continues with Q-RES-016 / FMT-RES-014; Q-RES-158 through
+Research continues with Q-RES-017 / FMT-RES-015; Q-RES-164 through
+Q-RES-167 retain icon-consumer questions; Q-RES-158 through
 Q-RES-163 retain help-text consumer questions; Q-RES-157 retains the
 archive-copy consumer question; Q-RES-151 through
 Q-RES-156 retain installer-text consumer questions; Q-RES-138 through
