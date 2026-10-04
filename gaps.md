@@ -62,6 +62,11 @@ They establish no field layout or parsing behavior, remain unknown, and have no
 implementation. Directory/suffix grouping likewise does not assert a shared
 format; research must split incompatible layouts. No upstream submission made.
 
+Upstream submission (2026-10-05): duplicate searches found no matching tracker;
+[toolkit issue #223](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/223)
+records the schema suggestion, the original checker-version qualification and
+synthetic acceptance criteria. Submitted through the GitHub connector.
+
 ## GAP-004: Raw-image validation must retain observed padding exceptions
 
 Recorded: 2026-10-02. Audience: shared optical-tooling and template authors.
