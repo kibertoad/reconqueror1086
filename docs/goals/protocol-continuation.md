@@ -30,7 +30,7 @@ None known.
 
 ## Handover
 
-- Stage: Survey. Latest research: FND-RES-023 / FMT-RES-015.
+- Stage: Survey. Latest research: FND-RES-024 / FMT-RES-015.
   Q-RES-017 remains Static for reader evidence; Q-RES-168 through Q-RES-170
   retain independent consumer questions.
 - Last checks: 2026-10-05 offline rules verification and documentation check,
@@ -44,7 +44,7 @@ None known.
   ran. Audits found no confirmed repository orphans; reusable MSBuild workers
   remain. Current authorization requires local commits without pushing to main.
   FMT-RES-015 remains unknown; Q-RES-017 names the next reader evidence.
-  FND-RES-023 supplies new executable-analysis leads; follow their references
+  FND-RES-024 supplies verified container mappings and import leads; follow them
   under Q-RES-017. Do not repeat raw shape counts or infer opens from literals.
   Latest research documentation regeneration and repository policy passed.
   No full fast gate was repeated for this research-only batch.
@@ -54,7 +54,7 @@ None known.
   the FND-RES-021 follow-up.
   Reporting backlog is cleared; future concerns still require duplicate checks.
   GitHub connector access works; the local gh token is invalid.
-- Next: trace FND-RES-023 leads for Q-RES-017 / FMT-RES-015, then
+- Next: trace FND-RES-024 argument/relocation leads for Q-RES-017 / FMT-RES-015, then
   Q-RES-168 through Q-RES-170, manual-screen reconciliation and consumer
   questions Q-RES-124 through Q-RES-163. Inspect the current entry's file list
   before assigning a family label. Rules snapshots remain unchanged unless the
