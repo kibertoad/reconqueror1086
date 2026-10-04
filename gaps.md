@@ -206,8 +206,7 @@ requirement when they identify their active replacement and cite the reconciliat
 evidence. Preserve the old uncertainty rather than forcing a second layout.
 
 Local handling: a single whole-file table redirects the former listing to
-FMT-RES-001, backed by FND-RES-018. No independent layout is introduced and no
-upstream submission has been made.
+FMT-RES-001, backed by FND-RES-018. No independent layout is introduced.
 
 Upstream submission (2026-10-05): duplicate checks found no matching tracker;
 [toolkit issue #227](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/227)
