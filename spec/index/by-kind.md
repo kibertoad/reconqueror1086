@@ -329,7 +329,7 @@ Entries by kind.
 
 ## findings
 
-238 entries.
+239 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -463,6 +463,7 @@ Entries by kind.
 | [FND-RES-017](../findings/FND-RES-017.md) | INSTALL.DAT stores ASCII directive-shaped lines with a final unterminated line | recorded |
 | [FND-RES-018](../findings/FND-RES-018.md) | The disc and installed C1086.GOB copies are identical and share the documented resource directory | recorded |
 | [FND-RES-019](../findings/FND-RES-019.md) | INSTALL.HLP preserves marked text regions, whitespace and a control byte followed by CRLF | recorded |
+| [FND-RES-020](../findings/FND-RES-020.md) | Disc-root icon candidates share counted directories but differ in a payload size value | recorded |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |

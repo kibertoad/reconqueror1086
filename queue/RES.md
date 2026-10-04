@@ -176,6 +176,11 @@ Next ID: Q-RES-164
   parsing syntax or field layout, splitting the entry if the files differ before
   making claims about them. Blocks: Survey data-family reconciliation.
 
+  Tried: FND-RES-020 inspected every candidate extent and payload header.
+  The shared directory partition is a lead; consumer field roles and the differing
+  payload size values remain unresolved. Next evidence: a reader or an independent
+  format-source comparison followed by complete payload decoding.
+
 - Q-RES-017. FMT-RES-015: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the
   parsing syntax or field layout, splitting the entry if the files differ before

@@ -41,5 +41,7 @@ formats of its members.
   binary/little metadata values are provisional hypotheses. Text syntax,
   big-endian fields or multiple unrelated layouts remain possible; the filenames
   do not settle them. Inspect file signatures and the relevant readers, and split
-  this group before asserting incompatible layouts. No parsing decision follows
+  this group before asserting incompatible layouts. FND-RES-020 records matching fingerprints and a shared counted-directory
+  partition, but bitmap field roles and the differing payload size values remain
+  unconfirmed by a consumer. No parsing decision follows
   from this unknown entry.
