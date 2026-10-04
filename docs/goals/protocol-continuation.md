@@ -46,9 +46,9 @@ None known.
   Latest session completed upstream reporting only; shared Node checks passed.
   No full fast gate was repeated for these narrative records.
 - Blockers: none known.
-- Upstream reporting: GAP-003, GAP-005, GAP-009 and GAP-010 are submitted as
-  toolkit issues #223, #229, #227 and #228 respectively. Remaining gaps
-  still need duplicate checks and submission or relevant existing-issue updates.
+- Upstream reporting: every recorded GAP-001 through GAP-010 has a toolkit
+  submission link in gaps.md. GAP-006 and GAP-008 share issue #231.
+  Reporting backlog is cleared; future concerns still require duplicate checks.
   GitHub connector access works; the local gh token is invalid.
 - Next: Q-RES-016 / FMT-RES-014 and manual-screen reconciliation, then consumer
   questions Q-RES-124 through Q-RES-163. Inspect the current entry's file list
