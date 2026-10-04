@@ -1,16 +1,11 @@
 using System.Buffers.Binary;
+using RefurbishedDinosaurs.Media.Audio;
 
 namespace Conqueror.Resources;
 
 public sealed record DynamixSoundSample(int Index, int SampleRate, byte[] Samples)
 {
-    public byte[] ToPcm16LittleEndian()
-    {
-        var pcm = new byte[checked(Samples.Length * 2)];
-        for (var index = 0; index < Samples.Length; index++)
-            BinaryPrimitives.WriteInt16LittleEndian(pcm.AsSpan(index * 2), checked((short)((Samples[index] - 128) << 8)));
-        return pcm;
-    }
+    public byte[] ToPcm16LittleEndian() => Pcm16.FromUnsigned8(Samples);
 }
 public sealed record DynamixSoundBank(IReadOnlyList<DynamixSoundSample> Samples);
 

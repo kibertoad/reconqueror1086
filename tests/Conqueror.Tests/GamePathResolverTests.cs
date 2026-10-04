@@ -8,32 +8,30 @@ public sealed class GamePathResolverTests
     [Fact]
     public void UserContentResolutionSupportsDevelopmentPortableAndInstalledLayouts()
     {
-        var root = Path.GetPathRoot(Path.GetFullPath("."))!;
+        var root = Path.Combine(Path.GetTempPath(), $"conqueror-layout-{Guid.NewGuid():N}");
         var application = Path.Combine(root, "application");
         var checkout = Path.Combine(root, "checkout");
         var userData = Path.Combine(root, "user-data");
-
-        Assert.Equal(Path.Combine(application, "UserContent"),
-            GamePathResolver.ResolveUserContent(application, checkout, userData, true, false, false));
-        Assert.Equal(Path.Combine(checkout, "UserContent"),
-            GamePathResolver.ResolveUserContent(application, checkout, userData, false, false, true));
-        Assert.Equal(Path.Combine(userData, GamePathResolver.ApplicationDataDirectory, "UserContent"),
-            GamePathResolver.ResolveUserContent(application, checkout, userData, false, false, false));
-    }
-
-    [Fact]
-    public void ParentPackageContentAndWritableStateUseStablePerPlatformPaths()
-    {
-        var root = Path.GetPathRoot(Path.GetFullPath("."))!;
-        var package = Path.Combine(root, "package");
-        var application = Path.Combine(package, "Game");
-        var elsewhere = Path.Combine(root, "elsewhere");
-        var userData = Path.Combine(root, "user-data");
-
-        Assert.Equal(Path.Combine(package, "UserContent"),
-            GamePathResolver.ResolveUserContent(application, elsewhere, userData, false, true, false));
-        Assert.Equal(Path.Combine(userData, GamePathResolver.ApplicationDataDirectory),
-            GamePathResolver.ResolveStateRoot(userData));
+        var applicationContent = Path.Combine(application, "UserContent");
+        var checkoutContent = Path.Combine(checkout, "UserContent");
+        var parentContent = Path.Combine(root, "UserContent");
+        try
+        {
+            Directory.CreateDirectory(applicationContent);
+            Directory.CreateDirectory(checkoutContent);
+            Directory.CreateDirectory(parentContent);
+            Assert.Equal(applicationContent, GamePathResolver.ResolveUserContent(application, checkout, userData));
+            Directory.Delete(applicationContent);
+            Assert.Equal(parentContent, GamePathResolver.ResolveUserContent(application, checkout, userData));
+            Directory.Delete(parentContent);
+            Assert.Equal(checkoutContent, GamePathResolver.ResolveUserContent(application, checkout, userData));
+            Directory.Delete(checkoutContent);
+            Assert.Equal(Path.Combine(userData, GamePathResolver.ApplicationDataDirectory, "UserContent"),
+                GamePathResolver.ResolveUserContent(application, checkout, userData));
+            Assert.Equal(Path.Combine(userData, GamePathResolver.ApplicationDataDirectory),
+                GamePathResolver.ResolveStateRoot(userData));
+        }
+        finally { Directory.Delete(root, true); }
     }
 
     [Theory]
@@ -43,6 +41,6 @@ public sealed class GamePathResolverTests
     public void MissingRootsAreRejected(string application, string current, string localData)
     {
         Assert.Throws<ArgumentException>(() =>
-            GamePathResolver.ResolveUserContent(application, current, localData, false, false, false));
+            GamePathResolver.ResolveUserContent(application, current, localData));
     }
 }

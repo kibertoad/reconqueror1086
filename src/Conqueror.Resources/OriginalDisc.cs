@@ -1,5 +1,5 @@
-using System.IO.Hashing;
-using System.Text;
+using RefurbishedDinosaurs.Core.Assets;
+using RefurbishedDinosaurs.Core.IO;
 using System.Text.Json;
 
 namespace Conqueror.Resources;
@@ -38,53 +38,31 @@ public static class ImportDiskPlanner
 {
     public static ImportDiskPlan Calculate(string root, IEnumerable<PlannedImportAsset> assets)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(root);
         ArgumentNullException.ThrowIfNull(assets);
-        long installed = 0;
-        long newBytes = 0;
-        long replacementScratch = 0;
-        var paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var asset in assets)
-        {
-            if (asset.Size < 0) throw new InvalidDataException("Planned asset has a negative size.");
-            if (Path.IsPathFullyQualified(asset.Path)) throw new InvalidDataException("Planned asset path must be relative.");
-            var target = ResourcePaths.SafeTarget(root, asset.Path);
-            if (!paths.Add(target)) throw new InvalidDataException("Planned asset paths are not unique.");
-            installed = checked(installed + asset.Size);
-            if (File.Exists(target)) replacementScratch = Math.Max(replacementScratch, asset.Size);
-            else newBytes = checked(newBytes + asset.Size);
-        }
-        return new(installed, newBytes, replacementScratch);
+        var plan = RefurbishedDinosaurs.Core.Assets.ImportDiskPlanner.Calculate(root,
+            assets.Select(asset => new PlannedAsset(PortableAssetPath.Relative(asset.Path), asset.Size)));
+        return new(plan.InstalledBytes, plan.NewBytes, plan.ReplacementScratchBytes);
     }
 }
 
 public static class GeneratedContentInstaller
 {
-    public static InstalledFile InstallBytes(string root, string relative, ReadOnlySpan<byte> bytes)
-    {
-        var target = ResourcePaths.SafeTarget(root, relative);
-        var hash = ResourceHash.Xxh3(bytes);
-        if (Matches(target, bytes.Length, hash)) return new(target, bytes.Length, hash, false);
-        AtomicFile.WriteBytes(target, bytes);
-        return new(target, bytes.Length, hash, true);
-    }
+    public static InstalledFile InstallBytes(string root, string relative, ReadOnlySpan<byte> bytes) =>
+        Adapt(InstalledContentWriter.WriteBytes(root, PortableAssetPath.Relative(relative), bytes));
 
-    public static InstalledFile InstallFile(string root, string relative, string source)
-    {
-        var target = ResourcePaths.SafeTarget(root, relative);
-        var info = new FileInfo(source);
-        var hash = ResourceHash.Xxh3(source);
-        if (Matches(target, info.Length, hash)) return new(target, info.Length, hash, false);
-        AtomicFile.Copy(source, target);
-        return new(target, info.Length, hash, true);
-    }
+    public static InstalledFile InstallFile(string root, string relative, string source) =>
+        Adapt(InstalledContentWriter.CopyFile(root, PortableAssetPath.Relative(relative), source));
+
+    private static InstalledFile Adapt(InstalledFileResult file) =>
+        new(file.Path, file.Bytes, file.Xxh3, file.Changed);
 
     public static InstalledFile InstallGenerated(string root, string relative, Action<Stream> write)
     {
         ArgumentNullException.ThrowIfNull(write);
         var target = ResourcePaths.SafeTarget(root, relative);
         Directory.CreateDirectory(Path.GetDirectoryName(target)!);
-        var temporary = AtomicFile.TemporaryPath(target);
+        var temporary = Path.Combine(Path.GetDirectoryName(target)!,
+            $".{Path.GetFileName(target)}.{Guid.NewGuid():N}.tmp");
         try
         {
             using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None,
@@ -116,78 +94,14 @@ public static class ImportedContentUninstaller
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(root);
         ArgumentNullException.ThrowIfNull(manifest);
-        var fullRoot = Path.GetFullPath(root);
-        var targets = (manifest.Assets ?? []).Select(asset => asset?.Path
-                ?? throw new InvalidDataException("Manifest contains a null asset record."))
-            .Select(relative => Path.IsPathFullyQualified(relative)
-                ? throw new InvalidDataException("Manifest contains an absolute asset path.")
-                : ResourcePaths.SafeTarget(fullRoot, relative))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-
-        var removed = 0;
-        foreach (var target in targets)
-            if (File.Exists(target))
-            {
-                File.Delete(target);
-                removed++;
-            }
-        var manifestPath = ResourcePaths.SafeTarget(fullRoot, "manifest.json");
-        if (File.Exists(manifestPath)) File.Delete(manifestPath);
-        if (Directory.Exists(fullRoot))
-            foreach (var directory in Directory.EnumerateDirectories(fullRoot, "*", SearchOption.AllDirectories)
-                         .OrderByDescending(path => path.Length))
-                if (!Directory.EnumerateFileSystemEntries(directory).Any()) Directory.Delete(directory);
-        return removed;
+        var files = (manifest.Assets ?? []).Select(asset => asset is null
+            ? throw new InvalidDataException("Manifest contains a null asset record.")
+            : new InstalledAsset(PortableAssetPath.Relative(asset.Path), asset.Size, asset.Xxh3, asset.Id)).ToArray();
+        // This is an in-memory adapter only; the game's version-two manifest stays unchanged on disk.
+        var shared = new InstalledAssetManifest(manifest.Version, "Conqueror", "original",
+            manifest.SourceImageXxh3, default, files, "Conqueror.Import");
+        return InstalledContentUninstaller.Remove(root, shared);
     }
-}
-
-public static class AtomicFile
-{
-    public static void WriteAllText(string path, string contents) => WriteBytes(path,
-        new UTF8Encoding(encoderShouldEmitUTF8Identifier: false).GetBytes(contents));
-
-    public static void WriteBytes(string path, ReadOnlySpan<byte> contents)
-    {
-        var fullPath = Path.GetFullPath(path);
-        Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
-        var temporary = TemporaryPath(fullPath);
-        try
-        {
-            using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None,
-                       128 * 1024, FileOptions.WriteThrough))
-            {
-                stream.Write(contents);
-                stream.Flush(flushToDisk: true);
-            }
-            File.Move(temporary, fullPath, overwrite: true);
-        }
-        finally
-        {
-            if (File.Exists(temporary)) File.Delete(temporary);
-        }
-    }
-
-    public static void Copy(string source, string destination)
-    {
-        var fullPath = Path.GetFullPath(destination);
-        Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
-        var temporary = TemporaryPath(fullPath);
-        try
-        {
-            File.Copy(source, temporary, overwrite: false);
-            using (var stream = File.Open(temporary, FileMode.Open, FileAccess.Write, FileShare.None))
-                stream.Flush(flushToDisk: true);
-            File.Move(temporary, fullPath, overwrite: true);
-        }
-        finally
-        {
-            if (File.Exists(temporary)) File.Delete(temporary);
-        }
-    }
-
-    internal static string TemporaryPath(string destination) => Path.Combine(
-        Path.GetDirectoryName(Path.GetFullPath(destination))!, $".{Path.GetFileName(destination)}.{Guid.NewGuid():N}.tmp");
 }
 
 public sealed record ImportVerificationIssue(string AssetId, string Path, string Reason);
@@ -269,13 +183,8 @@ public static class ResourcePaths
             : folder;
     }
 
-    public static string SafeTarget(string root, string relative)
-    {
-        var fullRoot = Path.GetFullPath(root) + Path.DirectorySeparatorChar;
-        var target = Path.GetFullPath(Path.Combine(root, relative));
-        if (!target.StartsWith(fullRoot, StringComparison.OrdinalIgnoreCase)) throw new InvalidDataException("Unsafe resource path.");
-        return target;
-    }
+    public static string SafeTarget(string root, string relative) =>
+        SafePath.Below(root, PortableAssetPath.Relative(relative));
 }
 
 // The 128-bit form of xxHash3 (XXH3_128bits, which `xxhsum -H2` prints), written as 32 lower-case hex
@@ -283,24 +192,14 @@ public static class ResourcePaths
 // file by the same hash, so the build manifest in spec/builds/ and the import manifest agree.
 public static class ResourceHash
 {
-    public const int Xxh3HexLength = 32;
+    public const int Xxh3HexLength = FileFingerprint.Xxh3Length;
 
-    public static string Xxh3(string path)
-    {
-        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read,
-            128 * 1024, FileOptions.SequentialScan);
-        return Xxh3(stream);
-    }
+    public static string Xxh3(string path) => FileFingerprint.Xxh3(path);
 
-    public static string Xxh3(Stream stream)
-    {
-        var hash = new XxHash128();
-        hash.Append(stream);
-        return Convert.ToHexStringLower(hash.GetCurrentHash());
-    }
+    public static string Xxh3(Stream stream) => FileFingerprint.Xxh3Async(stream).GetAwaiter().GetResult();
 
-    public static string Xxh3(ReadOnlySpan<byte> bytes) => Convert.ToHexStringLower(XxHash128.Hash(bytes));
+    public static string Xxh3(ReadOnlySpan<byte> bytes) => FileFingerprint.Xxh3(bytes);
 
-    public static bool IsXxh3(string? value) => value is { Length: Xxh3HexLength }
-        && value.All(character => character is >= '0' and <= '9' or >= 'a' and <= 'f' or >= 'A' and <= 'F');
+    // Existing imports admit uppercase hashes; output remains canonical lowercase.
+    public static bool IsXxh3(string? value) => FileFingerprint.IsXxh3(value?.ToLowerInvariant());
 }

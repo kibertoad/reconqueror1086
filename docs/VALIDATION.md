@@ -582,3 +582,33 @@ reported no problems in either workflow. The local `CONQUER.EXE` hashed to the
 xxh3 its BLD-GOG-EN manifest entry gives. Platform CI, installer jobs and remote
 signing were not exercised; LongRunning tests were not requested. No original
 program ran, and no gameplay, evidence or parity status changed.
+
+## Shared runtime 6.2.0 adoption (2026-10-05)
+
+NuGet's version indexes and the scientific-method-dotnet@6.2.0 release were
+checked before updating the common exact runtime pin from 2.0.0 to 6.2.0.
+Resources now references Core and Media.Audio directly. Shared APIs own atomic
+writes, XXH3 hashing, portable path admission, import disk planning, incremental
+byte/file installation, manifest-scoped uninstall, palette decoding, PCM
+conversion, JSON settings recovery, content discovery, viewport scaling and
+fixed-width text wrapping. Game-specific contracts remain adapters; the
+version-two import manifest and settings migration/default/clamp policy are
+preserved. Settings reads and writes are bounded to 64 KiB.
+
+The callback-based generated-file installer remains local: InstalledContentWriter
+has no streaming generation callback. Imported-content verification keeps the
+existing game manifest and asset identifiers. Game-specific parsers and rules
+remain local. Stream-backed ISO and overlay APIs add no replacement for custom
+logic here; disc parsing was already shared.
+
+The canonical fast gate passed with the repository-pinned Python engine isolated
+in artifacts/validation-python and EVIDENCE_PYTHON pointing to its interpreter.
+The machine's pre-existing engine 8.1.0 was restored after the initial pinned
+installation. Repository/configuration/infrastructure/documentation and node
+checks, synthetic evidence tests, the solution build, xUnit and executable
+specifications passed. Regression tests cover UTF-8 BOM settings, migration of
+backup generations, oversized primary/backup recovery, portable import paths,
+and content-directory precedence including trailing separators. Kaitai schema
+compilation was skipped because no compiler was available. LongRunning tests,
+owned-media comparisons, original-game runs and publication were not performed;
+no evidence or parity status changed.
