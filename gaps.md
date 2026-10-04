@@ -103,6 +103,10 @@ and the adoption engine version. Synthetic regressions cover future pins, missin
 packages, non-exact requirements and transitive version drift. No upstream
 submission has been made.
 
+Upstream submission (2026-10-05): duplicate checks found no matching tracker;
+[toolkit issue #229](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/229)
+records the downstream case and synthetic acceptance criteria.
+
 ## GAP-006: Survey text fixtures should preserve distinct end-of-file cases
 
 Recorded: 2026-10-02. Audience: shared-tooling and template authors.
@@ -184,6 +188,10 @@ Local handling: a single whole-file table redirects the former listing to
 FMT-RES-001, backed by FND-RES-018. No independent layout is introduced and no
 upstream submission has been made.
 
+Upstream submission (2026-10-05): duplicate checks found no matching tracker;
+[toolkit issue #227](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/227)
+records the downstream case and synthetic acceptance criteria.
+
 ## GAP-010: Pre-commit omitted active narrative-reference validation
 
 Recorded: 2026-10-02. Audience: shared-tooling and template authors.
@@ -201,3 +209,8 @@ Local resolution: remove the retired citation from the current handover and add
 Check-NarrativeReferences.mjs to the shared checks used by pre-commit and the
 canonical gate. A synthetic handover regression proves rejection and successful
 replacement by an active entry. No upstream submission has been made.
+
+Upstream submission (2026-10-05): duplicate checks found no matching tracker;
+[toolkit issue #228](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/228)
+records the downstream case and synthetic acceptance criteria.
+
