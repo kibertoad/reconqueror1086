@@ -44,7 +44,9 @@ formats of its members.
   distinct token families and APPEND-shaped equals-bearing left portions.
   FND-RES-023 identifies AUTOPLAY and SETUP filename-occurrence leads, without
   proving file opens. FND-RES-024 supplies distinct PE/NE data mappings and
-  profile-import leads. Further byte-shape counts cannot settle the consumer question.
+  profile-import leads. FND-RES-025 rules out direct SETUP filename fixups within
+  its declared relocation table, while leaving selector/offset construction open.
+  Further byte-shape counts cannot settle the consumer question.
   Trace the readers
   and split the entry before asserting incompatible field layouts. (Q-RES-017)
 - Which encoding interprets AUTORUN's four non-ASCII bytes? Multiple single-byte

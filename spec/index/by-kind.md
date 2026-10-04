@@ -14,7 +14,7 @@ Entries by kind.
 
 ## sources
 
-5 entries.
+6 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -22,6 +22,7 @@ Entries by kind.
 | [SRC-GAMEFAQS-66730](../sources/SRC-GAMEFAQS-66730.md) | Conqueror 1086 A.D. FAQ by mikel123456, GameFAQs FAQ 66730 | None |
 | [SRC-ICO-REFERENCE](../sources/SRC-ICO-REFERENCE.md) | Microsoft 1995 icon container and image reference | None |
 | [SRC-MANUAL](../sources/SRC-MANUAL.md) | Conqueror A.D. 1086 manual, as shipped with the GOG release | None |
+| [SRC-NE-REFERENCE](../sources/SRC-NE-REFERENCE.md) | Open Watcom NE container structures and relocation constants | None |
 | [SRC-PATCH-CATALOG](../sources/SRC-PATCH-CATALOG.md) | GOG public build catalog and Sierra Help patch catalog | None |
 
 ## formats
@@ -330,7 +331,7 @@ Entries by kind.
 
 ## findings
 
-243 entries.
+244 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -469,6 +470,7 @@ Entries by kind.
 | [FND-RES-022](../findings/FND-RES-022.md) | INF candidates retain different token families and equals signs inside command-shaped lines | recorded |
 | [FND-RES-023](../findings/FND-RES-023.md) | Root executable filename occurrences identify AUTOPLAY and SETUP as INF consumer leads | recorded |
 | [FND-RES-024](../findings/FND-RES-024.md) | AUTOPLAY uses PE32 data mapping while SETUP uses NE segment mapping | recorded |
+| [FND-RES-025](../findings/FND-RES-025.md) | SETUP relocations target selectors rather than the SIERRA filename offsets | recorded |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |

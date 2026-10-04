@@ -562,6 +562,7 @@ Entries by area.
 | [FND-RES-022](../findings/FND-RES-022.md) | INF candidates retain different token families and equals signs inside command-shaped lines | recorded |
 | [FND-RES-023](../findings/FND-RES-023.md) | Root executable filename occurrences identify AUTOPLAY and SETUP as INF consumer leads | recorded |
 | [FND-RES-024](../findings/FND-RES-024.md) | AUTOPLAY uses PE32 data mapping while SETUP uses NE segment mapping | recorded |
+| [FND-RES-025](../findings/FND-RES-025.md) | SETUP relocations target selectors rather than the SIERRA filename offsets | recorded |
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |

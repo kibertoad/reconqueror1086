@@ -214,6 +214,9 @@ Next ID: Q-RES-171
   Mapping: FND-RES-024 distinguishes AUTOPLAY PE32 and SETUP NE; trace the
   profile-import argument routes in the former and segment/relocation references
   in the latter. Import presence alone is not a call.
+  FND-RES-025 completes SETUP relocation-table inspection: the selector chain
+  needs instruction/offset provenance, not another direct filename-fixup search.
+  Next tooling prerequisite: correctly mapped launcher function inventories.
 
 - Q-RES-018. FMT-RES-016: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the
