@@ -373,7 +373,7 @@ Entries by status.
 
 ## recorded
 
-241 entries.
+242 entries.
 
 | ID | Title |
 |---|---|
@@ -511,6 +511,7 @@ Entries by status.
 | [FND-RES-021](../findings/FND-RES-021.md) | Disc-root INF candidates have distinct line shapes and one contains non-ASCII bytes |
 | [FND-RES-022](../findings/FND-RES-022.md) | INF candidates retain different token families and equals signs inside command-shaped lines |
 | [FND-RES-023](../findings/FND-RES-023.md) | Root executable filename occurrences identify AUTOPLAY and SETUP as INF consumer leads |
+| [FND-RES-024](../findings/FND-RES-024.md) | AUTOPLAY uses PE32 data mapping while SETUP uses NE segment mapping |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |

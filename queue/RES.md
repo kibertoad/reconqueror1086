@@ -211,6 +211,9 @@ Next ID: Q-RES-171
   New lead: FND-RES-023 locates AUTORUN/LANGUAGE filename bytes in AUTOPLAY
   and two SIERRA filename occurrences in SETUP. Trace their executable references
   independently into file-open inputs; no reachable consumer is proved yet.
+  Mapping: FND-RES-024 distinguishes AUTOPLAY PE32 and SETUP NE; trace the
+  profile-import argument routes in the former and segment/relocation references
+  in the latter. Import presence alone is not a call.
 
 - Q-RES-018. FMT-RES-016: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the

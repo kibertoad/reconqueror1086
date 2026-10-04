@@ -330,7 +330,7 @@ Entries by kind.
 
 ## findings
 
-242 entries.
+243 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -468,6 +468,7 @@ Entries by kind.
 | [FND-RES-021](../findings/FND-RES-021.md) | Disc-root INF candidates have distinct line shapes and one contains non-ASCII bytes | recorded |
 | [FND-RES-022](../findings/FND-RES-022.md) | INF candidates retain different token families and equals signs inside command-shaped lines | recorded |
 | [FND-RES-023](../findings/FND-RES-023.md) | Root executable filename occurrences identify AUTOPLAY and SETUP as INF consumer leads | recorded |
+| [FND-RES-024](../findings/FND-RES-024.md) | AUTOPLAY uses PE32 data mapping while SETUP uses NE segment mapping | recorded |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |
