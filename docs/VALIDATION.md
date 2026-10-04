@@ -640,3 +640,11 @@ prose or command sequences were committed, and no parity status was promoted.
 Documentation regeneration/check, narrative references, research tracking,
 coverage metadata and repository policy passed. Kaitai compilation was skipped;
 the full fast gate was not repeated for this research-only change.
+
+INF token-family follow-up: FND-RES-022 adds complete token traversal to the
+FND-RES-021 witness. Manifest identity and reconstruction were rechecked before
+classifying tokens. Documentation regeneration, narrative references, queue
+tracking, coverage metadata and repository policy passed. FMT-RES-015 remains
+unknown; Q-RES-169 and Q-RES-170 separate consumer dependencies. No original
+program ran, no parity was promoted, and Kaitai compilation/full fast gate were
+not repeated beyond the previously stated research limits.
