@@ -31,33 +31,28 @@ None known.
 ## Handover
 
 - Stage: Survey. Latest research: FND-RES-025 / FMT-RES-015.
-  Q-RES-017 remains Static for reader evidence; Q-RES-168 through Q-RES-170
-  retain independent consumer questions.
-- Last checks: 2026-10-05 offline rules verification and documentation check,
-  narrative references, research tracking, coverage metadata and repository policy
-  passed. Kaitai compilation was skipped because no compiler was available. No parity
-  validation is claimed. See docs/VALIDATION.md.
-- Tooling baseline: engine 1.0.1 and toolkit adoption a260e391, with shared runtime
-  6.2.0. The full canonical fast gate passed on 2026-10-05 for the preceding tooling batch; research did
-  not repeat it.
-- Unfinished: none from this batch. GAP-006 has a follow-up. No original program
-  ran. Audits found no confirmed repository orphans; reusable MSBuild workers
-  remain. Current authorization requires local commits without pushing to main.
-  FMT-RES-015 remains unknown; Q-RES-017 names the next reader evidence.
-  FND-RES-025 supplies relocation metadata; code analysis still needs correctly
-  mapped launcher inventories. Follow the combined FND-RES-024/025 leads
-  under Q-RES-017. Do not repeat raw shape counts or infer opens from literals.
-  Latest research documentation regeneration and repository policy passed.
-  No full fast gate was repeated for this research-only batch.
+  Q-RES-017 remains Static; Q-RES-168 through Q-RES-170 remain independent.
+- Last checks: the canonical fast gate passed on 2026-10-05 with pinned Python
+  via EVIDENCE_PYTHON, frozen Node dependencies and hash-pinned Python packages.
+  Documentation, repository/configuration policy, coverage metadata, Node
+  acceptance, solution build, xUnit and executable specifications passed.
+  Kaitai compilation was skipped because no compiler was available. See
+  docs/VALIDATION.md. No parity validation is claimed.
+- Tooling baseline: engine 1.0.1 and toolkit adoption a260e391, shared runtime
+  6.2.0. Launcher PE/NE inventories and bounded NE metadata checks are committed;
+  coverage/README.md records mappings and analyzer qualifications. Synthetic
+  offscreen capture controls are independent; GAP-011 records their limitation.
+- Unfinished: none from this batch. No original program ran. Post-commit audit
+  found no confirmed repository orphans; reusable MSBuild workers remain.
+  Authorization requires local commits without pushing to main. Gameplay remains
+  outside this goal's scope. FMT-RES-015 remains unknown.
 - Blockers: none known.
-- Upstream reporting: every recorded GAP-001 through GAP-010 has a toolkit
-  submission link in gaps.md. GAP-006 and GAP-008 share issue #231, now with
-  the FND-RES-021 follow-up.
-  Reporting backlog is cleared; future concerns still require duplicate checks.
-  GitHub connector access works; the local gh token is invalid.
-- Next: tooling batch for launcher inventories before Q-RES-017 code tracing,
-  using FND-RES-024 and FND-RES-025; then
-  Q-RES-168 through Q-RES-170, manual-screen reconciliation and consumer
-  questions Q-RES-124 through Q-RES-163. Inspect the current entry's file list
-  before assigning a family label. Rules snapshots remain unchanged unless the
-  owner requests their refresh. Gameplay remains outside this goal's scope.
+- Upstream reporting: GAP-001 through GAP-011 have submission links in gaps.md.
+  The latest is toolkit issue #235. Reporting backlog is cleared; future concerns
+  still require duplicate checks. GitHub connector access works; local gh token
+  is invalid.
+- Next: Q-RES-017 code tracing with the mapped launcher inventories and
+  FND-RES-024/025; Q-RES-168 through Q-RES-170; manual-screen reconciliation;
+  consumer questions Q-RES-124 through Q-RES-163. Do not repeat raw shape counts
+  or infer opens from literals. Rules snapshots stay unchanged unless the owner
+  requests their refresh.
