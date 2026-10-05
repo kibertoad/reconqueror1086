@@ -94,3 +94,30 @@ export function verifyInventory(image, build, manifest, text, path, { legacyPath
     legacyPathEvidence:path===destination?null:legacyEvidence,
     limitation:'Analyzer-discovered starts only; names/reasons require researcher provenance; body size is not a contiguous end.' };
 }
+
+// NE inventory addresses use table segment numbers, not analyzer selectors.
+export function verifySegmentedInventory(build, manifest, text, segments, path) {
+  const destination = inventoryPath(build, manifest);
+  if (path !== destination) throw new Error('Inventory destination does not match build/manifest identity');
+  if (typeof text !== 'string' || Buffer.byteLength(text) > 32 * 1024 * 1024) throw new Error('Inventory too large');
+  if (!Array.isArray(segments) || !segments.length || segments.some(s =>
+    !Number.isInteger(s.segment) || s.segment < 1 || s.segment > 65535 ||
+    !Number.isInteger(s.start) || !Number.isInteger(s.end) || s.start < 0 || s.end <= s.start || s.end > 65536) ||
+    new Set(segments.map(s => s.segment)).size !== segments.length) throw new Error('Invalid NE segment mapping');
+  const lines = text.trimEnd().split(/\r?\n/);
+  if (lines.shift() !== 'start\tsize' || !lines.length || lines.length > 1000000) throw new Error('Invalid NE inventory columns or row count');
+  const seen = new Set(), prefix = `${manifest}+`;
+  const capacity = segments.reduce((n, s) => n + s.end - s.start, 0);
+  for (const line of lines) {
+    const cells = line.split('\t');
+    const address = cells[0]?.startsWith(prefix) ? cells[0].slice(prefix.length) : '';
+    const match = /^([0-9A-F]{4}):([0-9A-F]{4})$/.exec(address);
+    if (cells.length !== 2 || !match) throw new Error('Noncanonical NE inventory address or columns');
+    const segment = Number.parseInt(match[1], 16), offset = Number.parseInt(match[2], 16);
+    if (!segments.some(s => s.segment === segment && offset >= s.start && offset < s.end)) throw new Error('NE start outside mapped segment');
+    if (seen.has(address)) throw new Error('Duplicate NE inventory start');
+    seen.add(address);
+    if (!/^[1-9][0-9]*$/.test(cells[1]) || !Number.isSafeInteger(Number(cells[1])) || Number(cells[1]) > capacity) throw new Error('Invalid NE body byte count');
+  }
+  return { rows: lines.length, destination };
+}

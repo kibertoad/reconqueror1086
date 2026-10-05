@@ -648,3 +648,25 @@ tracking, coverage metadata and repository policy passed. FMT-RES-015 remains
 unknown; Q-RES-169 and Q-RES-170 separate consumer dependencies. No original
 program ran, no parity was promoted, and Kaitai compilation/full fast gate were
 not repeated beyond the previously stated research limits.
+
+### Launcher inventory tooling (2026-10-05)
+
+Fresh Ghidra imports produced metadata-only inventories for CD:AUTOPLAY.EXE and
+CD:SETUP.EXE. Source size/fingerprint checks preceded analysis; SHA-256 identities,
+loader mappings and qualifications are recorded in coverage/README.md and
+coverage/launcher-inventories.json. NE starts use table segment numbers; the
+validator rejects analyzer selectors, unmapped offsets, duplicates, malformed
+columns and invalid body sizes. These inventories do not establish complete
+function discovery or behavior, and no parity status changed.
+
+The canonical Invoke-Validation.ps1 gate passed using EVIDENCE_PYTHON pointed to
+the pinned artifacts/validation-python interpreter, after frozen-lockfile Node
+installation and hash-pinned Python dependency verification. The initial gate
+failed on the synthetic offscreen capture fixture. Positive and uniform controls
+now use separate windows, rendered before moving offscreen; rejection and exact
+pixel checks remain. The cache limitation is tracked in toolkit issue #235 and
+GAP-011. The final gate passed repository, configuration, documentation, coverage,
+Node acceptance checks, solution build, xUnit and executable specifications.
+Kaitai compilation was skipped because no compiler was available. No original
+program ran, no proprietary analysis artifacts were committed, and no publication
+was performed.

@@ -240,3 +240,25 @@ Upstream submission (2026-10-05): duplicate checks found no matching tracker;
 [toolkit issue #228](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/228)
 records the downstream case and synthetic acceptance criteria.
 
+
+## GAP-011: Offscreen PrintWindow controls can observe cached frames
+
+Recorded: 2026-10-05. Audience: shared capture-tooling and template authors.
+
+A synthetic window created entirely offscreen repeatedly yielded a uniform
+PrintWindow result. Rendering before moving offscreen produced its expected
+pixels; another attempt to repaint the offscreen window uniformly returned the
+previous colored frame. This is a fixture observation, not an original-game
+finding or a universal claim about Windows renderers.
+
+Local handling: initialize and render separate positive and uniform controls
+before moving each offscreen. Preserve exact pixel assertions, invalid-window
+rejection, uniform rejection and the prohibition on saved rejected frames.
+This acceptance check does not establish freshness after offscreen repainting.
+
+Suggestion: test cache/freshness behavior separately and document that successful,
+nonuniform PrintWindow output alone does not prove a newly requested repaint.
+
+Upstream submission: duplicate searches for PrintWindow and capture/offscreen
+found no matching tracker. [Toolkit issue #235](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/235)
+records the synthetic observations and suggested acceptance boundaries.

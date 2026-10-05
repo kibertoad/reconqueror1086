@@ -35,3 +35,29 @@ function inventory. The manifest's setup executables are not silently counted as
 studied code. A future analysis into one of those files must add its own inventory
 with its actual loader and mapping. The DOSBox host and third-party demo programs
 are outside the original game's analyzed code scope.
+
+## Launcher inventories
+
+AUTOPLAY.EXE and SETUP.EXE were freshly extracted with manifest size/XXH3 guards
+on 2026-10-05. `launcher-inventories.json` records the SHA-256 identities, selected
+code spans and analyzer mapping metadata. Ghidra 12.1.3/JDK 21.0.12.1 imported
+AUTOPLAY as PE with x86:LE:32:default, and SETUP as NE with
+x86:LE:16:Protected Mode. The metadata reports agree with the independent
+container reads in FND-RES-024. Source and projects stay in ignored artifacts.
+
+The pinned toolkit a260e391 `ExportFunctionInventory.java` exported only starts
+and body-byte counts. The PE inventory retains preferred virtual addresses. NE
+selector 1000 identifies table segment 1; the committed addresses use 0001 as
+the Standard requires. Data/resource blocks and imported external functions are
+excluded from the committed inventory. The NE raw export also included functions
+in non-executable block 1058; canonicalization excluded that entire block using
+the inspected memory map. Canonicalization checked all
+starts against the executable memory block and rejected duplicate mappings.
+
+Both imports and post-analysis completed without script errors or timeouts.
+Analyzer warnings remain qualifications: PE export-directory analysis reported
+an invalid/missing function and no-return name normalization; NE decompilation
+reported an unread address for one function. These do not establish complete
+function discovery or validate any reading. Body sizes are never function ends.
+`Check-Coverage.mjs` validates both inventories, including NE table segment
+numbers; it does not prove code behavior or native reachability.

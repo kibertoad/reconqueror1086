@@ -36,7 +36,7 @@ Add-Type -ReferencedAssemblies System.Windows.Forms,System.Drawing -TypeDefiniti
 using System; using System.Drawing; using System.Windows.Forms;
 public class CaptureCanvas : Form {
  public bool Uniform;
- public CaptureCanvas(){ClientSize=new Size(32,16);StartPosition=FormStartPosition.Manual;Location=new Point(-10000,-10000);}
+ public CaptureCanvas(){ClientSize=new Size(32,16);StartPosition=FormStartPosition.Manual;Location=new Point(50,50);}
  protected override bool ShowWithoutActivation { get { return true; } }
  protected override void OnPaint(PaintEventArgs e) { e.Graphics.Clear(Color.Red); if(!Uniform) e.Graphics.FillRectangle(Brushes.Lime,16,0,16,16); }
  protected override void WndProc(ref Message m) {
@@ -50,7 +50,7 @@ public class CaptureCanvas : Form {
 '@
 $form=[CaptureCanvas]::new()
 try {
- $form.Show(); $form.Refresh()
+ $form.Show(); $form.Refresh(); $form.Location=[Drawing.Point]::new(-10000,-10000)
  $handle=$form.Handle
  $bounds=[pscustomobject]@{Width=32;Height=16;X=0;Y=0}
  $path=Join-Path $Output 'valid.png'
@@ -60,8 +60,13 @@ try {
   if ($bitmap.GetPixel(4,8).ToArgb() -ne [Drawing.Color]::Red.ToArgb() -or
       $bitmap.GetPixel(24,8).ToArgb() -ne [Drawing.Color]::Lime.ToArgb()) {throw 'Captured pixels are not from the target renderer'}
  } finally {$bitmap.Dispose()}
+# Use a fresh rendered control: offscreen repainting can retain a cached frame.
+ $form.Dispose()
+ $form=[CaptureCanvas]::new()
  $form.Uniform=$true
- $form.Refresh()
+ $form.Show()
+ $form.Refresh(); $form.Location=[Drawing.Point]::new(-10000,-10000)
+ $handle=$form.Handle
  try {Save-DirectScreenFrame $handle $bounds (Join-Path $Output 'blank.png');throw 'Blank result accepted'}
  catch {if($_.Exception.Message -notmatch 'uniform frame'){throw}}
  try {Save-DirectScreenFrame ([IntPtr]0) $bounds (Join-Path $Output 'invalid.png');throw 'Invalid window accepted'}

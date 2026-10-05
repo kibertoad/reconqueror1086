@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { sourceXxh3 } from "@scientific-method/executable-reader";
 import { readMz, incomingCalls } from "../../tools/evidence/legacy-image.mjs";
 import { reviewFlow, boundedTable } from "../../tools/evidence/review.mjs";
-import { inventoryPath, parseInventory, joinInventories, verifyInventory } from "../../tools/evidence/inventory.mjs";
+import { inventoryPath, parseInventory, joinInventories, verifyInventory, verifySegmentedInventory } from "../../tools/evidence/inventory.mjs";
 import { run } from "../../tools/evidence/report.mjs";
 
 function synthetic() {
@@ -216,4 +216,18 @@ test('committed inventory validates identity, columns, numeric aliases and expli
  assert.throws(()=>check(text.replace('name\tout_of_scope','name\tname')),/columns/);
  assert.throws(()=>check('start\tsize\n'),/row count/);
  assert.throws(()=>check(text,'/bad.tsv'),/Unsafe/);
+});
+
+test('NE inventory uses canonical table segments and rejects analyzer selectors and invalid metadata', () => {
+  const path = inventoryPath('BLD-TEST', 'CD:SETUP.EXE');
+  const ranges = [{ segment: 1, start: 0, end: 128 }];
+  const verify = (row, segments = ranges) => verifySegmentedInventory('BLD-TEST', 'CD:SETUP.EXE', `start\tsize\n${row}\n`, segments, path);
+  assert.equal(verify('CD:SETUP.EXE+0001:0010\t12').rows, 1);
+  for (const row of ['CD:SETUP.EXE+1000:0010\t12', 'CD:SETUP.EXE+0001:0080\t12',
+    'CD:OTHER.EXE+0001:0010\t12', 'CD:SETUP.EXE+0001:001a\t12',
+    'CD:SETUP.EXE+0001:0010\t0', 'CD:SETUP.EXE+0001:0010\t129',
+    'CD:SETUP.EXE+0001:0010\t12\tname', 'CD:SETUP.EXE+0001:0010\t12\nCD:SETUP.EXE+0001:0010\t12'])
+    assert.throws(() => verify(row));
+  assert.throws(() => verify('CD:SETUP.EXE+0001:0010\t12', [{ segment: 1, start: 0, end: 65537 }]));
+  assert.throws(() => verify('CD:SETUP.EXE+0001:0010\t12', [...ranges, ...ranges]));
 });

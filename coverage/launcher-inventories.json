@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "build": "BLD-GOG-EN",
+  "ghidra": "12.1.3",
+  "toolkitRevision": "a260e391fe2dea67f0034d5480e2bb439b0663ac",
+  "inventories": [
+    {
+      "manifest": "CD:AUTOPLAY.EXE",
+      "format": "PE",
+      "sourceSha256": "504904a2af2460c93b2ef0bd5262de9b96a174ec2d94416f8cc3d18fc5415823",
+      "ranges": [
+        {
+          "start": 4259840,
+          "end": 4278784
+        }
+      ],
+      "analyzerSelector": null
+    },
+    {
+      "manifest": "CD:SETUP.EXE",
+      "format": "NE",
+      "sourceSha256": "ec7f3052b6b33de049668de2fcd08cb21ec506c6412dea33d2a076b2d160833c",
+      "ranges": [
+        {
+          "segment": 1,
+          "start": 0,
+          "end": 17982
+        }
+      ],
+      "analyzerSelector": "1000"
+    }
+  ]
+}
