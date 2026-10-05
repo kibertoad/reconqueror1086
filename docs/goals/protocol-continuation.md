@@ -6,7 +6,8 @@ Continue the owner's ongoing restoration work according to the local Protocol
 and document results using the local Standard. Record suggestions and concerns
 for template, process, Protocol, Standard and shared-tooling authors as GitHub
 issues after duplicate checks, recording submission links in `gaps.md`.
-Commit completed batches and handovers; do not push to main. The owner supplied
+Commit completed batches and handovers. On 2026-10-05 the owner authorized
+wrapping up the current batch, pushing to main and stopping. The owner supplied
 no finite completion condition or turn limit, so this goal remains ongoing;
 completion of one batch does not complete the objective.
 
@@ -44,7 +45,8 @@ None known.
   offscreen capture controls are independent; GAP-011 records their limitation.
 - Unfinished: none from this batch. No original program ran. Post-commit audit
   found no confirmed repository orphans; reusable MSBuild workers remain.
-  Authorization requires local commits without pushing to main. Gameplay remains
+  The owner authorized pushing this completed session to main and stopping.
+  Further research awaits a new request. Gameplay remains
   outside this goal's scope. FMT-RES-015 remains unknown.
 - Blockers: none known.
 - Upstream reporting: GAP-001 through GAP-011 have submission links in gaps.md.
