@@ -27,7 +27,8 @@ equipment bit, and bolts add ammunition, whether or not the player gains anythin
 ## Parameters
 
 - `index`: the block's number in `scene_blocks`.
-- `x`, `y`: its cell.
+- `x`: the x coordinate of its cell.
+- `y`: the y coordinate of its cell.
 
 ## Inputs
 

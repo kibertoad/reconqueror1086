@@ -21,7 +21,8 @@ It describes the current environment, not every possible instrumentation method.
 | Capability | Who | Evidence or attempt | What would change it |
 |---|---|---|---|
 | Start and reach a prescribed gameplay state | person | Owned DOSBox launch works; no state-readable unattended probe exists | Implement and verify a build-specific state probe |
-| Send game input | person | SRC-MANUAL describes keyboard/mouse input; Windows accepted a posted Escape message, but game consumption was not verified | Verify input through an observable game-state transition |
+| Send game input: keyboard | person | SRC-MANUAL describes keyboard input; Windows accepted a posted Escape message, but game consumption was not verified | Verify keyboard input through an observable game-state transition |
+| Send game input: mouse | person | SRC-MANUAL describes mouse input; no mouse message has been tried on its own, so this answer is carried over from the earlier single input answer and names no attempt | Try a mouse message and verify it through an observable game-state transition |
 | Read game memory and set breakpoints | none | No DOS guest debugger adapter is configured; host addresses are not guest LE addresses | Verify a guest debugger and build-specific address mapping |
 | Load a patched save | none | No original-save patch/load workflow is verified; FMT-SAVE-001 through FMT-SAVE-005 retain gaps | Complete the needed structure and verify a reversible patch/load experiment |
 | Capture client frames | agent | Direct PrintWindow capture verified against an offscreen synthetic renderer and owned DOSBox client; blank/unsupported results fail | Recheck each different renderer and interpret each frame before using it as evidence |

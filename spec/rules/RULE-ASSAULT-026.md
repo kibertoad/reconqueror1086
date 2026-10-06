@@ -22,7 +22,8 @@ When the player attacks (RULE-ASSAULT-005), and then on every drawn frame until 
 
 ## Parameters
 
-- `x`, `y`: the click position in the view.
+- `x`: the click position's x coordinate in the view.
+- `y`: the click position's y coordinate in the view.
 
 ## Inputs
 

@@ -5,7 +5,7 @@ description: Resume restoration work at the start of a session. Use before any r
 
 # Start a session
 
-The rules are in the [work protocol](../../../docs/upstream/work-protocol.md#sessions) (lines 207-215).
+The rules are in the [work protocol](../../../docs/upstream/work-protocol.md#sessions) (lines 321-329).
 Open a linked section only when a step leaves a question it answers, read
 only the lines the link gives, and never a section already read this session.
 This skill is the procedure; where they differ, the protocol wins.
@@ -15,9 +15,13 @@ This skill is the procedure; where they differ, the protocol wins.
    holds both.
 2. Find the session's handover. Under a goal it is the Handover section of
    the goal's file in `docs/goals/`; read the whole file. With no goal it is
-   `docs/handover.md`. If the user gave a goal with no file, write the file
-   first (see `docs/goals/README.md`), check that no other goal file claims
-   the same areas, and get it onto the main branch before the first batch.
+   `docs/handover.md`. Unless the session is authorized to push to main, run
+   `git branch --list 'goal/*'` first: a listed branch whose tip still has its
+   goal file is the running goal, and no other goal starts. If the user gave
+   a goal with no file, write the file first (see `docs/goals/README.md`),
+   check that no other goal claims the same areas, and get it onto the main
+   branch before the first batch, or, without push authorization, onto a new
+   `goal/<name>` branch as its first commit, then list the branches again.
    An implementation session reads no research goal files.
 3. Compare the handover with reality: `git status`, `git log --oneline -10`,
    the current branch, and any `wip/` branch the handover names. Anything

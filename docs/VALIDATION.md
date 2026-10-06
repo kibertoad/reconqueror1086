@@ -96,7 +96,7 @@ action from
 [refurbished-dinosaurs-toolkit](https://github.com/kibertoad/refurbished-dinosaurs-toolkit),
 pinned to a full commit SHA, on every push to `main` and every pull request. It checks `spec/`,
 `parity/` and `deviations/` against the standard's list of
-[checks](upstream/documentation-standard.md#checks) (lines 947-998), compiles each `.ksy` file with
+[checks](upstream/documentation-standard.md#checks) (lines 1010-1062), compiles each `.ksy` file with
 the Kaitai Struct compiler, checks that every spec and deviation ID cited in `src/`, `tests/`, `tools/`
 exists and is not superseded, fails when `spec/index/` or `PARITY.md` is stale, and
 fails a `validated` row whose marked tests are not in `VALIDATION.md` as they are now. It
@@ -670,3 +670,18 @@ Node acceptance checks, solution build, xUnit and executable specifications.
 Kaitai compilation was skipped because no compiler was available. No original
 program ran, no proprietary analysis artifacts were committed, and no publication
 was performed.
+
+## Rules efa138ba and toolkit packages adoption (2026-10-06)
+
+`node tools/upstream.mjs verify`, `node tools/Verify-ToolkitPackages.mjs` and
+`tools/Verify-EvidenceEnvironment.py` passed for rules efa138ba, checker 2.2.0
+at toolkit 92a55920, reader 2.3.0 and engine 12.0.0, the engine installed in the
+ignored artifacts/validation-python interpreter. The documentation check passed
+with Kaitai compilation and no skipped steps after `PARITY.md` was regenerated
+for the `deviated` status. `node tools/upstream.mjs links` reported no stale
+section range. The canonical Invoke-Validation.ps1 gate passed with
+EVIDENCE_PYTHON pointed to that interpreter: repository, configuration,
+documentation, coverage and Node acceptance checks (the evidence tests include
+the reader's protocol 3 and the forwarding of `x86-imports` and `x86-table`),
+the solution build, the xUnit suite and the executable specifications. No
+original program ran and no proprietary analysis artifact was produced.

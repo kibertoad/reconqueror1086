@@ -1,7 +1,7 @@
 # Spec entry templates
 
 Blank entries for each kind in `spec/`, with the front matter fields and body
-sections the [documentation standard](upstream/documentation-standard.md#entry-types) (lines 468-945)
+sections the [documentation standard](upstream/documentation-standard.md#entry-types) (lines 496-1008)
 requires, in its order. Copy one into the directory for its kind, name the file
 after the ID (`spec/rules/RULE-COMBAT-007.md`), and replace every `<...>`. The
 standard defines what each field and section holds; this page does not repeat
@@ -10,7 +10,7 @@ it.
 Rules, formats, screens and bugs may also have `complete_reading`, a list of
 the static findings that together read all of the entry, which makes it
 `established` without a run (see the standard's
-[Complete readings](upstream/documentation-standard.md#complete-readings) (lines 181-273)).
+[Complete readings](upstream/documentation-standard.md#complete-readings) (lines 191-291)).
 Leave it out until such a reading exists.
 
 A section with nothing to say is kept and says `None known.`, or `None.` where
@@ -153,6 +153,14 @@ environment: null
 `environment` stays `null` for a static finding. A dynamic finding gives it in
 the form an experiment uses.
 
+How to reproduce may name the tool and its version, a script in `tools/` with
+the commit it was run from, and the query. The finding gives every query value
+its result depends on (entry, ranges searched, limits, positive control),
+because configurations and reports made from the original stay in `GAME_DIR`.
+Edit a recorded finding or experiment in place only where nothing it records
+changes; any correction supersedes the whole entry with replacements under new
+IDs, as [IDENTIFIERS-8](upstream/documentation-standard.md#identifiers-8) (lines 152-160) says.
+
 ## Experiment
 
 ````markdown
@@ -258,6 +266,8 @@ related: []
 
 ## Parameters
 
+- `<name>: <type>`: <what it holds>
+
 ## Inputs
 
 ## Procedure
@@ -277,6 +287,13 @@ None known.
 
 ## Open questions
 ````
+
+Parameters is `None.` for a rule that takes none, or a list with one item per
+parameter in the order a `call` or `emit` passes them, each opening with one
+code span holding the name (and type, unless it is the default integer type)
+followed directly by a colon. The check counts every `call` and `emit` against
+such a list; an item that names two parameters, such as ``- `x`, `y`: the
+cell``, makes the list one it cannot count.
 
 A list of more than 64 values in a procedure is a `table` whose values come
 from a value file in `spec/rules/`, named after the ID and the table:
@@ -412,18 +429,25 @@ behavior is strictly better than the original's, or that it is a small
 judgement call that makes the game better to play, for a `mandatory` deviation
 and for one that is `on` without being the fix of an unintended bug players do
 not rely on, as the
-[deviation log](upstream/documentation-standard.md#deviation-log) (lines 1004-1025)
-section sets out. Delete it otherwise. IDs are never reused or renumbered, and a dropped deviation keeps
-its file.
+[deviation log](upstream/documentation-standard.md#deviation-log) (lines 1068-1094)
+section sets out. Delete it otherwise. Keep the Replaces item only on a
+`mandatory` deviation that replaces some of the entries in Departs from
+entirely, and name only those; keep the Tests item only when test files check
+that the rebuild does what the Reason says (each citing this ID and never
+needing `GAME_DIR`). A row a Replaces item names has Tests `None` and becomes
+`deviated` once every `mandatory` deviation it lists has a Tests item. IDs are
+never reused or renumbered, and a dropped deviation keeps its file.
 
 ````markdown
 # DEV-<AREA>-<NNN>
 
 - Departs from: <rule, format, screen or bug IDs>
+- Replaces: <the rule, format or screen IDs of Departs from that a mandatory deviation replaces entirely>
 - Reason: <what the original does and why the rebuild differs>
 - Setting: <setting name, or None>
 - Default: <off, on or mandatory>
 - Justification: <why the rebuild's behaviour is strictly better, or what the judgement call improves and why no player would miss the original's>
+- Tests: <test files that check the rebuild does what the Reason says, each citing this ID>
 - Dropped: no
 ````
 

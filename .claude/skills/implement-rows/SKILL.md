@@ -5,8 +5,8 @@ description: Implement rebuild behaviour for parity rows of the current slice fr
 
 # Implementation batch
 
-The rules are in the [work protocol](../../../docs/upstream/work-protocol.md#implementation-batches) (lines 158-174)
-and the standard's [implementation side](../../../docs/upstream/documentation-standard.md#implementation-side) (lines 1000-1116).
+The rules are in the [work protocol](../../../docs/upstream/work-protocol.md#implementation-batches) (lines 162-178)
+and the standard's [implementation side](../../../docs/upstream/documentation-standard.md#implementation-side) (lines 1064-1188).
 Open a linked section only when a step leaves a question it answers, read
 only the lines the link gives, and never a section already read this session.
 
@@ -49,7 +49,11 @@ skill. That keeps the clean room, and it tests whether the spec says enough.
    and its inputs, never in `Game` alone.
    Comments cite the spec IDs they implement. A departure from the spec needs
    a deviation file first, with a Default of `off` unless its Justification
-   argues otherwise.
+   argues otherwise. A `mandatory` deviation that leaves nothing of an entry
+   to compare with the original names that entry in a Replaces item and lists
+   in a Tests item the test files (citing its ID, never needing `GAME_DIR`)
+   that check the rebuild does what its Reason says. The replaced row's Tests
+   is `None`, and the row becomes `deviated`.
 6. **Test it**: synthetic tests for the logic, one per branch the entry
    describes, including the branches `Game` cannot reach yet and the
    "impossible" arms of a guard; where an experiment fixture exists, a test
@@ -68,7 +72,19 @@ skill. That keeps the clean room, and it tests whether the spec says enough.
    shared value through input, `Core`, presentation and a save and restore,
    with distinct values per axis, and test what a second actor sees at each
    `# visible:` point. A checkpoint or replay change follows the protocol's
-   [Checkpoints and replay](../../../docs/upstream/work-protocol.md#checkpoints-and-replay) (lines 182-190).
+   [Checkpoints and replay](../../../docs/upstream/work-protocol.md#checkpoints-and-replay) (lines 256-264).
+   Where the entry has the shape one of these protocol sections describes,
+   its tests follow that section:
+   a caller that combines its callees' results or a cycle bounded by state
+   ([Calls that combine results](../../../docs/upstream/work-protocol.md#calls-that-combine-results) (lines 180-196));
+   a rule moved into `Core` behind an adapter
+   ([Rules behind an adapter](../../../docs/upstream/work-protocol.md#rules-behind-an-adapter) (lines 198-214));
+   arithmetic that wraps, truncates, converts or tests a value it later changes
+   ([Arithmetic at the original's widths](../../../docs/upstream/work-protocol.md#arithmetic-at-the-originals-widths) (lines 216-232));
+   allocation, container links and cleanup order
+   ([Allocation, containers and cleanup](../../../docs/upstream/work-protocol.md#allocation-containers-and-cleanup) (lines 240-254));
+   state that several components hold at once
+   ([Continuation cases](../../../docs/upstream/work-protocol.md#continuation-cases) (lines 266-292)).
    None of these tests validates a row.
 7. **Update the parity rows** (Code, Tests, Notes) and run the documentation
    check and `./tools/Invoke-Validation.ps1`.

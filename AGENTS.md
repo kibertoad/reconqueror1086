@@ -239,7 +239,9 @@ that page differ, the page wins.
   needs no decision.
 - Commit messages end with a `Spec:` trailer naming the entries created or
   changed, any commit that changes a row's status adds `Parity:`, and any
-  that closes queue items adds `Queue:` with their IDs.
+  that closes queue items adds `Queue:` with the IDs of the items it closed
+  and no others. Commits that only rewrite a handover, or create, change the
+  claim of or delete a goal file, are not batches and carry no trailers.
 - A claim moves from an `unknown` listing (or `sourced` from a document),
   through competing readings kept in its entry's Open questions, each with a
   queue item, to a description at `supported` once direct evidence (the code
@@ -253,7 +255,11 @@ that page differ, the page wins.
   200 lines, rewritten at the end of every session that works under no goal,
   and names items and entries by ID without saying what research found.
   `docs/goals/` holds one file per running goal, which claims its areas and
-  has a handover of its own for sessions under it. `docs/DECISIONS.md`
+  has a handover of its own for sessions under it. Without authorization to
+  push to main, only one goal runs at a time, on a `goal/<name>` branch whose
+  first commit creates its file, as `docs/goals/README.md` describes. The
+  batch that meets a goal leaves its file; a later commit deletes it and
+  moves what is still worth handing on to `docs/handover.md`. `docs/DECISIONS.md`
   records the owner's decisions and moves its oldest entries to
   `docs/decisions/` before it passes 1,000 lines. A session ends by
   committing its handover on its own; push only when the owner explicitly asks; half-done work
@@ -329,8 +335,8 @@ certain than the rest goes in its own entry or in its Open questions section.
 Never silently promote a plausible interpretation.
 
 A complete reading also covers what the standard's
-[Complete readings](docs/upstream/documentation-standard.md#complete-readings) (lines 181-273)
-and [Findings](docs/upstream/documentation-standard.md#findings) (lines 578-628) sections
+[Complete readings](docs/upstream/documentation-standard.md#complete-readings) (lines 191-291)
+and [Findings](docs/upstream/documentation-standard.md#findings) (lines 606-680) sections
 list, among them: two addresses are the same storage only where the reading
 shows the segment each is formed in and accessed through (a BP offset read
 through DS is the caller's stack only where DS equals SS there); a stored
@@ -342,11 +348,22 @@ header's size and the range later written, and a failed request may leave
 state changed; the number of outputs a procedure can produce is bounded on
 its own, apart from each input's bound; a return value is followed into each
 caller at the width it is tested; cleanup is read once per path into it; and
-an error passed back through recursion is traced to what can produce it. A
+an error passed back through recursion is traced to what can produce it.
+The reading also follows a callee's register return to each store that moves
+a loop on, names the last write before a call to each argument byte the callee
+reads, tracks ESP's offset through deferred cleanups, reads allocation,
+linking and cleanup steps in the code's order, and names how a caller keeps,
+combines or drops its callees' results. A
 finding that a function has no other callers checks the analyzer's list with
 a second search that does not depend on function boundaries, and one about a
 dispatch table reads how the input becomes an index and what bounds it before
-naming which input selects which entry. An `offset` into overlay code lies
+naming which input selects which entry, working out each table's extent on
+its own. An empty search has a positive control whose target was located
+without the build's address mapping, and lists the kinds of reference it
+searched and did not. A PE import is named by slot from the import tables, and
+a pointer table's entries are read from the build's bytes, each with a
+positive control (STATUS-42, STATUS-43). A recorded finding or experiment is
+corrected only by superseding the whole entry (IDENTIFIERS-8). An `offset` into overlay code lies
 wholly inside a row of its build's Code ranges section. Bytes in an executable
 that are read as data are located with `kind: file-data` and an `offset` into
 the shipped file; bytes the unpacker writes outside the load image add
@@ -420,7 +437,10 @@ The fix of an unintended bug that players do not rely on is `on` without one.
 A quirk that may be deliberate or that players rely on never qualifies, so its
 deviation starts `off`. The validation suite runs with every setting
 switched off, and a test that reaches a mandatory deviation cites its ID and
-allows for it. Rebalancing and new features belong in a separate mode or
+allows for it. A `mandatory` deviation that replaces an entry entirely names it
+in a Replaces item and lists in a Tests item the CI tests that check the
+rebuild does what its Reason says; that entry's row has Tests `None` and is
+`deviated`, a finished status like `validated`. Rebalancing and new features belong in a separate mode or
 project.
 
 ## Citing the spec
@@ -503,11 +523,19 @@ A checkpoint or replay API states what its identity covers (every field and
 behaviour-driving resource that decides how play continues, hashed in a
 stated, versioned encoding), rejects a mismatched checkpoint without changing
 the host, says whether a snapshot may be restored more than once, and never
-drops unsaved state such as a paused path search silently. These tests
+drops unsaved state such as a paused path search silently. A rule moved into
+`Core` is tested against `Core` and again through its adapter, for the
+objects, read-only collections, call order and partial failures its callers
+see as well as the values. Arithmetic is tested at its type's edges, as the
+entry's widths give it: wrapped sums, a value stored between two writes,
+signed division, masked shift counts, a byte a caller tests. Callers that
+combine callees' results, allocation and cleanup order, and state several
+components hold at once each have cases in the protocol. These tests
 compare the rebuild with the spec or with itself, so none of them validates a
 parity row; see the protocol's
-[Implementation batches](docs/upstream/work-protocol.md#implementation-batches) (lines 158-174)
-and [Checkpoints and replay](docs/upstream/work-protocol.md#checkpoints-and-replay) (lines 182-190).
+[Implementation batches](docs/upstream/work-protocol.md#implementation-batches) (lines 162-178)
+(and the sections after it, through Continuation cases)
+and [Checkpoints and replay](docs/upstream/work-protocol.md#checkpoints-and-replay) (lines 256-264).
 
 Each rule ships with fast-gate tests over synthetic state. The rule itself is
 usually a static class over the serializable state type, called by `Game`.

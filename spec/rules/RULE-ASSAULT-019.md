@@ -23,8 +23,10 @@ From a movement tick that changes the actor's cell (RULE-ASSAULT-017).
 ## Parameters
 
 - `e`: the movement effect.
-- `old_x`, `old_y`: the cell the actor leaves.
-- `new_x`, `new_y`: the cell it enters.
+- `old_x`: the x coordinate of the cell the actor leaves.
+- `old_y`: the y coordinate of the cell the actor leaves.
+- `new_x`: the x coordinate of the cell it enters.
+- `new_y`: the y coordinate of the cell it enters.
 
 ## Inputs
 

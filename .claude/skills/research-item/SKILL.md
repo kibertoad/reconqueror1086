@@ -5,7 +5,7 @@ description: Settle one research question about the original game as one batch -
 
 # Research batch
 
-The rules are in the [work protocol](../../../docs/upstream/work-protocol.md#research-batches) (lines 143-156),
+The rules are in the [work protocol](../../../docs/upstream/work-protocol.md#research-batches) (lines 147-160),
 and the sections of the methodology and the documentation standard the steps
 below link to. This skill is the procedure.
 Open a linked section only when a step leaves a question it answers, read
@@ -63,7 +63,7 @@ only the lines the link gives, and never a section already read this session.
    file exists, record the ID of every process the run starts in it, and if
    another agent holds it, do not wait). Never touch a process you did not
    start. Where `docs/RUNTIME.md` gives a probe, the run follows the protocol's
-   [Recorded runs](../../../docs/upstream/work-protocol.md#recorded-runs) (lines 227-239):
+   [Recorded runs](../../../docs/upstream/work-protocol.md#recorded-runs) (lines 341-353):
    the fixture lists each draw as `{ rule, bound, result }` by rule ID,
    never by call address, and a draw from a function no rule cites stops
    the recording and gets an `unknown` entry and a queue item. Memory writes
@@ -79,7 +79,7 @@ only the lines the link gives, and never a section already read this session.
    An emulated call is always allowed, including in a repository whose
    `AGENTS.md` keeps agents from running the original: those limits cover
    runs of the game only. For an item under `Emulated call`, follow the protocol's
-   [Emulated calls](../../../docs/upstream/work-protocol.md#emulated-calls) (lines 253-289).
+   [Emulated calls](../../../docs/upstream/work-protocol.md#emulated-calls) (lines 367-403).
    It needs no run lock. Write each reading under test as a procedure in
    `tools/emu/`, set up only the state the function reads (through layout
    fields that are `supported` or `established`), choose the special values,
@@ -116,17 +116,28 @@ only the lines the link gives, and never a section already read this session.
    decide a result, and nothing left to interrupts or threads (`# may run:`),
    memory nothing wrote, timing, or the operating system. List its findings in
    the entry's `complete_reading`. The standard's
-   [Complete readings](../../../docs/upstream/documentation-standard.md#complete-readings) (lines 181-273)
-   and [Findings](../../../docs/upstream/documentation-standard.md#findings) (lines 578-628)
+   [Complete readings](../../../docs/upstream/documentation-standard.md#complete-readings) (lines 191-291)
+   and [Findings](../../../docs/upstream/documentation-standard.md#findings) (lines 606-680)
    sections list what that covers; the parts most often missed are the
    segment each access actually goes through, every part of a stored call
    target, the other byte of a word written a byte at a time, allocation
    sizes and units, a bound on the number of outputs, return values at the
    width each caller tests, cleanup read once per path into it, and errors
-   passed back through recursion. A "no other caller" finding needs a second
+   passed back through recursion, as well as a callee's register return that
+   moves a loop on, the last write before a call to each argument byte the
+   callee reads, ESP's offset where cleanups are deferred, the order of
+   allocation, linking and cleanup steps, and how a caller combines its
+   callees' results. A "no other caller" finding needs a second
    search independent of the analyzer's function boundaries, with each hit
-   checked to decode as a call; a dispatch table finding reads how the input
-   becomes an index and what bounds it. An `offset` into overlay code lies
+   checked to decode as a call. An empty search names a positive control
+   whose target was located without the build's address mapping and that
+   the search found where the mapping puts it, and lists the kinds of
+   reference it searched and did not. A dispatch table finding reads how the
+   input becomes an index and what bounds it, each table's extent on its own.
+   A PE import is named from the import tables by slot address
+   (`node tools/evidence/report.mjs x86-imports`), and a pointer table's
+   entries are read from the build's bytes (`x86-table`), each with a
+   positive control; an analyzer's listing is compared, never trusted. An `offset` into overlay code lies
    inside a row of its build's Code ranges section, whose finding shows the
    range holds code with a location that is not `kind: file-data`. Bytes of an
    executable read as data are located with `kind: file-data` and an `offset`
@@ -141,6 +152,22 @@ only the lines the link gives, and never a section already read this session.
    `(unknown)`. Evidence that contradicts an entry makes it `disputed`. Write
    names, numbers and tables in full, and never copy more than a short passage
    of the game's writing, any of its art, or a meaningful slice of its code.
+   A rule's Parameters section is `None.` or a list with one item per
+   parameter, each opening with one code span and a colon, so the check can
+   count every `call` and `emit` against it.
+   A finding's How to reproduce may name the tool and version, a `tools/`
+   script with the commit it ran from, and the query; the finding itself
+   gives every query value its result depends on (entry, ranges, limits,
+   positive control), since configurations and reports stay in `GAME_DIR`.
+   Rules, formats, screens and bugs name no tools.
+   A recorded finding or experiment is edited in place only where nothing it
+   records changes (spelling, formatting, a link, a rewording of the same
+   facts). Any correction supersedes the whole entry: what still holds and
+   the correction go into replacement entries under new IDs, each `recorded`,
+   whose Alternatives (an experiment's Conclusion) name the old entry and say
+   what was wrong and how that was found. Then move every citation of the old
+   entry, glossary claims included, and give each citing entry the status its
+   remaining evidence supports, `disputed` where the correction contradicts it.
 6. **Update the queue in the same change**: delete the settled item, split an
    item that turned out to be two questions, add every new question as a new
    item in the queue file of the area of the first entry it names, and add
@@ -184,7 +211,9 @@ only the lines the link gives, and never a section already read this session.
 9. **Commit** with a message saying what was found and on what evidence, ending
    in a `Spec:` trailer listing the entries created or changed, and a
    `Parity:` trailer listing the rows whose status changed, if any, and a
-   `Queue:` trailer listing the IDs of the items it closed.
+   `Queue:` trailer listing the IDs of the items it closed and no others (an
+   item given `Tried:`, split or moved stays out; with none closed, no
+   `Queue:` line).
 10. **Print the status block** (format below), then continue with the next item
     if a goal is running, or `end-session` if not.
 

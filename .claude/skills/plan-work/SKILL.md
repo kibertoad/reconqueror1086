@@ -5,9 +5,9 @@ description: Plan restoration work - record the project's stage, write or revise
 
 # Plan work
 
-The rules are in the work protocol's [Stages](../../../docs/upstream/work-protocol.md#stages) (lines 32-80),
-[The queue](../../../docs/upstream/work-protocol.md#the-queue) (lines 82-121) and
-[Coding agents and long-running goals](../../../docs/upstream/work-protocol.md#coding-agents-and-long-running-goals) (lines 332-370).
+The rules are in the work protocol's [Stages](../../../docs/upstream/work-protocol.md#stages) (lines 32-82),
+[The queue](../../../docs/upstream/work-protocol.md#the-queue) (lines 84-123) and
+[Coding agents and long-running goals](../../../docs/upstream/work-protocol.md#coding-agents-and-long-running-goals) (lines 446-497).
 Open a linked section only when a step leaves a question it answers, read
 only the lines the link gives, and never a section already read this session.
 Planning changes `docs/implementation-plan.md`, `queue/` and `docs/goals/`,
@@ -20,7 +20,7 @@ never code or spec entries apart from new `unknown` entries.
    Record it in the plan. Do not move the stage forward on a criterion you
    could not check.
 2. Each slice in the plan names the spec areas or entries it needs and the
-   parity rows it must bring to `implemented` or `validated`, and each target
+   parity rows it must bring to `implemented`, `deviated` or `validated`, and each target
    is one `docs/RUNTIME.md` makes reachable: without runs of the original,
    format rows whose entries list files can reach `validated`, but rule and
    screen rows, and formats with no files (memory structures, messages), stop
@@ -68,10 +68,13 @@ what was tried, the documentation check passes on the last commit, and each
 batch ended with a status block; or stop after 40 turns.
 ```
 
-Write the goal file from `docs/goals/README.md`, check that no other goal file
+Write the goal file from `docs/goals/README.md`, check that no other goal
 claims the same areas, get the file onto the main branch before the goal's
-first batch (where sessions cannot push, run only one goal at a time), and
-give the user the condition to paste after `/goal`.
+first batch, or, where the session may not push to main, commit it as the
+first commit of a `goal/<name>` branch and run only one goal at a time as
+that README describes, and give the user the condition to paste after
+`/goal`. The commit that creates the goal file is not a batch and has no
+trailers.
 Split research and implementation into separate goals. An implementation
 goal's condition allows no change under `spec/` beyond added open questions
 and `unknown` entries, and accepts a `partial` row only with a `Spec gap:` note. Never write a goal

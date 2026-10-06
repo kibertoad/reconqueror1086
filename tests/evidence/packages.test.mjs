@@ -7,6 +7,7 @@ import { spawnSync } from "node:child_process";
 import { run as packageRun, PREPARED_PROTOCOL, sourceXxh3 } from "@scientific-method/executable-reader";
 import { run } from "../../tools/evidence/report.mjs";
 import { verifyToolkitPackages } from "../../tools/Verify-ToolkitPackages.mjs";
+import { evidencePython, withEvidencePython } from "../../tools/evidence/python.mjs";
 const root = resolve(import.meta.dirname, "../..");
 
 test("evidence environment follows changed pins and rejects transitive drift", t => {
@@ -21,7 +22,7 @@ test("evidence environment follows changed pins and rejects transitive drift", t
     writeFileSync(join(path, "METADATA"), `Metadata-Version: 2.1\nName: ${name}\nVersion: ${version}\n`);
   };
   distribution("scientific-method-engine", "9.8.7"); distribution("capstone", "1.2.3"); distribution("pypcode", "4.5.6");
-  const runCheck = () => spawnSync(process.env.EVIDENCE_PYTHON || "python", ["-B", join(root, "tools/Verify-EvidenceEnvironment.py"), "--root", dir],
+  const runCheck = () => spawnSync(evidencePython(), ["-B", join(root, "tools/Verify-EvidenceEnvironment.py"), "--root", dir],
     {encoding:"utf8", env:{...process.env, PYTHONPATH:metadata}});
   let result = runCheck(); assert.equal(result.status, 0, result.error?.message || result.stderr);
   distribution("pypcode", "4.5.7"); result = runCheck(); assert.notEqual(result.status, 0); assert.match(result.stderr, /pypcode: expected 4\.5\.6, installed 4\.5\.7/);
@@ -39,9 +40,9 @@ test("Conqueror x86 wrapper forwards package reports and retains synthetic retur
   const config = {source:"source.bin", sourceKind:"synthetic-raw", xxh3:sourceXxh3(bytes), entry:0,
     regions:[{name:"synthetic",start:0,end:4,segment:4096,ip:0,entries:[0],evidence:"synthetic test"}]};
   const file = join(dir, "config.json"); writeFileSync(file, JSON.stringify(config));
-  assert.equal(PREPARED_PROTOCOL, 2);
+  assert.equal(PREPARED_PROTOCOL, 3);
   const report = run(["x86-returns", file]);
-  assert.deepEqual(report, packageRun(["returns", file]));
+  assert.deepEqual(report, withEvidencePython(() => packageRun(["returns", file])));
   // Baseline was produced entirely from the fabricated four-byte source above.
   // New return-flow fields are allowed, but every prior field and value must survive.
   const baseline = JSON.parse(readFileSync(join(root, "tests/fixtures/synthetic/toolkit/return-baseline.json")));
@@ -72,9 +73,19 @@ test("package adoption rejects manifest, lock, integrity, installed-version and 
   const pnpmLock=join(dir,"pnpm-lock.yaml"),locked=readFileSync(pnpmLock,"utf8");
   writeFileSync(pnpmLock,locked.replace(/('@scientific-method\/standard-checker@[^']+':\r?\n    resolution: \{integrity: )[^}]+/,"$1"));
   assert.throws(()=>verifyToolkitPackages(dir),/integrity/);
-  writeFileSync(pnpmLock,locked.replace(/(specifier: )1\.0\.0/,"$1^1.0.0"));
+  const reader=JSON.parse(readFileSync(join(dir,"package.json"),"utf8")).devDependencies["@scientific-method/executable-reader"];
+  writeFileSync(pnpmLock,locked.replace(`specifier: ${reader}`,`specifier: ^${reader}`));
   assert.throws(()=>verifyToolkitPackages(dir),/exactly locked/);writeFileSync(pnpmLock,locked);
   change("node_modules/@scientific-method/executable-reader/package.json", x=>x.version="0.0.0", /Installed toolkit/);
   change("tools/upstream-lock.json", x=>x.checker.revision="a".repeat(40), /checker the upstream lock pins/);
   change("tools/upstream-lock.json", x=>x.checker.version="0.0.1", /checker the upstream lock pins/);
+});
+test("Conqueror x86 wrapper forwards the reader's PE import and pointer-table reports", t => {
+  // Both run in the reader without the engine; the refusals name each command's own query fields.
+  const dir = scratch(t), bytes = Buffer.from("synthetic");
+  writeFileSync(join(dir, "source.bin"), bytes);
+  const file = join(dir, "config.json");
+  writeFileSync(file, JSON.stringify({source:"source.bin", sourceKind:"pe32", xxh3:sourceXxh3(bytes)}));
+  assert.throws(() => run(["x86-imports", file]), /import report needs .* positive controls/);
+  assert.throws(() => run(["x86-table", file]), /table report needs table/);
 });

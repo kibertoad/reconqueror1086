@@ -340,3 +340,25 @@ status or parity status changes.
 Acceptance: the canonical fast gate with Kaitai 0.11, actionlint on both
 workflows, the documentation check and index regeneration, and a pre-commit run
 on the staged tree. Platform CI and installer jobs run when the change is pushed.
+
+## Rules efa138ba and toolkit packages adoption (2026-10-06)
+
+Owner scope: update to the latest Standard, work protocol and toolkit. Target:
+this repository only. The rules and packages are ahead of template main
+ebdd5c3, which is at rules 11dbbc53, checker 2.1.0, reader 1.0.0 and engine
+1.0.1, so they are adopted from their upstream releases rather than through
+the template.
+
+| Capability | Adoption and acceptance evidence |
+|---|---|
+| Rules efa138ba | `refresh` copied the three pages byte-exact and wrote the lock. The delta adds the `deviated` parity status with deviation Replaces and Tests items, IDENTIFIERS-8 (a corrected finding is superseded whole), STATUS-42 (PE import slots) and STATUS-43 (pointer-table contents), countable Parameters lists, address-mapping controls and reference kinds for empty searches, further complete-reading cases, per-part runtime capabilities, non-batch goal and handover commits, the `goal/` branch claim where sessions cannot push, and the protocol's implementation test sections. Skills, `AGENTS.md`, `docs/goals/README.md` and the entry templates summarize them; `links --write` regenerated every section range. |
+| Checker 2.2.0 at toolkit 92a55920 | CI action, lock and `package.json` moved together; `PARITY.md` gained its `deviated` row. Three rules whose Parameters items named two parameters each were split into one item per parameter with the same meaning, so every `call` is counted and the check passes with no skipped steps. No status changed. |
+| Reader 2.3.0 and engine 12.0.0 | Prepared protocol 3 on both. The engine's dependencies are unchanged; its hashes are pinned. The wrapper forwards the reader's new `imports` and `table` commands as `x86-imports` and `x86-table`, pinned by a test. No committed config or report depended on the changed engine outputs. |
+| Evidence interpreter | Template `tools/evidence/python.mjs` adopted: the wrapper and the evidence tests use `EVIDENCE_PYTHON`, else the first of `python` and `python3` that is Python 3.12 or later. |
+| Runtime record | `docs/RUNTIME.md` answers keyboard and mouse input separately; the mouse answer names no attempt of its own. Capture was already split into frames and sound. No queue item is under Agent run or Live session. |
+
+Not adopted from the template delta: the release-signing safeguards, the
+Dependabot configuration change and the pre-commit `node_modules` link (this
+repository's hook installs from the pnpm store instead) are template
+infrastructure outside this scope. No gameplay behaviour, evidence status or
+parity status changes.

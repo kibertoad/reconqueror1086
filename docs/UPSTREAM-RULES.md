@@ -92,8 +92,8 @@ node_modules. Initialize a ZIP checkout with git init before validation.
 ## Current migration target
 
 The template adoption is 39d31fdef9d7420e8571ab6d09e3b3026be05010. Rules main is
-c1758fd9c2fd253e28fb4328412061d7e92ce14a, which numbers the Standard's rules
-without changing them. The checker commit is in `tools/upstream-lock.json`;
+efa138ba212260b23bb4eb599e61336a7126c973, still Standard v1, adopted ahead of the
+template together with checker 2.2.0, reader 2.3.0 and engine 12.0.0. The checker commit is in `tools/upstream-lock.json`;
 package versions and the toolkit revision are in `tools/toolkit-packages.json`.
 Python integrity pins are in `requirements-evidence.txt`, and the validation gate
 checks every installed locked distribution through

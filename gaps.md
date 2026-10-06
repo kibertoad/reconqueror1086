@@ -262,3 +262,57 @@ nonuniform PrintWindow output alone does not prove a newly requested repaint.
 Upstream submission: duplicate searches for PrintWindow and capture/offscreen
 found no matching tracker. [Toolkit issue #235](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/235)
 records the synthetic observations and suggested acceptance boundaries.
+
+## GAP-012: Goal claims with push authorization given per task
+
+Recorded: 2026-10-06. Audience: work protocol authors.
+
+The protocol has a claim form for sessions that push to main and one for
+sessions that cannot (`goal/<name>` branches). This repository pushes only when
+the owner authorizes it in a task, so a goal file can reach main by an authorized
+push while a later session without that authorization follows the branch rule.
+The page does not say whether such a file on main still claims its areas.
+
+Local handling: `docs/goals/README.md` and the session skills say to use main
+when the session is authorized to push and the `goal/` branch otherwise.
+
+Upstream submission (2026-10-06): after reading rules issues #42 and #43,
+[rules issue #76](https://github.com/kibertoad/refurbished-dinosaurs/issues/76)
+records the per-task case and an acceptance example.
+
+## GAP-013: Engine upgrade notes carry no versions
+
+Recorded: 2026-10-06. Audience: toolkit authors.
+
+The engine has no changelog, and most "Engine upgrades" entries in the toolkit's
+migration guide name no version, so the 1.0.1 to 12.0.0 upgrade needed GitHub
+release notes matched to headings by hand.
+
+Upstream submission (2026-10-06):
+[toolkit issue #318](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/318).
+
+## GAP-014: Checker argument-count skip message
+
+Recorded: 2026-10-06. Audience: checker authors.
+
+Checker 2.2.0 reports an uncountable Parameters section as "is not None. or a
+list of parameters", which reads as "is not None", and does not name the item
+that stops the count. Three rules here had items naming two parameters.
+
+Local resolution: those items were split into one item per parameter with the
+same meaning; the check runs with no skipped steps.
+
+Upstream submission (2026-10-06):
+[toolkit issue #319](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/319).
+
+## GAP-015: Template behind the rules and toolkit releases
+
+Recorded: 2026-10-06. Audience: template authors.
+
+Template main pins rules 11dbbc53, checker 2.1.0, reader 1.0.0 and engine
+1.0.1, and its skills do not summarize the rules added since, so this adoption
+took the releases directly and adapted the guidance locally.
+
+Upstream submission (2026-10-06): after reading template PRs #77 and #78,
+[template issue #80](https://github.com/kibertoad/refurbished-dinosaurs-template/issues/80)
+lists the remaining parts.
