@@ -2,10 +2,10 @@
 
 ## Current state
 
-Stage: Survey. Template main 39d31fde is adopted, with the Standard at rules
-c1758fd9 (rules numbered, still v1), checker 0.2.0 at toolkit a260e391, reader
-1.0.0, engine 1.0.1 and the RefurbishedDinosaurs 6.2.0 runtime packages. Tooling
-installs through pnpm. CI for this adoption has not run yet. The completed capability audit is in
+Stage: Survey. Template main 39d31fde is adopted. The Standard and protocol are
+at rules efa138ba (still v1), with checker 2.2.0 at toolkit 92a55920, reader
+2.3.0, engine 12.0.0 and the RefurbishedDinosaurs 6.2.0 runtime packages.
+Tooling installs through pnpm. The adoption record is in
 [template-migration-plan.md](template-migration-plan.md).
 The earlier documentation audit is in [documentation-audit.md](documentation-audit.md).
 Game identities, owned-source contracts, LE adapters, gameplay and evidence
@@ -33,9 +33,10 @@ local. Acceptance details and limits are in [VALIDATION.md](VALIDATION.md).
 Kaitai compilation was skipped because no compiler was available; owned-media
 comparisons and LongRunning tests were not run. No original game ran.
 
-The pinned Python engine is installed in ignored artifacts/validation-python;
-set EVIDENCE_PYTHON to its Scripts/python.exe for this checkout's gate. The
-machine's existing engine 8.1.0 is restored. Tooling dependencies are installed
+The pinned Python engine 12.0.0 is installed in ignored
+artifacts/validation-python; set EVIDENCE_PYTHON to its Scripts/python.exe for
+this checkout's gate. The machine's global Python keeps engine 8.1.0 for other
+work. Tooling dependencies are installed
 from the existing locks. Remote CI has not been exercised for this update.
 
 Post-commit audits found no confirmed task orphans. Preserve unrelated processes
