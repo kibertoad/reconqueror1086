@@ -64,8 +64,8 @@ Entries by kind.
 | [FMT-RES-015](../formats/FMT-RES-015.md) | CONQUER.INF, the CD marker the install script tests for | unknown |
 | [FMT-RES-016](../formats/FMT-RES-016.md) | INST.EXE script syntax of CD-root INSTALL.SCR | supported |
 | [FMT-RES-017](../formats/FMT-RES-017.md) | SETUP.SOL, the first-stage installer's member archive | supported |
-| [FMT-RES-018](../formats/FMT-RES-018.md) | Unidentified .TXT data candidates in CD root | unknown |
-| [FMT-RES-019](../formats/FMT-RES-019.md) | Unidentified .WRI data candidates in CD root | unknown |
+| [FMT-RES-018](../formats/FMT-RES-018.md) | Unidentified .TXT data candidates in CD root | superseded |
+| [FMT-RES-019](../formats/FMT-RES-019.md) | Unidentified .WRI data candidates in CD root | superseded |
 | [FMT-RES-020](../formats/FMT-RES-020.md) | Unidentified .AVI data candidates in CD:DEMOS/MOVIES | superseded |
 | [FMT-RES-021](../formats/FMT-RES-021.md) | Unidentified .000 data candidates in CD:DEMOS/SHIVERS | superseded |
 | [FMT-RES-022](../formats/FMT-RES-022.md) | Unidentified .AUD data candidates in CD:DEMOS/SHIVERS | superseded |
@@ -161,7 +161,7 @@ Entries by kind.
 | [FMT-RES-112](../formats/FMT-RES-112.md) | Unidentified .DAT data candidates in CD:INN/TWINION/TWPATCH | superseded |
 | [FMT-RES-113](../formats/FMT-RES-113.md) | Unidentified .DOC data candidates in CD:INN/TWINION/TWPATCH | superseded |
 | [FMT-RES-114](../formats/FMT-RES-114.md) | Unidentified .EXE data candidates in CD:INN/TWINION/TWPATCH | superseded |
-| [FMT-RES-115](../formats/FMT-RES-115.md) | Unidentified .DOC data candidates in CD:VESA | unknown |
+| [FMT-RES-115](../formats/FMT-RES-115.md) | Unidentified .DOC data candidates in CD:VESA | superseded |
 | [FMT-RES-116](../formats/FMT-RES-116.md) | Leading raw-track record in the owned disc carrier | supported |
 | [FMT-RES-117](../formats/FMT-RES-117.md) | AUTORUN.INF, the CD launcher's profile file | supported |
 | [FMT-RES-118](../formats/FMT-RES-118.md) | SETUP.SOL directory record | supported |
@@ -336,7 +336,7 @@ Entries by kind.
 
 ## findings
 
-276 entries.
+277 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -508,6 +508,7 @@ Entries by kind.
 | [FND-RES-055](../findings/FND-RES-055.md) | INST.EXE runs install.scr line by line, with labels, goto, nine percent parameters, a table of named commands and any other line run as a program | recorded |
 | [FND-RES-056](../findings/FND-RES-056.md) | INST.EXE looks up 78 fixed INSTALL.TXT keys, help and confirmation texts by file name with hlp and inf extensions, and stops with a fatal error on a missing key everywhere but two calls | recorded |
 | [FND-RES-057](../findings/FND-RES-057.md) | No Conqueror file outside the disc's DEMOS and INN directories names DEMOS or a demo, and only INN.BAT enters INN, to run that directory's own installer | recorded |
+| [FND-RES-058](../findings/FND-RES-058.md) | The disc's two readme files, EMPTY.TXT, VERSION.TXT and the VESA directory are documentation, a placeholder and a third-party driver that no Conqueror program reads | recorded |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |

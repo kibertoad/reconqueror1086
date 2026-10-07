@@ -6,15 +6,12 @@ Entries by status.
 
 ## unknown
 
-8 entries.
+5 entries.
 
 | ID | Title |
 |---|---|
 | [FMT-ASSAULT-004](../formats/FMT-ASSAULT-004.md) | Live effect record, one of the 64 effects the scheduler runs |
 | [FMT-RES-015](../formats/FMT-RES-015.md) | CONQUER.INF, the CD marker the install script tests for |
-| [FMT-RES-018](../formats/FMT-RES-018.md) | Unidentified .TXT data candidates in CD root |
-| [FMT-RES-019](../formats/FMT-RES-019.md) | Unidentified .WRI data candidates in CD root |
-| [FMT-RES-115](../formats/FMT-RES-115.md) | Unidentified .DOC data candidates in CD:VESA |
 | [RULE-ASSAULT-027](../rules/RULE-ASSAULT-027.md) | Combatant and effect values whose layout or computation is not recorded |
 | [RULE-ASSAULT-030](../rules/RULE-ASSAULT-030.md) | Which retainer the loader removes above the cap |
 | [RULE-VIEW-004](../rules/RULE-VIEW-004.md) | Surface intersection, depth and pixel test inside the raycaster |
@@ -275,11 +272,13 @@ Entries by status.
 
 ## superseded
 
-99 entries.
+102 entries.
 
 | ID | Title |
 |---|---|
 | [FMT-RES-012](../formats/FMT-RES-012.md) | Unidentified .GOB data candidates in CD root |
+| [FMT-RES-018](../formats/FMT-RES-018.md) | Unidentified .TXT data candidates in CD root |
+| [FMT-RES-019](../formats/FMT-RES-019.md) | Unidentified .WRI data candidates in CD root |
 | [FMT-RES-020](../formats/FMT-RES-020.md) | Unidentified .AVI data candidates in CD:DEMOS/MOVIES |
 | [FMT-RES-021](../formats/FMT-RES-021.md) | Unidentified .000 data candidates in CD:DEMOS/SHIVERS |
 | [FMT-RES-022](../formats/FMT-RES-022.md) | Unidentified .AUD data candidates in CD:DEMOS/SHIVERS |
@@ -375,13 +374,14 @@ Entries by status.
 | [FMT-RES-112](../formats/FMT-RES-112.md) | Unidentified .DAT data candidates in CD:INN/TWINION/TWPATCH |
 | [FMT-RES-113](../formats/FMT-RES-113.md) | Unidentified .DOC data candidates in CD:INN/TWINION/TWPATCH |
 | [FMT-RES-114](../formats/FMT-RES-114.md) | Unidentified .EXE data candidates in CD:INN/TWINION/TWPATCH |
+| [FMT-RES-115](../formats/FMT-RES-115.md) | Unidentified .DOC data candidates in CD:VESA |
 | [FND-RES-044](../findings/FND-RES-044.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case |
 | [FND-RES-046](../findings/FND-RES-046.md) | INST.EXE runs install.scr line by line, with labels, goto, nine percent parameters, a table of named commands and any other line run as a program |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 
 ## recorded
 
-273 entries.
+274 entries.
 
 | ID | Title |
 |---|---|
@@ -551,6 +551,7 @@ Entries by status.
 | [FND-RES-055](../findings/FND-RES-055.md) | INST.EXE runs install.scr line by line, with labels, goto, nine percent parameters, a table of named commands and any other line run as a program |
 | [FND-RES-056](../findings/FND-RES-056.md) | INST.EXE looks up 78 fixed INSTALL.TXT keys, help and confirmation texts by file name with hlp and inf extensions, and stops with a fatal error on a missing key everywhere but two calls |
 | [FND-RES-057](../findings/FND-RES-057.md) | No Conqueror file outside the disc's DEMOS and INN directories names DEMOS or a demo, and only INN.BAT enters INN, to run that directory's own installer |
+| [FND-RES-058](../findings/FND-RES-058.md) | The disc's two readme files, EMPTY.TXT, VERSION.TXT and the VESA directory are documentation, a placeholder and a third-party driver that no Conqueror program reads |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |
@@ -710,8 +711,8 @@ Entries whose Open questions section says more than None known.
 | [FMT-RES-014](../formats/FMT-RES-014.md) | Owned disc-root indexed icon container layout | supported |
 | [FMT-RES-015](../formats/FMT-RES-015.md) | CONQUER.INF, the CD marker the install script tests for | unknown |
 | [FMT-RES-016](../formats/FMT-RES-016.md) | INST.EXE script syntax of CD-root INSTALL.SCR | supported |
-| [FMT-RES-018](../formats/FMT-RES-018.md) | Unidentified .TXT data candidates in CD root | unknown |
-| [FMT-RES-019](../formats/FMT-RES-019.md) | Unidentified .WRI data candidates in CD root | unknown |
+| [FMT-RES-018](../formats/FMT-RES-018.md) | Unidentified .TXT data candidates in CD root | superseded |
+| [FMT-RES-019](../formats/FMT-RES-019.md) | Unidentified .WRI data candidates in CD root | superseded |
 | [FMT-RES-020](../formats/FMT-RES-020.md) | Unidentified .AVI data candidates in CD:DEMOS/MOVIES | superseded |
 | [FMT-RES-021](../formats/FMT-RES-021.md) | Unidentified .000 data candidates in CD:DEMOS/SHIVERS | superseded |
 | [FMT-RES-022](../formats/FMT-RES-022.md) | Unidentified .AUD data candidates in CD:DEMOS/SHIVERS | superseded |
@@ -807,7 +808,7 @@ Entries whose Open questions section says more than None known.
 | [FMT-RES-112](../formats/FMT-RES-112.md) | Unidentified .DAT data candidates in CD:INN/TWINION/TWPATCH | superseded |
 | [FMT-RES-113](../formats/FMT-RES-113.md) | Unidentified .DOC data candidates in CD:INN/TWINION/TWPATCH | superseded |
 | [FMT-RES-114](../formats/FMT-RES-114.md) | Unidentified .EXE data candidates in CD:INN/TWINION/TWPATCH | superseded |
-| [FMT-RES-115](../formats/FMT-RES-115.md) | Unidentified .DOC data candidates in CD:VESA | unknown |
+| [FMT-RES-115](../formats/FMT-RES-115.md) | Unidentified .DOC data candidates in CD:VESA | superseded |
 | [FMT-RES-116](../formats/FMT-RES-116.md) | Leading raw-track record in the owned disc carrier | supported |
 | [FMT-RES-117](../formats/FMT-RES-117.md) | AUTORUN.INF, the CD launcher's profile file | supported |
 | [FMT-RES-118](../formats/FMT-RES-118.md) | SETUP.SOL directory record | supported |

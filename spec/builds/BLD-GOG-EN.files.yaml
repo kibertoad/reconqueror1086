@@ -9023,10 +9023,6 @@ files:
     format: data
     size: 57
     xxh3: d1cb8388fff6c22f15c82852d40d3257
-  - path: "CD:EMPTY.TXT"
-    format: data
-    size: 0
-    xxh3: 99aa06d3014798d86001c324468d497f
   - path: "CD:INN.BAT"
     format: data
     size: 30
@@ -9069,14 +9065,6 @@ files:
     format: data
     size: 29
     xxh3: f688675785d968f0686cb4964a6dcba2
-  - path: "CD:README.TXT"
-    format: data
-    size: 2010
-    xxh3: 0c20398954d99e0ceeb7c11ea39c6fab
-  - path: "CD:README.WRI"
-    format: data
-    size: 2816
-    xxh3: ac9c19fe0f23797f3ce1a9184356ddd5
   - path: "CD:RESOURCE.CFG"
     format: data
     size: 187
@@ -9093,18 +9081,6 @@ files:
     format: data
     size: 3439
     xxh3: a9f51bcff63b8c523a074202c5a3c7ef
-  - path: "CD:VERSION.TXT"
-    format: data
-    size: 43
-    xxh3: 97177e304a5ab6ffa7a758797fe314dd
-  - path: "CD:VESA/UNIVESA.DOC"
-    format: data
-    size: 6263
-    xxh3: 6f34ea6385aff9a4a595300b26366512
-  - path: "CD:VESA/UNIVESA.EXE"
-    format: MZ
-    size: 34032
-    xxh3: 5f78487eea8a2f23632e330dcb23488e
   - path: "game.gog"
     format: data
     size: 667316496

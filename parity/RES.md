@@ -18,9 +18,6 @@
 | `FMT-RES-015` | CONQUER.INF, the CD marker the install script tests for | unknown | missing | None | None | unknown | Only located use is a presence test; contents read by nothing located. |
 | `FMT-RES-016` | INST.EXE script syntax of CD-root INSTALL.SCR | supported | missing | None | None | supported | Line syntax, labels, parameters, every command, the program runner and the run's caller supported; parameter values and the installer's checks remain open. |
 | `FMT-RES-017` | SETUP.SOL, the first-stage installer's member archive | supported | missing | None | None | supported | Read by the CD's installer only; the rebuild does not install from the disc. Member streams are expanded as RULE-RES-005 gives. |
-| `FMT-RES-018` | Unidentified .TXT data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
-| `FMT-RES-019` | Unidentified .WRI data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
-| `FMT-RES-115` | Unidentified .DOC data candidates in CD:VESA | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
 | `FMT-RES-116` | Leading raw-track record in the owned disc carrier | supported | missing | None | None | supported | Owned padding exceptions included; trailer validation and record selection remain open under Q-RES-122 and Q-RES-123. |
 | `FMT-RES-117` | AUTORUN.INF, the CD launcher's profile file | supported | missing | None | None | supported | Read by the CD launcher only; the rebuild has no launcher. Open under Q-RES-171 and Q-RES-172. |
 | `FMT-RES-118` | SETUP.SOL directory record | supported | missing | None | None | supported | Read by the CD's installer only. Open under Q-RES-176. |

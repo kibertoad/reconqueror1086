@@ -306,21 +306,6 @@ Next ID: Q-RES-208
 - Q-RES-203. FMT-RES-016: What does the shipped `pick` line's fourth label buffer, which no word fills, hold when a key with a low byte of 0 is pressed?
   Settles it: read the stack writes that the calls before 1C17:0D8F leave at that buffer's offset, or replay the call with the harness from a recorded stack. Blocks: Survey data-family reconciliation.
 
-- Q-RES-020. FMT-RES-018: What layout, if any, is shared by these listed candidates?
-  Settles it: inspect bounded file signatures and the relevant readers; record the
-  parsing syntax or field layout, splitting the entry if the files differ before
-  making claims about them. Blocks: Survey data-family reconciliation.
-
-- Q-RES-021. FMT-RES-019: What layout, if any, is shared by these listed candidates?
-  Settles it: inspect bounded file signatures and the relevant readers; record the
-  parsing syntax or field layout, splitting the entry if the files differ before
-  making claims about them. Blocks: Survey data-family reconciliation.
-
-- Q-RES-117. FMT-RES-115: What layout, if any, is shared by these listed candidates?
-  Settles it: inspect bounded file signatures and the relevant readers; record the
-  parsing syntax or field layout, splitting the entry if the files differ before
-  making claims about them. Blocks: Survey data-family reconciliation.
-
 - Q-RES-118. FMT-RES-006: Does the shipped wrapper convert INDEX timestamps with 75 subdivisions per second?
   Settles it: statically locate the installed wrapper's cue consumer and read the
   complete timestamp conversion and its callers, distinguishing observed file

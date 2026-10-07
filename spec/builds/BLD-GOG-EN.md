@@ -67,7 +67,9 @@ owned source SRC-MANUAL. The empty `SAVEGAME` directory has no file to list.
 
 The disc's `DEMOS/` and `INN/` trees are listed in `BLD-GOG-EN.other-files.yaml`:
 other Sierra products' demos, and the ImagiNation Network software that only
-`INN.BAT` reaches, which no file of the game names (FND-RES-057). `VESA/`, the
+`INN.BAT` reaches, which no file of the game names (FND-RES-057). So are `VESA/`, a
+third-party driver, and the root's two readme files, `EMPTY.TXT` and
+`VERSION.TXT`, which no program of the game reads (FND-RES-058). The other
 root auxiliary files and the disc copy of `C1086.GOB` remain in the manifest
 conservatively. This inventory does not prove that every such path is a
 gameplay dependency; exclusion awaits a reading that establishes its lack of
