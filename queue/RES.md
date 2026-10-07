@@ -102,14 +102,6 @@ Next ID: Q-RES-192
   every relevant caller through the file-open decision. Blocks: Survey runtime-use
   reconciliation.
 
-- Q-RES-155. FMT-RES-011: What do `@GetOutDrive`, `@GetSubdir` and `@GetOption` do with the text in their blocks?
-  Settles it: read the character loops in 1B80:289B, 1B80:3206 and
-  19A2:049A to their ends, every branch. Blocks: Survey data-family reconciliation.
-  Tried: FND-RES-041 and FND-RES-042 settle bare text in the finish block,
-  in `@Display` blocks, as labels and elsewhere in the main run; the shipped
-  file's remaining bare text lies in these three blocks.
-
-
 - Q-RES-138. FMT-RES-010: Which shipped reader consumes CD-root RESOURCE.CFG, and is that path reachable?
   Settles it: trace file references from installation/media entry points through the relevant reader. Blocks: Survey data-family reconciliation.
 

@@ -378,7 +378,7 @@ Entries by status.
 
 ## recorded
 
-260 entries.
+261 entries.
 
 | ID | Title |
 |---|---|
@@ -535,6 +535,7 @@ Entries by status.
 | [FND-RES-040](../findings/FND-RES-040.md) | _SETUP.EXE's PICKDEST builds the destination from SierraDir and DirName, WRITE and APPEND write one line to a file, RUN ignores two words, and COPY takes no arguments |
 | [FND-RES-041](../findings/FND-RES-041.md) | CONFIG.EXE stops its script run at @FINISH and, just before exiting, reopens the script there to echo text and run commands up to @ENDFINISH |
 | [FND-RES-042](../findings/FND-RES-042.md) | CONFIG.EXE reads a word at the start of a line followed by a colon as a label, echoes @DISPLAY text to the screen, and stops at any other bare word |
+| [FND-RES-043](../findings/FND-RES-043.md) | CONFIG.EXE's @GetOutDrive, @GetSubdir and @GetOption echo their block text to the screen like @Display |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |
@@ -688,7 +689,6 @@ Entries whose Open questions section says more than None known.
 | [FMT-RES-008](../formats/FMT-RES-008.md) | Empty and ASCII text framing of CD-root batch files | supported |
 | [FMT-RES-009](../formats/FMT-RES-009.md) | Owned autoplay indexed bitmap layout | supported |
 | [FMT-RES-010](../formats/FMT-RES-010.md) | ASCII key/value syntax in CD-root RESOURCE.CFG | supported |
-| [FMT-RES-011](../formats/FMT-RES-011.md) | ASCII line framing of CD-root INSTALL.DAT | supported |
 | [FMT-RES-012](../formats/FMT-RES-012.md) | Unidentified .GOB data candidates in CD root | superseded |
 | [FMT-RES-013](../formats/FMT-RES-013.md) | Marked ASCII text framing of CD-root INSTALL.HLP | supported |
 | [FMT-RES-014](../formats/FMT-RES-014.md) | Owned disc-root indexed icon container layout | supported |
