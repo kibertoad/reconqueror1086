@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-RES-045, FND-RES-046, FND-RES-047]
+evidence: [FND-RES-045, FND-RES-046, FND-RES-047, FND-RES-048]
 conflicting: []
 split_with: []
 related: []
@@ -57,9 +57,14 @@ line after one space or tab; for every command except `echo`, `alert` and
 | `exists` | char[] | script_command | Takes a file name and a message. Shows the message box again and again until the file exists. | supported | FND-RES-047 |
 | `testdir` | char[] | script_command | Takes a directory. When it exists and holds any file, makes it current and asks a yes/no question; the yes answer ends the script. | supported | FND-RES-047 |
 | `del` | char[] | script_command | Deletes every file its argument matches, by bare name in the current directory. | supported | FND-RES-047 |
+| `if` | char[] | script_command | Takes an optional `not`, then `errorlevel` and a number, true when the last program's result is that number or more (compared signed), or `exist` and a file pattern, true when a file matches. When the test (inverted by `not`) holds, the rest of the line runs as the next line. Any other test word shows an error box and the command is skipped. | supported | FND-RES-048 |
 
-The words `copy` and `if` are commands too; what they do is in Open
-questions.
+The word `copy` is a command too; what it does is in Open questions.
+
+`if` does not run its command itself. The next pass starts in the script's
+own line at the place where the command began in the expanded line, so a
+parameter before the command whose value is not exactly two characters long
+moves that place [FND-RES-048].
 
 A first word that is none of these passes the whole line to a program
 runner, whose reading is open (Q-RES-198). When the runner reports one of its
@@ -89,8 +94,8 @@ a label, an empty line or one of `echo`, `end`, `clear`, `godir`, `alert`,
 `%1` to `%4` and `%%`. FND-RES-046 reads the run loop, the parameter setup,
 the expansion, the dispatch and the routines for comments, `echo`, `pause`,
 `goto`, `end`, `clear` and `cls`; FND-RES-047 reads `alert`, `space`,
-`pick`, `godir`, `exists`, `testdir` and `del`. The `copy` and `if`
-routines, the program runner behind unknown words, the message lookup and
+`pick`, `godir`, `exists`, `testdir` and `del`, and FND-RES-048 reads `if`.
+The `copy` routine, the program runner behind unknown words, the message lookup and
 the window routines are not read, and neither are several run-time routines
 the commands call, such as the key read and the find-next.
 
@@ -98,7 +103,6 @@ the commands call, such as the key read and the find-next.
 
 - What does `copy` do with its argument, with and without `+`, and when its
   source is in an archive? (Q-RES-201)
-- What syntax does `if` take, and what does it run? (Q-RES-197)
 - How does the program runner behind unknown words split the program from its
   arguments, and which DOS call runs it? (Q-RES-198)
 - Which installer fields give `%1` to `%7`, and what values do they hold
