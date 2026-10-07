@@ -297,9 +297,6 @@ Next ID: Q-RES-202
   or keeps it compressed inside another file; take this up again only with
   such a lead.
 
-- Q-RES-201. FMT-RES-016: What does INSTALL.SCR's `copy` command do with its argument, with and without `+`, and when its source is in an archive?
-  Settles it: read 1C17:19B8 with 1C17:11B1 and 1C17:1291 and every archive and file routine they reach, with every branch. Blocks: Survey data-family reconciliation.
-
 - Q-RES-198. FMT-RES-016: How does INST.EXE's program runner split an unknown INSTALL.SCR line into program, arguments and redirection, and which DOS call runs it?
   Settles it: read the first entry of the vtable at DS:1202 (2DDA:000A) with 1000:3EEE and 1000:3F69, and every result it returns. Blocks: Survey data-family reconciliation.
 
@@ -310,7 +307,7 @@ Next ID: Q-RES-202
   `%7` from depends on Q-RES-200.
 
 - Q-RES-200. FMT-RES-016: When does INST.EXE run INSTALL.SCR, and does every path through the shipped script reach `end`?
-  Settles it: locate the calls of vtable entry +0x30 of the object at DS:55D8, then follow every `goto`, `pick` and `if` path of the shipped script once Q-RES-201 is answered. Blocks: Survey data-family reconciliation.
+  Settles it: locate the calls of vtable entry +0x30 of the object at DS:55D8, then follow every `goto`, `pick` and `if` path of the shipped script. Blocks: Survey data-family reconciliation.
 
 - Q-RES-020. FMT-RES-018: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the

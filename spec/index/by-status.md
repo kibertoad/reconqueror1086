@@ -378,7 +378,7 @@ Entries by status.
 
 ## recorded
 
-266 entries.
+267 entries.
 
 | ID | Title |
 |---|---|
@@ -541,6 +541,7 @@ Entries by status.
 | [FND-RES-046](../findings/FND-RES-046.md) | INST.EXE runs install.scr line by line, with labels, goto, nine percent parameters, a table of named commands and any other line run as a program |
 | [FND-RES-047](../findings/FND-RES-047.md) | INSTALL.SCR's alert, space, pick, godir, exists, testdir and del commands in INST.EXE |
 | [FND-RES-048](../findings/FND-RES-048.md) | INSTALL.SCR's if command in INST.EXE tests errorlevel or exist, with an optional not, and resumes the raw line at the expanded command's offset |
+| [FND-RES-049](../findings/FND-RES-049.md) | INSTALL.SCR's copy command in INST.EXE extracts from drivers.sip and sierra.sip beside the source, then copies matching files, with /q, /s and a + concatenation form |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |

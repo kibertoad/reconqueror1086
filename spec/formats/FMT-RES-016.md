@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-RES-045, FND-RES-046, FND-RES-047, FND-RES-048]
+evidence: [FND-RES-045, FND-RES-046, FND-RES-047, FND-RES-048, FND-RES-049]
 conflicting: []
 split_with: []
 related: []
@@ -58,8 +58,7 @@ line after one space or tab; for every command except `echo`, `alert` and
 | `testdir` | char[] | script_command | Takes a directory. When it exists and holds any file, makes it current and asks a yes/no question; the yes answer ends the script. | supported | FND-RES-047 |
 | `del` | char[] | script_command | Deletes every file its argument matches, by bare name in the current directory. | supported | FND-RES-047 |
 | `if` | char[] | script_command | Takes an optional `not`, then `errorlevel` and a number, true when the last program's result is that number or more (compared signed), or `exist` and a file pattern, true when a file matches. When the test (inverted by `not`) holds, the rest of the line runs as the next line. Any other test word shows an error box and the command is skipped. | supported | FND-RES-048 |
-
-The word `copy` is a command too; what it does is in Open questions.
+| `copy` | char[] | script_command | Takes a source pattern, an optional destination and the options `/q` (no error when nothing matches) and `/s` (no per-file messages), lower case only. First extracts the members matching the source's name and extension from `drivers.sip` and `sierra.sip` in the source's directory, when they exist, into the destination's directory or the current one. Then copies each matching file, replacing the destination, which defaults to the same name in the current directory; a destination name that is empty or starts with `*`, or an extension of `.*`, takes the source file's. With a `+` anywhere, `copy a+b` appends `b` to `a` instead. | supported | FND-RES-049 |
 
 `if` does not run its command itself. The next pass starts in the script's
 own line at the place where the command began in the expanded line, so a
@@ -94,15 +93,14 @@ a label, an empty line or one of `echo`, `end`, `clear`, `godir`, `alert`,
 `%1` to `%4` and `%%`. FND-RES-046 reads the run loop, the parameter setup,
 the expansion, the dispatch and the routines for comments, `echo`, `pause`,
 `goto`, `end`, `clear` and `cls`; FND-RES-047 reads `alert`, `space`,
-`pick`, `godir`, `exists`, `testdir` and `del`, and FND-RES-048 reads `if`.
-The `copy` routine, the program runner behind unknown words, the message lookup and
+`pick`, `godir`, `exists`, `testdir` and `del`, FND-RES-048 reads `if`,
+and FND-RES-049 reads `copy`. The archive routines `copy` calls are not read;
+the build has no `.SIP` file for them to open. The program runner behind unknown words, the message lookup and
 the window routines are not read, and neither are several run-time routines
 the commands call, such as the key read and the find-next.
 
 ## Open questions
 
-- What does `copy` do with its argument, with and without `+`, and when its
-  source is in an archive? (Q-RES-201)
 - How does the program runner behind unknown words split the program from its
   arguments, and which DOS call runs it? (Q-RES-198)
 - Which installer fields give `%1` to `%7`, and what values do they hold

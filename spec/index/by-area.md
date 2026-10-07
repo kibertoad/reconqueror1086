@@ -590,6 +590,7 @@ Entries by area.
 | [FND-RES-046](../findings/FND-RES-046.md) | INST.EXE runs install.scr line by line, with labels, goto, nine percent parameters, a table of named commands and any other line run as a program | recorded |
 | [FND-RES-047](../findings/FND-RES-047.md) | INSTALL.SCR's alert, space, pick, godir, exists, testdir and del commands in INST.EXE | recorded |
 | [FND-RES-048](../findings/FND-RES-048.md) | INSTALL.SCR's if command in INST.EXE tests errorlevel or exist, with an optional not, and resumes the raw line at the expanded command's offset | recorded |
+| [FND-RES-049](../findings/FND-RES-049.md) | INSTALL.SCR's copy command in INST.EXE extracts from drivers.sip and sierra.sip beside the source, then copies matching files, with /q, /s and a + concatenation form | recorded |
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |
