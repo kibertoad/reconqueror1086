@@ -15,8 +15,10 @@ complete the objective.
 ## Scope
 
 Areas: project planning, Survey reconciliation, BLD-GOG-EN build inventory, RES inventory findings, formats and queue planning, and shared research tooling.
-Current Survey claim: Q-RES-017 / FMT-RES-015, using the current entry title
-and file list rather than a copied filename-family label.
+Current Survey claims: Q-RES-017 / FMT-RES-015, using the current entry title
+and file list rather than a copied filename-family label; and the Survey screen
+reconciliation, which compares the screens SRC-MANUAL mentions with the SCR
+entries and adds `unknown` screen entries (areas UI and SAVE) for any missing.
 Batches: research and its tooling only. Select concrete Survey research areas
 and record their claims here before changing their entries or queue items.
 Only this goal runs locally while publication is not authorized.
@@ -32,23 +34,23 @@ None known.
 
 ## Handover
 
-- Stage: Survey. Latest research on this branch: FND-RES-031 (RULE-RES-005
-  supported), FND-RES-032 and FND-RES-033 (FMT-RES-119, FMT-RES-120),
-  FND-RES-034 (FMT-RES-015 retitled, still unknown). Latest tooling: the
-  LZEXE 0.91 unpacker in `tools/evidence/` with its test; BLD-GOG-EN's
-  CD:INST.EXE item records its packer and unpacked identity.
-- Last checks: documentation check passed at the last batch commit. Fast
-  gate passed on 2026-10-07 after installing the hash-pinned evidence
-  requirements (the engine had drifted to 8.1.0).
-- Unfinished: none. No original program ran. Post-commit audits found no
-  repository orphans; reusable MSBuild workers and other agents' processes
-  were left running. Nothing is pushed; pushing needs the owner's word.
+- Stage: Survey. Latest research on this branch: the INSTALL.SCR language and
+  commands (FND-RES-055 and FND-RES-047 to FND-RES-052), INST.EXE's text dictionary and its lookups (FND-RES-053,
+  FND-RES-056, FMT-RES-013), and the moves of the disc's `DEMOS/`, `INN/`,
+  `VESA/`, readme, version and placeholder files to Other files (FND-RES-057,
+  FND-RES-058). Latest tooling: MZ function inventories for CD:CONFIG.EXE and
+  the unpacked CD:INST.EXE, verified by Check-Coverage.
+- Last checks: documentation check passed at the last batch commit; coverage
+  check and evidence tests passed at the tooling commit. Fast gate last
+  passed on 2026-10-07 before these batches; they changed no code or tests.
+- Unfinished: the screen reconciliation claimed above has started; a manual
+  read is under way and nothing is written yet. No original program ran.
+  Ghidra ran headless twice and left no process. Nothing is pushed; pushing
+  needs the owner's word.
 - Blockers: none known.
-- Upstream reporting: GAP-016 (toolkit #324), GAP-017 (rules #81), GAP-018
-  (rules #83) and GAP-019 (toolkit #326) are filed and linked in gaps.md.
-  Future concerns still need duplicate checks first.
-- Next: Q-RES-151 (FMT-RES-011, CONFIG.EXE's script open and the program
-  that starts it, its Tried note names where to resume); Q-RES-179 to
-  Q-RES-183 (FMT-RES-120 script interpreter and fields); Q-RES-176,
-  Q-RES-177, Q-RES-178, Q-RES-172. Q-RES-017 waits for a new lead, as its
-  Tried note says; do not repeat the whole-name search.
+- Upstream reporting: GAP-016 to GAP-021 are filed and linked in gaps.md;
+  GAP-021 is toolkit #328. Future concerns still need duplicate checks first.
+- Next: finish the screen reconciliation; then Q-RES-162, Q-RES-163,
+  Q-RES-206, Q-RES-207 (FMT-RES-013); Q-RES-199, Q-RES-202, Q-RES-203
+  (FMT-RES-016); Q-RES-180 to Q-RES-182 and Q-RES-185 to Q-RES-191
+  (FMT-RES-120); Q-RES-176 to Q-RES-178. Q-RES-017 waits for a new lead, as its Tried note says.
