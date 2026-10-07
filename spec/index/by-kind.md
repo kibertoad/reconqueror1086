@@ -281,7 +281,7 @@ Entries by kind.
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |
 | [RULE-RES-004](../rules/RULE-RES-004.md) | Archive paths and which archive is open | supported |
-| [RULE-RES-005](../rules/RULE-RES-005.md) | Expanding a SETUP.SOL member's stream | unknown |
+| [RULE-RES-005](../rules/RULE-RES-005.md) | Expanding a SETUP.SOL member's stream | supported |
 | [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number generator | supported |
 | [RULE-SAVE-001](../rules/RULE-SAVE-001.md) | Load and save screens | supported |
 | [RULE-SAVE-002](../rules/RULE-SAVE-002.md) | Writing a saved game | supported |
@@ -334,7 +334,7 @@ Entries by kind.
 
 ## findings
 
-249 entries.
+250 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -479,6 +479,7 @@ Entries by kind.
 | [FND-RES-028](../findings/FND-RES-028.md) | AUTOPLAY's directory enumeration supplies each entry's long name | recorded |
 | [FND-RES-029](../findings/FND-RES-029.md) | SETUP reads two Setup keys of a SIERRA.INF it finds beside itself and starts _SETUP.EXE | recorded |
 | [FND-RES-030](../findings/FND-RES-030.md) | SETUP extracts named members from SETUP.SOL, a directory of DH9 records followed by packed streams | recorded |
+| [FND-RES-031](../findings/FND-RES-031.md) | SETUP expands SETUP.SOL members with a DCL-style explode whose binary-mode path is read in full | recorded |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |

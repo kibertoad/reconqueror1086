@@ -6,7 +6,7 @@ Entries by status.
 
 ## unknown
 
-105 entries.
+104 entries.
 
 | ID | Title |
 |---|---|
@@ -113,7 +113,6 @@ Entries by status.
 | [FMT-RES-115](../formats/FMT-RES-115.md) | Unidentified .DOC data candidates in CD:VESA |
 | [RULE-ASSAULT-027](../rules/RULE-ASSAULT-027.md) | Combatant and effect values whose layout or computation is not recorded |
 | [RULE-ASSAULT-030](../rules/RULE-ASSAULT-030.md) | Which retainer the loader removes above the cap |
-| [RULE-RES-005](../rules/RULE-RES-005.md) | Expanding a SETUP.SOL member's stream |
 | [RULE-VIEW-004](../rules/RULE-VIEW-004.md) | Surface intersection, depth and pixel test inside the raycaster |
 
 ## sourced
@@ -129,7 +128,7 @@ Entries by status.
 
 ## supported
 
-223 entries.
+224 entries.
 
 | ID | Title |
 |---|---|
@@ -286,6 +285,7 @@ Entries by status.
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding |
 | [RULE-RES-004](../rules/RULE-RES-004.md) | Archive paths and which archive is open |
+| [RULE-RES-005](../rules/RULE-RES-005.md) | Expanding a SETUP.SOL member's stream |
 | [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number generator |
 | [RULE-SAVE-001](../rules/RULE-SAVE-001.md) | Load and save screens |
 | [RULE-SAVE-002](../rules/RULE-SAVE-002.md) | Writing a saved game |
@@ -376,7 +376,7 @@ Entries by status.
 
 ## recorded
 
-248 entries.
+249 entries.
 
 | ID | Title |
 |---|---|
@@ -521,6 +521,7 @@ Entries by status.
 | [FND-RES-028](../findings/FND-RES-028.md) | AUTOPLAY's directory enumeration supplies each entry's long name |
 | [FND-RES-029](../findings/FND-RES-029.md) | SETUP reads two Setup keys of a SIERRA.INF it finds beside itself and starts _SETUP.EXE |
 | [FND-RES-030](../findings/FND-RES-030.md) | SETUP extracts named members from SETUP.SOL, a directory of DH9 records followed by packed streams |
+| [FND-RES-031](../findings/FND-RES-031.md) | SETUP expands SETUP.SOL members with a DCL-style explode whose binary-mode path is read in full |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |
@@ -680,7 +681,6 @@ Entries whose Open questions section says more than None known.
 | [FMT-RES-014](../formats/FMT-RES-014.md) | Owned disc-root indexed icon container layout | supported |
 | [FMT-RES-015](../formats/FMT-RES-015.md) | Unidentified .INF data candidates in CD root | unknown |
 | [FMT-RES-016](../formats/FMT-RES-016.md) | Unidentified .SCR data candidates in CD root | unknown |
-| [FMT-RES-017](../formats/FMT-RES-017.md) | SETUP.SOL, the first-stage installer's member archive | supported |
 | [FMT-RES-018](../formats/FMT-RES-018.md) | Unidentified .TXT data candidates in CD root | unknown |
 | [FMT-RES-019](../formats/FMT-RES-019.md) | Unidentified .WRI data candidates in CD root | unknown |
 | [FMT-RES-020](../formats/FMT-RES-020.md) | Unidentified .AVI data candidates in CD:DEMOS/MOVIES | unknown |
@@ -873,7 +873,7 @@ Entries whose Open questions section says more than None known.
 | [RULE-PERSON-006](../rules/RULE-PERSON-006.md) | Retirement at 30 | supported |
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-004](../rules/RULE-RES-004.md) | Archive paths and which archive is open | supported |
-| [RULE-RES-005](../rules/RULE-RES-005.md) | Expanding a SETUP.SOL member's stream | unknown |
+| [RULE-RES-005](../rules/RULE-RES-005.md) | Expanding a SETUP.SOL member's stream | supported |
 | [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number generator | supported |
 | [RULE-SAVE-001](../rules/RULE-SAVE-001.md) | Load and save screens | supported |
 | [RULE-SAVE-002](../rules/RULE-SAVE-002.md) | Writing a saved game | supported |

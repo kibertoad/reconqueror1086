@@ -47,5 +47,4 @@ exactly the 800,418 bytes after the directory (FND-RES-030).
 
 ## Open questions
 
-- What are the members' streams? RULE-RES-005 lists the readings.
-  (Q-RES-175)
+None.

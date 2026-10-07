@@ -1,6 +1,6 @@
 # RES
 
-Next ID: Q-RES-177
+Next ID: Q-RES-178
 
 ## Static
 
@@ -24,12 +24,13 @@ Next ID: Q-RES-177
   Blocks: INF reconciliation.
   Tried: FND-RES-030 settles the first half: SETUP expands `_SETUP.EXE` from the
   `SETUP.SOL` beside it (FMT-RES-017). Reading it needs the expanded file, so this
-  waits on Q-RES-175 for a decoder whose reading is recorded.
+  waits on Q-RES-175 for a decoder whose reading is recorded. FND-RES-031 and
+  RULE-RES-005 now give that decoder; the expanded `_SETUP.EXE` is the next step.
 
-- Q-RES-175. RULE-RES-005, FMT-RES-017: Is a SETUP.SOL member's stream PKWARE DCL implode output?
-  Settles it: read SETUP's routine at 0001:41AB and the values FND-RES-030 lists it
-  receiving, every branch, and compare the procedure with the implode format.
-  Blocks: Q-RES-174.
+- Q-RES-177. RULE-RES-005: How does SETUP's expansion routine read literals in mode 1?
+  Settles it: read 0001:45CF and the table it builds from CS:0x3601, and the
+  literal path from 0001:4417 to 0001:44A8, every branch.
+  Blocks: none.
 
 - Q-RES-176. FMT-RES-118: What does SETUP's library routine at 0001:311E do with `unk_16` and `unk_18`?
   Settles it: read the routine at 0001:311E and the interrupt or import it reaches.
