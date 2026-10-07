@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-RES-021, FND-RES-026, FND-RES-027]
+evidence: [FND-RES-021, FND-RES-026, FND-RES-027, FND-RES-028]
 conflicting: []
 split_with: []
 related: []
@@ -37,7 +37,7 @@ and `<n>` is 1 to 9.
 | `[autorun]` `OPEN` | `char[]` | `autorun_open` | Not read by AUTOPLAY. | supported | FND-RES-026 |
 | `[autorun]` `ICON` | `char[]` | `autorun_icon` | Not read by AUTOPLAY. | supported | FND-RES-026 |
 | `[Sierra]` `Title` | `char[]` | `title` | Read into 50 bytes. A directory is taken as the installed game only when its `LANGUAGE.INF` has the same `Title` in section `Ident`, compared with ASCII letter case ignored and every other byte exact. Empty or missing shows an error box, and the launcher goes on. | supported | FND-RES-026, FND-RES-027 |
-| `[Sierra]` `DirName` | `char[]` | `dir_name` | Read into 20 bytes. The name of the installed game's directory, searched for under the Sierra directory and compared with ASCII letter case ignored and every other byte exact. Empty or missing shows an error box. | supported | FND-RES-026, FND-RES-027 |
+| `[Sierra]` `DirName` | `char[]` | `dir_name` | Read into 20 bytes. The name of the installed game's directory, searched for under the Sierra directory and compared with the long name Windows reports for each directory, ASCII letter case ignored and every other byte exact. Empty or missing shows an error box. | supported | FND-RES-026, FND-RES-027, FND-RES-028 |
 | `[Sierra]` `NecFiles` | `char[]` | `nec_files` | Read into 255 bytes. Comma-separated file names that must all open inside the found directory; spaces are kept as part of each name. Empty or missing skips the check. | supported | FND-RES-026 |
 | `[Sierra]` `ExeName` | `char[]` | `exe_name` | Read into 25 bytes. The command run in the found directory, appended to the directory path and passed to `WinExec`. Empty or missing shows an error box. | supported | FND-RES-026 |
 | `[Sierra]` `DefaultLang` | `char[]` | `default_lang` | Read into 1,024 bytes. The section that supplies the messages when the user's language has no entry in the launcher's table or no section in this file. | supported | FND-RES-026 |
@@ -71,9 +71,5 @@ no other, and its `Title` and `DirName` equal those in `CD:LANGUAGE.INF`'s
   and add a line holding one space. This depends on the Windows version
   running the launcher, not on the game. (No item:
   operating-system behaviour, not decided by the game)
-- Is a `DirName` match made against the long or the short (8.3) name of a
-  directory? The names come from a library routine at 0x00411140 over
-  `FindFirstFileA` and `FindNextFileA` that FND-RES-026 does not read, and
-  the shipped `DirName` fits either form. (Q-RES-173)
 - Which program reads the `autorun` section? Windows' AutoRun is the expected
   reader; no source for this build records it yet. (Q-RES-172)

@@ -15,11 +15,6 @@ Next ID: Q-RES-174
   Tried: FND-RES-022 retains all token classes; raw separators do not settle their roles.
   FND-RES-026: AUTOPLAY does not name SIERRA.INF; SETUP remains the lead.
 
-- Q-RES-173. FMT-RES-117: Does AUTOPLAY's directory enumeration give long or short (8.3) names?
-  Settles it: read the library routine at 0x00411140 and its continuation at
-  0x00411199, including which field of the find data each copies into the record
-  `fn_004109B8` reads. Blocks: none.
-
 - Q-RES-164. FMT-RES-014: Which shipped consumer opens the disc-root icons, and are those paths reachable?
   Settles it: Trace file-open references from media/application entry points. Blocks: Survey consumer reconciliation.
 

@@ -332,7 +332,7 @@ Entries by kind.
 
 ## findings
 
-246 entries.
+247 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -474,6 +474,7 @@ Entries by kind.
 | [FND-RES-025](../findings/FND-RES-025.md) | SETUP relocations target selectors rather than the SIERRA filename offsets | recorded |
 | [FND-RES-026](../findings/FND-RES-026.md) | AUTOPLAY reads AUTORUN.INF and an installed LANGUAGE.INF through the Windows profile API | recorded |
 | [FND-RES-027](../findings/FND-RES-027.md) | AUTOPLAY's name and title comparisons fold only ASCII capital letters | recorded |
+| [FND-RES-028](../findings/FND-RES-028.md) | AUTOPLAY's directory enumeration supplies each entry's long name | recorded |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |

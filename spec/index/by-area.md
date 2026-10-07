@@ -566,6 +566,7 @@ Entries by area.
 | [FND-RES-025](../findings/FND-RES-025.md) | SETUP relocations target selectors rather than the SIERRA filename offsets | recorded |
 | [FND-RES-026](../findings/FND-RES-026.md) | AUTOPLAY reads AUTORUN.INF and an installed LANGUAGE.INF through the Windows profile API | recorded |
 | [FND-RES-027](../findings/FND-RES-027.md) | AUTOPLAY's name and title comparisons fold only ASCII capital letters | recorded |
+| [FND-RES-028](../findings/FND-RES-028.md) | AUTOPLAY's directory enumeration supplies each entry's long name | recorded |
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |
