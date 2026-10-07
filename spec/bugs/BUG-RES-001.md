@@ -7,7 +7,7 @@ superseded_by: []
 impact: presentation
 intent: unintended
 player_reliance: not-relied-on
-evidence: [FND-RES-046, FND-RES-050]
+evidence: [FND-RES-055, FND-RES-050]
 conflicting: []
 split_with: []
 related: [FMT-RES-016]
@@ -27,7 +27,7 @@ key of the `pick` command on line 16.
 ## Mechanism
 
 `pick` jumps through `goto`, which looks forward for a label equal to the
-word byte for byte (FND-RES-046). The word on line 16 differs in letter case
+word byte for byte (FND-RES-055). The word on line 16 differs in letter case
 from the label on line 53 and is one character short of the label on line
 81, so no label matches, every later line is skipped and the run ends at the
 end of the script (FND-RES-050).

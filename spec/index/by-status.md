@@ -176,7 +176,7 @@ Entries by status.
 | [FMT-RES-009](../formats/FMT-RES-009.md) | Owned autoplay indexed bitmap layout |
 | [FMT-RES-010](../formats/FMT-RES-010.md) | ASCII key/value syntax in CD-root RESOURCE.CFG |
 | [FMT-RES-011](../formats/FMT-RES-011.md) | ASCII line framing of CD-root INSTALL.DAT |
-| [FMT-RES-013](../formats/FMT-RES-013.md) | Marked ASCII text framing of CD-root INSTALL.HLP |
+| [FMT-RES-013](../formats/FMT-RES-013.md) | INST.EXE text dictionary syntax of CD-root INSTALL.TXT and INSTALL.HLP |
 | [FMT-RES-014](../formats/FMT-RES-014.md) | Owned disc-root indexed icon container layout |
 | [FMT-RES-016](../formats/FMT-RES-016.md) | INST.EXE script syntax of CD-root INSTALL.SCR |
 | [FMT-RES-017](../formats/FMT-RES-017.md) | SETUP.SOL, the first-stage installer's member archive |
@@ -370,16 +370,18 @@ Entries by status.
 
 ## superseded
 
-2 entries.
+4 entries.
 
 | ID | Title |
 |---|---|
 | [FMT-RES-012](../formats/FMT-RES-012.md) | Unidentified .GOB data candidates in CD root |
+| [FND-RES-044](../findings/FND-RES-044.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case |
+| [FND-RES-046](../findings/FND-RES-046.md) | INST.EXE runs install.scr line by line, with labels, goto, nine percent parameters, a table of named commands and any other line run as a program |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 
 ## recorded
 
-270 entries.
+271 entries.
 
 | ID | Title |
 |---|---|
@@ -537,15 +539,16 @@ Entries by status.
 | [FND-RES-041](../findings/FND-RES-041.md) | CONFIG.EXE stops its script run at @FINISH and, just before exiting, reopens the script there to echo text and run commands up to @ENDFINISH |
 | [FND-RES-042](../findings/FND-RES-042.md) | CONFIG.EXE reads a word at the start of a line followed by a colon as a label, echoes @DISPLAY text to the screen, and stops at any other bare word |
 | [FND-RES-043](../findings/FND-RES-043.md) | CONFIG.EXE's @GetOutDrive, @GetSubdir and @GetOption echo their block text to the screen like @Display |
-| [FND-RES-044](../findings/FND-RES-044.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case |
 | [FND-RES-045](../findings/FND-RES-045.md) | INST.EXE takes the switches M, Z, F and D from its command line and loads install.scr whole before it reads RESOURCE.CFG |
-| [FND-RES-046](../findings/FND-RES-046.md) | INST.EXE runs install.scr line by line, with labels, goto, nine percent parameters, a table of named commands and any other line run as a program |
 | [FND-RES-047](../findings/FND-RES-047.md) | INSTALL.SCR's alert, space, pick, godir, exists, testdir and del commands in INST.EXE |
 | [FND-RES-048](../findings/FND-RES-048.md) | INSTALL.SCR's if command in INST.EXE tests errorlevel or exist, with an optional not, and resumes the raw line at the expanded command's offset |
 | [FND-RES-049](../findings/FND-RES-049.md) | INSTALL.SCR's copy command in INST.EXE extracts from drivers.sip and sierra.sip beside the source, then copies matching files, with /q, /s and a + concatenation form |
 | [FND-RES-050](../findings/FND-RES-050.md) | INST.EXE runs INSTALL.SCR from vtable entry +0x5C after two installer checks, and one choice of the shipped script's menu misses its label |
 | [FND-RES-051](../findings/FND-RES-051.md) | INST.EXE runs an unknown INSTALL.SCR line through spawn with one argument string, then the command interpreter, with standard output redirected for > and >> |
 | [FND-RES-052](../findings/FND-RES-052.md) | INST.EXE's bytes behind INSTALL.SCR's %1 and %2 are the destination drive letter and the drive the installer started on |
+| [FND-RES-053](../findings/FND-RES-053.md) | INST.EXE loads every message and help text from install.txt, install.hlp and the other .txt and .hlp files into one keyed dictionary marked by double-backslash lines |
+| [FND-RES-054](../findings/FND-RES-054.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case |
+| [FND-RES-055](../findings/FND-RES-055.md) | INST.EXE runs install.scr line by line, with labels, goto, nine percent parameters, a table of named commands and any other line run as a program |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |
@@ -701,7 +704,7 @@ Entries whose Open questions section says more than None known.
 | [FMT-RES-009](../formats/FMT-RES-009.md) | Owned autoplay indexed bitmap layout | supported |
 | [FMT-RES-010](../formats/FMT-RES-010.md) | ASCII key/value syntax in CD-root RESOURCE.CFG | supported |
 | [FMT-RES-012](../formats/FMT-RES-012.md) | Unidentified .GOB data candidates in CD root | superseded |
-| [FMT-RES-013](../formats/FMT-RES-013.md) | Marked ASCII text framing of CD-root INSTALL.HLP | supported |
+| [FMT-RES-013](../formats/FMT-RES-013.md) | INST.EXE text dictionary syntax of CD-root INSTALL.TXT and INSTALL.HLP | supported |
 | [FMT-RES-014](../formats/FMT-RES-014.md) | Owned disc-root indexed icon container layout | supported |
 | [FMT-RES-015](../formats/FMT-RES-015.md) | CONQUER.INF, the CD marker the install script tests for | unknown |
 | [FMT-RES-016](../formats/FMT-RES-016.md) | INST.EXE script syntax of CD-root INSTALL.SCR | supported |

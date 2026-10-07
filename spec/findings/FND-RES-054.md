@@ -1,9 +1,9 @@
 ---
-id: FND-RES-044
+id: FND-RES-054
 title: INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case
-status: superseded
+status: recorded
 builds: [BLD-GOG-EN]
-superseded_by: [FND-RES-054]
+superseded_by: []
 recorded_by: kibertoad
 reproduced_by: []
 method: static
@@ -76,9 +76,9 @@ sets the word at +0x1F5 to 1 (20F3:00F8) and the byte at +0x213 to 0x3D,
 
 DS:1A04 holds the far pointer 2583:55D8 in the file, with a relocation entry
 on its segment word; the byte search for 0x04 0x1A finds `les` reads of it
-and no store encoding. Main copies `argv[0]` into the string at DS:53AC and
-calls vtable entry +0x1C of that object with `argc` and `argv`. The 31
-entries of DS:1A14 equal those of DS:1846 except +0x18; +0x1C is 20F3:029C,
+and no store encoding. Main calls 2852:00BD with the text-dictionary object
+at DS:53AC and `argv[0]` (FND-RES-053), then calls vtable entry +0x1C of the
+object at DS:55D8 with `argc` and `argv`. The 31 entries of DS:1A14 equal those of DS:1846 except +0x18; +0x1C is 20F3:029C,
 +0x48 is 20F3:1093 and +0x4C is 20F3:1102.
 
 20F3:029C forms DS:5557 followed by `install.sip` (DS:14E8), and when DOS
@@ -174,6 +174,10 @@ objects.
   compared without case.
 - CONFIG.EXE or SETUP.EXE reads this file: not tested here; this finding
   locates the reader in INST.EXE and searched no other program.
+- DS:53AC is a string that main fills from `argv[0]`: ruled out. This
+  replaces FND-RES-044, which said so. A read of 2852:004E and 2852:00BD
+  (FND-RES-053) shows DS:53AC is the text-dictionary object, and main
+  passes `argv[0]` to its loader.
 
 ## How to reproduce
 

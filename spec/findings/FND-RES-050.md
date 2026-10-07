@@ -25,8 +25,8 @@ environment: null
 
 The unpacked file, its notation, the object at DS:55D8 with its vtables
 DS:1846 and DS:1A14, the routine 20F3:029C and the switch word +0x1F3 are
-as FND-RES-044 and FND-RES-045 give them. The script commands are as
-FND-RES-046 to FND-RES-049 give them.
+as FND-RES-054 and FND-RES-045 give them. The script commands are as
+FND-RES-055 to FND-RES-049 give them.
 
 Callers. Entry +0x30 of both vtables is 1C17:01AE and entry +0x5C is
 20F3:2949. A search of the load image for the encodings of a far call
@@ -101,7 +101,7 @@ by the first two choices.
 
 ## How to reproduce
 
-Unpack `CD:INST.EXE` as FND-RES-044 gives. Read the far pointers at +0x30
+Unpack `CD:INST.EXE` as FND-RES-054 gives. Read the far pointers at +0x30
 and +0x5C of DS:1846 and DS:1A14. Search the load image for 0xFF 0x5F 0x30
 and for 0xFF followed by a byte 0x50 to 0x5F and 0x5C, and decode each hit.
 Disassemble the ranges in Locations as 16-bit code with the load image at

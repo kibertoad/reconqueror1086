@@ -25,7 +25,7 @@ environment: null
 
 The unpacked file, its notation, the run loop, the dispatch, the message box
 1C17:0745 and the program runner's store of a result word into DS:5340 are as
-FND-RES-046 gives them; 1C17:1F1B is as FND-RES-047 gives it.
+FND-RES-055 gives them; 1C17:1F1B is as FND-RES-047 gives it.
 A byte search of the load image for 0x40 0x53 finds the store at 1C17:0731
 in the program runner and the read at 1C17:1D2B below, and nothing else.
 
@@ -85,7 +85,7 @@ and skips the command.
 
 ## How to reproduce
 
-Unpack `CD:INST.EXE` as FND-RES-044 gives. Disassemble the ranges in
+Unpack `CD:INST.EXE` as FND-RES-054 gives. Disassemble the ranges in
 Locations as 16-bit code with the load image at segment 0x1000 and relocation
 targets marked, read the strings from DS:116A to DS:11ED, and search the
 load image for 0x40 0x53. Keep listings

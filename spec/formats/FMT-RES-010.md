@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-RES-016, FND-RES-044]
+evidence: [FND-RES-016, FND-RES-054]
 conflicting: []
 split_with: []
 related: []
@@ -25,7 +25,7 @@ constraints [FND-RES-016].
 
 The installer `INST.EXE` reads the file as `resource.cfg` from the current
 directory, with no drive or directory added. Its reader accepts a wider
-language than the shipped file uses, supported by FND-RES-044:
+language than the shipped file uses, supported by FND-RES-054:
 
 - Each line is read into a buffer of 0x8D bytes and split at its first `=`.
   A line with no `=` has an empty key and value.
@@ -74,7 +74,7 @@ path-resolution behavior is asserted.
 
 For `cd`, `smartDrv` and `floppy` (the last only when no directory is
 given), the reader sets a flag only for the value `yes`, compared without
-case; any other value leaves the flag as it was [FND-RES-044]. The meaning of each flag, and the values other keys accept,
+case; any other value leaves the flag as it was [FND-RES-054]. The meaning of each flag, and the values other keys accept,
 are not established. The stored letter
 and digit tokens above are not a list of all accepted values.
 
@@ -86,7 +86,7 @@ None known.
 
 FND-RES-016 checks the whole listed file, every line and exact byte reconstruction.
 This entry does not cover similarly named files in media subdirectories or other
-configuration files. FND-RES-044 reads INST.EXE's reader and its line splitter;
+configuration files. FND-RES-054 reads INST.EXE's reader and its line splitter;
 the run-time library routines it calls for opening, reading lines and number
 conversion, the handler objects and the uses of the stored values are not
 read.
@@ -95,7 +95,7 @@ read.
 
 - Does INST.EXE reach its read of `resource.cfg` when `INSTALL.BAT` starts it
   as `inst.exe -f`? Main reaches it unless one of the calls the object makes
-  first ends the run (FND-RES-044); along direct calls those end it only on
+  first ends the run (FND-RES-054); along direct calls those end it only on
   failures, and eleven indirect calls are not resolved (FND-RES-045).
   (Q-RES-192)
 - How does the consumer interpret the `directory` value token? Its stored spelling

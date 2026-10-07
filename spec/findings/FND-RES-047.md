@@ -70,7 +70,7 @@ environment: null
 
 The unpacked file, its notation, the command table, the dispatch and its
 argument, the message lookup 2852:0B71 and the message box 1C17:0745 are as
-FND-RES-046 gives them. Every routine here reads its argument with 1000:620F
+FND-RES-055 gives them. Every routine here reads its argument with 1000:620F
 and a `%s` format, into stack buffers with no width given.
 
 Helpers read here:
@@ -213,7 +213,7 @@ A byte search of `INSTALL.HLP`, `LANGUAGE.INF`, `SIERRA.INF` and
 
 ## How to reproduce
 
-Unpack `CD:INST.EXE` as FND-RES-044 gives. Disassemble the ranges in
+Unpack `CD:INST.EXE` as FND-RES-054 gives. Disassemble the ranges in
 Locations as 16-bit code with the load image at segment 0x1000 and relocation
 targets marked, and read the strings at DS:003D, DS:0F33 to DS:1016, DS:115A
 to DS:1169 and DS:2BFB to DS:2C15. Search the CD-root text files named above

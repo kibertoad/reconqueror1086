@@ -33,7 +33,7 @@ environment: null
 ## Observation
 
 The unpacked file, its notation and the call from 1C17:05D5 are as
-FND-RES-046 gives them: 1C17:05D5 builds an object on its stack through
+FND-RES-055 gives them: 1C17:05D5 builds an object on its stack through
 1C17:1EA8, sets its vtable word to DS:1202, calls the vtable's first entry
 with the object and a string made from the line, maps the result to a
 message and stores the object's word at +8 in DS:5340. Run-time routines
@@ -104,7 +104,7 @@ the command interpreter, which handles built-in commands and batch files.
 -1 after the command interpreter path, whose result is not kept. With `>`
 the file is deleted and created anew; with `>>` it is opened for appending
 and the open fails when the file does not exist, unlike `echo`'s `>>`
-(FND-RES-046). Both keep standard output pointed at the file while the
+(FND-RES-055). Both keep standard output pointed at the file while the
 program runs and restore it after. When the output is not redirected, the
 installer calls two routines before and two after the program, which
 probably give the screen to the program and take it back.
@@ -125,7 +125,7 @@ values.
 
 ## How to reproduce
 
-Unpack `CD:INST.EXE` as FND-RES-044 gives. Read the far pointers at DS:11EE,
+Unpack `CD:INST.EXE` as FND-RES-054 gives. Read the far pointers at DS:11EE,
 DS:11F6 and DS:1202 and the strings at DS:3A7E to DS:3A89. Disassemble the
 ranges in Locations as 16-bit code with the load image at segment 0x1000 and
 relocation targets marked. Keep listings in ignored local storage.

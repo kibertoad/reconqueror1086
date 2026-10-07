@@ -4,7 +4,7 @@ title: Unidentified .TXT data candidates in CD root
 status: unknown
 builds: [BLD-GOG-EN]
 superseded_by: []
-files: ["CD:EMPTY.TXT", "CD:INSTALL.TXT", "CD:README.TXT", "CD:VERSION.TXT"]
+files: ["CD:EMPTY.TXT", "CD:README.TXT", "CD:VERSION.TXT"]
 byte_order: little # provisional hypothesis; see Open questions
 size: null
 text: false # provisional hypothesis; see Open questions

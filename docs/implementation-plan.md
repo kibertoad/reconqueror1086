@@ -14,8 +14,8 @@ BLD-GOG-EN. Survey remains open until every manifest data family and all
 manual-mentioned screens are reconciled. Conservatively retained auxiliary media
 need runtime-use review and format entries until evidence supports exclusion.
 Research continues with Q-RES-017 / FMT-RES-015; Q-RES-164 through
-Q-RES-167 retain icon-consumer questions; Q-RES-158 through
-Q-RES-163 retain help-text consumer questions; Q-RES-157 retains the
+Q-RES-167 retain icon-consumer questions; Q-RES-162, Q-RES-163,
+Q-RES-204 and Q-RES-205 retain text-dictionary questions; Q-RES-157 retains the
 archive-copy consumer question; Q-RES-141 through
 Q-RES-150 and Q-RES-192 retain configuration-consumer questions; Q-RES-199, Q-RES-202 and
 Q-RES-203 retain install-script questions; Q-RES-135 through

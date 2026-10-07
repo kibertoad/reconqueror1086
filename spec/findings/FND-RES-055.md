@@ -1,9 +1,9 @@
 ---
-id: FND-RES-046
+id: FND-RES-055
 title: INST.EXE runs install.scr line by line, with labels, goto, nine percent parameters, a table of named commands and any other line run as a program
-status: superseded
+status: recorded
 builds: [BLD-GOG-EN]
-superseded_by: [FND-RES-055]
+superseded_by: []
 recorded_by: kibertoad
 reproduced_by: []
 method: static
@@ -54,7 +54,7 @@ environment: null
 ## Observation
 
 The unpacked file, its notation, the object at DS:55D8 and the script buffer
-are as FND-RES-044 and FND-RES-045 give them: the whole of `install.scr` is
+are as FND-RES-054 and FND-RES-045 give them: the whole of `install.scr` is
 at the far pointer DS:534A, its length in DS:534E, with a 0 stored at the
 byte after the last one read. Vtable entry +0x30 of the object is 1C17:01AE.
 
@@ -63,7 +63,7 @@ byte equal to its character argument, testing equality before the end, or
 null at the first NUL; 1000:63F7 returns the length up to the first NUL, and
 0 for a null pointer; 1000:632B counts the leading bytes of its first string
 that are not in its second. 1000:63B6 compares without case and 1000:643A
-compares a given number of bytes keeping case, as FND-RES-044 gives;
+compares a given number of bytes keeping case, as FND-RES-054 gives;
 1000:62D2 compares two strings keeping case.
 
 Run loop, 1C17:01AE (this):
@@ -167,8 +167,8 @@ Program runner, 1C17:05D5 (line), builds an object with the vtable word
 DS:1202, a string made from the line, and calls the vtable's first entry with
 them. The result picks a message key: 1 `redirOpenErr` (DS:0ED2), 2 `execErr`
 (DS:0EED), 3 `redirCloseErr` (DS:0EDF); any other result shows nothing. For a
-key it fetches text through 2852:0B71 with the key and the string at DS:53AC,
-and calls 1C17:0745 with that text and the line. The word at [bp-0x14] of
+key it fetches text through 2852:0B71 with the text-dictionary object at
+DS:53AC and the key (FND-RES-053), and calls 1C17:0745 with that text and the line. The word at [bp-0x14] of
 the object's frame goes to DS:5340 on every path.
 
 Message box, 1C17:0745 (format, ...), formats into a 0xD6-byte stack buffer
@@ -247,10 +247,14 @@ The shipped script reaches neither 0x1A line along straight-line flow, since
 - `%%` gives a literal `%` as in DOS batch files: ruled out; both bytes are
   dropped.
 - Command names keep case: ruled out; they are compared through 1000:63B6.
+- DS:53AC is a string passed with the key: ruled out. This replaces
+  FND-RES-046, which said so. A read of 2852:004E and 2852:0B71
+  (FND-RES-053) shows DS:53AC is the text-dictionary object that 0B71
+  searches for the key.
 
 ## How to reproduce
 
-Unpack `CD:INST.EXE` as FND-RES-044 gives. Disassemble the ranges in
+Unpack `CD:INST.EXE` as FND-RES-054 gives. Disassemble the ranges in
 Locations as 16-bit code with the load image at segment 0x1000 and relocation
 targets marked. Read the 10-byte entries from DS:0CAE to the null name and the
 strings from DS:0E2A to DS:0F32. Search the load image for the byte pairs

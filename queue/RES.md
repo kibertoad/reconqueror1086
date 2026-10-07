@@ -1,6 +1,6 @@
 # RES
 
-Next ID: Q-RES-204
+Next ID: Q-RES-206
 
 ## Static
 
@@ -78,26 +78,19 @@ Next ID: Q-RES-204
   Settles it: Read admission and failure paths without inferring them from stored files. Blocks: Survey consumer reconciliation.
 
 
-- Q-RES-158. FMT-RES-013: Which shipped reader consumes CD-root INSTALL.HLP, and is that path reachable?
-  Settles it: trace filename references from installation/media entry points into the reader. Blocks: Survey data-family reconciliation.
-  Tried: FND-RES-046 finds INST.EXE fetching its message texts by key
-  (`outputErr`, `pauseMsg`, `enterEsc`) through 2852:0B71 with its own path;
-  that routine was not read, so which file it reads is open.
+- Q-RES-162. FMT-RES-013: Does INST.EXE's text-mode read stop at the 0x1A byte, keeping it out of the last entry's text?
+  Settles it: read the run-time `fgets` and text-mode read path under 1000:4543 for 0x1A handling. Blocks: Survey data-family reconciliation.
+  Tried: FND-RES-053 reads the dictionary parser; the run-time read below it was not read.
 
-- Q-RES-159. FMT-RES-013: What roles do the backslash-prefixed regions have?
-  Settles it: trace prefix recognition and every dispatch path using the marker remainder. Blocks: Survey data-family reconciliation.
+- Q-RES-163. FMT-RES-013: How does INST.EXE show tab bytes in a dictionary text?
+  Settles it: trace the texts INSTALL.HLP holds into the routines that draw them. Blocks: Survey data-family reconciliation.
+  Tried: FND-RES-053 shows the dictionary keeps tabs; no display routine was read.
 
-- Q-RES-160. FMT-RES-013: Does marker lookup retain or normalize trailing whitespace?
-  Settles it: read token boundaries and comparison inputs. Blocks: Survey data-family reconciliation.
+- Q-RES-204. FMT-RES-013: Which INST.EXE code looks up the keys of INSTALL.HLP, and with what keys?
+  Settles it: find every caller of 2852:0B71 and 2852:0A8B and how each forms its key. Blocks: Survey data-family reconciliation.
 
-- Q-RES-161. FMT-RES-013: How does the reader handle repeated complete marker remainders?
-  Settles it: read search order and behavior after a match. Blocks: Survey data-family reconciliation.
-
-- Q-RES-162. FMT-RES-013: How does the reader treat 0x1A and the following CRLF?
-  Settles it: read control-byte recognition and end-of-input branches. Blocks: Survey data-family reconciliation.
-
-- Q-RES-163. FMT-RES-013: How does the reader handle tabs within text regions?
-  Settles it: trace tab recognition through tokenization and presentation decisions. Blocks: Survey data-family reconciliation.
+- Q-RES-205. FMT-RES-013: Which flag does each caller of 2852:0B71 pass, so that a missing key ends the run or gives an empty text?
+  Settles it: read the flag argument at every call of 2852:0B71. Blocks: Survey data-family reconciliation.
 
 
 - Q-RES-157. FMT-RES-001: Which consumer selects the disc-root C1086.GOB copy
@@ -116,14 +109,14 @@ Next ID: Q-RES-204
 - Q-RES-141. FMT-RES-010: How does the consumer interpret the directory value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
   Blocks: Survey data-family reconciliation.
-  Tried: FND-RES-044 reads INST.EXE's reader, which copies the value to
+  Tried: FND-RES-054 reads INST.EXE's reader, which copies the value to
   object+0x194 and to the string at +0x18 of the object at +0x1EB; the uses of
   that field are not read.
 
 - Q-RES-142. FMT-RES-010: How does the consumer interpret the videoDrv value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
   Blocks: Survey data-family reconciliation.
-  Tried: FND-RES-044 finds that INST.EXE's reader passes this key to the
+  Tried: FND-RES-054 finds that INST.EXE's reader passes this key to the
   objects listed at object+2 (count at +0x192) through vtable entry +0x2C of
   each. Which objects the list holds (2487:0047 passes nine to vtable entry
   +0x00) and what they do are not read.
@@ -131,13 +124,13 @@ Next ID: Q-RES-204
 - Q-RES-143. FMT-RES-010: How does the consumer interpret the cd value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
   Blocks: Survey data-family reconciliation.
-  Tried: FND-RES-044 reads INST.EXE's reader, which sets the word at +0x1FB to
+  Tried: FND-RES-054 reads INST.EXE's reader, which sets the word at +0x1FB to
   1 for `yes`; the uses of that field are not read.
 
 - Q-RES-144. FMT-RES-010: How does the consumer interpret the joyDrv value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
   Blocks: Survey data-family reconciliation.
-  Tried: FND-RES-044 finds that INST.EXE's reader passes this key to the
+  Tried: FND-RES-054 finds that INST.EXE's reader passes this key to the
   objects listed at object+2 (count at +0x192) through vtable entry +0x2C of
   each. Which objects the list holds (2487:0047 passes nine to vtable entry
   +0x00) and what they do are not read.
@@ -145,7 +138,7 @@ Next ID: Q-RES-204
 - Q-RES-145. FMT-RES-010: How does the consumer interpret the memoryDrv value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
   Blocks: Survey data-family reconciliation.
-  Tried: FND-RES-044 finds that INST.EXE's reader passes this key to the
+  Tried: FND-RES-054 finds that INST.EXE's reader passes this key to the
   objects listed at object+2 (count at +0x192) through vtable entry +0x2C of
   each. Which objects the list holds (2487:0047 passes nine to vtable entry
   +0x00) and what they do are not read.
@@ -153,26 +146,26 @@ Next ID: Q-RES-204
 - Q-RES-146. FMT-RES-010: How does the consumer interpret the minCPU value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
   Blocks: Survey data-family reconciliation.
-  Tried: FND-RES-044 reads INST.EXE's reader, which copies the value to the
+  Tried: FND-RES-054 reads INST.EXE's reader, which copies the value to the
   string at +0x203; the uses of that field are not read.
 
 - Q-RES-147. FMT-RES-010: How does the consumer interpret the minDOS value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
   Blocks: Survey data-family reconciliation.
-  Tried: FND-RES-044 reads INST.EXE's reader, which converts the value through
+  Tried: FND-RES-054 reads INST.EXE's reader, which converts the value through
   1000:414A and keeps the low word at +0x207; the uses of that field are not
   read.
 
 - Q-RES-148. FMT-RES-010: How does the consumer interpret the mode value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
   Blocks: Survey data-family reconciliation.
-  Tried: FND-RES-044 reads INST.EXE's reader, which copies the value to the
+  Tried: FND-RES-054 reads INST.EXE's reader, which copies the value to the
   string at +0x1FF; the uses of that field are not read.
 
 - Q-RES-149. FMT-RES-010: How does the consumer interpret the mouseDrv value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
   Blocks: Survey data-family reconciliation.
-  Tried: FND-RES-044 finds that INST.EXE's reader passes this key to the
+  Tried: FND-RES-054 finds that INST.EXE's reader passes this key to the
   objects listed at object+2 (count at +0x192) through vtable entry +0x2C of
   each. Which objects the list holds (2487:0047 passes nine to vtable entry
   +0x00) and what they do are not read.
@@ -180,7 +173,7 @@ Next ID: Q-RES-204
 - Q-RES-150. FMT-RES-010: How does the consumer interpret the smartDrv value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
   Blocks: Survey data-family reconciliation.
-  Tried: FND-RES-044 reads INST.EXE's reader, which sets the word at +0x1FD to
+  Tried: FND-RES-054 reads INST.EXE's reader, which sets the word at +0x1FD to
   1 for `yes`; the uses of that field are not read.
 
 
@@ -301,7 +294,7 @@ Next ID: Q-RES-204
   Settles it: trace every write to the object fields +0x1E6, +0x23E, +0x1DE, +0x194, +0x1AA and +0x1AE and to DS:5557 before vtable entry +0x30 is called. Blocks: Survey data-family reconciliation.
   Tried: FND-RES-047 finds that `space` writes the free megabytes into +0x1AE
   of the object at DS:1A04; FND-RES-050 finds the run loop called on the
-  object at DS:55D8, which DS:1A04 points to (FND-RES-044). FND-RES-052
+  object at DS:55D8, which DS:1A04 points to (FND-RES-054). FND-RES-052
   settles `%1` and `%2`; the string fields behind `%3` to `%6` are written
   through string routines in 20F3, 2487 and 2821 that are not read.
 

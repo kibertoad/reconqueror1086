@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-RES-045, FND-RES-046, FND-RES-047, FND-RES-048, FND-RES-049, FND-RES-050, FND-RES-051, FND-RES-052]
+evidence: [FND-RES-045, FND-RES-055, FND-RES-047, FND-RES-048, FND-RES-049, FND-RES-050, FND-RES-051, FND-RES-052]
 conflicting: []
 split_with: []
 related: []
@@ -18,7 +18,7 @@ related: []
 ## Layout
 
 `INSTALL.SCR` is a script that the installer `INST.EXE` loads whole and runs
-from top to bottom, one line at a time [FND-RES-045, FND-RES-046]. It runs
+from top to bottom, one line at a time [FND-RES-045, FND-RES-055]. It runs
 after two of the installer's own checks pass, when the drive being
 installed to differs from the one the installer started on or `-f` was
 given on its command line [FND-RES-050, FND-RES-052].
@@ -48,12 +48,12 @@ line after one space or tab; for every command except `echo`, `alert` and
 
 | Key | Type | Name | Meaning | Status | Evidence |
 |---|---|---|---|---|---|
-| `;`, `rem`, `/*`, `//` | char[] | script_command | Comment: the line does nothing. | supported | FND-RES-046 |
-| `echo` | char[] | script_command | Writes its argument and a line break to the installer's window. With `>`, the text before it goes to the named file instead, replacing it; with `>>` it is appended. A line break is added unless the text ends in one. | supported | FND-RES-046 |
-| `pause` | char[] | script_command | Writes its argument, used as a format string, or a standard prompt when it has none, then a line break; between the two it calls a routine that is not read. | supported | FND-RES-046 |
-| `goto` | char[] | script_command | Jumps to a label (see below). | supported | FND-RES-046 |
-| `end` | char[] | script_command | Stops the script. | supported | FND-RES-046 |
-| `clear`, `cls` | char[] | script_command | Clear the window. | supported | FND-RES-046 |
+| `;`, `rem`, `/*`, `//` | char[] | script_command | Comment: the line does nothing. | supported | FND-RES-055 |
+| `echo` | char[] | script_command | Writes its argument and a line break to the installer's window. With `>`, the text before it goes to the named file instead, replacing it; with `>>` it is appended. A line break is added unless the text ends in one. | supported | FND-RES-055 |
+| `pause` | char[] | script_command | Writes its argument, used as a format string, or a standard prompt when it has none, then a line break; between the two it calls a routine that is not read. | supported | FND-RES-055 |
+| `goto` | char[] | script_command | Jumps to a label (see below). | supported | FND-RES-055 |
+| `end` | char[] | script_command | Stops the script. | supported | FND-RES-055 |
+| `clear`, `cls` | char[] | script_command | Clear the window. | supported | FND-RES-055 |
 | `alert` | char[] | script_command | Shows its argument in a message box. Enter goes on; any other key leaves the installer. | supported | FND-RES-047 |
 | `space` | char[] | script_command | Takes a drive letter, a number of kilobytes and a label. Jumps to the label when the drive's free space in kilobytes is less than the number, of which only the low 16 bits count. Also stores the free space as megabytes with one decimal. Stops the installer with an error when RESOURCE.CFG sets `space`. | supported | FND-RES-047 |
 | `pick` | char[] | script_command | Takes a list of key letters and four labels. Waits for a key in the list, without regard to case, signalling any other key, and jumps to the label in that key's position. A key whose code has a low byte of 0 selects the position after the last letter. | supported | FND-RES-047 |
@@ -96,13 +96,13 @@ None known.
 
 ## Coverage
 
-FND-RES-046 counts the shipped file's lines: every first word is a comment,
+FND-RES-055 counts the shipped file's lines: every first word is a comment,
 a label, an empty line or one of `echo`, `end`, `clear`, `godir`, `alert`,
 `copy`, `goto`, `space`, `pick` and `pause`, apart from two lines holding only
 0x1A, the second without a line end, which follow an `end`. The file uses
 `%1` to `%4` and `%%`.
 
-FND-RES-046 reads the run loop, the parameter setup, the expansion, the
+FND-RES-055 reads the run loop, the parameter setup, the expansion, the
 dispatch and the routines for comments, `echo`, `pause`, `goto`, `end`,
 `clear` and `cls`. FND-RES-047 reads `alert`, `space`, `pick`, `godir`,
 `exists`, `testdir` and `del`, FND-RES-048 reads `if`, FND-RES-049 reads
