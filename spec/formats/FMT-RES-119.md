@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-RES-021, FND-RES-026, FND-RES-032]
+evidence: [FND-RES-021, FND-RES-026, FND-RES-032, FND-RES-033]
 conflicting: []
 split_with: []
 related: []
@@ -31,7 +31,7 @@ with CR LF line ends and no line end after its last line (FND-RES-021).
 |---|---|---|---|---|---|
 | `[Ident]` `Title` | `char[]` | `title` | Read by the launcher into 50 bytes from an installed copy and compared with `AUTORUN.INF`'s `Title` (FMT-RES-117). | supported | FND-RES-026 |
 | `[Ident]` `ShortTitle` | `char[]` | `short_title` | Read by `_SETUP.EXE` into 0x50 bytes, default empty. | supported | FND-RES-032 |
-| `[Strings]` `<key>` | `char[]` | `strings` | Read by `_SETUP.EXE` under a key name its caller passes, into 0x200 bytes with an empty default, or into 0x50 bytes with an empty default or `Sierra`. Which keys are requested is not traced. | supported | FND-RES-032 |
+| `[Strings]` `<key>` | `char[]` | `strings` | Read by `_SETUP.EXE` under a key name its caller passes. Dialog titles and item texts in SIERRA.INF's `[Dialogs]` section (FMT-RES-120) that do not start with `*` are keys, read into 0x200 bytes with an empty default, so a missing key gives empty text. Two other reads, into 0x50 bytes with an empty default or `Sierra`, take keys not traced. | supported | FND-RES-032, FND-RES-033 |
 
 ## Enumerations and flags
 
@@ -50,9 +50,10 @@ requests. Its `Strings` section repeats the key `InstallDoneTitle`
 
 ## Open questions
 
-- Which `Strings` keys does `_SETUP.EXE` request, and is `InstallDoneTitle`
-  among them? The four reads at the `Strings` sites take the key from their
-  callers, which are not read. (Q-RES-169)
+- Which keys do the `Strings` reads at 0004:472C and 0004:496B request?
+  The shipped `[Dialogs]` section requests `InstallDoneTitle` once
+  (FND-RES-033); these two take their keys from callers not yet read.
+  (Q-RES-183)
 - Which occurrence of the repeated `InstallDoneTitle` does a read return?
   The profile routine decides, not the game; Windows versions are expected
   to return the first, which no source for this build records. (No item:

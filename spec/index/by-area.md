@@ -541,6 +541,7 @@ Entries by area.
 | [FMT-RES-117](../formats/FMT-RES-117.md) | AUTORUN.INF, the CD launcher's profile file | supported |
 | [FMT-RES-118](../formats/FMT-RES-118.md) | SETUP.SOL directory record | supported |
 | [FMT-RES-119](../formats/FMT-RES-119.md) | LANGUAGE.INF, the installer's profile file of titles and strings | supported |
+| [FMT-RES-120](../formats/FMT-RES-120.md) | SIERRA.INF, the installer's script file | supported |
 | [FND-RES-001](../findings/FND-RES-001.md) | All 100 containers share one layout: a header, the entry data packed from offset 8, and a directory of 52-byte records at the end | recorded |
 | [FND-RES-002](../findings/FND-RES-002.md) | One archive is open at a time; the game opens it, finds an entry by name or index, and reads it by its kind | recorded |
 | [FND-RES-003](../findings/FND-RES-003.md) | Kind 1 is a sequence of length-prefixed blocks, each stored or compressed with literals, back-references and runs | recorded |
@@ -573,6 +574,7 @@ Entries by area.
 | [FND-RES-030](../findings/FND-RES-030.md) | SETUP extracts named members from SETUP.SOL, a directory of DH9 records followed by packed streams | recorded |
 | [FND-RES-031](../findings/FND-RES-031.md) | SETUP expands SETUP.SOL members with a DCL-style explode whose binary-mode path is read in full | recorded |
 | [FND-RES-032](../findings/FND-RES-032.md) | _SETUP.EXE, expanded from SETUP.SOL, loads SIERRA.INF with section markers and reads LANGUAGE.INF through the profile routines | recorded |
+| [FND-RES-033](../findings/FND-RES-033.md) | _SETUP.EXE reads SIERRA.INF line by line into five marked sections, each with its own line grammar | recorded |
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |

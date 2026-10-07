@@ -128,7 +128,7 @@ Entries by status.
 
 ## supported
 
-225 entries.
+226 entries.
 
 | ID | Title |
 |---|---|
@@ -183,6 +183,7 @@ Entries by status.
 | [FMT-RES-117](../formats/FMT-RES-117.md) | AUTORUN.INF, the CD launcher's profile file |
 | [FMT-RES-118](../formats/FMT-RES-118.md) | SETUP.SOL directory record |
 | [FMT-RES-119](../formats/FMT-RES-119.md) | LANGUAGE.INF, the installer's profile file of titles and strings |
+| [FMT-RES-120](../formats/FMT-RES-120.md) | SIERRA.INF, the installer's script file |
 | [FMT-SAVE-001](../formats/FMT-SAVE-001.md) | Saved game, SAVEGAME\CONQn.SAV |
 | [FMT-SAVE-002](../formats/FMT-SAVE-002.md) | Strategic map state, TROOPS.SAV |
 | [FMT-SAVE-003](../formats/FMT-SAVE-003.md) | Properties, persons, items and variables, PROPERTY.SAV |
@@ -377,7 +378,7 @@ Entries by status.
 
 ## recorded
 
-250 entries.
+251 entries.
 
 | ID | Title |
 |---|---|
@@ -524,6 +525,7 @@ Entries by status.
 | [FND-RES-030](../findings/FND-RES-030.md) | SETUP extracts named members from SETUP.SOL, a directory of DH9 records followed by packed streams |
 | [FND-RES-031](../findings/FND-RES-031.md) | SETUP expands SETUP.SOL members with a DCL-style explode whose binary-mode path is read in full |
 | [FND-RES-032](../findings/FND-RES-032.md) | _SETUP.EXE, expanded from SETUP.SOL, loads SIERRA.INF with section markers and reads LANGUAGE.INF through the profile routines |
+| [FND-RES-033](../findings/FND-RES-033.md) | _SETUP.EXE reads SIERRA.INF line by line into five marked sections, each with its own line grammar |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |
@@ -785,6 +787,7 @@ Entries whose Open questions section says more than None known.
 | [FMT-RES-117](../formats/FMT-RES-117.md) | AUTORUN.INF, the CD launcher's profile file | supported |
 | [FMT-RES-118](../formats/FMT-RES-118.md) | SETUP.SOL directory record | supported |
 | [FMT-RES-119](../formats/FMT-RES-119.md) | LANGUAGE.INF, the installer's profile file of titles and strings | supported |
+| [FMT-RES-120](../formats/FMT-RES-120.md) | SIERRA.INF, the installer's script file | supported |
 | [FMT-SAVE-001](../formats/FMT-SAVE-001.md) | Saved game, SAVEGAME\CONQn.SAV | supported |
 | [FMT-SAVE-002](../formats/FMT-SAVE-002.md) | Strategic map state, TROOPS.SAV | supported |
 | [FMT-SAVE-004](../formats/FMT-SAVE-004.md) | Calendar block, ~~2.SAV | supported |
