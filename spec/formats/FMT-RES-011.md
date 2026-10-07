@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-RES-017, FND-RES-036]
+evidence: [FND-RES-017, FND-RES-036, FND-RES-037]
 conflicting: []
 split_with: []
 related: []
@@ -44,6 +44,15 @@ passed over; `@@` is a token of its own. Outside quoted strings, `//` drops
 everything to the end of its line, quotes included, and `/*` everything to
 the next `*/`; inside a quoted string neither starts a comment.
 
+A quoted string, supported by FND-RES-037, runs from `"` to the next
+unescaped `"`, across line breaks, and holds at most 1,499 bytes. Its
+escapes are `\"`, `\@`, `\\`, `\a`, `\b`, `\n`, `\r`, `\t` and `\x` (or
+`\X`) with hex digits; any other byte after a backslash, a string reaching
+1,500 bytes, or the end of the file inside a string ends the run with an
+error. An at-sign name inside a string is replaced by its value, `@@` gives
+`@`, and keywords insert either their numeric value or their own name. The
+file's strings use only `\\` and `\n`.
+
 Quotes, adjacent backslashes and punctuation occur inside the stored text.
 FND-RES-017 records complete character/prefix measurements. This entry assigns
 no string escape, comment or block semantics to them and reproduces no script
@@ -70,8 +79,6 @@ applies to stored text framing only.
 
 ## Open questions
 
-- What quoted-string and backslash rules does the interpreter use? Raw quote
-  parity and backslash counts are not string syntax evidence. (Q-RES-154)
 - What grammar handles nonempty regions without at-sign or double-slash prefixes?
   Continuations and another statement form remain possible. (Q-RES-155)
 - How does the interpreter handle the final unterminated region? Its stored

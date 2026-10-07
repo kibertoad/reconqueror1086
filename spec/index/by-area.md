@@ -578,6 +578,7 @@ Entries by area.
 | [FND-RES-034](../findings/FND-RES-034.md) | CONFIG.EXE runs the INSTALL.DAT script, whose only use of CONQUER.INF is an @exists test through DOS find-first | recorded |
 | [FND-RES-035](../findings/FND-RES-035.md) | CONFIG.EXE opens its script read-only, defaulting to INSTALL.DAT, and asks for a drive when the open fails | recorded |
 | [FND-RES-036](../findings/FND-RES-036.md) | CONFIG.EXE reads its script through a comment-removing character layer and upper-cases at-sign names before matching them | recorded |
+| [FND-RES-037](../findings/FND-RES-037.md) | CONFIG.EXE reads a quoted script string with nine backslash escapes and at-sign substitution, and stops on any other escape | recorded |
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |

@@ -80,9 +80,6 @@ Next ID: Q-RES-184
   every relevant caller through the file-open decision. Blocks: Survey runtime-use
   reconciliation.
 
-- Q-RES-154. FMT-RES-011: What quoted-string and backslash grammar does the interpreter use?
-  Settles it: read delimiter, escaping and continuation branches. Blocks: Survey data-family reconciliation.
-
 - Q-RES-155. FMT-RES-011: What grammar handles nonempty regions without at-sign or double-slash prefixes?
   Settles it: read the paths accepting these regions and their surrounding lexical state. Blocks: Survey data-family reconciliation.
 
