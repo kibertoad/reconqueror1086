@@ -378,3 +378,21 @@ none about locations.
 [Rules issue #83](https://github.com/kibertoad/refurbished-dinosaurs/issues/83)
 proposes a `members` list on an archive's file item and a `member` key on
 locations, with acceptance cases.
+
+## GAP-019: No shared unpacker for packed DOS executables
+
+Recorded: 2026-10-07. Audience: toolkit authors.
+
+The standard's packed-file keys need an unpacker named in `unpacked.tool`,
+and the executable reader has none. `CD:INST.EXE`, the DOS installer that
+runs INSTALL.DAT, is packed with LZEXE 0.91.
+
+Local handling: `tools/evidence/unlzexe.mjs` unpacks LZEXE 0.91 with a
+documented header rule and a synthetic test; the build entry names it with
+its commit.
+
+Upstream submission (2026-10-07): duplicate searches for LZEXE, unpacker,
+PKLITE, packed executable and LZ91 on the toolkit tracker found only #297,
+which mentions another project's LZEXE manifest item.
+[Toolkit issue #326](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/326)
+asks for an `unpack` command with a fixed header rule and acceptance cases.
