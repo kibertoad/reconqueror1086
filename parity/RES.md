@@ -17,7 +17,7 @@
 | `FMT-RES-014` | Owned disc-root indexed icon container layout | supported | missing | None | None | supported | Storage partition recorded; consumer questions Q-RES-164 through Q-RES-167 remain open. |
 | `FMT-RES-015` | Unidentified .INF data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
 | `FMT-RES-016` | Unidentified .SCR data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
-| `FMT-RES-017` | Unidentified .SOL data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
+| `FMT-RES-017` | SETUP.SOL, the first-stage installer's member archive | supported | missing | None | None | supported | Read by the CD's installer only; the rebuild does not install from the disc. Member streams are open under Q-RES-175. |
 | `FMT-RES-018` | Unidentified .TXT data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
 | `FMT-RES-019` | Unidentified .WRI data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
 | `FMT-RES-020` | Unidentified .AVI data candidates in CD:DEMOS/MOVIES | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
@@ -118,7 +118,9 @@
 | `FMT-RES-115` | Unidentified .DOC data candidates in CD:VESA | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
 | `FMT-RES-116` | Leading raw-track record in the owned disc carrier | supported | missing | None | None | supported | Owned padding exceptions included; trailer validation and record selection remain open under Q-RES-122 and Q-RES-123. |
 | `FMT-RES-117` | AUTORUN.INF, the CD launcher's profile file | supported | missing | None | None | supported | Read by the CD launcher only; the rebuild has no launcher. Open under Q-RES-171 and Q-RES-172. |
+| `FMT-RES-118` | SETUP.SOL directory record | supported | missing | None | None | supported | Read by the CD's installer only. Open under Q-RES-176. |
 | `RULE-RES-001` | Opening, searching, reading and writing the open archive | supported | partial | None | None | supported | `DynamixArchive.ReadDecoded` decodes kinds 0 to 2 by kind and throws on kind 3. The importer reads every archive at install time, so there is no single open archive, no case-insensitive lookup through a directory, and no writer or encoders. |
 | `RULE-RES-002` | Kind-1 decoding | supported | complete | None | None | implemented | `DynamixCompression.DecodeKind1`; see FMT-RES-003 for the extra checks. |
 | `RULE-RES-003` | Kind-2 decoding | supported | complete | None | None | implemented | `DynamixCompression.DecodeKind2` rejects a code above the next free code, which the original expands as the next one, and a first code of 256 or above, which the original writes as a byte. No shipped stream has either. |
 | `RULE-RES-004` | Archive paths and which archive is open | supported | missing | None | None | supported | The rebuild finds the installed files through its own path resolver and never reads `CONQUER.INI` paths, `C1086ad.GOB` or the `.LOW` scene files at run time. |
+| `RULE-RES-005` | Expanding a SETUP.SOL member's stream | unknown | missing | None | None | unknown | Open under Q-RES-175. |

@@ -1,6 +1,6 @@
 # RES
 
-Next ID: Q-RES-175
+Next ID: Q-RES-177
 
 ## Static
 
@@ -22,6 +22,18 @@ Next ID: Q-RES-175
   find the file `_SETUP.EXE` is expanded from (FMT-RES-017's SETUP.SOL is the
   candidate), then read that program's profile or file reads of the two INF files.
   Blocks: INF reconciliation.
+  Tried: FND-RES-030 settles the first half: SETUP expands `_SETUP.EXE` from the
+  `SETUP.SOL` beside it (FMT-RES-017). Reading it needs the expanded file, so this
+  waits on Q-RES-175 for a decoder whose reading is recorded.
+
+- Q-RES-175. RULE-RES-005, FMT-RES-017: Is a SETUP.SOL member's stream PKWARE DCL implode output?
+  Settles it: read SETUP's routine at 0001:41AB and the values FND-RES-030 lists it
+  receiving, every branch, and compare the procedure with the implode format.
+  Blocks: Q-RES-174.
+
+- Q-RES-176. FMT-RES-118: What does SETUP's library routine at 0001:311E do with `unk_16` and `unk_18`?
+  Settles it: read the routine at 0001:311E and the interrupt or import it reaches.
+  Blocks: none.
 
 - Q-RES-164. FMT-RES-014: Which shipped consumer opens the disc-root icons, and are those paths reachable?
   Settles it: Trace file-open references from media/application entry points. Blocks: Survey consumer reconciliation.
@@ -232,11 +244,6 @@ Next ID: Q-RES-175
   readers are behind Q-RES-174 and INST.EXE.
 
 - Q-RES-018. FMT-RES-016: What layout, if any, is shared by these listed candidates?
-  Settles it: inspect bounded file signatures and the relevant readers; record the
-  parsing syntax or field layout, splitting the entry if the files differ before
-  making claims about them. Blocks: Survey data-family reconciliation.
-
-- Q-RES-019. FMT-RES-017: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the
   parsing syntax or field layout, splitting the entry if the files differ before
   making claims about them. Blocks: Survey data-family reconciliation.

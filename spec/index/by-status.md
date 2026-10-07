@@ -13,7 +13,6 @@ Entries by status.
 | [FMT-ASSAULT-004](../formats/FMT-ASSAULT-004.md) | Live effect record, one of the 64 effects the scheduler runs |
 | [FMT-RES-015](../formats/FMT-RES-015.md) | Unidentified .INF data candidates in CD root |
 | [FMT-RES-016](../formats/FMT-RES-016.md) | Unidentified .SCR data candidates in CD root |
-| [FMT-RES-017](../formats/FMT-RES-017.md) | Unidentified .SOL data candidates in CD root |
 | [FMT-RES-018](../formats/FMT-RES-018.md) | Unidentified .TXT data candidates in CD root |
 | [FMT-RES-019](../formats/FMT-RES-019.md) | Unidentified .WRI data candidates in CD root |
 | [FMT-RES-020](../formats/FMT-RES-020.md) | Unidentified .AVI data candidates in CD:DEMOS/MOVIES |
@@ -114,6 +113,7 @@ Entries by status.
 | [FMT-RES-115](../formats/FMT-RES-115.md) | Unidentified .DOC data candidates in CD:VESA |
 | [RULE-ASSAULT-027](../rules/RULE-ASSAULT-027.md) | Combatant and effect values whose layout or computation is not recorded |
 | [RULE-ASSAULT-030](../rules/RULE-ASSAULT-030.md) | Which retainer the loader removes above the cap |
+| [RULE-RES-005](../rules/RULE-RES-005.md) | Expanding a SETUP.SOL member's stream |
 | [RULE-VIEW-004](../rules/RULE-VIEW-004.md) | Surface intersection, depth and pixel test inside the raycaster |
 
 ## sourced
@@ -129,7 +129,7 @@ Entries by status.
 
 ## supported
 
-221 entries.
+223 entries.
 
 | ID | Title |
 |---|---|
@@ -179,8 +179,10 @@ Entries by status.
 | [FMT-RES-011](../formats/FMT-RES-011.md) | ASCII line framing of CD-root INSTALL.DAT |
 | [FMT-RES-013](../formats/FMT-RES-013.md) | Marked ASCII text framing of CD-root INSTALL.HLP |
 | [FMT-RES-014](../formats/FMT-RES-014.md) | Owned disc-root indexed icon container layout |
+| [FMT-RES-017](../formats/FMT-RES-017.md) | SETUP.SOL, the first-stage installer's member archive |
 | [FMT-RES-116](../formats/FMT-RES-116.md) | Leading raw-track record in the owned disc carrier |
 | [FMT-RES-117](../formats/FMT-RES-117.md) | AUTORUN.INF, the CD launcher's profile file |
+| [FMT-RES-118](../formats/FMT-RES-118.md) | SETUP.SOL directory record |
 | [FMT-SAVE-001](../formats/FMT-SAVE-001.md) | Saved game, SAVEGAME\CONQn.SAV |
 | [FMT-SAVE-002](../formats/FMT-SAVE-002.md) | Strategic map state, TROOPS.SAV |
 | [FMT-SAVE-003](../formats/FMT-SAVE-003.md) | Properties, persons, items and variables, PROPERTY.SAV |
@@ -374,7 +376,7 @@ Entries by status.
 
 ## recorded
 
-247 entries.
+248 entries.
 
 | ID | Title |
 |---|---|
@@ -518,6 +520,7 @@ Entries by status.
 | [FND-RES-027](../findings/FND-RES-027.md) | AUTOPLAY's name and title comparisons fold only ASCII capital letters |
 | [FND-RES-028](../findings/FND-RES-028.md) | AUTOPLAY's directory enumeration supplies each entry's long name |
 | [FND-RES-029](../findings/FND-RES-029.md) | SETUP reads two Setup keys of a SIERRA.INF it finds beside itself and starts _SETUP.EXE |
+| [FND-RES-030](../findings/FND-RES-030.md) | SETUP extracts named members from SETUP.SOL, a directory of DH9 records followed by packed streams |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |
@@ -677,7 +680,7 @@ Entries whose Open questions section says more than None known.
 | [FMT-RES-014](../formats/FMT-RES-014.md) | Owned disc-root indexed icon container layout | supported |
 | [FMT-RES-015](../formats/FMT-RES-015.md) | Unidentified .INF data candidates in CD root | unknown |
 | [FMT-RES-016](../formats/FMT-RES-016.md) | Unidentified .SCR data candidates in CD root | unknown |
-| [FMT-RES-017](../formats/FMT-RES-017.md) | Unidentified .SOL data candidates in CD root | unknown |
+| [FMT-RES-017](../formats/FMT-RES-017.md) | SETUP.SOL, the first-stage installer's member archive | supported |
 | [FMT-RES-018](../formats/FMT-RES-018.md) | Unidentified .TXT data candidates in CD root | unknown |
 | [FMT-RES-019](../formats/FMT-RES-019.md) | Unidentified .WRI data candidates in CD root | unknown |
 | [FMT-RES-020](../formats/FMT-RES-020.md) | Unidentified .AVI data candidates in CD:DEMOS/MOVIES | unknown |
@@ -778,6 +781,7 @@ Entries whose Open questions section says more than None known.
 | [FMT-RES-115](../formats/FMT-RES-115.md) | Unidentified .DOC data candidates in CD:VESA | unknown |
 | [FMT-RES-116](../formats/FMT-RES-116.md) | Leading raw-track record in the owned disc carrier | supported |
 | [FMT-RES-117](../formats/FMT-RES-117.md) | AUTORUN.INF, the CD launcher's profile file | supported |
+| [FMT-RES-118](../formats/FMT-RES-118.md) | SETUP.SOL directory record | supported |
 | [FMT-SAVE-001](../formats/FMT-SAVE-001.md) | Saved game, SAVEGAME\CONQn.SAV | supported |
 | [FMT-SAVE-002](../formats/FMT-SAVE-002.md) | Strategic map state, TROOPS.SAV | supported |
 | [FMT-SAVE-004](../formats/FMT-SAVE-004.md) | Calendar block, ~~2.SAV | supported |
@@ -869,6 +873,7 @@ Entries whose Open questions section says more than None known.
 | [RULE-PERSON-006](../rules/RULE-PERSON-006.md) | Retirement at 30 | supported |
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-004](../rules/RULE-RES-004.md) | Archive paths and which archive is open | supported |
+| [RULE-RES-005](../rules/RULE-RES-005.md) | Expanding a SETUP.SOL member's stream | unknown |
 | [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number generator | supported |
 | [RULE-SAVE-001](../rules/RULE-SAVE-001.md) | Load and save screens | supported |
 | [RULE-SAVE-002](../rules/RULE-SAVE-002.md) | Writing a saved game | supported |

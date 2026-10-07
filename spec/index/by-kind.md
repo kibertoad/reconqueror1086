@@ -27,7 +27,7 @@ Entries by kind.
 
 ## formats
 
-169 entries.
+170 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -63,7 +63,7 @@ Entries by kind.
 | [FMT-RES-014](../formats/FMT-RES-014.md) | Owned disc-root indexed icon container layout | supported |
 | [FMT-RES-015](../formats/FMT-RES-015.md) | Unidentified .INF data candidates in CD root | unknown |
 | [FMT-RES-016](../formats/FMT-RES-016.md) | Unidentified .SCR data candidates in CD root | unknown |
-| [FMT-RES-017](../formats/FMT-RES-017.md) | Unidentified .SOL data candidates in CD root | unknown |
+| [FMT-RES-017](../formats/FMT-RES-017.md) | SETUP.SOL, the first-stage installer's member archive | supported |
 | [FMT-RES-018](../formats/FMT-RES-018.md) | Unidentified .TXT data candidates in CD root | unknown |
 | [FMT-RES-019](../formats/FMT-RES-019.md) | Unidentified .WRI data candidates in CD root | unknown |
 | [FMT-RES-020](../formats/FMT-RES-020.md) | Unidentified .AVI data candidates in CD:DEMOS/MOVIES | unknown |
@@ -164,6 +164,7 @@ Entries by kind.
 | [FMT-RES-115](../formats/FMT-RES-115.md) | Unidentified .DOC data candidates in CD:VESA | unknown |
 | [FMT-RES-116](../formats/FMT-RES-116.md) | Leading raw-track record in the owned disc carrier | supported |
 | [FMT-RES-117](../formats/FMT-RES-117.md) | AUTORUN.INF, the CD launcher's profile file | supported |
+| [FMT-RES-118](../formats/FMT-RES-118.md) | SETUP.SOL directory record | supported |
 | [FMT-SAVE-001](../formats/FMT-SAVE-001.md) | Saved game, SAVEGAME\CONQn.SAV | supported |
 | [FMT-SAVE-002](../formats/FMT-SAVE-002.md) | Strategic map state, TROOPS.SAV | supported |
 | [FMT-SAVE-003](../formats/FMT-SAVE-003.md) | Properties, persons, items and variables, PROPERTY.SAV | supported |
@@ -203,7 +204,7 @@ Entries by kind.
 
 ## rules
 
-122 entries.
+123 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -280,6 +281,7 @@ Entries by kind.
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |
 | [RULE-RES-004](../rules/RULE-RES-004.md) | Archive paths and which archive is open | supported |
+| [RULE-RES-005](../rules/RULE-RES-005.md) | Expanding a SETUP.SOL member's stream | unknown |
 | [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number generator | supported |
 | [RULE-SAVE-001](../rules/RULE-SAVE-001.md) | Load and save screens | supported |
 | [RULE-SAVE-002](../rules/RULE-SAVE-002.md) | Writing a saved game | supported |
@@ -332,7 +334,7 @@ Entries by kind.
 
 ## findings
 
-248 entries.
+249 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -476,6 +478,7 @@ Entries by kind.
 | [FND-RES-027](../findings/FND-RES-027.md) | AUTOPLAY's name and title comparisons fold only ASCII capital letters | recorded |
 | [FND-RES-028](../findings/FND-RES-028.md) | AUTOPLAY's directory enumeration supplies each entry's long name | recorded |
 | [FND-RES-029](../findings/FND-RES-029.md) | SETUP reads two Setup keys of a SIERRA.INF it finds beside itself and starts _SETUP.EXE | recorded |
+| [FND-RES-030](../findings/FND-RES-030.md) | SETUP extracts named members from SETUP.SOL, a directory of DH9 records followed by packed streams | recorded |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |

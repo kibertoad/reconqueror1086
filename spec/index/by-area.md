@@ -438,7 +438,7 @@ Entries by area.
 | [FMT-RES-014](../formats/FMT-RES-014.md) | Owned disc-root indexed icon container layout | supported |
 | [FMT-RES-015](../formats/FMT-RES-015.md) | Unidentified .INF data candidates in CD root | unknown |
 | [FMT-RES-016](../formats/FMT-RES-016.md) | Unidentified .SCR data candidates in CD root | unknown |
-| [FMT-RES-017](../formats/FMT-RES-017.md) | Unidentified .SOL data candidates in CD root | unknown |
+| [FMT-RES-017](../formats/FMT-RES-017.md) | SETUP.SOL, the first-stage installer's member archive | supported |
 | [FMT-RES-018](../formats/FMT-RES-018.md) | Unidentified .TXT data candidates in CD root | unknown |
 | [FMT-RES-019](../formats/FMT-RES-019.md) | Unidentified .WRI data candidates in CD root | unknown |
 | [FMT-RES-020](../formats/FMT-RES-020.md) | Unidentified .AVI data candidates in CD:DEMOS/MOVIES | unknown |
@@ -539,6 +539,7 @@ Entries by area.
 | [FMT-RES-115](../formats/FMT-RES-115.md) | Unidentified .DOC data candidates in CD:VESA | unknown |
 | [FMT-RES-116](../formats/FMT-RES-116.md) | Leading raw-track record in the owned disc carrier | supported |
 | [FMT-RES-117](../formats/FMT-RES-117.md) | AUTORUN.INF, the CD launcher's profile file | supported |
+| [FMT-RES-118](../formats/FMT-RES-118.md) | SETUP.SOL directory record | supported |
 | [FND-RES-001](../findings/FND-RES-001.md) | All 100 containers share one layout: a header, the entry data packed from offset 8, and a directory of 52-byte records at the end | recorded |
 | [FND-RES-002](../findings/FND-RES-002.md) | One archive is open at a time; the game opens it, finds an entry by name or index, and reads it by its kind | recorded |
 | [FND-RES-003](../findings/FND-RES-003.md) | Kind 1 is a sequence of length-prefixed blocks, each stored or compressed with literals, back-references and runs | recorded |
@@ -568,10 +569,12 @@ Entries by area.
 | [FND-RES-027](../findings/FND-RES-027.md) | AUTOPLAY's name and title comparisons fold only ASCII capital letters | recorded |
 | [FND-RES-028](../findings/FND-RES-028.md) | AUTOPLAY's directory enumeration supplies each entry's long name | recorded |
 | [FND-RES-029](../findings/FND-RES-029.md) | SETUP reads two Setup keys of a SIERRA.INF it finds beside itself and starts _SETUP.EXE | recorded |
+| [FND-RES-030](../findings/FND-RES-030.md) | SETUP extracts named members from SETUP.SOL, a directory of DH9 records followed by packed streams | recorded |
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |
 | [RULE-RES-004](../rules/RULE-RES-004.md) | Archive paths and which archive is open | supported |
+| [RULE-RES-005](../rules/RULE-RES-005.md) | Expanding a SETUP.SOL member's stream | unknown |
 
 ## MEDIA
 
