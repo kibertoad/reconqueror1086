@@ -336,3 +336,23 @@ overlap headers, bss, uninitialized section, Watcom and PE section found no
 match; issue #313 concerns import descriptors only.
 [Toolkit issue #324](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/324)
 gives a synthetic reproduction and acceptance cases.
+
+## GAP-017: No rule or reporter for naming NE imports
+
+Recorded: 2026-10-07. Audience: Standard and toolkit authors.
+
+STATUS-42 says how to name a PE import by slot; NE executables have no
+slots. Each far call to an import is a relocation-chain site, the record
+gives a module and an ordinal, and the ordinal's name needs the exporting
+module's table, which the restoration does not have.
+
+Local handling: FND-RES-029 walks SETUP's relocation chains with a cap,
+names the ordinals from Wine's 16-bit KERNEL export table as an outside
+source, and checks each call's arguments against it.
+
+Upstream submission (2026-10-07): duplicate searches for NE import,
+ordinal, NE relocation, Win16 and 16-bit Windows on the rules and toolkit
+trackers found only rules issue #47, which covers PE.
+[Rules issue #81](https://github.com/kibertoad/refurbished-dinosaurs/issues/81)
+asks for a rule and an NE mode of the import report, with a synthetic
+chain case.
