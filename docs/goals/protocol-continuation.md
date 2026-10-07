@@ -32,30 +32,23 @@ None known.
 
 ## Handover
 
-- Stage: Survey. Latest research: FND-RES-025 / FMT-RES-015.
-  Q-RES-017 remains Static; Q-RES-168 through Q-RES-170 remain independent.
-- Last checks: the canonical fast gate passed on 2026-10-05 with pinned Python
-  via EVIDENCE_PYTHON, frozen Node dependencies and hash-pinned Python packages.
-  Documentation, repository/configuration policy, coverage metadata, Node
-  acceptance, solution build, xUnit and executable specifications passed.
-  Kaitai compilation was skipped because no compiler was available. See
-  docs/VALIDATION.md. No parity validation is claimed.
-- Tooling baseline: engine 1.0.1 and toolkit adoption a260e391, shared runtime
-  6.2.0. Launcher PE/NE inventories and bounded NE metadata checks are committed;
-  coverage/README.md records mappings and analyzer qualifications. Synthetic
-  offscreen capture controls are independent; GAP-011 records their limitation.
-- Unfinished: none from this batch. No original program ran. Post-commit audit
-  found no confirmed repository orphans; reusable MSBuild workers remain.
-  The owner authorized pushing this completed session to main and stopping.
-  Further research awaits a new request. Gameplay remains
-  outside this goal's scope. FMT-RES-015 remains unknown.
+- Stage: Survey. Latest research on this branch: FND-RES-031 (RULE-RES-005
+  supported), FND-RES-032 and FND-RES-033 (FMT-RES-119, FMT-RES-120),
+  FND-RES-034 (FMT-RES-015 retitled, still unknown). Latest tooling: the
+  LZEXE 0.91 unpacker in `tools/evidence/` with its test; BLD-GOG-EN's
+  CD:INST.EXE item records its packer and unpacked identity.
+- Last checks: documentation check passed at the last batch commit. Fast
+  gate passed on 2026-10-07 after installing the hash-pinned evidence
+  requirements (the engine had drifted to 8.1.0).
+- Unfinished: none. No original program ran. Post-commit audits found no
+  repository orphans; reusable MSBuild workers and other agents' processes
+  were left running. Nothing is pushed; pushing needs the owner's word.
 - Blockers: none known.
-- Upstream reporting: GAP-001 through GAP-011 have submission links in gaps.md.
-  The latest is toolkit issue #235. Reporting backlog is cleared; future concerns
-  still require duplicate checks. GitHub connector access works; local gh token
-  is invalid.
-- Next: Q-RES-017 code tracing with the mapped launcher inventories and
-  FND-RES-024/025; Q-RES-168 through Q-RES-170; manual-screen reconciliation;
-  consumer questions Q-RES-124 through Q-RES-163. Do not repeat raw shape counts
-  or infer opens from literals. Rules snapshots stay unchanged unless the owner
-  requests their refresh.
+- Upstream reporting: GAP-016 (toolkit #324), GAP-017 (rules #81), GAP-018
+  (rules #83) and GAP-019 (toolkit #326) are filed and linked in gaps.md.
+  Future concerns still need duplicate checks first.
+- Next: Q-RES-151 (FMT-RES-011, CONFIG.EXE's script open and the program
+  that starts it, its Tried note names where to resume); Q-RES-179 to
+  Q-RES-183 (FMT-RES-120 script interpreter and fields); Q-RES-176,
+  Q-RES-177, Q-RES-178, Q-RES-172. Q-RES-017 waits for a new lead, as its
+  Tried note says; do not repeat the whole-name search.
