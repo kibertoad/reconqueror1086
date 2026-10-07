@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-RES-017, FND-RES-036, FND-RES-037]
+evidence: [FND-RES-017, FND-RES-036, FND-RES-037, FND-RES-041]
 conflicting: []
 split_with: []
 related: []
@@ -53,6 +53,16 @@ error. An at-sign name inside a string is replaced by its value, `@@` gives
 `@`, and keywords insert either their numeric value or their own name. The
 file's strings use only `\\` and `\n`.
 
+The run ends at the end of the file or at `@FINISH`, supported by
+FND-RES-041. `@FINISH` closes the file and marks the start of a finish
+block, which runs just before the program exits: the file is reopened
+there, every byte outside an at-sign command up to `@ENDFINISH` is written
+to the screen, line breaks included, and the commands in the block run.
+The end of the file inside the block, before an `@`, ends the run with an
+error. The shipped file's final unterminated region is the block's
+`@EndFinish`, which the name reader ends at the end of the file, so the
+missing line end has no effect.
+
 Quotes, adjacent backslashes and punctuation occur inside the stored text.
 FND-RES-017 records complete character/prefix measurements. This entry assigns
 no string escape, comment or block semantics to them and reproduces no script
@@ -71,15 +81,14 @@ None known.
 ## Coverage
 
 Every byte and every line region in the identified BLD-GOG-EN file was inspected,
-with exact reconstruction [FND-RES-017]. No interpreter or directive behavior was
-read or run. CD:CONFIG.EXE opens the file read-only, by default beside its
+with exact reconstruction [FND-RES-017]. Parts of the interpreter are read in
+FND-RES-036, FND-RES-037 and FND-RES-041; nothing was run. CD:CONFIG.EXE opens the file read-only, by default beside its
 own executable, and passes the handle to its script runner (FND-RES-034,
-FND-RES-035); how that runner reads lines is not read. Supported status
+FND-RES-035), which reads it as a stream of tokens in which line ends
+are white space, and runs the finish block at exit (FND-RES-041). Supported status
 applies to stored text framing only.
 
 ## Open questions
 
 - What grammar handles nonempty regions without at-sign or double-slash prefixes?
   Continuations and another statement form remain possible. (Q-RES-155)
-- How does the interpreter handle the final unterminated region? Its stored
-  presence does not establish execution or error behavior. (Q-RES-156)

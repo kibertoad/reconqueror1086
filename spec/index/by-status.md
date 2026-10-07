@@ -378,7 +378,7 @@ Entries by status.
 
 ## recorded
 
-258 entries.
+259 entries.
 
 | ID | Title |
 |---|---|
@@ -533,6 +533,7 @@ Entries by status.
 | [FND-RES-038](../findings/FND-RES-038.md) | _SETUP.EXE runs the [Script] text line by line, matching 37 command names as prefixes, and ends silently at an unknown command |
 | [FND-RES-039](../findings/FND-RES-039.md) | _SETUP.EXE's FLAG runs the rest of its line when a numbered flag is set, and DISKSPACE_LT sets a flag when free kilobytes are below a value |
 | [FND-RES-040](../findings/FND-RES-040.md) | _SETUP.EXE's PICKDEST builds the destination from SierraDir and DirName, WRITE and APPEND write one line to a file, RUN ignores two words, and COPY takes no arguments |
+| [FND-RES-041](../findings/FND-RES-041.md) | CONFIG.EXE stops its script run at @FINISH and, just before exiting, reopens the script there to echo text and run commands up to @ENDFINISH |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |

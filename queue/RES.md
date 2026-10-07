@@ -104,20 +104,10 @@ Next ID: Q-RES-192
 
 - Q-RES-155. FMT-RES-011: What grammar handles nonempty regions without at-sign or double-slash prefixes?
   Settles it: read the paths accepting these regions and their surrounding lexical state. Blocks: Survey data-family reconciliation.
-
-- Q-RES-156. FMT-RES-011: How does the interpreter handle the final unterminated region?
-  Settles it: read final-line consumption and end-of-file success/error branches. Blocks: Survey data-family reconciliation.
-  Lead: FND-RES-036 reads the byte layer (end of input when the 32-bit count
-  at DS:535E reaches 0, or at a 0x1A ending a buffer); where that count is set
-  and how the runner at 1B80:184F ends a statement at end of input are unread.
-  Tried: the runner at 1B80:184F reads tokens until 0xFFFF and dispatches 16
-  of them through the table at 1B80:2135, others through 192C:0003, 1B20:0000
-  and 1B80:0147, stopping with a syntax error when none takes it. Token 0x28
-  (`@FINISH`) calls 1B80:0007, which keeps the script position and closes the
-  file, and leaves the loop, so the file's final `@EndFinish` region is read by
-  whatever reopens the script at that position (1B80:00A5, called from
-  2377:46B5 and 2377:47FF). Next: read those callers and the reader of the
-  finish block to its end-of-input branch.
+  Tried: FND-RES-041 settles them inside the finish block, where they are
+  written to the screen. Before `@FINISH` the runner 1B80:184F takes them
+  as tokens from 221F:0003's number, identifier, string and single-character
+  readers, dispatched through 192C:0003, 1B20:0000 and 1B80:0147, none read.
 
 
 - Q-RES-138. FMT-RES-010: Which shipped reader consumes CD-root RESOURCE.CFG, and is that path reachable?
