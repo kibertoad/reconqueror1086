@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-RES-019, FND-RES-053]
+evidence: [FND-RES-019, FND-RES-053, FND-RES-056]
 conflicting: []
 split_with: []
 related: []
@@ -46,6 +46,13 @@ INSTALL.HLP has 157 entries with 147 distinct keys, 40 tabs and no continued
 lines; one key ends in a space, which the reader removes. The two files share
 no key [FND-RES-053, FND-RES-019]. No original text is kept here.
 
+Key naming. The installer names 78 of INSTALL.TXT's keys in its code; a
+missing one stops it with a fatal error message and a wait for Esc
+[FND-RES-056]. A key of the form `<name>.hlp` is the help text for the file
+`<name>` with any extension, shown with the text of `noHelp` when it is
+missing, and `<name>.inf` is a notice for that file that the player confirms
+with Enter or leaves with Esc; neither is required [FND-RES-056].
+
 ## Enumerations and flags
 
 None.
@@ -69,7 +76,9 @@ product directories of the disc are not covered.
   text-mode read would settle it. (Q-RES-162)
 - How does the installer show tabs in a text? The dictionary keeps them; the
   display routines were not read. (Q-RES-163)
-- Which code looks up the keys of INSTALL.HLP? None of the keys the code read
-  so far uses is in it. (Q-RES-204)
-- What happens when a key is missing: does each caller of 2852:0B71 pass a
-  flag that ends the run with a fatal error, or get an empty text? (Q-RES-205)
+- Which file names do the installer's objects at 1BA0 carry, and so which
+  `.drv` and other INSTALL.HLP keys are looked up besides the `.hlp` and
+  `.inf` forms? (Q-RES-206)
+- Which keys reach the five other lookups that build their key from data, and
+  do the 60 INSTALL.TXT keys no fixed lookup names reach any of them?
+  (Q-RES-207)

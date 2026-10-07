@@ -1,6 +1,6 @@
 # RES
 
-Next ID: Q-RES-206
+Next ID: Q-RES-208
 
 ## Static
 
@@ -86,11 +86,11 @@ Next ID: Q-RES-206
   Settles it: trace the texts INSTALL.HLP holds into the routines that draw them. Blocks: Survey data-family reconciliation.
   Tried: FND-RES-053 shows the dictionary keeps tabs; no display routine was read.
 
-- Q-RES-204. FMT-RES-013: Which INST.EXE code looks up the keys of INSTALL.HLP, and with what keys?
-  Settles it: find every caller of 2852:0B71 and 2852:0A8B and how each forms its key. Blocks: Survey data-family reconciliation.
+- Q-RES-206. FMT-RES-013: Which strings do INST.EXE's 1BA0 objects hold at +0xA and +0x10B, and so which INSTALL.HLP keys does the installer look up?
+  Settles it: trace where those objects are built and filled, through the driver lists they come from. Blocks: Survey data-family reconciliation.
 
-- Q-RES-205. FMT-RES-013: Which flag does each caller of 2852:0B71 pass, so that a missing key ends the run or gives an empty text?
-  Settles it: read the flag argument at every call of 2852:0B71. Blocks: Survey data-family reconciliation.
+- Q-RES-207. FMT-RES-013: Which keys reach the lookups at 1E86:027F, 2012:0101, 23F1:092D, 27C0:0139 and 27C0:018C, and do the 60 INSTALL.TXT keys that no fixed lookup names reach any of them?
+  Settles it: trace each call's key string back to where it is formed. Blocks: Survey data-family reconciliation.
 
 
 - Q-RES-157. FMT-RES-001: Which consumer selects the disc-root C1086.GOB copy

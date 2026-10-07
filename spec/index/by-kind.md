@@ -336,7 +336,7 @@ Entries by kind.
 
 ## findings
 
-274 entries.
+275 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -506,6 +506,7 @@ Entries by kind.
 | [FND-RES-053](../findings/FND-RES-053.md) | INST.EXE loads every message and help text from install.txt, install.hlp and the other .txt and .hlp files into one keyed dictionary marked by double-backslash lines | recorded |
 | [FND-RES-054](../findings/FND-RES-054.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case | recorded |
 | [FND-RES-055](../findings/FND-RES-055.md) | INST.EXE runs install.scr line by line, with labels, goto, nine percent parameters, a table of named commands and any other line run as a program | recorded |
+| [FND-RES-056](../findings/FND-RES-056.md) | INST.EXE looks up 78 fixed INSTALL.TXT keys, help and confirmation texts by file name with hlp and inf extensions, and stops with a fatal error on a missing key everywhere but two calls | recorded |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |

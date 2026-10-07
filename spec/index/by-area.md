@@ -598,6 +598,7 @@ Entries by area.
 | [FND-RES-053](../findings/FND-RES-053.md) | INST.EXE loads every message and help text from install.txt, install.hlp and the other .txt and .hlp files into one keyed dictionary marked by double-backslash lines | recorded |
 | [FND-RES-054](../findings/FND-RES-054.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case | recorded |
 | [FND-RES-055](../findings/FND-RES-055.md) | INST.EXE runs install.scr line by line, with labels, goto, nine percent parameters, a table of named commands and any other line run as a program | recorded |
+| [FND-RES-056](../findings/FND-RES-056.md) | INST.EXE looks up 78 fixed INSTALL.TXT keys, help and confirmation texts by file name with hlp and inf extensions, and stops with a fatal error on a missing key everywhere but two calls | recorded |
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |

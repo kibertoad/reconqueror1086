@@ -13,7 +13,7 @@
 | `FMT-RES-009` | Owned autoplay indexed bitmap layout | supported | missing | None | None | supported | Complete stored layout supported; consumer behavior remains open. |
 | `FMT-RES-010` | ASCII key/value syntax in CD-root RESOURCE.CFG | supported | missing | None | None | supported | Stored syntax and INST.EXE's line syntax supported; reachability and value meanings remain open. |
 | `FMT-RES-011` | ASCII line framing of CD-root INSTALL.DAT | supported | missing | None | None | supported | Stored framing supported; interpreter grammar and runtime behavior remain open. |
-| `FMT-RES-013` | INST.EXE text dictionary syntax of CD-root INSTALL.TXT and INSTALL.HLP | supported | missing | None | None | supported | Dictionary syntax supported; 0x1A handling, tab display and the users of INSTALL.HLP keys remain open. |
+| `FMT-RES-013` | INST.EXE text dictionary syntax of CD-root INSTALL.TXT and INSTALL.HLP | supported | missing | None | None | supported | Dictionary syntax and key naming supported; 0x1A handling, tab display and some lookups remain open. |
 | `FMT-RES-014` | Owned disc-root indexed icon container layout | supported | missing | None | None | supported | Storage partition recorded; consumer questions Q-RES-164 through Q-RES-167 remain open. |
 | `FMT-RES-015` | CONQUER.INF, the CD marker the install script tests for | unknown | missing | None | None | unknown | Only located use is a presence test; contents read by nothing located. |
 | `FMT-RES-016` | INST.EXE script syntax of CD-root INSTALL.SCR | supported | missing | None | None | supported | Line syntax, labels, parameters, every command, the program runner and the run's caller supported; parameter values and the installer's checks remain open. |
