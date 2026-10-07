@@ -378,7 +378,7 @@ Entries by status.
 
 ## recorded
 
-261 entries.
+262 entries.
 
 | ID | Title |
 |---|---|
@@ -536,6 +536,7 @@ Entries by status.
 | [FND-RES-041](../findings/FND-RES-041.md) | CONFIG.EXE stops its script run at @FINISH and, just before exiting, reopens the script there to echo text and run commands up to @ENDFINISH |
 | [FND-RES-042](../findings/FND-RES-042.md) | CONFIG.EXE reads a word at the start of a line followed by a colon as a label, echoes @DISPLAY text to the screen, and stops at any other bare word |
 | [FND-RES-043](../findings/FND-RES-043.md) | CONFIG.EXE's @GetOutDrive, @GetSubdir and @GetOption echo their block text to the screen like @Display |
+| [FND-RES-044](../findings/FND-RES-044.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |

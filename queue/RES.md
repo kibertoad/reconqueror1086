@@ -1,6 +1,6 @@
 # RES
 
-Next ID: Q-RES-192
+Next ID: Q-RES-193
 
 ## Static
 
@@ -102,54 +102,80 @@ Next ID: Q-RES-192
   every relevant caller through the file-open decision. Blocks: Survey runtime-use
   reconciliation.
 
-- Q-RES-138. FMT-RES-010: Which shipped reader consumes CD-root RESOURCE.CFG, and is that path reachable?
-  Settles it: trace file references from installation/media entry points through the relevant reader. Blocks: Survey data-family reconciliation.
-
-- Q-RES-139. FMT-RES-010: Does the reader require fixed key/separator alignment or accept other spacing?
-  Settles it: read its token-boundary and whitespace handling. Blocks: Survey data-family reconciliation.
-
-- Q-RES-140. FMT-RES-010: Does the reader match key casing exactly or without case distinctions?
-  Settles it: read its key comparison and caller-supplied key tokens. Blocks: Survey data-family reconciliation.
+- Q-RES-192. FMT-RES-010: Does INST.EXE reach its read of `resource.cfg` when `INSTALL.BAT` starts it as `inst.exe -f`?
+  Settles it: read vtable entries +0x44, +0x50, +0x54, +0x2C and +0x08 of the
+  object at DS:55D8 and 263F:0504, as 20F3:029C calls them, for every path
+  that ends the run with the arguments `-f`. Blocks: Survey data-family reconciliation.
 
 - Q-RES-141. FMT-RES-010: How does the consumer interpret the directory value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
   Blocks: Survey data-family reconciliation.
+  Tried: FND-RES-044 reads INST.EXE's reader, which copies the value to
+  object+0x194 and to the string at +0x18 of the object at +0x1EB; the uses of
+  that field are not read.
 
 - Q-RES-142. FMT-RES-010: How does the consumer interpret the videoDrv value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
   Blocks: Survey data-family reconciliation.
+  Tried: FND-RES-044 finds that INST.EXE's reader passes this key to the
+  objects listed at object+2 (count at +0x192) through vtable entry +0x2C of
+  each. Which objects the list holds (2487:0047 passes nine to vtable entry
+  +0x00) and what they do are not read.
 
 - Q-RES-143. FMT-RES-010: How does the consumer interpret the cd value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
   Blocks: Survey data-family reconciliation.
+  Tried: FND-RES-044 reads INST.EXE's reader, which sets the word at +0x1FB to
+  1 for `yes`; the uses of that field are not read.
 
 - Q-RES-144. FMT-RES-010: How does the consumer interpret the joyDrv value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
   Blocks: Survey data-family reconciliation.
+  Tried: FND-RES-044 finds that INST.EXE's reader passes this key to the
+  objects listed at object+2 (count at +0x192) through vtable entry +0x2C of
+  each. Which objects the list holds (2487:0047 passes nine to vtable entry
+  +0x00) and what they do are not read.
 
 - Q-RES-145. FMT-RES-010: How does the consumer interpret the memoryDrv value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
   Blocks: Survey data-family reconciliation.
+  Tried: FND-RES-044 finds that INST.EXE's reader passes this key to the
+  objects listed at object+2 (count at +0x192) through vtable entry +0x2C of
+  each. Which objects the list holds (2487:0047 passes nine to vtable entry
+  +0x00) and what they do are not read.
 
 - Q-RES-146. FMT-RES-010: How does the consumer interpret the minCPU value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
   Blocks: Survey data-family reconciliation.
+  Tried: FND-RES-044 reads INST.EXE's reader, which copies the value to the
+  string at +0x203; the uses of that field are not read.
 
 - Q-RES-147. FMT-RES-010: How does the consumer interpret the minDOS value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
   Blocks: Survey data-family reconciliation.
+  Tried: FND-RES-044 reads INST.EXE's reader, which converts the value through
+  1000:414A and keeps the low word at +0x207; the uses of that field are not
+  read.
 
 - Q-RES-148. FMT-RES-010: How does the consumer interpret the mode value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
   Blocks: Survey data-family reconciliation.
+  Tried: FND-RES-044 reads INST.EXE's reader, which copies the value to the
+  string at +0x1FF; the uses of that field are not read.
 
 - Q-RES-149. FMT-RES-010: How does the consumer interpret the mouseDrv value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
   Blocks: Survey data-family reconciliation.
+  Tried: FND-RES-044 finds that INST.EXE's reader passes this key to the
+  objects listed at object+2 (count at +0x192) through vtable entry +0x2C of
+  each. Which objects the list holds (2487:0047 passes nine to vtable entry
+  +0x00) and what they do are not read.
 
 - Q-RES-150. FMT-RES-010: How does the consumer interpret the smartDrv value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
   Blocks: Survey data-family reconciliation.
+  Tried: FND-RES-044 reads INST.EXE's reader, which sets the word at +0x1FD to
+  1 for `yes`; the uses of that field are not read.
 
 
 - Q-RES-135. FMT-RES-009: Which shipped consumer reads AUTOPLAY.BMP, and is that path reachable?
