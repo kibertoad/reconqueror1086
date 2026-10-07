@@ -1,6 +1,6 @@
 # RES
 
-Next ID: Q-RES-184
+Next ID: Q-RES-186
 
 ## Static
 
@@ -15,10 +15,15 @@ Next ID: Q-RES-184
   programs for the key name.
   Blocks: none.
 
-- Q-RES-179. FMT-RES-120: How does `_SETUP.EXE` interpret the `[Script]` text?
-  Settles it: find the reader of the script buffer at offset 4 of the loader's
-  object and the command table that follows `RUN` in segment 4, and read how a
-  line is split into a command and its arguments, every branch.
+- Q-RES-184. FMT-RES-120: What do the `[Script]` commands `FLAG`, `DIALOG`, `PICKDEST`, `DISKSPACE_LT`, `TOGGLEGROUPON`, `COPY`, `APPEND` and `RUN` do with their arguments?
+  Settles it: read the cases at 0004:3FE3, 0004:3EC4, 0004:42EF, 0004:4086
+  and the others the table at 0004:5C55 gives for these names, and
+  0004:7126, every branch, including how `FLAG` runs the command after its
+  number.
+  Blocks: none.
+
+- Q-RES-185. FMT-RES-120: What do the 24 `[Script]` commands the shipped script does not use do?
+  Settles it: read their cases from the table at 0004:5C55, every branch.
   Blocks: none.
 
 - Q-RES-180. FMT-RES-120: What do 0004:3142 and 0003:C46A do with a dialog item's trailing fields and a `*` title?
@@ -33,10 +38,6 @@ Next ID: Q-RES-184
 - Q-RES-182. FMT-RES-120: What do the numeric fields of `[Archives]`, `[Files]` and `[Billboards]` records mean?
   Settles it: read the readers of the arrays at offsets 0x0A, 0x22 and 0x3A of
   the loader's object.
-  Blocks: none.
-
-- Q-RES-183. FMT-RES-119: Which keys do the `Strings` reads at 0004:472C and 0004:496B request?
-  Settles it: read the callers of the two functions and where each key comes from.
   Blocks: none.
 
 - Q-RES-176. FMT-RES-118: What does SETUP's library routine at 0001:311E do with `unk_16` and `unk_18`?

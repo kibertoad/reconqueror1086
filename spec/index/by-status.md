@@ -378,7 +378,7 @@ Entries by status.
 
 ## recorded
 
-255 entries.
+256 entries.
 
 | ID | Title |
 |---|---|
@@ -530,6 +530,7 @@ Entries by status.
 | [FND-RES-035](../findings/FND-RES-035.md) | CONFIG.EXE opens its script read-only, defaulting to INSTALL.DAT, and asks for a drive when the open fails |
 | [FND-RES-036](../findings/FND-RES-036.md) | CONFIG.EXE reads its script through a comment-removing character layer and upper-cases at-sign names before matching them |
 | [FND-RES-037](../findings/FND-RES-037.md) | CONFIG.EXE reads a quoted script string with nine backslash escapes and at-sign substitution, and stops on any other escape |
+| [FND-RES-038](../findings/FND-RES-038.md) | _SETUP.EXE runs the [Script] text line by line, matching 37 command names as prefixes, and ends silently at an unknown command |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |
