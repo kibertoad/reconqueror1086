@@ -1,6 +1,6 @@
 # RES
 
-Next ID: Q-RES-186
+Next ID: Q-RES-189
 
 ## Static
 
@@ -15,15 +15,27 @@ Next ID: Q-RES-186
   programs for the key name.
   Blocks: none.
 
-- Q-RES-184. FMT-RES-120: What do the `[Script]` commands `FLAG`, `DIALOG`, `PICKDEST`, `DISKSPACE_LT`, `TOGGLEGROUPON`, `COPY`, `APPEND` and `RUN` do with their arguments?
-  Settles it: read the cases at 0004:3FE3, 0004:3EC4, 0004:42EF, 0004:4086
-  and the others the table at 0004:5C55 gives for these names, and
-  0004:7126, every branch, including how `FLAG` runs the command after its
-  number.
+- Q-RES-184. FMT-RES-120: What do the `[Script]` commands `COPY`, `PICKDEST`, `APPEND`, `WRITE` and `RUN` do with their arguments?
+  Settles it: read the cases at 0004:4086, 0004:42EF, 0004:5165 and
+  0004:5150 with 0004:6CEE, and 0004:7126 for `RUN`, every branch.
   Blocks: none.
 
-- Q-RES-185. FMT-RES-120: What do the 24 `[Script]` commands the shipped script does not use do?
+- Q-RES-185. FMT-RES-120: What do the 23 `[Script]` commands the shipped script does not use, other than `WINDISKSPACE_LT`, do?
   Settles it: read their cases from the table at 0004:5C55, every branch.
+  Blocks: none.
+
+- Q-RES-186. FMT-RES-120: What does the dialog routine 0003:9EE6 show and return for `DIALOG`, and does it set script flags?
+  Settles it: read 0003:9EE6 and its writes to the words at offset 0x56 of
+  the loader's object.
+  Blocks: none.
+
+- Q-RES-187. FMT-RES-120: What does `TOGGLEGROUPON` change in the `[Files]` data?
+  Settles it: read 0003:AEAA with offset 0x22 of the loader's object.
+  Blocks: none.
+
+- Q-RES-188. FMT-RES-120: When is the word at offset 0xAE of the object at DS:0FB4 set?
+  Settles it: find every write to offset 0xAE of that object in
+  `_SETUP.EXE` and read what decides it.
   Blocks: none.
 
 - Q-RES-180. FMT-RES-120: What do 0004:3142 and 0003:C46A do with a dialog item's trailing fields and a `*` title?

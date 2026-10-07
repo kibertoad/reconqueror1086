@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-RES-021, FND-RES-029, FND-RES-032, FND-RES-033, FND-RES-038]
+evidence: [FND-RES-021, FND-RES-029, FND-RES-032, FND-RES-033, FND-RES-038, FND-RES-039]
 conflicting: []
 split_with: []
 related: []
@@ -36,7 +36,7 @@ is skipped. A section met twice is read twice.
 
 | Key | Type | Name | Meaning | Status | Evidence |
 |---|---|---|---|---|---|
-| `[Script]` | `char[]` | `script` | Leading spaces and tabs are removed and the line, line feed included, is added to one script text of at most 64,000 bytes counting a NUL per line; a larger script stops the installer with a message. Ends at a line that is a line feed after the spaces and tabs. Read as commands, one per line (below). | supported | FND-RES-033, FND-RES-038 |
+| `[Script]` | `char[]` | `script` | Leading spaces and tabs are removed and the line, line feed included, is added to one script text of at most 64,000 bytes counting a NUL per line; a larger script stops the installer with a message. Ends at a line that is a line feed after the spaces and tabs. Read as commands, one per line (below). | supported | FND-RES-033, FND-RES-038, FND-RES-039 |
 | `[Archives]` | `char[]` | `archives` | Tokens split on comma, space and tab: a name, then a number. Then a 32-bit number, a number and a 32-bit number, the last two split on line feed as well. Ends at a line whose first token is missing or starts with a line feed. | supported | FND-RES-033 |
 | `[Files]` | `char[]` | `files_section` | As `[Archives]`, but the second token is a name, and a number follows it only when that name is `NOARCHIVE` (letter case ignored) or ends in `\`. | supported | FND-RES-033 |
 | `[Dialogs]` | `char[]` | `dialogs` | Blocks. A line containing `BEGIN` starts one, followed on that line by the dialog's number and name; the next line is its title; each later line is an item, a number, a comma and a text up to the next comma, space or line feed, with an optional comma and more; a line starting with `END` (letter case ignored) ends the block. Lines outside blocks without `BEGIN` are skipped, and the section ends at a line starting with a line feed. A title or item text not starting with `*` is a key of LANGUAGE.INF's `Strings` section (FMT-RES-119). | supported | FND-RES-033 |
@@ -70,6 +70,17 @@ with no name.
 then comma-separated fields: the second is such a key, and the third and
 fourth are optional.
 
+The script has numbered flags (FND-RES-039). `FLAG<n> <command>` runs the command only when flag n is
+set; a flag number has no bound. `DISKSPACE_LT <V> FLAG<n>` sets flag n when
+the drive of the destination directory has fewer than V kilobytes free, and
+`WINDISKSPACE_LT` does the same for the Windows directory's drive; neither
+clears a flag, and a missing value or flag word shows a message and goes
+on. `DIALOG <name>` shows the first dialog of `[Dialogs]` whose name starts
+with the argument, letter case ignored; a missing dialog shows a message and
+ends the script, as does a dialog that returns 0. `TOGGLEGROUPON <V>` passes
+a number to the `[Files]` data. Words these commands read end at a space,
+tab or line feed, and a missing word takes the first word of the next line.
+
 Numbers are decimal, with optional leading spaces and tabs and one sign,
 read to the first other byte; a number kept in 16 bits keeps the low 16 bits
 of the 32-bit value.
@@ -92,13 +103,19 @@ the loader skips. Its eight dialogs request 32 `Strings` keys, and its seven
 
 ## Open questions
 
-- What do the `[Script]` commands the shipped script uses do with their
-  arguments? FND-RES-038 reads `END`, `GOTO`, `:` and the two Program
-  Manager keys; `FLAG`, `DIALOG`, `PICKDEST`, `DISKSPACE_LT`,
-  `TOGGLEGROUPON`, `COPY`, `APPEND` and `RUN`'s callee 0004:7126 are not
+- What do `COPY`, `PICKDEST`, `APPEND`, `WRITE` and `RUN` do with their
+  arguments? FND-RES-038 and FND-RES-039 read the other commands the
+  shipped script uses; these cases and `RUN`'s callee 0004:7126 are not
   read. (Q-RES-184)
-- What do the 24 commands the shipped script does not use do? Their cases
-  are in the table at 0004:5C55 and not read. (Q-RES-185)
+- What do the 23 commands the shipped script does not use, other than
+  `WINDISKSPACE_LT`, do? Their cases are in the table at 0004:5C55 and not
+  read. (Q-RES-185)
+- What does a dialog shown by `DIALOG` return, and does it set flags? The
+  dialog routine 0003:9EE6 is not read. (Q-RES-186)
+- What does `TOGGLEGROUPON` change? It passes its value with the `[Files]`
+  data to 0003:AEAA, not read. (Q-RES-187)
+- When is the word at offset 0xAE of the object at DS:0FB4 set? While it
+  is, the free-space tests report 0xFFFFFFFF bytes free. (Q-RES-188)
 - What do the dialog item's trailing fields and a `*` title mean? Item
   fields after the text are read by 0004:3142 and a `*` title by 0003:C46A,
   neither read yet. (Q-RES-180)
