@@ -1,6 +1,6 @@
 # RES
 
-Next ID: Q-RES-174
+Next ID: Q-RES-175
 
 ## Static
 
@@ -8,12 +8,20 @@ Next ID: Q-RES-174
   Settles it: trace lookup order and continuation after a match. Blocks: INF reconciliation.
   Tried: FND-RES-022 establishes the repeated token, not lookup semantics.
   FND-RES-026: AUTOPLAY reads only `Ident`/`Title` from an installed copy, so the
-  reader of the `Strings` section is still to be found (SETUP or INST).
+  reader of the `Strings` section is still to be found. FND-RES-029: SETUP does not
+  name LANGUAGE.INF; `_SETUP.EXE` (Q-RES-174) and INST remain.
 
 - Q-RES-170. FMT-RES-015: Which SIERRA reader distinguishes command-shaped equals regions and comma-bearing data?
   Settles it: identify the reader and trace dispatch/token boundaries. Blocks: INF reconciliation.
   Tried: FND-RES-022 retains all token classes; raw separators do not settle their roles.
   FND-RES-026: AUTOPLAY does not name SIERRA.INF; SETUP remains the lead.
+  FND-RES-029: SETUP reads only two `Setup` keys; `_SETUP.EXE` is the next lead (Q-RES-174).
+
+- Q-RES-174. FMT-RES-015: Where does SETUP get `_SETUP.EXE`, and does it read SIERRA.INF's other sections and LANGUAGE.INF?
+  Settles it: read SETUP's LZEXPAND calls and the `.SOL` name use from 0001:0960 to
+  find the file `_SETUP.EXE` is expanded from (FMT-RES-017's SETUP.SOL is the
+  candidate), then read that program's profile or file reads of the two INF files.
+  Blocks: INF reconciliation.
 
 - Q-RES-164. FMT-RES-014: Which shipped consumer opens the disc-root icons, and are those paths reachable?
   Settles it: Trace file-open references from media/application entry points. Blocks: Survey consumer reconciliation.
@@ -219,6 +227,9 @@ Next ID: Q-RES-174
   (now FMT-RES-117) and shows AUTOPLAY reads only an installed LANGUAGE.INF's
   `Ident`/`Title` and never CONQUER.INF or SIERRA.INF. Next: SETUP's selector
   provenance with its NE inventory, and INST.EXE, for the three remaining files.
+  Fourth attempt: FND-RES-029 reads SETUP's SIERRA.INF use (two `Setup` keys
+  through the profile routines) and finds it starts `_SETUP.EXE`; the other
+  readers are behind Q-RES-174 and INST.EXE.
 
 - Q-RES-018. FMT-RES-016: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the

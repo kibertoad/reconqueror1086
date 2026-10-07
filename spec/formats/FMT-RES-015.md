@@ -51,9 +51,13 @@ formats of its members.
   Windows profile API, but the copy in an installed game directory, not the
   disc's, and only its `Ident` section's `Title`; AUTOPLAY names neither
   CONQUER.INF nor SIERRA.INF. That the installer copies the disc's LANGUAGE.INF
-  there rests only on equal values. Further byte-shape counts cannot settle the
-  consumer question. Trace SETUP's and INST's readers and split the entry
-  before asserting incompatible field layouts. (Q-RES-017)
+  there rests only on equal values. FND-RES-029 shows that SETUP reads only
+  `SetupSize` and `ForceLanguage` of SIERRA.INF's `Setup` section, through the
+  Windows profile routines, and then starts `_SETUP.EXE`, a second installer
+  whose names sit beside `.SOL` in SETUP's data; the other SIERRA sections
+  are not read by SETUP. Further byte-shape counts cannot settle the consumer
+  question. Read `_SETUP.EXE` and INST's readers and split the entry before
+  asserting incompatible field layouts. (Q-RES-017)
 - How does LANGUAGE handle its repeated InstallDoneTitle token? First-wins,
   last-wins and multiple-use readings all fit FND-RES-022; read lookup order
   and continuation after a match. (Q-RES-169)
