@@ -6,13 +6,12 @@ Entries by status.
 
 ## unknown
 
-104 entries.
+103 entries.
 
 | ID | Title |
 |---|---|
 | [FMT-ASSAULT-004](../formats/FMT-ASSAULT-004.md) | Live effect record, one of the 64 effects the scheduler runs |
 | [FMT-RES-015](../formats/FMT-RES-015.md) | CONQUER.INF, the CD marker the install script tests for |
-| [FMT-RES-016](../formats/FMT-RES-016.md) | Unidentified .SCR data candidates in CD root |
 | [FMT-RES-018](../formats/FMT-RES-018.md) | Unidentified .TXT data candidates in CD root |
 | [FMT-RES-019](../formats/FMT-RES-019.md) | Unidentified .WRI data candidates in CD root |
 | [FMT-RES-020](../formats/FMT-RES-020.md) | Unidentified .AVI data candidates in CD:DEMOS/MOVIES |
@@ -128,7 +127,7 @@ Entries by status.
 
 ## supported
 
-226 entries.
+227 entries.
 
 | ID | Title |
 |---|---|
@@ -178,6 +177,7 @@ Entries by status.
 | [FMT-RES-011](../formats/FMT-RES-011.md) | ASCII line framing of CD-root INSTALL.DAT |
 | [FMT-RES-013](../formats/FMT-RES-013.md) | Marked ASCII text framing of CD-root INSTALL.HLP |
 | [FMT-RES-014](../formats/FMT-RES-014.md) | Owned disc-root indexed icon container layout |
+| [FMT-RES-016](../formats/FMT-RES-016.md) | INST.EXE script syntax of CD-root INSTALL.SCR |
 | [FMT-RES-017](../formats/FMT-RES-017.md) | SETUP.SOL, the first-stage installer's member archive |
 | [FMT-RES-116](../formats/FMT-RES-116.md) | Leading raw-track record in the owned disc carrier |
 | [FMT-RES-117](../formats/FMT-RES-117.md) | AUTORUN.INF, the CD launcher's profile file |
@@ -378,7 +378,7 @@ Entries by status.
 
 ## recorded
 
-263 entries.
+264 entries.
 
 | ID | Title |
 |---|---|
@@ -538,6 +538,7 @@ Entries by status.
 | [FND-RES-043](../findings/FND-RES-043.md) | CONFIG.EXE's @GetOutDrive, @GetSubdir and @GetOption echo their block text to the screen like @Display |
 | [FND-RES-044](../findings/FND-RES-044.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case |
 | [FND-RES-045](../findings/FND-RES-045.md) | INST.EXE takes the switches M, Z, F and D from its command line and loads install.scr whole before it reads RESOURCE.CFG |
+| [FND-RES-046](../findings/FND-RES-046.md) | INST.EXE runs install.scr line by line, with labels, goto, nine percent parameters, a table of named commands and any other line run as a program |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |
@@ -695,7 +696,7 @@ Entries whose Open questions section says more than None known.
 | [FMT-RES-013](../formats/FMT-RES-013.md) | Marked ASCII text framing of CD-root INSTALL.HLP | supported |
 | [FMT-RES-014](../formats/FMT-RES-014.md) | Owned disc-root indexed icon container layout | supported |
 | [FMT-RES-015](../formats/FMT-RES-015.md) | CONQUER.INF, the CD marker the install script tests for | unknown |
-| [FMT-RES-016](../formats/FMT-RES-016.md) | Unidentified .SCR data candidates in CD root | unknown |
+| [FMT-RES-016](../formats/FMT-RES-016.md) | INST.EXE script syntax of CD-root INSTALL.SCR | supported |
 | [FMT-RES-018](../formats/FMT-RES-018.md) | Unidentified .TXT data candidates in CD root | unknown |
 | [FMT-RES-019](../formats/FMT-RES-019.md) | Unidentified .WRI data candidates in CD root | unknown |
 | [FMT-RES-020](../formats/FMT-RES-020.md) | Unidentified .AVI data candidates in CD:DEMOS/MOVIES | unknown |

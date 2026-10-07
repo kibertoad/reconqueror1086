@@ -1,6 +1,6 @@
 # RES
 
-Next ID: Q-RES-193
+Next ID: Q-RES-201
 
 ## Static
 
@@ -80,6 +80,9 @@ Next ID: Q-RES-193
 
 - Q-RES-158. FMT-RES-013: Which shipped reader consumes CD-root INSTALL.HLP, and is that path reachable?
   Settles it: trace filename references from installation/media entry points into the reader. Blocks: Survey data-family reconciliation.
+  Tried: FND-RES-046 finds INST.EXE fetching its message texts by key
+  (`outputErr`, `pauseMsg`, `enterEsc`) through 2852:0B71 with its own path;
+  that routine was not read, so which file it reads is open.
 
 - Q-RES-159. FMT-RES-013: What roles do the backslash-prefixed regions have?
   Settles it: trace prefix recognition and every dispatch path using the marker remainder. Blocks: Survey data-family reconciliation.
@@ -294,12 +297,29 @@ Next ID: Q-RES-193
   or keeps it compressed inside another file; take this up again only with
   such a lead.
 
-- Q-RES-018. FMT-RES-016: What layout, if any, is shared by these listed candidates?
-  Settles it: inspect bounded file signatures and the relevant readers; record the
-  parsing syntax or field layout, splitting the entry if the files differ before
-  making claims about them. Blocks: Survey data-family reconciliation.
-  Tried: FND-RES-045 finds that INST.EXE loads `install.scr` whole, as text,
-  into the buffer at DS:534A; the code that interprets the buffer is not read.
+- Q-RES-193. FMT-RES-016: What does INSTALL.SCR's `alert` command do with its argument?
+  Settles it: read 1C17:0CA2 and the routines it calls, with every branch. Blocks: Survey data-family reconciliation.
+
+- Q-RES-194. FMT-RES-016: What do INSTALL.SCR's `copy`, `del` and `exists` commands do, and what does each do when its file operation fails?
+  Settles it: read 1C17:19B8, 1C17:1C17 and 1C17:0F7C with every branch, including the archive path through the handle at +0x23A. Blocks: Survey data-family reconciliation.
+
+- Q-RES-195. FMT-RES-016: What do INSTALL.SCR's `space`, `godir` and `testdir` commands test or change, and when does `testdir` stop the script?
+  Settles it: read 1C17:0CBF, 1C17:0E4A and 1C17:1AC6 with 263F:004D. Blocks: Survey data-family reconciliation.
+
+- Q-RES-196. FMT-RES-016: What does INSTALL.SCR's `pick` command offer, and where does the choice go?
+  Settles it: read 1C17:0D8F and the routines it calls. Blocks: Survey data-family reconciliation.
+
+- Q-RES-197. FMT-RES-016: What syntax does INSTALL.SCR's `if` command take, and what does it run?
+  Settles it: read 1C17:1C63 and every path into 1C17:0504 or the run loop's state from it. Blocks: Survey data-family reconciliation.
+
+- Q-RES-198. FMT-RES-016: How does INST.EXE's program runner split an unknown INSTALL.SCR line into program, arguments and redirection, and which DOS call runs it?
+  Settles it: read the first entry of the vtable at DS:1202 (2DDA:000A) with 1000:3EEE and 1000:3F69, and every result it returns. Blocks: Survey data-family reconciliation.
+
+- Q-RES-199. FMT-RES-016: Which values do INSTALL.SCR's parameters `%1` to `%7` hold when the script runs?
+  Settles it: trace every write to the object fields +0x1E6, +0x23E, +0x1DE, +0x194, +0x1AA and +0x1AE and to DS:5557 before vtable entry +0x30 is called. Blocks: Survey data-family reconciliation.
+
+- Q-RES-200. FMT-RES-016: When does INST.EXE run INSTALL.SCR, and does every path through the shipped script reach `end`?
+  Settles it: locate the calls of vtable entry +0x30 of the object at DS:55D8, then follow every `goto`, `pick` and `if` path of the shipped script once Q-RES-196 and Q-RES-197 are answered. Blocks: Survey data-family reconciliation.
 
 - Q-RES-020. FMT-RES-018: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the
