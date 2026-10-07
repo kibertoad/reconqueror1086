@@ -80,12 +80,6 @@ Next ID: Q-RES-184
   every relevant caller through the file-open decision. Blocks: Survey runtime-use
   reconciliation.
 
-- Q-RES-152. FMT-RES-011: How does the interpreter tokenize at-sign identifiers and match their casing?
-  Settles it: read token boundaries and the dispatch comparison. Blocks: Survey data-family reconciliation.
-
-- Q-RES-153. FMT-RES-011: How does the interpreter recognize double-slash comments and handle quotes within them?
-  Settles it: read comment recognition, extent and interaction with the quote lexer. Blocks: Survey data-family reconciliation.
-
 - Q-RES-154. FMT-RES-011: What quoted-string and backslash grammar does the interpreter use?
   Settles it: read delimiter, escaping and continuation branches. Blocks: Survey data-family reconciliation.
 
@@ -94,6 +88,9 @@ Next ID: Q-RES-184
 
 - Q-RES-156. FMT-RES-011: How does the interpreter handle the final unterminated region?
   Settles it: read final-line consumption and end-of-file success/error branches. Blocks: Survey data-family reconciliation.
+  Lead: FND-RES-036 reads the byte layer (end of input when the 32-bit count
+  at DS:535E reaches 0, or at a 0x1A ending a buffer); where that count is set
+  and how the runner at 1B80:184F ends a statement at end of input are unread.
 
 
 - Q-RES-138. FMT-RES-010: Which shipped reader consumes CD-root RESOURCE.CFG, and is that path reachable?

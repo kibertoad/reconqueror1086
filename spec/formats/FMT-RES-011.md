@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-RES-017]
+evidence: [FND-RES-017, FND-RES-036]
 conflicting: []
 split_with: []
 related: []
@@ -30,10 +30,19 @@ framing and prefix shapes, not the complete script grammar or reader policy.
 | After leading spaces | char[] | install_dat_body | Retained text, including at-sign prefixes, double-slash prefixes and other nonempty forms. | supported | FND-RES-017 |
 
 At-sign-prefixed regions begin with letter-led identifier spellings containing
-letters, digits or underscores. Case variants occur, but their dispatch relation
-is unread. Double-slash-prefixed regions are comment-shaped; their lexical role
-and extent are not established. Other nonempty regions are retained unchanged,
+letters, digits or underscores. Other nonempty regions are retained unchanged,
 not treated as invalid or silently omitted.
+
+The reader's lexing of the two prefixes is supported by FND-RES-036. An at-sign
+name is `@` followed by letters and digits, upper-cased as it is read; any
+other byte, `_` and `:` included, ends it and is read again as the start of
+the next token. Names are matched against the keyword table and then the
+table of registered names with `a` to `z` and `A` to `Z` treated alike, so
+the case variants in the file select the same keyword or name. `@` right
+after a name, followed by `!`, is dropped as a separator; `@!` alone is
+passed over; `@@` is a token of its own. Outside quoted strings, `//` drops
+everything to the end of its line, quotes included, and `/*` everything to
+the next `*/`; inside a quoted string neither starts a comment.
 
 Quotes, adjacent backslashes and punctuation occur inside the stored text.
 FND-RES-017 records complete character/prefix measurements. This entry assigns
@@ -61,11 +70,6 @@ applies to stored text framing only.
 
 ## Open questions
 
-- How does the interpreter tokenize at-sign identifiers and match their casing?
-  The observed variants fit either distinct or case-insensitive dispatch.
-  (Q-RES-152)
-- How are double-slash regions recognized, and do quotes within them affect
-  lexing? Prefix counts alone do not establish comment extent. (Q-RES-153)
 - What quoted-string and backslash rules does the interpreter use? Raw quote
   parity and backslash counts are not string syntax evidence. (Q-RES-154)
 - What grammar handles nonempty regions without at-sign or double-slash prefixes?

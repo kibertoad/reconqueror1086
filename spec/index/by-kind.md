@@ -336,7 +336,7 @@ Entries by kind.
 
 ## findings
 
-254 entries.
+255 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -486,6 +486,7 @@ Entries by kind.
 | [FND-RES-033](../findings/FND-RES-033.md) | _SETUP.EXE reads SIERRA.INF line by line into five marked sections, each with its own line grammar | recorded |
 | [FND-RES-034](../findings/FND-RES-034.md) | CONFIG.EXE runs the INSTALL.DAT script, whose only use of CONQUER.INF is an @exists test through DOS find-first | recorded |
 | [FND-RES-035](../findings/FND-RES-035.md) | CONFIG.EXE opens its script read-only, defaulting to INSTALL.DAT, and asks for a drive when the open fails | recorded |
+| [FND-RES-036](../findings/FND-RES-036.md) | CONFIG.EXE reads its script through a comment-removing character layer and upper-cases at-sign names before matching them | recorded |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |
