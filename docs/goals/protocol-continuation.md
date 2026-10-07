@@ -6,10 +6,11 @@ Continue the owner's ongoing restoration work according to the local Protocol
 and document results using the local Standard. Record suggestions and concerns
 for template, process, Protocol, Standard and shared-tooling authors as GitHub
 issues after duplicate checks, recording submission links in `gaps.md`.
-Commit completed batches and handovers. On 2026-10-05 the owner authorized
-wrapping up the current batch, pushing to main and stopping. The owner supplied
-no finite completion condition or turn limit, so this goal remains ongoing;
-completion of one batch does not complete the objective.
+Commit completed batches and handovers on this goal branch. Since 2026-10-07
+the owner has not authorized pushing to main, so the goal runs on
+`goal/protocol-continuation`. The owner supplied no finite completion condition
+or turn limit, so this goal remains ongoing; completion of one batch does not
+complete the objective.
 
 ## Scope
 
