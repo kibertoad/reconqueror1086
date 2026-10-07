@@ -129,7 +129,7 @@ Entries by status.
 
 ## supported
 
-220 entries.
+221 entries.
 
 | ID | Title |
 |---|---|
@@ -180,6 +180,7 @@ Entries by status.
 | [FMT-RES-013](../formats/FMT-RES-013.md) | Marked ASCII text framing of CD-root INSTALL.HLP |
 | [FMT-RES-014](../formats/FMT-RES-014.md) | Owned disc-root indexed icon container layout |
 | [FMT-RES-116](../formats/FMT-RES-116.md) | Leading raw-track record in the owned disc carrier |
+| [FMT-RES-117](../formats/FMT-RES-117.md) | AUTORUN.INF, the CD launcher's profile file |
 | [FMT-SAVE-001](../formats/FMT-SAVE-001.md) | Saved game, SAVEGAME\CONQn.SAV |
 | [FMT-SAVE-002](../formats/FMT-SAVE-002.md) | Strategic map state, TROOPS.SAV |
 | [FMT-SAVE-003](../formats/FMT-SAVE-003.md) | Properties, persons, items and variables, PROPERTY.SAV |
@@ -373,7 +374,7 @@ Entries by status.
 
 ## recorded
 
-243 entries.
+244 entries.
 
 | ID | Title |
 |---|---|
@@ -513,6 +514,7 @@ Entries by status.
 | [FND-RES-023](../findings/FND-RES-023.md) | Root executable filename occurrences identify AUTOPLAY and SETUP as INF consumer leads |
 | [FND-RES-024](../findings/FND-RES-024.md) | AUTOPLAY uses PE32 data mapping while SETUP uses NE segment mapping |
 | [FND-RES-025](../findings/FND-RES-025.md) | SETUP relocations target selectors rather than the SIERRA filename offsets |
+| [FND-RES-026](../findings/FND-RES-026.md) | AUTOPLAY reads AUTORUN.INF and an installed LANGUAGE.INF through the Windows profile API |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |
@@ -772,6 +774,7 @@ Entries whose Open questions section says more than None known.
 | [FMT-RES-114](../formats/FMT-RES-114.md) | Unidentified .EXE data candidates in CD:INN/TWINION/TWPATCH | unknown |
 | [FMT-RES-115](../formats/FMT-RES-115.md) | Unidentified .DOC data candidates in CD:VESA | unknown |
 | [FMT-RES-116](../formats/FMT-RES-116.md) | Leading raw-track record in the owned disc carrier | supported |
+| [FMT-RES-117](../formats/FMT-RES-117.md) | AUTORUN.INF, the CD launcher's profile file | supported |
 | [FMT-SAVE-001](../formats/FMT-SAVE-001.md) | Saved game, SAVEGAME\CONQn.SAV | supported |
 | [FMT-SAVE-002](../formats/FMT-SAVE-002.md) | Strategic map state, TROOPS.SAV | supported |
 | [FMT-SAVE-004](../formats/FMT-SAVE-004.md) | Calendar block, ~~2.SAV | supported |

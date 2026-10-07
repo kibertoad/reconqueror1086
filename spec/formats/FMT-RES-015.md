@@ -4,7 +4,7 @@ title: Unidentified .INF data candidates in CD root
 status: unknown
 builds: [BLD-GOG-EN]
 superseded_by: []
-files: ["CD:AUTORUN.INF", "CD:CONQUER.INF", "CD:LANGUAGE.INF", "CD:SIERRA.INF"]
+files: ["CD:CONQUER.INF", "CD:LANGUAGE.INF", "CD:SIERRA.INF"]
 byte_order: little # provisional hypothesis; see Open questions
 size: null
 text: false # provisional hypothesis; see Open questions
@@ -19,7 +19,8 @@ related: []
 
 None known. This is a provisional inventory group by directory and filename
 suffix, not a finding that its files share one format. No field layout, parsing
-syntax or runtime use is established.
+syntax or runtime use is established. `CD:AUTORUN.INF` was listed here until
+FND-RES-026 located its reader; it is FMT-RES-117.
 
 ## Enumerations and flags
 
@@ -46,13 +47,13 @@ formats of its members.
   proving file opens. FND-RES-024 supplies distinct PE/NE data mappings and
   profile-import leads. FND-RES-025 rules out direct SETUP filename fixups within
   its declared relocation table, while leaving selector/offset construction open.
-  Further byte-shape counts cannot settle the consumer question.
-  Trace the readers
-  and split the entry before asserting incompatible field layouts. (Q-RES-017)
-- Which encoding interprets AUTORUN's four non-ASCII bytes? Multiple single-byte
-  code pages remain possible; inspect the consuming decoder or a relevant format
-  source rather than normalizing them to ASCII. This is an independently
-  answerable dependency of layout reconciliation. (Q-RES-168)
+  FND-RES-026 shows that AUTOPLAY reads a file named LANGUAGE.INF through the
+  Windows profile API, but the copy in an installed game directory, not the
+  disc's, and only its `Ident` section's `Title`; AUTOPLAY names neither
+  CONQUER.INF nor SIERRA.INF. That the installer copies the disc's LANGUAGE.INF
+  there rests only on equal values. Further byte-shape counts cannot settle the
+  consumer question. Trace SETUP's and INST's readers and split the entry
+  before asserting incompatible field layouts. (Q-RES-017)
 - How does LANGUAGE handle its repeated InstallDoneTitle token? First-wins,
   last-wins and multiple-use readings all fit FND-RES-022; read lookup order
   and continuation after a match. (Q-RES-169)

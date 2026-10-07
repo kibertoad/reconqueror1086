@@ -1,21 +1,23 @@
 # RES
 
-Next ID: Q-RES-171
+Next ID: Q-RES-173
 
 ## Static
 
 - Q-RES-169. FMT-RES-015: How does LANGUAGE handle repeated InstallDoneTitle?
   Settles it: trace lookup order and continuation after a match. Blocks: INF reconciliation.
   Tried: FND-RES-022 establishes the repeated token, not lookup semantics.
+  FND-RES-026: AUTOPLAY reads only `Ident`/`Title` from an installed copy, so the
+  reader of the `Strings` section is still to be found (SETUP or INST).
 
 - Q-RES-170. FMT-RES-015: Which SIERRA reader distinguishes command-shaped equals regions and comma-bearing data?
   Settles it: identify the reader and trace dispatch/token boundaries. Blocks: INF reconciliation.
   Tried: FND-RES-022 retains all token classes; raw separators do not settle their roles.
+  FND-RES-026: AUTOPLAY does not name SIERRA.INF; SETUP remains the lead.
 
-- Q-RES-168. FMT-RES-015: Which encoding interprets AUTORUN.INF non-ASCII bytes?
-  Settles it: trace the consuming decoder or establish a relevant format source
-  and compare its interpretation with the complete file. Blocks: INF reconciliation.
-  Tried: FND-RES-021 records four high bytes but cannot choose a code page.
+- Q-RES-171. FMT-RES-117: Do AUTOPLAY's comparisons of directory names and titles ignore letter case?
+  Settles it: read the library comparison routine at 0x004112B1 that FND-RES-026
+  names, every branch. Blocks: none.
 
 - Q-RES-164. FMT-RES-014: Which shipped consumer opens the disc-root icons, and are those paths reachable?
   Settles it: Trace file-open references from media/application entry points. Blocks: Survey consumer reconciliation.
@@ -217,6 +219,10 @@ Next ID: Q-RES-171
   FND-RES-025 completes SETUP relocation-table inspection: the selector chain
   needs instruction/offset provenance, not another direct filename-fixup search.
   Next tooling prerequisite: correctly mapped launcher function inventories.
+  Third attempt, with the mapped AUTOPLAY reading: FND-RES-026 settles AUTORUN.INF
+  (now FMT-RES-117) and shows AUTOPLAY reads only an installed LANGUAGE.INF's
+  `Ident`/`Title` and never CONQUER.INF or SIERRA.INF. Next: SETUP's selector
+  provenance with its NE inventory, and INST.EXE, for the three remaining files.
 
 - Q-RES-018. FMT-RES-016: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the
@@ -761,6 +767,10 @@ None.
 None.
 
 ## Source
+
+- Q-RES-172. FMT-RES-117: Which program reads the `autorun` section of AUTORUN.INF, and how?
+  Settles it: a Windows 95 AutoRun reference for the `OPEN` and `ICON` keys, compared
+  with the shipped values. AUTOPLAY does not read it (FND-RES-026). Blocks: none.
 
 - Q-RES-002. FMT-RES-002: What was `unk_24` intended to hold? Settles it: a contemporary design
   note, erratum or author statement addressing the intent; executable behavior alone does not
