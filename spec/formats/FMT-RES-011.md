@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-RES-017, FND-RES-036, FND-RES-037, FND-RES-041]
+evidence: [FND-RES-017, FND-RES-036, FND-RES-037, FND-RES-041, FND-RES-042]
 conflicting: []
 split_with: []
 related: []
@@ -53,6 +53,16 @@ error. An at-sign name inside a string is replaced by its value, `@@` gives
 `@`, and keywords insert either their numeric value or their own name. The
 file's strings use only `\\` and `\n`.
 
+Outside quoted strings and comments the file holds at-sign commands,
+labels and block text, supported by FND-RES-042. A label is a word of
+letters, digits and `_` in the first column followed by `:`; it defines
+`LABEL_<word>` for `@GOTO`. Text between `@Display` (or `@Welcome`) and
+`@EndDisplay` is written to the screen byte by byte, line breaks included,
+and the at-sign tokens in it are handled as they come. A bare word anywhere
+else in the main run stops the program with a syntax error. The shipped
+file's bare text is all labels or block text; the blocks of `@GetOutDrive`,
+`@GetSubdir` and `@GetOption` hold some of it.
+
 The run ends at the end of the file or at `@FINISH`, supported by
 FND-RES-041. `@FINISH` closes the file and marks the start of a finish
 block, which runs just before the program exits: the file is reopened
@@ -82,7 +92,7 @@ None known.
 
 Every byte and every line region in the identified BLD-GOG-EN file was inspected,
 with exact reconstruction [FND-RES-017]. Parts of the interpreter are read in
-FND-RES-036, FND-RES-037 and FND-RES-041; nothing was run. CD:CONFIG.EXE opens the file read-only, by default beside its
+FND-RES-036, FND-RES-037, FND-RES-041 and FND-RES-042; nothing was run. CD:CONFIG.EXE opens the file read-only, by default beside its
 own executable, and passes the handle to its script runner (FND-RES-034,
 FND-RES-035), which reads it as a stream of tokens in which line ends
 are white space, and runs the finish block at exit (FND-RES-041). Supported status
@@ -90,5 +100,7 @@ applies to stored text framing only.
 
 ## Open questions
 
-- What grammar handles nonempty regions without at-sign or double-slash prefixes?
-  Continuations and another statement form remain possible. (Q-RES-155)
+- What do `@GetOutDrive`, `@GetSubdir` and `@GetOption` do with the text
+  in their blocks? Each has a loop that reads characters up to `@`
+  (FND-RES-042); whether it echoes the text or keeps it as a prompt is not
+  read. (Q-RES-155)

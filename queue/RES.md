@@ -102,12 +102,12 @@ Next ID: Q-RES-192
   every relevant caller through the file-open decision. Blocks: Survey runtime-use
   reconciliation.
 
-- Q-RES-155. FMT-RES-011: What grammar handles nonempty regions without at-sign or double-slash prefixes?
-  Settles it: read the paths accepting these regions and their surrounding lexical state. Blocks: Survey data-family reconciliation.
-  Tried: FND-RES-041 settles them inside the finish block, where they are
-  written to the screen. Before `@FINISH` the runner 1B80:184F takes them
-  as tokens from 221F:0003's number, identifier, string and single-character
-  readers, dispatched through 192C:0003, 1B20:0000 and 1B80:0147, none read.
+- Q-RES-155. FMT-RES-011: What do `@GetOutDrive`, `@GetSubdir` and `@GetOption` do with the text in their blocks?
+  Settles it: read the character loops in 1B80:289B, 1B80:3206 and
+  19A2:049A to their ends, every branch. Blocks: Survey data-family reconciliation.
+  Tried: FND-RES-041 and FND-RES-042 settle bare text in the finish block,
+  in `@Display` blocks, as labels and elsewhere in the main run; the shipped
+  file's remaining bare text lies in these three blocks.
 
 
 - Q-RES-138. FMT-RES-010: Which shipped reader consumes CD-root RESOURCE.CFG, and is that path reachable?
