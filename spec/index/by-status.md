@@ -378,7 +378,7 @@ Entries by status.
 
 ## recorded
 
-252 entries.
+253 entries.
 
 | ID | Title |
 |---|---|
@@ -527,6 +527,7 @@ Entries by status.
 | [FND-RES-032](../findings/FND-RES-032.md) | _SETUP.EXE, expanded from SETUP.SOL, loads SIERRA.INF with section markers and reads LANGUAGE.INF through the profile routines |
 | [FND-RES-033](../findings/FND-RES-033.md) | _SETUP.EXE reads SIERRA.INF line by line into five marked sections, each with its own line grammar |
 | [FND-RES-034](../findings/FND-RES-034.md) | CONFIG.EXE runs the INSTALL.DAT script, whose only use of CONQUER.INF is an @exists test through DOS find-first |
+| [FND-RES-035](../findings/FND-RES-035.md) | CONFIG.EXE opens its script read-only, defaulting to INSTALL.DAT, and asks for a drive when the open fails |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |

@@ -80,13 +80,6 @@ Next ID: Q-RES-184
   every relevant caller through the file-open decision. Blocks: Survey runtime-use
   reconciliation.
 
-- Q-RES-151. FMT-RES-011: Which shipped interpreter consumes CD-root INSTALL.DAT, and is that path reachable?
-  Settles it: trace file references from installation/media entry points into the reader. Blocks: Survey data-family reconciliation.
-  Tried: FND-RES-034 locates CONFIG.EXE formatting INSTALL.DAT's path into the
-  far pointer at DS:7B82 and reporting a failed reopen of its script file, and
-  reads its `@exists` handler. Next: follow DS:7B82 into the file open and the
-  line reader, and the batch file that starts CONFIG.EXE.
-
 - Q-RES-152. FMT-RES-011: How does the interpreter tokenize at-sign identifiers and match their casing?
   Settles it: read token boundaries and the dispatch comparison. Blocks: Survey data-family reconciliation.
 

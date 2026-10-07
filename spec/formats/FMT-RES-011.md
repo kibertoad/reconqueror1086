@@ -54,17 +54,13 @@ None known.
 
 Every byte and every line region in the identified BLD-GOG-EN file was inspected,
 with exact reconstruction [FND-RES-017]. No interpreter or directive behavior was
-read or run. A reader of similarly named media files is not inferred from this
-one file. Supported status applies to stored text framing only.
+read or run. CD:CONFIG.EXE opens the file read-only, by default beside its
+own executable, and passes the handle to its script runner (FND-RES-034,
+FND-RES-035); how that runner reads lines is not read. Supported status
+applies to stored text framing only.
 
 ## Open questions
 
-- Which shipped interpreter consumes this file, and is that path reachable?
-  FND-RES-034 locates CD:CONFIG.EXE building INSTALL.DAT's path from a drive
-  and directory and reporting a failure to reopen its script file by that
-  name, and reads its `@exists` handler, so CONFIG.EXE is the lead; where it
-  first opens the file, and which shipped batch file or program starts it,
-  are not read. (Q-RES-151)
 - How does the interpreter tokenize at-sign identifiers and match their casing?
   The observed variants fit either distinct or case-insensitive dispatch.
   (Q-RES-152)

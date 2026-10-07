@@ -576,6 +576,7 @@ Entries by area.
 | [FND-RES-032](../findings/FND-RES-032.md) | _SETUP.EXE, expanded from SETUP.SOL, loads SIERRA.INF with section markers and reads LANGUAGE.INF through the profile routines | recorded |
 | [FND-RES-033](../findings/FND-RES-033.md) | _SETUP.EXE reads SIERRA.INF line by line into five marked sections, each with its own line grammar | recorded |
 | [FND-RES-034](../findings/FND-RES-034.md) | CONFIG.EXE runs the INSTALL.DAT script, whose only use of CONQUER.INF is an @exists test through DOS find-first | recorded |
+| [FND-RES-035](../findings/FND-RES-035.md) | CONFIG.EXE opens its script read-only, defaulting to INSTALL.DAT, and asks for a drive when the open fails | recorded |
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |
