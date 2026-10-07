@@ -10,8 +10,9 @@ Stage: Survey. Intake identifies the owned edition and current patch provenance
 (BLD-GOG-EN, SRC-PATCH-CATALOG); Runtime access is assessed in [RUNTIME.md](RUNTIME.md).
 Area queues and the inventory for the executable already studied are present.
 The complete installation/media path accounting is recorded in FND-RES-010 and
-BLD-GOG-EN. Survey remains open until every manifest data family and all
-manual-mentioned screens are reconciled. The disc's `DEMOS/`, `INN/` and `VESA/` trees and
+BLD-GOG-EN. Every screen SRC-MANUAL describes has a screen entry, SCR-UI-021 to
+SCR-UI-036 as `sourced` listings. Survey remains open until every manifest
+data family is reconciled. The disc's `DEMOS/`, `INN/` and `VESA/` trees and
 its readme, version and placeholder files are under the build's Other files
 (FND-RES-057, FND-RES-058). Conservatively retained auxiliary
 media need runtime-use review and format entries until evidence supports

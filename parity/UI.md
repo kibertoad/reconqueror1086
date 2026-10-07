@@ -30,3 +30,19 @@
 | `SCR-UI-018` | Fief overview | supported | partial | None | None | supported | The rebuild's `Overview` screen draws `f_over.pcx`; the three report pages are not shown. |
 | `SCR-UI-019` | Dubbing | supported | missing | None | None | supported | The rebuild goes from character creation to its own briefing screen. |
 | `SCR-UI-020` | Screen 5 | supported | missing | None | None | supported | None. |
+| `SCR-UI-021` | Practice jousting | sourced | missing | None | None | sourced | Survey listing from the manual. |
+| `SCR-UI-022` | Moneylender | sourced | missing | None | None | sourced | Survey listing from the manual. |
+| `SCR-UI-023` | Store item | sourced | missing | None | None | sourced | Survey listing from the manual. |
+| `SCR-UI-024` | Church | sourced | missing | None | None | sourced | Survey listing from the manual. |
+| `SCR-UI-025` | Tournament joust | sourced | missing | None | None | sourced | Survey listing from the manual. |
+| `SCR-UI-026` | Melee | sourced | missing | None | None | sourced | Survey listing from the manual. |
+| `SCR-UI-027` | Political status | sourced | missing | None | None | sourced | Survey listing from the manual. |
+| `SCR-UI-028` | Economics | sourced | missing | None | None | sourced | Survey listing from the manual. |
+| `SCR-UI-029` | Personal status | sourced | missing | None | None | sourced | Survey listing from the manual. |
+| `SCR-UI-030` | Orders | sourced | missing | None | None | sourced | Survey listing from the manual. |
+| `SCR-UI-031` | Overview map | sourced | missing | None | None | sourced | Survey listing from the manual. |
+| `SCR-UI-032` | Tactical map | sourced | missing | None | None | sourced | Survey listing from the manual. |
+| `SCR-UI-033` | Help | sourced | missing | None | None | sourced | Survey listing from the manual. |
+| `SCR-UI-034` | Choose formation | sourced | missing | None | None | sourced | Survey listing from the manual. |
+| `SCR-UI-035` | Field battle | sourced | missing | None | None | sourced | Survey listing from the manual. |
+| `SCR-UI-036` | Castle skirmish | sourced | missing | None | None | sourced | Survey listing from the manual. |

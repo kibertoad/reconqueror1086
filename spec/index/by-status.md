@@ -18,7 +18,7 @@ Entries by status.
 
 ## sourced
 
-4 entries.
+20 entries.
 
 | ID | Title |
 |---|---|
@@ -26,6 +26,22 @@ Entries by status.
 | [RULE-ESTATE-005](../rules/RULE-ESTATE-005.md) | Crop and forest revenue |
 | [RULE-ESTATE-006](../rules/RULE-ESTATE-006.md) | Population, food, housing and taxes |
 | [RULE-PERSON-005](../rules/RULE-PERSON-005.md) | Courtship and marriage |
+| [SCR-UI-021](../screens/SCR-UI-021.md) | Practice jousting |
+| [SCR-UI-022](../screens/SCR-UI-022.md) | Moneylender |
+| [SCR-UI-023](../screens/SCR-UI-023.md) | Store item |
+| [SCR-UI-024](../screens/SCR-UI-024.md) | Church |
+| [SCR-UI-025](../screens/SCR-UI-025.md) | Tournament joust |
+| [SCR-UI-026](../screens/SCR-UI-026.md) | Melee |
+| [SCR-UI-027](../screens/SCR-UI-027.md) | Political status |
+| [SCR-UI-028](../screens/SCR-UI-028.md) | Economics |
+| [SCR-UI-029](../screens/SCR-UI-029.md) | Personal status |
+| [SCR-UI-030](../screens/SCR-UI-030.md) | Orders |
+| [SCR-UI-031](../screens/SCR-UI-031.md) | Overview map |
+| [SCR-UI-032](../screens/SCR-UI-032.md) | Tactical map |
+| [SCR-UI-033](../screens/SCR-UI-033.md) | Help |
+| [SCR-UI-034](../screens/SCR-UI-034.md) | Choose formation |
+| [SCR-UI-035](../screens/SCR-UI-035.md) | Field battle |
+| [SCR-UI-036](../screens/SCR-UI-036.md) | Castle skirmish |
 
 ## supported
 
@@ -959,3 +975,19 @@ Entries whose Open questions section says more than None known.
 | [SCR-UI-018](../screens/SCR-UI-018.md) | Fief overview | supported |
 | [SCR-UI-019](../screens/SCR-UI-019.md) | Dubbing | supported |
 | [SCR-UI-020](../screens/SCR-UI-020.md) | Screen 5 | supported |
+| [SCR-UI-021](../screens/SCR-UI-021.md) | Practice jousting | sourced |
+| [SCR-UI-022](../screens/SCR-UI-022.md) | Moneylender | sourced |
+| [SCR-UI-023](../screens/SCR-UI-023.md) | Store item | sourced |
+| [SCR-UI-024](../screens/SCR-UI-024.md) | Church | sourced |
+| [SCR-UI-025](../screens/SCR-UI-025.md) | Tournament joust | sourced |
+| [SCR-UI-026](../screens/SCR-UI-026.md) | Melee | sourced |
+| [SCR-UI-027](../screens/SCR-UI-027.md) | Political status | sourced |
+| [SCR-UI-028](../screens/SCR-UI-028.md) | Economics | sourced |
+| [SCR-UI-029](../screens/SCR-UI-029.md) | Personal status | sourced |
+| [SCR-UI-030](../screens/SCR-UI-030.md) | Orders | sourced |
+| [SCR-UI-031](../screens/SCR-UI-031.md) | Overview map | sourced |
+| [SCR-UI-032](../screens/SCR-UI-032.md) | Tactical map | sourced |
+| [SCR-UI-033](../screens/SCR-UI-033.md) | Help | sourced |
+| [SCR-UI-034](../screens/SCR-UI-034.md) | Choose formation | sourced |
+| [SCR-UI-035](../screens/SCR-UI-035.md) | Field battle | sourced |
+| [SCR-UI-036](../screens/SCR-UI-036.md) | Castle skirmish | sourced |

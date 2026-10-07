@@ -1,6 +1,6 @@
 # UI
 
-Next ID: Q-UI-028
+Next ID: Q-UI-044
 
 ## Static
 
@@ -118,6 +118,54 @@ Next ID: Q-UI-028
 - Q-UI-027. SCR-UI-020: Which routine switches to screen 5, and what it shows? Settles it:
   follow the screen entry, input handlers and drawing paths named by the cited findings,
   retaining branch conditions and resource references. Blocks: none.
+
+- Q-UI-028. SCR-UI-021: Which code draws the practice jousting screen, from which resources, with which regions and keys?
+  Settles it: locate the screen's drawing and input code from the resources and handlers of the screens it is reached from. Blocks: Survey screen reconciliation.
+
+- Q-UI-029. SCR-UI-022: Which code draws the moneylender screen, from which resources, with which regions and keys?
+  Settles it: locate the screen's drawing and input code from the resources and handlers of the screens it is reached from. Blocks: Survey screen reconciliation.
+
+- Q-UI-030. SCR-UI-023: Which code draws the store item screen, from which resources, with which regions and keys?
+  Settles it: locate the screen's drawing and input code from the resources and handlers of the screens it is reached from. Blocks: Survey screen reconciliation.
+
+- Q-UI-031. SCR-UI-024: Which code draws the church screen, from which resources, with which regions and keys?
+  Settles it: locate the screen's drawing and input code from the resources and handlers of the screens it is reached from. Blocks: Survey screen reconciliation.
+
+- Q-UI-032. SCR-UI-025: Which code draws the tournament joust screen, from which resources, with which regions and keys?
+  Settles it: locate the screen's drawing and input code from the resources and handlers of the screens it is reached from. Blocks: Survey screen reconciliation.
+
+- Q-UI-033. SCR-UI-026: Which code draws the melee screen, from which resources, with which regions and keys?
+  Settles it: locate the screen's drawing and input code from the resources and handlers of the screens it is reached from. Blocks: Survey screen reconciliation.
+
+- Q-UI-034. SCR-UI-027: Which code draws the political status screen, from which resources, with which regions and keys?
+  Settles it: locate the screen's drawing and input code from the resources and handlers of the screens it is reached from. Blocks: Survey screen reconciliation.
+
+- Q-UI-035. SCR-UI-028: Which code draws the economics screen, from which resources, with which regions and keys?
+  Settles it: locate the screen's drawing and input code from the resources and handlers of the screens it is reached from. Blocks: Survey screen reconciliation.
+
+- Q-UI-036. SCR-UI-029: Which code draws the personal status screen, from which resources, with which regions and keys?
+  Settles it: locate the screen's drawing and input code from the resources and handlers of the screens it is reached from. Blocks: Survey screen reconciliation.
+
+- Q-UI-037. SCR-UI-030: Which code draws the orders screen, from which resources, with which regions and keys?
+  Settles it: locate the screen's drawing and input code from the resources and handlers of the screens it is reached from. Blocks: Survey screen reconciliation.
+
+- Q-UI-038. SCR-UI-031: Which code draws the overview map screen, from which resources, with which regions and keys?
+  Settles it: locate the screen's drawing and input code from the resources and handlers of the screens it is reached from. Blocks: Survey screen reconciliation.
+
+- Q-UI-039. SCR-UI-032: Which code draws the tactical map screen, from which resources, with which regions and keys?
+  Settles it: locate the screen's drawing and input code from the resources and handlers of the screens it is reached from. Blocks: Survey screen reconciliation.
+
+- Q-UI-040. SCR-UI-033: Which code draws the help screen, from which resources, with which regions and keys?
+  Settles it: locate the screen's drawing and input code from the resources and handlers of the screens it is reached from. Blocks: Survey screen reconciliation.
+
+- Q-UI-041. SCR-UI-034: Which code draws the choose formation screen, from which resources, with which regions and keys?
+  Settles it: locate the screen's drawing and input code from the resources and handlers of the screens it is reached from. Blocks: Survey screen reconciliation.
+
+- Q-UI-042. SCR-UI-035: Which code draws the field battle screen, from which resources, with which regions and keys?
+  Settles it: locate the screen's drawing and input code from the resources and handlers of the screens it is reached from. Blocks: Survey screen reconciliation.
+
+- Q-UI-043. SCR-UI-036: Which code draws the castle skirmish screen, from which resources, with which regions and keys?
+  Settles it: locate the screen's drawing and input code from the resources and handlers of the screens it is reached from. Blocks: Survey screen reconciliation.
 
 ## Emulated call
 

@@ -17,6 +17,13 @@ creation, the estate, War Planning (pages 36 to 38), tournaments, castle assault
 dragon quest. It gives few numbers and no formulas, so it serves as a lead and as the name the
 game gives a concept.
 
+Each scan page is a two-page spread; PDF pages 18 and 19 are the same spread scanned twice. The
+screens it describes (PDF pages 6 to 34) each have a screen entry: SCR-UI-001 to SCR-UI-019,
+SCR-UI-021 to SCR-UI-036, SCR-SAVE-001 and SCR-SAVE-002. Its four quadrant management screens
+share SCR-UI-011. It mentions the intro movie, the overlord's order box, yes/no prompts, wagers,
+battle and spy reports, the marriage offer, the dragon fight and the closing battle only in
+passing, and the setup programs' menus on PDF pages 5, 6 and 35.
+
 ## Known errors
 
 None known.
