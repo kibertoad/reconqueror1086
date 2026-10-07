@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-RES-045, FND-RES-046, FND-RES-047, FND-RES-048, FND-RES-049]
+evidence: [FND-RES-045, FND-RES-046, FND-RES-047, FND-RES-048, FND-RES-049, FND-RES-050]
 conflicting: []
 split_with: []
 related: []
@@ -18,7 +18,9 @@ related: []
 ## Layout
 
 `INSTALL.SCR` is a script that the installer `INST.EXE` loads whole and runs
-from top to bottom, one line at a time [FND-RES-045, FND-RES-046].
+from top to bottom, one line at a time [FND-RES-045, FND-RES-046]. It runs
+after two of the installer's own checks pass, when two drive letters the
+installer holds differ or `-f` was given on its command line [FND-RES-050].
 
 Lines:
 
@@ -94,7 +96,9 @@ a label, an empty line or one of `echo`, `end`, `clear`, `godir`, `alert`,
 the expansion, the dispatch and the routines for comments, `echo`, `pause`,
 `goto`, `end`, `clear` and `cls`; FND-RES-047 reads `alert`, `space`,
 `pick`, `godir`, `exists`, `testdir` and `del`, FND-RES-048 reads `if`,
-and FND-RES-049 reads `copy`. The archive routines `copy` calls are not read;
+and FND-RES-049 reads `copy`. FND-RES-050 follows every route through the
+shipped script: each reaches `end` or an `alert` box, except the menu's
+third choice, which names no label exactly (BUG-RES-001). The archive routines `copy` calls are not read;
 the build has no `.SIP` file for them to open. The program runner behind unknown words, the message lookup and
 the window routines are not read, and neither are several run-time routines
 the commands call, such as the key read and the find-next.
@@ -105,5 +109,8 @@ the commands call, such as the key read and the find-next.
   arguments, and which DOS call runs it? (Q-RES-198)
 - Which installer fields give `%1` to `%7`, and what values do they hold
   when the script runs? (Q-RES-199)
-- When does INST.EXE run the script, and does every path through the shipped
-  script reach an `end`? (Q-RES-200)
+- What do the installer's checks before the script (vtable entries +0x10
+  and +0x28 of its main object) decide, and which drive letters do the bytes
+  at +0x1E6 and +0x23E hold? (Q-RES-202)
+- What does the shipped `pick` line's unfilled fourth label buffer hold, which
+  a key with a low byte of 0 selects? (Q-RES-203)

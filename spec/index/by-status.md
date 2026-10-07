@@ -127,7 +127,7 @@ Entries by status.
 
 ## supported
 
-227 entries.
+228 entries.
 
 | ID | Title |
 |---|---|
@@ -138,6 +138,7 @@ Entries by status.
 | [BUG-ESTATE-002](../bugs/BUG-ESTATE-002.md) | Removing a company gives back population that raising it did not take |
 | [BUG-ESTATE-003](../bugs/BUG-ESTATE-003.md) | Killing Drogo after refusing to pay leaves the debt |
 | [BUG-JOUST-001](../bugs/BUG-JOUST-001.md) | The dragon lance frame scan reads past its table when the lance is above y 92 |
+| [BUG-RES-001](../bugs/BUG-RES-001.md) | The install script's third menu choice names no label exactly and ends the script without its closing message |
 | [BUG-SAVE-001](../bugs/BUG-SAVE-001.md) | A saved game without temp.jap stops the program when loaded |
 | [BUG-SAVE-002](../bugs/BUG-SAVE-002.md) | The title editor cannot be cancelled and types Esc and Backspace into the title |
 | [BUG-SOUND-001](../bugs/BUG-SOUND-001.md) | Samples at 11,050 Hz play with the last step their voice used |
@@ -378,7 +379,7 @@ Entries by status.
 
 ## recorded
 
-267 entries.
+268 entries.
 
 | ID | Title |
 |---|---|
@@ -542,6 +543,7 @@ Entries by status.
 | [FND-RES-047](../findings/FND-RES-047.md) | INSTALL.SCR's alert, space, pick, godir, exists, testdir and del commands in INST.EXE |
 | [FND-RES-048](../findings/FND-RES-048.md) | INSTALL.SCR's if command in INST.EXE tests errorlevel or exist, with an optional not, and resumes the raw line at the expanded command's offset |
 | [FND-RES-049](../findings/FND-RES-049.md) | INSTALL.SCR's copy command in INST.EXE extracts from drivers.sip and sierra.sip beside the source, then copies matching files, with /q, /s and a + concatenation form |
+| [FND-RES-050](../findings/FND-RES-050.md) | INST.EXE runs INSTALL.SCR from vtable entry +0x5C after two installer checks, and one choice of the shipped script's menu misses its label |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |
@@ -669,6 +671,7 @@ Entries whose Open questions section says more than None known.
 | [BUG-BATTLE-001](../bugs/BUG-BATTLE-001.md) | Morale adds the remainder by 3 instead of a third | supported |
 | [BUG-CONFIG-001](../bugs/BUG-CONFIG-001.md) | A CONQUER.INI without DELAYVGA makes the game compare memory at address 0 with ON | supported |
 | [BUG-ESTATE-001](../bugs/BUG-ESTATE-001.md) | Removing a company refunds its price only after the committed companies of its kind are used up | supported |
+| [BUG-RES-001](../bugs/BUG-RES-001.md) | The install script's third menu choice names no label exactly and ends the script without its closing message | supported |
 | [BUG-SAVE-001](../bugs/BUG-SAVE-001.md) | A saved game without temp.jap stops the program when loaded | supported |
 | [BUG-SAVE-002](../bugs/BUG-SAVE-002.md) | The title editor cannot be cancelled and types Esc and Backspace into the title | supported |
 | [BUG-SOUND-001](../bugs/BUG-SOUND-001.md) | Samples at 11,050 Hz play with the last step their voice used | supported |

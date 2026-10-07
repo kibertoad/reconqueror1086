@@ -16,7 +16,7 @@
 | `FMT-RES-013` | Marked ASCII text framing of CD-root INSTALL.HLP | supported | missing | None | None | supported | Stored framing supported; reader semantics and runtime use remain open. |
 | `FMT-RES-014` | Owned disc-root indexed icon container layout | supported | missing | None | None | supported | Storage partition recorded; consumer questions Q-RES-164 through Q-RES-167 remain open. |
 | `FMT-RES-015` | CONQUER.INF, the CD marker the install script tests for | unknown | missing | None | None | unknown | Only located use is a presence test; contents read by nothing located. |
-| `FMT-RES-016` | INST.EXE script syntax of CD-root INSTALL.SCR | supported | missing | None | None | supported | Line syntax, labels, parameters and every command supported; the program runner, parameter values and the run's caller remain open. |
+| `FMT-RES-016` | INST.EXE script syntax of CD-root INSTALL.SCR | supported | missing | None | None | supported | Line syntax, labels, parameters, every command and the run's caller supported; the program runner, parameter values and the installer's checks remain open. |
 | `FMT-RES-017` | SETUP.SOL, the first-stage installer's member archive | supported | missing | None | None | supported | Read by the CD's installer only; the rebuild does not install from the disc. Member streams are expanded as RULE-RES-005 gives. |
 | `FMT-RES-018` | Unidentified .TXT data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |
 | `FMT-RES-019` | Unidentified .WRI data candidates in CD root | unknown | missing | None | None | unknown | Survey listing only; structural layout and runtime use remain unresolved. |

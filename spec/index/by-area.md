@@ -422,6 +422,7 @@ Entries by area.
 
 | ID | Title | Status |
 |---|---|---|
+| [BUG-RES-001](../bugs/BUG-RES-001.md) | The install script's third menu choice names no label exactly and ends the script without its closing message | supported |
 | [FMT-RES-001](../formats/FMT-RES-001.md) | Resource container, a GOB, RES or LOW file | supported |
 | [FMT-RES-002](../formats/FMT-RES-002.md) | Container directory record | supported |
 | [FMT-RES-003](../formats/FMT-RES-003.md) | Kind-1 stream, the stored bytes of a kind-1 entry | supported |
@@ -591,6 +592,7 @@ Entries by area.
 | [FND-RES-047](../findings/FND-RES-047.md) | INSTALL.SCR's alert, space, pick, godir, exists, testdir and del commands in INST.EXE | recorded |
 | [FND-RES-048](../findings/FND-RES-048.md) | INSTALL.SCR's if command in INST.EXE tests errorlevel or exist, with an optional not, and resumes the raw line at the expanded command's offset | recorded |
 | [FND-RES-049](../findings/FND-RES-049.md) | INSTALL.SCR's copy command in INST.EXE extracts from drivers.sip and sierra.sip beside the source, then copies matching files, with /q, /s and a + concatenation form | recorded |
+| [FND-RES-050](../findings/FND-RES-050.md) | INST.EXE runs INSTALL.SCR from vtable entry +0x5C after two installer checks, and one choice of the shipped script's menu misses its label | recorded |
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |
