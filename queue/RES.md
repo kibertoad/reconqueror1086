@@ -1,35 +1,39 @@
 # RES
 
-Next ID: Q-RES-178
+Next ID: Q-RES-179
 
 ## Static
 
-- Q-RES-169. FMT-RES-015: How does LANGUAGE handle repeated InstallDoneTitle?
-  Settles it: trace lookup order and continuation after a match. Blocks: INF reconciliation.
+- Q-RES-169. FMT-RES-119: Which `Strings` keys does `_SETUP.EXE` request, and is the repeated InstallDoneTitle among them?
+  Settles it: read the callers of the `Strings` reads at 0004:34DF, 0004:366C,
+  0004:472C and 0004:496B in `_SETUP.EXE` and where each key comes from. Blocks: INF reconciliation.
   Tried: FND-RES-022 establishes the repeated token, not lookup semantics.
   FND-RES-026: AUTOPLAY reads only `Ident`/`Title` from an installed copy, so the
   reader of the `Strings` section is still to be found. FND-RES-029: SETUP does not
   name LANGUAGE.INF; `_SETUP.EXE` (Q-RES-174) and INST remain.
+  FND-RES-032: `_SETUP.EXE` reads `Strings` one key at a time through the
+  profile routine, so which duplicate is returned is decided by Windows; the
+  question left is which keys the callers pass.
 
 - Q-RES-170. FMT-RES-015: Which SIERRA reader distinguishes command-shaped equals regions and comma-bearing data?
   Settles it: identify the reader and trace dispatch/token boundaries. Blocks: INF reconciliation.
   Tried: FND-RES-022 retains all token classes; raw separators do not settle their roles.
   FND-RES-026: AUTOPLAY does not name SIERRA.INF; SETUP remains the lead.
   FND-RES-029: SETUP reads only two `Setup` keys; `_SETUP.EXE` is the next lead (Q-RES-174).
-
-- Q-RES-174. FMT-RES-015: Where does SETUP get `_SETUP.EXE`, and does it read SIERRA.INF's other sections and LANGUAGE.INF?
-  Settles it: read SETUP's LZEXPAND calls and the `.SOL` name use from 0001:0960 to
-  find the file `_SETUP.EXE` is expanded from (FMT-RES-017's SETUP.SOL is the
-  candidate), then read that program's profile or file reads of the two INF files.
-  Blocks: INF reconciliation.
-  Tried: FND-RES-030 settles the first half: SETUP expands `_SETUP.EXE` from the
-  `SETUP.SOL` beside it (FMT-RES-017). Reading it needs the expanded file, so this
-  waits on Q-RES-175 for a decoder whose reading is recorded. FND-RES-031 and
-  RULE-RES-005 now give that decoder; the expanded `_SETUP.EXE` is the next step.
+  FND-RES-032: `_SETUP.EXE` loads SIERRA.INF at 0004:2C84 with five bracketed
+  markers and the separator bytes `, 	
+`; read that loader and the command
+  dispatch next.
 
 - Q-RES-177. RULE-RES-005: How does SETUP's expansion routine read literals in mode 1?
   Settles it: read 0001:45CF and the table it builds from CS:0x3601, and the
   literal path from 0001:4417 to 0001:44A8, every branch.
+  Blocks: none.
+
+- Q-RES-178. FMT-RES-119: Does `_SETUP.EXE` copy LANGUAGE.INF into the product directory, and what reads `Ident` `DirName`?
+  Settles it: read `_SETUP.EXE`'s file copies of LANGUAGE.INF and the
+  variable-file `Ident` reads FND-RES-032 lists, and search the other shipped
+  programs for the key name.
   Blocks: none.
 
 - Q-RES-176. FMT-RES-118: What does SETUP's library routine at 0001:311E do with `unk_16` and `unk_18`?
@@ -243,6 +247,9 @@ Next ID: Q-RES-178
   Fourth attempt: FND-RES-029 reads SETUP's SIERRA.INF use (two `Setup` keys
   through the profile routines) and finds it starts `_SETUP.EXE`; the other
   readers are behind Q-RES-174 and INST.EXE.
+  Fifth attempt: FND-RES-032 splits LANGUAGE.INF out (FMT-RES-119) and locates
+  SIERRA.INF's loader in `_SETUP.EXE` (Q-RES-170); CONQUER.INF's reader is
+  still to be found, with INST.EXE the lead.
 
 - Q-RES-018. FMT-RES-016: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the

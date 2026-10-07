@@ -4,7 +4,7 @@ title: Unidentified .INF data candidates in CD root
 status: unknown
 builds: [BLD-GOG-EN]
 superseded_by: []
-files: ["CD:CONQUER.INF", "CD:LANGUAGE.INF", "CD:SIERRA.INF"]
+files: ["CD:CONQUER.INF", "CD:SIERRA.INF"]
 byte_order: little # provisional hypothesis; see Open questions
 size: null
 text: false # provisional hypothesis; see Open questions
@@ -20,7 +20,8 @@ related: []
 None known. This is a provisional inventory group by directory and filename
 suffix, not a finding that its files share one format. No field layout, parsing
 syntax or runtime use is established. `CD:AUTORUN.INF` was listed here until
-FND-RES-026 located its reader; it is FMT-RES-117.
+FND-RES-026 located its reader; it is FMT-RES-117. `CD:LANGUAGE.INF` was listed
+here until FND-RES-032 located its readers; it is FMT-RES-119.
 
 ## Enumerations and flags
 
@@ -55,12 +56,14 @@ formats of its members.
   `SetupSize` and `ForceLanguage` of SIERRA.INF's `Setup` section, through the
   Windows profile routines, and then starts `_SETUP.EXE`, a second installer
   whose names sit beside `.SOL` in SETUP's data; the other SIERRA sections
-  are not read by SETUP. Further byte-shape counts cannot settle the consumer
-  question. Read `_SETUP.EXE` and INST's readers and split the entry before
-  asserting incompatible field layouts. (Q-RES-017)
-- How does LANGUAGE handle its repeated InstallDoneTitle token? First-wins,
-  last-wins and multiple-use readings all fit FND-RES-022; read lookup order
-  and continuation after a match. (Q-RES-169)
+  are not read by SETUP. FND-RES-032 shows that `_SETUP.EXE` loads
+  SIERRA.INF as a whole file divided by bracketed section markers, and reads
+  LANGUAGE.INF (now FMT-RES-119) through the profile routines, so the two
+  have different readers. CONQUER.INF's reader is not located; INST.EXE is
+  the remaining lead. (Q-RES-017)
 - Which SIERRA reader distinguishes command-shaped equals-bearing regions from
   simple assignments and comma-bearing data? FND-RES-022 records their shapes;
-  trace dispatch and token boundaries to settle the roles. (Q-RES-170)
+  trace dispatch and token boundaries to settle the roles. FND-RES-032
+  locates the loader in `_SETUP.EXE` at 0004:2C84, with the markers
+  `[Archives]`, `[Files]`, `[Dialogs]`, `[Script]` and `[Billboards]`.
+  (Q-RES-170)
