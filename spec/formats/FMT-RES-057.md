@@ -1,10 +1,10 @@
 ---
 id: FMT-RES-057
 title: Unidentified .CNT data candidates in CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN
-status: unknown
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
-files: ["CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/CDPLAYER.CNT", "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MPLAYER.CNT", "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/SNDVOL32.CNT", "CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/SOUNDREC.CNT"]
+superseded_by: [FND-RES-057]
+files: []
 byte_order: little # provisional hypothesis; see Open questions
 size: null
 text: false # provisional hypothesis; see Open questions
@@ -34,6 +34,14 @@ None known.
 The listed paths occur in BLD-GOG-EN's manifest. No layout definition has been
 checked against them. An enclosing archive's listing does not establish the
 formats of its members.
+
+This entry listed the files
+`CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/CDPLAYER.CNT`,
+`CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/MPLAYER.CNT`,
+`CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/SNDVOL32.CNT`,
+`CD:DEMOS/THEXDER/DIRECTX/DRIVERS/AUDIO/BIN/SOUNDREC.CNT`. FND-RES-057 shows
+that no file of the game names them, and they are listed under BLD-GOG-EN's
+Other files; the `files` list is empty because the build no longer lists them.
 
 ## Open questions
 

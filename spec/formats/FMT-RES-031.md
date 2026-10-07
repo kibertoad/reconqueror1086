@@ -1,10 +1,10 @@
 ---
 id: FMT-RES-031
 title: Unidentified .DRV data candidates in CD:DEMOS/SWAT
-status: unknown
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
-files: ["CD:DEMOS/SWAT/ADL.DRV", "CD:DEMOS/SWAT/DACBLAST.DRV", "CD:DEMOS/SWAT/DACPRO.DRV", "CD:DEMOS/SWAT/DACPRO16.DRV", "CD:DEMOS/SWAT/DACPRO8.DRV", "CD:DEMOS/SWAT/GENMIDI.DRV", "CD:DEMOS/SWAT/MT32.DRV", "CD:DEMOS/SWAT/PROAUDIO.DRV", "CD:DEMOS/SWAT/SADL.DRV", "CD:DEMOS/SWAT/SBPRO.DRV", "CD:DEMOS/SWAT/VESA.DRV"]
+superseded_by: [FND-RES-057]
+files: []
 byte_order: little # provisional hypothesis; see Open questions
 size: null
 text: false # provisional hypothesis; see Open questions
@@ -34,6 +34,11 @@ None known.
 The listed paths occur in BLD-GOG-EN's manifest. No layout definition has been
 checked against them. An enclosing archive's listing does not establish the
 formats of its members.
+
+This entry listed 11 files in `CD:DEMOS/SWAT` with the suffix `.DRV`.
+FND-RES-057 shows that no file of the game names them, and they are listed
+under BLD-GOG-EN's Other files; the `files` list is empty because the build no
+longer lists them.
 
 ## Open questions
 

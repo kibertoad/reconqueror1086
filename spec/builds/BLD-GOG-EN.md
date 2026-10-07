@@ -65,10 +65,13 @@ That list accounts for the installed DOSBox wrapper, host launch/configuration
 files, distributor metadata, documentation and uninstaller. `Manual.pdf` is the
 owned source SRC-MANUAL. The empty `SAVEGAME` directory has no file to list.
 
-Previously omitted disc paths, including `DEMOS/`, `INN/`, `VESA/`, root auxiliary
-files and the disc copy of `C1086.GOB`, remain in the manifest conservatively.
-This inventory does not prove that every such path is a gameplay dependency;
-exclusion awaits a reading that establishes its lack of game-native use.
+The disc's `DEMOS/` and `INN/` trees are listed in `BLD-GOG-EN.other-files.yaml`:
+other Sierra products' demos, and the ImagiNation Network software that only
+`INN.BAT` reaches, which no file of the game names (FND-RES-057). `VESA/`, the
+root auxiliary files and the disc copy of `C1086.GOB` remain in the manifest
+conservatively. This inventory does not prove that every such path is a
+gameplay dependency; exclusion awaits a reading that establishes its lack of
+game-native use.
 The HMI drivers and both configuration executables remain accounted for.
 
 Traversal entered the raw image's ISO filesystem and identified the raw audio

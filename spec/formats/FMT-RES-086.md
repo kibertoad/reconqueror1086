@@ -1,10 +1,10 @@
 ---
 id: FMT-RES-086
 title: Unidentified .CFG data candidates in CD:INN/INN
-status: unknown
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
-files: ["CD:INN/INN/GAME.CFG", "CD:INN/INN/GAMELIST.CFG", "CD:INN/INN/GAMES.CFG", "CD:INN/INN/LAND.CFG", "CD:INN/INN/LSCI.CFG"]
+superseded_by: [FND-RES-057]
+files: []
 byte_order: little # provisional hypothesis; see Open questions
 size: null
 text: false # provisional hypothesis; see Open questions
@@ -34,6 +34,11 @@ None known.
 The listed paths occur in BLD-GOG-EN's manifest. No layout definition has been
 checked against them. An enclosing archive's listing does not establish the
 formats of its members.
+
+This entry listed 5 files in `CD:INN/INN` with the suffix `.CFG`. FND-RES-057
+shows that no file of the game names them, and they are listed under
+BLD-GOG-EN's Other files; the `files` list is empty because the build no
+longer lists them.
 
 ## Open questions
 

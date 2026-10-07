@@ -417,3 +417,21 @@ adds standing goals, the stop reasons, a wrap-up procedure, skill changes
 and a Claude Code Stop hook.
 [Rules issue #84](https://github.com/kibertoad/refurbished-dinosaurs/issues/84)
 asks for the matching protocol wording.
+
+## GAP-021: A superseded format entry must still match the build's files
+
+Recorded: 2026-10-07. Audience: shared-tooling and standard authors.
+
+FND-RES-057 moved the disc's `DEMOS/` and `INN/` paths to the build's Other
+files and superseded the 95 format entries that listed only them. The checker
+(standard-checker 2.2.0) applies its files-pattern check to superseded entries
+too, so every one failed with `files pattern ... matches no file`.
+
+Local handling: the 95 entries have `files: []`, and each one's Coverage
+section names the paths it listed.
+
+Upstream submission (2026-10-07): searches of the toolkit and rules trackers
+for superseded files, files pattern, Other files and superseded format found
+only the related #227 and #327.
+[Toolkit issue #328](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/328)
+asks for the exemption or a check against Other files.

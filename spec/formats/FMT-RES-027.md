@@ -1,10 +1,10 @@
 ---
 id: FMT-RES-027
 title: Unidentified .WAV data candidates in CD:DEMOS/SHIVERS
-status: unknown
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
-files: ["CD:DEMOS/SHIVERS/15014.WAV", "CD:DEMOS/SHIVERS/15018.WAV", "CD:DEMOS/SHIVERS/15026.WAV", "CD:DEMOS/SHIVERS/15027.WAV", "CD:DEMOS/SHIVERS/35010.WAV", "CD:DEMOS/SHIVERS/607.WAV"]
+superseded_by: [FND-RES-057]
+files: []
 byte_order: little # provisional hypothesis; see Open questions
 size: null
 text: false # provisional hypothesis; see Open questions
@@ -34,6 +34,11 @@ None known.
 The listed paths occur in BLD-GOG-EN's manifest. No layout definition has been
 checked against them. An enclosing archive's listing does not establish the
 formats of its members.
+
+This entry listed 6 files in `CD:DEMOS/SHIVERS` with the suffix `.WAV`.
+FND-RES-057 shows that no file of the game names them, and they are listed
+under BLD-GOG-EN's Other files; the `files` list is empty because the build no
+longer lists them.
 
 ## Open questions
 

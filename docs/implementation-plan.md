@@ -11,8 +11,10 @@ Stage: Survey. Intake identifies the owned edition and current patch provenance
 Area queues and the inventory for the executable already studied are present.
 The complete installation/media path accounting is recorded in FND-RES-010 and
 BLD-GOG-EN. Survey remains open until every manifest data family and all
-manual-mentioned screens are reconciled. Conservatively retained auxiliary media
-need runtime-use review and format entries until evidence supports exclusion.
+manual-mentioned screens are reconciled. The disc's `DEMOS/` and `INN/` trees are
+under the build's Other files (FND-RES-057). Conservatively retained auxiliary
+media need runtime-use review and format entries until evidence supports
+exclusion.
 Research continues with Q-RES-017 / FMT-RES-015; Q-RES-164 through
 Q-RES-167 retain icon-consumer questions; Q-RES-162, Q-RES-163,
 Q-RES-206 and Q-RES-207 retain text-dictionary questions; Q-RES-157 retains the

@@ -1,10 +1,10 @@
 ---
 id: FMT-RES-089
 title: Unidentified .DOC data candidates in CD:INN/INN
-status: unknown
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
-files: ["CD:INN/INN/_ASLAND.DOC", "CD:INN/INN/_EDBARON.DOC", "CD:INN/INN/_ENERAL.DOC", "CD:INN/INN/_IERRLND.DOC", "CD:INN/INN/_LUBHOUS.DOC", "CD:INN/INN/_RENA.DOC", "CD:INN/INN/_RSNLADS.DOC", "CD:INN/INN/_SERBIUS.DOC", "CD:INN/INN/__DGOLF.DOC"]
+superseded_by: [FND-RES-057]
+files: []
 byte_order: little # provisional hypothesis; see Open questions
 size: null
 text: false # provisional hypothesis; see Open questions
@@ -34,6 +34,11 @@ None known.
 The listed paths occur in BLD-GOG-EN's manifest. No layout definition has been
 checked against them. An enclosing archive's listing does not establish the
 formats of its members.
+
+This entry listed 9 files in `CD:INN/INN` with the suffix `.DOC`. FND-RES-057
+shows that no file of the game names them, and they are listed under
+BLD-GOG-EN's Other files; the `files` list is empty because the build no
+longer lists them.
 
 ## Open questions
 

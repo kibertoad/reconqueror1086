@@ -1,10 +1,10 @@
 ---
 id: FMT-RES-108
 title: Unidentified .CFG data candidates in CD:INN/TWINION
-status: unknown
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
-files: ["CD:INN/TWINION/LSCI.CFG"]
+superseded_by: [FND-RES-057]
+files: []
 byte_order: little # provisional hypothesis; see Open questions
 size: null
 text: false # provisional hypothesis; see Open questions
@@ -34,6 +34,10 @@ None known.
 The listed paths occur in BLD-GOG-EN's manifest. No layout definition has been
 checked against them. An enclosing archive's listing does not establish the
 formats of its members.
+
+This entry listed the file `CD:INN/TWINION/LSCI.CFG`. FND-RES-057 shows that
+no file of the game names it, and it is listed under BLD-GOG-EN's Other
+files; the `files` list is empty because the build no longer lists it.
 
 ## Open questions
 
