@@ -356,3 +356,25 @@ trackers found only rules issue #47, which covers PE.
 [Rules issue #81](https://github.com/kibertoad/refurbished-dinosaurs/issues/81)
 asks for a rule and an NE mode of the import report, with a synthetic
 chain case.
+
+## GAP-018: No location form for a file that ships only inside an archive
+
+Recorded: 2026-10-07. Audience: Standard and checker authors.
+
+A location names a file from the build's file list. `_SETUP.EXE`, the
+second-stage installer that reads SIERRA.INF and LANGUAGE.INF, exists only
+as a member of `CD:SETUP.SOL`, and the packed-file keys describe one file
+packed in place, so its `segment:offset` addresses have no location form.
+
+Local handling: FND-RES-032 locates the member's stored stream in
+`CD:SETUP.SOL` with an `offset`, gives the expanded member's size and
+XXH3-128, and writes its addresses in the text.
+
+Upstream submission (2026-10-07): duplicate searches for archive member,
+member executable, installer archive, nested executable, member location,
+extracted file and embedded executable on the rules and toolkit trackers
+found rules issue #77 (listing records) and the InstallShield reader issues,
+none about locations.
+[Rules issue #83](https://github.com/kibertoad/refurbished-dinosaurs/issues/83)
+proposes a `members` list on an archive's file item and a `member` key on
+locations, with acceptance cases.
