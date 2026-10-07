@@ -378,7 +378,7 @@ Entries by status.
 
 ## recorded
 
-264 entries.
+265 entries.
 
 | ID | Title |
 |---|---|
@@ -539,6 +539,7 @@ Entries by status.
 | [FND-RES-044](../findings/FND-RES-044.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case |
 | [FND-RES-045](../findings/FND-RES-045.md) | INST.EXE takes the switches M, Z, F and D from its command line and loads install.scr whole before it reads RESOURCE.CFG |
 | [FND-RES-046](../findings/FND-RES-046.md) | INST.EXE runs install.scr line by line, with labels, goto, nine percent parameters, a table of named commands and any other line run as a program |
+| [FND-RES-047](../findings/FND-RES-047.md) | INSTALL.SCR's alert, space, pick, godir, exists, testdir and del commands in INST.EXE |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |

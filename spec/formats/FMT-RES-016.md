@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-RES-045, FND-RES-046]
+evidence: [FND-RES-045, FND-RES-046, FND-RES-047]
 conflicting: []
 split_with: []
 related: []
@@ -50,9 +50,16 @@ line after one space or tab; for every command except `echo`, `alert` and
 | `goto` | char[] | script_command | Jumps to a label (see below). | supported | FND-RES-046 |
 | `end` | char[] | script_command | Stops the script. | supported | FND-RES-046 |
 | `clear`, `cls` | char[] | script_command | Clear the window. | supported | FND-RES-046 |
+| `alert` | char[] | script_command | Shows its argument in a message box. Enter goes on; any other key leaves the installer. | supported | FND-RES-047 |
+| `space` | char[] | script_command | Takes a drive letter, a number of kilobytes and a label. Jumps to the label when the drive's free space in kilobytes is less than the number, of which only the low 16 bits count. Also stores the free space as megabytes with one decimal. Stops the installer with an error when RESOURCE.CFG sets `space`. | supported | FND-RES-047 |
+| `pick` | char[] | script_command | Takes a list of key letters and four labels. Waits for a key in the list, without regard to case, signalling any other key, and jumps to the label in that key's position. A key whose code has a low byte of 0 selects the position after the last letter. | supported | FND-RES-047 |
+| `godir` | char[] | script_command | Takes a path and a label. Makes the path's drive and the path current, creating each missing directory level, and jumps to the label when it cannot. | supported | FND-RES-047 |
+| `exists` | char[] | script_command | Takes a file name and a message. Shows the message box again and again until the file exists. | supported | FND-RES-047 |
+| `testdir` | char[] | script_command | Takes a directory. When it exists and holds any file, makes it current and asks a yes/no question; the yes answer ends the script. | supported | FND-RES-047 |
+| `del` | char[] | script_command | Deletes every file its argument matches, by bare name in the current directory. | supported | FND-RES-047 |
 
-The words `alert`, `copy`, `space`, `godir`, `exists`, `pick`, `testdir`,
-`del` and `if` are commands too; what they do is in Open questions.
+The words `copy` and `if` are commands too; what they do is in Open
+questions.
 
 A first word that is none of these passes the whole line to a program
 runner, whose reading is open (Q-RES-198). When the runner reports one of its
@@ -81,18 +88,16 @@ a label, an empty line or one of `echo`, `end`, `clear`, `godir`, `alert`,
 0x1A, the second without a line end, which follow an `end`. The file uses
 `%1` to `%4` and `%%`. FND-RES-046 reads the run loop, the parameter setup,
 the expansion, the dispatch and the routines for comments, `echo`, `pause`,
-`goto`, `end`, `clear` and `cls`; the other nine command routines, the
-program runner behind unknown words, the message lookup and the window
-routines are not read.
+`goto`, `end`, `clear` and `cls`; FND-RES-047 reads `alert`, `space`,
+`pick`, `godir`, `exists`, `testdir` and `del`. The `copy` and `if`
+routines, the program runner behind unknown words, the message lookup and
+the window routines are not read, and neither are several run-time routines
+the commands call, such as the key read and the find-next.
 
 ## Open questions
 
-- What does `alert` do with its argument? (Q-RES-193)
-- What do `copy`, `del` and `exists` do with their arguments, and what does
-  each do when the file operation fails? (Q-RES-194)
-- What do `space`, `godir` and `testdir` test or change, and when does
-  `testdir` stop the script? (Q-RES-195)
-- What does `pick` offer and where does the choice go? (Q-RES-196)
+- What does `copy` do with its argument, with and without `+`, and when its
+  source is in an archive? (Q-RES-201)
 - What syntax does `if` take, and what does it run? (Q-RES-197)
 - How does the program runner behind unknown words split the program from its
   arguments, and which DOS call runs it? (Q-RES-198)

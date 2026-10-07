@@ -1,6 +1,6 @@
 # RES
 
-Next ID: Q-RES-201
+Next ID: Q-RES-202
 
 ## Static
 
@@ -297,17 +297,8 @@ Next ID: Q-RES-201
   or keeps it compressed inside another file; take this up again only with
   such a lead.
 
-- Q-RES-193. FMT-RES-016: What does INSTALL.SCR's `alert` command do with its argument?
-  Settles it: read 1C17:0CA2 and the routines it calls, with every branch. Blocks: Survey data-family reconciliation.
-
-- Q-RES-194. FMT-RES-016: What do INSTALL.SCR's `copy`, `del` and `exists` commands do, and what does each do when its file operation fails?
-  Settles it: read 1C17:19B8, 1C17:1C17 and 1C17:0F7C with every branch, including the archive path through the handle at +0x23A. Blocks: Survey data-family reconciliation.
-
-- Q-RES-195. FMT-RES-016: What do INSTALL.SCR's `space`, `godir` and `testdir` commands test or change, and when does `testdir` stop the script?
-  Settles it: read 1C17:0CBF, 1C17:0E4A and 1C17:1AC6 with 263F:004D. Blocks: Survey data-family reconciliation.
-
-- Q-RES-196. FMT-RES-016: What does INSTALL.SCR's `pick` command offer, and where does the choice go?
-  Settles it: read 1C17:0D8F and the routines it calls. Blocks: Survey data-family reconciliation.
+- Q-RES-201. FMT-RES-016: What does INSTALL.SCR's `copy` command do with its argument, with and without `+`, and when its source is in an archive?
+  Settles it: read 1C17:19B8 with 1C17:11B1 and 1C17:1291 and every archive and file routine they reach, with every branch. Blocks: Survey data-family reconciliation.
 
 - Q-RES-197. FMT-RES-016: What syntax does INSTALL.SCR's `if` command take, and what does it run?
   Settles it: read 1C17:1C63 and every path into 1C17:0504 or the run loop's state from it. Blocks: Survey data-family reconciliation.
@@ -317,6 +308,9 @@ Next ID: Q-RES-201
 
 - Q-RES-199. FMT-RES-016: Which values do INSTALL.SCR's parameters `%1` to `%7` hold when the script runs?
   Settles it: trace every write to the object fields +0x1E6, +0x23E, +0x1DE, +0x194, +0x1AA and +0x1AE and to DS:5557 before vtable entry +0x30 is called. Blocks: Survey data-family reconciliation.
+  Tried: FND-RES-047 finds that `space` writes the free megabytes into +0x1AE
+  of the object at DS:1A04; whether that is the object the run loop reads
+  `%7` from depends on Q-RES-200.
 
 - Q-RES-200. FMT-RES-016: When does INST.EXE run INSTALL.SCR, and does every path through the shipped script reach `end`?
   Settles it: locate the calls of vtable entry +0x30 of the object at DS:55D8, then follow every `goto`, `pick` and `if` path of the shipped script once Q-RES-196 and Q-RES-197 are answered. Blocks: Survey data-family reconciliation.
