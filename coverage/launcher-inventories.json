@@ -28,6 +28,31 @@
         }
       ],
       "analyzerSelector": "1000"
+    },
+    {
+      "manifest": "CD:CONFIG.EXE",
+      "format": "MZ",
+      "sourceSha256": "f779912f559e82163b177b3b71b1e7f62d206dffa7f38c44626eaa1cfaaa7e70",
+      "ranges": [
+        {
+          "start": 16384,
+          "end": 179952
+        }
+      ],
+      "analyzerSelector": "1000"
+    },
+    {
+      "manifest": "CD:INST.EXE",
+      "format": "MZ",
+      "sourceSha256": "44d4250461ba542d4f7d63b04e0e1958410bf2067e355a1d7534a9c620882423",
+      "unpacked": true,
+      "ranges": [
+        {
+          "start": 14832,
+          "end": 168480
+        }
+      ],
+      "analyzerSelector": "1000"
     }
   ]
 }

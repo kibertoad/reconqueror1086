@@ -61,3 +61,27 @@ reported an unread address for one function. These do not establish complete
 function discovery or validate any reading. Body sizes are never function ends.
 `Check-Coverage.mjs` validates both inventories, including NE table segment
 numbers; it does not prove code behavior or native reachability.
+
+## MZ inventories: CONFIG.EXE and INST.EXE
+
+Exported on 2026-10-07 with Ghidra 12.1.3 and JDK 21.0.12.1, using the shared
+`ExportFunctionInventory.java` of the pinned evidence engine. Both sources were
+read from the owned disc image with manifest size and XXH3 guards. Ghidra's
+Old-style DOS Executable loader imported each with `x86:LE:16:Real Mode` at
+load segment 0x1000, the same segment the spec's notation uses, so its
+segment:offset starts are the addresses the findings cite.
+
+`CD:INST.EXE` ships packed with LZEXE 0.91. Its inventory is of the unpacked
+file that `tools/evidence/unlzexe.mjs` produces and BLD-GOG-EN identifies, and
+its rows are offsets into that file (`"unpacked": true` in
+`launcher-inventories.json`). `CD:CONFIG.EXE` is not packed.
+
+`node tools/evidence/report.mjs inventory` joined each raw export through the
+MZ reader with load segment 0x1000 into canonical file offsets, keeping only
+starts in one declared view: the load image below the data segment (INST.EXE
+file offsets 0x39F0 to 0x29220, data segment at notation 3583; CONFIG.EXE
+0x4000 to 0x2BEF0, data segment at notation 37EF). One CONFIG.EXE start inside
+its data segment was excluded. Starts the findings cite, such as INST.EXE
+2852:0B71 and CONFIG.EXE 1B80:184F, are rows of these inventories. The rows are
+analyzer-discovered functions, not a census of the original's functions, and
+body sizes are not contiguous spans.

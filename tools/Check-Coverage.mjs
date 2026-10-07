@@ -17,7 +17,8 @@ if (launcherMetadata.schemaVersion !== 1 || launcherMetadata.build !== 'BLD-GOG-
 for (const launcher of launcherMetadata.inventories) {
   const destination = inventoryPath(launcherMetadata.build, launcher.manifest);
   const text = readFileSync(resolve(root, destination), 'utf8');
-  if (launcher.format === 'PE') verifyInventory({ ranges: launcher.ranges }, launcherMetadata.build, launcher.manifest, text, destination);
+  // MZ rows are canonical file offsets, into the unpacked file when the entry says unpacked.
+  if (launcher.format === 'PE' || launcher.format === 'MZ') verifyInventory({ ranges: launcher.ranges }, launcherMetadata.build, launcher.manifest, text, destination);
   else if (launcher.format === 'NE') verifySegmentedInventory(launcherMetadata.build, launcher.manifest, text, launcher.ranges, destination);
   else throw new Error('Unsupported launcher inventory format');
   console.log(`Launcher inventory metadata verified: ${destination}`);
