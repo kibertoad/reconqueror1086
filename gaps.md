@@ -316,3 +316,23 @@ took the releases directly and adapted the guidance locally.
 Upstream submission (2026-10-06): after reading template PRs #77 and #78,
 [template issue #80](https://github.com/kibertoad/refurbished-dinosaurs-template/issues/80)
 lists the remaining parts.
+
+## GAP-016: PE readers refuse a section with a zero raw pointer and a nonzero raw size
+
+Recorded: 2026-10-07. Audience: toolkit authors (executable reader and engine).
+
+AUTOPLAY.EXE, a Watcom-linked PE32, has a `.bss` section with a raw-data
+pointer of 0 and a raw size of 0xE00. Executable-reader 2.3.0 `imports` and
+every engine 12.0.0 `pe32` report stop with "PE section raw bytes overlap
+headers" before running a query, although the loader treats such a section
+as having no file bytes.
+
+Local handling: FND-RES-026 names the import slots with its own bounded walk
+of the import tables, using FND-RES-024's two slots as positive controls, and
+reads the code with a bounded disassembly kept in ignored storage.
+
+Upstream submission (2026-10-07): duplicate searches for PointerToRawData,
+overlap headers, bss, uninitialized section, Watcom and PE section found no
+match; issue #313 concerns import descriptors only.
+[Toolkit issue #324](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/324)
+gives a synthetic reproduction and acceptance cases.
