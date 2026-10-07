@@ -1,6 +1,6 @@
 # RES
 
-Next ID: Q-RES-189
+Next ID: Q-RES-192
 
 ## Static
 
@@ -9,15 +9,24 @@ Next ID: Q-RES-189
   literal path from 0001:4417 to 0001:44A8, every branch.
   Blocks: none.
 
-- Q-RES-178. FMT-RES-119: Does `_SETUP.EXE` copy LANGUAGE.INF into the product directory, and what reads `Ident` `DirName`?
-  Settles it: read `_SETUP.EXE`'s file copies of LANGUAGE.INF and the
-  variable-file `Ident` reads FND-RES-032 lists, and search the other shipped
-  programs for the key name.
+- Q-RES-178. FMT-RES-119: Does `_SETUP.EXE` copy LANGUAGE.INF into the product directory?
+  Settles it: read `_SETUP.EXE`'s file copies of LANGUAGE.INF.
+  Tried: FND-RES-040 found the `Ident` `DirName` reader at 0004:4394, the
+  other half of this item's first wording; the copy question is open.
   Blocks: none.
 
-- Q-RES-184. FMT-RES-120: What do the `[Script]` commands `COPY`, `PICKDEST`, `APPEND`, `WRITE` and `RUN` do with their arguments?
-  Settles it: read the cases at 0004:4086, 0004:42EF, 0004:5165 and
-  0004:5150 with 0004:6CEE, and 0004:7126 for `RUN`, every branch.
+- Q-RES-189. FMT-RES-120: What does `PICKDEST`'s destination routine 0004:5EB4 show, and which choices return 2 and 7?
+  Settles it: read 0004:5EB4 and every return value it can give.
+  Blocks: none.
+
+- Q-RES-190. FMT-RES-120: What does `COPY`'s copy routine do with the `[Files]`, `[Archives]` and `[Billboards]` data and `AnimationDLL`?
+  Settles it: read 0004:626C, 0003:AF90, 0003:4ECC and 0002:30D8, every
+  branch.
+  Blocks: none.
+
+- Q-RES-191. FMT-RES-120: How does `RUN` wait for a program (0004:D3D8), and what do 0002:A742 and 0004:C70A show?
+  Settles it: read the three routines and the string resources 0xBB9 and
+  0xBBA they name.
   Blocks: none.
 
 - Q-RES-185. FMT-RES-120: What do the 23 `[Script]` commands the shipped script does not use, other than `WINDISKSPACE_LT`, do?

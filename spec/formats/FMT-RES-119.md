@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-RES-021, FND-RES-026, FND-RES-032, FND-RES-033, FND-RES-038]
+evidence: [FND-RES-021, FND-RES-026, FND-RES-032, FND-RES-033, FND-RES-038, FND-RES-040]
 conflicting: []
 split_with: []
 related: []
@@ -30,6 +30,7 @@ with CR LF line ends and no line end after its last line (FND-RES-021).
 | Key | Type | Name | Meaning | Status | Evidence |
 |---|---|---|---|---|---|
 | `[Ident]` `Title` | `char[]` | `title` | Read by the launcher into 50 bytes from an installed copy and compared with `AUTORUN.INF`'s `Title` (FMT-RES-117). | supported | FND-RES-026 |
+| `[Ident]` `DirName` | `char[]` | `dir_name` | Read by `_SETUP.EXE` into 13 bytes, default empty, and added after `\` to the destination directory it proposes. | supported | FND-RES-040 |
 | `[Ident]` `ShortTitle` | `char[]` | `short_title` | Read by `_SETUP.EXE` into 0x50 bytes, default empty. | supported | FND-RES-032 |
 | `[Strings]` `<key>` | `char[]` | `strings` | Read by `_SETUP.EXE` under a key name its caller passes. Dialog titles and item texts in SIERRA.INF's `[Dialogs]` section (FMT-RES-120) that do not start with `*` are keys, read into 0x200 bytes with an empty default, so a missing key gives empty text. The `[Script]` command `ADDPROGMANGROUP`'s argument is a key read into 0x50 bytes with default `Sierra`, and `ADDPROGMANITEM`'s second field one read into 0x50 bytes with an empty default. | supported | FND-RES-032, FND-RES-033, FND-RES-038 |
 
@@ -44,8 +45,7 @@ None known.
 ## Coverage
 
 The shipped `CD:LANGUAGE.INF` of BLD-GOG-EN has the sections `Ident` and
-`Strings`. Its `Ident` section also has `DirName`, which no located reader
-requests. Its `Strings` section has the keys of the three
+`Strings`. Its `Ident` `DirName` is `CONQUER` (FND-RES-040). Its `Strings` section has the keys of the three
 `ADDPROGMANITEM` lines and lacks the `ADDPROGMANGROUP` key, so the group
 name is `Sierra` (FND-RES-038). It repeats the key `InstallDoneTitle`
 (FND-RES-022), and 12 of its lines begin with `;` (FND-RES-021).
@@ -56,6 +56,6 @@ name is `Sierra` (FND-RES-038). It repeats the key `InstallDoneTitle`
   The profile routine decides, not the game; Windows versions are expected
   to return the first, which no source for this build records. (No item:
   operating-system behaviour, not decided by the game)
-- Who reads `DirName`, and does the installer copy this file into the
-  installed directory? The launcher's reading of an installed copy rests
-  on equal values only. (Q-RES-178)
+- Does the installer copy this file into the installed directory? The
+  launcher's reading of an installed copy rests on equal values only.
+  (Q-RES-178)

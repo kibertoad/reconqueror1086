@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-RES-021, FND-RES-029, FND-RES-032, FND-RES-033, FND-RES-038, FND-RES-039]
+evidence: [FND-RES-021, FND-RES-029, FND-RES-032, FND-RES-033, FND-RES-038, FND-RES-039, FND-RES-040]
 conflicting: []
 split_with: []
 related: []
@@ -36,11 +36,12 @@ is skipped. A section met twice is read twice.
 
 | Key | Type | Name | Meaning | Status | Evidence |
 |---|---|---|---|---|---|
-| `[Script]` | `char[]` | `script` | Leading spaces and tabs are removed and the line, line feed included, is added to one script text of at most 64,000 bytes counting a NUL per line; a larger script stops the installer with a message. Ends at a line that is a line feed after the spaces and tabs. Read as commands, one per line (below). | supported | FND-RES-033, FND-RES-038, FND-RES-039 |
+| `[Script]` | `char[]` | `script` | Leading spaces and tabs are removed and the line, line feed included, is added to one script text of at most 64,000 bytes counting a NUL per line; a larger script stops the installer with a message. Ends at a line that is a line feed after the spaces and tabs. Read as commands, one per line (below). | supported | FND-RES-033, FND-RES-038, FND-RES-039, FND-RES-040 |
 | `[Archives]` | `char[]` | `archives` | Tokens split on comma, space and tab: a name, then a number. Then a 32-bit number, a number and a 32-bit number, the last two split on line feed as well. Ends at a line whose first token is missing or starts with a line feed. | supported | FND-RES-033 |
 | `[Files]` | `char[]` | `files_section` | As `[Archives]`, but the second token is a name, and a number follows it only when that name is `NOARCHIVE` (letter case ignored) or ends in `\`. | supported | FND-RES-033 |
 | `[Dialogs]` | `char[]` | `dialogs` | Blocks. A line containing `BEGIN` starts one, followed on that line by the dialog's number and name; the next line is its title; each later line is an item, a number, a comma and a text up to the next comma, space or line feed, with an optional comma and more; a line starting with `END` (letter case ignored) ends the block. Lines outside blocks without `BEGIN` are skipped, and the section ends at a line starting with a line feed. A title or item text not starting with `*` is a key of LANGUAGE.INF's `Strings` section (FMT-RES-119). | supported | FND-RES-033 |
 | `[Billboards]` | `char[]` | `billboards` | `<number>=<text>`, the text running to the line feed. Ends at a line starting with a line feed. | supported | FND-RES-033 |
+| `[Setup]` `AnimationDLL` | `char[]` | `animation_dll` | Read by `_SETUP.EXE`'s `COPY` command into 13 bytes, default empty, and passed to its copy routine. Not in the shipped file. | supported | FND-RES-040 |
 | `[Setup]` `SetupSize` | `UINT16` | `setup_size` | Read by `SETUP.EXE` through the profile routines as an integer. | supported | FND-RES-029 |
 | `[Setup]` `ForceLanguage` | `char[]` | `force_language` | Read by `SETUP.EXE` into 10 bytes and compared with five language names. Not in the shipped file. | supported | FND-RES-029 |
 
@@ -81,6 +82,21 @@ ends the script, as does a dialog that returns 0. `TOGGLEGROUPON <V>` passes
 a number to the `[Files]` data. Words these commands read end at a space,
 tab or line feed, and a missing word takes the first word of the next line.
 
+`PICKDEST [label]` proposes the destination `<SierraDir>\<DirName>`, from
+`SIERRA.INI`'s `Sierra` `SierraDir` (`<drive>:\SIERRA` when that is empty)
+and LANGUAGE.INF's `Ident` `DirName`, and runs the destination routine
+(FND-RES-040). One of its results ends the script and another jumps to the
+label as `GOTO` does; otherwise `SIERRA.INI` gets the parent directory as
+`Sierra` `SierraDir` and as a key of `SierraDirs`, and the destination as
+`Misc` `ProductDir`. `COPY` takes no arguments and runs the copy of the
+`[Files]` and `[Archives]` data; the rest of its line would be read as a
+command. `WRITE <file> <text>` replaces the file with the text and a line
+end, and `APPEND <file> <text>` adds them; the text starts one byte after
+the file name, and a line longer than 223 bytes overruns the reader's
+buffer. `RUN [NOWAIT] <word> <word> <command line>` starts the command line,
+waiting for it unless `NOWAIT` is given; the two words are read and not
+used, and `RUN` never ends the script.
+
 Numbers are decimal, with optional leading spaces and tabs and one sign,
 read to the first other byte; a number kept in 16 bits keeps the low 16 bits
 of the 32-bit value.
@@ -103,10 +119,14 @@ the loader skips. Its eight dialogs request 32 `Strings` keys, and its seven
 
 ## Open questions
 
-- What do `COPY`, `PICKDEST`, `APPEND`, `WRITE` and `RUN` do with their
-  arguments? FND-RES-038 and FND-RES-039 read the other commands the
-  shipped script uses; these cases and `RUN`'s callee 0004:7126 are not
-  read. (Q-RES-184)
+- What does the destination routine 0004:5EB4 show, and which choices give
+  the results 2 and 7 that end the script or jump to `PICKDEST`'s label?
+  (Q-RES-189)
+- What does `COPY`'s copy routine do with the `[Files]`, `[Archives]` and
+  `[Billboards]` data and `AnimationDLL`? 0004:626C, 0003:AF90, 0003:4ECC
+  and 0002:30D8 are not read. (Q-RES-190)
+- How does `RUN` wait for a program, and what do the script's error
+  routines 0002:A742 and 0004:C70A show? (Q-RES-191)
 - What do the 23 commands the shipped script does not use, other than
   `WINDISKSPACE_LT`, do? Their cases are in the table at 0004:5C55 and not
   read. (Q-RES-185)

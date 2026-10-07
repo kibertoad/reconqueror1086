@@ -581,6 +581,7 @@ Entries by area.
 | [FND-RES-037](../findings/FND-RES-037.md) | CONFIG.EXE reads a quoted script string with nine backslash escapes and at-sign substitution, and stops on any other escape | recorded |
 | [FND-RES-038](../findings/FND-RES-038.md) | _SETUP.EXE runs the [Script] text line by line, matching 37 command names as prefixes, and ends silently at an unknown command | recorded |
 | [FND-RES-039](../findings/FND-RES-039.md) | _SETUP.EXE's FLAG runs the rest of its line when a numbered flag is set, and DISKSPACE_LT sets a flag when free kilobytes are below a value | recorded |
+| [FND-RES-040](../findings/FND-RES-040.md) | _SETUP.EXE's PICKDEST builds the destination from SierraDir and DirName, WRITE and APPEND write one line to a file, RUN ignores two words, and COPY takes no arguments | recorded |
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |

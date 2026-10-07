@@ -336,7 +336,7 @@ Entries by kind.
 
 ## findings
 
-258 entries.
+259 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -490,6 +490,7 @@ Entries by kind.
 | [FND-RES-037](../findings/FND-RES-037.md) | CONFIG.EXE reads a quoted script string with nine backslash escapes and at-sign substitution, and stops on any other escape | recorded |
 | [FND-RES-038](../findings/FND-RES-038.md) | _SETUP.EXE runs the [Script] text line by line, matching 37 command names as prefixes, and ends silently at an unknown command | recorded |
 | [FND-RES-039](../findings/FND-RES-039.md) | _SETUP.EXE's FLAG runs the rest of its line when a numbered flag is set, and DISKSPACE_LT sets a flag when free kilobytes are below a value | recorded |
+| [FND-RES-040](../findings/FND-RES-040.md) | _SETUP.EXE's PICKDEST builds the destination from SierraDir and DirName, WRITE and APPEND write one line to a file, RUN ignores two words, and COPY takes no arguments | recorded |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |
