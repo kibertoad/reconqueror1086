@@ -27,7 +27,7 @@ Entries by kind.
 
 ## formats
 
-172 entries.
+179 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -167,6 +167,13 @@ Entries by kind.
 | [FMT-RES-118](../formats/FMT-RES-118.md) | SETUP.SOL directory record | supported |
 | [FMT-RES-119](../formats/FMT-RES-119.md) | LANGUAGE.INF, the installer's profile file of titles and strings | supported |
 | [FMT-RES-120](../formats/FMT-RES-120.md) | SIERRA.INF, the installer's script file | supported |
+| [FMT-RES-121](../formats/FMT-RES-121.md) | Pointer hot spots, an MVG entry | supported |
+| [FMT-RES-122](../formats/FMT-RES-122.md) | Starting home fief, FIEF0.DAT | unknown |
+| [FMT-RES-123](../formats/FMT-RES-123.md) | MIDI song, an HMP entry | supported |
+| [FMT-RES-124](../formats/FMT-RES-124.md) | MIDI instrument bank, a BNK entry | supported |
+| [FMT-RES-125](../formats/FMT-RES-125.md) | Point-of-view settings, the POV entry of a scene file | unknown |
+| [FMT-RES-126](../formats/FMT-RES-126.md) | SVG entry of SKIRMISH.RES | unknown |
+| [FMT-RES-127](../formats/FMT-RES-127.md) | SFG entry of SKIRMISH.RES | unknown |
 | [FMT-SAVE-001](../formats/FMT-SAVE-001.md) | Saved game, SAVEGAME\CONQn.SAV | supported |
 | [FMT-SAVE-002](../formats/FMT-SAVE-002.md) | Strategic map state, TROOPS.SAV | supported |
 | [FMT-SAVE-003](../formats/FMT-SAVE-003.md) | Properties, persons, items and variables, PROPERTY.SAV | supported |
@@ -336,7 +343,7 @@ Entries by kind.
 
 ## findings
 
-277 entries.
+280 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -509,6 +516,9 @@ Entries by kind.
 | [FND-RES-056](../findings/FND-RES-056.md) | INST.EXE looks up 78 fixed INSTALL.TXT keys, help and confirmation texts by file name with hlp and inf extensions, and stops with a fatal error on a missing key everywhere but two calls | recorded |
 | [FND-RES-057](../findings/FND-RES-057.md) | No Conqueror file outside the disc's DEMOS and INN directories names DEMOS or a demo, and only INN.BAT enters INN, to run that directory's own installer | recorded |
 | [FND-RES-058](../findings/FND-RES-058.md) | The disc's two readme files, EMPTY.TXT, VERSION.TXT and the VESA directory are documentation, a placeholder and a third-party driver that no Conqueror program reads | recorded |
+| [FND-RES-059](../findings/FND-RES-059.md) | An MVG entry holds the pointer shapes' hot spots; 0x00018850 loads it and the CSF of the same name | recorded |
+| [FND-RES-060](../findings/FND-RES-060.md) | FIEF0.DAT is a text file of six sections, each a column line and a line of integers, read when a new game sets up the home fief | recorded |
+| [FND-RES-061](../findings/FND-RES-061.md) | Every use of the name FFONTA2.FNT ends in a property call that stores nothing, so the game never reads the .FNT entry | recorded |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |

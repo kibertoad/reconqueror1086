@@ -26,8 +26,9 @@ Q-RES-203 retain install-script questions; Q-RES-135 through
 Q-RES-137 retain bitmap-consumer questions; Q-RES-132 through
 Q-RES-134 retain batch-consumer questions; Q-RES-124 through
 Q-RES-131 retain driver-consumer and payload questions; Q-RES-120 through Q-RES-123
-retain disc-consumer and audio questions; Q-RES-118 and Q-RES-119 track the cue consumer questions. Archive-member format coverage is a separate exit
-criterion from matching an enclosing archive path to a format entry.
+retain disc-consumer and audio questions; Q-RES-118 and Q-RES-119 track the cue consumer questions. Every kind of entry in C1086.GOB and the scene files has a format entry
+(FMT-RES-121 to FMT-RES-127 cover the last ones), except `ffonta2.fnt`, which
+nothing reads (FND-RES-061); Q-RES-208 to Q-RES-214 retain their questions.
 Existing implemented slices remain in the milestone table; their implementation
 does not prove Survey complete or promote any evidence status.
 

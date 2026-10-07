@@ -49,6 +49,9 @@ The additional disc-root manifest path is byte-identical to the installed copy;
 its complete directory and stored extents were independently checked
 [FND-RES-018]. This is another copy, not a new container-content variant.
 
+Each kind of entry the containers hold has a format entry, except
+`ffonta2.fnt` of C1086.GOB, which no code reads [FND-RES-061].
+
 ## Open questions
 
 - What, if anything, the 1,236 bytes before `FNT6.PCX` in `SKIRMISH.RES` held. (Q-RES-001)

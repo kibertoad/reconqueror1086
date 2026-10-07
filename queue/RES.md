@@ -1,8 +1,36 @@
 # RES
 
-Next ID: Q-RES-208
+Next ID: Q-RES-215
 
 ## Static
+
+- Q-RES-208. FMT-RES-121: Does any code read the first two dwords of an MVG record?
+  Settles it: search every reader of the table at `0x000B07E4` and of `0x000B07AC`, each read whole.
+  Blocks: none.
+
+- Q-RES-209. FMT-RES-122: Which values do sections 2 to 6 of FIEF0.DAT hold, and which reader reads each?
+  Settles it: read `0x00013520`, `0x0005F480`, `0x0001C410` and `0x000309D0`, every parse and store.
+  Blocks: none.
+
+- Q-RES-210. FMT-RES-123: Does the game compare an HMP entry's tag before playing it?
+  Settles it: locate the uses of the executable's copy of the tag and read them.
+  Blocks: none.
+
+- Q-RES-211. FMT-RES-124: What layout does the HMI driver expect of a BNK entry?
+  Settles it: a source describing the HMI bank format, checked against the two shipped banks.
+  Blocks: none.
+
+- Q-RES-212. FMT-RES-125: What does a POV entry hold, and which fields does the game read?
+  Settles it: read `0x00050CA0` and `0x00050D6F` and every use of the buffer at `0x0009CB64`.
+  Blocks: none.
+
+- Q-RES-213. FMT-RES-126: What reads skirmish.svg, and what does it hold?
+  Settles it: read the code at `0x0007DD59` and `0x0007DEBD` and what opens the names it forms.
+  Blocks: none.
+
+- Q-RES-214. FMT-RES-127: What reads SFG data, and what does skirmish.sfg hold?
+  Settles it: read the code at `0x00025C6A` and `0x0003C9EB` and the loader it calls.
+  Blocks: none.
 
 - Q-RES-177. RULE-RES-005: How does SETUP's expansion routine read literals in mode 1?
   Settles it: read 0001:45CF and the table it builds from CS:0x3601, and the

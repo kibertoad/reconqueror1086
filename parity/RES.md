@@ -23,6 +23,13 @@
 | `FMT-RES-118` | SETUP.SOL directory record | supported | missing | None | None | supported | Read by the CD's installer only. Open under Q-RES-176. |
 | `FMT-RES-119` | LANGUAGE.INF, the installer's profile file of titles and strings | supported | missing | None | None | supported | Read by the CD launcher and installer only; the rebuild has neither. Open under Q-RES-178. |
 | `FMT-RES-120` | SIERRA.INF, the installer's script file | supported | missing | None | None | supported | Read by the CD's installers only; the rebuild has no installer. Open under Q-RES-180 to Q-RES-182 and Q-RES-185 to Q-RES-191. |
+| `FMT-RES-121` | Pointer hot spots, an MVG entry | supported | missing | None | None | supported | Survey listing; open under Q-RES-208. |
+| `FMT-RES-122` | Starting home fief, FIEF0.DAT | unknown | missing | None | None | unknown | Survey listing; open under Q-RES-209. |
+| `FMT-RES-123` | MIDI song, an HMP entry | supported | missing | None | None | supported | Survey listing; open under Q-RES-210. |
+| `FMT-RES-124` | MIDI instrument bank, a BNK entry | supported | missing | None | None | supported | Survey listing; open under Q-RES-211. |
+| `FMT-RES-125` | Point-of-view settings, the POV entry of a scene file | unknown | missing | None | None | unknown | Survey listing; open under Q-RES-212. |
+| `FMT-RES-126` | SVG entry of SKIRMISH.RES | unknown | missing | None | None | unknown | Survey listing; open under Q-RES-213. |
+| `FMT-RES-127` | SFG entry of SKIRMISH.RES | unknown | missing | None | None | unknown | Survey listing; open under Q-RES-214. |
 | `RULE-RES-001` | Opening, searching, reading and writing the open archive | supported | partial | None | None | supported | `DynamixArchive.ReadDecoded` decodes kinds 0 to 2 by kind and throws on kind 3. The importer reads every archive at install time, so there is no single open archive, no case-insensitive lookup through a directory, and no writer or encoders. |
 | `RULE-RES-002` | Kind-1 decoding | supported | complete | None | None | implemented | `DynamixCompression.DecodeKind1`; see FMT-RES-003 for the extra checks. |
 | `RULE-RES-003` | Kind-2 decoding | supported | complete | None | None | implemented | `DynamixCompression.DecodeKind2` rejects a code above the next free code, which the original expands as the next one, and a first code of 256 or above, which the original writes as a byte. No shipped stream has either. |
