@@ -385,3 +385,22 @@ stay; `check-upstream` reports both current.
 Retained adaptations: the pre-commit hook keeps installing the staged lock from
 the pnpm store instead of linking `node_modules`. No gameplay behaviour,
 evidence status or parity status changes.
+
+## Template main 25c5808b adoption (2026-10-07)
+
+Owner scope: update to the latest template version. Target: this repository
+only. The reviewed delta is template 99c3e110 to
+25c5808bb497d863aded815e50838ee1e6d94256. The template now pins rules efa138ba,
+checker 2.2.0 at toolkit 92a55920, reader 2.3.0 and engine 12.0.0, the
+versions this repository already runs, so `docs/upstream/`,
+`tools/upstream-lock.json`, `tools/toolkit-packages.json` and the Node and
+Python pins are unchanged.
+
+| Capability | Adoption and acceptance evidence |
+|---|---|
+| Runtime libraries 10.0.0 | `RefurbishedDinosaursVersion` moves from 6.2.0 to 10.0.0 for every `RefurbishedDinosaurs.*` package. The solution builds with no source change. The 10.0.0 raw-image reader checks the sync pattern of each MODE1/2352 sector and the ISO 9660 reader checks the primary volume descriptor's logical block size, so the executable specification's synthetic raw image now writes a sync pattern and mode byte in every sector and gives its volume descriptor a 2048-byte block size and a 20-block volume. No source project reads a disc image. |
+| Evidence review checks | `docs/EVIDENCE-REVIEW.md` gains the template's text for the last write to each argument byte, ESP offsets, arguments removed without being read, allocate-fill-link and cleanup order, callers that combine results, neighbouring dispatch tables, loop progress through a register return, call-graph cycles, controls for empty searches, PE import slots and pointer tables (STATUS-42, STATUS-43), IDENTIFIERS-8 and How to reproduce. |
+| PE harness import slots | `AGENTS.md` and the research-item skill say that a PE loader in the harness fills each import address table slot from the import tables (STATUS-42) and that a call through a slot with no import stops the run. |
+| Rules summaries | Not copied: `AGENTS.md`, the skills, `docs/goals/README.md` and `docs/SPEC-ENTRY-TEMPLATES.md` already summarize rules efa138ba in this repository's own words (the goal and handover commit rules, the `goal/` branch procedure, the `Queue:` rule, the countable Parameters form, a replaced row's Tests `None` and the four implementation test subsections). Section links were already at the new line ranges. |
+
+No gameplay behaviour, evidence status or parity status changes.

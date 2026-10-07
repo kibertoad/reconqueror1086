@@ -453,8 +453,18 @@ static byte[] CreateSyntheticRawIso()
     const int payloadOffset = 16;
     const int payloadSize = 2048;
     var raw = new byte[20 * rawSector];
+    // Every sector carries the MODE1/2352 sync pattern and mode byte that the image reader checks.
+    for (var sector = 0; sector < 20; sector++)
+    {
+        raw.AsSpan(sector * rawSector + 1, 10).Fill(0xFF);
+        raw[sector * rawSector + 15] = 1;
+    }
     var pvd = new byte[payloadSize];
     pvd[0] = 1; Encoding.ASCII.GetBytes("CD001").CopyTo(pvd, 1); pvd[6] = 1;
+    BinaryPrimitives.WriteUInt32LittleEndian(pvd.AsSpan(80, 4), 20);
+    BinaryPrimitives.WriteUInt32BigEndian(pvd.AsSpan(84, 4), 20);
+    BinaryPrimitives.WriteUInt16LittleEndian(pvd.AsSpan(128, 2), payloadSize);
+    BinaryPrimitives.WriteUInt16BigEndian(pvd.AsSpan(130, 2), payloadSize);
     WriteIsoRecord(pvd, 156, 17, payloadSize, 2, [0]);
     CopyPayload(raw, 16, pvd);
 

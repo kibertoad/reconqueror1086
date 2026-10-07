@@ -673,6 +673,16 @@ Kaitai compilation was skipped because no compiler was available. No original
 program ran, no proprietary analysis artifacts were committed, and no publication
 was performed.
 
+## Shared runtime 10.0.0 adoption (2026-10-07)
+
+The common exact runtime pin moves from 6.2.0 to 10.0.0 with template main
+25c5808b. The solution builds unchanged. The 10.0.0 raw-image reader rejects a
+MODE1/2352 sector without its sync pattern, and the ISO 9660 reader rejects a
+primary volume descriptor whose logical block size is not 2048, so the
+synthetic raw image of the executable specifications writes both. The fast
+gate (`./tools/Invoke-Validation.ps1`) passed on 2026-10-07 with every test
+and executable specification passing.
+
 ## Rules efa138ba and toolkit packages adoption (2026-10-06)
 
 `node tools/upstream.mjs verify`, `node tools/Verify-ToolkitPackages.mjs` and

@@ -100,7 +100,7 @@ require explicit authorization.
 
 ## Template workflow
 
-The current infrastructure migration targets template main 99c3e110793e8ea6acd7de8df669f98bc945a88d
+The current infrastructure migration targets template main 25c5808bb497d863aded815e50838ee1e6d94256
 and the toolkit revision recorded in `tools/toolkit-packages.json`. Toolkit dependencies
 are pinned in package.json, pnpm-lock.yaml and requirements-evidence.txt; the adoption
 record is tools/toolkit-packages.json, and the checker's commit and version are also in
@@ -177,6 +177,9 @@ that page differ, the page wins.
   depends on interrupts (`# may run:`), timing, the operating system or the
   hardware. Every import, interrupt or port access the function reaches has
   an explicit stub, anything else stops the run with an error naming it, and
+  a PE loader fills each import address table slot with the stub for the
+  import the file's import tables name there (a slot with no import holds no
+  stub, and a call through it stops the run), and
   an experiment names in its Setup every stub, port model and video memory
   mapped as ordinary RAM, and gives each port value by its glossary name. A
   copy into video memory that ran to the end shows the bytes written, never

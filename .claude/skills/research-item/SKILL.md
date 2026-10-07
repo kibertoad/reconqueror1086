@@ -87,7 +87,10 @@ only the lines the link gives, and never a section already read this session.
    the type edges, cases for every branch and seeded random cases, run them
    all in the harness and in each reading, and compare exactly. Give every
    import, interrupt or port access the function reaches an explicit stub
-   (anything else must stop the run with an error naming it); name in Setup
+   (anything else must stop the run with an error naming it; a PE loader
+   fills each import address table slot with the stub for the import the
+   file's import tables name there, per STATUS-42, and a call through a slot
+   with no import stops the run naming the slot); name in Setup
    each stub, port model and video memory mapped as RAM, and what the
    comparison assumes of them; give port values by glossary name. A copy to
    video memory shows the bytes written, never the pixels. The fixture

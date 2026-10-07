@@ -2,9 +2,9 @@
 
 ## Current state
 
-Stage: Survey. Template main 99c3e110 is adopted. The Standard and protocol are
+Stage: Survey. Template main 25c5808b is adopted. The Standard and protocol are
 at rules efa138ba (still v1), with checker 2.2.0 at toolkit 92a55920, reader
-2.3.0, engine 12.0.0 and the RefurbishedDinosaurs 6.2.0 runtime packages.
+2.3.0, engine 12.0.0 and the RefurbishedDinosaurs 10.0.0 runtime packages.
 Tooling installs through pnpm. The adoption record is in
 [template-migration-plan.md](template-migration-plan.md).
 The earlier documentation audit is in [documentation-audit.md](documentation-audit.md).
