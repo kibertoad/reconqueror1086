@@ -384,8 +384,9 @@ locations, with acceptance cases.
 Recorded: 2026-10-07. Audience: toolkit authors.
 
 The standard's packed-file keys need an unpacker named in `unpacked.tool`,
-and the executable reader has none. `CD:INST.EXE`, the DOS installer that
-runs INSTALL.DAT, is packed with LZEXE 0.91.
+and the executable reader has none. `CD:INST.EXE`, the DOS installer, is
+packed with LZEXE 0.91. (CD:CONFIG.EXE, not INST.EXE, runs INSTALL.DAT:
+FND-RES-034.)
 
 Local handling: `tools/evidence/unlzexe.mjs` unpacks LZEXE 0.91 with a
 documented header rule and a synthetic test; the build entry names it with
@@ -396,3 +397,23 @@ PKLITE, packed executable and LZ91 on the toolkit tracker found only #297,
 which mentions another project's LZEXE manifest item.
 [Toolkit issue #326](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/326)
 asks for an `unpack` command with a fixed header rule and acceptance cases.
+
+## GAP-020: Goals stop after one session, and there is no wrap-up procedure
+
+Recorded: 2026-10-07. Audience: template and protocol authors.
+
+The owner runs this goal until the game is restored. Agents under it, here
+and on other restorations, stopped after committing a session's handover
+because nothing said the end of a session is not the end of the goal. Nor
+did anything say what to do when the owner asks to wrap up with work left.
+
+Local handling: none yet. The project syncs with the template once the
+change below is reviewed and merged.
+
+Upstream submission (2026-10-07): searches of both trackers for goal,
+session, stop and handover found no duplicate.
+[Template PR #84](https://github.com/kibertoad/refurbished-dinosaurs-template/pull/84)
+adds standing goals, the stop reasons, a wrap-up procedure, skill changes
+and a Claude Code Stop hook.
+[Rules issue #84](https://github.com/kibertoad/refurbished-dinosaurs/issues/84)
+asks for the matching protocol wording.
