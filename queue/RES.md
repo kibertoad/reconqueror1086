@@ -301,10 +301,14 @@ Next ID: Q-RES-204
   Settles it: trace every write to the object fields +0x1E6, +0x23E, +0x1DE, +0x194, +0x1AA and +0x1AE and to DS:5557 before vtable entry +0x30 is called. Blocks: Survey data-family reconciliation.
   Tried: FND-RES-047 finds that `space` writes the free megabytes into +0x1AE
   of the object at DS:1A04; FND-RES-050 finds the run loop called on the
-  object at DS:55D8, which DS:1A04 points to (FND-RES-044).
+  object at DS:55D8, which DS:1A04 points to (FND-RES-044). FND-RES-052
+  settles `%1` and `%2`; the string fields behind `%3` to `%6` are written
+  through string routines in 20F3, 2487 and 2821 that are not read.
 
 - Q-RES-202. FMT-RES-016: What do INST.EXE's checks before the script, vtable entries +0x10 and +0x28 of the object at DS:55D8, decide, and which drive letters do the bytes at +0x1E6 and +0x23E hold?
   Settles it: read 20F3:1021 and 20F3:1D07 with every branch, and every write to +0x1E6 and +0x23E. Blocks: Survey data-family reconciliation.
+  Tried: FND-RES-052 settles the drive letters at +0x1E6 and +0x23E; +0x10
+  (20F3:1021) and +0x28 (20F3:1D07) are not read.
 
 - Q-RES-203. FMT-RES-016: What does the shipped `pick` line's fourth label buffer, which no word fills, hold when a key with a low byte of 0 is pressed?
   Settles it: read the stack writes that the calls before 1C17:0D8F leave at that buffer's offset, or replay the call with the harness from a recorded stack. Blocks: Survey data-family reconciliation.

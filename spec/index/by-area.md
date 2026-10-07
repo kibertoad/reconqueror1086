@@ -594,6 +594,7 @@ Entries by area.
 | [FND-RES-049](../findings/FND-RES-049.md) | INSTALL.SCR's copy command in INST.EXE extracts from drivers.sip and sierra.sip beside the source, then copies matching files, with /q, /s and a + concatenation form | recorded |
 | [FND-RES-050](../findings/FND-RES-050.md) | INST.EXE runs INSTALL.SCR from vtable entry +0x5C after two installer checks, and one choice of the shipped script's menu misses its label | recorded |
 | [FND-RES-051](../findings/FND-RES-051.md) | INST.EXE runs an unknown INSTALL.SCR line through spawn with one argument string, then the command interpreter, with standard output redirected for > and >> | recorded |
+| [FND-RES-052](../findings/FND-RES-052.md) | INST.EXE's bytes behind INSTALL.SCR's %1 and %2 are the destination drive letter and the drive the installer started on | recorded |
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |

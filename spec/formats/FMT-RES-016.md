@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-RES-045, FND-RES-046, FND-RES-047, FND-RES-048, FND-RES-049, FND-RES-050, FND-RES-051]
+evidence: [FND-RES-045, FND-RES-046, FND-RES-047, FND-RES-048, FND-RES-049, FND-RES-050, FND-RES-051, FND-RES-052]
 conflicting: []
 split_with: []
 related: []
@@ -19,8 +19,9 @@ related: []
 
 `INSTALL.SCR` is a script that the installer `INST.EXE` loads whole and runs
 from top to bottom, one line at a time [FND-RES-045, FND-RES-046]. It runs
-after two of the installer's own checks pass, when two drive letters the
-installer holds differ or `-f` was given on its command line [FND-RES-050].
+after two of the installer's own checks pass, when the drive being
+installed to differs from the one the installer started on or `-f` was
+given on its command line [FND-RES-050, FND-RES-052].
 
 Lines:
 
@@ -34,8 +35,9 @@ Lines:
 Parameters. Before a line runs, `%` followed by a digit `1` to `9` is replaced
 with one of nine strings the installer holds. `%` followed by any other byte
 drops both bytes and keeps the byte after them, so `%%` keeps neither `%`.
-`%1` and `%2` are single characters, `%3`, `%4` and `%6` are strings the
-installer keeps, `%5` is the path prefix it reads its own files from, and
+`%1` is the lower-case letter of the drive being installed to and `%2` that
+of the drive the installer started on [FND-RES-052]. `%3`, `%4` and `%6` are
+strings the installer keeps, `%5` is the path prefix it reads its own files from, and
 `%7` is another field of the installer; `%8` and `%9` are never set. A `%` at
 the end of a line reads past the line's end.
 
@@ -116,10 +118,8 @@ find-next.
 
 ## Open questions
 
-- Which installer fields give `%1` to `%7`, and what values do they hold
-  when the script runs? (Q-RES-199)
+- What values do `%3` to `%7` hold when the script runs? (Q-RES-199)
 - What do the installer's checks before the script (vtable entries +0x10
-  and +0x28 of its main object) decide, and which drive letters do the bytes
-  at +0x1E6 and +0x23E hold? (Q-RES-202)
+  and +0x28 of its main object) decide? (Q-RES-202)
 - What does the shipped `pick` line's unfilled fourth label buffer hold, which
   a key with a low byte of 0 selects? (Q-RES-203)
