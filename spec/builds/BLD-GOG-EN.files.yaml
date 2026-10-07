@@ -11287,6 +11287,12 @@ files:
     format: MZ
     size: 87640
     xxh3: 50c2f5dcc0bba9a475ce3da00a788414
+    packer: LZEXE 0.91
+    unpacked:
+      size: 189616
+      xxh3: bf7404f9532b9075dbe7004337db4119
+      format: MZ
+      tool: tools/evidence/unlzexe.mjs at commit 0f1ac61
   - path: "CD:INSTALL.BAT"
     format: data
     size: 23

@@ -60,7 +60,11 @@ one file. Supported status applies to stored text framing only.
 ## Open questions
 
 - Which shipped interpreter consumes this file, and is that path reachable?
-  File text alone does not establish runtime use. (Q-RES-151)
+  FND-RES-034 locates CD:CONFIG.EXE building INSTALL.DAT's path from a drive
+  and directory and reporting a failure to reopen its script file by that
+  name, and reads its `@exists` handler, so CONFIG.EXE is the lead; where it
+  first opens the file, and which shipped batch file or program starts it,
+  are not read. (Q-RES-151)
 - How does the interpreter tokenize at-sign identifiers and match their casing?
   The observed variants fit either distinct or case-insensitive dispatch.
   (Q-RES-152)
