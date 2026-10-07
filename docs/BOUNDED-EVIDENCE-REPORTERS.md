@@ -24,6 +24,13 @@ A config names its source by `xxh3`, the XXH3-128 hash the build entry gives, as
 config that still names a `sha256`, and the report's `sourceIdentity` repeats the
 `xxh3` it checked. `node tools/evidence/xxh3.mjs <file>...` prints that hash.
 
+`node tools/evidence/unlzexe.mjs <packed.exe> <unpacked.exe>` unpacks a DOS
+executable packed by LZEXE 0.91 (INST.EXE) and prints the unpacked file's size
+and `xxh3`, which the build's `unpacked` item records with this tool's commit.
+The unpacked header is the tool's own, described at the top of the script, so
+another unpacker gives other bytes. It refuses LZEXE 0.90 and writes no file
+that already exists. The executable reader has no LZEXE support.
+
 `x86-imports` and `x86-table` forward to the reader's `imports` and `table`
 commands, which run in Node without the engine. `imports` maps each import
 address table slot of a PE file (AUTOPLAY.EXE) to the import its tables name,

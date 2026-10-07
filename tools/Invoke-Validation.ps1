@@ -49,6 +49,7 @@ try {
     Invoke-Node @('tools/Invoke-NodeChecks.mjs')
     Invoke-Node @('tools/upstream.mjs', 'links')
     Invoke-Node @('--test', 'tests/evidence/evidence.test.mjs', 'tests/evidence/packages.test.mjs', 'tests/evidence/xxh3.test.mjs',
+        'tests/evidence/unlzexe.test.mjs',
         'tests/upstream/upstream.test.mjs', 'tests/upstream/narrative.test.mjs',
         'tests/upstream/gui-exit.test.mjs', 'tests/upstream/research-tracking.test.mjs',
         'tests/upstream/diagnostics.test.mjs', 'tests/upstream/memory-blocks.test.mjs',
