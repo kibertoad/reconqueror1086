@@ -100,7 +100,7 @@ require explicit authorization.
 
 ## Template workflow
 
-The current infrastructure migration targets template main 39d31fdef9d7420e8571ab6d09e3b3026be05010
+The current infrastructure migration targets template main 99c3e110793e8ea6acd7de8df669f98bc945a88d
 and the toolkit revision recorded in `tools/toolkit-packages.json`. Toolkit dependencies
 are pinned in package.json, pnpm-lock.yaml and requirements-evidence.txt; the adoption
 record is tools/toolkit-packages.json, and the checker's commit and version are also in
@@ -263,7 +263,13 @@ that page differ, the page wins.
   records the owner's decisions and moves its oldest entries to
   `docs/decisions/` before it passes 1,000 lines. A session ends by
   committing its handover on its own; push only when the owner explicitly asks; half-done work
-  never goes into a batch commit.
+  never goes into a batch commit. Under a goal whose condition does not
+  hold, the end of a session is a checkpoint: the next session starts at once,
+  in the same conversation, and `docs/goals/README.md` lists the only reasons
+  to stop. When the owner asks to wrap up, no new agent or item starts: the
+  batch in progress is finished, documented, committed and pushed to the main
+  branch, and the goal stops, as that file's "Wrapping up" says. The request
+  to wrap up is the owner's explicit request for that push.
 - Progress is what scripts compute: parity totals, entries by status,
   executable and file coverage, queue sizes. Never a hand-written percentage.
   Executable coverage is measured against the function inventories,
@@ -554,16 +560,18 @@ raising the limit.
 ```powershell
 ./tools/Verify-Configuration.ps1   # placeholders and template leftovers
 ./tools/Verify-Repository.ps1      # original-content and large-file policy
-./tools/Invoke-Validation.ps1      # policy checks plus build and tests (fast gate)
+./tools/Invoke-Validation.ps1 -TestFilter <filter>   # policy checks, build, relevant tests
 dotnet build Conqueror1086.slnx        # full solution
 dotnet run --project src/Conqueror.Game -- --smoke-test
 ```
 
-`Invoke-Validation.ps1` is the canonical local validation entry point. Its
-default fast gate skips tests tagged `Category=LongRunning`; run
-`-IncludeLongRunningTests` only when the user asks for it or a change to that
-coverage needs it. Add `-TestFilter` to narrow a run and `-MinimumExpectedTests`
-to fail when discovery drops below an expected count.
+Never run the full validation gate (`Invoke-Validation.ps1` without
+`-TestFilter`) or the full test suite locally. CI runs the gate on every pull
+request. Locally, run only the tests directly relevant to the change: the
+test classes that cover the code and spec entries it touches, through
+`-TestFilter` or `dotnet test --filter`. Run more only when the user asks for
+it. `-MinimumExpectedTests` fails a run when discovery drops below an expected
+count.
 
 Enable the pre-commit hook once in each clone, before the first commit, with
 `git config core.hooksPath .githooks`, and do not bypass it with
@@ -573,7 +581,8 @@ fails before the commit instead of in CI.
 
 ## Definition of done
 
-A change is finished when the solution builds, `./tools/Invoke-Validation.ps1` passes, new
+A change is finished when the solution builds, the tests relevant to it pass
+locally and CI passes, new
 behavior has tests that exercise every branch its entry describes directly,
 not only the branches a play session reaches, the spec entries it relies on
 exist with the status their evidence supports, the documents that assert status

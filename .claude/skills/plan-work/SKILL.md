@@ -40,7 +40,9 @@ never code or spec entries apart from new `unknown` entries.
    it names, with an ID from that file's `Next ID:` line. A question a static
    reading can settle goes under `Static`; a call of one function goes under
    `Emulated call`; a run of the game goes under `Agent run` or
-   `Live session` as `docs/RUNTIME.md` says. A `supported` entry gets a
+   `Live session` as `docs/RUNTIME.md` says for the parts of each capability
+   the run needs, and where the record answers those parts separately, the
+   item's `Settles it:` text names them. A `supported` entry gets a
    `Static` item to complete its reading and an `Emulated call` item where
    the harness reaches its functions, or, only where it depends on something
    the code does not decide, a run item to confirm it. Every rule the code
@@ -75,6 +77,22 @@ first commit of a `goal/<name>` branch and run only one goal at a time as
 that README describes, and give the user the condition to paste after
 `/goal`. The commit that creates the goal file is not a batch and has no
 trailers.
+
+When the owner wants work to go on until the game is restored, write two
+standing goals (`docs/goals/README.md`), one research and one implementation,
+with conditions such as:
+
+```text
+Every queue item is closed or under Blocked with Waiting on; stop earlier only
+for a reason docs/goals/README.md lists.
+```
+
+```text
+Every parity row that is not superseded is validated or deviated, or partial
+with a Spec gap note naming an open queue item; stop earlier only for a reason
+docs/goals/README.md lists.
+```
+
 Split research and implementation into separate goals. An implementation
 goal's condition allows no change under `spec/` beyond added open questions
 and `unknown` entries, and accepts a `partial` row only with a `Spec gap:` note. Never write a goal

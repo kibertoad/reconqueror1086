@@ -53,11 +53,11 @@ try {
         'tests/upstream/upstream.test.mjs', 'tests/upstream/narrative.test.mjs',
         'tests/upstream/gui-exit.test.mjs', 'tests/upstream/research-tracking.test.mjs',
         'tests/upstream/diagnostics.test.mjs', 'tests/upstream/memory-blocks.test.mjs',
-        'tests/upstream/capture-window.test.mjs')
+        'tests/upstream/capture-window.test.mjs', 'tests/upstream/goal-run.test.mjs')
     # Give the command-double test the PowerShell running this gate.
     $previousPwsh = $env:PWSH
     if (-not $env:PWSH) { $env:PWSH = [Diagnostics.Process]::GetCurrentProcess().MainModule.FileName }
-    try { Invoke-Node @('--test', 'tests/upstream/offline-validation.test.mjs') }
+    try { Invoke-Node @('--test', 'tests/upstream/offline-validation.test.mjs', 'tests/upstream/release-signing.test.mjs') }
     finally { $env:PWSH = $previousPwsh }
     $python = if ($env:EVIDENCE_PYTHON) { $env:EVIDENCE_PYTHON } else { 'python' }
     & $python -B (Join-Path $root 'tools/Verify-EvidenceEnvironment.py')

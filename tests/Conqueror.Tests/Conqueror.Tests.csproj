@@ -6,7 +6,7 @@
     <ProjectReference Include="../../src/Conqueror.Core/Conqueror.Core.csproj" />
     <ProjectReference Include="../../src/Conqueror.Game/Conqueror.Game.csproj" />
     <ProjectReference Include="../../src/Conqueror.Resources/Conqueror.Resources.csproj" />
-    <PackageReference Include="xunit.v3" Version="4.0.0" />
+    <PackageReference Include="xunit.v3" Version="4.0.1" />
   </ItemGroup>
   <ItemGroup><Compile Include="../../src/Conqueror.Resources/SharedMediaAliases.cs" Link="SharedMediaAliases.cs" /></ItemGroup>
 </Project>

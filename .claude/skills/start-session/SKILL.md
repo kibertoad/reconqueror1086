@@ -22,7 +22,9 @@ This skill is the procedure; where they differ, the protocol wins.
    check that no other goal claims the same areas, and get it onto the main
    branch before the first batch, or, without push authorization, onto a new
    `goal/<name>` branch as its first commit, then list the branches again.
-   An implementation session reads no research goal files.
+   Then run `node tools/goal-run.mjs start <name>` in the session's worktree,
+   so the Stop hook holds the session to the goal (`docs/goals/README.md`,
+   "Run marker"). An implementation session reads no research goal files.
 3. Compare the handover with reality: `git status`, `git log --oneline -10`,
    the current branch, and any `wip/` branch the handover names. Anything
    uncommitted that the handover does not mention belongs to someone else or

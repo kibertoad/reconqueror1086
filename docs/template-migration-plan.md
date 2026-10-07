@@ -362,3 +362,26 @@ Dependabot configuration change and the pre-commit `node_modules` link (this
 repository's hook installs from the pnpm store instead) are template
 infrastructure outside this scope. No gameplay behaviour, evidence status or
 parity status changes.
+
+## Template main 99c3e110 adoption (2026-10-07)
+
+Owner scope: update to the latest template version. Target: this repository
+only. The reviewed delta is template 39d31fde to
+99c3e110793e8ea6acd7de8df669f98bc945a88d. The template pins rules 11dbbc53 and
+checker 2.1.0, behind this repository's rules efa138ba and checker 2.2.0, which
+stay; `check-upstream` reports both current.
+
+| Capability | Adoption and acceptance evidence |
+|---|---|
+| Standing goals and wrap-up | `docs/goals/README.md` gains Standing goals, Wrapping up and Run marker. `AGENTS.md`, the research-item, implement-rows, plan-work, start-session and end-session skills follow the template: under a goal whose condition does not hold, a session's end is a checkpoint and the next session starts in the same conversation; a request to wrap up finishes the batch in progress, pushes to main and stops. This repository pushes only on the owner's explicit request, and `AGENTS.md` and end-session say the request to wrap up is that request. |
+| Goal run marker | Template `tools/goal-run.mjs` and `tests/upstream/goal-run.test.mjs` adopted unchanged; the gate runs the test. The template's `.claude/settings.json`, which installs the Stop hook, is left for the owner to add: an agent session may not write Claude Code's own settings. Until it is added, the marker is written and nothing holds a session back. |
+| Relevant tests only | `AGENTS.md` Commands and Definition of done, `docs/VALIDATION.md` and implement-rows: the full gate runs in CI on every pull request and locally only with `-TestFilter` for the tests a change touches. |
+| Per-part runtime capabilities | `queue/README.md`, research-item and plan-work say which parts of a capability a run item needs. `docs/RUNTIME.md` and runtime-access already followed this. |
+| Continuation cases | Not copied: the template names the protocol's Continuation cases without a link because its copy of the protocol lacks them. This repository's copy has the section, and `AGENTS.md` and implement-rows already link it. |
+| Release signing safeguards | `tools/Assert-WindowsSignature.ps1`, `tools/Ensure-ReleaseTag.ps1` and `tests/upstream/release-signing.test.mjs` adopted unchanged; the gate runs the test. The release workflow, with this game's package names, now fails when dispatched from another branch, bounds every job to 45 minutes, checks every Windows signature against the `ES_CERTIFICATE_THUMBPRINT` environment secret (the signing certificate's 40-digit SHA-1 thumbprint), and on a rerun reuses a tag only when it resolves to the prepared commit and has no Release yet. Signed releases need that secret in the `release-signing` environment, whose deployment branches should be limited to `main`. |
+| Dependabot | `.github/dependabot.yml` follows the template: weekly NuGet updates after a seven-day cooldown, the `RefurbishedDinosaurs.*` packages grouped and taken at once, and the `xunit.*` packages grouped. The npm and pip entries are removed, since the checker moves only through `tools/upstream.mjs refresh` and the reader and engine move together. The template's `SabreTools.Serialization` exception is dropped; no project here references it. |
+| Test packages | `xunit.v3` 4.0.1, as the template's Dependabot bump. |
+
+Retained adaptations: the pre-commit hook keeps installing the staged lock from
+the pnpm store instead of linking `node_modules`. No gameplay behaviour,
+evidence status or parity status changes.

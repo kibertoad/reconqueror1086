@@ -36,8 +36,8 @@ changes and evidence-status promotions are outside this documentation batch.
 The current template/toolkit infrastructure migration is specified in
 [template-migration-plan.md](template-migration-plan.md). Its concrete scope is
 approved by the owner on 2026-09-30 and refreshed with explicit authorization
-on 2026-10-01. The current template adoption is 39d31fde;
-the rules snapshot is c1758fd9. Package versions and their toolkit revision
+on 2026-10-01. The current template adoption is 99c3e110;
+the rules snapshot is efa138ba. Package versions and their toolkit revision
 are recorded in `tools/toolkit-packages.json`, with dependency integrity in
 `pnpm-lock.yaml` and `requirements-evidence.txt`. Plans document authorized work and do not
 require a separate explicit approval before implementation or tooling proceeds.

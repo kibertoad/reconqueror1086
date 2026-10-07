@@ -1,6 +1,6 @@
 ---
 name: end-session
-description: Close a work session on this restoration - audit processes, release a run lock the session owns, rewrite the handover, commit completed work, and report. Push only when explicitly requested by the owner.
+description: Close a work session on this restoration - audit processes, release a run lock the session owns, rewrite the handover, commit completed work, and either start the next session (under a goal whose condition does not hold) or report. Push only when explicitly requested by the owner, which a request to wrap up is.
 ---
 
 # End a session
@@ -39,9 +39,18 @@ only the lines the link gives, and never a section already read this session.
    them into the handover. Never write what research found or tried. Delete
    what is no longer true instead of adding below it. Stay under 200 lines.
    Commit the handover on its own, with no trailers: it is not a batch.
-5. **Push** the branch only when the owner explicitly requests it. Check the
+5. **Push** the branch only when the owner explicitly requests it. When the
+   owner asked to wrap up, push the work to the main branch, as "Wrapping up"
+   in `docs/goals/README.md` says. Check the
    canonical configured push destination as `AGENTS.md` requires. Check Git directly for the branch's remote sync
    state when reporting it; do not copy a count into the handover.
-6. **Report** the final status block from `research-item`, followed by one
+6. **Continue or stop.** If the session worked under a goal whose condition
+   does not hold and none of the stop reasons in `docs/goals/README.md`
+   applies, the session's end is a checkpoint: run `start-session` now and
+   take the next item, without reporting or ending the turn. Otherwise run
+   `node tools/goal-run.mjs stop` and go on to the report, naming the stop
+   reason that applies. When the owner asked to wrap up, follow "Wrapping up"
+   in `docs/goals/README.md`: no new item starts.
+7. **Report** the final status block from `research-item`, followed by one
    line on anything the owner has to decide or do, such as a live session
    request waiting for an answer.

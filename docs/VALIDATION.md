@@ -26,10 +26,12 @@ locked toolkit packages. Run `pnpm install --frozen-lockfile` and
 `python -m pip install --require-hashes -r requirements-evidence.txt` before validation. CI runs
 the same gate in `.github/workflows/ci.yml` on every push to `main` and every pull request.
 
-The default fast gate excludes `Category=LongRunning`. Use `-TestFilter` to narrow
-the suite or `-IncludeLongRunningTests` when that coverage is needed. Override
-`-MinimumExpectedTests` for a deliberately narrowed run; the default discovery floor
-is 98. The gate always runs the executable specification suite.
+Locally, run the gate only with `-TestFilter`, for the tests the change touches.
+The full gate runs in CI on every pull request and is never run locally
+(`AGENTS.md`, Commands). The default gate excludes `Category=LongRunning`;
+`-IncludeLongRunningTests` runs them, only when the user asks for it. Override
+`-MinimumExpectedTests` for a narrowed run; the default discovery floor is 98.
+The gate always runs the executable specification suite.
 
 After a normal run has restored packages, use `-NoRestore` to reuse that restore
 state. The build receives `--no-restore`; all checks and test selection still run.
