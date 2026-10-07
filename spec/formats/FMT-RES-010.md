@@ -95,7 +95,9 @@ read.
 
 - Does INST.EXE reach its read of `resource.cfg` when `INSTALL.BAT` starts it
   as `inst.exe -f`? Main reaches it unless one of the calls the object makes
-  first ends the run (FND-RES-044). (Q-RES-192)
+  first ends the run (FND-RES-044); along direct calls those end it only on
+  failures, and eleven indirect calls are not resolved (FND-RES-045).
+  (Q-RES-192)
 - How does the consumer interpret the `directory` value token? Its stored spelling
   alone does not establish its effect. (Q-RES-141)
 - How does the consumer interpret the `videoDrv` value token? Its stored spelling

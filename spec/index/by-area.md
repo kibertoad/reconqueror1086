@@ -586,6 +586,7 @@ Entries by area.
 | [FND-RES-042](../findings/FND-RES-042.md) | CONFIG.EXE reads a word at the start of a line followed by a colon as a label, echoes @DISPLAY text to the screen, and stops at any other bare word | recorded |
 | [FND-RES-043](../findings/FND-RES-043.md) | CONFIG.EXE's @GetOutDrive, @GetSubdir and @GetOption echo their block text to the screen like @Display | recorded |
 | [FND-RES-044](../findings/FND-RES-044.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case | recorded |
+| [FND-RES-045](../findings/FND-RES-045.md) | INST.EXE takes the switches M, Z, F and D from its command line and loads install.scr whole before it reads RESOURCE.CFG | recorded |
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |

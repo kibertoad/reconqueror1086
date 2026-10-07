@@ -336,7 +336,7 @@ Entries by kind.
 
 ## findings
 
-263 entries.
+264 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -495,6 +495,7 @@ Entries by kind.
 | [FND-RES-042](../findings/FND-RES-042.md) | CONFIG.EXE reads a word at the start of a line followed by a colon as a label, echoes @DISPLAY text to the screen, and stops at any other bare word | recorded |
 | [FND-RES-043](../findings/FND-RES-043.md) | CONFIG.EXE's @GetOutDrive, @GetSubdir and @GetOption echo their block text to the screen like @Display | recorded |
 | [FND-RES-044](../findings/FND-RES-044.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case | recorded |
+| [FND-RES-045](../findings/FND-RES-045.md) | INST.EXE takes the switches M, Z, F and D from its command line and loads install.scr whole before it reads RESOURCE.CFG | recorded |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |

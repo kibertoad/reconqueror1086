@@ -103,9 +103,12 @@ Next ID: Q-RES-193
   reconciliation.
 
 - Q-RES-192. FMT-RES-010: Does INST.EXE reach its read of `resource.cfg` when `INSTALL.BAT` starts it as `inst.exe -f`?
-  Settles it: read vtable entries +0x44, +0x50, +0x54, +0x2C and +0x08 of the
-  object at DS:55D8 and 263F:0504, as 20F3:029C calls them, for every path
-  that ends the run with the arguments `-f`. Blocks: Survey data-family reconciliation.
+  Settles it: resolve the eleven indirect calls FND-RES-045 lists in the
+  callees of 20F3:029C before 20F3:03D6, and read each target for paths that
+  end the run with the arguments `-f`. Blocks: Survey data-family reconciliation.
+  Tried: FND-RES-045 reads the command line (+0x44) and the script load
+  (+0x54) and walks the direct calls of all six callees; along direct calls
+  the run ends only on failures, but the indirect calls are not followed.
 
 - Q-RES-141. FMT-RES-010: How does the consumer interpret the directory value token?
   Settles it: trace this key through value parsing and every relevant consumer use.
@@ -295,6 +298,8 @@ Next ID: Q-RES-193
   Settles it: inspect bounded file signatures and the relevant readers; record the
   parsing syntax or field layout, splitting the entry if the files differ before
   making claims about them. Blocks: Survey data-family reconciliation.
+  Tried: FND-RES-045 finds that INST.EXE loads `install.scr` whole, as text,
+  into the buffer at DS:534A; the code that interprets the buffer is not read.
 
 - Q-RES-020. FMT-RES-018: What layout, if any, is shared by these listed candidates?
   Settles it: inspect bounded file signatures and the relevant readers; record the
