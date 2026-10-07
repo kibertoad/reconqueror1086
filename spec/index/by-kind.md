@@ -336,7 +336,7 @@ Entries by kind.
 
 ## findings
 
-269 entries.
+270 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -501,6 +501,7 @@ Entries by kind.
 | [FND-RES-048](../findings/FND-RES-048.md) | INSTALL.SCR's if command in INST.EXE tests errorlevel or exist, with an optional not, and resumes the raw line at the expanded command's offset | recorded |
 | [FND-RES-049](../findings/FND-RES-049.md) | INSTALL.SCR's copy command in INST.EXE extracts from drivers.sip and sierra.sip beside the source, then copies matching files, with /q, /s and a + concatenation form | recorded |
 | [FND-RES-050](../findings/FND-RES-050.md) | INST.EXE runs INSTALL.SCR from vtable entry +0x5C after two installer checks, and one choice of the shipped script's menu misses its label | recorded |
+| [FND-RES-051](../findings/FND-RES-051.md) | INST.EXE runs an unknown INSTALL.SCR line through spawn with one argument string, then the command interpreter, with standard output redirected for > and >> | recorded |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |

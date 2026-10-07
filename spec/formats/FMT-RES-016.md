@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-RES-045, FND-RES-046, FND-RES-047, FND-RES-048, FND-RES-049, FND-RES-050]
+evidence: [FND-RES-045, FND-RES-046, FND-RES-047, FND-RES-048, FND-RES-049, FND-RES-050, FND-RES-051]
 conflicting: []
 split_with: []
 related: []
@@ -67,10 +67,16 @@ own line at the place where the command began in the expanded line, so a
 parameter before the command whose value is not exactly two characters long
 moves that place [FND-RES-048].
 
-A first word that is none of these passes the whole line to a program
-runner, whose reading is open (Q-RES-198). When the runner reports one of its
-three errors, a message box offers Enter to go on; any other key leaves the
-installer.
+A first word that is none of these runs the line as a DOS program
+[FND-RES-051]. A `>` sends the program's standard output to the named file,
+deleted and created anew, and `>>` appends to it; with `>>` the file must
+already exist. The program name ends at the first `/`, space, tab or LF, and
+the rest of the line, trimmed, is its one argument string. When the program
+cannot be started, the line without its redirection goes to the command
+interpreter. `if errorlevel` sees the program's exit code, or -1 after the
+command interpreter. When the redirection cannot be set up or undone, or the
+command interpreter reports failure, a message box offers Enter to go on;
+any other key leaves the installer.
 
 `goto` takes its argument's first word. It jumps to just after the first
 recorded label whose name starts with that word, comparing case. When none
@@ -92,21 +98,24 @@ FND-RES-046 counts the shipped file's lines: every first word is a comment,
 a label, an empty line or one of `echo`, `end`, `clear`, `godir`, `alert`,
 `copy`, `goto`, `space`, `pick` and `pause`, apart from two lines holding only
 0x1A, the second without a line end, which follow an `end`. The file uses
-`%1` to `%4` and `%%`. FND-RES-046 reads the run loop, the parameter setup,
-the expansion, the dispatch and the routines for comments, `echo`, `pause`,
-`goto`, `end`, `clear` and `cls`; FND-RES-047 reads `alert`, `space`,
-`pick`, `godir`, `exists`, `testdir` and `del`, FND-RES-048 reads `if`,
-and FND-RES-049 reads `copy`. FND-RES-050 follows every route through the
-shipped script: each reaches `end` or an `alert` box, except the menu's
-third choice, which names no label exactly (BUG-RES-001). The archive routines `copy` calls are not read;
-the build has no `.SIP` file for them to open. The program runner behind unknown words, the message lookup and
-the window routines are not read, and neither are several run-time routines
-the commands call, such as the key read and the find-next.
+`%1` to `%4` and `%%`.
+
+FND-RES-046 reads the run loop, the parameter setup, the expansion, the
+dispatch and the routines for comments, `echo`, `pause`, `goto`, `end`,
+`clear` and `cls`. FND-RES-047 reads `alert`, `space`, `pick`, `godir`,
+`exists`, `testdir` and `del`, FND-RES-048 reads `if`, FND-RES-049 reads
+`copy` and FND-RES-051 reads the program runner. FND-RES-050 follows every
+route through the shipped script: each reaches `end` or an `alert` box,
+except the menu's third choice, which names no label exactly (BUG-RES-001).
+
+Not read: the archive routines `copy` calls (the build has no `.SIP` file
+for them to open), the message lookup, the window routines, and the
+run-time routines named in those findings as not read, such as the spawn,
+the command interpreter call, the handle duplication, the key read and the
+find-next.
 
 ## Open questions
 
-- How does the program runner behind unknown words split the program from its
-  arguments, and which DOS call runs it? (Q-RES-198)
 - Which installer fields give `%1` to `%7`, and what values do they hold
   when the script runs? (Q-RES-199)
 - What do the installer's checks before the script (vtable entries +0x10

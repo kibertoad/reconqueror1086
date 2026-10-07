@@ -297,9 +297,6 @@ Next ID: Q-RES-204
   or keeps it compressed inside another file; take this up again only with
   such a lead.
 
-- Q-RES-198. FMT-RES-016: How does INST.EXE's program runner split an unknown INSTALL.SCR line into program, arguments and redirection, and which DOS call runs it?
-  Settles it: read the first entry of the vtable at DS:1202 (2DDA:000A) with 1000:3EEE and 1000:3F69, and every result it returns. Blocks: Survey data-family reconciliation.
-
 - Q-RES-199. FMT-RES-016: Which values do INSTALL.SCR's parameters `%1` to `%7` hold when the script runs?
   Settles it: trace every write to the object fields +0x1E6, +0x23E, +0x1DE, +0x194, +0x1AA and +0x1AE and to DS:5557 before vtable entry +0x30 is called. Blocks: Survey data-family reconciliation.
   Tried: FND-RES-047 finds that `space` writes the free megabytes into +0x1AE
