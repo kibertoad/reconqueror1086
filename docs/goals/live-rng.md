@@ -49,15 +49,20 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
   VALIDATION.md. No full-game or actual rebuild replay gate has passed.
 - Unfinished: complete rule ownership, full-game recording/replay, prescribed
   observable gameplay state, and upstream/shared-helper proposal. No WIP branch.
-- Screen-loader entry verification passed on both debugger builds. No original
-  probe remains running and no run lock is held. Quiet structured and portable
+- Screen-loader entry verification passed on both debugger builds. An owned
+  quiet animation-off startup-checkpoint probe remains running with the machine
+  lock held; preserve and observe its existing operation before another run.
+  Quiet structured and portable
   synthetic controls and a bounded quiet native startup recording passed.
   A guarded quiet loaded-return attempt ended at an explicit diagnostic pause;
   its incomplete journal and local snapshot are retained. Loaded-screen-return
   verification remains unfinished. Probes default to
   quiet output; audio is enabled only for an explicit sound investigation.
 - Blockers: none established. RUNTIME.md is the current capability assessment.
-- Next: trace the original-input boundary in the latest quiet loaded-return
+- Next: observe the active startup-checkpoint probe and verify whether a
+  candidate RNG entry was reached before interpreting startup progress.
+  The read-only boundary instrumentation and 23 safety checks passed.
+  Then trace the original-input boundary in the latest quiet loaded-return
   diagnostic before another recorded run. The explicit animation-off control
   and guest configuration verification are documented in VALIDATION.md; the
   screen-loading boundary remains unverified. Follow the startup path from
