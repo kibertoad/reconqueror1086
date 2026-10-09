@@ -1,5 +1,9 @@
 # Reusable DOSBox-X instrumentation helpers
 
+Published after duplicate checking as
+[toolkit issue #403](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/403).
+No shared package has been extracted or adopted yet.
+
 Reconqueror has verified structured debugger transport, owned runtime lifecycle,
 live mapping and a guarded startup-input/screen-return probe. The commands and
 limits are in [RUNTIME.md](RUNTIME.md), with dated checks in
