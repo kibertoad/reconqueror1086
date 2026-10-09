@@ -49,34 +49,23 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
   VALIDATION.md. No full-game or actual rebuild replay gate has passed.
 - Unfinished: complete rule ownership, full-game recording/replay, prescribed
   observable gameplay state, and upstream/shared-helper proposal. No WIP branch.
-- Screen-loader entry verification passed on both debugger builds. An owned
-  quiet animation-off extraction-checkpoint probe remains running with the machine
-  lock held; preserve and observe its existing operation before another run.
-  Quiet structured and portable
-  synthetic controls and a bounded quiet native startup recording passed.
-  A guarded quiet loaded-return attempt ended at an explicit diagnostic pause;
-  its incomplete journal and local snapshot are retained. Loaded-screen-return
-  verification remains unfinished. Probes default to
-  quiet output; audio is enabled only for an explicit sound investigation.
+- Screen-loader entry verification passed on both debugger builds. The previous
+  extraction-checkpoint probe ended at an explicit diagnostic pause; its owned
+  processes and lock were cleaned up. Its durable completed prefix matches
+  its incomplete final journal and numeric replay.
+- A fresh owned quiet startup-click verification probe is running with the
+  machine lock held. Preserve its existing operation. It uses fixed cycles
+  1000, disabled animations, startup checkpoints and eager controller imports;
+  local source fingerprints identify the code loaded before launch.
+- Guarded supported-state pointer input has synthetic validation, but original
+  verification and loaded-screen return remain unfinished. FND-UI-019 and
+  FND-BATTLE-023 support the input wait and queue fields. Audio is enabled only
+  for an explicit sound investigation.
 - Blockers: none established. RUNTIME.md is the current capability assessment.
-- Next: observe the active startup-checkpoint probe and verify whether a
-  candidate RNG entry was reached before interpreting startup progress.
-  The read-only boundary, extraction and expanded caller-policy safety checks passed.
-  The preceding diagnostic confirmed the initial seed was reached; its completed
-  prefix and incomplete final journal agree. Preserve the current extraction
-  probe while taking independent static RNG ownership work.
-  Its archive extraction returns and preparation entry are now observed;
-  screen return remains unverified. The running process predates the latest
-  RULE-SOUND-002 and RULE-ASSAULT-023 policy additions; preserve it rather than
-  expecting edits to change its loaded Python modules.
-  Then trace the original-input boundary in the latest quiet loaded-return
-  diagnostic before another recorded run. The explicit animation-off control
-  and guest configuration verification are documented in VALIDATION.md; the
-  screen-loading boundary remains unverified. Follow the startup path from
-  FND-MEDIA-009 with that controlled configuration before another live attempt.
-  FND-BATTLE-023 records the current pointer input provenance; use the
-  current glossary when adding supported input state.
-  Verify heap-object identity from FND-UI-017 before gameplay writes.
+- Next: observe the active probe for the guarded startup click and subsequent
+  checkpoints or screen return. Verify heap-object identity from FND-UI-017
+  before gameplay writes. Complete rule ownership and full-game replay remain
+  necessary even if this startup boundary succeeds.
 - Q-STRATEGY-043 / RULE-STRATEGY-012: complete the downstream
   consumer review from FND-STRATEGY-043/044/045/046 and resolve the disputed rule.
   Its directly read bound is accepted by tools/native_rng_recorder.py; the
