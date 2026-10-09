@@ -841,6 +841,14 @@ writer closes, and an existing capture cannot be overwritten or appended.
 The native recorder's seven synthetic boundary checks also passed with this
 writer integrated. These checks do not establish full-game recording.
 
+The no-heavy pinned debugger completed the isolated native startup probe in
+artifacts/runtime-tools/native-rng-no-heavy-20261010-a. Its journal contains
+one seed, thirty RULE-PERSON-002 draws and one RULE-STRATEGY-012 draw, followed
+by the screen-loader entry boundary. The address-free event sequence passed
+tools/rng_journal.py replay against its recorded final RNG state. The owned
+emulator and run lock were cleaned up. This verifies the startup recording
+path only; full-game and accepted-caller completeness remain false.
+
 The loaded-screen-return transport added after FND-UI-017 passed seven
 synthetic cases in tools/test_native_rng_recorder.py. The checks reject null
 record pointers, a wrong screen-object identity and an unrecorded RNG-state

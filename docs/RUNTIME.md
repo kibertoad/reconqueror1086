@@ -119,8 +119,9 @@ uses the installed Visual Studio 2019 Build Tools and Windows SDK:
 The executable is under `bin/x64/Agent Debug SDL2/`.
 For an experimental alternate build, replace the configuration with
 `Agent Debug No Heavy SDL2` and select it using `--debugger-build no-heavy`.
-This configuration has compiled successfully; original-run verification remains
-pending. It lacks CPU tracing and memory-change breakpoints. The probe rejects
+This configuration has compiled successfully and passed a native startup probe
+through the initial screen-loader entry (see docs/VALIDATION.md). It lacks CPU
+tracing and memory-change breakpoints. The probe rejects
 CPU tracing with this selection and records the selected executable hash in
 its local debugger-build.json. The default remains the verified heavy build.
 New structured sessions also save capabilities.json and session-identity.json
