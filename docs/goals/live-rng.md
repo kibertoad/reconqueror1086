@@ -48,12 +48,16 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
   VALIDATION.md. No full-game or actual rebuild replay gate has passed.
 - Unfinished: complete rule ownership, full-game recording/replay, prescribed
   observable gameplay state, and upstream/shared-helper proposal. No WIP branch.
-- Screen-loader entry verification passed and its owned process/lock cleanup
-  completed. No original probe remains active. The no-heavy debugger build
-  completed; its original verification is pending. The probe selects and records
-  debugger build identity; its default remains heavy until alternate verification.
+- Screen-loader entry verification passed on the heavy build. The alternate
+  build is now running in exec session 86992, Python PID 4020, DOSBox-X PID
+  34628. Poll that same handle before another original run; observation expiry
+  is not termination. Its reported feature set matches no-heavy. The new
+  loaded-screen-return probe has passed synthetic checks but awaits native use.
 - Blockers: none established. RUNTIME.md is the current capability assessment.
-- Next: Q-STRATEGY-043 / RULE-STRATEGY-012, complete the downstream
+- Next: finish alternate-build verification, then run the guarded
+  loaded-screen-return probe from FND-UI-017 and verify heap-object identity
+  before attempting supported-state writes or gameplay input.
+- Q-STRATEGY-043 / RULE-STRATEGY-012: complete the downstream
   consumer review from FND-STRATEGY-043/044/045 and resolve the disputed rule.
   Its directly read bound is accepted by tools/native_rng_recorder.py; the
   extended native case is documented in VALIDATION.md.
