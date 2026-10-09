@@ -38,13 +38,16 @@ None known.
   All five converted inventories pass the shared canonical reader and the new
   Check-Coverage.mjs sidecar/body-intersection validation.
 - Documentation gate on the current unfinished conversion FAILS on legacy range
-  ends. Audit-RangeEnds.mjs reports all candidates without the checker diagnostic
-  cap. artifacts/coverage-migration/range-end-audit.json is the local review set:
-  complete-body candidates need a finding recording their extents and intended
-  scope review; other candidates need the entry's own last-item/size evidence,
-  or whole-entry supersession. Do not blindly increment every flagged endpoint.
+  ends. Audit-RangeEnds.mjs reports all candidates without the diagnostic cap;
+  its ignored report is the review set. Remaining candidates need intended-scope
+  review, the entry's own last-item/size evidence, or whole-entry supersession.
+  Grouped function extents are review hints only. Do not increment every end.
 - Uncommitted migration work: five canonical start/size/ranges inventories, ten
-  provenance/regions sidecars, and the replacement tools/Check-Coverage.mjs.
+  provenance/regions sidecars, the replacement tools/Check-Coverage.mjs,
+  the new extent finding and the notation conversions citing it. Conversion helpers and
+  ExportBoundaryMetadata.java are uncommitted, as are coverage/tool guidance
+  and regenerated spec indexes. The draft finding approaches its line limit;
+  put additional extents in a separately allocated finding.
   Keep these together with their evidence corrections for final validation.
   .claude/settings.json was already untracked and remains unrelated.
 - Raw exports and adoption contracts: artifacts/coverage-migration/{le,pe,ne,
@@ -57,9 +60,11 @@ None known.
   suffix -stable; source/mapping qualifications and boundary changes still need
   documentation in coverage/README.md. Historical size-only bodies cannot prove
   that their start-plus-size interval was contiguous.
-- Remote branches were fetched and open PR heads checked on 2026-10-09 before
-  the next new finding. Recheck the proposed ID across every origin ref before
-  allocating it; no migration finding ID has yet been taken.
+- Origin refs were fetched on 2026-10-09. The new RES extent finding is a draft;
+  its next sequential ID was checked unused but has not been allocated.
+  Recheck IDs before taking additional findings. LE project digest remained
+  unchanged after the metadata-only boundary probe. All six conversion tests
+  and all five native inventory/sidecar checks pass on the unfinished tree.
 - Next: record verified native function extents and review/correct legacy ends;
   reconcile ambiguous candidates without changing evidence claims silently;
   update coverage/caller documentation and remove obsolete metadata paths;
