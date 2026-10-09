@@ -30,13 +30,15 @@ class EventLog:
 
 
 def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen=False, stop_after_screen=False,
-           startup_checkpoints=False, startup_click=False):
+           startup_checkpoints=False, startup_click=False, continue_after_screen=False):
     if stop_at_screen and stop_after_screen:
         raise ValueError('Choose one screen diagnostic boundary')
     if startup_checkpoints and not stop_after_screen:
         raise ValueError('Startup checkpoints require the loaded-screen diagnostic')
     if startup_click and not startup_checkpoints:
         raise ValueError('Startup click requires verified startup checkpoints')
+    if continue_after_screen and not stop_after_screen:
+        raise ValueError('Continuation requires a verified loaded-screen boundary')
     if type(maximum_draws) is not int or not 1 <= maximum_draws <= 100000:
         raise ValueError('Invalid recording draw limit')
     output = Path(output)
@@ -223,6 +225,21 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                 report['screen_observation'] = {'record_pointer': pointer, 'object_pointer': object_pointer,
                                                 'screen_id': screen_id, 'history': history}
                 screen_frame = None
+                if continue_after_screen:
+                    (output / 'screen-load-checkpoint.json').write_text(
+                        json.dumps({'request': report['screen_request'],
+                                    'observation': report['screen_observation'],
+                                    'rng_state': report['end_rng_state']}, indent=2) + '\n')
+                    # These are one-time startup observations, not policies for
+                    # subsequent screen transitions or archive requests.
+                    for hook_id, hook_kind in list(hooks.items()):
+                        if hook_kind in ('screen-entry', 'screen-return', 'startup-checkpoint',
+                                         'archive-entry', 'archive-return'):
+                            runtime.agent.delete_breakpoint(runtime.session.id, hook_id)
+                            del hooks[hook_id]
+                    report['status'] = 'incomplete'
+                    runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
+                    continue
                 return report
             if kind == 'screen-entry':
                 if pc not in (0x595c0, 0x596c0) or frame is not None:

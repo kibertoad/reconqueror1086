@@ -216,7 +216,7 @@ and unsuitable timing, exercise unsigned release-gap wrap, reject a running
 guest and detect readback divergence. Integration permits the click only at
 the exact preparation wait and rejects a different callback before writing.
 These tests do not establish physical input delivery or an original screen
-transition. Original verification of this option remains pending.
+transition. The original verification below covers the controlled startup boundary.
 
 The preceding extraction-checkpoint run was ended by an explicit diagnostic
 pause and cleaned up, including its owned machine lock. Its 32 completed
@@ -225,10 +225,27 @@ replay ends at state 4153690744. Seven archive extraction entry/return pairs
 and preparation entry were observed. The final journal remains incomplete;
 neither loaded-screen return nor full-game replay was established.
 
-A fresh quiet startup-click verification run uses fixed cycles 1000, disabled
-animations and startup checkpoints. Its configuration and authored-controller
-SHA-256 fingerprints are retained locally. It is still an in-progress probe,
-not a passing original-input verification.
+The quiet startup-click run `native-rng-supported-startup-click-20261010-a`
+passed the preparation checkpoints and guarded initial screen-loading return.
+It used fixed cycles 1000, disabled animations and one supported-state short
+click at the verified preparation wait. Its initial seed was 895806914;
+32 completed seed/draw events match the durable event log exactly, and numeric
+replay ends at state 994841325. The loaded screen identifier and history head
+both matched requested screen zero. All pending-operation flags were false.
+The owned emulator exited and its lock was released. The configuration and
+controller fingerprints remain local; every fingerprint matched its authored
+source at verification. This verifies the debugger-controlled startup input
+and return, not physical mouse delivery, full-game coverage or rebuild replay.
+A second same-configuration run with a fresh seed is in progress.
+
+2026-10-10: 39 pointer-input, recorder, journal, event-log and mapping tests
+passed after adding continuation beyond the guarded initial screen return.
+The new synthetic continuation case removes only startup diagnostic hooks,
+resumes recording, and rejects an unknown raw caller before a draw. Its final
+journal retains the loaded-screen observation while remaining incomplete.
+Continuation without a loaded-screen guard is rejected. The first sandboxed
+attempt failed on temporary-directory permissions; the authorized rerun passed.
+Original continuation beyond startup has not yet been verified.
 
 2026-10-10: native caller policy checks passed 29 recorder, journal,
 durable-event-log and mapping tests. The new synthetic cases record the

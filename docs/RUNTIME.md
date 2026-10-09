@@ -239,8 +239,18 @@ rejects an unrecorded RNG-state change or unregistered screen number.
 `--stop-after-screen` instead follows the initial loader to its return
 (FND-UI-017). It checks the returned record, screen-object identifier
 (FND-UI-002), history head and recorded RNG state, rejecting recursive loading
-or an invalid pointer. This mode is synthetically checked but awaits native
-verification. It does not establish input readiness or full-game completeness.
+or an invalid pointer. A quiet native startup-click run verified this return
+and its screen identity/history guards (see VALIDATION.md). It does not
+establish physical input delivery or full-game completeness.
+
+Add `--continue-after-screen` to retain that initial loaded-screen guard and
+then continue RNG recording. After a valid return, the recorder writes local
+`screen-load-checkpoint.json`, removes the one-time screen, preparation and
+extraction breakpoints, and resumes with its seed/draw policies still active.
+Unknown callers still stop before their state write. The final journal stays
+incomplete unless the bounded draw limit is reached; that limit also makes no
+full-game completeness claim. This continuation has synthetic validation;
+original gameplay beyond the initial screen still requires verification.
 
 ### Operating and interpreting a probe
 
@@ -287,8 +297,15 @@ use expected hashes, publish the count last and require matching readback.
 The one-shot wait breakpoint is removed after that input. The local
 `supported-input.json` records the prescribed click without original addresses.
 This is debugger-controlled queue input, not verification of a physical mouse
-or Windows input delivery. Its synthetic checks passed; an original run using
-this option still needs to verify the resulting preparation and screen returns.
+or Windows input delivery. A native run verified the queued click, preparation
+checkpoints and guarded screen return without an unrecorded RNG-state change.
+Repeat the controlled startup probe with a fresh output directory:
+
+```powershell
+$env:GAME_DIR = 'C:/GOG Games/Conqueror AD1086'
+python -u -B tools/Probe-LiveMapping.py --output artifacts/runtime-tools/startup-click-fresh --samples 8 --observation-ms 1000 --rng-break --cycles 1000 --record-native --record-draw-limit 1000 --stop-after-screen --debugger-build no-heavy --animations-off --startup-checkpoints --startup-click
+```
+
 The probe imports its recorder and input helper before starting the guest and
 writes their authored-source hashes in local `probe-source.json`. Later source
 edits do not change those loaded modules. A traceback may display lines from an

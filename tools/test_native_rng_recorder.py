@@ -1,5 +1,6 @@
 """Synthetic native stops using FND-RNG-003 and FND-UI-001 entry identities."""
 from types import SimpleNamespace
+import json
 import unittest
 from unittest.mock import Mock, patch
 from native_rng_recorder import record
@@ -49,6 +50,43 @@ def runtime_and_mapping(screen_state=123, screen_number=0, record_pointer=0x3000
 
 
 class ScreenBoundaryTests(unittest.TestCase):
+    def test_continuation_requires_the_loaded_screen_guard(self):
+        with self.assertRaisesRegex(ValueError, 'verified loaded-screen boundary'):
+            record(None, None, (), 'unused-output', continue_after_screen=True)
+
+    def test_loaded_screen_continuation_preserves_unknown_draw_rejection(self):
+        runtime, mapping = runtime_and_mapping()
+        original_wait, original_registers = runtime.wait_until_stopped, runtime.registers
+        def wait(operation):
+            if runtime.phase == 3:
+                runtime.phase = 4
+                runtime.session.stop_reason.breakpoint_id = 'draw'
+            else:
+                original_wait(operation)
+        def registers():
+            if runtime.phase == 4:
+                return SimpleNamespace(general={'esp': '0x1000'},
+                                       segments={'cs': '0x180', 'ds': '0x188', 'ss': '0x188'},
+                                       cpu_mode='protected', instruction_pointer=hex(0x6b3f1))
+            return original_registers()
+        runtime.wait_until_stopped, runtime.registers = wait, registers
+        with patch('native_rng_recorder.tables_from_diagnostic', return_value=(0, 16)), \
+             patch('native_rng_recorder.descriptor', side_effect=[mapping.code, mapping.data] * 8), \
+             patch('native_rng_recorder.EventLog'), \
+             patch('native_rng_recorder.Path.write_text') as writes:
+            with self.assertRaisesRegex(RecordingError, 'Unowned raw'):
+                record(runtime, mapping, ('draw', 'seed'), 'unused-output',
+                       stop_after_screen=True, continue_after_screen=True)
+        self.assertEqual(runtime.phase, 4)
+        self.assertEqual({call.args[1] for call in runtime.agent.delete_breakpoint.call_args_list},
+                         {'hook-595c0', 'hook-5965f'})
+        final = json.loads(writes.call_args.args[0])
+        self.assertEqual(final['status'], 'incomplete')
+        self.assertEqual(final['screen_observation']['screen_id'], 0)
+        self.assertFalse(final['full_game_complete'])
+        self.assertFalse(final['pending_screen_load'])
+        self.assertEqual(len(final['events']), 1)
+
     def startup_sequence(self, corrupt_stack=False, extraction=False, corrupt_archive=False,
                          startup_click=False, wrong_callback=False):
         runtime, mapping = runtime_and_mapping()
