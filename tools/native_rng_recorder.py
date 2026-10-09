@@ -29,11 +29,13 @@ class EventLog:
 
 
 def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen=False, stop_after_screen=False,
-           startup_checkpoints=False):
+           startup_checkpoints=False, startup_click=False):
     if stop_at_screen and stop_after_screen:
         raise ValueError('Choose one screen diagnostic boundary')
     if startup_checkpoints and not stop_after_screen:
         raise ValueError('Startup checkpoints require the loaded-screen diagnostic')
+    if startup_click and not startup_checkpoints:
+        raise ValueError('Startup click requires verified startup checkpoints')
     if type(maximum_draws) is not int or not 1 <= maximum_draws <= 100000:
         raise ValueError('Invalid recording draw limit')
     output = Path(output)
@@ -71,6 +73,10 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         selector, offset = mapping.code_address(address)
         hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
         hooks[hook.id] = name
+    if startup_click:
+        selector, offset = mapping.code_address(0x5b790)  # FND-UI-019
+        hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
+        hooks[hook.id] = 'startup-wait'
     controls = []
     code_ranges = [(0x6b3eb, 0x6b423), (0x24c38, 0x24c4c), (0x1a14c, 0x1a1ef), (0x43670, 0x436e0)]
     code_ranges.extend(((0x445b4, 0x445c2), (0x4f2ac, 0x4f2d6), (0x5b418, 0x5b470)))
@@ -82,6 +88,10 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
     if startup_checkpoints:
         code_ranges.append((0x2ac08, 0x2ad5b))  # FND-UI-018
         code_ranges.append((0x49ba8, 0x49c79))  # FND-SAVE-003
+    if startup_click:
+        # FND-UI-019 / FND-BATTLE-023: input boundary and queue consumers.
+        code_ranges.extend(((0x5b790, 0x5b7bd), (0x5bb34, 0x5bb49),
+                            (0x24d14, 0x24d54), (0x63098, 0x63102), (0x63114, 0x63267)))
     for start, end in code_ranges:
         selector, offset = mapping.code_address(start, end - start)
         address = runtime.MemoryAddress.segmented(selector, offset)
@@ -124,6 +134,28 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
             stack_pointer = int(registers.general['esp'], 16)
             key = (int(registers.segments['ss'], 16), stack_pointer)
             kind = hooks[stop.breakpoint_id]
+            if kind == 'startup-wait':
+                if pc != 0x5b790 or frame is not None or archive_key is not None or screen_frame is not None or startup_key is None:
+                    raise RecordingError('Startup input boundary/frame mismatch')
+                if key != (startup_key[0], startup_key[1] - 104):
+                    raise RecordingError('Startup wait stack differs from its supported caller')
+                arguments = runtime.read(runtime.MemoryAddress.segmented(key[0], key[1]), 12)
+                words = [int.from_bytes(arguments[i:i + 4], 'little') for i in (0, 4, 8)]
+                if canonical_return(words[0]) != 0x2ac61 or words[1] != 6144 or words[2] != mapping.code_address(0x5bb34)[1]:
+                    raise RecordingError('Startup wait arguments differ from their supported reading')
+                current_state = journal.complete()
+                if state() != current_state or replay(journal.events) != current_state:
+                    raise RecordingError('Startup input RNG state differs before supported writes')
+                from supported_pointer_input import queue_primary_click
+                observation = queue_primary_click(runtime, mapping)
+                report.setdefault('supported_input', []).append(observation)
+                (output / 'supported-input.json').write_text(json.dumps(report['supported_input'], indent=2))
+                if state() != current_state:
+                    raise RecordingError('RNG state changed during supported pointer writes')
+                runtime.agent.delete_breakpoint(runtime.session.id, stop.breakpoint_id)
+                del hooks[stop.breakpoint_id]
+                runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
+                continue
             if kind in ('archive-entry', 'archive-return'):
                 if frame is not None:
                     raise RecordingError('Archive checkpoint overlaps a pending recorded operation')

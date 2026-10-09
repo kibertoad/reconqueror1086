@@ -29,6 +29,8 @@ def main():
     parser.add_argument('--stop-after-screen', action='store_true')
     parser.add_argument('--startup-checkpoints', action='store_true',
                         help='Read and continue through verified preparation boundaries before screen loading')
+    parser.add_argument('--startup-click', action='store_true',
+                        help='Queue one supported-state short click at the verified preparation wait')
     parser.add_argument('--record-draw-limit', type=int, default=30)
     parser.add_argument('--animations-off', action='store_true',
                         help='Set the supported ANIMATIONS switch OFF in the private INI')
@@ -41,6 +43,8 @@ def main():
         raise ValueError('Choose one screen diagnostic boundary')
     if args.startup_checkpoints and not args.stop_after_screen:
         raise ValueError('Startup checkpoints require --stop-after-screen')
+    if args.startup_click and not args.startup_checkpoints:
+        raise ValueError('Startup click requires --startup-checkpoints')
     if args.trace_loader and args.debugger_build != 'heavy':
         raise ValueError('CPU tracing requires the heavy debugger build')
     if args.draw_check and not args.seed_check:
@@ -84,7 +88,8 @@ def main():
     (drive / 'CONQUER.INI').write_text(ini)
     (root / 'probe-configuration.json').write_text(json.dumps({
         'movie': 'OFF', 'credits': 'OFF', 'animations_off': args.animations_off,
-        'sound_investigation': args.sound_investigation
+        'sound_investigation': args.sound_investigation,
+        'startup_checkpoints': args.startup_checkpoints, 'startup_click': args.startup_click
     }, indent=2))
     source = Path('artifacts/runtime-tools/dosbox-x-agent-source')
     configuration = 'Agent Debug SDL2' if args.debugger_build == 'heavy' else 'Agent Debug No Heavy SDL2'
@@ -154,7 +159,8 @@ def main():
                         from native_rng_recorder import record
                         native_recording_started = True
                         journal = record(runtime, live_map, ids, root, args.record_draw_limit,
-                                 args.stop_at_screen, args.stop_after_screen, args.startup_checkpoints)
+                                 args.stop_at_screen, args.stop_after_screen, args.startup_checkpoints,
+                                 args.startup_click)
                         print('native recording', journal['status'], 'events', len(journal['events']))
                         break
                     if args.record_startup_shifts and runtime.session.stop_reason.breakpoint_id != ids[1]:

@@ -209,6 +209,15 @@ including Kaitai compilation and base-branch comparison. Q-BATTLE-018 is closed.
 
 ## Local gate
 
+2026-10-10: supported pointer input and native boundary integration passed
+37 queue, recorder, journal, durable-event-log and mapping tests. Synthetic
+queue cases preserve unknown tails, publish count last, reject nonempty queues
+and unsuitable timing, exercise unsigned release-gap wrap, reject a running
+guest and detect readback divergence. Integration permits the click only at
+the exact preparation wait and rejects a different callback before writing.
+These tests do not establish physical input delivery or an original screen
+transition. The current original run predates this option and remains unchanged.
+
 2026-10-10: native caller policy checks passed 29 recorder, journal,
 durable-event-log and mapping tests. The new synthetic cases record the
 scaled hit-check result and the busy-voice remainder register, and reject

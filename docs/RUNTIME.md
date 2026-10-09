@@ -277,6 +277,19 @@ and the appropriate reduced-result register. Other scaled callers remain
 rejected. Synthetic verification of these policies does not establish that
 the corresponding original gameplay paths have been exercised.
 
+`--startup-click` requires `--startup-checkpoints --stop-after-screen`.
+At the exact preparation wait of FND-UI-019, the recorder verifies its caller,
+arguments, stack, original code and recorded RNG state. It then queues a
+supported-state primary press/release at (0, 0), using the observed pointer
+clock and the timing checks of RULE-BATTLE-012. Only the documented event
+fields and count change; both unknown record tails remain untouched. Writes
+use expected hashes, publish the count last and require matching readback.
+The one-shot wait breakpoint is removed after that input. The local
+`supported-input.json` records the prescribed click without original addresses.
+This is debugger-controlled queue input, not verification of a physical mouse
+or Windows input delivery. Its synthetic checks passed; an original run using
+this option still needs to verify the resulting preparation and screen returns.
+
 Do not replace this with `nosound=true` in the structured build: native and
 synthetic readiness attempts with that setting failed before the guest marker.
 The portable debugger's synthetic check passed with it, so that result alone

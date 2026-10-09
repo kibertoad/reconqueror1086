@@ -49,10 +49,21 @@ def runtime_and_mapping(screen_state=123, screen_number=0, record_pointer=0x3000
 
 
 class ScreenBoundaryTests(unittest.TestCase):
-    def startup_sequence(self, corrupt_stack=False, extraction=False, corrupt_archive=False):
+    def startup_sequence(self, corrupt_stack=False, extraction=False, corrupt_archive=False,
+                         startup_click=False, wrong_callback=False):
         runtime, mapping = runtime_and_mapping()
         pcs = (0x6b413, 0x6b422, 0x2ac08, 0x2ac86, 0x2ad54, 0x595c0, 0x5965f)  # FND-UI-018/017
         ids = ('seed', 'hook-6b422', 'hook-2ac08', 'hook-2ac86', 'hook-2ad54', 'hook-595c0', 'hook-5965f')
+        if startup_click:
+            pcs = pcs[:3] + (0x5b790,) + pcs[3:]  # FND-UI-019
+            ids = ids[:3] + ('hook-5b790',) + ids[3:]
+            original_read = runtime.read
+            def read(address, length):
+                if address == (0x188, 0x1000 - 104):
+                    return b''.join(word.to_bytes(4, 'little') for word in
+                                    (0x2ac61, 6144, 0 if wrong_callback else 0x5bb34))
+                return original_read(address, length)
+            runtime.read = read
         if extraction:
             pcs = pcs[:2] + (0x49ba8, 0x49c78) + pcs[2:]  # FND-SAVE-003
             ids = ids[:2] + ('hook-49ba8', 'hook-49c78') + ids[2:]
@@ -68,6 +79,8 @@ class ScreenBoundaryTests(unittest.TestCase):
                 result.general['esp'] = '0x1004'
             if pcs[saved_phase] in (0x2ac86, 0x2ad54):
                 result.general['esp'] = hex(0x1000 - (88 if corrupt_stack else 92))
+            elif pcs[saved_phase] == 0x5b790:
+                result.general['esp'] = hex(0x1000 - 104)
             return result
         runtime.registers = registers
         def wait(operation):
@@ -76,9 +89,19 @@ class ScreenBoundaryTests(unittest.TestCase):
         runtime.wait_until_stopped = wait
         with patch('native_rng_recorder.tables_from_diagnostic', return_value=(0, 16)), \
              patch('native_rng_recorder.descriptor', side_effect=[mapping.code, mapping.data] * len(pcs)), \
-             patch('native_rng_recorder.EventLog'), patch('native_rng_recorder.Path.write_text'):
-            return record(runtime, mapping, ('draw', 'seed'), 'unused-output',
-                          stop_after_screen=True, startup_checkpoints=True)
+             patch('native_rng_recorder.EventLog'), patch('native_rng_recorder.Path.write_text'), \
+             patch('supported_pointer_input.queue_primary_click', return_value={'action': 'primary-short-click'}) as click:
+            try:
+                result = record(runtime, mapping, ('draw', 'seed'), 'unused-output',
+                                stop_after_screen=True, startup_checkpoints=True, startup_click=startup_click)
+            except Exception:
+                if wrong_callback:
+                    click.assert_not_called()
+                raise
+            if startup_click:
+                click.assert_called_once_with(runtime, mapping)
+                runtime.agent.delete_breakpoint.assert_called_once_with('owned', 'hook-5b790')
+            return result
 
     def test_startup_checkpoints_continue_to_verified_screen(self):
         report = self.startup_sequence()
@@ -103,6 +126,16 @@ class ScreenBoundaryTests(unittest.TestCase):
     def test_archive_progress_rejects_wrong_return_frame(self):
         with self.assertRaisesRegex(RecordingError, 'Archive extraction return/frame mismatch'):
             self.startup_sequence(extraction=True, corrupt_archive=True)
+
+    def test_supported_click_only_runs_at_the_verified_startup_wait(self):
+        report = self.startup_sequence(startup_click=True)
+        self.assertEqual(report['supported_input'], [{'action': 'primary-short-click'}])
+        self.assertEqual(report['status'], 'screen-load-return-reached')
+        self.assertEqual(len(report['events']), 1)
+
+    def test_startup_click_rejects_a_different_callback_before_writing(self):
+        with self.assertRaisesRegex(RecordingError, 'Startup wait arguments differ'):
+            self.startup_sequence(startup_click=True, wrong_callback=True)
 
     def run_sequence(self, after=False, **options):
         runtime, mapping = runtime_and_mapping(**options)
