@@ -274,7 +274,7 @@ Its 32 completed events agree exactly between the durable log and incomplete
 final journal and replay to that state. No RNG, archive or screen-load operation
 was pending. Its emulator and lock were cleaned up. This is a sampled final
 state after title input, not observation of the replacement return instruction.
-The fresh options-return probe adds the latter guard and is in progress.
+The following options-return probe adds that instruction/frame guard.
 
 2026-10-10: 48 recorder and related safety tests passed after adding guarded
 new-game input. The synthetic sequence reaches initial title, options and
@@ -289,6 +289,15 @@ draws retain their respective rule IDs and verify inclusive bound 4/result 3.
 A changed bound or unknown return site is rejected before the draw. An initial
 test attempt exposed a syntax error in the changed policy branch; it was
 corrected before the passing run. No original dilemma traversal is claimed.
+
+2026-10-10: `native-rng-options-return-20261010-a` passed the guarded initial
+and replacement returns, with ordered screen identifiers 0 and 1. The final
+history was `[1, 0, -1, -1, -1]`. Its initial seed was 895807504; all 32
+completed events agree between durable log and final journal and numerically
+replay to state 1708486835. All pending-operation flags were false. The target
+return is deliberately incomplete for full-game coverage. The owned emulator
+and lock were cleaned up. The next quiet probe exercises New Game and targets
+character-options identity; its native result is still pending.
 
 2026-10-10: native caller policy checks passed 29 recorder, journal,
 durable-event-log and mapping tests. The new synthetic cases record the

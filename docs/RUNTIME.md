@@ -250,7 +250,7 @@ extraction breakpoints, and resumes with its seed/draw policies still active.
 Unknown callers still stop before their state write. The final journal stays
 incomplete unless the bounded draw limit is reached; that limit also makes no
 full-game completeness claim. This continuation has synthetic validation;
-original gameplay beyond the initial screen still requires verification.
+Traversal beyond game options still requires original verification.
 
 With continuation, `--title-click` queues one supported-state primary click
 at (10, 10) only after the verified initial screen identifier is zero.
@@ -258,8 +258,8 @@ SCR-UI-001 supports that full-screen title region. The same queue timing,
 hash and readback guards apply, and RNG state must remain unchanged.
 The controller records this input locally before resuming. This option has
 synthetic checks. A deliberately paused native continuation snapshot showed
-game-options identity/history after that input (VALIDATION.md); guarded
-replacement-return verification is a separate pending check.
+game-options identity/history after that input (VALIDATION.md). A subsequent
+native checkpoint run verified both initial and game-options return boundaries.
 
 `--screen-checkpoints` requires `--continue-after-screen`. It retains separate
 entry/return guards for initial loading and replacement (FND-UI-017/020), checks
@@ -269,7 +269,8 @@ Nested loading is rejected. The title input is queued only once, after the
 initial verified return; subsequent screen observations do not repeat it.
 Add `--stop-after-screen-id 1` to end on the verified game-options return.
 This target stop remains incomplete for full-game coverage. These guards have
-synthetic validation; native replacement-return verification is pending.
+synthetic validation and native initial/title-to-options return verification.
+Transitions beyond game options still require their own original checks.
 
 `--new-game-click` requires screen checkpoints. After the first verified
 game-options return it queues a primary click at (100, 350), inside region 3
