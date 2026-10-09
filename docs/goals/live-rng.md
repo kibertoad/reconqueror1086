@@ -52,11 +52,15 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
 - Screen-loader entry verification passed on both debugger builds. No original
   probe remains running and no run lock is held. Quiet structured and portable
   synthetic controls and a bounded quiet native startup recording passed.
-  Loaded-screen-return verification remains unfinished. Probes default to
+  A guarded quiet loaded-return attempt ended at an explicit diagnostic pause;
+  its incomplete journal and local snapshot are retained. Loaded-screen-return
+  verification remains unfinished. Probes default to
   quiet output; audio is enabled only for an explicit sound investigation.
 - Blockers: none established. RUNTIME.md is the current capability assessment.
-- Next: run the guarded quiet loaded-screen-return probe from FND-UI-017 and verify heap-object identity
-  before attempting supported-state writes or gameplay input.
+- Next: trace the original-input boundary in the latest quiet loaded-return
+  diagnostic before another recorded run. FND-BATTLE-023 records the current pointer input provenance; use the
+  current glossary when adding supported input state.
+  Verify heap-object identity from FND-UI-017 before gameplay writes.
 - Q-STRATEGY-043 / RULE-STRATEGY-012: complete the downstream
   consumer review from FND-STRATEGY-043/044/045/046 and resolve the disputed rule.
   Its directly read bound is accepted by tools/native_rng_recorder.py; the
