@@ -209,6 +209,18 @@ including Kaitai compilation and base-branch comparison. Q-BATTLE-018 is closed.
 
 ## Local gate
 
+2026-10-10: the explicit `--animations-off` option passed Python syntax/CLI
+checks, the 21 native-recorder, journal, durable-event-log and live-mapping
+checks, and the full documentation check including Kaitai compilation.
+The quiet native run `native-rng-quiet-animations-off-20261010-a` verified its
+initial map and recorded the startup prefix. A deliberate diagnostic pause
+ended the recording before the guarded screen entry/return. Its local capture
+confirmed configuration discovery selected `./CONQUER.INI`, with the three
+movie, credits and animation flags zero (FND-CONFIG-001, FND-SOUND-004).
+The journal remains incomplete; this does not establish screen readiness or
+full-game recording. The owned emulator exited and the machine lock was
+released. Captures and the configuration record remain local.
+
 `tools/Invoke-Validation.ps1` is the canonical local gate. `Run Tests.bat` discovers
 the SDK and delegates to it. The gate takes an exclusive checkout-specific lock
 and stops at the first failure:
