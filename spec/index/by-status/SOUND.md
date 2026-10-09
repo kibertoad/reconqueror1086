@@ -27,7 +27,7 @@ Entries by status.
 
 ## recorded
 
-6 entries.
+7 entries.
 
 | ID | Title |
 |---|---|
@@ -37,6 +37,7 @@ Entries by status.
 | [FND-SOUND-004](../../findings/FND-SOUND-004.md) | CONQUER.INI switches the sound systems and names an HMI SOS driver setup; the digital driver runs at 22,050 Hz |
 | [FND-SOUND-006](../../findings/FND-SOUND-006.md) | CD music plays tracks 2 to 6 of the disc through MSCDEX requests and loops by replaying the range |
 | [FND-SOUND-007](../../findings/FND-SOUND-007.md) | MIDI music plays one HMP song at a time through 0x0005B0D4; the release holds 12 songs |
+| [FND-SOUND-008](../../findings/FND-SOUND-008.md) | Busy-voice replacement reduces one generator result by the verified ten-voice loop count |
 
 ## Open questions
 

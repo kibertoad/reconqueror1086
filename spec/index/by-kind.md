@@ -343,7 +343,7 @@ Entries by kind.
 
 ## findings
 
-309 entries.
+310 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -551,6 +551,7 @@ Entries by kind.
 | [FND-SOUND-005](../findings/FND-SOUND-005.md) | MIDI music plays one HMP song at a time through 0x0005B0D4; the release holds 12 songs | superseded |
 | [FND-SOUND-006](../findings/FND-SOUND-006.md) | CD music plays tracks 2 to 6 of the disc through MSCDEX requests and loops by replaying the range | recorded |
 | [FND-SOUND-007](../findings/FND-SOUND-007.md) | MIDI music plays one HMP song at a time through 0x0005B0D4; the release holds 12 songs | recorded |
+| [FND-SOUND-008](../findings/FND-SOUND-008.md) | Busy-voice replacement reduces one generator result by the verified ten-voice loop count | recorded |
 | [FND-STRATEGY-001](../findings/FND-STRATEGY-001.md) | The strategic pass at 0x0003C290 runs brigands, the spy, the player forces and then the hostile pass | recorded |
 | [FND-STRATEGY-002](../findings/FND-STRATEGY-002.md) | Routine 0x0003B9F4 issues a brigand order or an order from the king | superseded |
 | [FND-STRATEGY-003](../findings/FND-STRATEGY-003.md) | The hostile pass at 0x0003C088 generates first, then moves slots 0 to 4 and resolves each arrival | recorded |

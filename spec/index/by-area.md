@@ -697,6 +697,7 @@ Entries by area.
 | [FND-SOUND-005](../findings/FND-SOUND-005.md) | MIDI music plays one HMP song at a time through 0x0005B0D4; the release holds 12 songs | superseded |
 | [FND-SOUND-006](../findings/FND-SOUND-006.md) | CD music plays tracks 2 to 6 of the disc through MSCDEX requests and loops by replaying the range | recorded |
 | [FND-SOUND-007](../findings/FND-SOUND-007.md) | MIDI music plays one HMP song at a time through 0x0005B0D4; the release holds 12 songs | recorded |
+| [FND-SOUND-008](../findings/FND-SOUND-008.md) | Busy-voice replacement reduces one generator result by the verified ten-voice loop count | recorded |
 | [RULE-SOUND-001](../rules/RULE-SOUND-001.md) | Loading and freeing a sound bank | supported |
 | [RULE-SOUND-002](../rules/RULE-SOUND-002.md) | Playing a sample | supported |
 | [RULE-SOUND-003](../rules/RULE-SOUND-003.md) | Starting the sound systems and playing MIDI music | supported |

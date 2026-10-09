@@ -4,7 +4,7 @@ title: Playing a sample
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-SOUND-003, FND-SOUND-004, FND-SOUND-002, FND-RNG-003]
+evidence: [FND-SOUND-003, FND-SOUND-004, FND-SOUND-002, FND-SOUND-008, FND-RNG-003]
 conflicting: []
 split_with: []
 related: [RULE-SOUND-001, RULE-RNG-001, FMT-SOUND-001]
