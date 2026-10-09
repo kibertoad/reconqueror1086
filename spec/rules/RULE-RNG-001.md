@@ -85,5 +85,9 @@ None known.
 
 ## Open questions
 
-- What `fn_0006B3B4` returns; it is likely the C library's `time`. If it is, two prompts drawn in
-  the same second get the same variant, and every draw after a prompt follows from the clock. (Q-RNG-001)
+- FND-RNG-005 shows that `fn_0006B3B4` reads DOS calendar time and rounds
+  seconds before conversion. A calendar epoch-seconds return remains plausible;
+  the month tables, adjustment helpers and their environment inputs must be read
+  before that interpretation is supported. EXP-RNG-001 does not settle those
+  dependencies. A raw tick/hundredths return is ruled out by FND-RNG-005.
+  (Q-RNG-001)

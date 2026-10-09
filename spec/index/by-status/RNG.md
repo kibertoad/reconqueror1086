@@ -22,7 +22,7 @@ Entries by status.
 
 ## recorded
 
-4 entries.
+5 entries.
 
 | ID | Title |
 |---|---|
@@ -30,6 +30,7 @@ Entries by status.
 | [FND-RNG-002](../../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-RNG-004](../../findings/FND-RNG-004.md) | Live LE relocations and native seed and draw stops identify the loaded RNG state |
+| [FND-RNG-005](../../findings/FND-RNG-005.md) | The seed source reads DOS calendar time and rounds its seconds before conversion |
 
 ## Open questions
 
