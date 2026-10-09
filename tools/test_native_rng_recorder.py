@@ -90,7 +90,7 @@ class ScreenBoundaryTests(unittest.TestCase):
         with patch('native_rng_recorder.tables_from_diagnostic', return_value=(0, 16)), \
              patch('native_rng_recorder.descriptor', side_effect=[mapping.code, mapping.data] * len(pcs)), \
              patch('native_rng_recorder.EventLog'), patch('native_rng_recorder.Path.write_text'), \
-             patch('supported_pointer_input.queue_primary_click', return_value={'action': 'primary-short-click'}) as click:
+             patch('native_rng_recorder.queue_primary_click', return_value={'action': 'primary-short-click'}) as click:
             try:
                 result = record(runtime, mapping, ('draw', 'seed'), 'unused-output',
                                 stop_after_screen=True, startup_checkpoints=True, startup_click=startup_click)

@@ -10,6 +10,7 @@ import shutil
 from dosbox_session import AgentRuntime, ObservationTimeout
 from emu.le_image import load_image
 from live_mapping import validate_snapshot
+from native_rng_recorder import record
 
 
 def main():
@@ -71,6 +72,13 @@ def main():
     if hashlib.sha256(executable.read_bytes()).hexdigest() != '5d7231758766204ad061e6b82cf2f0e0cbe28899b35d095f13e4aad75c8b79d6':
         raise RuntimeError('Wrong BLD-GOG-EN source identity')
     drive.mkdir(parents=True)
+    tool_names = ('Probe-LiveMapping.py', 'dosbox_session.py', 'live_mapping.py',
+                  'native_rng_recorder.py', 'rng_journal.py', 'rng_recording.py',
+                  'supported_pointer_input.py', 'emu/le_image.py')
+    (root / 'probe-source.json').write_text(json.dumps({
+        'tool_sha256': {name: hashlib.sha256((Path(__file__).parent / name).read_bytes()).hexdigest()
+                        for name in tool_names}
+    }, indent=2))
     for name in ('C1086.GOB', 'CONQUER.INI'):
         shutil.copyfile(installation / name, drive / name)
     shutil.copyfile(executable, drive / 'CONQUER.EXE')
@@ -156,7 +164,6 @@ def main():
                     (root / 'breakpoint-stack.bin').write_bytes(stack)
                     print('instrumented entry breakpoint hit', runtime.session.stop_reason)
                     if args.record_native:
-                        from native_rng_recorder import record
                         native_recording_started = True
                         journal = record(runtime, live_map, ids, root, args.record_draw_limit,
                                  args.stop_at_screen, args.stop_after_screen, args.startup_checkpoints,

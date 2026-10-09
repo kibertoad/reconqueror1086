@@ -289,6 +289,10 @@ The one-shot wait breakpoint is removed after that input. The local
 This is debugger-controlled queue input, not verification of a physical mouse
 or Windows input delivery. Its synthetic checks passed; an original run using
 this option still needs to verify the resulting preparation and screen returns.
+The probe imports its recorder and input helper before starting the guest and
+writes their authored-source hashes in local `probe-source.json`. Later source
+edits do not change those loaded modules. A traceback may display lines from an
+edited file, so use the run's hashes and its recorded state when diagnosing it.
 
 Do not replace this with `nosound=true` in the structured build: native and
 synthetic readiness attempts with that setting failed before the guest marker.

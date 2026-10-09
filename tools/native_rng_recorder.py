@@ -12,6 +12,7 @@ from pathlib import Path
 from rng_journal import Journal, replay
 from live_mapping import descriptor, tables_from_diagnostic
 from rng_recording import RecordingError, canonical_pc
+from supported_pointer_input import queue_primary_click
 
 
 class EventLog:
@@ -146,7 +147,6 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                 current_state = journal.complete()
                 if state() != current_state or replay(journal.events) != current_state:
                     raise RecordingError('Startup input RNG state differs before supported writes')
-                from supported_pointer_input import queue_primary_click
                 observation = queue_primary_click(runtime, mapping)
                 report.setdefault('supported_input', []).append(observation)
                 (output / 'supported-input.json').write_text(json.dumps(report['supported_input'], indent=2))
