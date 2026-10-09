@@ -9,7 +9,9 @@ Next ID: Q-STRATEGY-044
   shipped data, establish their extents and follow index 7 through every
   relevant consumer; resolve the bound-6 rule against FND-STRATEGY-043.
   Blocks: none. Tried: FND-STRATEGY-043 confirms argument provenance and the
-  unclamped store/read; table extent and endpoint semantics remain unread.
+  unclamped store/read. FND-STRATEGY-044 records nine consecutive person/route
+  pairs, including index 7; FND-STRATEGY-045 corrects the prior setup reading.
+  The full downstream consumer review remains unfinished.
 
 - Q-STRATEGY-001. BUG-STRATEGY-001: What the local holds at the start of a session? Settles it:
   trace the cited path and its callers through the boundary case; distinguish executable

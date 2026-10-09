@@ -9,7 +9,7 @@ byte_order: little
 size: 18
 text: false
 definition: fmt_strategy_003.ksy
-evidence: [FND-STRATEGY-003, FND-STRATEGY-007, FND-STRATEGY-008, FND-STRATEGY-040, FND-STRATEGY-021, FND-STRATEGY-023, FND-UI-004, FND-UI-005, FND-UI-006]
+evidence: [FND-STRATEGY-003, FND-STRATEGY-007, FND-STRATEGY-008, FND-STRATEGY-040, FND-STRATEGY-021, FND-STRATEGY-045, FND-UI-004, FND-UI-005, FND-UI-006]
 conflicting: []
 split_with: []
 related: []
@@ -28,9 +28,9 @@ changes them in place. Record 0 is never used.
 | `0x06` | 1 | `UINT8` | `flags` | Flags. | supported | FND-STRATEGY-040 |
 | `0x06 bits 0..1` | | `bits[1]` | `eligible` | Set: the person counts in the household and can be met on the map. | supported | FND-STRATEGY-003, FND-STRATEGY-040 |
 | `0x06 bits 1..8` | | `bits[7]` | `unk_06_1` | Purpose unknown. | supported | FND-STRATEGY-040 |
-| `0x07` | 1 | `UINT8` | `assignment` | Compared with a property's `state`; 0 for a person with no seat. | supported | FND-STRATEGY-003, FND-STRATEGY-023 |
-| `0x08` | 2 | `UINT16LE` | `cell_row` | Row of the person's terrain cell. | supported | FND-STRATEGY-007, FND-STRATEGY-023 |
-| `0x0A` | 2 | `UINT16LE` | `cell_col` | Column of that cell. | supported | FND-STRATEGY-007, FND-STRATEGY-023 |
+| `0x07` | 1 | `UINT8` | `assignment` | Compared with a property's `state`; 0 for a person with no seat. | supported | FND-STRATEGY-003, FND-STRATEGY-045 |
+| `0x08` | 2 | `UINT16LE` | `cell_row` | Row of the person's terrain cell. | supported | FND-STRATEGY-007, FND-STRATEGY-045 |
+| `0x0A` | 2 | `UINT16LE` | `cell_col` | Column of that cell. | supported | FND-STRATEGY-007, FND-STRATEGY-045 |
 | `0x0C` | 1 | `UINT8` | `rating` | The lord rating that sizes the property's forces. | supported | FND-STRATEGY-008, FND-STRATEGY-021 |
 | `0x0D` | 1 | `UINT8` | `next` | Link of the person list, `0xFF` at its end. | supported | FND-STRATEGY-008, FND-STRATEGY-040 |
 | `0x0E` | 1 | `UINT8` | `unk_0E` | Purpose unknown. | supported | FND-STRATEGY-040 |

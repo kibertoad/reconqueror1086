@@ -9,7 +9,7 @@ byte_order: little
 size: 4 + point_count * 8
 text: false
 definition: fmt_strategy_004.ksy
-evidence: [FND-STRATEGY-007, FND-STRATEGY-016, FND-STRATEGY-032]
+evidence: [FND-STRATEGY-007, FND-STRATEGY-044, FND-STRATEGY-032]
 conflicting: []
 split_with: []
 related: []
@@ -21,8 +21,8 @@ The `rt_*.rat`, `sc_*.rat`, `br_*.rat`, `scot.rat` and `wales.rat` entries of `C
 
 | Offset | Size | Type | Name | Meaning | Status | Evidence |
 |---|---|---|---|---|---|---|
-| `0x00` | 4 | `INT32LE` | `point_count` | Number of points. | supported | FND-STRATEGY-016 |
-| `0x04` | `point_count * 8` | `INT32LE[]` | `points` | The points in walking order, each an x and a y in route units. | supported | FND-STRATEGY-016 |
+| `0x00` | 4 | `INT32LE` | `point_count` | Number of points. | supported | FND-STRATEGY-044 |
+| `0x04` | `point_count * 8` | `INT32LE[]` | `points` | The points in walking order, each an x and a y in route units. | supported | FND-STRATEGY-044 |
 | | | | | Total size `4 + point_count * 8` | | |
 
 ## Enumerations and flags

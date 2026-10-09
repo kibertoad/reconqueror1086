@@ -188,7 +188,10 @@ interrupts. Each stop rechecks protected mode, descriptors and the relevant
 original function code against the validated initial snapshot. A pending
 continuation is observed again on timeout; it is never restarted automatically.
 
-The current accepted policies cover initial seeding and character shifts. The
+The current accepted policies cover initial seeding, character shifts and the
+home selector's directly read argument 7 (FND-STRATEGY-043). The complete
+selection rule remains disputed; capture preserves its native argument without
+assuming the disputed table interpretation. The
 prompt reseed/remainder policy is statically grounded in FND-TALK-003 but has
 not yet been verified in a live dialogue. Unaccepted callers, unexpected state
 writes and reentrant RNG invocations stop capture before further work and keep

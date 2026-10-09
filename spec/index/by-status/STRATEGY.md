@@ -50,13 +50,15 @@ Entries by status.
 
 ## superseded
 
-4 entries.
+6 entries.
 
 | ID | Title |
 |---|---|
 | [FND-STRATEGY-002](../../findings/FND-STRATEGY-002.md) | Routine 0x0003B9F4 issues a brigand order or an order from the king |
 | [FND-STRATEGY-015](../../findings/FND-STRATEGY-015.md) | The property and person tables hold 14 records of 15 bytes and 176 records of 18 bytes |
+| [FND-STRATEGY-016](../../findings/FND-STRATEGY-016.md) | The route resources are a count followed by that many pairs of signed dwords |
 | [FND-STRATEGY-019](../../findings/FND-STRATEGY-019.md) | The player pass at 0x00013168 moves each player record, then tests it against the hostile records and the dragon cells |
+| [FND-STRATEGY-023](../../findings/FND-STRATEGY-023.md) | New-game setup 0x000110E8 places the player at one of seven homes and clears the strategic records |
 | [FND-STRATEGY-033](../../findings/FND-STRATEGY-033.md) | The brigand pass fights player armies on contact, rewards or punishes, and ends orders by date |
 
 ## recorded
@@ -78,13 +80,11 @@ Entries by status.
 | [FND-STRATEGY-012](../../findings/FND-STRATEGY-012.md) | The retargeter 0x0003A9BC sends an arrived force at the first player force within 300 units, else home or at the player |
 | [FND-STRATEGY-013](../../findings/FND-STRATEGY-013.md) | Terrain speed comes from a tile-kind table and four profile pointers, scaled by a speed from 1 to 15 |
 | [FND-STRATEGY-014](../../findings/FND-STRATEGY-014.md) | The month selects one of four terrain profiles through the table at 0x0009B720 |
-| [FND-STRATEGY-016](../../findings/FND-STRATEGY-016.md) | The route resources are a count followed by that many pairs of signed dwords |
 | [FND-STRATEGY-017](../../findings/FND-STRATEGY-017.md) | The strategic terrain is resource 292, icon.jp, a 200 by 400 grid of dwords |
 | [FND-STRATEGY-018](../../findings/FND-STRATEGY-018.md) | A route point maps to a grid cell through staggered diamonds, scanned in camera order, whose lower half is one line taller |
 | [FND-STRATEGY-020](../../findings/FND-STRATEGY-020.md) | Routine 0x00011554 moves one player record along its route or toward its target |
 | [FND-STRATEGY-021](../../findings/FND-STRATEGY-021.md) | The encounter routine 0x00039428 fights a player army against a hostile force and settles the result |
 | [FND-STRATEGY-022](../../findings/FND-STRATEGY-022.md) | The staging routine 0x00035924 trims both sides to 60 and hands six counters to the battle |
-| [FND-STRATEGY-023](../../findings/FND-STRATEGY-023.md) | New-game setup 0x000110E8 places the player at one of seven homes and clears the strategic records |
 | [FND-STRATEGY-024](../../findings/FND-STRATEGY-024.md) | Joining and leaving an army swap the player record 0x0009AE6C between an army and the avatar |
 | [FND-STRATEGY-025](../../findings/FND-STRATEGY-025.md) | Field records are placed round the home at six fixed offsets and removed with the selection passed on |
 | [FND-STRATEGY-026](../../findings/FND-STRATEGY-026.md) | Map clicks at 0x000122AC pick a player record, confirm a target or add a route point |
@@ -104,6 +104,8 @@ Entries by status.
 | [FND-STRATEGY-041](../../findings/FND-STRATEGY-041.md) | The player pass at 0x00013168 moves each player record, then tests it against the hostile records and the dragon cells |
 | [FND-STRATEGY-042](../../findings/FND-STRATEGY-042.md) | The brigand pass fights player armies on contact, rewards or punishes, and ends orders by date |
 | [FND-STRATEGY-043](../../findings/FND-STRATEGY-043.md) | The home selector calls the inclusive helper with seven, contradicting the rule's bound of six |
+| [FND-STRATEGY-044](../../findings/FND-STRATEGY-044.md) | Route resources and nine home-selection table entries, of which eight are selectable |
+| [FND-STRATEGY-045](../../findings/FND-STRATEGY-045.md) | New-game setup 0x000110E8 places the player at one of eight homes and clears the strategic records |
 
 ## Open questions
 

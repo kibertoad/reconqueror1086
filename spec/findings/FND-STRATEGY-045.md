@@ -1,9 +1,9 @@
 ---
-id: FND-STRATEGY-023
-title: New-game setup 0x000110E8 places the player at one of seven homes and clears the strategic records
-status: superseded
+id: FND-STRATEGY-045
+title: New-game setup 0x000110E8 places the player at one of eight homes and clears the strategic records
+status: recorded
 builds: [BLD-GOG-EN]
-superseded_by: [FND-STRATEGY-045]
+superseded_by: []
 recorded_by: kibertoad
 reproduced_by: []
 method: static
@@ -45,7 +45,7 @@ and brigand routes, stores 1086 in `0x0009AE4C` and `0x0009AE50`, 5000 in `0x000
 
 ## Interpretation
 
-The home is one of seven fixed castles. The person living there becomes the fallback target of the
+The home is one of eight selectable homes. The person living there becomes the fallback target of the
 hostile movements and its group their fallback origin, and loses its assignment. The accumulator
 starts full, so the first timed movement is tried on the first pass. `0x0009A560` asks the strategic
 pass for the planting notice (FND-STRATEGY-001), and `0x0009AE5C` counts the field records
@@ -53,7 +53,10 @@ pass for the planting notice (FND-STRATEGY-001), and `0x0009AE5C` counts the fie
 
 ## Alternatives
 
-None known.
+This supersedes FND-STRATEGY-023 in full. The setup writes and calls are
+retained; the seven-home interpretation is corrected by FND-STRATEGY-043
+and FND-STRATEGY-044. Those entries show bound 7 and a real person/route
+pair at index 7. The remaining downstream review is Q-STRATEGY-043.
 
 ## How to reproduce
 

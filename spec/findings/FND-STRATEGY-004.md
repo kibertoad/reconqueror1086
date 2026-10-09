@@ -52,7 +52,7 @@ at `0x00024C38(count - 1)`. `0x0003BE24(s)` returns 1 when a hostile record 0 to
 `0x0009AEA8` counts passes since the last reactive pursuit. The draw above 96 only decides whether
 player-targeted pursuits are tried before the ordinary timed movement; the ordinary movement is
 tried every time the accumulator reaches 5,000. The accumulator starts at 5,000 in a new game
-(FND-STRATEGY-023). `p` is only written by `0x0003BB4C` when it finds something and by the
+(FND-STRATEGY-045). `p` is only written by `0x0003BB4C` when it finds something and by the
 pursuit loop, so the test of `p` in the timed branch can read a value left from an earlier pass
 or the frame's previous contents.
 

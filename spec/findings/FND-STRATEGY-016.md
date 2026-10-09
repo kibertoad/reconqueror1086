@@ -1,9 +1,9 @@
 ---
 id: FND-STRATEGY-016
 title: The route resources are a count followed by that many pairs of signed dwords
-status: recorded
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
+superseded_by: [FND-STRATEGY-044]
 recorded_by: kibertoad
 reproduced_by: []
 method: static

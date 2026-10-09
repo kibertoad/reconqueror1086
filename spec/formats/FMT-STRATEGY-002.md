@@ -9,7 +9,7 @@ byte_order: little
 size: 15
 text: false
 definition: fmt_strategy_002.ksy
-evidence: [FND-STRATEGY-003, FND-STRATEGY-005, FND-STRATEGY-040, FND-STRATEGY-016]
+evidence: [FND-STRATEGY-003, FND-STRATEGY-005, FND-STRATEGY-040, FND-STRATEGY-044]
 conflicting: []
 split_with: []
 related: []

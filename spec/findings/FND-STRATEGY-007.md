@@ -50,7 +50,7 @@ and returns 1.
 Mode 1 walks straight from the property to the target person's cell; mode 2 follows a route file.
 Flag 1 picks a property-to-property route by the target person's group, reversing the file when
 the pair is stored the other way round; flag 0 picks the starting-home route chosen at the start of
-the game (FND-STRATEGY-023). `+0x10` records that the route was reversed. The direct mode has no
+the game (FND-STRATEGY-045). `+0x10` records that the route was reversed. The direct mode has no
 guard for a zero length either.
 
 ## Alternatives

@@ -906,3 +906,13 @@ The five synthetic general-journal checks passed, including reseeding to zero,
 missing/pending operations, state discontinuity and forbidden diagnostic fields.
 Dialogue reseeding, reentrant writes, full-game completeness and actual rebuild
 replay have not been verified.
+
+## Home-selection recorder extension (2026-10-10)
+
+A fresh original launch recorded the startup prefix and the following home
+selection through native entry/return breakpoints. The journal contains one
+seed and 31 draws; its last draw is tagged RULE-STRATEGY-012 with inclusive
+bound 7. Native state/raw/bounded comparisons and numeric journal replay passed.
+The journal and map diagnostics remain in the local original capture store.
+This does not settle Q-STRATEGY-043's complete downstream review or establish
+full-game coverage or actual rebuild replay.

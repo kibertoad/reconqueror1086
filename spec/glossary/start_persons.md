@@ -1,6 +1,5 @@
 # start_persons
 
-The home-selection person-index table of `INT32` entries at `0x0009B8C8`
-[FND-STRATEGY-016, FND-STRATEGY-023]. Its independent extent remains unresolved:
-the prior seven-entry reading conflicts with an unclamped possible index 7
-in its reader (Q-STRATEGY-043) [FND-STRATEGY-043].
+Nine consecutive `INT32` person indexes at `0x0009B8C8`; the home selector's
+inclusive bound 7 selects the first eight. Index 7 holds person 28. The remaining
+consumer reading is Q-STRATEGY-043 [FND-STRATEGY-043, FND-STRATEGY-044].

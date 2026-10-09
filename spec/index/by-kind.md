@@ -343,7 +343,7 @@ Entries by kind.
 
 ## findings
 
-303 entries.
+305 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -565,14 +565,14 @@ Entries by kind.
 | [FND-STRATEGY-013](../findings/FND-STRATEGY-013.md) | Terrain speed comes from a tile-kind table and four profile pointers, scaled by a speed from 1 to 15 | recorded |
 | [FND-STRATEGY-014](../findings/FND-STRATEGY-014.md) | The month selects one of four terrain profiles through the table at 0x0009B720 | recorded |
 | [FND-STRATEGY-015](../findings/FND-STRATEGY-015.md) | The property and person tables hold 14 records of 15 bytes and 176 records of 18 bytes | superseded |
-| [FND-STRATEGY-016](../findings/FND-STRATEGY-016.md) | The route resources are a count followed by that many pairs of signed dwords | recorded |
+| [FND-STRATEGY-016](../findings/FND-STRATEGY-016.md) | The route resources are a count followed by that many pairs of signed dwords | superseded |
 | [FND-STRATEGY-017](../findings/FND-STRATEGY-017.md) | The strategic terrain is resource 292, icon.jp, a 200 by 400 grid of dwords | recorded |
 | [FND-STRATEGY-018](../findings/FND-STRATEGY-018.md) | A route point maps to a grid cell through staggered diamonds, scanned in camera order, whose lower half is one line taller | recorded |
 | [FND-STRATEGY-019](../findings/FND-STRATEGY-019.md) | The player pass at 0x00013168 moves each player record, then tests it against the hostile records and the dragon cells | superseded |
 | [FND-STRATEGY-020](../findings/FND-STRATEGY-020.md) | Routine 0x00011554 moves one player record along its route or toward its target | recorded |
 | [FND-STRATEGY-021](../findings/FND-STRATEGY-021.md) | The encounter routine 0x00039428 fights a player army against a hostile force and settles the result | recorded |
 | [FND-STRATEGY-022](../findings/FND-STRATEGY-022.md) | The staging routine 0x00035924 trims both sides to 60 and hands six counters to the battle | recorded |
-| [FND-STRATEGY-023](../findings/FND-STRATEGY-023.md) | New-game setup 0x000110E8 places the player at one of seven homes and clears the strategic records | recorded |
+| [FND-STRATEGY-023](../findings/FND-STRATEGY-023.md) | New-game setup 0x000110E8 places the player at one of seven homes and clears the strategic records | superseded |
 | [FND-STRATEGY-024](../findings/FND-STRATEGY-024.md) | Joining and leaving an army swap the player record 0x0009AE6C between an army and the avatar | recorded |
 | [FND-STRATEGY-025](../findings/FND-STRATEGY-025.md) | Field records are placed round the home at six fixed offsets and removed with the selection passed on | recorded |
 | [FND-STRATEGY-026](../findings/FND-STRATEGY-026.md) | Map clicks at 0x000122AC pick a player record, confirm a target or add a route point | recorded |
@@ -593,6 +593,8 @@ Entries by kind.
 | [FND-STRATEGY-041](../findings/FND-STRATEGY-041.md) | The player pass at 0x00013168 moves each player record, then tests it against the hostile records and the dragon cells | recorded |
 | [FND-STRATEGY-042](../findings/FND-STRATEGY-042.md) | The brigand pass fights player armies on contact, rewards or punishes, and ends orders by date | recorded |
 | [FND-STRATEGY-043](../findings/FND-STRATEGY-043.md) | The home selector calls the inclusive helper with seven, contradicting the rule's bound of six | recorded |
+| [FND-STRATEGY-044](../findings/FND-STRATEGY-044.md) | Route resources and nine home-selection table entries, of which eight are selectable | recorded |
+| [FND-STRATEGY-045](../findings/FND-STRATEGY-045.md) | New-game setup 0x000110E8 places the player at one of eight homes and clears the strategic records | recorded |
 | [FND-TALK-001](../findings/FND-TALK-001.md) | Conversation nodes are read by length from the .CBF file through a sorted .CIF index | recorded |
 | [FND-TALK-002](../findings/FND-TALK-002.md) | The conversation loop runs node actions, then the chosen response actions, then follows a redirect | recorded |
 | [FND-TALK-003](../findings/FND-TALK-003.md) | The prompt variant is drawn after reseeding the generator from the clock | recorded |

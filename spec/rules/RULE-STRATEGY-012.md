@@ -4,8 +4,8 @@ title: New game, joining armies and field placement
 status: disputed
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-STRATEGY-001, FND-STRATEGY-039, FND-STRATEGY-003, FND-STRATEGY-004, FND-STRATEGY-006, FND-STRATEGY-007, FND-STRATEGY-013, FND-STRATEGY-040, FND-STRATEGY-016, FND-STRATEGY-041, FND-STRATEGY-021, FND-STRATEGY-023, FND-STRATEGY-024, FND-STRATEGY-025, FND-STRATEGY-026, FND-STRATEGY-029, FND-STRATEGY-030, FND-STRATEGY-031, FND-STRATEGY-032, FND-STRATEGY-035, FND-TOURNEY-001, FND-TOURNEY-009, FND-STRATEGY-043]
-conflicting: [FND-STRATEGY-043]
+evidence: [FND-STRATEGY-001, FND-STRATEGY-039, FND-STRATEGY-003, FND-STRATEGY-004, FND-STRATEGY-006, FND-STRATEGY-007, FND-STRATEGY-013, FND-STRATEGY-040, FND-STRATEGY-044, FND-STRATEGY-041, FND-STRATEGY-021, FND-STRATEGY-045, FND-STRATEGY-024, FND-STRATEGY-025, FND-STRATEGY-026, FND-STRATEGY-029, FND-STRATEGY-030, FND-STRATEGY-031, FND-STRATEGY-032, FND-STRATEGY-035, FND-TOURNEY-001, FND-TOURNEY-009, FND-STRATEGY-043, FND-STRATEGY-044]
+conflicting: [FND-STRATEGY-043, FND-STRATEGY-044]
 split_with: []
 related: [RULE-RNG-001, RULE-STRATEGY-007, RULE-STRATEGY-014]
 ---
@@ -235,8 +235,8 @@ None known.
 - Whether the reset routine clears the freed route pointers. (Q-STRATEGY-024)
 
 - The prior seven-home/bound-6 reading versus the directly observed bound 7:
-  FND-STRATEGY-023 records 7 but interprets seven homes; FND-STRATEGY-043 and
-  FND-RNG-002 show a remainder modulo eight and an unclamped indexed read.
-  Read the tables independently and trace index 7 through its consumers to
-  distinguish an intended eighth entry from adjacent-data access.
+  FND-STRATEGY-043 and FND-RNG-002 show a remainder modulo eight and an
+  unclamped indexed read. FND-STRATEGY-044 records a real person/route pair
+  at index 7, and FND-STRATEGY-045 replaces the prior seven-home interpretation.
+  Complete the downstream consumer reading before resolving this entry.
   (Q-STRATEGY-043)

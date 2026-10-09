@@ -4,7 +4,7 @@ title: Brigand orders, raids and orders from the king
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-STRATEGY-039, FND-STRATEGY-040, FND-STRATEGY-016, FND-STRATEGY-021, FND-STRATEGY-032]
+evidence: [FND-STRATEGY-039, FND-STRATEGY-040, FND-STRATEGY-044, FND-STRATEGY-021, FND-STRATEGY-032]
 conflicting: []
 split_with: []
 related: [FMT-STRATEGY-001, FMT-STRATEGY-004, FMT-STRATEGY-006, RULE-RNG-001, RULE-STRATEGY-014]

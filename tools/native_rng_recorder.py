@@ -1,6 +1,6 @@
 """Native entry/return breakpoint recorder; accepted caller coverage is explicit.
 
-FND-RNG-002/003/004, FND-PERSON-003, FND-TALK-003 support the current policies.
+FND-RNG-002/003/004, FND-PERSON-003, FND-TALK-003, FND-STRATEGY-043 support the current policies.
 This transport does not claim full-game caller coverage or actual rebuild replay.
 """
 import dataclasses
@@ -23,7 +23,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30):
         hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
         hooks[hook.id] = name
     controls = []
-    for start, end in ((0x6b3eb, 0x6b423), (0x24c38, 0x24c4c), (0x1a14c, 0x1a1ef)):
+    for start, end in ((0x6b3eb, 0x6b423), (0x24c38, 0x24c4c), (0x1a14c, 0x1a1ef), (0x43670, 0x436e0)):
         selector, offset = mapping.code_address(start, end - start)
         address = runtime.MemoryAddress.segmented(selector, offset)
         controls.append((address, runtime.read(address, end - start)))
@@ -37,6 +37,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30):
         return value - mapping.code_base + 0x10000
     frame = None
     count = 0
+    shift_ordinal = 0
     report = {'schema': 'conquer-native-rng-journal-v1', 'status': 'incomplete',
               'full_game_complete': False, 'accepted_callers_complete': False,
               'events': journal.events}
@@ -75,13 +76,24 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30):
                     frame = {'key': key, 'return_pc': return_pc, 'phase': 'seed'}
                 elif return_pc == 0x24c3d:
                     outer_pc = canonical_return(words[1])
-                    bound = {0x1624d: 1, 0x16259: 8}.get(outer_pc)
+                    bound = {0x1624d: 1, 0x16259: 8, 0x43678: 7}.get(outer_pc)
                     if bound is None:
                         raise RecordingError('Unowned inclusive-helper caller; stopped before draw')
-                    index = int(registers.general['esi'], 16)
-                    if words[2] != bound or index != (count // 2) * 4 or count >= 30 or bound != (1 if count % 2 == 0 else 8):
-                        raise RecordingError('Startup bound/index/order differs from its supported reading')
-                    journal.begin_draw('RULE-PERSON-002', 'inclusive', bound, state())
+                    if words[2] != bound:
+                        raise RecordingError('Native helper argument differs from its direct reading')
+                    if outer_pc == 0x43678:
+                        # FND-STRATEGY-043 settles this caller's actual argument.
+                        # RULE-STRATEGY-012 remains disputed; record 7 faithfully
+                        # without asserting the selection tables' final meaning.
+                        rule = 'RULE-STRATEGY-012'
+                    else:
+                        index = int(registers.general['esi'], 16)
+                        if shift_ordinal == 30 and index == 0 and bound == 1:
+                            shift_ordinal = 0
+                        if index != (shift_ordinal // 2) * 4 or shift_ordinal >= 30 or bound != (1 if shift_ordinal % 2 == 0 else 8):
+                            raise RecordingError('Character-shift bound/index/order differs from its supported reading')
+                        rule = 'RULE-PERSON-002'
+                    journal.begin_draw(rule, 'inclusive', bound, state())
                     frame = {'key': key, 'return_pc': return_pc, 'phase': 'raw',
                              'bound_key': (key[0], key[1] + 4), 'bound_pc': 0x24c4b,
                              'outer_pc': outer_pc}
@@ -111,6 +123,8 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30):
                 if frame is None or frame['phase'] != 'bound' or frame['bound_key'] != key or frame['bound_pc'] != pc:
                     raise RecordingError('Bounded result/frame mismatch')
                 result_register = 'edx' if kind == 'prompt-result' else 'eax'
+                if journal.pending['rule'] == 'RULE-PERSON-002':
+                    shift_ordinal += 1
                 journal.finish_bound(state(), int(registers.general[result_register], 16))
                 frame = None
                 count += 1
