@@ -41,32 +41,33 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
 ## Handover
 
 - Stage: Survey; this goal adds runtime research capabilities.
-- Last gate: 2026-10-10 full documentation check passed with checker 4.1.1;
-  41 pointer-input, recorder, journal, event-log and mapping safety tests passed.
-  Prior canonical configuration/build gates remain recorded in VALIDATION.md.
+- Last gate: 2026-10-10 full documentation and recorder-related safety checks
+  passed with checker 4.1.1. Prior canonical configuration/build gates remain
+  recorded in VALIDATION.md.
 - Native startup input and guarded initial loaded-screen return passed in two
-  fresh quiet runs with different seeds. Both durable prefixes match their
-  journals and numeric replay. Their owned processes and locks were cleaned up.
-  No full-game or actual rebuild replay gate has passed.
-- An owned quiet title-continuation probe is running with the machine lock
-  held. Preserve its existing operation. It uses fixed cycles 1000, disabled
-  animations, startup checkpoints, startup click, loaded-screen continuation
-  and title click. Source fingerprints identify its eagerly loaded controllers.
-  Title-to-options traversal and original continuation remain unverified.
-- Unfinished: complete rule ownership, full-game recording/replay and prescribed
-  observable gameplay state. Shared helper extraction is not implemented.
-  Reproducibility guidance and helper boundaries were sent upstream in toolkit
-  issue #403 after duplicate checking; docs/dosbox-x-helper-proposal.md links it.
+  fresh quiet runs with different seeds. A subsequent title-to-options probe
+  verified ordered initial/replacement returns and matching journal replay.
+  Those owned processes and locks were cleaned up. No full-game or actual
+  rebuild replay gate has passed.
+- An owned quiet new-game probe is running with the machine lock held.
+  Preserve its existing operation. It uses fixed cycles 1000, disabled
+  animations, startup checkpoints/click, loaded-screen continuation, title
+  input, screen checkpoints and new-game input, targeting character options.
+  Its eagerly loaded controllers are identified by local source fingerprints.
+- Unfinished: native new-game/dilemma traversal, complete rule ownership,
+  prescribed gameplay state and full-game recording/replay. Shared helper
+  extraction is not implemented. The proposal is toolkit issue #403, linked
+  from docs/dosbox-x-helper-proposal.md.
 - Blockers: none established. RUNTIME.md is the capability assessment. Audio
   remains muted except for an explicit sound investigation. No WIP branch.
-- Next: observe the existing title-continuation operation for its guarded input
-  or next unaccepted caller; verify returned screen state before further writes.
-- Then extend supported input reachability and RNG caller policies from direct
-  findings, using the local call-survey report only as leads. Keep unknown
-  callers rejected and journals explicitly incomplete.
+- Next: observe the existing new-game operation for its verified target or
+  next unaccepted caller. Keep unknown callers rejected and journals incomplete.
+- Extend supported input reachability from FND-UI-020, SCR-UI-002/003 and
+  FND-PERSON-004. The three dilemma caller policies have synthetic validation;
+  their original traversal is not yet verified.
 - Q-STRATEGY-043 / RULE-STRATEGY-012: finish the downstream consumer review
   from FND-STRATEGY-043/044/045/046 before resolving its disputed status.
 - Q-RNG-001 / RULE-RNG-001: continue seed-source provenance from
   FND-RNG-005/006 when complete clock/environment semantics are needed.
 - Complete two prescribed full-game runs, trace ordering/completeness and actual
-  draw-by-draw rebuild replay; startup verification does not meet this condition.
+  draw-by-draw rebuild replay; startup/menu verification does not meet this condition.
