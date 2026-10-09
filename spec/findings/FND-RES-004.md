@@ -19,7 +19,7 @@ locations:
     address: 0x00048658..0x000486B7
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x00..0x21B93B1
+    offset: 0x00..0x21B93B2
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect) and a container census written for this project
 environment: null
 ---
@@ -63,3 +63,6 @@ alignment; resetting at byte, word or dword boundaries also fails. Those reading
 ## How to reproduce
 
 Disassemble the three ranges, and decode the five kind-2 entries with the growth rule described.
+
+Whole-resource exclusive bounds follow FND-RES-070; complete-file identities
+and sizes follow BLD-GOG-EN and the listing comparison in FND-RES-069.

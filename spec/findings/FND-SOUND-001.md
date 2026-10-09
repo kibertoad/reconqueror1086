@@ -10,82 +10,82 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1A457CB..0x1A4B69C
+    offset: 0x1A457CB..0x1A4B69D
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1A4B69D..0x1A64642
+    offset: 0x1A4B69D..0x1A64643
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1A64643..0x1A64B6B
+    offset: 0x1A64643..0x1A64B6C
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1A64B6C..0x1A65094
+    offset: 0x1A64B6C..0x1A65095
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1A65095..0x1A655BD
+    offset: 0x1A65095..0x1A655BE
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1A655BE..0x1A65AE6
+    offset: 0x1A655BE..0x1A65AE7
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1A65AE7..0x1A6A9AA
+    offset: 0x1A65AE7..0x1A6A9AB
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1A6A9AB..0x1A77BF4
+    offset: 0x1A6A9AB..0x1A77BF5
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1A77BF5..0x1A7811D
+    offset: 0x1A77BF5..0x1A7811E
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1A7811E..0x1A78646
+    offset: 0x1A7811E..0x1A78647
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1A78647..0x1A78B6F
+    offset: 0x1A78647..0x1A78B70
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1A78B70..0x1A861DC
+    offset: 0x1A78B70..0x1A861DD
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1A861DD..0x1A86705
+    offset: 0x1A861DD..0x1A86706
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1A86706..0x1A86C2E
+    offset: 0x1A86706..0x1A86C2F
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1A86C2F..0x1A87157
+    offset: 0x1A86C2F..0x1A87158
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1A87158..0x1A87680
+    offset: 0x1A87158..0x1A87681
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1A87681..0x1AAC3C7
+    offset: 0x1A87681..0x1AAC3C8
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1AAC3C8..0x1AC2061
+    offset: 0x1AAC3C8..0x1AC2062
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1AC2062..0x1ACBE7C
+    offset: 0x1AC2062..0x1ACBE7D
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x2076CB4..0x20A81FB
+    offset: 0x2076CB4..0x20A81FC
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x20A81FC..0x20BDE07
+    offset: 0x20A81FC..0x20BDE08
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x20BDE08..0x20E84EA
+    offset: 0x20BDE08..0x20E84EB
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x20E84EB..0x2134998
+    offset: 0x20E84EB..0x2134999
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x2134999..0x2161407
+    offset: 0x2134999..0x2161408
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x21A4357..0x21B30F5
+    offset: 0x21A4357..0x21B30F6
   - build: BLD-GOG-EN
     file: CD:CONQUER/SKIRMISH.RES
-    offset: 0x08..0x4403F
+    offset: 0x08..0x44040
 tool: Container census written for this project
 environment: null
 ---
@@ -144,3 +144,6 @@ converting them (FND-SOUND-003), and the driver's sample format was not traced.
 ## How to reproduce
 
 Decode each named entry (RULE-RES-001) and walk its samples from offset 4.
+
+Whole-resource exclusive bounds follow FND-RES-070; complete-file identities
+and sizes follow BLD-GOG-EN and the listing comparison in FND-RES-069.

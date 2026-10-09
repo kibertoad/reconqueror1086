@@ -10,7 +10,7 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:INN.BAT
-    offset: 0x00000000..0x0000001D
+    offset: 0x00000000..0x0000001E
 tool: Python 3.14 ISO 9660 traversal of the raw 2352-byte data records with XXH3-128 checks against the manifest, and case-insensitive byte searches
 environment: null
 ---
@@ -82,3 +82,6 @@ bytes at offset 16 of each 2352-byte record), extract every file outside
 Unpack `CD:INST.EXE` as FND-RES-066 gives. Search every file for the names
 above, case-insensitively, as ASCII bytes and as UTF-16LE. Keep the extracted
 files in ignored local storage.
+
+Whole-resource exclusive bounds follow FND-RES-070; complete-file identities
+and sizes follow BLD-GOG-EN and the listing comparison in FND-RES-069.

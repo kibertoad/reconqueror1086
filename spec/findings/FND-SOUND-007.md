@@ -1,9 +1,9 @@
 ---
-id: FND-SOUND-005
+id: FND-SOUND-007
 title: MIDI music plays one HMP song at a time through 0x0005B0D4; the release holds 12 songs
-status: superseded
+status: recorded
 builds: [BLD-GOG-EN]
-superseded_by: [FND-SOUND-007]
+superseded_by: []
 recorded_by: kibertoad
 reproduced_by: []
 method: static
@@ -22,46 +22,46 @@ locations:
     address: 0x0009AE70..0x0009AE7F
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1AFDDF7..0x1AFFC8A
+    offset: 0x1AFDDF7..0x1AFFC8B
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1AFFC8B..0x1B03A10
+    offset: 0x1AFFC8B..0x1B03A11
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1B03A11..0x1B03DDA
+    offset: 0x1B03A11..0x1B03DDB
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1B03DDB..0x1B04194
+    offset: 0x1B03DDB..0x1B04195
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1B04195..0x1B0454E
+    offset: 0x1B04195..0x1B0454F
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1B0454F..0x1B04F61
+    offset: 0x1B0454F..0x1B04F62
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1B04F62..0x1B08BE5
+    offset: 0x1B04F62..0x1B08BE6
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1B08BE6..0x1B0A2ED
+    offset: 0x1B08BE6..0x1B0A2EE
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1B0A2EE..0x1B0AF19
+    offset: 0x1B0A2EE..0x1B0AF1A
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1BCB224..0x1BCB9B3
+    offset: 0x1BCB224..0x1BCB9B4
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1BCB9B4..0x1BCC32A
+    offset: 0x1BCB9B4..0x1BCC32B
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1BCC32B..0x1BCCC08
+    offset: 0x1BCC32B..0x1BCCC09
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1B0AF1A..0x1B0BBD0
+    offset: 0x1B0AF1A..0x1B0BBD1
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1B0BBD1..0x1B0C31A
+    offset: 0x1B0BBD1..0x1B0C31B
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -96,6 +96,8 @@ buffer.
 
 ## Alternatives
 
+This replaces FND-SOUND-005, whose resource-location ends named the last stored bytes without settling the intended scope in its own text. This replacement explicitly includes each complete stored resource, bounded by FND-RES-070. All behavioral observations and qualifications are retained; no complete reading is claimed.
+
 The HMP layout past the tag is the HMI library's; the game never reads it. The castle table may be
 chosen at random; the index into it at the two calls was not traced.
 
@@ -103,3 +105,6 @@ chosen at random; the index into it at the two calls was not traced.
 
 Disassemble the listed ranges in `CD:CONQUER.EXE`; scan object 1 for calls to `0x0005B0D4`; read the
 first 14 bytes of each `.hmp` entry.
+
+Whole-resource exclusive bounds follow FND-RES-070; complete-file identities
+and sizes follow BLD-GOG-EN and the listing comparison in FND-RES-069.

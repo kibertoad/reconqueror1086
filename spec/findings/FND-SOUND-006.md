@@ -43,13 +43,13 @@ locations:
     address: 0x0005BA1D..0x0005BA3F
   - build: BLD-GOG-EN
     file: game.ins
-    offset: 0x00..0x112
+    offset: 0x00..0x113
   - build: BLD-GOG-EN
     file: CD:track02
     offset: 0x00..0x45B220
   - build: BLD-GOG-EN
     file: CD:track03
-    offset: 0x00..0x9729BF
+    offset: 0x00..0x9729C0
   - build: BLD-GOG-EN
     file: CD:track04
     offset: 0x00..0x15F99F0
@@ -58,7 +58,7 @@ locations:
     offset: 0x00..0x2648310
   - build: BLD-GOG-EN
     file: CD:track06
-    offset: 0x00..0xE0A9BF
+    offset: 0x00..0xE0A9C0
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -118,3 +118,6 @@ FND-BATTLE-018).
 Disassemble the listed ranges in `CD:CONQUER.EXE`; read `game.ins` and measure the audio tracks.
 
 Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.
+
+Whole-resource exclusive bounds follow FND-RES-070; complete-file identities
+and sizes follow BLD-GOG-EN and the listing comparison in FND-RES-069.

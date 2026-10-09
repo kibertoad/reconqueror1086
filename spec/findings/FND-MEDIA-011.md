@@ -1,28 +1,28 @@
 ---
-id: FND-MEDIA-010
+id: FND-MEDIA-011
 title: Owner screenshots match FLUFF.PCX, V66_1111.PCX, INNPEOPL.PCX and COMSCRN1.PCX, and the executable names the inn patrons
-status: superseded
+status: recorded
 builds: [BLD-GOG-EN]
-superseded_by: [FND-MEDIA-011]
+superseded_by: []
 recorded_by: kibertoad
 reproduced_by: []
 method: static
 locations:
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x21805C1..0x21A0F57
+    offset: 0x21805C1..0x21A0F58
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1D560F8..0x1D766DA
+    offset: 0x1D560F8..0x1D766DB
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x8D793E..0x901BBB
+    offset: 0x8D793E..0x901BBC
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x15CBB1A..0x15F90E1
+    offset: 0x15CBB1A..0x15F90E2
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x141D04C..0x143C3DB
+    offset: 0x141D04C..0x143C3DC
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00098D54..0x00098DB7
@@ -59,6 +59,8 @@ pictures. The inn labels are in the order of the regions of SCR-UI-017.
 
 ## Alternatives
 
+This replaces FND-MEDIA-010, whose resource-location ends named the last stored bytes without settling the intended scope in its own text. This replacement explicitly includes each complete stored resource, bounded by FND-RES-070. All behavioral observations and qualifications are retained; no complete reading is claimed.
+
 The captures were scaled by an emulator, so pixel-exact comparison was not possible; the RMSE
 values are from normalized images.
 
@@ -66,3 +68,6 @@ values are from normalized images.
 
 Decode the named pictures (RULE-RES-001) and compare them with captures of the same screens of the
 running game; read the strings from `0x00098D54` in `CD:CONQUER.EXE`.
+
+Whole-resource exclusive bounds follow FND-RES-070; complete-file identities
+and sizes follow BLD-GOG-EN and the listing comparison in FND-RES-069.

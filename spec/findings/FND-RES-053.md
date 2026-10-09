@@ -43,7 +43,7 @@ locations:
     address: 2FD0:04B0..2FD0:05ED
   - build: BLD-GOG-EN
     file: CD:INSTALL.TXT
-    offset: 0x00000000..0x00002575
+    offset: 0x00000000..0x00002576
   - build: BLD-GOG-EN
     file: CD:INSTALL.HLP
     offset: 0x00000000..0x000054F3
@@ -187,3 +187,6 @@ storage.
 Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.
 
 Grouped whole-function exclusive bounds follow the extents recorded in FND-RES-063.
+
+Whole-resource exclusive bounds follow FND-RES-070; complete-file identities
+and sizes follow BLD-GOG-EN and the listing comparison in FND-RES-069.

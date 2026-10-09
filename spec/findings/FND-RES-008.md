@@ -10,7 +10,7 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x00..0x21B93B1
+    offset: 0x00..0x21B93B2
 tool: Container census written for this project
 environment: null
 ---
@@ -34,3 +34,6 @@ None known.
 ## How to reproduce
 
 Run both decoders over the kind-1 blocks of the `.PCX` and `.PCC` entries of `C1086.GOB`.
+
+Whole-resource exclusive bounds follow FND-RES-070; complete-file identities
+and sizes follow BLD-GOG-EN and the listing comparison in FND-RES-069.

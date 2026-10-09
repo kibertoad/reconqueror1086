@@ -10,10 +10,10 @@ method: static
 locations: 
   - build: BLD-GOG-EN
     file: CONQUER.INI
-    offset: 0x00..0x16F
+    offset: 0x00..0x170
   - build: BLD-GOG-EN
     file: CD:CONQUER.INI
-    offset: 0x00..0x139
+    offset: 0x00..0x13A
 tool: Conqueror.Inspect (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -54,3 +54,6 @@ writes `GOB`, `AUD_DRV` and `CD_PATH`, and whether either writes `WAR_MODE`, `PO
 
 Extract the two INI files and compare them; list the printable strings of `CD:CONFIG.EXE` and
 `CD:CONQUER/CONCFG.EXE` around the listed offsets.
+
+Whole-resource exclusive bounds follow FND-RES-070; complete-file identities
+and sizes follow BLD-GOG-EN and the listing comparison in FND-RES-069.

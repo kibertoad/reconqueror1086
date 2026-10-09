@@ -31,7 +31,7 @@ locations:
     address: 0x00056859
   - build: BLD-GOG-EN
     file: CD:CONQUER/SKIRMISH.RES
-    offset: 0x00..0xAFBEF
+    offset: 0x00..0xAFBF0
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -84,3 +84,6 @@ Disassemble `0x0004C414..0x0004C6DE` and its callers in `CD:CONQUER.EXE`; decode
 `CD:CONQUER/SKIRMISH.RES` and draw `SKIRMISH.PCX` with `SKIRMISH.PAL`.
 
 Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.
+
+Whole-resource exclusive bounds follow FND-RES-070; complete-file identities
+and sizes follow BLD-GOG-EN and the listing comparison in FND-RES-069.

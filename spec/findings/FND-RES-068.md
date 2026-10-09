@@ -22,7 +22,7 @@ locations:
     address: 0x0001AA16..0x0001AA3F
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1B105B4..0x1B105E4
+    offset: 0x1B105B4..0x1B105E5
 tool: Python 3.14 LE object, page and fixup mapping of CONQUER.EXE with capstone 5.0.7 bounded 32-bit disassembly; Python container reader per FMT-RES-001 to FMT-RES-003
 environment: null
 ---
@@ -80,3 +80,6 @@ Read the `ffonta2.fnt` entry of C1086.GOB.
 Verify the body boundaries against FND-RES-063 using its read-only metadata
 procedure. Those extents bound this recorded scope and do not establish the
 behavior or completeness of a reading.
+
+Whole-resource exclusive bounds follow FND-RES-070; complete-file identities
+and sizes follow BLD-GOG-EN and the listing comparison in FND-RES-069.

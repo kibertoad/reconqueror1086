@@ -1,5 +1,19 @@
 # Validation
 
+## Stored-resource boundary conversion (2026-10-09)
+
+The complete owned listing and bounded archive directories identified legacy
+last-byte ends in complete-file and complete-resource locations. Reviewed bounds
+now use the exclusive end of the same stored scope. FND-RES-070 records the
+stored extents, including the two scene resources, without substituting decoded
+lengths. FND-MEDIA-011 and FND-SOUND-007 replace findings whose text left the
+scope ambiguous; observations and claim statuses remain unchanged.
+The resource-boundary audit found no remaining whole-file or whole-entry
+last-byte candidates, and Audit-RangeEnds.mjs found no native-function boundary
+diagnostics. The documentation write check and canonical Invoke-Validation.ps1
+gate passed with ResourceAndDefinitionTests and MinimumExpectedTests 1.
+The original game did not run and all generated analysis remains ignored.
+
 ## Canonical paths and value bounds (2026-10-09)
 
 The adopted primary-volume reader reproduced the earlier full installation and

@@ -10,22 +10,22 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER/TITLE.SMK
-    offset: 0x00..0x13B7FF
+    offset: 0x00..0x13B800
   - build: BLD-GOG-EN
     file: CD:CONQUER/CREDITZZ.SMK
-    offset: 0x00..0x197457
+    offset: 0x00..0x197458
   - build: BLD-GOG-EN
     file: CD:CONQUER/WH_640.SMK
-    offset: 0x00..0x16DE03
+    offset: 0x00..0x16DE04
   - build: BLD-GOG-EN
     file: CD:CONQUER/1101.SMK
-    offset: 0x00..0xF867
+    offset: 0x00..0xF868
   - build: BLD-GOG-EN
     file: CD:CONQUER/TRANDRAG.SMK
-    offset: 0x00..0x18313
+    offset: 0x00..0x18314
   - build: BLD-GOG-EN
     file: CD:CONQUER/JOUSPRAC.SMK
-    offset: 0x00..0xC16F3
+    offset: 0x00..0xC16F4
 tool: Smacker census written for this project
 environment: null
 ---
@@ -59,3 +59,6 @@ None known.
 
 Parse every `CONQUER/*.SMK` of the disc image with a Smacker 2 parser and decode its palette,
 audio and video packets.
+
+Whole-resource exclusive bounds follow FND-RES-070; complete-file identities
+and sizes follow BLD-GOG-EN and the listing comparison in FND-RES-069.

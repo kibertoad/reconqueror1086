@@ -17,6 +17,14 @@ Entries by status.
 | [RULE-SOUND-003](../../rules/RULE-SOUND-003.md) | Starting the sound systems and playing MIDI music |
 | [RULE-SOUND-004](../../rules/RULE-SOUND-004.md) | Playing CD music |
 
+## superseded
+
+1 entries.
+
+| ID | Title |
+|---|---|
+| [FND-SOUND-005](../../findings/FND-SOUND-005.md) | MIDI music plays one HMP song at a time through 0x0005B0D4; the release holds 12 songs |
+
 ## recorded
 
 6 entries.
@@ -27,8 +35,8 @@ Entries by status.
 | [FND-SOUND-002](../../findings/FND-SOUND-002.md) | Sound banks load through 0x0005B584, only when SOUND_EFFECTS is on, from the open archive by index |
 | [FND-SOUND-003](../../findings/FND-SOUND-003.md) | Samples play through 0x0005B3B0 on ten voices, with rate factors for 11,025, 22,050 and 44,100 Hz only |
 | [FND-SOUND-004](../../findings/FND-SOUND-004.md) | CONQUER.INI switches the sound systems and names an HMI SOS driver setup; the digital driver runs at 22,050 Hz |
-| [FND-SOUND-005](../../findings/FND-SOUND-005.md) | MIDI music plays one HMP song at a time through 0x0005B0D4; the release holds 12 songs |
 | [FND-SOUND-006](../../findings/FND-SOUND-006.md) | CD music plays tracks 2 to 6 of the disc through MSCDEX requests and loops by replaying the range |
+| [FND-SOUND-007](../../findings/FND-SOUND-007.md) | MIDI music plays one HMP song at a time through 0x0005B0D4; the release holds 12 songs |
 
 ## Open questions
 

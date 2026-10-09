@@ -10,19 +10,19 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x00..0x21B93B1
+    offset: 0x00..0x21B93B2
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1C7C310..0x1C82853
+    offset: 0x1C7C310..0x1C82854
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1CA9D9D..0x1CC978E
+    offset: 0x1CA9D9D..0x1CC978F
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1C42856..0x1C48EB0
+    offset: 0x1C42856..0x1C48EB1
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x16B7915..0x16C2514
+    offset: 0x16B7915..0x16C2515
 tool: Container census written for this project
 environment: null
 ---
@@ -63,3 +63,6 @@ None known.
 
 Decode each `.PCX` and `.PCC` entry of `C1086.GOB` (RULE-RES-001) and read its header, rows and
 trailer.
+
+Whole-resource exclusive bounds follow FND-RES-070; complete-file identities
+and sizes follow BLD-GOG-EN and the listing comparison in FND-RES-069.

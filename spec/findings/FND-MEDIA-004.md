@@ -25,10 +25,10 @@ locations:
     address: 0x0002A756..0x0002A765
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x21A0F58..0x21A2E65
+    offset: 0x21A0F58..0x21A2E66
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1B0CFA6..0x1B0EFA7
+    offset: 0x1B0CFA6..0x1B0EFA8
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -61,3 +61,6 @@ Disassemble `0x000644D4`, `0x00064524`, `0x0006E0D0` and `0x0002A756` in `CD:CON
 `CONFONT.CSF` from `C1086.GOB`.
 
 Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.
+
+Whole-resource exclusive bounds follow FND-RES-070; complete-file identities
+and sizes follow BLD-GOG-EN and the listing comparison in FND-RES-069.

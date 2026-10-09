@@ -22,19 +22,19 @@ locations:
     address: 0x0005ADA8..0x0005B0D3
   - build: BLD-GOG-EN
     file: CONQUER.INI
-    offset: 0x00..0x16F
+    offset: 0x00..0x170
   - build: BLD-GOG-EN
     file: CD:CONQUER.INI
-    offset: 0x00..0x139
+    offset: 0x00..0x13A
   - build: BLD-GOG-EN
     file: CD:HMIDET.386
-    offset: 0x00..0x14023
+    offset: 0x00..0x14024
   - build: BLD-GOG-EN
     file: CD:HMIDRV.386
-    offset: 0x00..0x3FCB8
+    offset: 0x00..0x3FCB9
   - build: BLD-GOG-EN
     file: CD:HMIMDRV.386
-    offset: 0x00..0x1B537
+    offset: 0x00..0x1B538
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -83,10 +83,13 @@ instrument sets the MIDI driver plays with.
 ## Alternatives
 
 That the drivers are HMI's rests on the file names and the `HMIMIDIP013195` tag of the songs
-(FND-SOUND-005); the driver entry points `0x00078151` and `0x000793C7` were not traced inside. What
+(FND-SOUND-007); the driver entry points `0x00078151` and `0x000793C7` were not traced inside. What
 the 30 passed to `0x00069AAC` means was not traced.
 
 ## How to reproduce
 
 Disassemble the listed ranges in `CD:CONQUER.EXE`; read the strings at `0x0009850C` to `0x000987FC`
 and compare the keys with `CONQUER.INI`.
+
+Whole-resource exclusive bounds follow FND-RES-070; complete-file identities
+and sizes follow BLD-GOG-EN and the listing comparison in FND-RES-069.

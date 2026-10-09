@@ -16,7 +16,7 @@ locations:
     address: 0x00029968..0x00029A3F
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0xC29B3F..0xC29E47
+    offset: 0xC29B3F..0xC29E48
 tool: Python 3.14 LE object, page and fixup mapping of CONQUER.EXE with capstone 5.0.7 bounded 32-bit disassembly; Python container reader per FMT-RES-001 to FMT-RES-003
 environment: null
 ---
@@ -69,3 +69,6 @@ sections (12 and 7 values).
 Map CONQUER.EXE as FND-RES-067 gives and disassemble the ranges above; read
 the format strings each `0x00065108` call pushes. Decode `fief0.dat` from
 C1086.GOB and count its lines and each data line's values.
+
+Whole-resource exclusive bounds follow FND-RES-070; complete-file identities
+and sizes follow BLD-GOG-EN and the listing comparison in FND-RES-069.

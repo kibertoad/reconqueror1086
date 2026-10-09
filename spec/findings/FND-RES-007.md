@@ -10,58 +10,58 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER/MELEE0.RES
-    offset: 0x00..0xC207A
+    offset: 0x00..0xC207B
   - build: BLD-GOG-EN
     file: CD:CONQUER/MELEE00.RES
-    offset: 0x00..0xC2063
+    offset: 0x00..0xC2064
   - build: BLD-GOG-EN
     file: CD:CONQUER/MELEE01.RES
-    offset: 0x00..0xC21B3
+    offset: 0x00..0xC21B4
   - build: BLD-GOG-EN
     file: CD:CONQUER/MELEE02.RES
-    offset: 0x00..0xC207A
+    offset: 0x00..0xC207B
   - build: BLD-GOG-EN
     file: CD:CONQUER/MELEE03.RES
-    offset: 0x00..0xC2288
+    offset: 0x00..0xC2289
   - build: BLD-GOG-EN
     file: CD:CONQUER/MELEE04.RES
-    offset: 0x00..0xC2916
+    offset: 0x00..0xC2917
   - build: BLD-GOG-EN
     file: CD:CONQUER/MELEE1.RES
-    offset: 0x00..0xB2D8E
-  - build: BLD-GOG-EN
-    file: CD:CONQUER/MELEE10.RES
-    offset: 0x00..0xB2D8A
-  - build: BLD-GOG-EN
-    file: CD:CONQUER/MELEE11.RES
-    offset: 0x00..0xB2D94
-  - build: BLD-GOG-EN
-    file: CD:CONQUER/MELEE12.RES
     offset: 0x00..0xB2D8F
   - build: BLD-GOG-EN
+    file: CD:CONQUER/MELEE10.RES
+    offset: 0x00..0xB2D8B
+  - build: BLD-GOG-EN
+    file: CD:CONQUER/MELEE11.RES
+    offset: 0x00..0xB2D95
+  - build: BLD-GOG-EN
+    file: CD:CONQUER/MELEE12.RES
+    offset: 0x00..0xB2D90
+  - build: BLD-GOG-EN
     file: CD:CONQUER/MELEE13.RES
-    offset: 0x00..0xB2EAD
+    offset: 0x00..0xB2EAE
   - build: BLD-GOG-EN
     file: CD:CONQUER/MELEE14.RES
-    offset: 0x00..0xB2E87
+    offset: 0x00..0xB2E88
   - build: BLD-GOG-EN
     file: CD:CONQUER/MELEE2.RES
-    offset: 0x00..0x910A4
+    offset: 0x00..0x910A5
   - build: BLD-GOG-EN
     file: CD:CONQUER/MELEE20.RES
-    offset: 0x00..0x910AD
+    offset: 0x00..0x910AE
   - build: BLD-GOG-EN
     file: CD:CONQUER/MELEE21.RES
-    offset: 0x00..0x910B5
-  - build: BLD-GOG-EN
-    file: CD:CONQUER/MELEE22.RES
     offset: 0x00..0x910B6
   - build: BLD-GOG-EN
+    file: CD:CONQUER/MELEE22.RES
+    offset: 0x00..0x910B7
+  - build: BLD-GOG-EN
     file: CD:CONQUER/MELEE23.RES
-    offset: 0x00..0x912BA
+    offset: 0x00..0x912BB
   - build: BLD-GOG-EN
     file: CD:CONQUER/MELEE24.RES
-    offset: 0x00..0x912CA
+    offset: 0x00..0x912CB
 tool: Container census written for this project
 environment: null
 ---
@@ -102,3 +102,6 @@ None known.
 ## How to reproduce
 
 Decode each scene's entries and compare them by name with the unsuffixed scene of the family.
+
+Whole-resource exclusive bounds follow FND-RES-070; complete-file identities
+and sizes follow BLD-GOG-EN and the listing comparison in FND-RES-069.

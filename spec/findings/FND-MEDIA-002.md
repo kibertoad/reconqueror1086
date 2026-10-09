@@ -10,31 +10,31 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x00..0x21B93B1
+    offset: 0x00..0x21B93B2
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0xA850D3..0xBB64D1
+    offset: 0xA850D3..0xBB64D2
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0xC743E5..0xE069EC
+    offset: 0xC743E5..0xE069ED
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x111B818..0x11E5FB3
+    offset: 0x111B818..0x11E5FB4
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x11E5FB4..0x12B0486
+    offset: 0x11E5FB4..0x12B0487
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x12B0487..0x137A003
+    offset: 0x12B0487..0x137A004
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x21A0F58..0x21A2E65
+    offset: 0x21A0F58..0x21A2E66
   - build: BLD-GOG-EN
     file: C1086.GOB
-    offset: 0x1B0CFA6..0x1B0EFA7
+    offset: 0x1B0CFA6..0x1B0EFA8
   - build: BLD-GOG-EN
     file: CD:CONQUER/SKIRMISH.RES
-    offset: 0x44040..0x59238
+    offset: 0x44040..0x59239
 tool: Container census written for this project
 environment: null
 ---
@@ -95,3 +95,6 @@ tells which.
 
 Decode each `.CSF` entry of `C1086.GOB` and `CD:CONQUER/SKIRMISH.RES` (RULE-RES-001) and walk the size
 table and rows as described; draw `skirmish.csf` with `SKIRMISH.PAL` to see the groups.
+
+Whole-resource exclusive bounds follow FND-RES-070; complete-file identities
+and sizes follow BLD-GOG-EN and the listing comparison in FND-RES-069.

@@ -643,6 +643,7 @@ Entries by area.
 | [FND-RES-067](../findings/FND-RES-067.md) | An MVG entry holds the pointer shapes' hot spots; 0x00018850 loads it and the CSF of the same name | recorded |
 | [FND-RES-068](../findings/FND-RES-068.md) | Every use of the name FFONTA2.FNT ends in a property call that stores nothing, so the game never reads the .FNT entry | recorded |
 | [FND-RES-069](../findings/FND-RES-069.md) | Canonical primary-volume paths agree with the owned build accounting | recorded |
+| [FND-RES-070](../findings/FND-RES-070.md) | Stored archive extents resolve resource-location last-byte bounds | recorded |
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |
@@ -668,7 +669,8 @@ Entries by area.
 | [FND-MEDIA-007](../findings/FND-MEDIA-007.md) | SKIRMISH.RES keeps its screens as raw 320x200 pictures that the game builds from PCX files when they are missing | recorded |
 | [FND-MEDIA-008](../findings/FND-MEDIA-008.md) | The CD holds 2,131 Smacker movies, all SMK2, most 196x204 at 100 ms with one 22,050 Hz track | recorded |
 | [FND-MEDIA-009](../findings/FND-MEDIA-009.md) | Movies play through a Smacker wrapper at 0x0002FCB0 and a frame loop at 0x0002FCF0 that a callback can stop | recorded |
-| [FND-MEDIA-010](../findings/FND-MEDIA-010.md) | Owner screenshots match FLUFF.PCX, V66_1111.PCX, INNPEOPL.PCX and COMSCRN1.PCX, and the executable names the inn patrons | recorded |
+| [FND-MEDIA-010](../findings/FND-MEDIA-010.md) | Owner screenshots match FLUFF.PCX, V66_1111.PCX, INNPEOPL.PCX and COMSCRN1.PCX, and the executable names the inn patrons | superseded |
+| [FND-MEDIA-011](../findings/FND-MEDIA-011.md) | Owner screenshots match FLUFF.PCX, V66_1111.PCX, INNPEOPL.PCX and COMSCRN1.PCX, and the executable names the inn patrons | recorded |
 | [RULE-MEDIA-001](../rules/RULE-MEDIA-001.md) | Loading a CSF sprite file | supported |
 | [RULE-MEDIA-002](../rules/RULE-MEDIA-002.md) | Drawing a sprite frame and a line of text | supported |
 | [RULE-MEDIA-003](../rules/RULE-MEDIA-003.md) | Drawing a PCX picture | supported |
@@ -685,8 +687,9 @@ Entries by area.
 | [FND-SOUND-002](../findings/FND-SOUND-002.md) | Sound banks load through 0x0005B584, only when SOUND_EFFECTS is on, from the open archive by index | recorded |
 | [FND-SOUND-003](../findings/FND-SOUND-003.md) | Samples play through 0x0005B3B0 on ten voices, with rate factors for 11,025, 22,050 and 44,100 Hz only | recorded |
 | [FND-SOUND-004](../findings/FND-SOUND-004.md) | CONQUER.INI switches the sound systems and names an HMI SOS driver setup; the digital driver runs at 22,050 Hz | recorded |
-| [FND-SOUND-005](../findings/FND-SOUND-005.md) | MIDI music plays one HMP song at a time through 0x0005B0D4; the release holds 12 songs | recorded |
+| [FND-SOUND-005](../findings/FND-SOUND-005.md) | MIDI music plays one HMP song at a time through 0x0005B0D4; the release holds 12 songs | superseded |
 | [FND-SOUND-006](../findings/FND-SOUND-006.md) | CD music plays tracks 2 to 6 of the disc through MSCDEX requests and loops by replaying the range | recorded |
+| [FND-SOUND-007](../findings/FND-SOUND-007.md) | MIDI music plays one HMP song at a time through 0x0005B0D4; the release holds 12 songs | recorded |
 | [RULE-SOUND-001](../rules/RULE-SOUND-001.md) | Loading and freeing a sound bank | supported |
 | [RULE-SOUND-002](../rules/RULE-SOUND-002.md) | Playing a sample | supported |
 | [RULE-SOUND-003](../rules/RULE-SOUND-003.md) | Starting the sound systems and playing MIDI music | supported |

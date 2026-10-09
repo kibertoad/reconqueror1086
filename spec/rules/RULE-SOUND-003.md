@@ -4,7 +4,7 @@ title: Starting the sound systems and playing MIDI music
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-SOUND-004, FND-SOUND-005, FND-RES-006, FND-SOUND-006, FND-UI-012, FND-SOUND-003]
+evidence: [FND-SOUND-004, FND-SOUND-007, FND-RES-006, FND-SOUND-006, FND-UI-012, FND-SOUND-003]
 conflicting: []
 split_with: []
 related: [RULE-RES-001, RULE-RES-004, RULE-SOUND-001, RULE-CONFIG-002]
@@ -107,7 +107,7 @@ Sound from the drivers; the flags `digital_ready` and `midi_ready`.
 
 ## What the sources say
 
-The executable (FND-SOUND-004, FND-SOUND-005); the installed `CONQUER.INI` and the songs.
+The executable (FND-SOUND-004, FND-SOUND-007); the installed `CONQUER.INI` and the songs.
 
 ## Differences between builds
 

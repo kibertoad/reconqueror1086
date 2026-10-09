@@ -22,7 +22,7 @@ locations:
     offset: 0x00000D16..0x00000D46
   - build: BLD-GOG-EN
     file: CD:README.BAT
-    offset: 0x00000000..0x0000001C
+    offset: 0x00000000..0x0000001D
 tool: Python 3.14 case-insensitive byte searches of the files FND-RES-057 extracted and checked; capstone 5.0.7 bounded 16-bit disassembly of the LZEXE-unpacked INST.EXE with relocation targets marked
 environment: null
 ---
@@ -98,3 +98,6 @@ with the load image at segment 0x1000. Keep the extracted files and listings
 in ignored local storage.
 
 Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.
+
+Whole-resource exclusive bounds follow FND-RES-070; complete-file identities
+and sizes follow BLD-GOG-EN and the listing comparison in FND-RES-069.

@@ -22,6 +22,14 @@ Entries by status.
 | [RULE-MEDIA-004](../../rules/RULE-MEDIA-004.md) | Loading a skirmish screen from SKIRMISH.RES |
 | [RULE-MEDIA-005](../../rules/RULE-MEDIA-005.md) | Playing a Smacker movie |
 
+## superseded
+
+1 entries.
+
+| ID | Title |
+|---|---|
+| [FND-MEDIA-010](../../findings/FND-MEDIA-010.md) | Owner screenshots match FLUFF.PCX, V66_1111.PCX, INNPEOPL.PCX and COMSCRN1.PCX, and the executable names the inn patrons |
+
 ## recorded
 
 10 entries.
@@ -37,7 +45,7 @@ Entries by status.
 | [FND-MEDIA-007](../../findings/FND-MEDIA-007.md) | SKIRMISH.RES keeps its screens as raw 320x200 pictures that the game builds from PCX files when they are missing |
 | [FND-MEDIA-008](../../findings/FND-MEDIA-008.md) | The CD holds 2,131 Smacker movies, all SMK2, most 196x204 at 100 ms with one 22,050 Hz track |
 | [FND-MEDIA-009](../../findings/FND-MEDIA-009.md) | Movies play through a Smacker wrapper at 0x0002FCB0 and a frame loop at 0x0002FCF0 that a callback can stop |
-| [FND-MEDIA-010](../../findings/FND-MEDIA-010.md) | Owner screenshots match FLUFF.PCX, V66_1111.PCX, INNPEOPL.PCX and COMSCRN1.PCX, and the executable names the inn patrons |
+| [FND-MEDIA-011](../../findings/FND-MEDIA-011.md) | Owner screenshots match FLUFF.PCX, V66_1111.PCX, INNPEOPL.PCX and COMSCRN1.PCX, and the executable names the inn patrons |
 
 ## Open questions
 
