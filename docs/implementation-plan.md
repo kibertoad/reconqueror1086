@@ -29,21 +29,18 @@ Q-RES-131 retain driver-consumer and payload questions; Q-RES-120 through Q-RES-
 retain disc-consumer and audio questions; Q-RES-118 and Q-RES-119 track the cue consumer questions. Every kind of entry in C1086.GOB and the scene files has a format entry
 (FMT-RES-121 to FMT-RES-127 cover the last ones), except `ffonta2.fnt`, which
 nothing reads (FND-RES-068); Q-RES-208 to Q-RES-214 retain their questions.
-Existing implemented slices remain in the milestone table; their implementation
-does not prove Survey complete or promote any evidence status.
+Existing implementation is tracked by parity rows; it does not prove Survey
+complete or promote evidence. Missing code baselines remain explicit in the
+coverage report and coverage/baseline.json.
 
-The next implementation slice remains strategic schema-2 runtime integration,
-with the exact player inputs, fixed-update scheduler and presentation wired
-before removing the dated adapter. Research uses the area queues; gameplay
-changes and evidence-status promotions are outside this documentation batch.
+The next implementation slice is strategic schema-two runtime integration.
+This migration changes guidance and evidence notation, not gameplay or claim statuses.
 
 ## Delivery principles
 
 The current template/toolkit infrastructure migration is specified in
-[template-migration-plan.md](template-migration-plan.md). Its concrete scope is
-approved by the owner on 2026-09-30 and refreshed with explicit authorization
-on 2026-10-01. The current template adoption is 25c5808b;
-the rules snapshot is recorded in `tools/upstream-lock.json`. Package versions and their toolkit revision
+[template-migration-plan.md](template-migration-plan.md). The owner authorizes its scope; plans do not add another approval gate.
+The rules snapshot is recorded in `tools/upstream-lock.json`. Package versions and their toolkit revision
 are recorded in `tools/toolkit-packages.json`, with dependency integrity in
 `pnpm-lock.yaml` and `requirements-evidence.txt`. Plans document authorized work and do not
 require a separate explicit approval before implementation or tooling proceeds.
@@ -64,37 +61,21 @@ require a separate explicit approval before implementation or tooling proceeds.
 - The [GameFAQs Conqueror 1086 A.D. FAQ by mikel123456](https://gamefaqs.gamespot.com/pc/574792-conqueror-1086-ad/faqs/66730) (SRC-GAMEFAQS-66730) is a useful secondary source for game mechanics, screen flow, strategies, and general information. A rule that rests on it alone stays below `supported`.
 - Record where the FAQ agrees or disagrees with the executable in the What the sources say section of each rule and in the Known errors of SRC-GAMEFAQS-66730, and keep disagreements as open questions rather than silently choosing either behaviour.
 
-## Current baseline
+## Progress and evidence boundaries
 
-Strategic temporary-force contact (RULE-STRATEGY-017): the fixed map pass performs pre-route contact, emits the avatar notice, and hands army encounters to the direct six-counter tactical/automatic resolver and source-variable settlement.
+Use PARITY.md and the generated status indexes for current totals. Run
+`node tools/Report-Coverage.mjs` for inventory/citation progress and explicit
+missing baselines; coverage/README.md defines its limits. Coverage is not a
+share of behavior understood, and complete-reading coverage is unavailable
+without a checked function-level baseline.
 
-Strategic temporary-force producers (RULE-STRATEGY-019): the desktop fixed map pass forwards the persisted conversation variables into the `scot.rat` and `wales.rat` creator actions, with active-descriptor replay suppression. Patrol encounter resolution uses the direct counters; which conversations make the forces available is still open.
-
-Hostile combat mode 9 (RULE-ASSAULT-008): the runtime implements both edges; forced-state tests cover templates 3, 5, and 9. No shipped placement starts in mode 9, and how an actor enters it in ordinary play is an open question of the rule.
-
-Friendly combat mode 9 (RULE-ASSAULT-008): both states are implemented and tested in forced-state conditions; the current handler shares mode 10's scaled non-cardinal escape motion. No placed actor starts in mode 9, and its ordinary-play entry is still open.
-
-Strategic tactical cadence (RULE-BATTLE-010): the default host timer quantizes to four-ms steps, so a pass first becomes eligible at 204 ms from an aligned sample and a delayed pass resets its baseline without catch-up. The hardware phase of the original timer is not known.
-
-Strategic tactical input (RULE-BATTLE-012): the resolver's primary selection/control and secondary destination routes receive the eight press/release codes from live host button transitions. The host advances the hold/repeat timestamp through the recovered timer accumulator. The bounded host queue retains every same-callback edge in low-bit order with its event-time coordinates, consuming one per stable update; tests cover strict repeat boundaries, independent buttons, simultaneous edges, coordinate snapshots, and the 30-entry cap.
-
-Dragon encounter continuation: the run follows RULE-JOUST-001 and RULE-JOUST-003 with one pass per movie frame (DEV-JOUST-001). The event classifier's wall-clock throughput and cursor presentation remain to recover.
-
-The repository currently provides:
-
-- A MonoGame desktop application and data-driven campaign core that requires verified owner-imported official assets.
-- Character templates, the original 30-dilemma selection/outcome interpreter, economy, construction counters, army recruitment, travel, tournaments, courtship, equipment, field battles, sieges, crown victory, dragon victory, and the age limit.
-- Persistent strategic garrisons, spying, interception, retreat, conquest, and JSON saves.
-- A read-only original-disc inspector with ISO inventory, hashes, executable-string offsets, archive/compression reports, CSF previews, and HAT layout reports.
-- Bounded parsers for GOB/RES directories, kind-1 LZ/RLE blocks, indexed PCX/PCC images, headerless indexed screen planes, CSF animation frames, raw RGB palettes, HAT screen descriptors, and rate-tagged `.666` sound banks.
-- An end-user importer that installs byte-stored, kind-1, and kind-2 owned resources plus lossless CDDA WAV files under ignored local storage.
-- A runtime imported-content catalog, CD music playback, and definition-driven original art for the title, options hub, character options, pre-generated characters, campaign briefing, animated youth dilemmas, estate/travel shell, England map, load screen, Home/farm/blacksmith flows, and a tournament portrait.
-- The `TITLE.HAT`/`FFTITLE.PCX` title load (SCR-UI-001) followed by a character-options flow whose exact geometry comes from installed `CGOPTS.HAT` and `PREGEN.HAT`.
-- Self-contained Windows x64, Linux x64, macOS arm64, and macOS x64 packaging automation, with a smart ownership-aware Windows installer and a pinned four-artifact release workflow.
-- A repository-wide 1,000-line compiled-source ceiling; the game shell and resource regression suite are split into focused partial modules so the limit passes without exemptions.
-- Automated xUnit behavior tests and executable specifications that run without a graphics device through the canonical validation gate.
-
-Practice joust: the replacement follows RULE-JOUST-001 and RULE-JOUST-002, advancing once per movie frame (DEV-JOUST-001); parity/JOUST.md lists what remains.
+Every implementation slice works from the spec alone. It targets named parity
+rows at `implemented` unless docs/RUNTIME.md and recorded replay evidence make
+`validated` reachable. File-backed format rows may use owned-file comparisons;
+rules, screens and memory formats need recorded-run or emulated-call fixtures.
+A complete static reading can establish an entry but does not validate its
+replacement. Add the headless fixture runner before slices that replay those
+fixtures. Remaining owner-run observations are risks, never waiting gates.
 
 ## Dependency map
 
@@ -142,17 +123,17 @@ Maintain a reviewable clean-room specification alongside the implementation rath
 
 Deliverables:
 
-- Document byte layouts, endianness, offsets, length semantics, compression framing, known signatures, and validation rules in `docs/resource-formats.md`.
-- Record sample-population totals and the exact hashed release to which each observation applies.
+- Document original byte layouts, widths, length semantics, compression framing and validation rules in `spec/formats/`, with findings as evidence. `docs/resource-formats.md` explains the rebuild and cites spec IDs.
+- Record evidence populations and the exact hashed release in the findings that require them; keep changing validation totals in generated reports.
 - Give every field and codec entry a status in `spec/formats/` and keep uncertain fields in its Open questions.
-- Link format claims to the inspector report that reproduces them and to synthetic specifications covering malformed input.
+- Link original claims to spec evidence; keep inspector reports local and link implementation tests through spec IDs and parity rows.
 - Update the specification whenever support is added for a new archive, image, palette, dialogue, audio, animation, save, or metadata structure.
 - Preserve unsuccessful hypotheses when they prevent future contributors from repeating the same false identification.
 
 Acceptance criteria:
 
 - A contributor can implement an independent parser from the documentation without consulting proprietary files.
-- Every implemented field has a documented bounds rule and confidence grade.
+- Every implemented field has a documented bounds rule and the Standard status its evidence supports.
 - Generated reports and original bytes remain ignored; only compact facts, layouts, hashes, and independently authored fixtures are tracked.
 - Format documentation and decoder changes are reviewed and committed together.
 
@@ -163,7 +144,7 @@ Deliverables:
 - Decode text encoding, speaker identifiers, conversation nodes, choices, conditions, and resource references.
 - Generate a local, versioned dialogue manifest keyed by stable original identifiers.
 - Add a runtime dialogue repository backed by the required local official-asset extraction.
-- Record short factual findings and confidence grades without committing complete copyrighted dialogue.
+- Record factual findings and the Standard evidence status without committing complete copyrighted dialogue.
 
 Acceptance criteria:
 
@@ -209,22 +190,22 @@ Deliverables:
 - Identify compiler/runtime, executable segments, overlays, relocation information, and useful symbol/string references.
 - Add bounded table scanners and structured hex reports to `Conqueror.Inspect`.
 - Locate candidate tables for buildings, unit prices/upkeep, equipment, opponents, wagers, map locations, garrisons, loot, and combat.
-- Record code/data addresses, interpretation rationale, release hashes, and confidence grades.
+- Record native code/data locations, competing readings, release hashes and the Standard evidence status in spec findings and entries.
 
 ### 2.2 Controlled behavioral observation
 
 Deliverables:
 
-- Define repeatable DOSBox scenarios for uncertain formulas.
-- Capture inputs, initial saves, random-seed assumptions, outcomes, and sample sizes.
+- Take an original run only after its own static attempt, or to confirm a static reading. Use the capabilities and lock in RUNTIME.md; request a live session where a person must drive it.
+- Fix starting state and vary one input; record the seed and every rule-tagged random draw where the protocol requires recorded runs. Reach state through supported fields and wait on readable state, never a fixed delay.
 - Build small analysis commands for distributions and candidate-formula comparison.
 - Keep original saves/captures local and commit only derived facts and test fixtures that contain no proprietary content.
 
 ### 2.3 Definition promotion
 
-For each recovered table:
+Keep research and implementation in separate batches. For each recovered table:
 
-1. Write or update the spec entries for the table.
+1. Record the table and its evidence in a research batch, then hand off the spec.
 2. Change the relevant typed definition.
 3. Add an executable specification through the real interpreter.
 4. Update the parity row in `parity/`.
@@ -433,8 +414,6 @@ Deliverables:
 - Track conquest spoils separately in the economics overview.
 - Apply correct estate transfer, fame, experience, strength, and victory effects.
 
-Current progress: bounded `Viewer`, `Scenario`, `Map`, `Blocks`, `Backdrop`, `BackImage`, and `Pal0`-`Pal127` data from the owned scene archives drive first-person geometry, presentation, interaction, and combat. Executable tracing assigns `MELEE00`-`MELEE24` to tournament melee, a random unsuffixed `MELEE0`-`MELEE2` to practice, and common `MELEE0.RES` to campaign castle and London assaults. The original `SKIRMISH.PCX`, `SKIRMISH.PAL`, and 53-frame `SKIRMISH.CSF` supply the viewport shell, wall shading, actors, weapon foregrounds, and hit effects. The desktop runtime requires a fully verified extraction from the supported official GOG release and fails before graphics initialization when any mapped dependency is missing, damaged, incomplete, or unsupported; placeholder and no-media gameplay are outside the supported design. What the rebuild implements of the first-person combat rules is tracked in `parity/ASSAULT.md` and `parity/VIEW.md`.
-
 Acceptance criteria:
 
 - Every castle is completable without debug tools.
@@ -565,37 +544,12 @@ All parser fixtures must be synthetic or independently authored; never commit ex
 - Fail CI if `UserContent` or `analysis/original` generated outputs are tracked.
 - Review new binary files and unusually large files explicitly.
 
-## Milestone status
+## Slice completion tracking
 
-Status is conservative: “prototype” means the route is playable but substantial original behavior or balance remains provisional; only acceptance-criteria completion can mark a milestone complete.
-
-| Milestone | Phases | Status (2026-09-10) | Remaining completion gate |
-| --- | --- | --- | --- |
-| M1: Decoded content | 1-2 | In progress: archive kinds 1 and 2, all `.RES`/`.LOW` scene archives, raw `TEX` dimensions, PCX/PCC, CSF, palettes, HAT layouts, dilemma text, the 1,311-node `ALL.CIF`/`ALL.CBF` conversation graph, `.666` sound-bank framing, complete owned-release SMK codecs, collision-free installer, and evidence reports work. Scene decoding now includes Viewer/Scenario metadata, maps, typed cardinal face and billboard references, backdrop images, all 128 indexed color-remap tables, and the map generation and colour-map selection of RULE-VIEW-006 and RULE-VIEW-007. | Decode remaining conversation conditions/mutations and scene/text structures, bind remaining audio events, and complete executable table recovery and controlled observations. |
-| M2: Feudal simulation | 3-4 | Playable prototype: the original estate shell and typed panel/navigation layout are active, and farm commands/help share one definition registry. | Exact terrain sprites and map/economy data, tile-based fief construction, multiple managed estates, full dialogue/quests, and political orders. |
-| M3: Knightly competition | 5 | Playable prototype. | Exact opponent tables plus faithful first-person jousting and tactical tournament melee. |
-| M4: Conquest | 6-7 | Playable prototype: the five-division War Planning roster of the manual, company editing, membership, field state, one-live one-report spies, joined-division combat, persisted captain-commanded movement, persisted five-slot autonomous enemy movement with report-before-advance spy binding, and original scene-map/start/spawn ingestion are active. The hostile generator, force construction, the three movement handlers, terrain speed, the grid and projection, and retargeting (RULE-STRATEGY-002 to RULE-STRATEGY-009 and RULE-STRATEGY-014) are implemented and regression-tested as `parity/STRATEGY.md` lists. `icon.jp` drives the new slot-ordered motion kernel alongside all 97 executable-selected paths; the playable campaign still isolates its daily dated-travel adapter until generation/contact integration is complete. The non-bijective schema-1-to-2 settlement and exact replacement state are specified in `architecture.md`. Campaign assaults use `MELEE0.RES`, practice picks one of the three unsuffixed base scenes (RULE-TOURNEY-005), and the two-digit family stays with tournament melee. Imported first-person scenes render inside the original combat shell and viewport with cropped connected maps, panoramas, cardinal and distance-shaded wall faces, explicit door state targets, direction-aware actor state templates with imported completion gates, exactly bound equipped-weapon foreground attacks, original per-weapon break rolls, and fatal/wounding hit effects with occlusion. | Complete the fixed-update scheduler shell around the strategic motion kernel, activate schema 2, and remove the dated adapter; captain battle rules, remaining original strategic rules, status/control rules, exact foreground presentation, combat balance and AI, retainers, and loot. |
-| M5: Two endings | 8 | Both routes are playable as prototypes. The dragon moor stays hidden until conversation variable 2 is raised by Anna Lisa's lair branch (FND-TALK-011); clean-room mode mirrors that disclosure after her second successful courtship joust, and older saves already at the moor migrate safely. The dated named-location route proceeds from the owned `TRANDRAG.SMK` approach into the timed encounter after lair discovery; the strategic-map trigger of RULE-DRAGON-001 enters the dragon worker directly. Lance experience and live equipment set the strict two-axis score threshold. `DRJSTRUN.SMK` plays during the encounter; the worker's zero/nonzero result plays `DRJSTWIN.SMK` or `DRJSTLSE.SMK` respectively. Host withdrawal remains possible and returns to the map without a fabricated outcome movie; its transient trigger suppression lets later player records and hostile scheduling resume until the distinguished record leaves the region. Dragon victory then continues into the `CHAMPL30.SMK` King's Champion investiture, while taking London plays the `CROWNL30.SMK` throne ceremony (RULE-DRAGON-002). Reaching age 30 without either victory plays the `AVG_END.SMK` sequence, distinct from fatal dragon and Drogo outcomes. The imported `DRJSTWIN.PCX` supplies the dragon battle background. The dragon run loads the 25-frame `lance1.CSF`, bound as the live foreground through the frame selector and motion of RULE-JOUST-001 with one pass per movie frame (DEV-JOUST-001); host cursor presentation and interaction timing remain to recover. Imported courtship sessions defer prize mutations to each lady's action tree (FND-TALK-011) rather than applying a synthetic ladder. Unpaid harvest debt now raises a persisted Drogo demand with exact-debt payment or a fatal first-person fight; killing him permanently disables the moneylender; refusal requires the imported four-hostile `MONEY.RES` scene (FND-ASSAULT-048) and its template stats. | Recover original pointer-event timing and cursor presentation, and recover crown politics plus any remaining fatal transitions. |
-| M6: Original presentation | 9 | In progress: file-backed direct title/credits/item-movie playback, the confirmed campaign briefing, title fallback, options hub with original state widgets and persistent channel volumes/reduced motion, pause, a centered aspect-correct virtual canvas with windowed/borderless-fullscreen and integer-scaling modes, character screens, estate/map panels, all ten Home hotspots (SCR-UI-009), Overview/War Planning backgrounds and controls, four descriptor-driven fief-management variants, the populated inn with ten named patrons and portraits, all six tournament lady selector conversations, original blacksmith node `3201`, ordinary parish selector `3100`, Cambridge armor-quest selector `3149`, CD audio, presentation descriptors, edge-triggered controller navigation, context-sensitive dialogue/map/shop/tournament/combat actions, and a right-stick virtual pointer for all original hotspots are active. | Exact army-path behavior, exact estate tiles, choosing the church's priest from the place record (FND-UI-005), remaining conversation entry points and typed-state bridges, remaining CSF/SMK event bindings and seeking, fonts, cursors, subtitles, and input remapping. |
-| M7: Release | 10 | In progress: launch/test/import utilities, five atomic save slots plus a separate transition-triggered autosave with explicit schema migration, previous-generation recovery, and user-visible generation-specific corruption diagnostics; supported-release detection; exact disk-space preflight; progress-reported atomic/resumable content writes; manifest-wide verify/repair and manifest-scoped uninstall commands; a data-driven legal-boundary check; four-platform CI; self-contained Windows/Linux/macOS packages; a manual four-installer release workflow; and an ownership-aware Windows installer with smart GOG discovery, shortcut validation, and automatic extraction are implemented. | Signed/notarized packages, clean-machine verification, third-party notices, and release checklist. |
-
-M5 correction (2026-09-22): the desktop Drogo-refusal route requires and decodes the owned `MONEY.RES` scene, then passes its layout through the layout-required `Campaign.CreateDrogoBattle(SiegeLayout)` with retainers explicitly excluded. It uses the scene's one player and four hostile placements (FND-ASSAULT-048), the imported map, collision, actor, backdrop, colour-map and texture data, and the template stats, so no one-on-one fallback remains. The July collection and the fight follow RULE-ESTATE-003.
-
-M6 correction (2026-09-22): `OriginalUiFont` draws `CONFONT.CSF` as RULE-MEDIA-002 describes, keeping the relative advances, alpha-mask shapes and caller colour while fitting the host canvas. Recover the active screen-palette mapping and remaining vertical/layout rules plus cursor timing/hourglass behavior.
-
-## Schema-2 replacement-state
-
-`OriginalStrategicCampaignState` provides the non-aliased mutable replacement specified by `architecture.md`: all 176 people, five exact enemy slots, six exact player records, route identities/cursors, integer and floating movement state, generator/reactive counters, bounded speed, month-derived profile, persisted camera, list heads, and sparse full-dword terrain mutations. `StrategicSchemaTwoMigration.Prepare` implements deterministic slot-ordered schema-1 settlement, returning complete columns only to valid still-hostile origins and journaling all return/dispersal outcomes before clearing the dated roster. Complete JSON round-trip and structural rejection tests pass. The decoded resource provider and both movement shells are now implemented; schema activation still waits for exact player command construction, application fixed-update/presentation wiring, and dated-adapter replacement.
-
-## Strategic motion-kernel
-
-The decoded provider now drives a mutable physical-slot-order pass for all three original movement modes. `AdvanceMovementPass` implements the direct, routed and pursuit handlers of RULE-STRATEGY-006 and RULE-STRATEGY-007. Sparse saved terrain mutations override `icon.jp` during the same lookup. Focused tests cover physical slot order, exact-boundary crossing, byte wrap, route tolerance/completion, corrupt-direction teardown, live pursuit, target disappearance, and fallback. Schema and dated campaign behavior remain unchanged; next integrate generator-first dispatch, completion contacts/encounters, and live player-army targets before activating fixed updates and schema 2.
-
-## Strategic scheduler-shell
-
-`AdvanceSchedulerPass` now surrounds the motion kernel with the executable's generator-first, first-free-slot construction and per-slot completion interleaving. It implements both timed and reactive branches, ordinary and pursuit constructors, the corrected ordinary force expression `household + floor(floor(lord rating / 4) / 3)`, reactive detachment/support arithmetic, direct grid-person lookup, five-probe contact precedence, encounter handoff, byte-garrison reinforcement, teardown, and exact first-nearby-army/player/origin retargeting. Tests prove a newly generated record can move in the same pass and that an encounter stops later physical slots. The original's uninitialized finder-output read is documented and replaced with an explicit-current-detection safety policy. The next checkpoint supplies these inputs from live campaign state, preserves spy reporting before the pass, wires the scheduler to the fixed update and encounter presentation, activates schema 2, and removes the dated adapter.
-
-Strategic contact handoff correction: in the original the player pass runs the encounter before the hostile scheduler, in the same pass (RULE-STRATEGY-011). The replacement's interactive resolver opens on a later UI update, so a pass that emits a new player/enemy encounter defers its hostile scheduler and preserves the captured combatants for the modal's live-snapshot validation. Existing modal and unavailable-fallback guards still apply; a focused regression covers the deferral.
+The phase acceptance criteria below define the work, while parity rows record
+its implementation status. Research blockers live in the area queues; a slice
+names their IDs and either closes them or explicitly accepts their gaps.
+Completed work and dated validation belong in Git and docs/VALIDATION.md.
 
 ## Host policies
 
@@ -620,116 +574,39 @@ These are future opt-in presentation features, not compatibility requirements an
 
 The owned art contains no established distant LOD asset tiers, so any reduced-detail treatment must be derived presentation work and clearly separated from the preservation profile. Evaluate these options only after the faithful renderer is complete, using visual regression captures to ensure the original profile remains unchanged.
 
-## Current resource and startup sprint
+## Research priorities
 
-Local analysis reference: the complete owned installation is available read-only at `C:\GOG Games\Conqueror AD1086`. This machine-specific path is for inspection/import tooling only; no proprietary file from it may be committed, packaged, or redistributed.
+Follow the area queues in the protocol's order, keeping static attempts before
+emulated calls and original runs. The remaining startup/input work belongs to
+the UI and MEDIA queues and their parity rows. Survey still needs the data-family
+reconciliation and missing-code baselines described above and in coverage/README.md.
+Local source locations and analyzer setup belong in RUNTIME.md and ghidra.md.
 
-Local static-analysis tool: Ghidra 12.1.3 is installed user-wide at `C:\Users\kiber\AppData\Local\Programs\Ghidra\ghidra_12.1.3_PUBLIC`, with Temurin JDK 21.0.12.1 at `C:\Users\kiber\AppData\Local\Programs\Java\jdk-21.0.12.1+1`. `GHIDRA_HOME`, `JAVA_HOME`, and the user `PATH` contain these locations. Temporary Ghidra projects and derived disassembly must remain outside Git just like other original-binary analysis artifacts. [`ghidra.md`](ghidra.md) documents setup, isolated-Codex environment variables, LE executable handling, and the reproducible headless workflow.
+## Next implementation slice
 
-- [x] Move shared ISO/cue/CDDA/manifest primitives out of the inspector executable into `Conqueror.Resources`.
-- [x] Add synthetic ISO, cue, WAV, archive, manifest, and path-safety tests.
-- [x] Add an xUnit.net v3 4.0.0 suite and an isolated Windows test launcher that cannot collide with a running game's build outputs.
-- [x] Reverse-engineer and bounds-check the top-level `C1086.GOB`/scene-RES directory structure.
-- [x] Inventory stored versus compressed entries without bulk decompression.
-- [x] Identify and decode the marker-delimited `DILEM*.DAT` text resources end to end; all 30 validate through a bounded ASCII parser and are exposed by stable number through the runtime dialogue repository.
-- [x] Decode `ALL.CIF`/`ALL.CBF` conversation framing end to end; all 1,311 indexed nodes, 2,062 prompt variants, 2,696 terminal/linked responses, and 63 zero-response continuation slots validate through a bounded graph parser and runtime catalog adapter. The inn's ten roots follow FND-TALK-011.
-- [x] Preserve all 423 node-level and 2,318 response-level action references from the fixed conversation headers, with exact 30-slot bounds and metadata-only reporting.
-- [x] Decode the indexed `ALL.TMI`/`ALL.TMB` structure with bounded recursive traversal and validate the population of FND-TALK-010.
-- [x] Recover action function IDs 3-9, the relocated operator jump table, and the 190-value `ALL.VTB` initializer; execute the expression and branch grammar of RULE-TALK-002, persistent script variables, dialogue redirects, raw item counters, and wealth mutations from original inn conversations.
-- [x] Map the original scope-1 selectors for wealth, honor, fame, piety, strength, stamina, and intelligence onto typed campaign fields; map produced/consumed item IDs 0-23 onto their visible inventory names while retaining raw counters for save compatibility and the item-161 test of FND-TALK-010.
-- [x] Decode one byte-stored image/palette resource into runtime RGBA pixels end to end.
-- [x] Decode all five byte-stored CSF indexed-animation sequences into bounded palette indices and alpha masks.
-- [x] Validate and classify the five stored 256-color RGB palette resources.
-- [x] Add current findings with evidence.
-- [x] Make the importer install byte-stored entries and expose them through `ImportedContentCatalog`.
-- [x] Prove and implement the kind-1 compression method used by unequal-size entries.
-  - [x] Confirm kind-1 block framing across all 471 entries in the hashed GOB.
-  - [x] Confirm 16 KiB output slices and the `0x40` compressed/`0x80` verbatim block markers across the GOB and all 50 scene containers.
-  - [x] Separate the five kind-2 entries and disprove raw inner-chunk LZW and independently reset classic LH1 for kind 1.
-  - [x] Identify the kind-1 LZ/RLE token codec and validate all 20,381 blocks plus 188 decoded PCX-compatible images.
-  - [x] Recover kind 2 (FMT-RES-004); validate exact expansion of all five GOB entries and strict 640x480 PCX decoding of all four image entries.
-- [x] Activate decoded `fftitle.pcx` and `engmap1.pcx` through definition-driven title and map roles.
-- [x] Correct the startup flow from executable/resource evidence: static `FFTITLE.PCX` title, then interactive `CHAR_OPS.PCX`, with `PREGEN.PCX` and `LOADGAME.PCX` registered as distinct screen roles.
-- [x] Decode HAT screen descriptors and use installed `CGOPTS.HAT`/`PREGEN.HAT` geometry at runtime; verified official assets are now a launch requirement.
-- [x] Split Home, farm management, blacksmith workshop, and blacksmith inventory into distinct runtime scenes using screenshot-verified `TACTICAL.PCX`, `FIEFMGMT.PCX`, `FORGESMI.PCX`, and `SWDTEMP.PCX` roles.
-- [x] Activate screenshot-confirmed `INNPEOPL.PCX`; bind its ten patrons, Exit, and footer through `VINN.HAT`; and use the executable-ordered name catalog plus matching PCC portraits in the shared conversation frame.
-- [x] Activate the populated inn's original conversation roots from the startup-decoded database: preload referenced portraits, select prompt variants, render all declared response rows, accept mouse/number selection, execute node/response action programs, follow action redirects plus response and zero-choice continuation edges, and terminate on target zero.
-- [x] Replace character-slicing fallback text wrapping with word-boundary wrapping; preserve explicit paragraph breaks and keep a single oversized token intact, matching the original text control's explicit `WORDWRAP` behavior at the level supported by the fixed-width fallback font.
-- [x] Decode the 40-record `WEAPONS.DAT` store table and bind its prices, local descriptions, item order, and `SWORDS.CSF` frame indices to typed equipment definitions and the original inventory shell.
-- [x] Decode and palette-verify all four `BUYSELL.CSF` overlays, then select blank/View and Sell/Purchase states from store metadata and current ownership through typed presentation definitions.
-- [x] Identify `ICONTEMP.PCX`/`ICONMAP.HAT` as the estate/travel shell and activate its exact viewport, inset-map, tab, information, and navigation regions.
-- [x] Replace farm input branching and separately maintained help strings with one typed command/action registry.
-- [x] Add shared data-driven visual-scene hover labels and confirm the separate Blacksmith/Buy-Sell `VSMITH.HAT` targets. Correct the Home descriptor from `FCASTLE.HAT` to `FOPTS.HAT` and activate its seven visually/evidence-correlated office objects; three ambiguous targets remain disabled.
-- [x] Route the Home Castle model and Farm/Village/Forest books into a shared section-aware management screen, import `FCASTLE.HAT`, `FVILLAGE.HAT`, `FFARM.HAT`, and `FFOREST.HAT`, and source each variant's exact terrain/fullscreen region IDs from its descriptor. Row semantics remain deliberately unassigned where evidence is incomplete.
-- [x] Activate descriptor-driven fief-management OK/Cancel controls with transactional commit/rollback; prevent pending edits from leaking into saves, and restore economy, development, recruitment, and journal state on cancellation.
-- [x] Recover the four contiguous fief-management label catalogs from executable data, render them through each HAT's exact row rectangles, add bounded Village scrolling, activate only supported row mutations, and correct the shared upper-right region from a presumed wealth field to the visible Full Screen control.
-- [x] Bind all ten `FOPTS.HAT` Home regions in the executable's contiguous label order, correct War Planning/Orders region identities, activate both exit regions, and register the original `F_OVER.PCX`/`WARPLAN.PCX` destinations with their descriptors.
-- [x] Decode the 22-frame `WARPLAN.CSF` state catalog and map its five army selectors, Field Army, Join/Leave, Send Out Spy, unit rows, army name, and footer through `FWARPLAN.HAT`.
-- [x] Apply the owned manual's War Planning rules: persist five named divisions, edit 100-serf companies with a 60-company cap and home-territory restriction, stage field/join/spy state transactionally, charge all-division upkeep, preserve the confirmed 80-shilling single-live one-report spy lifetime through the first active slot of a persisted five-record movement roster, and make OK/Cancel commit or restore every pending change. The former monthly report proxy is removed. Preserve the exact named property rows, linked lord inputs, person-record layout, and initial household counts; exact movement scheduling, routes, and runtime index migration remain provisional.
-- [x] Decode and classify all 26 `.666` sound banks with bounded length/rate validation; the ignored population report accounts for 102 samples and zero rejects.
-- [x] Confirm unsigned 8-bit mono PCM from waveform centering, identify the identical shared UI sample across 17 screen banks, and activate it through a startup cache that decodes each referenced bank and converts each registered sample only once.
-- [x] Decode and classify all six `FFMOUSE.CSF` cursor frames, activate contextual travel/talk/target/pressed-hand selection, and use the decoded `OPTION.CSF` held states with same-region press/release activation.
-- [x] Activate the original `PRACTICE.PCX`/`PRACTICE.HAT` menu, preserve its executable-ordered War/Joust/Melee/Exit/Castle Skirmish labels, bind the directly decoded `JOUSPRAC.SMK`, and route War versus Melee/Castle Skirmish into isolated non-campaign tactical versus first-person practice sessions. Exact legacy combat presentation and parameters remain provisional.
-- [x] Decode the first-person `Viewer`, `Scenario`, 128x128 column-major `Map`, fixed-size named `Blocks`, and paired `Backdrop`/`BackImage` records; use original scene geometry, viewer start/facing, wrapping panorama, interactive block roles, exit/gate boundaries, and defender/champion placements in melee and castle-skirmish sessions.
-- [x] Classify solid-block cardinal surface slots separately from kind-4 billboard references and render the contacted wall or door face through the map-aware raycaster. The face order follows FND-VIEW-006 and the colour maps RULE-VIEW-006.
-- [x] Recover door behavior-bit and state-target semantics (RULE-ASSAULT-021).
-- [x] Classify and activate original knight/champion/footman state templates (RULE-ASSAULT-029), import each state's `SFXDEFS` completion gate (RULE-ASSAULT-018), preserve wall-column occlusion, and remove dead actors from collision and combat before their death-state gate completes.
-- [x] Decode the complete canonical `Pal0`-`Pal127` scene color-map set as four 32-step indexed-remap families, regenerate them with RULE-VIEW-006, and apply the fixed-depth clamp of RULE-VIEW-007 through a bounded texture/map cache.
-- [x] Remove the incorrect 15-castle mapping across tournament's `MELEE00`-`MELEE24` family. Practice picks `MELEE0`-`MELEE2` (RULE-TOURNEY-005), and the two-digit family belongs to tournament melee.
-- [x] Decode and palette-verify the 53-frame `SKIRMISH.CSF` sequence, classify its weapon, shield, and blood-effect runs, and bind the axe, crossbow, hammer, mace, sword, and dagger sequences to first-person combat (RULE-ASSAULT-026, RULE-ASSAULT-028, RULE-ASSAULT-031).
-- [x] Decode the headerless 320x200 `SKIRMISH.PCX` indexed plane with its separate raw palette; use its exact 167x117 combat aperture, message/status panels, command labels, health strip, and radar well. Missing or unsupported official media fails startup; an assetless/generated presentation path is intentionally unsupported. Exact dynamic field contents and mouse-command semantics are still open.
-- [x] Render the exit or gate of each melee (FND-ASSAULT-047) and every non-actor kind-4 pickup, debris, and weapon-contact object as an occluded billboard (RULE-ASSAULT-005, RULE-ASSAULT-021).
-- [ ] Trace the complete startup/menu state machine, input timing, cursor behavior, and region-action dispatch from `CONQUER.EXE` into `spec/screens/`.
+Strategic schema-two runtime integration follows architecture.md and
+RULE-STRATEGY-006, RULE-STRATEGY-007, RULE-STRATEGY-010, RULE-STRATEGY-011,
+RULE-STRATEGY-012 and RULE-STRATEGY-013. Its target rows are in parity/STRATEGY.md
+and stop at `implemented` until recorded replay evidence is available.
 
-The resource-decoding sprint is first because it unlocks exact dialogue, screen mappings, opponent identities, construction data, and balance tables needed by most later phases.
+Exit: construct exact player commands and temporary-force inputs from live
+serializable state; wire fixed updates, encounter handoff and presentation;
+activate schema two only when bootstrap, migration and save/load are complete;
+then remove the dated adapter. Preserve the spy-report ordering and unresolved
+evidence gaps in the named entries. Require deterministic headless cases for
+the whole branch tables and migration outcomes before activation.
 
-## Next implementation priorities
+Later implementation uses parity/ASSAULT.md for remaining combat transitions,
+parity/UI.md and parity/MEDIA.md for cursor/menu timing and event bindings,
+parity/ESTATE.md for atlas and terrain assignments, and RULE-SOUND-002's row
+for sample callers. Missing spec behavior is a `Spec gap:` note, not a guess.
 
-1. Continue first-person combat recovery: the remaining transition-table entries, the mode value the orders reset to, and the view row the actor rays test (RULE-ASSAULT-004, RULE-ASSAULT-008, RULE-ASSAULT-010). `parity/ASSAULT.md` lists the rest.
-   Future-proof the recovered design with a monotonic simulation clock and per-record deadlines. Preserve original interval values, state order, strict threshold, and deadline-overrun behavior in compatibility tests, but keep rendering observational and use bounded update catch-up after stalls. Do not make effect or combat speed depend on processor throughput, render-call count, monitor refresh rate, or wall-clock adjustments; represent the original four-render-call blood lifetime as four explicit presentation/simulation steps once the original render cadence is established.
-2. Continue tracing startup/menu input timing and HAT region-action dispatch from `CONQUER.EXE`; all ten Home labels, nine registered Home actions, War Planning controls, independent division movement, and the five-slot report-before-movement spy boundary are active. `JUMP!!` is now closed as an intentionally inactive label-only region. Schema-2 runtime migration and original input timing remain.
-3. [Completed 2026-09-08; policy updated 2026-09-13] Bind the decoded five-definition age groups to campaign state using the per-age selection of the PERSON rules and keep original prose local. Startup now requires those owner-imported resources rather than supporting built-in summary gameplay.
-4. In progress: bind menu CSF sequences to verified palettes and roles. `OPTION.CSF` ON/OFF held/released and Resume frames use `OPTFIN.PCX`; `SWORDS.CSF` item art and `BUYSELL.CSF` control states use `SWDTEMP.PCX`; all six `FFMOUSE.CSF` frames are classified and contextual travel/talk/target/pressed-hand selection is active. Exact cursor timing, hourglass dispatch, and other menu sequences still require evidence.
-5. [Completed 2026-09-10] Add legal-boundary automation that fails if imported media or generated analysis artifacts enter Git, then add Windows x64, Linux x64, macOS arm64, and macOS x64 CI restore/build/test/publish coverage plus native installer checks. `tools/Verify-Repository.ps1` interprets the data-only `repository-policy.json`; the local test launcher and every GitHub Actions package workflow enforce it before compiling.
-6. In progress: `ICA`/`ICS`/`ICW` are decoded and active as seasonal 337-frame estate atlases using the `ICONTEMP.PCX` palette. Recover the executable's exact terrain/frame table plus roads, shield, cursor, and layout data; current semantic frame assignments remain provisional.
-7. In progress: all imported samples are eagerly converted into a retained startup cache and the shared click is active. Bind the remaining samples to the callers of RULE-SOUND-002.
+## Infrastructure requirements
 
-## Combat rendering notes
+The current rules snapshot/checker are pinned by tools/upstream-lock.json;
+toolkit versions and revision are in tools/toolkit-packages.json. Exact package
+locks and requirements-evidence.txt define installed dependency integrity.
+Follow template-migration-plan.md for the current migration acceptance audit.
+Use the canonical validation gate and keep owned-source evidence local.
+Publication requires the owner's explicit request.
 
-Acquisition traverses the complete wrapped source map, not only the cropped visible layout. Scene activation now retains CPU-decoded sources for every structural face and all kind-4 heading sectors while allocating GPU textures only for the render set. This fixes melee practice failing when a valid off-layout ray candidate selected texture 11; focused closure coverage locks ordinary faces plus mirrored and unmirrored billboards.
-
-Dependency enumeration begins with placed map blocks and follows only state-target edges eligible for ray traversal, so unused block definitions do not create requirements for textures the archive lacks. `CONQUER/DEFEND2.RES`, the only scene archive holding textures 64 to 138, serves as a common combat actor atlas; active scene slots override it, supplying normalized walk families 64/96/128 without losing scene-specific states. `SiegeTextureDependencies` and `LoadCombatTextureSources` preflight this layered closure. All procedural siege actor, object, wall, backdrop, and shell fallbacks are removed, leaving one supported original-resource rendering path.
-
-Indexed scene and CSF uploads now premultiply transparent pixels for MonoGame, removing the atlas-colored rectangles around actors and foregrounds. Runtime actor/object placement uses the `center + lateral/forward` viewer basis of RULE-VIEW-003; actor width, lower/upper elevations, actor-minus-viewer heading sector, and keyboard strike target use the same fixed-depth billboard geometry as pointer acquisition. The 1088x200 `BackImage` is treated as four overlapping 320x200 views at stride 256, and the exact `(26,24,167,117)` combat aperture is selected rather than compressing a 640-pixel strip. Movement timing stays processor-independent and follows the ASSAULT movement rules.
-
-Potential higher-powered-machine presentation work should be opt-in and observational: viewport supersampling and filtering can be explored after fidelity completion, while visibility, picking, occlusion, interaction, and AI retain the original 64-step ray. A longer ray is not planned because source lookup wraps in the 128-cell authored map and could reveal duplicated or unauthored scenery.
-
-## Home inactive `JUMP!!` region
-
-`SceneHotspot.Interactive` now expresses that distinction: Home retains all ten HAT bounds and hover labels, while activation ignores `JUMP!!`, which has no routine in the original (SCR-UI-009). A focused test pins region 7 as the only inactive Home hotspot.
-
-
-## Strategic reactive-finder
-
-The reactive finder of RULE-STRATEGY-003 is implemented inside the scheduler rather than supplied by the application. The full gate passes.
-
-The six-record player update, command construction, bootstrap, join/leave exchange, and field-record lifecycle are recovered and implemented. `OriginalStrategicPlayerMovementSlot` persists exact route/target, cursor, state-8, grid, cooldown, terrain, position, and direction state for five army records plus avatar slot 5. `AdvancePlayerMovementPass`, `AdvancePlayerPass`, `OriginalStrategicPlayerCommands` and `CreateForNewGame` implement RULE-STRATEGY-010, RULE-STRATEGY-012 and RULE-STRATEGY-013. The full gate passes. Next bind temporary force inputs, fixed updates and presentation, then activate schema 2 and remove the dated adapter.
-
-## Latest upstream adoption (2026-10-01)
-
-Owner-authorized update: template `8d0eef35ec8f3b1053ba1dd129a7bd75b044cf27`,
-Standard/Protocol `ca39d0750e67c8c3900e8554e66a84083fe67452`,
-and checker/reporters `f8c51bfc5d167c25a04f2b6ddb3f7390714dc45f`.
-Protocol and Methodology bytes are unchanged. This adoption supersedes the
-previous infrastructure baseline above. Game-specific LE coverage, identities,
-source contracts and evidence statuses are retained.
-
-## Current package migration
-
-The completed template migration and its historical acceptance evidence are in
-[template-migration-plan.md](template-migration-plan.md). Current toolkit package
-versions and revision are authoritative in `tools/toolkit-packages.json`; Python
-integrity pins are in `requirements-evidence.txt`. The owner requested the latest
-toolkit dependencies on 2026-10-02. Local verification of that update is recorded
-in [VALIDATION.md](VALIDATION.md); no publication or cross-platform CI result is
-claimed for the new pins. Template 79d18a20 and rules ca39d075 remain unchanged.
