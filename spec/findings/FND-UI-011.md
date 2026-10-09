@@ -10,13 +10,13 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00024DB8..0x00024DB8
+    address: 0x00024DB8
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0005B0D4..0x0005B0D4
+    address: 0x0005B0D4
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0005B584..0x0005B584
+    address: 0x0005B584
   - build: BLD-GOG-EN
     file: C1086.GOB
     offset: 0x00..0x21B93B2

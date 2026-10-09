@@ -52,7 +52,7 @@ locations:
     address: 0x00019C80..0x00019CB1
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00060600..0x00060600
+    address: 0x00060600
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---

@@ -1,5 +1,13 @@
 # Validation
 
+## Single-address notation audit (2026-10-09)
+
+Four legacy locations repeated one address as both range ends. They now use the
+single-address form, retaining the same named call targets and adding no body
+extent (FND-UI-011, FND-UI-013). The documentation write check passed, and the
+canonical Invoke-Validation.ps1 gate passed with ResourceAndDefinitionTests and
+MinimumExpectedTests 1. Complete-reading status remains unchanged.
+
 ## Stored-resource boundary conversion (2026-10-09)
 
 The complete owned listing and bounded archive directories identified legacy
