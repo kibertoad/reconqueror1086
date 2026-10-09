@@ -216,7 +216,19 @@ and unsuitable timing, exercise unsigned release-gap wrap, reject a running
 guest and detect readback divergence. Integration permits the click only at
 the exact preparation wait and rejects a different callback before writing.
 These tests do not establish physical input delivery or an original screen
-transition. The current original run predates this option and remains unchanged.
+transition. Original verification of this option remains pending.
+
+The preceding extraction-checkpoint run was ended by an explicit diagnostic
+pause and cleaned up, including its owned machine lock. Its 32 completed
+events agree exactly between the durable event log and final journal; numeric
+replay ends at state 4153690744. Seven archive extraction entry/return pairs
+and preparation entry were observed. The final journal remains incomplete;
+neither loaded-screen return nor full-game replay was established.
+
+A fresh quiet startup-click verification run uses fixed cycles 1000, disabled
+animations and startup checkpoints. Its configuration and authored-controller
+SHA-256 fingerprints are retained locally. It is still an in-progress probe,
+not a passing original-input verification.
 
 2026-10-10: native caller policy checks passed 29 recorder, journal,
 durable-event-log and mapping tests. The new synthetic cases record the
