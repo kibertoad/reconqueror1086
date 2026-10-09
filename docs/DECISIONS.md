@@ -1,5 +1,13 @@
 # Decisions
 
+## 2026-10-09: Standing DOSBox-X instrumentation authorization
+
+The owner authorized future programmatic DOSBox-X installation/builds and
+isolated debugger probes for CONQUER.EXE live mapping and RNG recording without
+another permission question. [AGENTS.md](../AGENTS.md) records the scope and
+preserves run locking, supported-state writes, local-only captures and process
+ownership requirements. Execution-environment sandbox approvals remain separate.
+
 ## 2026-10-09: Focus mapping on CONQUER.EXE
 
 The owner deferred analysis of every other runtime to Later as non-essential.

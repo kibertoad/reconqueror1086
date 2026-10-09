@@ -833,6 +833,18 @@ Kaitai compilation was skipped because no compiler was available. No original
 program ran, no proprietary analysis artifacts were committed, and no publication
 was performed.
 
+## Structured debugger tooling checkpoint (2026-10-09)
+
+`python -B tools/test_dosbox_session.py` passed four synthetic lifecycle checks:
+pending-operation preservation, terminal observation, transport-close failure
+cleanup, and retained locking when process termination fails.
+`python -B tools/emu/test_harness.py` passed nine synthetic emulator checks after
+the LE loader began exposing relocation metadata. Local guest snapshot comparison
+and a bounded structured CPU trace completed, and an instrumented process-exit
+entry stopped natively. No full-game RNG fixture or gameplay parity was validated.
+The analysis-readiness, repository-policy and documentation gates passed; the
+documentation gate completed without skipped compiler or base-branch checks.
+
 ## Shared runtime 10.0.0 adoption (2026-10-07)
 
 The common exact runtime pin moves from 6.2.0 to 10.0.0 with template main

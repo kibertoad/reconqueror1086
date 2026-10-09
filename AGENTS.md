@@ -1,5 +1,19 @@
 # Repository agent instructions
 
+## Standing authorization for DOSBox-X instrumentation
+
+The owner authorizes future programmatic DOSBox-X installation, pinned-source
+builds, debugger setup and verification, and isolated CONQUER.EXE probes for live
+address mapping and RNG recording without requesting permission again. This
+includes starting an owned emulator, reading guest registers and memory, setting
+breakpoints, and supported-state writes needed by the documented probes.
+Use private writable copies and read-only original media, acquire the machine
+run lock, and clean up only processes and locks created by the task. Keep original
+content and diagnostic captures local. This authorization does not change the
+evidence requirements, restrictions on unsupported state writes, or push policy.
+Sandbox approval requests may still be required by the execution environment;
+they are not a requirement for renewed owner permission.
+
 ## Original technical-design documentation
 
 The final reimplementation deliverable includes a documented technical map of

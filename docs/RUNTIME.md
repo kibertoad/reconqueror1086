@@ -1,5 +1,12 @@
 # Runtime access
 
+The owner granted standing authorization on 2026-10-09 for programmatic DOSBox-X
+installation/builds, debugger verification and isolated CONQUER.EXE mapping/RNG
+probes. Agents need no renewed owner permission for these actions; see the
+standing authorization in [AGENTS.md](../AGENTS.md). Capability verification,
+supported-state writes, exclusive run locking and owned-process cleanup remain
+required. Authorization alone does not establish any capability in the table.
+
 ## BLD-GOG-EN
 
 The owned edition runs in GOG's bundled DOSBox 0.74, with its documented S3 SVGA
@@ -84,6 +91,65 @@ under analysis/documentation-audit/runtime. The probe verifies the original's
 relocated DOS entry and a protected-mode memory read, not a gameplay state.
 Its current source-identity check also requires the local extracted executable
 under analysis/original/disc-root. Dumps and reports stay under ignored artifacts.
+
+## Structured debugger build and live mapping diagnostics
+
+The portable release does not include the structured Agent API. A local source
+build uses official DOSBox-X revision
+`b6abbd5980a885f5f310a4088c59a8688d1b116c` (tag `dosbox-x-v2026.10.01`),
+configuration `Agent Debug SDL2`, x64. The upstream Python client from that same
+checkout supplies JSON-RPC transport and models; `tools/dosbox_session.py`
+checks the revision before importing it. Its named pipe is unique to the probe.
+
+Clone the official repository into the ignored directory
+`artifacts/runtime-tools/dosbox-x-agent-source`, selecting that tag and verifying
+`git rev-parse HEAD` against the revision above. The verified local build command
+uses the installed Visual Studio 2019 Build Tools and Windows SDK:
+
+```powershell
+& 'C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/MSBuild/Current/Bin/MSBuild.exe' `
+  artifacts/runtime-tools/dosbox-x-agent-source/vs/dosbox-x.sln `
+  '/p:Configuration=Agent Debug SDL2' /p:Platform=x64 `
+  /p:PlatformToolset=v142 /p:WindowsTargetPlatformVersion=10.0.19041.0 /m:2 /v:minimal
+```
+
+The executable is under `bin/x64/Agent Debug SDL2/`. Synthetic verification
+observed a stopped startup, a native breakpoint operation, register effects and
+a memory write/read with the expected-hash precondition. The process needs the
+same hidden native console as the portable debugger. Before target launch, the
+wrapper observes a guest-written readiness marker after C: and D: setup; RPC
+availability alone does not prove AUTOEXEC has finished. An observation timeout
+preserves the pending operation, and cleanup failure retains the run lock while
+the owned process is still live.
+
+Run `python -B tools/test_dosbox_session.py` for synthetic lifecycle checks.
+For a bounded diagnostic, use a fresh output directory and a command-scoped
+GAME_DIR pointing to the owned installation:
+
+```powershell
+$env:GAME_DIR = 'C:/GOG Games/Conqueror AD1086'
+python -B tools/Probe-LiveMapping.py --output artifacts/runtime-tools/live-map-new `
+  --samples 8 --observation-ms 1000 --rng-break --cycles 1000
+```
+
+The probe copies the fingerprinted executable from the local extracted store,
+GOB and INI into a private drive, disables movie/credits in that copy, and mounts
+the owned disc read-only. It records descriptors, local memory diagnostics and
+bounded startup traces. `--rng-break` installs candidate RNG/fatal/exit entry
+breakpoints after a unique identity control matches. This diagnostic neither
+records all draws nor proves a prescribed gameplay state. Compare its complete
+local snapshot with `python -B tools/Verify-LiveSnapshot.py <physical-memory.bin>`;
+residual writes require independent audit before the candidate map is trusted.
+Use `--trace-loader` for an additional bounded local instruction trace at the
+survey limit. The Debug configuration progresses timed startup slowly at high
+cycle budgets; the 1,000-cycle diagnostic reached the seed entry described in
+FND-RNG-003. This is a breakpoint transport check, not evidence of all draws.
+The original content and traces remain local and must never be committed.
+
+After full verification, propose reusable lifecycle, locking, operation-wait and
+debugger helpers upstream, together with a reproducible guide. Keep game-specific
+LE identity, field mapping and rule ownership here; check existing upstream
+issues and helpers before proposing extraction.
 
 ## Unicorn function harness
 

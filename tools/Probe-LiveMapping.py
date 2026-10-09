@@ -1,0 +1,165 @@
+"""Bounded live mapping survey. Original-derived observations remain local."""
+import argparse
+import dataclasses
+import hashlib
+import json
+import os
+import re
+from pathlib import Path
+import shutil
+from dosbox_session import AgentRuntime
+from emu.le_image import load_image
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--samples', type=int, default=8)
+    parser.add_argument('--observation-ms', type=int, default=100)
+    parser.add_argument('--rng-break', action='store_true')
+    parser.add_argument('--cycles', type=int, default=10000)
+    parser.add_argument('--trace-loader', action='store_true')
+    args = parser.parse_args()
+    if not 1 <= args.samples <= 100:
+        raise ValueError('Samples must be between 1 and 100')
+    if not 1 <= args.observation_ms <= 1000:
+        raise ValueError('Observation interval must be between 1 and 1000 ms')
+    # // needs: GAME_DIR
+    installation = Path(os.environ['GAME_DIR']).resolve()
+    root = args.output.resolve()
+    drive = root / 'drive'
+    if drive.exists():
+        raise RuntimeError('Use a fresh isolated drive for each survey')
+    executable = Path('analysis/original/disc-root/CONQUER.EXE')
+    if hashlib.sha256(executable.read_bytes()).hexdigest() != '5d7231758766204ad061e6b82cf2f0e0cbe28899b35d095f13e4aad75c8b79d6':
+        raise RuntimeError('Wrong BLD-GOG-EN source identity')
+    drive.mkdir(parents=True)
+    for name in ('C1086.GOB', 'CONQUER.INI'):
+        shutil.copyfile(installation / name, drive / name)
+    shutil.copyfile(executable, drive / 'CONQUER.EXE')
+    (drive / 'SAVEGAME').mkdir()
+    # FMT-CONFIG-001: supported switches; modify only the private copy.
+    ini = (drive / 'CONQUER.INI').read_text()
+    ini = ini.replace('MOVIE=ON', 'MOVIE=OFF').replace('CREDITS=ON', 'CREDITS=OFF')
+    (drive / 'CONQUER.INI').write_text(ini)
+    source = Path('artifacts/runtime-tools/dosbox-x-agent-source')
+    emulator = source / 'bin/x64/Agent Debug SDL2/dosbox-x.exe'
+    records = []
+    images, _ = load_image(executable)
+    probe_offset = 0x6b3f1 - images[0]['base']  # FND-RNG-003
+    signature = bytes(images[0]['image'][probe_offset:probe_offset + 34])
+    breakpoints_installed = False
+    try:
+        with AgentRuntime(source, emulator, root, drive, 'CONQUER.EXE', installation / 'game.ins', args.cycles) as runtime:
+            print('startup', runtime.registers())
+            for attempt in range(args.samples):
+                operation = runtime.agent.continue_(runtime.session.id)
+                if breakpoints_installed:
+                    try:
+                        runtime.wait(operation, seconds=30)
+                        observed = runtime.agent.wait(runtime.session.id, operation.id, timeout_ms=100)
+                    except TimeoutError:
+                        # The same continuation remains live until the explicit
+                        # pause below; allow uninterrupted loader progress.
+                        observed = runtime.agent.wait(runtime.session.id, operation.id, timeout_ms=100)
+                else:
+                    observed = runtime.agent.wait(runtime.session.id, operation.id, timeout_ms=args.observation_ms)
+                if observed.running:
+                    # Observation timeout leaves that operation live. Pause it
+                    # explicitly to obtain a coherent snapshot, never restart it.
+                    runtime.wait(runtime.agent.pause(runtime.session.id))
+                else:
+                    runtime.session = observed.session
+                if runtime.session.state != 'stopped':
+                    print('terminal', runtime.session)
+                    break
+                registers = runtime.registers()
+                diagnostic = runtime.agent.execute_command(runtime.session.id, 'CPU')
+                print('sample', attempt, registers.cpu_mode, registers.segments['cs'],
+                      registers.instruction_pointer, diagnostic.raw_output[:400])
+                records.append({'registers': dataclasses.asdict(registers), 'cpu': diagnostic.raw_output})
+                records[-1]['stop_reason'] = dataclasses.asdict(runtime.session.stop_reason)
+                if breakpoints_installed and runtime.session.stop_reason.kind == 'breakpoint':
+                    stack = runtime.read(runtime.MemoryAddress.segmented(
+                        int(registers.segments['ss'], 16), int(registers.general['esp'], 16)), 64)
+                    (root / 'breakpoint-stack.bin').write_bytes(stack)
+                    print('instrumented entry breakpoint hit', runtime.session.stop_reason)
+                    break
+                # Preserve diagnostics locally even if the loader returns to
+                # real mode; no guest text or bytes enter committed reports.
+                # Linear access goes through the VGA memory handler. Raw
+                # physical backing reads do not represent video device RAM.
+                text_memory = runtime.read(runtime.MemoryAddress.linear(0xb8000), 4000)
+                (root / f'text-video-{attempt}.bin').write_bytes(text_memory)
+                if registers.cpu_mode == 'real' and int(registers.segments['cs'], 16) == 0:
+                    (root / f'zero-state-{attempt}.bin').write_bytes(
+                        runtime.read(runtime.MemoryAddress.physical(0), 65536))
+                    print('invalid startup execution location; diagnostic captured')
+                if registers.cpu_mode == 'protected':
+                    memory = runtime.read(runtime.MemoryAddress.physical(0), 16 * 4096)
+                    (root / f'low-memory-{attempt}.bin').write_bytes(memory)
+                    match = re.search(r'GDT\s+base=([0-9a-fA-F]+)\s+limit=([0-9a-fA-F]+)', diagnostic.raw_output)
+                    if not match:
+                        raise RuntimeError('Protected-mode diagnostic omitted GDT bounds')
+                    base, limit = (int(value, 16) for value in match.groups())
+                    if limit > 65535:
+                        raise RuntimeError('Descriptor table exceeds architectural bound')
+                    table = runtime.read(runtime.MemoryAddress.physical(base), limit + 1)
+                    (root / f'gdt-{attempt}.bin').write_bytes(table)
+                    descriptors = []
+                    for offset in range(0, len(table) - 7, 8):
+                        row = table[offset:offset + 8]
+                        if not row[5] & 128:
+                            continue
+                        descriptor_base = int.from_bytes(row[2:4], 'little') | row[4] << 16 | row[7] << 24
+                        descriptor_limit = int.from_bytes(row[:2], 'little') | (row[6] & 15) << 16
+                        if row[6] & 128:
+                            descriptor_limit = (descriptor_limit << 12) | 4095
+                        descriptors.append({'selector': offset, 'base': descriptor_base,
+                                            'limit': descriptor_limit, 'access': row[5],
+                                            'big': bool(row[6] & 64)})
+                    records[-1]['descriptors'] = descriptors
+                    print('large descriptors', [row for row in descriptors if row['big'] and row['limit'] > 65535])
+                    if args.rng_break and not breakpoints_installed:
+                        search = b''.join(runtime.read(runtime.MemoryAddress.physical(base), 65536)
+                                          for base in range(0, 4 * 1024 * 1024, 65536))
+                        position = search.find(signature)
+                        if position >= 0:
+                            if search.find(signature, position + 1) >= 0:
+                                raise RuntimeError('Ambiguous RNG identity control')
+                            code_base = position - probe_offset
+                            code_segments = [row for row in descriptors if row['big'] and row['access'] & 8
+                                             and row['base'] <= position <= row['base'] + row['limit']]
+                            if len(code_segments) != 1:
+                                raise RuntimeError('RNG candidate has ambiguous code selectors')
+                            code_segment = code_segments[0]
+                            ids = []
+                            # FND-RNG-003 and FND-CONFIG-001: stop on RNG
+                            # entries, fatal diagnostics or process exit.
+                            for address in (0x6b3f1, 0x6b413, 0x636d0, 0x64ff5):
+                                bp = runtime.agent.create_execution_breakpoint(runtime.session.id,
+                                    code_segment['selector'], code_base + address - images[0]['base'] - code_segment['base'])
+                                ids.append(bp.id)
+                            records[-1]['candidate_rng_breakpoints'] = ids
+                            breakpoints_installed = True
+                            print('candidate RNG/fatal/exit breakpoints installed')
+                if attempt == args.samples - 1 or (registers.cpu_mode == 'real' and int(registers.segments['cs'], 16) == 0):
+                    # A bounded physical snapshot allows an independent local
+                    # image search, including objects not selected by CS yet.
+                    with (root / 'physical-memory.bin').open('wb') as snapshot:
+                        for base in range(0, 16 * 1024 * 1024, 65536):
+                            snapshot.write(runtime.read(runtime.MemoryAddress.physical(base), 65536))
+                    if args.trace_loader:
+                        runtime.agent.start_trace(runtime.session.id, 'normal', 256)
+                        runtime.wait(runtime.agent.continue_(runtime.session.id), seconds=10)
+                        trace = runtime.agent.read_trace(runtime.session.id, None, 256)
+                        (root / 'startup-trace.json').write_text(json.dumps(dataclasses.asdict(trace), indent=2))
+                        print('bounded startup trace events', len(trace.events), 'active', trace.active)
+                if registers.cpu_mode == 'real' and int(registers.segments['cs'], 16) == 0:
+                    break
+    finally:
+        (root / 'mapping-observations.json').write_text(json.dumps(records, indent=2))
+
+
+if __name__ == '__main__':
+    main()

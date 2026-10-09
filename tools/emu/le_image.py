@@ -67,7 +67,7 @@ def decode_image(data):
                 raise LoaderError('Truncated LE page')
             image[ordinal * 4096:ordinal * 4096 + copied] = data[offset:offset + copied]
         objects.append(dict(base=base, size=size, flags=flags, first=first,
-                            count=number, image=image))
+                            count=number, image=image, relocations=[]))
     page_table = header + read(header + 0x68)
     records = header + read(header + 0x6c)
     extent = read(page_table + count * 4)
@@ -101,5 +101,7 @@ def decode_image(data):
                 raise LoaderError('Fixup source outside object')
             value = (objects[target - 1]['base'] + target_offset) & 0xffffffff
             struct.pack_into('<I', obj['image'], position, value)
+            obj['relocations'].append(dict(position=position, target=target,
+                                           target_offset=target_offset))
             fixups += 1
     return objects, fixups
