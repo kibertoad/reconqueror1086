@@ -235,6 +235,37 @@ rejects an unrecorded RNG-state change or unregistered screen number.
 or an invalid pointer. This mode is synthetically checked but awaits native
 verification. It does not establish input readiness or full-game completeness.
 
+### Operating and interpreting a probe
+
+Before executable analysis, run `tools/Verify-Configuration.ps1
+-RequireAnalysisReady`. Use a fresh local-only output directory, a
+command-scoped GAME_DIR and the machine lock acquired by the wrapper. Keep
+the original disc read-only and change only the private drive. Check the
+selected build's executable hash and actual capabilities; a configuration
+header alone does not prove a runtime feature is enabled.
+
+Keep the process/session identity and the pending operation together. Read
+session-identity.json rather than guessing a session identifier. Poll the
+same owning command and debugger operation while it is live. An operation
+identifier or CPU-time measurement does not reveal how many draws completed;
+read the completed-event log or final journal for that. Observation expiry
+alone is no reason to restart, add another continuation or release the lock.
+
+A manual diagnostic pause is an interruption, not an expected recorder
+boundary. The recorder rejects such a stop and attempts local register and
+memory diagnostics; do not present its surviving prefix as a finished run.
+If a deliberate pause is needed, verify the owned session and process first.
+After terminal completion, check both the journal's status/completeness fields
+and cleanup: the owned process must have stopped before its lock is released.
+Never use that check to stop another task's emulator or remove its lock.
+
+Tool edits do not update Python modules already loaded by a running probe.
+Finish observing that run under its original code, and test the new version
+in a fresh launch. Keep the loaded-screen return check distinct from the
+screen-entry check, and both distinct from verified input readiness. The RNG
+formula replay is a transport consistency check; actual rebuild replay and
+complete caller ownership remain separate obligations.
+
 After full verification, propose reusable lifecycle, locking, operation-wait and
 debugger helpers upstream, together with a reproducible guide. Keep game-specific
 LE identity, field mapping and rule ownership here; check existing upstream
