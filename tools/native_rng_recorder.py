@@ -30,7 +30,7 @@ class EventLog:
 
 
 def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen=False, stop_after_screen=False,
-           startup_checkpoints=False, startup_click=False, continue_after_screen=False):
+           startup_checkpoints=False, startup_click=False, continue_after_screen=False, title_click=False):
     if stop_at_screen and stop_after_screen:
         raise ValueError('Choose one screen diagnostic boundary')
     if startup_checkpoints and not stop_after_screen:
@@ -39,6 +39,8 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         raise ValueError('Startup click requires verified startup checkpoints')
     if continue_after_screen and not stop_after_screen:
         raise ValueError('Continuation requires a verified loaded-screen boundary')
+    if title_click and not continue_after_screen:
+        raise ValueError('Title input requires guarded recording continuation')
     if type(maximum_draws) is not int or not 1 <= maximum_draws <= 100000:
         raise ValueError('Invalid recording draw limit')
     output = Path(output)
@@ -226,10 +228,22 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                                                 'screen_id': screen_id, 'history': history}
                 screen_frame = None
                 if continue_after_screen:
+                    report['status'] = 'incomplete'
                     (output / 'screen-load-checkpoint.json').write_text(
                         json.dumps({'request': report['screen_request'],
                                     'observation': report['screen_observation'],
                                     'rng_state': report['end_rng_state']}, indent=2) + '\n')
+                    if title_click:
+                        if screen_id != 0:
+                            raise RecordingError('Prescribed title input requires screen zero')
+                        # SCR-UI-001: the title's full-screen region accepts a
+                        # primary click. The queue helper enforces field/timing guards.
+                        click = queue_primary_click(runtime, mapping, x=10, y=10)
+                        report.setdefault('supported_input', []).append(dict(click, screen=0))
+                        (output / 'supported-input.json').write_text(
+                            json.dumps(report['supported_input'], indent=2) + '\n')
+                        if state() != report['end_rng_state']:
+                            raise RecordingError('RNG state changed while queuing title input')
                     # These are one-time startup observations, not policies for
                     # subsequent screen transitions or archive requests.
                     for hook_id, hook_kind in list(hooks.items()):
@@ -237,7 +251,6 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                                          'archive-entry', 'archive-return'):
                             runtime.agent.delete_breakpoint(runtime.session.id, hook_id)
                             del hooks[hook_id]
-                    report['status'] = 'incomplete'
                     runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
                     continue
                 return report

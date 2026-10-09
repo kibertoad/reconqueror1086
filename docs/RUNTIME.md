@@ -252,6 +252,13 @@ incomplete unless the bounded draw limit is reached; that limit also makes no
 full-game completeness claim. This continuation has synthetic validation;
 original gameplay beyond the initial screen still requires verification.
 
+With continuation, `--title-click` queues one supported-state primary click
+at (10, 10) only after the verified initial screen identifier is zero.
+SCR-UI-001 supports that full-screen title region. The same queue timing,
+hash and readback guards apply, and RNG state must remain unchanged.
+The controller records this input locally before resuming. This option has
+synthetic checks; reaching game options through it still needs an original run.
+
 ### Operating and interpreting a probe
 
 Both DOSBox probe commands mute host audio by default with `MIXER MASTER 0:0`

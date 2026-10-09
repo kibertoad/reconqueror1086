@@ -55,6 +55,16 @@ class ScreenBoundaryTests(unittest.TestCase):
             record(None, None, (), 'unused-output', continue_after_screen=True)
 
     def test_loaded_screen_continuation_preserves_unknown_draw_rejection(self):
+        self.continuation_sequence()
+
+    def test_title_input_is_queued_after_loaded_identity_before_continuation(self):
+        self.continuation_sequence(title_click=True)
+
+    def test_title_input_requires_recording_continuation(self):
+        with self.assertRaisesRegex(ValueError, 'guarded recording continuation'):
+            record(None, None, (), 'unused-output', title_click=True)
+
+    def continuation_sequence(self, title_click=False):
         runtime, mapping = runtime_and_mapping()
         original_wait, original_registers = runtime.wait_until_stopped, runtime.registers
         def wait(operation):
@@ -73,10 +83,16 @@ class ScreenBoundaryTests(unittest.TestCase):
         with patch('native_rng_recorder.tables_from_diagnostic', return_value=(0, 16)), \
              patch('native_rng_recorder.descriptor', side_effect=[mapping.code, mapping.data] * 8), \
              patch('native_rng_recorder.EventLog'), \
-             patch('native_rng_recorder.Path.write_text') as writes:
+             patch('native_rng_recorder.Path.write_text') as writes, \
+             patch('native_rng_recorder.queue_primary_click',
+                   return_value={'action': 'primary-short-click'}) as click:
             with self.assertRaisesRegex(RecordingError, 'Unowned raw'):
                 record(runtime, mapping, ('draw', 'seed'), 'unused-output',
-                       stop_after_screen=True, continue_after_screen=True)
+                       stop_after_screen=True, continue_after_screen=True, title_click=title_click)
+        if title_click:
+            click.assert_called_once_with(runtime, mapping, x=10, y=10)
+        else:
+            click.assert_not_called()
         self.assertEqual(runtime.phase, 4)
         self.assertEqual({call.args[1] for call in runtime.agent.delete_breakpoint.call_args_list},
                          {'hook-595c0', 'hook-5965f'})
@@ -86,6 +102,8 @@ class ScreenBoundaryTests(unittest.TestCase):
         self.assertFalse(final['full_game_complete'])
         self.assertFalse(final['pending_screen_load'])
         self.assertEqual(len(final['events']), 1)
+        if title_click:
+            self.assertEqual(final['supported_input'], [{'action': 'primary-short-click', 'screen': 0}])
 
     def startup_sequence(self, corrupt_stack=False, extraction=False, corrupt_archive=False,
                          startup_click=False, wrong_callback=False):

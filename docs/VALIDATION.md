@@ -251,6 +251,12 @@ Continuation without a loaded-screen guard is rejected. The first sandboxed
 attempt failed on temporary-directory permissions; the authorized rerun passed.
 Original continuation beyond startup has not yet been verified.
 
+2026-10-10: the same safety suite passed 41 tests after adding guarded title
+input. The synthetic case queues input only after the initial loaded-screen
+check, preserves the RNG event prefix and still rejects the next unknown draw.
+Title input without guarded continuation is rejected. No native title-to-options
+transition is established by these synthetic checks.
+
 2026-10-10: native caller policy checks passed 29 recorder, journal,
 durable-event-log and mapping tests. The new synthetic cases record the
 scaled hit-check result and the busy-voice remainder register, and reject
