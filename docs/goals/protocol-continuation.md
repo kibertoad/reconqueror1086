@@ -29,22 +29,29 @@ None known.
 
 ## Handover
 
-- Active: owner requested latest rules/libraries and full evidence conversion.
-- Baseline freshness check on 2026-10-09 identifies rules a9884ae2 and checker
-  3.0.1 as newer than the installed pins. Migration acceptance is pending.
-- Stage: Survey. Every manual screen has a screen entry (SCR-UI-021 to
-  SCR-UI-036, `sourced`), and every archive member kind has a format entry
-  (FMT-RES-121 to FMT-RES-127; FND-RES-061 covers the unread `.FNT` entry).
-  Template main 25c5808b is adopted, with the RefurbishedDinosaurs 10.0.0
-  packages.
-- Last checks: documentation check passed at the last batch commit. The fast
-  gate passed on 2026-10-07 at the template adoption; the later batch changed
-  no code or tests.
-- Unfinished: none. No original program ran.
-- Blockers: none known.
-- Upstream reporting: GAP-016 to GAP-021 are filed and linked in gaps.md;
-  GAP-021 is toolkit #328. Future concerns still need duplicate checks first.
-- Next: Q-RES-212 to Q-RES-214 (POV, SVG and SFG readers); Q-RES-209
-  (FMT-RES-122 sections); Q-UI-028 to Q-UI-043 (screen code for the sourced
-  screens); Q-RES-162, Q-RES-163, Q-RES-206, Q-RES-207 (FMT-RES-013);
-  Q-RES-180 to Q-RES-182 and Q-RES-185 to Q-RES-191 (FMT-RES-120).
+- Active: latest rules/libraries and full evidence conversion. Stage: Survey.
+- Adopted dependency locks and rules snapshots are in their authoritative lock
+  files. The dependency-adoption batch is committed; full acceptance is pending.
+- Last checks: 2026-10-09 canonical gate passed with
+  FullyQualifiedName~ResourceAndDefinitionTests, minimum discovery 1; startup
+  failure reporter regression passed separately. Kaitai compiled. Upstream
+  freshness matched rules/checker main. No original program ran.
+- Unfinished: inventory body ranges, provenance and region sidecars; complete
+  half-open-range and build/listing accounting audits; conversion guidance and
+  final acceptance. docs/template-migration-plan.md lists the requirements.
+- Local state: .claude/settings.json was already untracked; preserve it.
+- Existing LE project: analysis/documentation-audit/ghidra/LeInventory2.
+  PE/NE projects: artifacts/launcher-inventory-pe-20261005/LauncherPE and
+  artifacts/launcher-inventory-ne-20261005/LauncherNE. MZ snapshot folder
+  analysis/original/mz-inventory/proj is empty; recover or rebuild it with
+  verified source/mapping rather than inventing provenance.
+- Shared ExportFunctionInventory.java still exports only starts and sizes;
+  the new protocol needs a project exporter/adapter with actual body ranges
+  and the denominator partition. Existing Check-Coverage.mjs does not prove it.
+- No rule, format, screen or bug is established; complete-reading claims must
+  not be inferred from evidence citations. No legacy root validation record
+  or original-reading parity test requires migration.
+- Next: implement and validate inventory export/sidecar tooling; re-export all
+  five inventories; audit range ends and primary ISO path/accounting; update
+  remaining guidance; perform the full requirement-by-requirement audit.
+- Blockers: none requiring an owner decision. No push is authorized.
