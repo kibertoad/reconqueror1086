@@ -835,6 +835,16 @@ was performed.
 
 ## Continuous debugger observation checks (2026-10-10)
 
+The canonical gate runs Node acceptance files sequentially by default, with
+`-NodeTestConcurrency` available to choose a higher limit. This retains every
+check while avoiding simultaneous synthetic GUI acceptance sessions on Windows.
+The complete canonical `Invoke-Validation.ps1` gate passed with this default,
+including documentation, toolkit identity, Node acceptance checks, solution
+build, xUnit and executable specifications. The local evidence engine was
+restored from the hash-pinned requirements at the already adopted version;
+no repository dependency version changed. The no-heavy CPU-trace rejection
+check also passed without starting an emulator.
+
 `python -B -m unittest discover -s tools -p test_dosbox_session.py` passed
 six synthetic checks. Repeated observation expiries retain the exact same
 operation, while a transport timeout propagates instead of being retried as

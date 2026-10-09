@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
     [ValidateRange(1, 16)][int] $MaxCpuCount = 2,
+    [ValidateRange(1, 16)][int] $NodeTestConcurrency = 1,
     [string] $TestFilter,
     [switch] $IncludeLongRunningTests,
     [switch] $LongRunningTestsOnly,
@@ -31,6 +32,9 @@ function Invoke-Dotnet([string[]] $Arguments) {
     if ($LASTEXITCODE -ne 0) { throw "dotnet $($Arguments[0]) failed ($LASTEXITCODE)." }
 }
 function Invoke-Node([string[]] $Arguments) {
+    if ($Arguments.Count -gt 0 -and $Arguments[0] -eq '--test') {
+        $Arguments = @("--test-concurrency=$NodeTestConcurrency") + $Arguments
+    }
     & node @Arguments
     if ($LASTEXITCODE -ne 0) { throw "Node validation failed ($LASTEXITCODE)." }
 }

@@ -116,8 +116,15 @@ uses the installed Visual Studio 2019 Build Tools and Windows SDK:
   /p:PlatformToolset=v142 /p:WindowsTargetPlatformVersion=10.0.19041.0 /m:2 /v:minimal
 ```
 
-The executable is under `bin/x64/Agent Debug SDL2/`. Synthetic verification
-observed a stopped startup, a native breakpoint operation, register effects and
+The executable is under `bin/x64/Agent Debug SDL2/`.
+For an experimental alternate build, replace the configuration with
+`Agent Debug No Heavy SDL2` and select it using `--debugger-build no-heavy`.
+This configuration has compiled successfully; original-run verification remains
+pending. It lacks CPU tracing and memory-change breakpoints. The probe rejects
+CPU tracing with this selection and records the selected executable hash in
+its local debugger-build.json. The default remains the verified heavy build.
+
+Synthetic verification observed a stopped startup, a native breakpoint operation, register effects and
 a memory write/read with the expected-hash precondition. The process needs the
 same hidden native console as the portable debugger. Before target launch, the
 wrapper observes a guest-written readiness marker after C: and D: setup; RPC

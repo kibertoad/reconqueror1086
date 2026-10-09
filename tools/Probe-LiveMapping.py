@@ -19,6 +19,7 @@ def main():
     parser.add_argument('--observation-ms', type=int, default=100)
     parser.add_argument('--rng-break', action='store_true')
     parser.add_argument('--cycles', type=int, default=10000)
+    parser.add_argument('--debugger-build', choices=('heavy', 'no-heavy'), default='heavy')
     parser.add_argument('--trace-loader', action='store_true')
     parser.add_argument('--seed-check', action='store_true')
     parser.add_argument('--draw-check', action='store_true')
@@ -29,6 +30,8 @@ def main():
     args = parser.parse_args()
     if args.stop_at_screen and not args.record_native:
         raise ValueError('Screen diagnostic boundary requires native recording')
+    if args.trace_loader and args.debugger_build != 'heavy':
+        raise ValueError('CPU tracing requires the heavy debugger build')
     if args.draw_check and not args.seed_check:
         raise ValueError('Draw identity check requires the seed identity check')
     if args.seed_check and not args.rng_break:
@@ -62,7 +65,11 @@ def main():
     ini = ini.replace('MOVIE=ON', 'MOVIE=OFF').replace('CREDITS=ON', 'CREDITS=OFF')
     (drive / 'CONQUER.INI').write_text(ini)
     source = Path('artifacts/runtime-tools/dosbox-x-agent-source')
-    emulator = source / 'bin/x64/Agent Debug SDL2/dosbox-x.exe'
+    configuration = 'Agent Debug SDL2' if args.debugger_build == 'heavy' else 'Agent Debug No Heavy SDL2'
+    emulator = source / 'bin/x64' / configuration / 'dosbox-x.exe'
+    (root / 'debugger-build.json').write_text(json.dumps({
+        'configuration': configuration, 'sha256': hashlib.sha256(emulator.read_bytes()).hexdigest()
+    }, indent=2))
     records = []
     images, _ = load_image(executable)
     probe_offset = 0x6b3f1 - images[0]['base']  # FND-RNG-003
