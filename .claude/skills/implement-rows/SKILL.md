@@ -6,7 +6,7 @@ description: Implement rebuild behaviour for parity rows of the current slice fr
 # Implementation batch
 
 The rules are in the [work protocol](../../../docs/upstream/work-protocol.md#implementation-batches) (lines 162-178)
-and the standard's [implementation side](../../../docs/upstream/documentation-standard.md#implementation-side) (lines 1064-1188).
+and the standard's [implementation side](../../../docs/upstream/documentation-standard.md#implementation-side) (lines 1155-1281).
 Open a linked section only when a step leaves a question it answers, read
 only the lines the link gives, and never a section already read this session.
 
@@ -64,7 +64,7 @@ skill. That keeps the clean room, and it tests whether the spec says enough.
    `Spec gap:`. Tests that need the original find
    it through `GAME_DIR`, skip without it, and carry the comment
    `// needs: GAME_DIR`; after they pass locally with the original, record the
-   run in `VALIDATION.md` as `docs/VALIDATION.md` describes. Where the code
+   run under `validation/` as `docs/VALIDATION.md` describes. Where the code
    uses a different algorithm from the entry's procedure, compare the state a
    later call reads as well as the result (for a queued search: a node queued
    twice, a score improved while an older entry waits, a stop at the step

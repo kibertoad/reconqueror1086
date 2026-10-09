@@ -1,5 +1,43 @@
 # Template and toolkit migration
 
+## Rules and shared-library migration (2026-10-09)
+
+Owner scope: latest Standard, protocol and shared libraries, with full conversion
+of existing data and evidence. The earlier template target remains historical;
+this migration adopts newer published rules and packages directly.
+
+Verified targets: rules `a9884ae244bab87fed24b1deeeaf84745e60f6f4`, checker
+3.0.1 at its release-tag commit `74c682de203683d66c7e8bad652d73cf9bc3e2aa`,
+reader 2.6.0, Python engine 13.6.0 and RefurbishedDinosaurs runtime packages
+11.2.0. Official npm, PyPI and NuGet registries supplied the release versions;
+PyPI supplied both engine distribution hashes. Lockfiles remain authoritative.
+
+Acceptance is not just a passing checker. Complete these conversion audits:
+
+- Byte-exact snapshots, matching local/CI checker inputs, exact dependency
+  locks and installed versions, and all existing runtime consumers.
+- Validation runs use `validation/`; no root legacy record exists and no
+  current parity test reads the original, so no historical record needs moving.
+- Inventory exports retain actual body ranges, provenance and executable-region
+  partitions. Re-export validated snapshots read-only with analysis disabled,
+  verify source identity and deterministic repeated exports, and reconcile all
+  existing inventories. Audit missing code files and exclusions explicitly.
+- Audit all address and value ranges against half-open notation, including
+  narrative ranges and build Code ranges. Correct an unambiguous legacy end
+  only under IDENTIFIERS-8; uncertain corrections supersede the whole finding.
+- Audit build identity, primary ISO names, archive-member accounting and full
+  manifest/Other files coverage. A listing record is optional in the Standard;
+  preserve reproducible accounting whether the audit introduces one or not.
+- Audit evidence status and complete-reading claims. No rule, format, screen
+  or bug currently has status `established`; do not infer complete readings from
+  citations or invent provenance. Preserve historical reporter observations;
+  changed reporter semantics require new evidence rather than rewriting facts.
+- Update workflow summaries, templates, coverage and evidence-review guidance,
+  regenerate section links/indexes, and run applicable canonical gates.
+
+The dependency and snapshot adoption is underway. Full inventory/evidence
+conversion and final acceptance remain pending. No publication is authorized.
+
 Status: implemented and locally validated after owner approval on 2026-09-30.
 The owner also requested removal of
 mandatory explicit implementation-plan approval gates from this repository and

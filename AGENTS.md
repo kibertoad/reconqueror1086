@@ -29,7 +29,7 @@ Run `tools/Check-Documentation.ps1 -Write` after changing `spec/`, `parity/` or
 (`docs/VALIDATION.md` describes the check). A test that reads the original's
 files finds them through `GAME_DIR`, skips without them, and carries the
 comment `// needs: GAME_DIR`; CI never has them, so record a passing local run
-in `VALIDATION.md` as `docs/VALIDATION.md` describes.
+in a dated run file under `validation/` as `docs/VALIDATION.md` describes.
 
 Keep proprietary bytes and generated analysis artifacts out of Git. Commit only
 independently authored technical descriptions, compact facts, hashes, and legal
@@ -277,10 +277,17 @@ that page differ, the page wins.
   executable and file coverage, queue sizes. Never a hand-written percentage.
   Executable coverage is measured against the function inventories,
   `coverage/<build ID>/<manifest path>.tsv` (a `CD:` prefix becomes an `@CD`
-  directory), one for each file the analysis reads. An inventory holds only each function's start address, its size, and
-  optionally a name the researcher gave it and why it is out of scope, never
-  code, bytes, strings, constants or names that came from the original, so it
-  is committed.
+  directory), one for each file the analysis reads. An inventory holds each
+  function's start, body-byte count, actual body ranges when noncontiguous, and
+  optionally a researcher-authored name and scope reason. Its adjacent
+  `.provenance.tsv` identifies the source hash, analysis tool/version, database
+  snapshot and export revision; `.regions.tsv` partitions executable regions
+  into instruction, defined-data and undefined bytes, with each class's bytes
+  outside recognized bodies. Export read-only with analysis disabled, validate
+  completion and repeatability, and preserve annotations when boundaries change.
+  Never commit code, bytes, strings, constants or original names. Mapping,
+  citation and complete-reading coverage are separate; complete reading comes
+  from entries' `complete_reading` findings, never an inventory completion flag.
 
 The procedures are skills in `.claude/skills/`: `runtime-access`,
 `plan-work`, `start-session`, `research-item`, `implement-rows`,
@@ -310,7 +317,7 @@ skills print.
   of the game. Tests that read the original find it through `GAME_DIR`,
   report themselves skipped when it is absent, and carry the comment
   `// needs: GAME_DIR`. They run on a maintainer's machine, and the run is
-  recorded in `VALIDATION.md` (`docs/VALIDATION.md`).
+  recorded under `validation/` (`docs/VALIDATION.md`).
 - **Parse defensively.** Original files are untrusted input: bound every length,
   reject path traversal, and fail with a diagnosable error instead of throwing
   from deep inside a reader.
@@ -344,8 +351,8 @@ certain than the rest goes in its own entry or in its Open questions section.
 Never silently promote a plausible interpretation.
 
 A complete reading also covers what the standard's
-[Complete readings](docs/upstream/documentation-standard.md#complete-readings) (lines 191-291)
-and [Findings](docs/upstream/documentation-standard.md#findings) (lines 606-680) sections
+[Complete readings](docs/upstream/documentation-standard.md#complete-readings) (lines 197-297)
+and [Findings](docs/upstream/documentation-standard.md#findings) (lines 693-767) sections
 list, among them: two addresses are the same storage only where the reading
 shows the segment each is formed in and accessed through (a BP offset read
 through DS is the caller's stack only where DS equals SS there); a stored

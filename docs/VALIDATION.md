@@ -1,5 +1,28 @@
 # Validation
 
+## Rules and library adoption verification (2026-10-09)
+
+`tools/Invoke-Validation.ps1 -TestFilter
+'FullyQualifiedName~ResourceAndDefinitionTests' -MinimumExpectedTests 1`
+passed against the upgraded dependency locks. It compiled all projects without
+warnings or errors, compiled the Kaitai definitions, verified documentation,
+tracking and existing inventory metadata, ran the evidence/upstream/capture and
+release-safeguard regressions, checked the hash-pinned Python environment, ran
+the selected resource-consumer tests and passed the executable specifications.
+The startup failure reporter test also passed with
+`dotnet test --project tests/Conqueror.Tests/Conqueror.Tests.csproj --no-build
+--no-restore --artifacts-path artifacts/validation --no-progress
+--minimum-expected-tests 1 --filter
+'FullyQualifiedName~StartupFailureReporterTests'`.
+
+`node tools/upstream.mjs check-upstream` confirmed that all adopted rules bytes
+and the checker match upstream main. Existing `validation/` conversion needs no
+historical move: no root record or original-reading parity test exists. This is
+dependency-adoption verification, not final evidence-migration acceptance:
+inventory body ranges, provenance, region partitions and the range/accounting
+audits in `template-migration-plan.md` remain pending. No original program ran,
+no evidence status changed, and no release or push was performed.
+
 This page describes the checks a change has to pass before it is committed, locally and in CI.
 
 ## Local gate
@@ -55,20 +78,24 @@ absent, and its file carries the comment `// needs: GAME_DIR`. The documentation
 listed test file that mentions `GAME_DIR` without the comment. No current test reads the original.
 
 CI never has the original's files, so the marked tests skip there. They run on a maintainer's
-machine with `GAME_DIR` set to the owned copy. After a run of `Run Tests.bat` in which every test in
-every marked test file of a `validated` row passed and none was skipped, record the run and commit
-the `VALIDATION.md` it writes at the repository root:
+machine with `GAME_DIR` set to the owned copy. Commit the tested change first,
+then run `Run Tests.bat` against that commit. When every test in every marked
+test file of a `validated` row passed and none was skipped, record the run and
+commit the dated run file it writes under `validation/`:
 
 ```powershell
 $env:GAME_DIR = 'D:\conqueror-evidence'
 & '.\Run Tests.bat'
 ./tools/Check-Documentation.ps1 -RecordValidation BLD-GOG-EN
-git add VALIDATION.md
+git add -A validation/
 ```
 
-`VALIDATION.md` holds the commit, the date, the builds and the hash of each marked test file of a
-`validated` row. The check, in CI as well, fails a `validated` row whose marked test file is missing
-from the record or has changed since it was recorded, so a change to such a test needs a new local
+Each `validation/<date>-<commit-prefix>.md` holds the commit, date, builds and
+hash of each marked test file of a `validated` row. Recording requires a clean
+committed tree, including untracked files that Git does not ignore. Existing run
+files remain immutable; a file that matches no current marked test is removed.
+The check, in CI as well, fails a `validated` row whose marked test file is missing
+from every run or has changed since it was recorded, so a change to such a test needs a new local
 run before it merges. A change to code a marked test exercises needs one too, which the check
 cannot see.
 
@@ -98,10 +125,10 @@ action from
 [refurbished-dinosaurs-toolkit](https://github.com/kibertoad/refurbished-dinosaurs-toolkit),
 pinned to a full commit SHA, on every push to `main` and every pull request. It checks `spec/`,
 `parity/` and `deviations/` against the standard's list of
-[checks](upstream/documentation-standard.md#checks) (lines 1010-1062), compiles each `.ksy` file with
+[checks](upstream/documentation-standard.md#checks) (lines 1097-1153), compiles each `.ksy` file with
 the Kaitai Struct compiler, checks that every spec and deviation ID cited in `src/`, `tests/`, `tools/`
 exists and is not superseded, fails when `spec/index/` or `PARITY.md` is stale, and
-fails a `validated` row whose marked tests are not in `VALIDATION.md` as they are now. It
+fails a `validated` row whose marked tests are not in a run under `validation/` as they are now. It
 fetches the full history so it can fail a pull request that deletes a spec ID, area or deviation
 that exists on `main`. The toolkit's
 [setup guide](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/blob/main/docs/documentation-standard-check.md)

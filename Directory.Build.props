@@ -10,6 +10,6 @@
     <RestoreIgnoreFailedSources>true</RestoreIgnoreFailedSources>
     <!-- The RefurbishedDinosaurs.* runtime packages release together and are pinned exactly. Every
          project that references one uses this version, so a bump is one edit. -->
-    <RefurbishedDinosaursVersion>10.0.0</RefurbishedDinosaursVersion>
+    <RefurbishedDinosaursVersion>11.2.0</RefurbishedDinosaursVersion>
   </PropertyGroup>
 </Project>

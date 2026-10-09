@@ -120,8 +120,8 @@ only the lines the link gives, and never a section already read this session.
    decide a result, and nothing left to interrupts or threads (`# may run:`),
    memory nothing wrote, timing, or the operating system. List its findings in
    the entry's `complete_reading`. The standard's
-   [Complete readings](../../../docs/upstream/documentation-standard.md#complete-readings) (lines 191-291)
-   and [Findings](../../../docs/upstream/documentation-standard.md#findings) (lines 606-680)
+   [Complete readings](../../../docs/upstream/documentation-standard.md#complete-readings) (lines 197-297)
+   and [Findings](../../../docs/upstream/documentation-standard.md#findings) (lines 693-767)
    sections list what that covers; the parts most often missed are the
    segment each access actually goes through, every part of a stored call
    target, the other byte of a word written a byte at a time, allocation

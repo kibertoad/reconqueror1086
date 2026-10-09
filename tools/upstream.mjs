@@ -82,7 +82,7 @@ export function exemptChecker(workspace, version) {
 }
 // The checker inputs the CI step gives under with:, as the arguments the action passes for them, so a
 // local run checks what CI checks. Only flat "key: value" lines are read; anything else fails.
-const INPUTS = ["code", "references", "images", "max-range", "data-dirs"];
+const INPUTS = ["code", "references", "images", "max-range", "data-dirs", "rebuild", "base", "scheduled-generation", "squashed"];
 export function ciCheckerArgs(ci) {
   const lines = ci.split(/\r?\n/), at = lines.findIndex((line) => line.includes(ACTION));
   if (at < 0) throw new Error("CI does not run the pinned checker action");
@@ -102,8 +102,10 @@ export function ciCheckerArgs(ci) {
     if (!m) throw new Error(`Unsupported CI checker input line: ${line.trim()}`);
     const [, key, ...values] = m, value = values.find((v) => v !== undefined) ?? "";
     if (!INPUTS.includes(key)) continue;
-    // The action always passes code and references, and the other inputs only when they are set.
-    if (value || key === "code" || key === "references") args.push(`--${key}`, value);
+    if (key === "scheduled-generation") {
+      if (!["true", "false"].includes(value)) throw new Error("scheduled-generation must be true or false");
+      if (value === "true") args.push("--scheduled-generation");
+    } else if (value || ["code", "references", "rebuild"].includes(key)) args.push(`--${key}`, value);
   }
   return args;
 }

@@ -81,7 +81,12 @@ test("local runs take the checker inputs the CI step gives", () => {
     "          images: 0x00400000..0x004C9000 # the image finding", "          references: \"multiplayer\"",
     "          code: ''", "          max-range: \"\"", "          base: main", "          kaitai-version: '0.11'",
     "      - run: echo", "        with:", "          images: 0x00000000..0x00000010"].join("\n")),
-    ["--images", "0x00400000..0x004C9000", "--references", "multiplayer", "--code", ""]);
+    ["--images", "0x00400000..0x004C9000", "--references", "multiplayer", "--code", "", "--base", "main"]);
+  const squash = [1, 2].map(n => ["FND", "AI", String(n).padStart(3, "0")].join("-")).join("=");
+  assert.deepEqual(ciCheckerArgs(step + `        with:\n          rebuild: ''\n          scheduled-generation: true\n          squashed: ${squash}\n`),
+    ["--rebuild", "", "--scheduled-generation", "--squashed", squash]);
+  assert.deepEqual(ciCheckerArgs(step + "        with:\n          scheduled-generation: false\n"), []);
+  assert.throws(() => ciCheckerArgs(step + "        with:\n          scheduled-generation: yes\n"), /true or false/);
   assert.throws(() => ciCheckerArgs(step + "        with: { images: x }\n"), /block of key: value/);
   assert.throws(() => ciCheckerArgs(step + "        with:\n          images: |\n"), /Unsupported/);
   assert.deepEqual(ciCheckerArgs(readFileSync(resolve(root, ".github/workflows/ci.yml"), "utf8")), []);

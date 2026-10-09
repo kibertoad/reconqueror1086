@@ -2,7 +2,7 @@
 
 One file per long-running goal while it runs, named after it:
 `docs/goals/combat-static.md`. The
-[work protocol](../upstream/work-protocol.md#coding-agents-and-long-running-goals) (lines 446-497)
+[work protocol](../upstream/work-protocol.md#coding-agents-and-long-running-goals) (lines 482-533)
 says how to write the condition. The batch whose work meets the goal leaves
 the file in place, and a later commit deletes it: the session's handover commit
 for its own goal, or a commit of its own for a goal dropped between sessions
@@ -63,7 +63,7 @@ branch and starts no goal. Deleting the goal file on the branch ends the
 claim. A copy of a goal file that reaches main through a merge claims nothing
 there. A session outside a worktree of the shared clone starts no goal unless
 the person running it says none is running. The
-[protocol](../upstream/work-protocol.md#coding-agents-and-long-running-goals) (lines 446-497)
+[protocol](../upstream/work-protocol.md#coding-agents-and-long-running-goals) (lines 482-533)
 gives the details. `Dead ends` records tools and approaches that failed across the
 whole goal, in a line or two each, so a resumed session does not repeat them;
 what a research attempt tried on a question goes under its queue item's
