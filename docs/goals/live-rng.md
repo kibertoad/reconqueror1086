@@ -41,20 +41,21 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
 ## Handover
 
 - Stage: Survey; this goal adds runtime research capabilities.
-- Last gate: 2026-10-10 complete documentation and repository gates passed;
-  complete canonical fast gate passed before the authorized main push.
+- Last gate: 2026-10-10 complete canonical gate passed with checker 4.1.1;
+  final documentation, recorder and lifecycle checks passed after quiet-probe
+  verification. Package and CI pins agree with the released checker.
   mapping, lifecycle, emulator, call-survey and RNG-journal synthetic checks
   passed. EXP-RNG-001 and native recorder transport checks are documented in
   VALIDATION.md. No full-game or actual rebuild replay gate has passed.
 - Unfinished: complete rule ownership, full-game recording/replay, prescribed
   observable gameplay state, and upstream/shared-helper proposal. No WIP branch.
-- Screen-loader entry verification passed on both debugger builds. The
-  loaded-screen-return probe is running in exec session 58350, Python PID
-  68576, DOSBox-X PID 67120, with the no-heavy build. Poll that same handle
-  before another original run; observation expiry is not termination. Its
-  completed-event prefix is durable; the final return result is still pending.
+- Screen-loader entry verification passed on both debugger builds. No original
+  probe remains running and no run lock is held. Quiet structured and portable
+  synthetic controls and a bounded quiet native startup recording passed.
+  Loaded-screen-return verification remains unfinished. Probes default to
+  quiet output; audio is enabled only for an explicit sound investigation.
 - Blockers: none established. RUNTIME.md is the current capability assessment.
-- Next: finish the guarded loaded-screen-return probe from FND-UI-017 and verify heap-object identity
+- Next: run the guarded quiet loaded-screen-return probe from FND-UI-017 and verify heap-object identity
   before attempting supported-state writes or gameplay input.
 - Q-STRATEGY-043 / RULE-STRATEGY-012: complete the downstream
   consumer review from FND-STRATEGY-043/044/045/046 and resolve the disputed rule.
