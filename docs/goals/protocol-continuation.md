@@ -2,31 +2,26 @@
 
 ## Condition
 
-Continue the owner's ongoing restoration work according to the local Protocol
-and document results using the local Standard. Record suggestions and concerns
-for template, process, Protocol, Standard and shared-tooling authors as GitHub
-issues after duplicate checks, recording submission links in `gaps.md`.
-Commit completed batches and handovers on this goal branch. Since 2026-10-07
-the owner has not authorized pushing to main, so the goal runs on
-`goal/protocol-continuation`. The owner supplied no finite completion condition
-or turn limit, so this goal remains ongoing; completion of one batch does not
-complete the objective.
+Update to the latest published Standard, work protocol and shared libraries,
+and fully convert existing data and evidence to their requirements. Completion
+requires verified upstream provenance, consistent installed dependency locks,
+conversion of every affected active caller and evidence entry, updated workflow
+guidance, regenerated documentation, and passing applicable validation gates.
+Preserve evidence uncertainty and immutable historical findings; conversion
+does not authorize promoting claims. Commit completed batches and handovers on
+this goal branch. Publishing remains unauthorized.
 
 ## Scope
 
-Areas: project planning, Survey reconciliation, BLD-GOG-EN build inventory, RES inventory findings, formats and queue planning, and shared research tooling.
-Current Survey claims: Q-RES-017 / FMT-RES-015, using the current entry title
-and file list rather than a copied filename-family label; and the Survey screen
-reconciliation, which compares the screens SRC-MANUAL mentions with the SCR
-entries and adds `unknown` screen entries (areas UI and SAVE) for any missing.
-Batches: research and its tooling only. Select concrete Survey research areas
-and record their claims here before changing their entries or queue items.
+Areas: all existing evidence and tracking, workflow guidance, upstream snapshots,
+dependency locks, shared research tooling and runtime-library integrations.
+Batches: tooling migration and evidence conversion, kept separate where required.
 Only this goal runs locally while publication is not authorized.
 
 ## Must not touch
 
-Gameplay implementation under `src/`. Proprietary content and generated analysis
-artifacts in Git. Immutable rules snapshots. Remote configuration.
+Gameplay rule changes. Proprietary content and generated analysis artifacts in
+Git. Manual edits to immutable upstream snapshots. Remote configuration.
 
 ## Dead ends
 
@@ -34,7 +29,9 @@ None known.
 
 ## Handover
 
-- Stopped: owner asked to wrap up.
+- Active: owner requested latest rules/libraries and full evidence conversion.
+- Baseline freshness check on 2026-10-09 identifies rules a9884ae2 and checker
+  3.0.1 as newer than the installed pins. Migration acceptance is pending.
 - Stage: Survey. Every manual screen has a screen entry (SCR-UI-021 to
   SCR-UI-036, `sourced`), and every archive member kind has a format entry
   (FMT-RES-121 to FMT-RES-127; FND-RES-061 covers the unread `.FNT` entry).
