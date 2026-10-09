@@ -41,20 +41,15 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
 ## Handover
 
 - Stage: Survey; this goal adds runtime research capabilities.
-- Last gate: 2026-10-09 tooling synthetic checks and documentation passed.
-- Unfinished: live mapping audit and full-game rule-tagged draw recording.
-  Verify-LiveSnapshot.py finds a unique RNG identity control and unanimous code
-  relocation target bases in local live-rng-map-e/physical-memory.bin. Residual
-  code/data writes and selectors still require audit; no live map is established.
-- Blockers: none established. A diagnostic exit breakpoint identified digital
-  driver loading before disc setup completed. Guest readiness gating fixed the
-  setup ordering. The 1,000-cycle probe reached the startup seed entry described
-  in FND-RNG-003, captured its stack argument and exited with the run lock clear.
-- Next: finish startup instrumentation verification; audit residual code writes
-  and live selector identity. Candidate breakpoints and a bounded instruction
-  trace now reach the loaded game and its initial seed; no draw recording exists
-  yet. Then map RNG
-  callers from spec evidence and validate deterministic full-game recording.
-- Checks: four lifecycle and nine synthetic emulator checks passed;
-  local snapshot comparison completed. These do not establish gameplay coverage.
-  Analysis-readiness, repository and documentation gates passed without skips.
+- Last gate: 2026-10-09 mapping, lifecycle and emulator synthetic checks passed;
+  the complete documentation gate passed without skips.
+- Unfinished: rule ownership, full-game recording/replay, prescribed observable
+  gameplay state, and reproducible upstream/shared-helper proposal. No WIP branch.
+- Blockers: none established. RUNTIME.md is the current capability assessment.
+- Next: Q-RNG-001 / RULE-RNG-001, finish the static time-source reading; then
+  implement rule-tagged capture, starting with RULE-PERSON-002's bounded startup
+  shifts and rejecting unowned calls. Validate recorder completeness and ordering
+  in two different-seed runs before proposing upstream extraction.
+- Evidence references: FND-RNG-004 and FND-RNG-003. Per-run checks live in
+  tools/live_mapping.py; tools/Probe-LiveMapping.py verifies native seed/draw
+  state identity. Capture paths and hashes belong to the finding, not this file.
