@@ -30,7 +30,8 @@ class EventLog:
 
 
 def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen=False, stop_after_screen=False,
-           startup_checkpoints=False, startup_click=False, continue_after_screen=False, title_click=False):
+           startup_checkpoints=False, startup_click=False, continue_after_screen=False, title_click=False,
+           screen_checkpoints=False, stop_after_screen_id=None):
     if stop_at_screen and stop_after_screen:
         raise ValueError('Choose one screen diagnostic boundary')
     if startup_checkpoints and not stop_after_screen:
@@ -41,6 +42,11 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         raise ValueError('Continuation requires a verified loaded-screen boundary')
     if title_click and not continue_after_screen:
         raise ValueError('Title input requires guarded recording continuation')
+    if screen_checkpoints and not continue_after_screen:
+        raise ValueError('Screen checkpoints require guarded recording continuation')
+    if stop_after_screen_id is not None and (not screen_checkpoints or
+            type(stop_after_screen_id) is not int or not 0 <= stop_after_screen_id <= 24):
+        raise ValueError('Screen target requires checkpoints and a registered screen identifier')
     if type(maximum_draws) is not int or not 1 <= maximum_draws <= 100000:
         raise ValueError('Invalid recording draw limit')
     output = Path(output)
@@ -54,7 +60,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
     if stop_at_screen or stop_after_screen:
         # FND-UI-001 names both screen-loading entries and their arguments.
         # This boundary precedes loading/setup; it does not mean menu-ready.
-        for address in ((0x595c0,) if stop_after_screen else (0x595c0, 0x596c0)):
+        for address in ((0x595c0,) if stop_after_screen and not screen_checkpoints else (0x595c0, 0x596c0)):
             selector, offset = mapping.code_address(address)
             hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
             hooks[hook.id] = 'screen-entry'
@@ -62,6 +68,10 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         selector, offset = mapping.code_address(0x5965f)  # FND-UI-017
         hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
         hooks[hook.id] = 'screen-return'
+        if screen_checkpoints:
+            selector, offset = mapping.code_address(0x5975e)  # FND-UI-020
+            hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
+            hooks[hook.id] = 'screen-return'
     startup_points = {0x2ac08: 'preparation-entry', 0x2ac86: 'animation-test',
                       0x2ad54: 'preparation-epilogue'}  # FND-UI-018
     if startup_checkpoints:
@@ -111,6 +121,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         return value - mapping.code_base + 0x10000
     frame = None
     screen_frame = None
+    initial_screen_seen = False
     startup_key = None
     archive_key = None
     archive_ordinal = 0
@@ -204,7 +215,8 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                 runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
                 continue
             if kind == 'screen-return':
-                if pc != 0x5965f or frame is not None or archive_key is not None or screen_frame is None or screen_frame['key'] != key:
+                if frame is not None or archive_key is not None or screen_frame is None or \
+                        pc != screen_frame['return_pc'] or screen_frame['key'] != key:
                     raise RecordingError('Loaded-screen return/frame mismatch')
                 selector, offset = mapping.data_address(0xafe50, 4)  # FND-UI-017
                 pointer = int.from_bytes(runtime.read(runtime.MemoryAddress.segmented(selector, offset), 4), 'little')
@@ -227,13 +239,25 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                 report['screen_observation'] = {'record_pointer': pointer, 'object_pointer': object_pointer,
                                                 'screen_id': screen_id, 'history': history}
                 screen_frame = None
+                if screen_checkpoints:
+                    observation = {'request': report['screen_request'],
+                                   'observation': report['screen_observation'],
+                                   'rng_state': report['end_rng_state']}
+                    report.setdefault('screen_loads', []).append(observation)
+                    (output / 'screen-load-checkpoints.json').write_text(
+                        json.dumps(report['screen_loads'], indent=2) + '\n')
+                    print('Verified loaded screen:', screen_id, flush=True)
+                    if screen_id == stop_after_screen_id:
+                        report['status'] = 'screen-target-return-reached'
+                        return report
                 if continue_after_screen:
                     report['status'] = 'incomplete'
-                    (output / 'screen-load-checkpoint.json').write_text(
-                        json.dumps({'request': report['screen_request'],
-                                    'observation': report['screen_observation'],
-                                    'rng_state': report['end_rng_state']}, indent=2) + '\n')
-                    if title_click:
+                    if not initial_screen_seen:
+                        (output / 'screen-load-checkpoint.json').write_text(
+                            json.dumps({'request': report['screen_request'],
+                                        'observation': report['screen_observation'],
+                                        'rng_state': report['end_rng_state']}, indent=2) + '\n')
+                    if title_click and not initial_screen_seen:
                         if screen_id != 0:
                             raise RecordingError('Prescribed title input requires screen zero')
                         # SCR-UI-001: the title's full-screen region accepts a
@@ -247,10 +271,11 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                     # These are one-time startup observations, not policies for
                     # subsequent screen transitions or archive requests.
                     for hook_id, hook_kind in list(hooks.items()):
-                        if hook_kind in ('screen-entry', 'screen-return', 'startup-checkpoint',
-                                         'archive-entry', 'archive-return'):
+                        if hook_kind in ('startup-checkpoint', 'archive-entry', 'archive-return') or \
+                                (not screen_checkpoints and hook_kind in ('screen-entry', 'screen-return')):
                             runtime.agent.delete_breakpoint(runtime.session.id, hook_id)
                             del hooks[hook_id]
+                    initial_screen_seen = True
                     runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
                     continue
                 return report
@@ -264,7 +289,8 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                 if stop_after_screen:
                     if screen_frame is not None:
                         raise RecordingError('Recursive screen loading requires separate evidence')
-                    screen_frame = {'key': key, 'request': {'screen': screen, 'draw': draw, 'mode': mode}}
+                    screen_frame = {'key': key, 'return_pc': 0x5965f if pc == 0x595c0 else 0x5975e,
+                                    'request': {'screen': screen, 'draw': draw, 'mode': mode}}
                     runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
                     continue
                 report['end_rng_state'] = journal.complete()

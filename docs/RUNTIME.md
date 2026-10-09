@@ -259,6 +259,16 @@ hash and readback guards apply, and RNG state must remain unchanged.
 The controller records this input locally before resuming. This option has
 synthetic checks; reaching game options through it still needs an original run.
 
+`--screen-checkpoints` requires `--continue-after-screen`. It retains separate
+entry/return guards for initial loading and replacement (FND-UI-017/020), checks
+the corresponding saved frame, current object identifier, history head and
+recorded RNG state, and appends local `screen-load-checkpoints.json` observations.
+Nested loading is rejected. The title input is queued only once, after the
+initial verified return; subsequent screen observations do not repeat it.
+Add `--stop-after-screen-id 1` to end on the verified game-options return.
+This target stop remains incomplete for full-game coverage. These guards have
+synthetic validation; native replacement-return verification is pending.
+
 ### Operating and interpreting a probe
 
 Both DOSBox probe commands mute host audio by default with `MIXER MASTER 0:0`

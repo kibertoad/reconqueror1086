@@ -50,6 +50,78 @@ def runtime_and_mapping(screen_state=123, screen_number=0, record_pointer=0x3000
 
 
 class ScreenBoundaryTests(unittest.TestCase):
+    def replacement_sequence(self, wrong_return=False, wrong_frame=False, wrong_identity=False):
+        runtime, mapping = runtime_and_mapping()
+        original_wait, original_registers, original_read = (
+            runtime.wait_until_stopped, runtime.registers, runtime.read)
+        def wait(operation):
+            if runtime.phase < 3:
+                original_wait(operation)
+            else:
+                runtime.phase += 1
+                runtime.session.stop_reason.breakpoint_id = (
+                    'hook-596c0' if runtime.phase == 4 else 'hook-5975e')
+        def registers():
+            if runtime.phase < 4:
+                return original_registers()
+            return SimpleNamespace(general={'esp': '0x1004' if wrong_frame and runtime.phase == 5 else '0x1000'},
+                                   segments={'cs': '0x180', 'ds': '0x188', 'ss': '0x188'},
+                                   cpu_mode='protected', instruction_pointer=hex(
+                                       0x596c0 if runtime.phase == 4 else 0x5965f if wrong_return else 0x5975e))
+        def read(address, length):
+            if runtime.phase >= 4:
+                if address == (0x188, 0x1004):
+                    return b''.join(word.to_bytes(4, 'little') for word in (1, 1, 1))
+                if address == (0x188, 0x300000):
+                    return b''.join(word.to_bytes(4, 'little') for word in
+                                    (0x300100, 1, 0, *([0xffffffff] * 3)))
+                if address == (0x188, 0x300100):
+                    block = bytearray(184)
+                    block[96:100] = (2 if wrong_identity else 1).to_bytes(4, 'little')
+                    return bytes(block)
+            return original_read(address, length)
+        runtime.wait_until_stopped, runtime.registers, runtime.read = wait, registers, read
+        with patch('native_rng_recorder.tables_from_diagnostic', return_value=(0, 16)), \
+             patch('native_rng_recorder.descriptor', side_effect=[mapping.code, mapping.data] * 8), \
+             patch('native_rng_recorder.EventLog'), patch('native_rng_recorder.Path.write_text'), \
+             patch('native_rng_recorder.queue_primary_click',
+                   return_value={'action': 'primary-short-click'}) as click:
+            report = record(runtime, mapping, ('draw', 'seed'), 'unused-output', stop_after_screen=True,
+                            continue_after_screen=True, title_click=True, screen_checkpoints=True,
+                            stop_after_screen_id=1)
+        click.assert_called_once_with(runtime, mapping, x=10, y=10)
+        runtime.agent.delete_breakpoint.assert_not_called()
+        return report
+
+    def test_replacement_screen_target_checks_both_returns_without_repeating_title_input(self):
+        report = self.replacement_sequence()
+        self.assertEqual(report['status'], 'screen-target-return-reached')
+        self.assertEqual([item['observation']['screen_id'] for item in report['screen_loads']], [0, 1])
+        self.assertEqual(report['screen_observation']['history'], [1, 0, -1, -1, -1])
+        self.assertFalse(report['pending_screen_load'])
+        self.assertFalse(report['full_game_complete'])
+        self.assertEqual(len(report['events']), 1)
+
+    def test_replacement_rejects_the_initial_loader_return_address(self):
+        with self.assertRaisesRegex(RecordingError, 'return/frame mismatch'):
+            self.replacement_sequence(wrong_return=True)
+
+    def test_replacement_rejects_a_different_stack_frame(self):
+        with self.assertRaisesRegex(RecordingError, 'return/frame mismatch'):
+            self.replacement_sequence(wrong_frame=True)
+
+    def test_replacement_rejects_wrong_loaded_identity(self):
+        with self.assertRaisesRegex(RecordingError, 'identity/history differs'):
+            self.replacement_sequence(wrong_identity=True)
+
+    def test_screen_target_rejects_missing_guard_and_invalid_identifiers(self):
+        for options in ({'stop_after_screen_id': 1}, {'screen_checkpoints': True,
+                        'stop_after_screen_id': True}, {'screen_checkpoints': True,
+                        'stop_after_screen_id': 25}):
+            with self.subTest(options=options), self.assertRaisesRegex(ValueError, 'Screen target'):
+                record(None, None, (), 'unused-output', stop_after_screen=True,
+                       continue_after_screen=True, **options)
+
     def test_continuation_requires_the_loaded_screen_guard(self):
         with self.assertRaisesRegex(ValueError, 'verified loaded-screen boundary'):
             record(None, None, (), 'unused-output', continue_after_screen=True)

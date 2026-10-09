@@ -257,6 +257,15 @@ check, preserves the RNG event prefix and still rejects the next unknown draw.
 Title input without guarded continuation is rejected. No native title-to-options
 transition is established by these synthetic checks.
 
+2026-10-10: 46 pointer-input, recorder, journal, event-log and mapping tests
+passed after adding replacement-screen checkpoints and an observable screen
+target. Synthetic initial/replacement returns retain ordered observations and
+queue title input once. A replacement rejects the initial loader's return
+address, a different stack frame and a different object identifier. Invalid
+targets and targets without checkpoints are rejected. Original replacement
+return verification remains pending; these tests do not establish full-game
+coverage or actual rebuild replay.
+
 2026-10-10: native caller policy checks passed 29 recorder, journal,
 durable-event-log and mapping tests. The new synthetic cases record the
 scaled hit-check result and the busy-voice remainder register, and reject
