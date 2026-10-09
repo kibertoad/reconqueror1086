@@ -236,7 +236,11 @@ The owned emulator exited and its lock was released. The configuration and
 controller fingerprints remain local; every fingerprint matched its authored
 source at verification. This verifies the debugger-controlled startup input
 and return, not physical mouse delivery, full-game coverage or rebuild replay.
-A second same-configuration run with a fresh seed is in progress.
+The second same-configuration run, suffix `b`, also reached the guarded return.
+Its seed was 895807065 and its 32 completed events replay to state 3761746176.
+Its log and journal agree, all pending-operation flags are false, and its owned
+process and lock were cleaned up. These different-seed runs verify this
+startup boundary, not the goal's required full-game traces.
 
 2026-10-10: 39 pointer-input, recorder, journal, event-log and mapping tests
 passed after adding continuation beyond the guarded initial screen return.
