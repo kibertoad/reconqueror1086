@@ -135,12 +135,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30):
                     report['status'] = 'bounded-limit-reached'
                     return report
             operation = runtime.agent.continue_(runtime.session.id)
-            try:
-                runtime.wait(operation, seconds=30)
-            except TimeoutError:
-                # Keep observing this same live operation; do not issue another
-                # continuation simply because its first observation expired.
-                runtime.wait(operation, seconds=30)
+            runtime.wait_until_stopped(operation)
     except Exception as error:
         report['failure'] = str(error)
         try:

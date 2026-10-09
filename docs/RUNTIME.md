@@ -186,7 +186,10 @@ in place of `--seed-check --record-startup-shifts`. Native entry/return
 breakpoints observe the raw and bounded results without single-stepping through
 interrupts. Each stop rechecks protected mode, descriptors and the relevant
 original function code against the validated initial snapshot. A pending
-continuation is observed again on timeout; it is never restarted automatically.
+continuation is observed again after each observation expiry until it stops;
+there is no second-expiry cutoff. Every observation verifies the owned emulator
+is still alive. Transport failures propagate separately from observation expiry;
+the continuation is never restarted automatically.
 
 The current accepted policies cover initial seeding, character shifts and the
 home selector's directly read argument 7 (FND-STRATEGY-043). The complete

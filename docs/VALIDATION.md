@@ -833,6 +833,15 @@ Kaitai compilation was skipped because no compiler was available. No original
 program ran, no proprietary analysis artifacts were committed, and no publication
 was performed.
 
+## Continuous debugger observation checks (2026-10-10)
+
+`python -B -m unittest discover -s tools -p test_dosbox_session.py` passed
+six synthetic checks. Repeated observation expiries retain the exact same
+operation, while a transport timeout propagates instead of being retried as
+pending execution. Existing lifecycle cleanup and lock retention checks pass.
+The RNG journal and live-mapping synthetic suites also passed. These checks
+do not establish full-game recording or gameplay replay.
+
 ## Structured debugger tooling checkpoint (2026-10-09)
 
 `python -B tools/test_dosbox_session.py` passed four synthetic lifecycle checks:

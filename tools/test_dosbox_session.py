@@ -4,7 +4,7 @@ import tempfile
 from types import SimpleNamespace
 import unittest
 from unittest.mock import Mock, patch
-from dosbox_session import AgentRuntime, SessionError
+from dosbox_session import AgentRuntime, ObservationTimeout, SessionError
 
 
 def runtime():
@@ -18,6 +18,25 @@ def runtime():
 
 
 class LifecycleTests(unittest.TestCase):
+    def test_repeated_observation_expiry_keeps_same_operation(self):
+        value = runtime()
+        operation = SimpleNamespace(id='operation')
+        stopped = SimpleNamespace(state='stopped')
+        value.wait = Mock(side_effect=[ObservationTimeout(), ObservationTimeout(), stopped])
+        self.assertIs(stopped, value.wait_until_stopped(operation))
+        self.assertEqual(value.wait.call_count, 3)
+        for call in value.wait.call_args_list:
+            self.assertIs(call.args[0], operation)
+        value.agent.continue_.assert_not_called()
+        value.agent.start.assert_not_called()
+
+    def test_transport_timeout_is_not_observation_expiry(self):
+        value = runtime()
+        value.wait = Mock(side_effect=TimeoutError('transport failed'))
+        with self.assertRaisesRegex(TimeoutError, 'transport failed'):
+            value.wait_until_stopped(SimpleNamespace(id='operation'))
+        value.wait.assert_called_once()
+
     def test_observation_timeout_preserves_pending_operation(self):
         value = runtime()
         value.agent.wait.return_value = SimpleNamespace(running=True)

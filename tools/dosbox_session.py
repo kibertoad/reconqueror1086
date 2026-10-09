@@ -19,6 +19,10 @@ class SessionError(RuntimeError):
     pass
 
 
+class ObservationTimeout(TimeoutError):
+    """The owned operation is still pending, rather than failed."""
+
+
 def import_client(source):
     source = Path(source).resolve()
     revision = subprocess.check_output(['git', '-C', str(source), 'rev-parse', 'HEAD'], text=True).strip()
@@ -119,7 +123,19 @@ class AgentRuntime:
                 self.session = result.session
                 return self.session
         # A timeout is not a terminal state and never starts another operation.
-        raise TimeoutError(f'Operation {operation.id} remains pending')
+        raise ObservationTimeout(f'Operation {operation.id} remains pending')
+
+    def wait_until_stopped(self, operation, seconds=30):
+        """Observe one operation until terminal; each poll verifies process life.
+
+        Transport failures propagate. Only our bounded observation expiry is
+        retried, without creating another continuation or restarting the guest.
+        """
+        while True:
+            try:
+                return self.wait(operation, seconds=seconds)
+            except ObservationTimeout:
+                print(f'Owned debugger operation {operation.id} still pending; observing same operation', flush=True)
 
     def registers(self):
         return self.agent.get_registers(self.session.id)
