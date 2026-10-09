@@ -215,6 +215,11 @@ those guards. tools/rng_journal.py separately verifies reseeds, ordering and
 raw/bounded state transitions; run tools/test_rng_journal.py for synthetic checks.
 This remains intermediate transport verification, without actual rebuild replay.
 
+Completed seeds and bounded results are also appended to native-rng-events.jsonl
+and flushed to disk before continuing the guest. Existing event logs are never
+reused. This preserves completed events after interruption; a surviving prefix
+does not establish recording completeness or authorize resuming a guest from it.
+
 For a startup state diagnostic, add `--stop-at-screen` and increase
 `--record-draw-limit` above the startup prefix. The optional breakpoints stop
 before either screen-loading procedure runs (FND-UI-001), recording its requested

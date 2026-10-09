@@ -53,6 +53,7 @@ class ScreenBoundaryTests(unittest.TestCase):
         runtime, mapping = runtime_and_mapping(**options)
         with patch('native_rng_recorder.tables_from_diagnostic', return_value=(0, 16)), \
              patch('native_rng_recorder.descriptor', side_effect=[mapping.code, mapping.data] * 4), \
+             patch('native_rng_recorder.EventLog'), \
              patch('native_rng_recorder.Path.write_text'):
             return record(runtime, mapping, ('draw', 'seed'), 'unused-output',
                           stop_at_screen=not after, stop_after_screen=after)

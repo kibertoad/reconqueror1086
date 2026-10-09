@@ -835,6 +835,12 @@ was performed.
 
 ## Continuous debugger observation checks (2026-10-10)
 
+The completed-event log passed two synthetic checks in
+tools/test_rng_event_log.py: a seed/draw prefix remains readable before the
+writer closes, and an existing capture cannot be overwritten or appended.
+The native recorder's seven synthetic boundary checks also passed with this
+writer integrated. These checks do not establish full-game recording.
+
 The loaded-screen-return transport added after FND-UI-017 passed seven
 synthetic cases in tools/test_native_rng_recorder.py. The checks reject null
 record pointers, a wrong screen-object identity and an unrecorded RNG-state

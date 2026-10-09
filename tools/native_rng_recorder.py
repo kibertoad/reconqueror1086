@@ -7,10 +7,25 @@ This transport does not claim full-game caller coverage or actual rebuild replay
 """
 import dataclasses
 import json
+import os
 from pathlib import Path
 from rng_journal import Journal, replay
 from live_mapping import descriptor, tables_from_diagnostic
 from rng_recording import RecordingError, canonical_pc
+
+
+class EventLog:
+    """Append only completed rule events; retain them if capture is interrupted."""
+    def __init__(self, path):
+        self.file = Path(path).open('x', encoding='utf-8', newline='\n')
+
+    def append(self, event):
+        self.file.write(json.dumps(event, separators=(',', ':'), allow_nan=False) + '\n')
+        self.file.flush()
+        os.fsync(self.file.fileno())
+
+    def close(self):
+        self.file.close()
 
 
 def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen=False, stop_after_screen=False):
@@ -63,6 +78,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
     report = {'schema': 'conquer-native-rng-journal-v1', 'status': 'incomplete',
               'full_game_complete': False, 'accepted_callers_complete': False,
               'events': journal.events}
+    event_log = EventLog(output / 'native-rng-events.jsonl')
     try:
         while True:
             stop = runtime.session.stop_reason
@@ -179,6 +195,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                 if pc != 0x6b422 or frame is None or frame['phase'] != 'seed' or frame['key'] != key:
                     raise RecordingError('Seed return/frame mismatch')
                 journal.finish_seed(state())
+                event_log.append(journal.events[-1])
                 frame = None
             elif kind == 'draw-return':
                 if pc != 0x6b412 or frame is None or frame['phase'] != 'raw' or frame['key'] != key:
@@ -192,6 +209,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                 if journal.pending['rule'] == 'RULE-PERSON-002':
                     shift_ordinal += 1
                 journal.finish_bound(state(), int(registers.general[result_register], 16))
+                event_log.append(journal.events[-1])
                 frame = None
                 count += 1
                 if count == maximum_draws:
@@ -216,6 +234,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
             report['diagnostic_failure'] = type(diagnostic_error).__name__
         raise
     finally:
+        event_log.close()
         report['pending_operation'] = journal.pending is not None
         report['pending_screen_load'] = screen_frame is not None
         (output / 'native-rng-journal.json').write_text(json.dumps(report, indent=2))
