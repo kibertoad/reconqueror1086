@@ -1,5 +1,17 @@
 # Validation
 
+## Coverage progress semantics (2026-10-09)
+
+`node tools/Report-Coverage.mjs` generated a report from committed spec,
+inventories and validated sidecars without reading original files. It separates
+metadata-only citations, research citations, unique cited bodies and actual
+location intersections, and lists missing inventory baselines explicitly.
+Controlled synthetic regressions passed for shared tails, body holes, file-data
+exclusion, real-mode aliases and additions/removals/boundary changes with
+unchanged research evidence. Complete-reading coverage remains unavailable
+without a checked function-level audit. The canonical Invoke-Validation.ps1
+gate passed with ResourceAndDefinitionTests and MinimumExpectedTests 1.
+
 ## Single-address notation audit (2026-10-09)
 
 Four legacy locations repeated one address as both range ends. They now use the

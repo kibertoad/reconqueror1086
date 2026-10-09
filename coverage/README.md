@@ -57,4 +57,27 @@ twice after its repository bookkeeping stabilized.
 The older size-only exports remain historical validation records. They cannot
 recover body extents by adding size to start and are not inputs to the current
 coverage checker. Raw exports, databases, logs and source files remain ignored.
-The HMI data-container analysis in FND-SOUND-001 supplies no function inventory.
+The HMI data-container analysis in FND-RES-013 supplies no function inventory.
+
+## Progress reports
+
+`node tools/Report-Coverage.mjs` reads only committed spec and coverage metadata.
+Keep its JSON output in ignored artifacts. It checks the sidecars before joining
+locations to actual body ranges. Shared tails count once; a location in a gap
+does not cite either adjoining body. For packed files, loaded addresses use the
+manifest's unpacked format and verified inventory identity; file-data offsets
+remain separate.
+
+The report distinguishes all citations from research citations after removing
+the metadata-only findings named in `baseline.json`. For each it gives both the
+unique bytes of cited bodies and the actual bytes intersected by locations.
+Neither is a complete-reading count. Complete-reading coverage is unavailable
+until a function-level audit checks the findings in `complete_reading`; the
+number of established entries is not a substitute.
+
+The generated report names manifest code files without inventories. The baseline
+also records opaque driver payloads, imported/generated code and unresolved area
+assignments. These limits keep Survey open; an absent denominator is unavailable,
+not zero. `compareInventories` in the progress helper distinguishes additions,
+removals and changed body boundaries when comparing frozen revisions. It does
+not infer why a definition disappeared or credit denominator changes as research.

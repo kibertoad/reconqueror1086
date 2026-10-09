@@ -1,0 +1,12 @@
+{
+  "metadataOnlyFindings": ["FND-RES-062", "FND-RES-063"],
+  "limitations": [
+    "Analyzer bodies and mapped executable partitions are a discovery baseline, not exhaustive behavior or complete readings.",
+    "CD:CONQUER/CONCFG.EXE has header/string observations but no verified function snapshot; its coverage is unavailable.",
+    "CD:BOOTDISK.EXE remains in the manifest without a function-analysis baseline; its coverage is unavailable.",
+    "HMI driver payloads remain opaque data-container members under FND-RES-013; code inside them and generated code have no verified inventory.",
+    "Library routines already present in an executable are included in its analyzer inventory; imported or generated code must not be inferred from that inventory.",
+    "Functions have no assigned research area without evidence about their roles.",
+    "Complete-reading declarations require a separate checked function-level audit; entry status and citation overlap cannot supply it."
+  ]
+}
