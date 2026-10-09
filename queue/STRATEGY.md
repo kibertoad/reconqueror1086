@@ -11,7 +11,9 @@ Next ID: Q-STRATEGY-044
   Blocks: none. Tried: FND-STRATEGY-043 confirms argument provenance and the
   unclamped store/read. FND-STRATEGY-044 records nine consecutive person/route
   pairs, including index 7; FND-STRATEGY-045 corrects the prior setup reading.
-  The full downstream consumer review remains unfinished.
+  FND-STRATEGY-046 follows the home-route branch through its forward-copy
+  path without a seven-home clamp. The full downstream consumer review
+  remains unfinished.
 
 - Q-STRATEGY-001. BUG-STRATEGY-001: What the local holds at the start of a session? Settles it:
   trace the cited path and its callers through the boundary case; distinguish executable

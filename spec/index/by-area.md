@@ -235,6 +235,7 @@ Entries by area.
 | [FND-STRATEGY-043](../findings/FND-STRATEGY-043.md) | The home selector calls the inclusive helper with seven, contradicting the rule's bound of six | recorded |
 | [FND-STRATEGY-044](../findings/FND-STRATEGY-044.md) | Route resources and nine home-selection table entries, of which eight are selectable | recorded |
 | [FND-STRATEGY-045](../findings/FND-STRATEGY-045.md) | New-game setup 0x000110E8 places the player at one of eight homes and clears the strategic records | recorded |
+| [FND-STRATEGY-046](../findings/FND-STRATEGY-046.md) | The home-route branch uses the selected route without a seven-home clamp | recorded |
 | [RULE-STRATEGY-001](../rules/RULE-STRATEGY-001.md) | Strategic pass and the yearly orders | supported |
 | [RULE-STRATEGY-002](../rules/RULE-STRATEGY-002.md) | Hostile pass and arrival | supported |
 | [RULE-STRATEGY-003](../rules/RULE-STRATEGY-003.md) | Hostile generator and reactive finder | supported |

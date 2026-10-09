@@ -63,7 +63,7 @@ Entries by status.
 
 ## recorded
 
-39 entries.
+40 entries.
 
 | ID | Title |
 |---|---|
@@ -106,6 +106,7 @@ Entries by status.
 | [FND-STRATEGY-043](../../findings/FND-STRATEGY-043.md) | The home selector calls the inclusive helper with seven, contradicting the rule's bound of six |
 | [FND-STRATEGY-044](../../findings/FND-STRATEGY-044.md) | Route resources and nine home-selection table entries, of which eight are selectable |
 | [FND-STRATEGY-045](../../findings/FND-STRATEGY-045.md) | New-game setup 0x000110E8 places the player at one of eight homes and clears the strategic records |
+| [FND-STRATEGY-046](../../findings/FND-STRATEGY-046.md) | The home-route branch uses the selected route without a seven-home clamp |
 
 ## Open questions
 
