@@ -1,5 +1,21 @@
 # Validation
 
+## Final migration acceptance (2026-10-09)
+
+Official npm/PyPI/NuGet release metadata and upstream-main refs still match the
+adopted rules, checker 3.0.1, reader 2.6.0, engine 13.6.0 and all shared runtime
+packages at 11.2.0. Frozen-lockfile pnpm installation, hash-pinned Python
+installation, installed-version verification and strict source readiness pass.
+The final default Invoke-Validation.ps1 gate passes with the snapshot, native
+command and progress regression suites explicitly included, documentation and
+Kaitai checks, solution build, non-long-running xUnit tests and executable
+specifications. Long-running tests and remote cross-platform CI were not run.
+All committed coverage bundles validate, boundary audits report no remaining
+review candidates, and generated progress retains unavailable complete-reading
+and missing-code baselines. template-migration-plan.md records the full acceptance
+audit. No original game ran, no proprietary/generated evidence entered Git and
+no push or publication was performed.
+
 ## Coverage progress semantics (2026-10-09)
 
 `node tools/Report-Coverage.mjs` generated a report from committed spec,

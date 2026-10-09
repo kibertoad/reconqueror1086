@@ -609,4 +609,3 @@ locks and requirements-evidence.txt define installed dependency integrity.
 Follow template-migration-plan.md for the current migration acceptance audit.
 Use the canonical validation gate and keep owned-source evidence local.
 Publication requires the owner's explicit request.
-

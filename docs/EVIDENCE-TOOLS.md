@@ -6,8 +6,8 @@ bytes remain in the ignored local evidence store, never in Git.
 
 ## Conqueror executable boundary
 
-BLD-GOG-EN identifies a DOS/16M-bound LE executable. The generic MZ/FBOV operand,
-incoming-call and inventory resolver does **not** support this container. Do not
+BLD-GOG-EN identifies a DOS/16M-bound LE executable. The generic MZ/FBOV operand
+and incoming-call resolver does **not** support this container. Do not
 pass it a stripped stub or pretend its addresses are MZ addresses. Use the
 Conqueror inspector's explicit LE object mapping and the mapped Ghidra project
 described in [ghidra.md](ghidra.md). A function inventory is analyzer metadata,
@@ -19,8 +19,8 @@ not proof of a complete reading, all callers or instruction identity.
 adoption and checking, and the MZ/FBOV identity resolver. `@scientific-method/executable-reader`
 is the separately locked toolkit package instruction-derived reporter. Its supported
 formats and query contracts are in
-[BOUNDED-EVIDENCE-REPORTERS.md](BOUNDED-EVIDENCE-REPORTERS.md). Every command
-names its source by the `xxh3` its build entry gives and refuses another file.
+[BOUNDED-EVIDENCE-REPORTERS.md](BOUNDED-EVIDENCE-REPORTERS.md). Source-derived reports
+name their source by the `xxh3` its build entry gives and refuse another file.
 Keep unsupported formats and unresolved calls explicit; synthetic acceptance of
 a tool is never original-game evidence.
 

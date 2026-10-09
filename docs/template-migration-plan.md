@@ -35,8 +35,28 @@ Acceptance is not just a passing checker. Complete these conversion audits:
 - Update workflow summaries, templates, coverage and evidence-review guidance,
   regenerate section links/indexes, and run applicable canonical gates.
 
-The dependency and snapshot adoption is underway. Full inventory/evidence
-conversion and final acceptance remain pending. No publication is authorized.
+The migration acceptance audit is complete. Historical findings retain their
+observations; reviewed notation corrections preserve scope, and ambiguous scopes
+have whole-finding replacements. No evidence or parity claim was promoted.
+No publication is authorized.
+
+| Acceptance area | Verified result and durable record |
+|---|---|
+| Published revisions and dependencies | Official registry and upstream-main checks on 2026-10-09 still match the targets above. Frozen pnpm and hash-pinned Python installation, package verification, solution restore/build and strict source readiness pass. |
+| Snapshot and CI consistency | Offline digest, checker/action pin and section-link checks pass; unmodified upstream snapshots remain authoritative. |
+| Existing native inventories | Every existing inventory has actual body ranges, verified source/snapshot provenance and executable partitions. Check-Coverage.mjs validates the bundles; coverage/README.md records mapping qualifications and exclusions. |
+| Active evidence callers | Native snapshot adoption/checking replaces size-only report contracts; obsolete launcher metadata is removed. The shared unpacker reproduces the verified installer identity. Synthetic migration suites are included explicitly in the canonical gate. |
+| Address, resource and value notation | Reviewed code and resource extents, value extrema and repeated-address points are converted. FND-RES-062, FND-RES-063 and FND-RES-070 record boundary metadata. Uncertain scopes have replacement findings and active citations; code and whole-resource candidate audits report none. |
+| Owned paths and archive accounting | FND-RES-069 checks canonical primary-volume names and complete manifest/Other files accounting against the owned listing. Archive members retain their format coverage and explicit unanswered questions; no unsupported member listing is invented. |
+| Status and progress semantics | Claims retain their statuses. Report-Coverage.mjs distinguishes metadata/research citations, unique bodies and actual intersections; complete-reading coverage and missing code baselines remain explicitly unavailable. |
+| Workflow guidance | The current plan separates research and implementation, uses generated status, retains Survey and its unresolved scope, and defines reachable slice targets. Coverage/evidence guidance and generated indexes are current. |
+| Validation and delivery boundary | The default canonical gate passes with all migrated evidence suites, documentation/Kaitai, solution build, non-long-running xUnit selection and executable specifications. Generated evidence and original content remain local; no original game or publication was performed. |
+
+Unstudied code, opaque driver payloads, missing complete-reading baselines and
+remaining Survey questions are research scope, recorded as unavailable or queued;
+they are not unconverted legacy evidence or claims of completed restoration.
+
+## Historical template adoption (2026-09-30)
 
 Status: implemented and locally validated after owner approval on 2026-09-30.
 The owner also requested removal of
