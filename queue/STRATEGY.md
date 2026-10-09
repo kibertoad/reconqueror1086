@@ -1,8 +1,15 @@
 # STRATEGY
 
-Next ID: Q-STRATEGY-043
+Next ID: Q-STRATEGY-044
 
 ## Static
+
+- Q-STRATEGY-043. RULE-STRATEGY-012: What does the home selector's inclusive
+  endpoint select? Settles it: independently locate the selection tables in the
+  shipped data, establish their extents and follow index 7 through every
+  relevant consumer; resolve the bound-6 rule against FND-STRATEGY-043.
+  Blocks: none. Tried: FND-STRATEGY-043 confirms argument provenance and the
+  unclamped store/read; table extent and endpoint semantics remain unread.
 
 - Q-STRATEGY-001. BUG-STRATEGY-001: What the local holds at the start of a session? Settles it:
   trace the cited path and its callers through the boundary case; distinguish executable

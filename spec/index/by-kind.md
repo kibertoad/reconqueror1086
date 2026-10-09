@@ -311,7 +311,7 @@ Entries by kind.
 | [RULE-STRATEGY-009](../rules/RULE-STRATEGY-009.md) | Terrain speed, seasons and the speed setting | supported |
 | [RULE-STRATEGY-010](../rules/RULE-STRATEGY-010.md) | Player records on the map | supported |
 | [RULE-STRATEGY-011](../rules/RULE-STRATEGY-011.md) | Encounter with a hostile force | supported |
-| [RULE-STRATEGY-012](../rules/RULE-STRATEGY-012.md) | New game, joining armies and field placement | supported |
+| [RULE-STRATEGY-012](../rules/RULE-STRATEGY-012.md) | New game, joining armies and field placement | disputed |
 | [RULE-STRATEGY-013](../rules/RULE-STRATEGY-013.md) | Map clicks and drawn routes | supported |
 | [RULE-STRATEGY-014](../rules/RULE-STRATEGY-014.md) | Strategic grid, projection and camera | supported |
 | [RULE-STRATEGY-015](../rules/RULE-STRATEGY-015.md) | Terrain, markers and the route preview | supported |
@@ -343,7 +343,7 @@ Entries by kind.
 
 ## findings
 
-302 entries.
+303 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -592,6 +592,7 @@ Entries by kind.
 | [FND-STRATEGY-040](../findings/FND-STRATEGY-040.md) | The property and person tables hold 14 records of 15 bytes and 176 records of 18 bytes | recorded |
 | [FND-STRATEGY-041](../findings/FND-STRATEGY-041.md) | The player pass at 0x00013168 moves each player record, then tests it against the hostile records and the dragon cells | recorded |
 | [FND-STRATEGY-042](../findings/FND-STRATEGY-042.md) | The brigand pass fights player armies on contact, rewards or punishes, and ends orders by date | recorded |
+| [FND-STRATEGY-043](../findings/FND-STRATEGY-043.md) | The home selector calls the inclusive helper with seven, contradicting the rule's bound of six | recorded |
 | [FND-TALK-001](../findings/FND-TALK-001.md) | Conversation nodes are read by length from the .CBF file through a sorted .CIF index | recorded |
 | [FND-TALK-002](../findings/FND-TALK-002.md) | The conversation loop runs node actions, then the chosen response actions, then follows a redirect | recorded |
 | [FND-TALK-003](../findings/FND-TALK-003.md) | The prompt variant is drawn after reseeding the generator from the clock | recorded |

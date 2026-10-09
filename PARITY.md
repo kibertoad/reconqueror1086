@@ -10,8 +10,8 @@ How much of the spec in `spec/` the rebuild does. The rows are in `parity/`, one
 | sourced | 20 |
 | supported | 156 |
 | established | 0 |
-| disputed | 0 |
-| implemented | 56 |
+| disputed | 1 |
+| implemented | 55 |
 | deviated | 0 |
 | validated | 0 |
 

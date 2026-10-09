@@ -6,7 +6,7 @@ Entries by status.
 
 ## supported
 
-30 entries.
+29 entries.
 
 | ID | Title |
 |---|---|
@@ -32,7 +32,6 @@ Entries by status.
 | [RULE-STRATEGY-009](../../rules/RULE-STRATEGY-009.md) | Terrain speed, seasons and the speed setting |
 | [RULE-STRATEGY-010](../../rules/RULE-STRATEGY-010.md) | Player records on the map |
 | [RULE-STRATEGY-011](../../rules/RULE-STRATEGY-011.md) | Encounter with a hostile force |
-| [RULE-STRATEGY-012](../../rules/RULE-STRATEGY-012.md) | New game, joining armies and field placement |
 | [RULE-STRATEGY-013](../../rules/RULE-STRATEGY-013.md) | Map clicks and drawn routes |
 | [RULE-STRATEGY-014](../../rules/RULE-STRATEGY-014.md) | Strategic grid, projection and camera |
 | [RULE-STRATEGY-015](../../rules/RULE-STRATEGY-015.md) | Terrain, markers and the route preview |
@@ -40,6 +39,14 @@ Entries by status.
 | [RULE-STRATEGY-017](../../rules/RULE-STRATEGY-017.md) | Brigand pass and brigand movement |
 | [RULE-STRATEGY-018](../../rules/RULE-STRATEGY-018.md) | Spies |
 | [RULE-STRATEGY-019](../../rules/RULE-STRATEGY-019.md) | Map events from conversation variables |
+
+## disputed
+
+1 entries.
+
+| ID | Title |
+|---|---|
+| [RULE-STRATEGY-012](../../rules/RULE-STRATEGY-012.md) | New game, joining armies and field placement |
 
 ## superseded
 
@@ -54,7 +61,7 @@ Entries by status.
 
 ## recorded
 
-38 entries.
+39 entries.
 
 | ID | Title |
 |---|---|
@@ -96,6 +103,7 @@ Entries by status.
 | [FND-STRATEGY-040](../../findings/FND-STRATEGY-040.md) | The property and person tables hold 14 records of 15 bytes and 176 records of 18 bytes |
 | [FND-STRATEGY-041](../../findings/FND-STRATEGY-041.md) | The player pass at 0x00013168 moves each player record, then tests it against the hostile records and the dragon cells |
 | [FND-STRATEGY-042](../../findings/FND-STRATEGY-042.md) | The brigand pass fights player armies on contact, rewards or punishes, and ends orders by date |
+| [FND-STRATEGY-043](../../findings/FND-STRATEGY-043.md) | The home selector calls the inclusive helper with seven, contradicting the rule's bound of six |
 
 ## Open questions
 
@@ -117,7 +125,7 @@ Entries whose Open questions section says more than None known.
 | [RULE-STRATEGY-009](../../rules/RULE-STRATEGY-009.md) | Terrain speed, seasons and the speed setting | supported |
 | [RULE-STRATEGY-010](../../rules/RULE-STRATEGY-010.md) | Player records on the map | supported |
 | [RULE-STRATEGY-011](../../rules/RULE-STRATEGY-011.md) | Encounter with a hostile force | supported |
-| [RULE-STRATEGY-012](../../rules/RULE-STRATEGY-012.md) | New game, joining armies and field placement | supported |
+| [RULE-STRATEGY-012](../../rules/RULE-STRATEGY-012.md) | New game, joining armies and field placement | disputed |
 | [RULE-STRATEGY-013](../../rules/RULE-STRATEGY-013.md) | Map clicks and drawn routes | supported |
 | [RULE-STRATEGY-014](../../rules/RULE-STRATEGY-014.md) | Strategic grid, projection and camera | supported |
 | [RULE-STRATEGY-015](../../rules/RULE-STRATEGY-015.md) | Terrain, markers and the route preview | supported |

@@ -1,16 +1,21 @@
 ---
 id: RULE-STRATEGY-012
 title: New game, joining armies and field placement
-status: supported
+status: disputed
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-STRATEGY-001, FND-STRATEGY-039, FND-STRATEGY-003, FND-STRATEGY-004, FND-STRATEGY-006, FND-STRATEGY-007, FND-STRATEGY-013, FND-STRATEGY-040, FND-STRATEGY-016, FND-STRATEGY-041, FND-STRATEGY-021, FND-STRATEGY-023, FND-STRATEGY-024, FND-STRATEGY-025, FND-STRATEGY-026, FND-STRATEGY-029, FND-STRATEGY-030, FND-STRATEGY-031, FND-STRATEGY-032, FND-STRATEGY-035, FND-TOURNEY-001, FND-TOURNEY-009]
-conflicting: []
+evidence: [FND-STRATEGY-001, FND-STRATEGY-039, FND-STRATEGY-003, FND-STRATEGY-004, FND-STRATEGY-006, FND-STRATEGY-007, FND-STRATEGY-013, FND-STRATEGY-040, FND-STRATEGY-016, FND-STRATEGY-041, FND-STRATEGY-021, FND-STRATEGY-023, FND-STRATEGY-024, FND-STRATEGY-025, FND-STRATEGY-026, FND-STRATEGY-029, FND-STRATEGY-030, FND-STRATEGY-031, FND-STRATEGY-032, FND-STRATEGY-035, FND-TOURNEY-001, FND-TOURNEY-009, FND-STRATEGY-043]
+conflicting: [FND-STRATEGY-043]
 split_with: []
 related: [RULE-RNG-001, RULE-STRATEGY-007, RULE-STRATEGY-014]
 ---
 
 ## Summary
+
+FND-STRATEGY-043 contradicts the selection bound below: the caller supplies 7
+to the inclusive helper and uses its result without clamping. The seven-home
+range remains disputed pending Q-STRATEGY-043; the procedure retains the prior
+reading so the disagreement is explicit.
 
 A new game places the player at one of seven homes, drawn at random, and clears every strategic
 record. The player can place up to five armies round the home, join one to ride with it, leave it
@@ -228,3 +233,10 @@ None known.
 - What value `new_strategic_game` stores in `place_person`. (Q-STRATEGY-023)
 
 - Whether the reset routine clears the freed route pointers. (Q-STRATEGY-024)
+
+- The prior seven-home/bound-6 reading versus the directly observed bound 7:
+  FND-STRATEGY-023 records 7 but interprets seven homes; FND-STRATEGY-043 and
+  FND-RNG-002 show a remainder modulo eight and an unclamped indexed read.
+  Read the tables independently and trace index 7 through its consumers to
+  distinguish an intended eighth entry from adjacent-data access.
+  (Q-STRATEGY-043)

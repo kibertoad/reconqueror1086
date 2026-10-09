@@ -19,7 +19,7 @@
 | `RULE-STRATEGY-009` | Terrain speed, seasons and the speed setting | supported | complete | None | None | implemented | None |
 | `RULE-STRATEGY-010` | Player records on the map | supported | complete | None | None | implemented | None |
 | `RULE-STRATEGY-011` | Encounter with a hostile force | supported | partial | None | None | supported | BATTLE_WON, BATTLE_LOST and INTELLIGENCE are not changed, the lord rating does not drop, and the king's order is not carried out. |
-| `RULE-STRATEGY-012` | New game, joining armies and field placement | supported | complete | None | None | implemented | None |
+| `RULE-STRATEGY-012` | New game, joining armies and field placement | disputed | complete | None | None | disputed | Research pending Q-STRATEGY-043: conflicting home-selection bound. |
 | `RULE-STRATEGY-013` | Map clicks and drawn routes | supported | complete | None | None | implemented | None |
 | `RULE-STRATEGY-014` | Strategic grid, projection and camera | supported | partial | None | None | supported | The cell test is a symmetric diamond, so some points find another cell; panning moves both axes in one call and does not hold back the hostile pass. |
 | `RULE-STRATEGY-015` | Terrain, markers and the route preview | supported | partial | None | None | supported | PLACEHOLDER: the markers are drawn with the campaign-shell palette; the palette the original installs for them is not traced. |
