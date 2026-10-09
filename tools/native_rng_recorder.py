@@ -97,6 +97,8 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
     controls = []
     code_ranges = [(0x6b3eb, 0x6b423), (0x24c38, 0x24c4c), (0x1a14c, 0x1a1ef), (0x43670, 0x436e0)]
     code_ranges.extend(((0x445b4, 0x445c2), (0x4f2ac, 0x4f2d6), (0x5b418, 0x5b470)))
+    # FND-PERSON-004: initial, rerolled and continued dilemma-selection draws.
+    code_ranges.extend(((0x148c0, 0x14902), (0x15054, 0x150e9), (0x15228, 0x152a5)))
     if stop_at_screen or stop_after_screen:
         code_ranges.extend(((0x595c0, 0x59660), (0x596c0, 0x5975f)))
     if stop_after_screen:
@@ -327,17 +329,18 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                     frame = {'key': key, 'return_pc': return_pc, 'phase': 'seed'}
                 elif return_pc == 0x24c3d:
                     outer_pc = canonical_return(words[1])
-                    bound = {0x1624d: 1, 0x16259: 8, 0x43678: 7}.get(outer_pc)
-                    if bound is None:
+                    policy = {0x1624d: (1, 'RULE-PERSON-002'), 0x16259: (8, 'RULE-PERSON-002'),
+                              0x43678: (7, 'RULE-STRATEGY-012'),
+                              0x148f6: (4, 'RULE-PERSON-003'), 0x15299: (4, 'RULE-PERSON-003'),
+                              0x150db: (4, 'RULE-PERSON-004')}.get(outer_pc)
+                    if policy is None:
                         raise RecordingError('Unowned inclusive-helper caller; stopped before draw')
+                    bound, rule = policy
                     if words[2] != bound:
                         raise RecordingError('Native helper argument differs from its direct reading')
-                    if outer_pc == 0x43678:
-                        # FND-STRATEGY-043 settles this caller's actual argument.
-                        # RULE-STRATEGY-012 remains disputed; record 7 faithfully
-                        # without asserting the selection tables' final meaning.
-                        rule = 'RULE-STRATEGY-012'
-                    else:
+                    # FND-STRATEGY-043 settles its caller's argument; recording
+                    # 7 does not settle RULE-STRATEGY-012's disputed interpretation.
+                    if rule == 'RULE-PERSON-002':
                         index = int(registers.general['esi'], 16)
                         if shift_ordinal == 30 and index == 0 and bound == 1:
                             shift_ordinal = 0

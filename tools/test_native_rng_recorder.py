@@ -329,10 +329,10 @@ class ScreenBoundaryTests(unittest.TestCase):
 
 
 class OwnedReductionTests(unittest.TestCase):
-    def run_draw(self, sound=False, bound=200, caller=0x4f2cf, divisor=10):
+    def run_draw(self, sound=False, bound=200, caller=0x4f2cf, divisor=10, inclusive=False):
         runtime, mapping = runtime_and_mapping()
-        raw_return = 0x5b44d if sound else 0x445b9  # FND-SOUND-008 / FND-RNG-002
-        endpoint = 0x5b454 if sound else 0x445c1
+        raw_return = 0x24c3d if inclusive else 0x5b44d if sound else 0x445b9  # FND-SOUND-008 / FND-RNG-002
+        endpoint = 0x24c4b if inclusive else 0x5b454 if sound else 0x445c1
         pcs = (0x6b413, 0x6b422, 0x6b3f1, 0x6b412, endpoint)
         original_read = runtime.read
         def read(address, length):
@@ -345,7 +345,7 @@ class OwnedReductionTests(unittest.TestCase):
         runtime.read = read
         runtime.registers = lambda: SimpleNamespace(
             general={'esp': '0x1004' if runtime.phase == 4 else '0x1000',
-                     'eax': hex(102 if runtime.phase == 4 else 16838),
+                     'eax': hex((3 if inclusive else 102) if runtime.phase == 4 else 16838),
                      'edx': '0x8', 'esi': hex(divisor)},
             segments={'cs': '0x180', 'ds': '0x188', 'ss': '0x188'},
             cpu_mode='protected', instruction_pointer=hex(pcs[runtime.phase]))
@@ -358,6 +358,23 @@ class OwnedReductionTests(unittest.TestCase):
              patch('native_rng_recorder.descriptor', side_effect=[mapping.code, mapping.data] * 5), \
              patch('native_rng_recorder.EventLog'), patch('native_rng_recorder.Path.write_text'):
             return record(runtime, mapping, ('draw', 'seed'), 'unused-output', maximum_draws=1)
+
+    def test_dilemma_draws_preserve_initial_reroll_and_continue_ownership(self):
+        # FND-PERSON-004 records all three call sites and the fixed argument.
+        for caller, rule in ((0x148f6, 'RULE-PERSON-003'), (0x15299, 'RULE-PERSON-003'),
+                             (0x150db, 'RULE-PERSON-004')):
+            with self.subTest(caller=caller):
+                event = self.run_draw(inclusive=True, caller=caller, bound=4)['events'][-1]
+                self.assertEqual((event['rule'], event['reduction'], event['bound'], event['result']),
+                                 (rule, 'inclusive', 4, 3))
+
+    def test_dilemma_draws_reject_a_changed_argument_before_draw(self):
+        with self.assertRaisesRegex(RecordingError, 'argument differs'):
+            self.run_draw(inclusive=True, caller=0x148f6, bound=5)
+
+    def test_dilemma_draws_reject_an_unowned_return_site(self):
+        with self.assertRaisesRegex(RecordingError, 'Unowned inclusive-helper'):
+            self.run_draw(inclusive=True, caller=0x148f7, bound=4)
 
     def test_hit_check_records_the_scaled_result(self):
         report = self.run_draw()

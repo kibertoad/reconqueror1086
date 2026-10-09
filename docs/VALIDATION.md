@@ -283,6 +283,13 @@ their respective verified states, and preserves its RNG event prefix. New-game
 input without screen checkpoints is rejected. Native new-game traversal and
 its intervening RNG callers remain unverified.
 
+2026-10-10: 51 recorder and related safety tests passed with the three
+FND-PERSON-004 dilemma caller policies. Synthetic initial, reroll and continued
+draws retain their respective rule IDs and verify inclusive bound 4/result 3.
+A changed bound or unknown return site is rejected before the draw. An initial
+test attempt exposed a syntax error in the changed policy branch; it was
+corrected before the passing run. No original dilemma traversal is claimed.
+
 2026-10-10: native caller policy checks passed 29 recorder, journal,
 durable-event-log and mapping tests. The new synthetic cases record the
 scaled hit-check result and the busy-voice remainder register, and reject

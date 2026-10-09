@@ -280,6 +280,13 @@ or seed/draw ownership checks. With `--stop-after-screen-id 2`, the next probe
 can stop on verified character-options state or reject an unowned intervening
 draw. This input stage has synthetic checks; native verification is pending.
 
+The native inclusive-draw policies also accept the three fixed-bound dilemma
+selection calls of FND-PERSON-004. Initial selection and reroll carry
+RULE-PERSON-003, and continued selection carries RULE-PERSON-004. Each requires
+the exact return site and argument 4 and verifies both raw state/result and
+the inclusive reduction. Other callers or changed arguments remain rejected.
+Synthetic policy checks passed; original traversal of these calls is pending.
+
 ### Operating and interpreting a probe
 
 Both DOSBox probe commands mute host audio by default with `MIXER MASTER 0:0`
