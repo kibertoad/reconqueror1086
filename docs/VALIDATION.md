@@ -193,6 +193,20 @@ no evidence status changed, and no release or push was performed.
 
 This page describes the checks a change has to pass before it is committed, locally and in CI.
 
+## 2026-10-10 quiet loaded-return diagnostic
+
+The quiet no-heavy probe `native-rng-quiet-loaded-return-20261010-a`
+verified its initial live map and durably recorded the startup seed and draw
+prefix. The guarded screen-loader return was not reached. An explicit owned
+diagnostic pause ended the attempt with an unmodelled-stop error; its final
+journal is incomplete, with neither a pending RNG operation nor a pending
+screen load. The durable event log agrees with the final journal. Registers
+and a memory snapshot remain local beside that output. The owned emulator
+exited and its machine run lock was released. No full-game pass is claimed.
+
+The full documentation write check passed after the FND-BATTLE-023 correction,
+including Kaitai compilation and base-branch comparison. Q-BATTLE-018 is closed.
+
 ## Local gate
 
 `tools/Invoke-Validation.ps1` is the canonical local gate. `Run Tests.bat` discovers
