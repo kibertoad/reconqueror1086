@@ -17,7 +17,7 @@ its readme, version and placeholder files are under the build's Other files
 (FND-RES-057, FND-RES-058). Conservatively retained auxiliary
 media need runtime-use review and format entries until evidence supports
 exclusion.
-Research continues with Q-RES-017 / FMT-RES-015; Q-RES-164 through
+Later research includes Q-RES-017 / FMT-RES-015; Q-RES-164 through
 Q-RES-167 retain icon-consumer questions; Q-RES-162, Q-RES-163,
 Q-RES-206 and Q-RES-207 retain text-dictionary questions; Q-RES-157 retains the
 archive-copy consumer question; Q-RES-141 through
@@ -576,11 +576,30 @@ The owned art contains no established distant LOD asset tiers, so any reduced-de
 
 ## Research priorities
 
+Current focus (owner decision, 2026-10-09): analyse CONQUER.EXE and the
+resources it consumes. Select queue items within that scope; auxiliary-runtime
+questions are Later work and do not block current mapping.
+
 Follow the area queues in the protocol's order, keeping static attempts before
 emulated calls and original runs. The remaining startup/input work belongs to
 the UI and MEDIA queues and their parity rows. Survey still needs the data-family
 reconciliation and missing-code baselines described above and in coverage/README.md.
 Local source locations and analyzer setup belong in RUNTIME.md and ghidra.md.
+
+## Later: auxiliary-runtime analysis
+
+Owner decision, 2026-10-09: defer analysis of every runtime other than
+CONQUER.EXE as non-essential to current mapping. This includes AUTOPLAY.EXE,
+SETUP.EXE, _SETUP.EXE, INST.EXE, CONFIG.EXE, CONCFG.EXE, BOOTDISK.EXE,
+external wrappers and separate driver/library payload code. Resource data and
+calls within CONQUER.EXE remain current; tracing into another runtime is Later.
+
+Preserve existing findings, inventories, manifest entries and queue questions.
+Queue evidence sections remain unchanged. Auxiliary consumer reconciliation
+and missing inventories do not block current CONQUER.EXE work; full Survey
+remains open. Current executable coverage uses CONQUER.EXE alone, while
+full-build reports retain deferred files and unavailable baselines. Resume
+Later work when the owner changes focus or CONQUER.EXE mapping is complete.
 
 ## Next implementation slice
 
