@@ -41,41 +41,32 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
 ## Handover
 
 - Stage: Survey; this goal adds runtime research capabilities.
-- Last gate: 2026-10-10 complete canonical gate passed with checker 4.1.1;
-  final documentation, recorder and lifecycle checks passed after quiet-probe
-  verification. Package and CI pins agree with the released checker.
-  mapping, lifecycle, emulator, call-survey and RNG-journal synthetic checks
-  passed. EXP-RNG-001 and native recorder transport checks are documented in
-  VALIDATION.md. No full-game or actual rebuild replay gate has passed.
-- Unfinished: complete rule ownership, full-game recording/replay, prescribed
-  observable gameplay state, and upstream/shared-helper proposal. No WIP branch.
-- Screen-loader entry verification passed on both debugger builds. The previous
-  extraction-checkpoint probe ended at an explicit diagnostic pause; its owned
-  processes and lock were cleaned up. Its durable completed prefix matches
-  its incomplete final journal and numeric replay.
-- A fresh owned quiet startup-click verification probe is running with the
-  machine lock held. Preserve its existing operation. It uses fixed cycles
-  1000, disabled animations, startup checkpoints and eager controller imports;
-  local source fingerprints identify the code loaded before launch.
-- Guarded supported-state pointer input has synthetic validation, but original
-  verification and loaded-screen return remain unfinished. FND-UI-019 and
-  FND-BATTLE-023 support the input wait and queue fields. Audio is enabled only
-  for an explicit sound investigation.
-- Blockers: none established. RUNTIME.md is the current capability assessment.
-- Next: observe the active probe for the guarded startup click and subsequent
-  checkpoints or screen return. Verify heap-object identity from FND-UI-017
-  before gameplay writes. Complete rule ownership and full-game replay remain
-  necessary even if this startup boundary succeeds.
-- Q-STRATEGY-043 / RULE-STRATEGY-012: complete the downstream
-  consumer review from FND-STRATEGY-043/044/045/046 and resolve the disputed rule.
-  Its directly read bound is accepted by tools/native_rng_recorder.py; the
-  extended native case is documented in VALIDATION.md.
-- Then continue beyond the home-selection result to the next unaccepted
-  caller or observable input boundary; extend policies and state reachability. Use the
-  local Survey-RngCalls.py output as leads, never as a complete caller audit.
-- Q-RNG-001 / RULE-RNG-001 remains open after FND-RNG-005; finish the adjustment
-  provenance reading when needed for clock semantics.
-- Evidence references: EXP-RNG-001, FND-RNG-003/004/005, FND-STRATEGY-043/044/045/046.
-  tools/live_mapping.py validates the initial native map;
-  tools/native_rng_recorder.py rechecks code/descriptors at each stop.
-  Capture paths belong to findings and validation documentation, not this file.
+- Last gate: 2026-10-10 full documentation check passed with checker 4.1.1;
+  41 pointer-input, recorder, journal, event-log and mapping safety tests passed.
+  Prior canonical configuration/build gates remain recorded in VALIDATION.md.
+- Native startup input and guarded initial loaded-screen return passed in two
+  fresh quiet runs with different seeds. Both durable prefixes match their
+  journals and numeric replay. Their owned processes and locks were cleaned up.
+  No full-game or actual rebuild replay gate has passed.
+- An owned quiet title-continuation probe is running with the machine lock
+  held. Preserve its existing operation. It uses fixed cycles 1000, disabled
+  animations, startup checkpoints, startup click, loaded-screen continuation
+  and title click. Source fingerprints identify its eagerly loaded controllers.
+  Title-to-options traversal and original continuation remain unverified.
+- Unfinished: complete rule ownership, full-game recording/replay and prescribed
+  observable gameplay state. Shared helper extraction is not implemented.
+  Reproducibility guidance and helper boundaries were sent upstream in toolkit
+  issue #403 after duplicate checking; docs/dosbox-x-helper-proposal.md links it.
+- Blockers: none established. RUNTIME.md is the capability assessment. Audio
+  remains muted except for an explicit sound investigation. No WIP branch.
+- Next: observe the existing title-continuation operation for its guarded input
+  or next unaccepted caller; verify returned screen state before further writes.
+- Then extend supported input reachability and RNG caller policies from direct
+  findings, using the local call-survey report only as leads. Keep unknown
+  callers rejected and journals explicitly incomplete.
+- Q-STRATEGY-043 / RULE-STRATEGY-012: finish the downstream consumer review
+  from FND-STRATEGY-043/044/045/046 before resolving its disputed status.
+- Q-RNG-001 / RULE-RNG-001: continue seed-source provenance from
+  FND-RNG-005/006 when complete clock/environment semantics are needed.
+- Complete two prescribed full-game runs, trace ordering/completeness and actual
+  draw-by-draw rebuild replay; startup verification does not meet this condition.
