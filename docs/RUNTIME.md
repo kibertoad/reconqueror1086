@@ -31,7 +31,7 @@ It describes the current environment, not every possible instrumentation method.
 | Send game input: keyboard | person | SRC-MANUAL describes keyboard input; Windows accepted a posted Escape message, but game consumption was not verified | Verify keyboard input through an observable game-state transition |
 | Send game input: mouse | person | SRC-MANUAL describes mouse input; no mouse message has been tried on its own, so this answer is carried over from the earlier single input answer and names no attempt | Try a mouse message and verify it through an observable game-state transition |
 | Read guest memory and control breakpoints | agent | DOSBox-X 2026.10.01 native TCP debugger: synthetic memory roundtrip and breakpoint hit verified; original relocated DOS entry and protected-mode guest memory read verified on 2026-10-09 | Map live LE game addresses before using spec fields or game-function breakpoints |
-| Map live guest memory to spec fields | agent, limited to the checked RNG state | FND-RNG-004: full relocated code comparison, separate object bases, native seed/draw stops and observed state changes | Build a per-run map validator and verify additional fields before using them |
+| Map live guest memory to spec fields | agent for loaded LE objects; RNG state checked natively | FND-RNG-004 and tools/live_mapping.py: per-run full code/relocation/descriptor checks plus native RNG controls | Verify heap-object provenance and supported field identities before a gameplay-state probe |
 | Load a patched save | none | No original-save patch/load workflow is verified; FMT-SAVE-001 through FMT-SAVE-005 retain gaps | Complete the needed structure and verify a reversible patch/load experiment |
 | Capture client frames | agent | Direct PrintWindow capture verified against an offscreen synthetic renderer and owned DOSBox client; blank/unsupported results fail | Recheck each different renderer and interpret each frame before using it as evidence |
 | Capture sound | person | Bundled DOSBox documentation specifies Ctrl-F6 WAV capture; no unattended audio adapter is verified | Verify a repeatable audio recording case |
@@ -62,8 +62,9 @@ when its owned DOSBox process ended. [orphanCleanupLog.md](../orphanCleanupLog.m
 records forced cleanup. Captures, configurations and probe logs remain local.
 
 There is no unattended gameplay-state probe or full-game RNG recorder yet.
-Debugger transport and the observed RNG mapping are verified (FND-RNG-004), but
-a general per-run map validator and rule-tagged draw capture are absent.
+Debugger transport and the observed RNG mapping are verified (FND-RNG-004), and
+a per-run validator is available for the observed unpaged, flat-selector layout.
+Rule-tagged draw capture is absent.
 Research must not assume arbitrary state fields or full recording capabilities.
 An emulated call starts no game process and requires no run lock.
 
@@ -141,6 +142,14 @@ breakpoints after a unique identity control matches. This diagnostic neither
 records all draws nor proves a prescribed gameplay state. Compare its complete
 local snapshot with `python -B tools/Verify-LiveSnapshot.py <physical-memory.bin>`;
 residual writes require independent audit before the candidate map is trusted.
+With `--observations <mapping-observations.json>`, the snapshot verifier requires
+the per-run validator to pass: a unique identity control, unanimous object
+relocation bases, exact code comparison apart from the observed selector word,
+unpaged protected mode, one readable code descriptor, a flat writable data
+descriptor and an independent RNG pointer. The live probe repeats these checks
+at each instrumented entry before reading its stack or state. An unexpected code
+change, ambiguous control, descriptor change or unsupported layout stops it.
+`python -B tools/test_live_mapping.py` checks synthetic acceptance and rejection.
 Use `--trace-loader` for an additional bounded local instruction trace at the
 survey limit. The Debug configuration progresses timed startup slowly at high
 cycle budgets; the 1,000-cycle diagnostic reached the seed entry described in

@@ -4,22 +4,34 @@ This diagnostic emits compact mapping facts, never guest bytes. Residual changes
 remain unverified; its output is not permission to write game state.
 """
 import argparse
+import dataclasses
 from collections import Counter
 import json
 from pathlib import Path
 import struct
 from emu.le_image import load_image
+from live_mapping import validate_snapshot
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('snapshot', type=Path)
     parser.add_argument('--source', type=Path, default=Path('analysis/original/disc-root/CONQUER.EXE'))
+    parser.add_argument('--observations', type=Path,
+                        help='Coherent CPU/table observations from the snapshot run; require full map validation')
     args = parser.parse_args()
     objects, _ = load_image(args.source)
     memory = args.snapshot.read_bytes()
     if len(memory) != 16 * 1024 * 1024:
         raise ValueError('Expected the complete bounded 16 MiB probe snapshot')
+    if args.observations:
+        records = json.loads(args.observations.read_text())
+        if not isinstance(records, list) or not records or not isinstance(records[-1].get('cpu'), str):
+            raise ValueError('Missing coherent CPU diagnostic')
+        mapping = validate_snapshot(memory, objects, records[-1]['cpu'])
+        print(json.dumps({'mapping_status': 'validated for this snapshot',
+                          'mapping': dataclasses.asdict(mapping)}, indent=2))
+        return
     # FND-RNG-003: relative calls and state arithmetic form a local identity
     # control. The full relocation comparison below independently checks it.
     offset, end = 0x6b3f1 - objects[0]['base'], 0x6b413 - objects[0]['base']

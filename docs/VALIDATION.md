@@ -847,6 +847,10 @@ documentation gate completed without skipped compiler or base-branch checks.
 FND-RNG-004 records native seed/state comparisons in two fresh original launches
 and the first native draw/state/result comparison in one of them. These are
 identity controls, not full-game recordings or parity validation.
+`python -B tools/test_live_mapping.py` passed seven synthetic mapping checks.
+The per-run validator passed at both native seed and draw stops in another fresh
+launch, followed by the bounded native state/result comparisons. The original
+diagnostics remain local; no gameplay fixture or parity status changed.
 
 ## Shared runtime 10.0.0 adoption (2026-10-07)
 

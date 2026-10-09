@@ -9,6 +9,7 @@ from pathlib import Path
 import shutil
 from dosbox_session import AgentRuntime
 from emu.le_image import load_image
+from live_mapping import validate_snapshot
 
 
 def main():
@@ -24,6 +25,8 @@ def main():
     args = parser.parse_args()
     if args.draw_check and not args.seed_check:
         raise ValueError('Draw identity check requires the seed identity check')
+    if args.seed_check and not args.rng_break:
+        raise ValueError('Seed identity check requires RNG entry breakpoints')
     if not 1 <= args.samples <= 100:
         raise ValueError('Samples must be between 1 and 100')
     if not 1 <= args.observation_ms <= 1000:
@@ -84,6 +87,19 @@ def main():
                 records.append({'registers': dataclasses.asdict(registers), 'cpu': diagnostic.raw_output})
                 records[-1]['stop_reason'] = dataclasses.asdict(runtime.session.stop_reason)
                 if breakpoints_installed and runtime.session.stop_reason.kind == 'breakpoint':
+                    snapshot = b''.join(runtime.read(runtime.MemoryAddress.physical(base), 65536)
+                                        for base in range(0, 16 * 1024 * 1024, 65536))
+                    live_map = validate_snapshot(snapshot, images, diagnostic.raw_output)
+                    (root / f'entry-memory-{attempt}.bin').write_bytes(snapshot)
+                    records[-1]['validated_map'] = dataclasses.asdict(live_map)
+                    expected_code, expected_offset = live_map.code_address(
+                        0x6b413 if runtime.session.stop_reason.breakpoint_id == ids[1] else
+                        0x6b3f1 if runtime.session.stop_reason.breakpoint_id == ids[0] else
+                        0x636d0 if runtime.session.stop_reason.breakpoint_id == ids[2] else 0x64ff5)
+                    if (int(registers.segments['cs'], 16), int(registers.instruction_pointer, 16)) != (expected_code, expected_offset):
+                        raise RuntimeError('Native breakpoint and validated code map disagree')
+                    if any(int(registers.segments[name], 16) != live_map.data.selector for name in ('ds', 'ss')):
+                        raise RuntimeError('Native data/stack selectors differ from the verified mapping')
                     stack = runtime.read(runtime.MemoryAddress.segmented(
                         int(registers.segments['ss'], 16), int(registers.general['esp'], 16)), 64)
                     (root / 'breakpoint-stack.bin').write_bytes(stack)
