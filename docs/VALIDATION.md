@@ -884,3 +884,12 @@ documentation, coverage and Node acceptance checks (the evidence tests include
 the reader's protocol 3 and the forwarding of `x86-imports` and `x86-table`),
 the solution build, the xUnit suite and the executable specifications. No
 original program ran and no proprietary analysis artifact was produced.
+
+## RNG call-survey tooling (2026-10-09)
+
+`python -B tools/test_call_survey.py` passed five synthetic traversal checks.
+The local three-search survey found 107 raw direct-call leads and 68 leads
+through inventory bodies. Every raw lead missed by the body searches lay
+outside those inventory bodies. These are diagnostic counts, not a complete
+caller audit or added mapping coverage. Unresolved indirect flow remains
+explicit in the local report. No guest process was started.

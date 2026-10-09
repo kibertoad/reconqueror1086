@@ -187,3 +187,23 @@ Pass that directory and the local `tools/ghidra` directory to Ghidra's
 source description, jump-table helper and guarded edition/version-tracking
 exports. Common helper copies have been removed; their packaged counterparts
 provide the same inventory safety and bounded memory-map selection.
+
+## RNG caller lead survey
+
+Use `python -B tools/Survey-RngCalls.py --output
+artifacts/runtime-tools/rng-call-leads-new.json` with a fresh local output path.
+This read-only tool compares code-object E8 offsets, linear inventory decoding
+and direct control-flow traversal within inventory bodies. Its targets come
+from FND-RNG-002 and FND-RNG-003. Reports contain local address leads and
+unresolved edges; they stay outside Git. It rejects output outside the ignored
+artifacts/original-store roots. Run `python -B tools/test_call_survey.py` for
+synthetic branching, inline-data, fragmented-body and failure checks.
+
+A raw direct-call lead outside an inventory body remains a research lead. It
+must be checked against code context; it is neither a recognized function nor
+a reason to count a function as mapped. The report identifies such leads
+explicitly. Neither inventory completion nor agreement among these searches
+proves absence of indirect, far or interrupt-driven calls. The known helper
+positive control uses the build mapping and cannot support an independent
+negative-search finding. Verify semantic rule ownership separately before
+adding a site to the recorder's accepted callers.
