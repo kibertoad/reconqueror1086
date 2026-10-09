@@ -16,10 +16,10 @@ locations:
     address: 0x0004B9EC..0x0004BDF1
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0004B198..0x0004B278
+    address: 0x0004B198..0x0004B279
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0004B290..0x0004B326
+    address: 0x0004B290..0x0004B327
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0004B328..0x0004B4CB
@@ -88,3 +88,5 @@ arguments.
 
 Disassemble the listed ranges; decode the rectangle tables at file offsets `0x86BB4` and `0x86BE4`
 (object 1 offsets `0x3A960` and `0x3A990`); look up entries `0x184` and `0x185` of `C1086.GOB`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

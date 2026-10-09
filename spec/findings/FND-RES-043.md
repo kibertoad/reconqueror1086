@@ -28,7 +28,7 @@ environment: null
 
 Addresses, DS, the class table at DS:6D7B, the character layer, the token
 reader 221F:0003, the keyword table at DS:272F, the echo routine 35C0:0E1F
-and the stop 213C:00A1 are as FND-RES-036, FND-RES-041 and FND-RES-042 give
+and the stop 213C:00A1 are as FND-RES-036, FND-RES-064 and FND-RES-042 give
 them. The runner's table sends token 0x0F (`@GETOUTDRIVE`) to 1B80:289B,
 0x10 (`@GETSUBDIR`) to 1B80:3206 and 0x3C (`@GETOPTION`) to 19A2:049A.
 
@@ -56,7 +56,7 @@ not read.
 
 Text in the blocks of `@GetOutDrive`, `@GetSubdir` and `@GetOption` is
 written to the screen as it stands, line breaks included, as `@Display`
-text is (FND-RES-042). Together with FND-RES-041 and FND-RES-042 this accounts for every
+text is (FND-RES-042). Together with FND-RES-064 and FND-RES-042 this accounts for every
 bare line of the shipped INSTALL.DAT.
 
 ## Alternatives

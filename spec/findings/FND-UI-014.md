@@ -25,7 +25,7 @@ locations:
     address: 0x00061AFC..0x00061F56
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0004310C..0x00043131
+    address: 0x0004310C..0x00043132
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00061F70..0x00062130
@@ -82,3 +82,5 @@ None.
 ## How to reproduce
 
 Disassemble the listed routines and read the strings at the object-2 offsets pushed.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

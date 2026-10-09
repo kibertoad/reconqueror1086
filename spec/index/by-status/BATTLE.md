@@ -27,6 +27,15 @@ Entries by status.
 | [RULE-BATTLE-011](../../rules/RULE-BATTLE-011.md) | Field battle drawing |
 | [RULE-BATTLE-012](../../rules/RULE-BATTLE-012.md) | Pointer events |
 
+## superseded
+
+2 entries.
+
+| ID | Title |
+|---|---|
+| [FND-BATTLE-009](../../findings/FND-BATTLE-009.md) | The battle clock counts at 250 Hz and its reader returns four times the count |
+| [FND-BATTLE-017](../../findings/FND-BATTLE-017.md) | The resolver counts survivors by category and returns 1 for a win |
+
 ## recorded
 
 20 entries.
@@ -41,7 +50,6 @@ Entries by status.
 | [FND-BATTLE-006](../../findings/FND-BATTLE-006.md) | Formation code 3 splits the player's first category, and the foe is placed on a coin toss |
 | [FND-BATTLE-007](../../findings/FND-BATTLE-007.md) | Category 0 is the halberdiers, 0x78 the swordsmen and 0xF0 the knights |
 | [FND-BATTLE-008](../../findings/FND-BATTLE-008.md) | Each loop pass draws rectangles, dispatches input, and runs the unit pass every 200 clock units |
-| [FND-BATTLE-009](../../findings/FND-BATTLE-009.md) | The battle clock counts at 250 Hz and its reader returns four times the count |
 | [FND-BATTLE-010](../../findings/FND-BATTLE-010.md) | The rectangle hit test returns the first containing rectangle, counted from 1 |
 | [FND-BATTLE-011](../../findings/FND-BATTLE-011.md) | The neighbour probe tests four corners and stops early after a dead first hit |
 | [FND-BATTLE-012](../../findings/FND-BATTLE-012.md) | The unit pass completes deaths, probes contacts and deals damage by category |
@@ -49,10 +57,11 @@ Entries by status.
 | [FND-BATTLE-014](../../findings/FND-BATTLE-014.md) | State 0 acquires a target, walks to a destination, or picks the nearest foe |
 | [FND-BATTLE-015](../../findings/FND-BATTLE-015.md) | The pointer dispatcher scrolls, shows hover status, and routes codes 2, 3, 6 and 7 |
 | [FND-BATTLE-016](../../findings/FND-BATTLE-016.md) | The keyboard dispatcher selects by category, pauses, exits, and has two test switches |
-| [FND-BATTLE-017](../../findings/FND-BATTLE-017.md) | The resolver counts survivors by category and returns 1 for a win |
 | [FND-BATTLE-018](../../findings/FND-BATTLE-018.md) | The resolver reads WAR_MODE and loads BATTLE.PCX and MEN8.CSF |
 | [FND-BATTLE-019](../../findings/FND-BATTLE-019.md) | The renderer sorts dead units first then by y and x, and picks frames by lane, category, heading and phase |
 | [FND-BATTLE-020](../../findings/FND-BATTLE-020.md) | Pointer events are queued with a timer count and classified into eight codes |
+| [FND-BATTLE-021](../../findings/FND-BATTLE-021.md) | The battle clock counts at 250 Hz and its reader returns four times the count |
+| [FND-BATTLE-022](../../findings/FND-BATTLE-022.md) | The resolver counts survivors by category and returns 1 for a win |
 
 ## Open questions
 

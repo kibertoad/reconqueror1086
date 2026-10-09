@@ -10,13 +10,13 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000644D4..0x00064523
+    address: 0x000644D4..0x00064524
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00064524..0x000645AB
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0006E0D0..0x0006E0E1
+    address: 0x0006E0D0..0x0006E0E2
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0006E0B0
@@ -59,3 +59,5 @@ kerning and no line breaking in the routine.
 
 Disassemble `0x000644D4`, `0x00064524`, `0x0006E0D0` and `0x0002A756` in `CD:CONQUER.EXE`; decode
 `CONFONT.CSF` from `C1086.GOB`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

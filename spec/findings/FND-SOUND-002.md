@@ -13,7 +13,7 @@ locations:
     address: 0x0005B554..0x0005B583
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0005B584..0x0005B716
+    address: 0x0005B584..0x0005B717
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00053EC5..0x00053EDF
@@ -61,5 +61,7 @@ from the offsets.
 
 ## How to reproduce
 
-Disassemble `0x0005B554..0x0005B716` in `CD:CONQUER.EXE`; scan object 1 for `E8` calls whose target
+Disassemble `0x0005B554..0x0005B717` in `CD:CONQUER.EXE`; scan object 1 for `E8` calls whose target
 is `0x0005B584` and read the two pushes before each.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

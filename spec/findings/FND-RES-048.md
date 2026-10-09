@@ -1,9 +1,9 @@
 ---
 id: FND-RES-048
 title: INSTALL.SCR's if command in INST.EXE tests errorlevel or exist, with an optional not, and resumes the raw line at the expanded command's offset
-status: recorded
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
+superseded_by: [FND-RES-065]
 recorded_by: kibertoad
 reproduced_by: []
 method: static
@@ -13,7 +13,7 @@ locations:
     address: 1C17:1C63..1C17:1E4A
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1000:65EA..1000:66B0
+    address: 1000:65EA..1000:66B1
   - build: BLD-GOG-EN
     file: CD:INST.EXE
     address: 3583:116A..3583:11ED
@@ -90,3 +90,5 @@ Locations as 16-bit code with the load image at segment 0x1000 and relocation
 targets marked, read the strings from DS:116A to DS:11ED, and search the
 load image for 0x40 0x53. Keep listings
 in ignored local storage.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

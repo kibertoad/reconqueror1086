@@ -10,7 +10,7 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00015920..0x00015A9F
+    address: 0x00015920..0x00015AA0
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00015B80..0x00015D52
@@ -19,13 +19,13 @@ locations:
     address: 0x00015D54..0x00015EA0
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00016008..0x0001629F
+    address: 0x00016008..0x000162A0
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00024C4C..0x00024C9C
+    address: 0x00024C4C..0x00024C9D
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000682C0..0x00068324
+    address: 0x000682C0..0x00068325
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -76,5 +76,7 @@ None known.
 
 ## How to reproduce
 
-Disassemble `0x00015920` to `0x00015A9F`, `0x00015B80` to `0x00015EA0`, `0x00016008` to
-`0x0001629F`, `0x00024C4C` and `0x000682C0`, and read the object-2 strings the pushes name.
+Disassemble `0x00015920` to `0x00015AA0` (exclusive), `0x00015B80` to `0x00015EA0`, `0x00016008` to
+`0x000162A0` (exclusive), `0x00024C4C` and `0x000682C0`, and read the object-2 strings the pushes name.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

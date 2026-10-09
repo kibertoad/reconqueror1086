@@ -13,13 +13,13 @@ locations:
     address: 0x0002A558..0x0002A749
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00059BD4..0x00059C0F
+    address: 0x00059BD4..0x00059C10
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000595C0..0x0005965F
+    address: 0x000595C0..0x00059660
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000596C0..0x0005975E
+    address: 0x000596C0..0x0005975F
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00059760..0x000597D7
@@ -71,3 +71,5 @@ When the routine at `+0xB0` runs was not traced; the conversation screen puts it
 
 Disassemble `0x0002A558` to `0x0002A749`, `0x00059BD4`, `0x000595C0` to `0x000597D7` and `0x00059C10`
 to `0x00059C49`, and read the strings the pushed object-2 offsets name.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

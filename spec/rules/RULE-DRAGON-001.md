@@ -4,7 +4,7 @@ title: Dragon encounter
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-DRAGON-001, FND-DRAGON-002, FND-DRAGON-003, FND-STRATEGY-001, FND-STRATEGY-019, SRC-GAMEFAQS-66730]
+evidence: [FND-DRAGON-001, FND-DRAGON-002, FND-DRAGON-003, FND-STRATEGY-001, FND-STRATEGY-041, SRC-GAMEFAQS-66730]
 conflicting: []
 split_with: []
 related: [RULE-PERSON-001, RULE-JOUST-003]

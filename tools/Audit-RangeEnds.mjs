@@ -24,7 +24,7 @@ for (const diagnostic of diagnostics) {
   const key = `${diagnostic.file}\0${match[1]}..${match[2]}`;
   if (candidates.has(key)) continue;
   const places = new Set(entry.meta.locations.map(loc=>`${loc.build}\0${loc.file}`));
-  const spans = [];
+  const spans = [], groupedSpans = [];
   for (const inv of read.inventories.filter(inv=>places.has(`${inv.build}\0${inv.file}`))) {
     const start = linear(match[1],inv.format), end = linear(match[2],inv.format);
     if (start===null || end===null) continue;
@@ -33,9 +33,16 @@ for (const diagnostic of diagnostics) {
         spans.push({build:inv.build,file:inv.file,functionStart:fn.start,
           body:fn.body.map(r=>({start:r.start.toString(),end:r.end.toString()}))});
     }
+    // A grouped extent remains a review candidate: holes and omitted callees
+    // do not prove which bytes the historical author intended to include.
+    const contained = inv.functions.filter(fn=>fn.body.every(r=>r.start>=start && r.end<=end+1n));
+    if (contained.length>1 && contained.some(fn=>fn.body[0].start===start) &&
+        contained.some(fn=>fn.body.at(-1).end===end+1n))
+      groupedSpans.push({build:inv.build,file:inv.file,functions:contained.map(fn=>({
+        functionStart:fn.start,body:fn.body.map(r=>({start:r.start.toString(),end:r.end.toString()}))}))});
   }
   candidates.set(key,{entry:entry.meta.id,file:diagnostic.file,oldRange:`${match[1]}..${match[2]}`,
-    fullFunctionSpans:spans,intendedEndReviewed:false});
+    fullFunctionSpans:spans,groupedFunctionSpans:groupedSpans,intendedEndReviewed:false});
 }
 const result = {diagnostics:diagnostics.length,candidates:[...candidates.values()],
   fullFunctionCandidates:[...candidates.values()].filter(c=>c.fullFunctionSpans.length).length,

@@ -13,13 +13,13 @@ locations:
     address: 0x0002B1DE..0x0002B1E3
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0005C550..0x0005C5CA
+    address: 0x0005C550..0x0005C5CB
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0005C5CC..0x0005C613
+    address: 0x0005C5CC..0x0005C614
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0005C380..0x0005C3DD
+    address: 0x0005C380..0x0005C3DE
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0005C520..0x0005C54E
@@ -31,7 +31,7 @@ locations:
     address: 0x0005C3FC..0x0005C51E
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0004377C..0x00043792
+    address: 0x0004377C..0x00043793
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -67,3 +67,5 @@ The routine that ends at `0x0002B1DE` may run at another time than the turn of a
 
 Disassemble the listed ranges, and scan object 1 for calls to `0x0005C550`, `0x0005C380`,
 `0x0005C520` and `0x00010FF0`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

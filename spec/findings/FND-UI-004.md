@@ -22,7 +22,7 @@ locations:
     address: 0x0005C614..0x0005C67C
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00038678..0x00038680
+    address: 0x00038678..0x00038681
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -67,3 +67,5 @@ The label table at `0x0009DEE0` is filled elsewhere; what fills it was not trace
 ## How to reproduce
 
 Disassemble `0x0006076C` to `0x00060B72` and `0x00060E1C` to `0x00060F0F`, and the helpers named.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

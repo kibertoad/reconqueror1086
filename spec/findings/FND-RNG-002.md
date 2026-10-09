@@ -10,16 +10,16 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000445B4..0x000445C1
+    address: 0x000445B4..0x000445C2
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00041110..0x0004111D
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00024C38..0x00024C4B
+    address: 0x00024C38..0x00024C4C
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0004CE4C..0x0004CE73
+    address: 0x0004CE4C..0x0004CE74
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -46,3 +46,5 @@ None known.
 ## How to reproduce
 
 Disassemble the four addresses and scan object 1 for `E8` calls to each.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

@@ -66,6 +66,6 @@ sections (12 and 7 values).
 
 ## How to reproduce
 
-Map CONQUER.EXE as FND-RES-059 gives and disassemble the ranges above; read
+Map CONQUER.EXE as FND-RES-067 gives and disassemble the ranges above; read
 the format strings each `0x00065108` call pushes. Decode `fief0.dat` from
 C1086.GOB and count its lines and each data line's values.

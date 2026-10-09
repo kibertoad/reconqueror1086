@@ -54,7 +54,7 @@ Entries by status.
 
 ## superseded
 
-101 entries.
+106 entries.
 
 | ID | Title |
 |---|---|
@@ -157,12 +157,17 @@ Entries by status.
 | [FMT-RES-113](../../formats/FMT-RES-113.md) | Unidentified .DOC data candidates in CD:INN/TWINION/TWPATCH |
 | [FMT-RES-114](../../formats/FMT-RES-114.md) | Unidentified .EXE data candidates in CD:INN/TWINION/TWPATCH |
 | [FMT-RES-115](../../formats/FMT-RES-115.md) | Unidentified .DOC data candidates in CD:VESA |
+| [FND-RES-041](../../findings/FND-RES-041.md) | CONFIG.EXE stops its script run at @FINISH and, just before exiting, reopens the script there to echo text and run commands up to @ENDFINISH |
 | [FND-RES-044](../../findings/FND-RES-044.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case |
 | [FND-RES-046](../../findings/FND-RES-046.md) | INST.EXE runs install.scr line by line, with labels, goto, nine percent parameters, a table of named commands and any other line run as a program |
+| [FND-RES-048](../../findings/FND-RES-048.md) | INSTALL.SCR's if command in INST.EXE tests errorlevel or exist, with an optional not, and resumes the raw line at the expanded command's offset |
+| [FND-RES-054](../../findings/FND-RES-054.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case |
+| [FND-RES-059](../../findings/FND-RES-059.md) | An MVG entry holds the pointer shapes' hot spots; 0x00018850 loads it and the CSF of the same name |
+| [FND-RES-061](../../findings/FND-RES-061.md) | Every use of the name FFONTA2.FNT ends in a property call that stores nothing, so the game never reads the .FNT entry |
 
 ## recorded
 
-59 entries.
+61 entries.
 
 | ID | Title |
 |---|---|
@@ -206,25 +211,27 @@ Entries by status.
 | [FND-RES-038](../../findings/FND-RES-038.md) | _SETUP.EXE runs the [Script] text line by line, matching 37 command names as prefixes, and ends silently at an unknown command |
 | [FND-RES-039](../../findings/FND-RES-039.md) | _SETUP.EXE's FLAG runs the rest of its line when a numbered flag is set, and DISKSPACE_LT sets a flag when free kilobytes are below a value |
 | [FND-RES-040](../../findings/FND-RES-040.md) | _SETUP.EXE's PICKDEST builds the destination from SierraDir and DirName, WRITE and APPEND write one line to a file, RUN ignores two words, and COPY takes no arguments |
-| [FND-RES-041](../../findings/FND-RES-041.md) | CONFIG.EXE stops its script run at @FINISH and, just before exiting, reopens the script there to echo text and run commands up to @ENDFINISH |
 | [FND-RES-042](../../findings/FND-RES-042.md) | CONFIG.EXE reads a word at the start of a line followed by a colon as a label, echoes @DISPLAY text to the screen, and stops at any other bare word |
 | [FND-RES-043](../../findings/FND-RES-043.md) | CONFIG.EXE's @GetOutDrive, @GetSubdir and @GetOption echo their block text to the screen like @Display |
 | [FND-RES-045](../../findings/FND-RES-045.md) | INST.EXE takes the switches M, Z, F and D from its command line and loads install.scr whole before it reads RESOURCE.CFG |
 | [FND-RES-047](../../findings/FND-RES-047.md) | INSTALL.SCR's alert, space, pick, godir, exists, testdir and del commands in INST.EXE |
-| [FND-RES-048](../../findings/FND-RES-048.md) | INSTALL.SCR's if command in INST.EXE tests errorlevel or exist, with an optional not, and resumes the raw line at the expanded command's offset |
 | [FND-RES-049](../../findings/FND-RES-049.md) | INSTALL.SCR's copy command in INST.EXE extracts from drivers.sip and sierra.sip beside the source, then copies matching files, with /q, /s and a + concatenation form |
 | [FND-RES-050](../../findings/FND-RES-050.md) | INST.EXE runs INSTALL.SCR from vtable entry +0x5C after two installer checks, and one choice of the shipped script's menu misses its label |
 | [FND-RES-051](../../findings/FND-RES-051.md) | INST.EXE runs an unknown INSTALL.SCR line through spawn with one argument string, then the command interpreter, with standard output redirected for > and >> |
 | [FND-RES-052](../../findings/FND-RES-052.md) | INST.EXE's bytes behind INSTALL.SCR's %1 and %2 are the destination drive letter and the drive the installer started on |
 | [FND-RES-053](../../findings/FND-RES-053.md) | INST.EXE loads every message and help text from install.txt, install.hlp and the other .txt and .hlp files into one keyed dictionary marked by double-backslash lines |
-| [FND-RES-054](../../findings/FND-RES-054.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case |
 | [FND-RES-055](../../findings/FND-RES-055.md) | INST.EXE runs install.scr line by line, with labels, goto, nine percent parameters, a table of named commands and any other line run as a program |
 | [FND-RES-056](../../findings/FND-RES-056.md) | INST.EXE looks up 78 fixed INSTALL.TXT keys, help and confirmation texts by file name with hlp and inf extensions, and stops with a fatal error on a missing key everywhere but two calls |
 | [FND-RES-057](../../findings/FND-RES-057.md) | No Conqueror file outside the disc's DEMOS and INN directories names DEMOS or a demo, and only INN.BAT enters INN, to run that directory's own installer |
 | [FND-RES-058](../../findings/FND-RES-058.md) | The disc's two readme files, EMPTY.TXT, VERSION.TXT and the VESA directory are documentation, a placeholder and a third-party driver that no Conqueror program reads |
-| [FND-RES-059](../../findings/FND-RES-059.md) | An MVG entry holds the pointer shapes' hot spots; 0x00018850 loads it and the CSF of the same name |
 | [FND-RES-060](../../findings/FND-RES-060.md) | FIEF0.DAT is a text file of six sections, each a column line and a line of integers, read when a new game sets up the home fief |
-| [FND-RES-061](../../findings/FND-RES-061.md) | Every use of the name FFONTA2.FNT ends in a property call that stores nothing, so the game never reads the .FNT entry |
+| [FND-RES-062](../../findings/FND-RES-062.md) | Verified analyzer body extents and a named return boundary used to convert location bounds |
+| [FND-RES-063](../../findings/FND-RES-063.md) | Analyzer body extents for remaining legacy boundary reviews |
+| [FND-RES-064](../../findings/FND-RES-064.md) | CONFIG.EXE stops its script run at @FINISH and, just before exiting, reopens the script there to echo text and run commands up to @ENDFINISH |
+| [FND-RES-065](../../findings/FND-RES-065.md) | INSTALL.SCR's if command in INST.EXE tests errorlevel or exist, with an optional not, and resumes the raw line at the expanded command's offset |
+| [FND-RES-066](../../findings/FND-RES-066.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case |
+| [FND-RES-067](../../findings/FND-RES-067.md) | An MVG entry holds the pointer shapes' hot spots; 0x00018850 loads it and the CSF of the same name |
+| [FND-RES-068](../../findings/FND-RES-068.md) | Every use of the name FFONTA2.FNT ends in a property call that stores nothing, so the game never reads the .FNT entry |
 
 ## Open questions
 

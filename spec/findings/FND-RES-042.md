@@ -13,19 +13,19 @@ locations:
     address: 221F:0003..221F:0335
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 221F:07E2..221F:085E
+    address: 221F:07E2..221F:085F
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 1B20:0000..1B20:05C2
+    address: 1B20:0000..1B20:05C3
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 1B80:0147..1B80:0181
+    address: 1B80:0147..1B80:0182
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
     address: 1B80:1D90..1B80:1DA6
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 1B80:36DA..1B80:3792
+    address: 1B80:36DA..1B80:3793
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
     address: 192C:0003..192C:0022
@@ -42,7 +42,7 @@ Addresses, DS, the class table at DS:6D7B, the character layer, the line
 flag at DS:536A, the token reader 221F:0003, the name buffer at DS:7C02, the
 keyword table at DS:272F and the stop 213C:00A1 are as FND-RES-036 gives
 them; the runner 1B80:184F, the echo routine 35C0:0E1F and the `end of
-file` stop are as FND-RES-041 gives them.
+file` stop are as FND-RES-064 gives them.
 
 Words. 221F:0003 keeps DS:536A in [bp-6] after skipping white space and
 before reading the first character. A first character with class bit 2 or
@@ -137,3 +137,5 @@ DS:272F, and the strings at DS:16F1 and DS:1761. Walk INSTALL.DAT up to
 bare line to the innermost open block among the four pairs named above or
 to the label form; report counts only. Keep listings in ignored local
 storage.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

@@ -10,7 +10,7 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 20F3:2975..20F3:2C69
+    address: 20F3:2975..20F3:2C6A
   - build: BLD-GOG-EN
     file: CD:SIERRA.INF
     offset: 0x00000656..0x0000069D
@@ -93,6 +93,8 @@ same kinds of reference as FND-RES-057 were not covered.
 
 Extract and check the files as FND-RES-057 gives. Search each for the names
 above, case-insensitively, as ASCII and as UTF-16LE, and read each hit's
-line. Unpack `CD:INST.EXE` as FND-RES-054 gives and disassemble 20F3:2975
+line. Unpack `CD:INST.EXE` as FND-RES-066 gives and disassemble 20F3:2975
 with the load image at segment 0x1000. Keep the extracted files and listings
 in ignored local storage.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

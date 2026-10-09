@@ -16,7 +16,7 @@ locations:
     address: 0x0001BA6F..0x0001BAB6
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0001BB1B..0x0001BB5A
+    address: 0x0001BB1B..0x0001BB5B
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0001B6A0..0x0001B6AA
@@ -54,3 +54,6 @@ played. The result 1 that the wrapper tests for never occurs.
 
 Disassemble `0x0001B3AC` to `0x0001B580`, and the worker `0x0001B584` from `0x0001B6A0` to its return
 at `0x0001BB5A`.
+
+The exclusive bound includes the named return instruction, whose extent is
+recorded in FND-RES-062.

@@ -10,7 +10,7 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0002FCB0..0x0002FCEC
+    address: 0x0002FCB0..0x0002FCED
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0002FCF0..0x0002FED8
@@ -19,7 +19,7 @@ locations:
     address: 0x00030100..0x0003029D
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00024D14..0x00024D53
+    address: 0x00024D14..0x00024D54
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00061D67..0x00061D8B
@@ -94,3 +94,5 @@ traced.
 
 Disassemble the listed addresses in `CD:CONQUER.EXE`; read the strings at `0x000941E0` to
 `0x00094238`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

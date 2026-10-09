@@ -10,13 +10,13 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 20F3:06F7..20F3:0841
+    address: 20F3:06F7..20F3:0842
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 2CBD:00EC..2CBD:0109
+    address: 2CBD:00EC..2CBD:010A
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 20F3:0842..20F3:0890
+    address: 20F3:0842..20F3:0891
   - build: BLD-GOG-EN
     file: CD:INST.EXE
     address: 1C17:000F..1C17:01AD
@@ -30,7 +30,7 @@ environment: null
 ## Observation
 
 The unpacked file, its notation, the object at DS:55D8 and its vtables are as
-FND-RES-054 gives them. 20F3:029C calls vtable entries +0x44, +0x50, +0x54,
+FND-RES-066 gives them. 20F3:029C calls vtable entries +0x44, +0x50, +0x54,
 +0x2C and +0x08 and 263F:0504 before its read of `resource.cfg` at
 20F3:03D6.
 
@@ -104,7 +104,7 @@ are not resolved, so this does not show that the read is always reached.
 
 ## How to reproduce
 
-Unpack `CD:INST.EXE` as FND-RES-054 gives. Disassemble the ranges in
+Unpack `CD:INST.EXE` as FND-RES-066 gives. Disassemble the ranges in
 Locations as 16-bit code with the load image at segment 0x1000 and read the
 strings at DS:0D83 to DS:0E29 and DS:142E. List the relocation entries whose
 target word follows a 0x9A byte and whose far pointer is 0000:085B or
@@ -112,3 +112,5 @@ target word follows a 0x9A byte and whose far pointer is 0000:085B or
 function at every direct call target, stopping each path at a return, an
 unconditional jump or an invalid byte, and list the functions reached and the
 indirect calls met. Keep listings in ignored local storage.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

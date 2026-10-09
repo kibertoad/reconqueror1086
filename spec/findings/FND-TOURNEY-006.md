@@ -13,7 +13,7 @@ locations:
     address: 0x0005CDE3..0x0005CE1A
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000642CC..0x00064300
+    address: 0x000642CC..0x00064301
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -41,3 +41,5 @@ None known.
 
 Disassemble `0x0005CDE3` to `0x0005CE1A` and `0x000642CC`, and follow the stack offsets of the two
 `lea` instructions.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

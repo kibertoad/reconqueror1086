@@ -10,7 +10,7 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0004C414..0x0004C6DD
+    address: 0x0004C414..0x0004C6DE
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0004E253
@@ -80,5 +80,7 @@ archive already holds every cached screen, so the PCX path runs only for a missi
 
 ## How to reproduce
 
-Disassemble `0x0004C414..0x0004C6DD` and its callers in `CD:CONQUER.EXE`; decode the entries of
+Disassemble `0x0004C414..0x0004C6DE` and its callers in `CD:CONQUER.EXE`; decode the entries of
 `CD:CONQUER/SKIRMISH.RES` and draw `SKIRMISH.PCX` with `SKIRMISH.PAL`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

@@ -10,13 +10,13 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 20F3:0A77..20F3:0AD3
+    address: 20F3:0A77..20F3:0AD4
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 20F3:0AD4..20F3:0FE3
+    address: 20F3:0AD4..20F3:0FE4
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1000:08E6..1000:08FF
+    address: 1000:08E6..1000:0900
 tool: capstone 5.0.7 bounded 16-bit disassembly of the LZEXE-unpacked file with relocation targets marked; Python byte searches of its load image
 environment: null
 ---
@@ -24,7 +24,7 @@ environment: null
 ## Observation
 
 The unpacked file, its notation, the object at DS:55D8 and its vtables are as
-FND-RES-054 gives them, the flow of 20F3:029C as FND-RES-050 gives it, and
+FND-RES-066 gives them, the flow of 20F3:029C as FND-RES-050 gives it, and
 the parameters `%1` and `%2` as FND-RES-055 gives them: the bytes at +0x1E6
 and +0x23E.
 
@@ -49,7 +49,7 @@ plus 0x61, at +0x1E6. It returns 1 when the selection result is not -1.
 
 20F3:029C calls +0x38 before 20F3:0457 and, from 20F3:0457, calls +0x34 when
 the word at +0x1F5 is not 0 (FND-RES-050). The word at +0x1D6 is the flag
-`floppy=yes` sets in `RESOURCE.CFG` (FND-RES-054), and +0x1F3 the flag the
+`floppy=yes` sets in `RESOURCE.CFG` (FND-RES-066), and +0x1F3 the flag the
 `F` switch sets (FND-RES-045).
 
 ## Interpretation
@@ -70,7 +70,9 @@ From `INSTALL.BAT`, which passes `-f`, the player always picks.
 
 ## How to reproduce
 
-Unpack `CD:INST.EXE` as FND-RES-054 gives. Search the load image for 0xE6
+Unpack `CD:INST.EXE` as FND-RES-066 gives. Search the load image for 0xE6
 0x01 and 0x3E 0x02 and decode the instruction each hit ends. Disassemble the
 ranges in Locations as 16-bit code with the load image at segment 0x1000 and
 relocation targets marked. Keep listings in ignored local storage.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

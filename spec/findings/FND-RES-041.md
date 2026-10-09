@@ -1,16 +1,16 @@
 ---
 id: FND-RES-041
 title: CONFIG.EXE stops its script run at @FINISH and, just before exiting, reopens the script there to echo text and run commands up to @ENDFINISH
-status: recorded
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
+superseded_by: [FND-RES-064]
 recorded_by: kibertoad
 reproduced_by: []
 method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 1B80:0007..1B80:0146
+    address: 1B80:0007..1B80:0147
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
     address: 1B80:184F..1B80:198A
@@ -19,7 +19,7 @@ locations:
     address: 1B80:1F26..1B80:200B
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 1B80:532B..1B80:573D
+    address: 1B80:532B..1B80:573E
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
     address: 1A72:06BE..1A72:06E7
@@ -128,3 +128,5 @@ Disassemble `CD:CONFIG.EXE` as 16-bit code with the load image at segment
 strings at DS:1BFE, DS:2329 and DS:1B75. Search the load image as Search
 says. Walk INSTALL.DAT from `@Finish` to the end; report counts and names
 only. Keep listings in ignored local storage.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

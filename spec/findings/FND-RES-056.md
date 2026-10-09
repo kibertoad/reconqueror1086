@@ -10,22 +10,22 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 2852:0E49..2852:0F0F
+    address: 2852:0E49..2852:0F10
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 2852:0F10..2852:106F
+    address: 2852:0F10..2852:1070
   - build: BLD-GOG-EN
     file: CD:INST.EXE
     address: 2852:1070..2852:1160
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1BA0:00B7..1BA0:00ED
+    address: 1BA0:00B7..1BA0:00EE
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1BA0:00EE..1BA0:01EC
+    address: 1BA0:00EE..1BA0:01ED
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 2E08:000E..2E08:0114
+    address: 2E08:000E..2E08:0115
 tool: capstone 5.0.7 bounded 16-bit disassembly of the LZEXE-unpacked file with relocation targets marked; Python byte searches of its load image
 environment: null
 ---
@@ -39,7 +39,7 @@ Calls. A search of the load image for the far call bytes 0x9A 0x71 0x0B 0x52
 0x18 (2852:0B71 with its segment word before relocation), and for `push cs`
 followed by a near call whose target is 2852:0B71, finds 94 far and 4 near
 calls, 98 in all. The same search for 2852:00BD finds its one call, in main
-at 20F3:2D83, located before this search by reading main (FND-RES-054).
+at 20F3:2D83, located before this search by reading main (FND-RES-066).
 Calls through pointers, jumps and far pointers stored as data were not
 searched. At each call the caller pushes the flag word, reserves 4 bytes for
 the key string, builds the key there, pushes DS:53AC and the result, and
@@ -115,7 +115,7 @@ calls that build their key from data.
 
 ## How to reproduce
 
-Unpack `CD:INST.EXE` as FND-RES-054 gives. Search the load image for the
+Unpack `CD:INST.EXE` as FND-RES-066 gives. Search the load image for the
 bytes 0x9A 0x71 0x0B 0x52 0x18, and for 0x0E 0xE8 followed by a 16-bit
 displacement that reaches 2852:0B71, and the same for 2852:00BD as the
 control. At each hit, disassemble back to the `push` before `sub sp, 4` for
@@ -125,3 +125,7 @@ string it is given. Compare the keys with the trimmed, lower-cased keys of
 and DS:3AE8 to DS:3B1C and the far pointer at DS:3AE4. Disassemble the ranges
 in Locations as 16-bit code with the load image at segment 0x1000 and
 relocation targets marked. Keep listings in ignored local storage.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.
+
+Grouped whole-function exclusive bounds follow the extents recorded in FND-RES-063.

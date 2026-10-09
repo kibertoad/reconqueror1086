@@ -3,7 +3,7 @@ meta:
   title: Pointer hot spots, an MVG entry
   license: MIT
   endian: le
-doc-ref: FMT-RES-121, FND-RES-059
+doc-ref: FMT-RES-121, FND-RES-067
 seq:
   - id: magic
     contents: [0x34, 0x12, 0xad, 0xde]

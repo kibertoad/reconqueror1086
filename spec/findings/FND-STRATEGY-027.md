@@ -10,25 +10,25 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000130E4..0x00013165
+    address: 0x000130E4..0x00013166
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0003C6E0..0x0003C769
+    address: 0x0003C6E0..0x0003C76A
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0003D83C..0x0003D8B5
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0006E500..0x0006E518
+    address: 0x0006E500..0x0006E519
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0006E524..0x0006E544
+    address: 0x0006E524..0x0006E545
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0006E558..0x0006E570
+    address: 0x0006E558..0x0006E571
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0006E57C..0x0006E59C
+    address: 0x0006E57C..0x0006E59D
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -62,4 +62,6 @@ None known.
 
 ## How to reproduce
 
-Disassemble `0x000130E4..0x00013165`, `0x0003C6E0..0x0003C769`, `0x0003D83C..0x0003D8B5`, `0x0006E500..0x0006E518`, `0x0006E524..0x0006E544`, `0x0006E558..0x0006E570`, `0x0006E57C..0x0006E59C` in `CD:CONQUER.EXE`.
+Disassemble `0x000130E4..0x00013166`, `0x0003C6E0..0x0003C76A`, `0x0003D83C..0x0003D8B5`, `0x0006E500..0x0006E519`, `0x0006E524..0x0006E545`, `0x0006E558..0x0006E571`, `0x0006E57C..0x0006E59D` in `CD:CONQUER.EXE`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

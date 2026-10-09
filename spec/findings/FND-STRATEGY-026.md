@@ -28,7 +28,7 @@ locations:
     address: 0x00084980..0x00084A48
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0007234C..0x00072374
+    address: 0x0007234C..0x00072375
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -69,4 +69,6 @@ None known.
 
 ## How to reproduce
 
-Disassemble `0x000122AC..0x0001265A`, `0x00012044..0x00012283`, `0x00012284..0x000122AB`, `0x000640A0..0x00064163`, `0x00064164`, `0x00084980..0x00084A48`, `0x0007234C..0x00072374` in `CD:CONQUER.EXE`.
+Disassemble `0x000122AC..0x0001265A`, `0x00012044..0x00012283`, `0x00012284..0x000122AB`, `0x000640A0..0x00064163`, `0x00064164`, `0x00084980..0x00084A48`, `0x0007234C..0x00072375` in `CD:CONQUER.EXE`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

@@ -13,13 +13,13 @@ locations:
     address: 221F:0B5C..221F:1124
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 213C:0007..213C:0058
+    address: 213C:0007..213C:0059
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 213C:00A1..213C:0163
+    address: 213C:00A1..213C:0164
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 1000:0668..1000:0676
+    address: 1000:0668..1000:0677
   - build: BLD-GOG-EN
     file: CD:INSTALL.DAT
     offset: 0x00..0xBDDB
@@ -127,3 +127,5 @@ words at 221F:10F5, and the strings at DS:2FD7, DS:308E, DS:30D9 to DS:3142,
 DS:3170, DS:31AF and DS:25E0 to DS:262B. Walk INSTALL.DAT outside comments,
 pair the quotes, and count the escapes; report counts only. Keep listings
 in ignored local storage.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

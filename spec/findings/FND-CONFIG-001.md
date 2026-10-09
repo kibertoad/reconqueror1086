@@ -13,16 +13,16 @@ locations:
     address: 0x0002A38A..0x0002A3D3
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000715D0..0x00071837
+    address: 0x000715D0..0x00071838
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00062B80..0x00062D92
+    address: 0x00062B80..0x00062D93
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00062FC0..0x00062FFD
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000636D0..0x00063747
+    address: 0x000636D0..0x00063748
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -84,3 +84,5 @@ traced.
 
 Disassemble the listed ranges in `CD:CONQUER.EXE` and read the strings at object-2 offsets
 `0x3880`, `0x38B0`, `0x9774` to `0x978C`, `0x8FCC` and the table at `0xDF54`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

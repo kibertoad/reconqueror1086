@@ -152,8 +152,10 @@ run `MapConquerorLe.java` before auto-analysis. Its fingerprint guard and mappin
 follow BLD-GOG-EN and FND-RES-009. The script replaces blocks in that disposable
 project; never run it over an existing research project. Its required seed file may be empty, or contain documented entry addresses
 within the code object, one hexadecimal number per line without `0x` or `fn_`.
-Run `DescribeInventorySource.java` and `ExportFunctionInventory.java` afterward,
-with exports in an ignored local analysis directory. The provenance and limits
+Freeze the analyzed project and run `ExportCoverageSnapshot.java` afterward
+with `-readOnly -noanalysis`, a new ignored output directory and the verified
+source SHA-256. Require its completion marker and compare repeated exports.
+The provenance and limits
 of the committed metadata are in [coverage/README.md](../coverage/README.md).
 Raw fixup operands remain unrelocated, so indirect targets remain uncertain.
 

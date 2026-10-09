@@ -33,30 +33,26 @@ shared reporter regressions use synthetic instructions and state.
 
 ## Function inventories
 
-Run `ExportFunctionInventory.java` against a correctly mapped analysis project
-with a new local TSV destination. It exports only starts and body byte counts.
-Verify the project's source hash, loader, address map and analyzer version before
-copying those two columns into `coverage/<build>/<manifest>.tsv`. `CD:` becomes
-`@CD/`. Retain provenance and exclusions in `coverage/README.md`. Do not export
-names, instructions, strings or bytes; a body byte count does not define an end
-address, especially for noncontiguous or shared bodies.
+Use `ExportCoverageSnapshot.java` against a verified frozen project with
+`-readOnly -noanalysis`. It exports starts, body-byte counts, separate body
+ranges and executable-region partitions. Compare repeated exports and unchanged
+project digests before adoption. `coverage-snapshot.mjs adopt` converts the
+native coordinates and writes the inventory with provenance and region
+sidecars. The procedure and mapping qualifications are in
+[coverage/README.md](../coverage/README.md). Do not export names, instructions,
+strings or bytes; a body byte count does not define an end address.
 
 ## Committed inventory verification
 
-The shared `inventory-check` command validates a hash-guarded MZ/FBOV source,
-build and manifest. Its input path must end in the declared safe repository
-path, which must match the portable coverage destination. Starts must be unique,
-use the manifest prefix and eight-digit uppercase notation, and lie in mapped
-source. Sizes are positive bounded body byte counts, never end addresses. Only
-`start`, `size`, optional researcher-authored `name` and `out_of_scope` columns
-are permitted; analyzer default names are rejected. A historical path requires
-an explicit safe `legacyPath` and nonempty `legacyEvidence`.
-
-Reconqueror uses `node tools/Check-Coverage.mjs` for its committed LE inventory.
-That adapter supplies the documented LE code-object range and checks build,
-manifest, destination and TSV metadata through the same verifier. Its starts
-are LE virtual addresses, not MZ file offsets. It does not claim that the shared
-MZ/FBOV loader supports LE or that an inventory establishes complete behavior.
+Use `node tools/Check-Coverage.mjs` for all committed inventories. It loads the
+spec and native body notation with the pinned Standard checker, then validates
+the sidecars, source identities, executable partitions and unique body unions.
+Starts have no manifest prefix: LE/PE use virtual addresses; MZ uses native
+segment:offset addresses; NE uses table segment:offset addresses. The manifest
+is identified by the inventory path. The older `report.mjs inventory` and
+`inventory-check` contracts describe historical size-only metadata and must not
+generate or validate the current inventory format. Their output cannot supply
+missing body ranges or establish a complete reading.
 
 Use `x86-target` before citing a far call's target: it keeps the raw operand,
 the relocation or FBOV fixup, the stored descriptor word and decoded index, the

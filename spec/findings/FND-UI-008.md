@@ -16,7 +16,7 @@ locations:
     address: 0x00072180..0x00072205
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00064030..0x0006409D
+    address: 0x00064030..0x0006409E
   - build: BLD-GOG-EN
     file: C1086.GOB
     offset: 0x00..0x21B93B2
@@ -47,3 +47,5 @@ Which frames the other screens select, and what the hot spot table holds, were n
 ## How to reproduce
 
 Disassemble the listed ranges; decode `ffmouse.CSF`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

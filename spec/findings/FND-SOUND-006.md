@@ -13,16 +13,16 @@ locations:
     address: 0x0005B368..0x0005B3AF
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000703E0..0x0007047D
+    address: 0x000703E0..0x0007047E
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00070480..0x0007054A
+    address: 0x00070480..0x0007054B
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00070550..0x000705C3
+    address: 0x00070550..0x000705C4
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000705D0..0x0007060F
+    address: 0x000705D0..0x00070610
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0002ACF0..0x0002AD1E
@@ -116,3 +116,5 @@ FND-BATTLE-018).
 ## How to reproduce
 
 Disassemble the listed ranges in `CD:CONQUER.EXE`; read `game.ins` and measure the audio tracks.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

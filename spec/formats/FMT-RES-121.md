@@ -9,7 +9,7 @@ byte_order: little
 size: null
 text: false
 definition: fmt_res_121.ksy
-evidence: [FND-RES-059, FND-UI-008]
+evidence: [FND-RES-067, FND-UI-008]
 conflicting: []
 split_with: []
 related: []
@@ -22,20 +22,20 @@ with the `.CSF` entry of the same name.
 
 | Offset | Size | Type | Name | Meaning | Status | Evidence |
 |---|---|---|---|---|---|---|
-| `0x00` | 4 | `UINT32LE` | `magic` | `0xDEAD1234`; any other value fails the load. | supported | FND-RES-059 |
-| `0x04` | 4 | `INT32LE` | `count` | Number of records, one per frame of the sprite set. | supported | FND-RES-059 |
-| `0x08` | 4 | `INT32LE` | `buffer_size` | Size in bytes of each of the three work buffers the pointer drawing allocates. | supported | FND-RES-059 |
-| `0x0C` | `count * 16` | `record[count]` | `records` | One record per frame. | supported | FND-RES-059 |
+| `0x00` | 4 | `UINT32LE` | `magic` | `0xDEAD1234`; any other value fails the load. | supported | FND-RES-067 |
+| `0x04` | 4 | `INT32LE` | `count` | Number of records, one per frame of the sprite set. | supported | FND-RES-067 |
+| `0x08` | 4 | `INT32LE` | `buffer_size` | Size in bytes of each of the three work buffers the pointer drawing allocates. | supported | FND-RES-067 |
+| `0x0C` | `count * 16` | `record[count]` | `records` | One record per frame. | supported | FND-RES-067 |
 | | | | | Total size `12 + count * 16` | | |
 
 A record:
 
 | Offset | Size | Type | Name | Meaning | Status | Evidence |
 |---|---|---|---|---|---|---|
-| `0x00` | 4 | `INT32LE` | `unk_00` | Never read; equals the frame's width in the shipped entry. | supported | FND-RES-059 |
-| `0x04` | 4 | `INT32LE` | `unk_04` | Never read; equals the frame's height in the shipped entry. | supported | FND-RES-059 |
-| `0x08` | 4 | `INT32LE` | `hot_x` | Subtracted from the pointer's x to place the frame. | supported | FND-RES-059 |
-| `0x0C` | 4 | `INT32LE` | `hot_y` | Subtracted from the pointer's y to place the frame. | supported | FND-RES-059 |
+| `0x00` | 4 | `INT32LE` | `unk_00` | Never read; equals the frame's width in the shipped entry. | supported | FND-RES-067 |
+| `0x04` | 4 | `INT32LE` | `unk_04` | Never read; equals the frame's height in the shipped entry. | supported | FND-RES-067 |
+| `0x08` | 4 | `INT32LE` | `hot_x` | Subtracted from the pointer's x to place the frame. | supported | FND-RES-067 |
+| `0x0C` | 4 | `INT32LE` | `hot_y` | Subtracted from the pointer's y to place the frame. | supported | FND-RES-067 |
 | | | | | Total size 16 | | |
 
 ## Enumerations and flags
@@ -49,10 +49,10 @@ None known.
 ## Coverage
 
 The one MVG entry of the release, `ffmouse.mvg` in C1086.GOB, decodes to 108
-bytes and fits the layout with count 6 and buffer size 484 [FND-RES-059].
+bytes and fits the layout with count 6 and buffer size 484 [FND-RES-067].
 
 ## Open questions
 
-- Whether `unk_00` and `unk_04` are read anywhere: the readers FND-RES-059
+- Whether `unk_00` and `unk_04` are read anywhere: the readers FND-RES-067
   found take the frame size from the CSF frame; a search for other readers of
   the record table was not made. (Q-RES-208)

@@ -4,7 +4,7 @@ title: Map clicks and drawn routes
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-JOUST-002, FND-STRATEGY-003, FND-STRATEGY-018, FND-STRATEGY-019, FND-STRATEGY-026, FND-STRATEGY-027, FND-STRATEGY-032]
+evidence: [FND-JOUST-002, FND-STRATEGY-003, FND-STRATEGY-018, FND-STRATEGY-041, FND-STRATEGY-026, FND-STRATEGY-027, FND-STRATEGY-032]
 conflicting: []
 split_with: []
 related: []

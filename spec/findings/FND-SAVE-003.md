@@ -13,7 +13,7 @@ locations:
     address: 0x0004ADD4..0x0004B196
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00049BA8..0x00049C78
+    address: 0x00049BA8..0x00049C79
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -53,3 +53,5 @@ load may never meet a save without it in normal play.
 ## How to reproduce
 
 Disassemble the listed ranges and read the strings at object-2 offsets `0x769C` to `0x7904`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

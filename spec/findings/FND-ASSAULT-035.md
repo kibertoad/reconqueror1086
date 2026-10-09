@@ -10,7 +10,7 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00055524..0x00055A58
+    address: 0x00055524..0x00055A59
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x000555AB..0x0005562E
@@ -62,3 +62,5 @@ the contact on a projected surface (RULE-VIEW-003).
 
 Open `0x00055524`. The test of the primary flag and the loop over selected combatants come first,
 then the branches on behaviour bits `0x80` and `0x10`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

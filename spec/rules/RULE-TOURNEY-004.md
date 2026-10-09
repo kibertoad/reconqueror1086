@@ -4,7 +4,7 @@ title: Tournament melee wager, scene and settlement
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-TOURNEY-001, FND-TOURNEY-003, FND-TOURNEY-005, FND-TOURNEY-006, FND-RNG-002, FND-PERSON-002, SRC-GAMEFAQS-66730, FND-UI-004]
+evidence: [FND-TOURNEY-001, FND-TOURNEY-009, FND-TOURNEY-005, FND-TOURNEY-006, FND-RNG-002, FND-PERSON-002, SRC-GAMEFAQS-66730, FND-UI-004]
 conflicting: []
 split_with: []
 related: [RULE-RNG-001, RULE-PERSON-001, RULE-TOURNEY-002, RULE-UI-002]

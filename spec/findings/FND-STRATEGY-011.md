@@ -13,7 +13,7 @@ locations:
     address: 0x0004A300..0x0004A61B
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0002FC70..0x0002FCAB
+    address: 0x0002FC70..0x0002FCAC
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -52,4 +52,6 @@ None known.
 
 ## How to reproduce
 
-Disassemble `0x0004A300..0x0004A61B`, `0x0002FC70..0x0002FCAB` in `CD:CONQUER.EXE`.
+Disassemble `0x0004A300..0x0004A61B`, `0x0002FC70..0x0002FCAC` in `CD:CONQUER.EXE`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

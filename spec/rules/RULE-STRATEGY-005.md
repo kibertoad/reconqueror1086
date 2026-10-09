@@ -4,7 +4,7 @@ title: Hostile force size
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-STRATEGY-003, FND-STRATEGY-008, FND-STRATEGY-015]
+evidence: [FND-STRATEGY-003, FND-STRATEGY-008, FND-STRATEGY-040]
 conflicting: []
 split_with: []
 related: []

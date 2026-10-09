@@ -5,7 +5,7 @@ status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
 resolution: 640x480
-evidence: [FND-TOURNEY-003, FND-UI-001, FND-UI-002, FND-UI-003, FND-UI-010, FND-UI-013]
+evidence: [FND-TOURNEY-009, FND-UI-001, FND-UI-002, FND-UI-003, FND-UI-010, FND-UI-013]
 conflicting: []
 split_with: []
 related: [SCR-UI-006, SCR-UI-015, SCR-UI-016]
@@ -24,8 +24,8 @@ related: [SCR-UI-006, SCR-UI-015, SCR-UI-016]
 | region 0 | (37, 77, 131, 100) | Always | Stores 1 in `0x0009DBD0` and switches to SCR-UI-006. | FND-UI-013 |
 | region 1 | (422, 345, 86, 62) | Always | None; the setup binds no routine. | FND-UI-003 |
 | region 2 | (356, 146, 172, 28) | Always | Switches to SCR-UI-015. | FND-UI-013 |
-| region 3 | (259, 180, 338, 28) | Always | Stores 0 in the tent choice at `0x000AFF44` (FND-TOURNEY-003) and switches to SCR-UI-016. | FND-UI-013, FND-TOURNEY-003 |
-| region 4 | (237, 301, 172, 80) | Always | Stores 1 in the tent choice and switches to SCR-UI-016. | FND-UI-013, FND-TOURNEY-003 |
+| region 3 | (259, 180, 338, 28) | Always | Stores 0 in the tent choice at `0x000AFF44` (FND-TOURNEY-009) and switches to SCR-UI-016. | FND-UI-013, FND-TOURNEY-009 |
+| region 4 | (237, 301, 172, 80) | Always | Stores 1 in the tent choice and switches to SCR-UI-016. | FND-UI-013, FND-TOURNEY-009 |
 
 ## Keyboard input
 

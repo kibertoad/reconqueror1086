@@ -13,13 +13,13 @@ locations:
     address: 0x00063E20..0x00063EBF
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000629B0..0x00062B7C
+    address: 0x000629B0..0x00062B7D
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0006E5A0..0x0006E8D8
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00063EC0..0x00063EDC
+    address: 0x00063EC0..0x00063EDD
   - build: BLD-GOG-EN
     file: C1086.GOB
     offset: 0x00..0x21B93B2
@@ -70,3 +70,5 @@ the scan: with the camera at `(0, 0)` it gives a different cell for 610 of the 8
 ## How to reproduce
 
 Disassemble the listed ranges of `CD:CONQUER.EXE`, then project every point of the `rt_` and `sc_` files with both camera extremes.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

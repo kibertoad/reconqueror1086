@@ -10,7 +10,7 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00052DE0..0x00052F11
+    address: 0x00052DE0..0x00052F12
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x000580D3..0x000580E0
@@ -210,3 +210,5 @@ Run `tools/Conqueror.Inspect` with `--xref-block-flags=0x40 --executable-only` a
 `--xref-code=0x52DE0 --executable-only`, disassemble the listed ranges with `--disassemble`, and read
 the fixup for `0x00051E10` with `--fixup-source=0x51E10`. For the census, decode each archive's
 `Map` (FMT-VIEW-002) and `Blocks` (FMT-VIEW-001) and group placed blocks by behaviour.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

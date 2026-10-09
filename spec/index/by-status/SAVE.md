@@ -27,6 +27,14 @@ Entries by status.
 | [SCR-SAVE-001](../../screens/SCR-SAVE-001.md) | Load game |
 | [SCR-SAVE-002](../../screens/SCR-SAVE-002.md) | Save game |
 
+## superseded
+
+1 entries.
+
+| ID | Title |
+|---|---|
+| [FND-SAVE-004](../../findings/FND-SAVE-004.md) | What the saved files hold: forces, properties, persons, items, conversation variables, fief 0, armies, calendar and tournament |
+
 ## recorded
 
 5 entries.
@@ -36,8 +44,8 @@ Entries by status.
 | [FND-SAVE-001](../../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV |
 | [FND-SAVE-002](../../findings/FND-SAVE-002.md) | A save writes ten temporary files and packs them with a title and version into one resource container |
 | [FND-SAVE-003](../../findings/FND-SAVE-003.md) | A load checks VERSION 2.1, unpacks the entries and runs the component loaders; temp.jap must be present |
-| [FND-SAVE-004](../../findings/FND-SAVE-004.md) | What the saved files hold: forces, properties, persons, items, conversation variables, fief 0, armies, calendar and tournament |
 | [FND-SAVE-005](../../findings/FND-SAVE-005.md) | Startup writes default.dat from the pristine person and property tables, and a new game reads it back |
+| [FND-SAVE-006](../../findings/FND-SAVE-006.md) | What the saved files hold: forces, properties, persons, items, conversation variables, fief 0, armies, calendar and tournament |
 
 ## Open questions
 

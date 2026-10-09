@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-RES-017, FND-RES-036, FND-RES-037, FND-RES-041, FND-RES-042, FND-RES-043]
+evidence: [FND-RES-017, FND-RES-036, FND-RES-037, FND-RES-064, FND-RES-042, FND-RES-043]
 conflicting: []
 split_with: []
 related: []
@@ -64,7 +64,7 @@ else in the main run stops the program with a syntax error. The blocks of
 (FND-RES-043). The shipped file's bare text is all labels or block text.
 
 The run ends at the end of the file or at `@FINISH`, supported by
-FND-RES-041. `@FINISH` closes the file and marks the start of a finish
+FND-RES-064. `@FINISH` closes the file and marks the start of a finish
 block, which runs just before the program exits: the file is reopened
 there, every byte outside an at-sign command up to `@ENDFINISH` is written
 to the screen, line breaks included, and the commands in the block run.
@@ -92,10 +92,10 @@ None known.
 
 Every byte and every line region in the identified BLD-GOG-EN file was inspected,
 with exact reconstruction [FND-RES-017]. Parts of the interpreter are read in
-FND-RES-036, FND-RES-037 and FND-RES-041 to FND-RES-043; nothing was run. CD:CONFIG.EXE opens the file read-only, by default beside its
+FND-RES-036, FND-RES-037 and FND-RES-064, FND-RES-042 and FND-RES-043; nothing was run. CD:CONFIG.EXE opens the file read-only, by default beside its
 own executable, and passes the handle to its script runner (FND-RES-034,
 FND-RES-035), which reads it as a stream of tokens in which line ends
-are white space, and runs the finish block at exit (FND-RES-041). Supported status
+are white space, and runs the finish block at exit (FND-RES-064). Supported status
 applies to stored text framing only.
 
 ## Open questions

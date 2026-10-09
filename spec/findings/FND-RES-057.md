@@ -23,7 +23,7 @@ Files. BLD-GOG-EN's manifest lists 452 paths under `CD:DEMOS/` and 111 under
 ISO 9660 directories through FMT-RES-005's record mapping. Each one's size and
 XXH3-128 equal the manifest's. To them were added the installed `C1086.GOB`,
 `CONQUER.INI` and `game.ins`, and the LZEXE-unpacked `CD:INST.EXE` of
-FND-RES-054. The installed `C1086.GOB` is byte for byte the disc copy.
+FND-RES-066. The installed `C1086.GOB` is byte for byte the disc copy.
 
 Search. Each file was searched, as stored, for these names in ASCII and in
 UTF-16LE, without case: `DEMOS`, `MOVIES`, `SHIVERS`, `SWAT`, `THEXDER`,
@@ -40,7 +40,7 @@ UTF-16LE, without case: `DEMOS`, `MOVIES`, `SHIVERS`, `SWAT`, `THEXDER`,
   part of this question.
 
 Positive control. The search finds `install.scr` at offset 0x2A6F5 of the
-unpacked INST.EXE, which is DS:14D5, the string FND-RES-054 locates through
+unpacked INST.EXE, which is DS:14D5, the string FND-RES-066 locates through
 the code that uses it. No reference in UTF-16LE was located in advance, so
 that encoding has no control.
 
@@ -79,6 +79,6 @@ directory.
 Walk the ISO 9660 directories of the owned image's data records (mode 1, 2048
 bytes at offset 16 of each 2352-byte record), extract every file outside
 `DEMOS/` and `INN/`, and check each against the manifest's size and XXH3-128.
-Unpack `CD:INST.EXE` as FND-RES-054 gives. Search every file for the names
+Unpack `CD:INST.EXE` as FND-RES-066 gives. Search every file for the names
 above, case-insensitively, as ASCII bytes and as UTF-16LE. Keep the extracted
 files in ignored local storage.

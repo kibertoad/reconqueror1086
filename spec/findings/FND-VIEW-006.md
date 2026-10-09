@@ -10,7 +10,7 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000470A8..0x00047589
+    address: 0x000470A8..0x0004758A
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00046739..0x000467F7
@@ -20,7 +20,7 @@ environment: null
 
 ## Observation
 
-Raycaster `0x000470A8`..`0x00047589` takes an origin in 8.8 map units, a heading and a view
+Raycaster `0x000470A8`..`0x0004758A` takes an origin in 8.8 map units, a heading and a view
 column `x`. It forms the local ray `(0x4000, ((0x400000 / width) * (x - width / 2)) >> 8)`,
 with `width` the view width, and rotates it by the heading through `0x000447C4`. It calls
 traversal `0x00045158` to collect candidates, then visits them in the order they were added. For
@@ -49,3 +49,5 @@ out.
 
 Open `0x000470A8`; the constants `0x4000` and `0x400000` appear in the basis computation before
 the call to `0x00045158`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

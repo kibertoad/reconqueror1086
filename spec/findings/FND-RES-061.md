@@ -1,9 +1,9 @@
 ---
 id: FND-RES-061
 title: Every use of the name FFONTA2.FNT ends in a property call that stores nothing, so the game never reads the .FNT entry
-status: recorded
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
+superseded_by: [FND-RES-068]
 recorded_by: kibertoad
 reproduced_by: []
 method: static

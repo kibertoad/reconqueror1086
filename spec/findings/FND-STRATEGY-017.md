@@ -13,13 +13,13 @@ locations:
     offset: 0x00..0x21B93B2
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0003E660..0x0003E6CB
+    address: 0x0003E660..0x0003E6CC
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0003EE50
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0003E6CC..0x0003E707
+    address: 0x0003E6CC..0x0003E708
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0003E708..0x0003E72B
@@ -31,7 +31,7 @@ locations:
     address: 0x0003E928
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0006E1D0..0x0006E317
+    address: 0x0006E1D0..0x0006E318
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0006E320
@@ -68,3 +68,5 @@ None known.
 ## How to reproduce
 
 Disassemble the listed ranges of `CD:CONQUER.EXE`, and decode entry 292 of `C1086.GOB`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

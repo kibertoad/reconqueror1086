@@ -4,7 +4,7 @@ title: Retirement at 30
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-PERSON-001, FND-PERSON-003, FND-PERSON-008, FND-STRATEGY-014, FND-STRATEGY-019, SRC-MANUAL, FND-STRATEGY-036]
+evidence: [FND-PERSON-001, FND-PERSON-003, FND-PERSON-008, FND-STRATEGY-014, FND-STRATEGY-041, SRC-MANUAL, FND-STRATEGY-036]
 conflicting: []
 split_with: []
 related: [RULE-PERSON-001]

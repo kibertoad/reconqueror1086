@@ -10,7 +10,7 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1C17:0FDD..1C17:1AC5
+    address: 1C17:0FDD..1C17:1AC6
   - build: BLD-GOG-EN
     file: CD:INST.EXE
     address: 3583:101B..3583:1159
@@ -22,7 +22,7 @@ environment: null
 
 The unpacked file, its notation, the dispatch, the window output 2973:092F,
 the message lookup 2852:0B71, the message box 1C17:0745, 1000:6295 and
-1000:65EA are as FND-RES-055 and FND-RES-048 give them, and 2CBD:010A as
+1000:65EA are as FND-RES-055 and FND-RES-065 give them, and 2CBD:010A as
 FND-RES-047 gives it. Run-time routines named below with "(not read)" are
 known only by their arguments.
 
@@ -154,9 +154,11 @@ most 32 KB.
 
 ## How to reproduce
 
-Unpack `CD:INST.EXE` as FND-RES-054 gives. Disassemble 1C17:0FDD to
-1C17:1AC5 as 16-bit code with the load image at segment 0x1000 and relocation
+Unpack `CD:INST.EXE` as FND-RES-066 gives. Disassemble 1C17:0FDD to
+1C17:1AC6 (exclusive) as 16-bit code with the load image at segment 0x1000 and relocation
 targets marked, and read the strings from DS:101B to DS:1159. Search the
 build's manifest for paths ending in `.SIP`, and split the shipped
 `INSTALL.SCR`'s `copy` lines into words. Keep listings in ignored local
 storage.
+
+Grouped whole-function exclusive bounds follow the extents recorded in FND-RES-063.

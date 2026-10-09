@@ -9,7 +9,7 @@ byte_order: null
 size: null
 text: true
 definition: null
-evidence: [FND-RES-045, FND-RES-055, FND-RES-047, FND-RES-048, FND-RES-049, FND-RES-050, FND-RES-051, FND-RES-052]
+evidence: [FND-RES-045, FND-RES-055, FND-RES-047, FND-RES-065, FND-RES-049, FND-RES-050, FND-RES-051, FND-RES-052]
 conflicting: []
 split_with: []
 related: []
@@ -61,13 +61,13 @@ line after one space or tab; for every command except `echo`, `alert` and
 | `exists` | char[] | script_command | Takes a file name and a message. Shows the message box again and again until the file exists. | supported | FND-RES-047 |
 | `testdir` | char[] | script_command | Takes a directory. When it exists and holds any file, makes it current and asks a yes/no question; the yes answer ends the script. | supported | FND-RES-047 |
 | `del` | char[] | script_command | Deletes every file its argument matches, by bare name in the current directory. | supported | FND-RES-047 |
-| `if` | char[] | script_command | Takes an optional `not`, then `errorlevel` and a number, true when the last program's result is that number or more (compared signed), or `exist` and a file pattern, true when a file matches. When the test (inverted by `not`) holds, the rest of the line runs as the next line. Any other test word shows an error box and the command is skipped. | supported | FND-RES-048 |
+| `if` | char[] | script_command | Takes an optional `not`, then `errorlevel` and a number, true when the last program's result is that number or more (compared signed), or `exist` and a file pattern, true when a file matches. When the test (inverted by `not`) holds, the rest of the line runs as the next line. Any other test word shows an error box and the command is skipped. | supported | FND-RES-065 |
 | `copy` | char[] | script_command | Takes a source pattern, an optional destination and the options `/q` (no error when nothing matches) and `/s` (no per-file messages), lower case only. First extracts the members matching the source's name and extension from `drivers.sip` and `sierra.sip` in the source's directory, when they exist, into the destination's directory or the current one. Then copies each matching file, replacing the destination, which defaults to the same name in the current directory; a destination name that is empty or starts with `*`, or an extension of `.*`, takes the source file's. With a `+` anywhere, `copy a+b` appends `b` to `a` instead. | supported | FND-RES-049 |
 
 `if` does not run its command itself. The next pass starts in the script's
 own line at the place where the command began in the expanded line, so a
 parameter before the command whose value is not exactly two characters long
-moves that place [FND-RES-048].
+moves that place [FND-RES-065].
 
 A first word that is none of these runs the line as a DOS program
 [FND-RES-051]. A `>` sends the program's standard output to the named file,
@@ -105,7 +105,7 @@ a label, an empty line or one of `echo`, `end`, `clear`, `godir`, `alert`,
 FND-RES-055 reads the run loop, the parameter setup, the expansion, the
 dispatch and the routines for comments, `echo`, `pause`, `goto`, `end`,
 `clear` and `cls`. FND-RES-047 reads `alert`, `space`, `pick`, `godir`,
-`exists`, `testdir` and `del`, FND-RES-048 reads `if`, FND-RES-049 reads
+`exists`, `testdir` and `del`, FND-RES-065 reads `if`, FND-RES-049 reads
 `copy` and FND-RES-051 reads the program runner. FND-RES-050 follows every
 route through the shipped script: each reaches `end` or an `alert` box,
 except the menu's third choice, which names no label exactly (BUG-RES-001).

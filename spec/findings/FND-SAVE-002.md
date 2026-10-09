@@ -24,7 +24,7 @@ environment: null
 `~~3.SAV`, `~~4.SAV`, `vtsave.vtb` and `~~5.SAV` through `0x000681D1`. It then calls, in order,
 `0x000109AC()` and `0x00042AF0()`, stopping the game with `Error in saving game data. Aborting.`
 (code 0) when either returns 0, then `0x00015B80("~~1.SAV")`, `0x000385B4("~~2.SAV")`,
-`0x0002B3E0("~~3.SAV")`, `0x00029C5C("~~4.SAV")` and `0x0005C3FC("~~5.SAV")` (FND-SAVE-004).
+`0x0002B3E0("~~3.SAV")`, `0x00029C5C("~~4.SAV")` and `0x0005C3FC("~~5.SAV")` (FND-SAVE-006).
 
 It builds `SAVEGAME\` + `name` and opens it as a new archive with `0x00049200(path, "w+b")`,
 stopping the game on failure, and adds entries with kind 2 and field 24 set to 0 (FND-RES-005):

@@ -10,16 +10,16 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0002B060..0x0002B1EB
+    address: 0x0002B060..0x0002B1EC
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0002D52C..0x0002D6C0
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0002DC08..0x0002DD3B
+    address: 0x0002DC08..0x0002DD3C
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0001074C..0x000109AA
+    address: 0x0001074C..0x000109AB
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -85,4 +85,6 @@ purpose or the offsets are wrong; the layout of those rows has not been recovere
 ## How to reproduce
 
 Disassemble `0x0002B060`, `0x0002D52C` to `0x0002D6C0`, `0x0002DC08` and `0x0001074C` to
-`0x000109AA`. Read the strings at the object-2 offsets named above.
+`0x000109AB` (exclusive). Read the strings at the object-2 offsets named above.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

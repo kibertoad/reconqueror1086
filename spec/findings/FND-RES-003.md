@@ -10,10 +10,10 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00048148..0x0004819B
+    address: 0x00048148..0x0004819C
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00047EA8..0x0004808D
+    address: 0x00047EA8..0x0004808E
   - build: BLD-GOG-EN
     file: C1086.GOB
     offset: 0x00..0x21B93B1
@@ -362,3 +362,5 @@ the shipped files simply never do otherwise.
 
 Disassemble the two ranges, then decode every kind-1 entry as described and compare the output
 length with the record's expanded size.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

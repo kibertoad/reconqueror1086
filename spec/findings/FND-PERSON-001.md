@@ -10,13 +10,13 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00015EAC..0x00015EBA
+    address: 0x00015EAC..0x00015EBB
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00015EF0..0x00015F09
+    address: 0x00015EF0..0x00015F0A
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00015F0C..0x00015F86
+    address: 0x00015F0C..0x00015F87
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -43,3 +43,5 @@ None known.
 ## How to reproduce
 
 Disassemble `0x00015EAC` to `0x00015F86`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

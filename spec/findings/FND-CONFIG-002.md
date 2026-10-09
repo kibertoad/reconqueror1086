@@ -10,13 +10,13 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00062ED0..0x00062FBF
+    address: 0x00062ED0..0x00062FC0
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00062EA0..0x00062ECE
+    address: 0x00062EA0..0x00062ECF
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00062D94..0x00062E9C
+    address: 0x00062D94..0x00062E9D
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00037CA3..0x00038472
@@ -76,3 +76,5 @@ traced. When the routines at `0x00052405` and `0x0005860C` run was not traced.
 
 Disassemble the listed ranges; the strings are at object-2 offsets `0x8FD0`, `0x8FD4`, `0x8FDC` and
 `0x7E10` to `0x7E40`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

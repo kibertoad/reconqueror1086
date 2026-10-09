@@ -25,7 +25,7 @@ locations:
     address: 0x0002250C..0x00022563
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00043100..0x00043131
+    address: 0x00043100..0x00043132
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -58,3 +58,5 @@ Functions 7 to 9 ignore `args[0]`; what the scripts pass there was not checked.
 ## How to reproduce
 
 Run `tools/Conqueror.Inspect` against the installation with `--disassemble=ADDR --executable-only` for each address listed, and read the report.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

@@ -10,10 +10,10 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00018430..0x0001869B
+    address: 0x00018430..0x0001869C
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0001869C..0x0001884A
+    address: 0x0001869C..0x0001884B
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0006A360..0x0006A3F0
@@ -72,5 +72,7 @@ version, and the game treats them the same way either way.
 
 ## How to reproduce
 
-Disassemble `0x00018430..0x0001869B`, `0x0001869C..0x0001884A` and `0x0006A360` in `CD:CONQUER.EXE`;
+Disassemble `0x00018430..0x0001869C`, `0x0001869C..0x0001884B` and `0x0006A360` in `CD:CONQUER.EXE`;
 read the string at `0x0009E034`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

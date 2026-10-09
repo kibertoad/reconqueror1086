@@ -4,7 +4,7 @@ title: Reading a saved game
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-SAVE-003, FND-SAVE-004, FND-PERSON-003]
+evidence: [FND-SAVE-003, FND-SAVE-006, FND-PERSON-003]
 conflicting: []
 split_with: []
 related: [RULE-RES-001, FMT-SAVE-001, FMT-SAVE-002, FMT-SAVE-003, FMT-SAVE-004, FMT-SAVE-005, FMT-SAVE-006, FMT-SAVE-007, FMT-TALK-008, FMT-PERSON-001]

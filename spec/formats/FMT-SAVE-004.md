@@ -9,7 +9,7 @@ byte_order: little
 size: 64
 text: false
 definition: fmt_save_004.ksy
-evidence: [FND-SAVE-004, FND-UI-004, FND-STRATEGY-001]
+evidence: [FND-SAVE-006, FND-UI-004, FND-STRATEGY-001]
 conflicting: []
 split_with: []
 related: [RULE-SAVE-002, RULE-SAVE-003]
@@ -22,10 +22,10 @@ the pointer is null.
 
 | Offset | Size | Type | Name | Meaning | Status | Evidence |
 |---|---|---|---|---|---|---|
-| `0x00` | 24 | `BYTE[24]` | `unk_00` | Purpose unknown. | supported | FND-SAVE-004 |
+| `0x00` | 24 | `BYTE[24]` | `unk_00` | Purpose unknown. | supported | FND-SAVE-006 |
 | `0x18` | 4 | `INT32LE` | `month` | The zero-based month `current_month` returns. | supported | FND-STRATEGY-001 |
 | `0x1C` | 4 | `INT32LE` | `day` | The calendar field `fn_00038678` returns. | supported | FND-UI-004 |
-| `0x20` | 32 | `BYTE[32]` | `unk_20` | Purpose unknown. | supported | FND-SAVE-004 |
+| `0x20` | 32 | `BYTE[32]` | `unk_20` | Purpose unknown. | supported | FND-SAVE-006 |
 | `0x40` | | | | Total size 64 | | |
 
 ## Enumerations and flags

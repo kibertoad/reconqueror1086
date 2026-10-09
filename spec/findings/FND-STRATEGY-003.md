@@ -13,13 +13,13 @@ locations:
     address: 0x0003C088..0x0003C28E
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000437CC..0x000437EB
+    address: 0x000437CC..0x000437EC
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000437EC..0x0004381D
+    address: 0x000437EC..0x0004381E
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00043868..0x0004389B
+    address: 0x00043868..0x0004389C
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -61,4 +61,6 @@ None known.
 
 ## How to reproduce
 
-Disassemble `0x0003C088..0x0003C28E`, `0x000437CC..0x000437EB`, `0x000437EC..0x0004381D`, `0x00043868..0x0004389B` in `CD:CONQUER.EXE`.
+Disassemble `0x0003C088..0x0003C28E`, `0x000437CC..0x000437EC`, `0x000437EC..0x0004381E`, `0x00043868..0x0004389C` in `CD:CONQUER.EXE`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

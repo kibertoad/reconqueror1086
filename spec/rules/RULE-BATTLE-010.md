@@ -4,7 +4,7 @@ title: Battle clock
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-BATTLE-009, FND-BATTLE-020]
+evidence: [FND-BATTLE-021, FND-BATTLE-020]
 conflicting: []
 split_with: []
 related: []

@@ -50,7 +50,7 @@ its complete directory and stored extents were independently checked
 [FND-RES-018]. This is another copy, not a new container-content variant.
 
 Each kind of entry the containers hold has a format entry, except
-`ffonta2.fnt` of C1086.GOB, which no code reads [FND-RES-061].
+`ffonta2.fnt` of C1086.GOB, which no code reads [FND-RES-068].
 
 ## Open questions
 

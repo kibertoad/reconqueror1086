@@ -10,7 +10,7 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0005B3B0..0x0005B551
+    address: 0x0005B3B0..0x0005B552
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0009D628
@@ -66,5 +66,7 @@ game's generator, so a game with sound on can draw a different sequence than one
 
 ## How to reproduce
 
-Disassemble `0x0005B3B0..0x0005B551` in `CD:CONQUER.EXE`; scan object 1 for calls to `0x0005B3B0`
+Disassemble `0x0005B3B0..0x0005B552` in `CD:CONQUER.EXE`; scan object 1 for calls to `0x0005B3B0`
 and match their offsets against the sample starts of each bank.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

@@ -1,5 +1,25 @@
 # Validation
 
+## Native coverage bodies and evidence boundaries (2026-10-09)
+
+The five native inventories and their provenance/region sidecars passed
+`node tools/Check-Coverage.mjs`. The six synthetic coverage conversion
+regressions passed, and the metadata boundary probe compiled and completed
+against the frozen LE snapshot without changing its digest. FND-RES-062 and
+FND-RES-063 record the metadata used for notation conversion; uncertain partial
+scopes were handled through whole-finding replacements, with citations moved
+and claim statuses retained. The uncapped range-end audit reported no remaining
+diagnostics. That result covers the checker's inventory-aware boundary checks,
+not the goal's wider value-range and listing audits.
+
+`tools/Check-Documentation.ps1 -Write` passed after index regeneration. The
+canonical gate passed with `-TestFilter
+'FullyQualifiedName~ResourceAndDefinitionTests' -MinimumExpectedTests 1`, including
+repository/configuration checks, documentation and Kaitai compilation, Node
+acceptance checks, the solution build, the selected xUnit tests and executable
+specifications. The local output is under ignored artifacts/coverage-migration.
+No original game ran and no proprietary bytes or analysis output were committed.
+
 ## Rules and library adoption verification (2026-10-09)
 
 `tools/Invoke-Validation.ps1 -TestFilter

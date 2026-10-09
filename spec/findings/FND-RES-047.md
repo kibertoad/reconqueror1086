@@ -16,43 +16,43 @@ locations:
     address: 1C17:1AC6..1C17:1C62
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1C17:1F1B..1C17:1F3A
+    address: 1C17:1F1B..1C17:1F3B
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1E1A:0073..1E1A:0133
+    address: 1E1A:0073..1E1A:0134
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 263F:004D..263F:01ED
+    address: 263F:004D..263F:01EE
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 2CBD:00B6..2CBD:0142
+    address: 2CBD:00B6..2CBD:0143
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 2CB5:0050..2CB5:0063
+    address: 2CB5:0050..2CB5:0064
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 2FA4:0005..2FA4:0025
+    address: 2FA4:0005..2FA4:0026
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 2FA4:0118..2FA4:0136
+    address: 2FA4:0118..2FA4:0137
   - build: BLD-GOG-EN
     file: CD:INST.EXE
     address: 1000:027A..1000:0290
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1000:02C2..1000:02D9
+    address: 1000:02C2..1000:02DA
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1000:043D..1000:0474
+    address: 1000:043D..1000:0475
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1000:0C53..1000:0C6A
+    address: 1000:0C53..1000:0C6B
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1000:1A62..1000:1A79
+    address: 1000:1A62..1000:1A7A
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1000:4113..1000:4149
+    address: 1000:4113..1000:414A
   - build: BLD-GOG-EN
     file: CD:INST.EXE
     address: 3583:0F33..3583:1016
@@ -213,8 +213,10 @@ A byte search of `INSTALL.HLP`, `LANGUAGE.INF`, `SIERRA.INF` and
 
 ## How to reproduce
 
-Unpack `CD:INST.EXE` as FND-RES-054 gives. Disassemble the ranges in
+Unpack `CD:INST.EXE` as FND-RES-066 gives. Disassemble the ranges in
 Locations as 16-bit code with the load image at segment 0x1000 and relocation
 targets marked, and read the strings at DS:003D, DS:0F33 to DS:1016, DS:115A
 to DS:1169 and DS:2BFB to DS:2C15. Search the CD-root text files named above
 for the four key strings. Keep listings in ignored local storage.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

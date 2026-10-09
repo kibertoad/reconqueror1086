@@ -13,7 +13,7 @@ locations:
     address: 0x00047914..0x00047A84
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000476C0..0x00047737
+    address: 0x000476C0..0x00047738
   - build: BLD-GOG-EN
     file: CD:CONQUER/DEFEND0.LOW
     offset: 0x00..0x47700
@@ -296,7 +296,7 @@ environment: null
 Routine `0x00047914`..`0x00047A84` builds map `i` of `count` maps. It computes the weight
 `(count - i) / count` and one minus that weight in floating point, and for each palette entry `c`
 blends each channel as `palette[c] * weight + palette[target] * (1 - weight)`, where `target` is
-the fade colour, adds 0.5 and truncates through `0x00063EC0`. Helper `0x000476C0`..`0x00047737`
+the fade colour, adds 0.5 and truncates through `0x00063EC0`. Helper `0x000476C0`..`0x00047738`
 then scans the 256 palette entries from 0, starting with index 1 and distance `0x2FD`, and
 replaces them only when an entry's sum of absolute channel differences is strictly smaller, so
 the lowest index wins a tie and index 1 is returned when no entry is nearer than `0x2FD`.
@@ -318,3 +318,5 @@ None known.
 
 Open `0x00047914`; the two nested loops over 256 entries hold the blend and the nearest-colour
 search. Run the procedure of RULE-VIEW-006 against `Pal0` to `Pal31` of any archive.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

@@ -9,7 +9,7 @@ byte_order: little
 size: 3200
 text: false
 definition: fmt_save_006.ksy
-evidence: [FND-SAVE-004, FND-ESTATE-002]
+evidence: [FND-SAVE-006, FND-ESTATE-002]
 conflicting: []
 split_with: []
 related: [RULE-SAVE-002, RULE-SAVE-003]
@@ -19,7 +19,7 @@ related: [RULE-SAVE-002, RULE-SAVE-003]
 
 | Offset | Size | Type | Name | Meaning | Status | Evidence |
 |---|---|---|---|---|---|---|
-| `0x000` | 3200 | `BYTE[640][5]` | `armies` | The five army records of `army_records`, whole. | supported | FND-SAVE-004, FND-ESTATE-002 |
+| `0x000` | 3200 | `BYTE[640][5]` | `armies` | The five army records of `army_records`, whole. | supported | FND-SAVE-006, FND-ESTATE-002 |
 | `0xC80` | | | | Total size 3200 | | |
 
 ## Enumerations and flags

@@ -16,7 +16,7 @@ locations:
     address: 0x0003B97C..0x0003B9F0
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00049ED0..0x0004A06C
+    address: 0x00049ED0..0x0004A06D
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -43,7 +43,7 @@ loads the pairs into a buffer at `+0x6C`, stores 0 in `+0x30`, `+0x10` and `+0x0
 
 ## Interpretation
 
-The three records are brigand forces. Slot 0 is the yearly brigand order (FND-STRATEGY-002) from a
+The three records are brigand forces. Slot 0 is the yearly brigand order (FND-STRATEGY-039) from a
 random property's own route pair; slots 1 and 2 are the fixed Scottish and Welsh raids from London.
 The descriptor's month and year are the date the order ends, and a slot runs one order at a time.
 
@@ -53,4 +53,6 @@ None known.
 
 ## How to reproduce
 
-Disassemble `0x0003B0E4..0x0003B29F`, `0x0003B97C..0x0003B9F0`, `0x00049ED0..0x0004A06C` in `CD:CONQUER.EXE`.
+Disassemble `0x0003B0E4..0x0003B29F`, `0x0003B97C..0x0003B9F0`, `0x00049ED0..0x0004A06D` in `CD:CONQUER.EXE`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

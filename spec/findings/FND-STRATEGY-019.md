@@ -1,9 +1,9 @@
 ---
 id: FND-STRATEGY-019
 title: The player pass at 0x00013168 moves each player record, then tests it against the hostile records and the dragon cells
-status: recorded
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
+superseded_by: [FND-STRATEGY-041]
 recorded_by: kibertoad
 reproduced_by: []
 method: static

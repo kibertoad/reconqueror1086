@@ -10,7 +10,7 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000408CC..0x00040AED
+    address: 0x000408CC..0x00040AEE
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -41,4 +41,6 @@ The ordinal table's contents were not read; the three words first, second and th
 
 ## How to reproduce
 
-Disassemble `0x000408CC` to `0x00040AED`.
+Disassemble `0x000408CC` to `0x00040AEE` (exclusive).
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

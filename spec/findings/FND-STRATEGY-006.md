@@ -16,7 +16,7 @@ locations:
     address: 0x0003A738..0x0003A760
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0003A6A0..0x0003A736
+    address: 0x0003A6A0..0x0003A737
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -51,4 +51,6 @@ None known.
 
 ## How to reproduce
 
-Disassemble `0x0003A764..0x0003A9B9`, `0x0003A738..0x0003A760`, `0x0003A6A0..0x0003A736` in `CD:CONQUER.EXE`.
+Disassemble `0x0003A764..0x0003A9B9`, `0x0003A738..0x0003A760`, `0x0003A6A0..0x0003A737` in `CD:CONQUER.EXE`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

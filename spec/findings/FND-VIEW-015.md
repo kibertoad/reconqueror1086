@@ -10,7 +10,7 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00043B8C..0x00043CD4
+    address: 0x00043B8C..0x00043CD5
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00046AF4
@@ -20,7 +20,7 @@ environment: null
 
 ## Observation
 
-Routine `0x00043B8C`..`0x00043CD4` returns at once when the backdrop image pointer is 0. It
+Routine `0x00043B8C`..`0x00043CD5` returns at once when the backdrop image pointer is 0. It
 takes a heading and a view horizon row as arguments. It sets the source column to
 `heading * scale`, subtracts the backdrop width once when that is above the width, and takes
 `first = min(width - column, view_width)`. It sets `shift = view_horizon - backdrop_horizon`;
@@ -48,3 +48,5 @@ and moves one image byte to one view byte.
 
 Open `0x00043B8C`; the multiply by the scale, the subtraction of the backdrop horizon from the
 argument and the two `rep movsd` copies per row are in the first 80 instructions.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

@@ -10,7 +10,7 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000445B4..0x000446AA
+    address: 0x000445B4..0x000446AB
 tool: Ghidra 12.1.3
 environment: null
 ---
@@ -48,3 +48,5 @@ None known.
 
 Open `0x000445C4`; the multiplication by `0x20` and the division appear in each branch. The
 callers at `0x0004F98D` and `0x0004FE76` negate the y difference before the call.
+
+Grouped whole-function exclusive bounds follow the extents recorded in FND-RES-063.

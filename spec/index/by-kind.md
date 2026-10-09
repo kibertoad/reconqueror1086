@@ -343,7 +343,7 @@ Entries by kind.
 
 ## findings
 
-280 entries.
+295 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -403,7 +403,7 @@ Entries by kind.
 | [FND-BATTLE-006](../findings/FND-BATTLE-006.md) | Formation code 3 splits the player's first category, and the foe is placed on a coin toss | recorded |
 | [FND-BATTLE-007](../findings/FND-BATTLE-007.md) | Category 0 is the halberdiers, 0x78 the swordsmen and 0xF0 the knights | recorded |
 | [FND-BATTLE-008](../findings/FND-BATTLE-008.md) | Each loop pass draws rectangles, dispatches input, and runs the unit pass every 200 clock units | recorded |
-| [FND-BATTLE-009](../findings/FND-BATTLE-009.md) | The battle clock counts at 250 Hz and its reader returns four times the count | recorded |
+| [FND-BATTLE-009](../findings/FND-BATTLE-009.md) | The battle clock counts at 250 Hz and its reader returns four times the count | superseded |
 | [FND-BATTLE-010](../findings/FND-BATTLE-010.md) | The rectangle hit test returns the first containing rectangle, counted from 1 | recorded |
 | [FND-BATTLE-011](../findings/FND-BATTLE-011.md) | The neighbour probe tests four corners and stops early after a dead first hit | recorded |
 | [FND-BATTLE-012](../findings/FND-BATTLE-012.md) | The unit pass completes deaths, probes contacts and deals damage by category | recorded |
@@ -411,10 +411,12 @@ Entries by kind.
 | [FND-BATTLE-014](../findings/FND-BATTLE-014.md) | State 0 acquires a target, walks to a destination, or picks the nearest foe | recorded |
 | [FND-BATTLE-015](../findings/FND-BATTLE-015.md) | The pointer dispatcher scrolls, shows hover status, and routes codes 2, 3, 6 and 7 | recorded |
 | [FND-BATTLE-016](../findings/FND-BATTLE-016.md) | The keyboard dispatcher selects by category, pauses, exits, and has two test switches | recorded |
-| [FND-BATTLE-017](../findings/FND-BATTLE-017.md) | The resolver counts survivors by category and returns 1 for a win | recorded |
+| [FND-BATTLE-017](../findings/FND-BATTLE-017.md) | The resolver counts survivors by category and returns 1 for a win | superseded |
 | [FND-BATTLE-018](../findings/FND-BATTLE-018.md) | The resolver reads WAR_MODE and loads BATTLE.PCX and MEN8.CSF | recorded |
 | [FND-BATTLE-019](../findings/FND-BATTLE-019.md) | The renderer sorts dead units first then by y and x, and picks frames by lane, category, heading and phase | recorded |
 | [FND-BATTLE-020](../findings/FND-BATTLE-020.md) | Pointer events are queued with a timer count and classified into eight codes | recorded |
+| [FND-BATTLE-021](../findings/FND-BATTLE-021.md) | The battle clock counts at 250 Hz and its reader returns four times the count | recorded |
+| [FND-BATTLE-022](../findings/FND-BATTLE-022.md) | The resolver counts survivors by category and returns 1 for a win | recorded |
 | [FND-CONFIG-001](../findings/FND-CONFIG-001.md) | Startup finds CONQUER.INI in four places and loads it into a list of keys and values | recorded |
 | [FND-CONFIG-002](../findings/FND-CONFIG-002.md) | Keys match case-sensitively, and a write rewrites every stored line of CONQUER.INI | recorded |
 | [FND-CONFIG-003](../findings/FND-CONFIG-003.md) | The other keys: CD_PATH at eleven sites, the view window size, SLOWMACHINE, USE_CYBERMAN, FULL_MOVIE, DELAYVGA and an unused GRAPHICS | recorded |
@@ -498,35 +500,43 @@ Entries by kind.
 | [FND-RES-038](../findings/FND-RES-038.md) | _SETUP.EXE runs the [Script] text line by line, matching 37 command names as prefixes, and ends silently at an unknown command | recorded |
 | [FND-RES-039](../findings/FND-RES-039.md) | _SETUP.EXE's FLAG runs the rest of its line when a numbered flag is set, and DISKSPACE_LT sets a flag when free kilobytes are below a value | recorded |
 | [FND-RES-040](../findings/FND-RES-040.md) | _SETUP.EXE's PICKDEST builds the destination from SierraDir and DirName, WRITE and APPEND write one line to a file, RUN ignores two words, and COPY takes no arguments | recorded |
-| [FND-RES-041](../findings/FND-RES-041.md) | CONFIG.EXE stops its script run at @FINISH and, just before exiting, reopens the script there to echo text and run commands up to @ENDFINISH | recorded |
+| [FND-RES-041](../findings/FND-RES-041.md) | CONFIG.EXE stops its script run at @FINISH and, just before exiting, reopens the script there to echo text and run commands up to @ENDFINISH | superseded |
 | [FND-RES-042](../findings/FND-RES-042.md) | CONFIG.EXE reads a word at the start of a line followed by a colon as a label, echoes @DISPLAY text to the screen, and stops at any other bare word | recorded |
 | [FND-RES-043](../findings/FND-RES-043.md) | CONFIG.EXE's @GetOutDrive, @GetSubdir and @GetOption echo their block text to the screen like @Display | recorded |
 | [FND-RES-044](../findings/FND-RES-044.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case | superseded |
 | [FND-RES-045](../findings/FND-RES-045.md) | INST.EXE takes the switches M, Z, F and D from its command line and loads install.scr whole before it reads RESOURCE.CFG | recorded |
 | [FND-RES-046](../findings/FND-RES-046.md) | INST.EXE runs install.scr line by line, with labels, goto, nine percent parameters, a table of named commands and any other line run as a program | superseded |
 | [FND-RES-047](../findings/FND-RES-047.md) | INSTALL.SCR's alert, space, pick, godir, exists, testdir and del commands in INST.EXE | recorded |
-| [FND-RES-048](../findings/FND-RES-048.md) | INSTALL.SCR's if command in INST.EXE tests errorlevel or exist, with an optional not, and resumes the raw line at the expanded command's offset | recorded |
+| [FND-RES-048](../findings/FND-RES-048.md) | INSTALL.SCR's if command in INST.EXE tests errorlevel or exist, with an optional not, and resumes the raw line at the expanded command's offset | superseded |
 | [FND-RES-049](../findings/FND-RES-049.md) | INSTALL.SCR's copy command in INST.EXE extracts from drivers.sip and sierra.sip beside the source, then copies matching files, with /q, /s and a + concatenation form | recorded |
 | [FND-RES-050](../findings/FND-RES-050.md) | INST.EXE runs INSTALL.SCR from vtable entry +0x5C after two installer checks, and one choice of the shipped script's menu misses its label | recorded |
 | [FND-RES-051](../findings/FND-RES-051.md) | INST.EXE runs an unknown INSTALL.SCR line through spawn with one argument string, then the command interpreter, with standard output redirected for > and >> | recorded |
 | [FND-RES-052](../findings/FND-RES-052.md) | INST.EXE's bytes behind INSTALL.SCR's %1 and %2 are the destination drive letter and the drive the installer started on | recorded |
 | [FND-RES-053](../findings/FND-RES-053.md) | INST.EXE loads every message and help text from install.txt, install.hlp and the other .txt and .hlp files into one keyed dictionary marked by double-backslash lines | recorded |
-| [FND-RES-054](../findings/FND-RES-054.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case | recorded |
+| [FND-RES-054](../findings/FND-RES-054.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case | superseded |
 | [FND-RES-055](../findings/FND-RES-055.md) | INST.EXE runs install.scr line by line, with labels, goto, nine percent parameters, a table of named commands and any other line run as a program | recorded |
 | [FND-RES-056](../findings/FND-RES-056.md) | INST.EXE looks up 78 fixed INSTALL.TXT keys, help and confirmation texts by file name with hlp and inf extensions, and stops with a fatal error on a missing key everywhere but two calls | recorded |
 | [FND-RES-057](../findings/FND-RES-057.md) | No Conqueror file outside the disc's DEMOS and INN directories names DEMOS or a demo, and only INN.BAT enters INN, to run that directory's own installer | recorded |
 | [FND-RES-058](../findings/FND-RES-058.md) | The disc's two readme files, EMPTY.TXT, VERSION.TXT and the VESA directory are documentation, a placeholder and a third-party driver that no Conqueror program reads | recorded |
-| [FND-RES-059](../findings/FND-RES-059.md) | An MVG entry holds the pointer shapes' hot spots; 0x00018850 loads it and the CSF of the same name | recorded |
+| [FND-RES-059](../findings/FND-RES-059.md) | An MVG entry holds the pointer shapes' hot spots; 0x00018850 loads it and the CSF of the same name | superseded |
 | [FND-RES-060](../findings/FND-RES-060.md) | FIEF0.DAT is a text file of six sections, each a column line and a line of integers, read when a new game sets up the home fief | recorded |
-| [FND-RES-061](../findings/FND-RES-061.md) | Every use of the name FFONTA2.FNT ends in a property call that stores nothing, so the game never reads the .FNT entry | recorded |
+| [FND-RES-061](../findings/FND-RES-061.md) | Every use of the name FFONTA2.FNT ends in a property call that stores nothing, so the game never reads the .FNT entry | superseded |
+| [FND-RES-062](../findings/FND-RES-062.md) | Verified analyzer body extents and a named return boundary used to convert location bounds | recorded |
+| [FND-RES-063](../findings/FND-RES-063.md) | Analyzer body extents for remaining legacy boundary reviews | recorded |
+| [FND-RES-064](../findings/FND-RES-064.md) | CONFIG.EXE stops its script run at @FINISH and, just before exiting, reopens the script there to echo text and run commands up to @ENDFINISH | recorded |
+| [FND-RES-065](../findings/FND-RES-065.md) | INSTALL.SCR's if command in INST.EXE tests errorlevel or exist, with an optional not, and resumes the raw line at the expanded command's offset | recorded |
+| [FND-RES-066](../findings/FND-RES-066.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case | recorded |
+| [FND-RES-067](../findings/FND-RES-067.md) | An MVG entry holds the pointer shapes' hot spots; 0x00018850 loads it and the CSF of the same name | recorded |
+| [FND-RES-068](../findings/FND-RES-068.md) | Every use of the name FFONTA2.FNT ends in a property call that stores nothing, so the game never reads the .FNT entry | recorded |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV | recorded |
 | [FND-SAVE-002](../findings/FND-SAVE-002.md) | A save writes ten temporary files and packs them with a title and version into one resource container | recorded |
 | [FND-SAVE-003](../findings/FND-SAVE-003.md) | A load checks VERSION 2.1, unpacks the entries and runs the component loaders; temp.jap must be present | recorded |
-| [FND-SAVE-004](../findings/FND-SAVE-004.md) | What the saved files hold: forces, properties, persons, items, conversation variables, fief 0, armies, calendar and tournament | recorded |
+| [FND-SAVE-004](../findings/FND-SAVE-004.md) | What the saved files hold: forces, properties, persons, items, conversation variables, fief 0, armies, calendar and tournament | superseded |
 | [FND-SAVE-005](../findings/FND-SAVE-005.md) | Startup writes default.dat from the pristine person and property tables, and a new game reads it back | recorded |
+| [FND-SAVE-006](../findings/FND-SAVE-006.md) | What the saved files hold: forces, properties, persons, items, conversation variables, fief 0, armies, calendar and tournament | recorded |
 | [FND-SOUND-001](../findings/FND-SOUND-001.md) | The release holds 26 .666 sound banks with 102 unsigned 8-bit samples at 11,025, 11,050 and 22,050 Hz | recorded |
 | [FND-SOUND-002](../findings/FND-SOUND-002.md) | Sound banks load through 0x0005B584, only when SOUND_EFFECTS is on, from the open archive by index | recorded |
 | [FND-SOUND-003](../findings/FND-SOUND-003.md) | Samples play through 0x0005B3B0 on ten voices, with rate factors for 11,025, 22,050 and 44,100 Hz only | recorded |
@@ -534,7 +544,7 @@ Entries by kind.
 | [FND-SOUND-005](../findings/FND-SOUND-005.md) | MIDI music plays one HMP song at a time through 0x0005B0D4; the release holds 12 songs | recorded |
 | [FND-SOUND-006](../findings/FND-SOUND-006.md) | CD music plays tracks 2 to 6 of the disc through MSCDEX requests and loops by replaying the range | recorded |
 | [FND-STRATEGY-001](../findings/FND-STRATEGY-001.md) | The strategic pass at 0x0003C290 runs brigands, the spy, the player forces and then the hostile pass | recorded |
-| [FND-STRATEGY-002](../findings/FND-STRATEGY-002.md) | Routine 0x0003B9F4 issues a brigand order or an order from the king | recorded |
+| [FND-STRATEGY-002](../findings/FND-STRATEGY-002.md) | Routine 0x0003B9F4 issues a brigand order or an order from the king | superseded |
 | [FND-STRATEGY-003](../findings/FND-STRATEGY-003.md) | The hostile pass at 0x0003C088 generates first, then moves slots 0 to 4 and resolves each arrival | recorded |
 | [FND-STRATEGY-004](../findings/FND-STRATEGY-004.md) | The hostile generator 0x0003BE58 tries a reactive pursuit, then a timed movement every 5,000 speed units | recorded |
 | [FND-STRATEGY-005](../findings/FND-STRATEGY-005.md) | The reactive finder 0x0003BB4C scans properties, then player forces, and marks alerted and approached properties | recorded |
@@ -547,11 +557,11 @@ Entries by kind.
 | [FND-STRATEGY-012](../findings/FND-STRATEGY-012.md) | The retargeter 0x0003A9BC sends an arrived force at the first player force within 300 units, else home or at the player | recorded |
 | [FND-STRATEGY-013](../findings/FND-STRATEGY-013.md) | Terrain speed comes from a tile-kind table and four profile pointers, scaled by a speed from 1 to 15 | recorded |
 | [FND-STRATEGY-014](../findings/FND-STRATEGY-014.md) | The month selects one of four terrain profiles through the table at 0x0009B720 | recorded |
-| [FND-STRATEGY-015](../findings/FND-STRATEGY-015.md) | The property and person tables hold 14 records of 15 bytes and 176 records of 18 bytes | recorded |
+| [FND-STRATEGY-015](../findings/FND-STRATEGY-015.md) | The property and person tables hold 14 records of 15 bytes and 176 records of 18 bytes | superseded |
 | [FND-STRATEGY-016](../findings/FND-STRATEGY-016.md) | The route resources are a count followed by that many pairs of signed dwords | recorded |
 | [FND-STRATEGY-017](../findings/FND-STRATEGY-017.md) | The strategic terrain is resource 292, icon.jp, a 200 by 400 grid of dwords | recorded |
 | [FND-STRATEGY-018](../findings/FND-STRATEGY-018.md) | A route point maps to a grid cell through staggered diamonds, scanned in camera order, whose lower half is one line taller | recorded |
-| [FND-STRATEGY-019](../findings/FND-STRATEGY-019.md) | The player pass at 0x00013168 moves each player record, then tests it against the hostile records and the dragon cells | recorded |
+| [FND-STRATEGY-019](../findings/FND-STRATEGY-019.md) | The player pass at 0x00013168 moves each player record, then tests it against the hostile records and the dragon cells | superseded |
 | [FND-STRATEGY-020](../findings/FND-STRATEGY-020.md) | Routine 0x00011554 moves one player record along its route or toward its target | recorded |
 | [FND-STRATEGY-021](../findings/FND-STRATEGY-021.md) | The encounter routine 0x00039428 fights a player army against a hostile force and settles the result | recorded |
 | [FND-STRATEGY-022](../findings/FND-STRATEGY-022.md) | The staging routine 0x00035924 trims both sides to 60 and hands six counters to the battle | recorded |
@@ -565,12 +575,16 @@ Entries by kind.
 | [FND-STRATEGY-030](../findings/FND-STRATEGY-030.md) | The hostile markers use a frame from a per-property table and brigands frame 3 | recorded |
 | [FND-STRATEGY-031](../findings/FND-STRATEGY-031.md) | The route preview at 0x00011CC0 dots the selected record's route with marker frames | recorded |
 | [FND-STRATEGY-032](../findings/FND-STRATEGY-032.md) | Routine 0x0003B0E4 with a descriptor creates a brigand force on one of three route families | recorded |
-| [FND-STRATEGY-033](../findings/FND-STRATEGY-033.md) | The brigand pass fights player armies on contact, rewards or punishes, and ends orders by date | recorded |
+| [FND-STRATEGY-033](../findings/FND-STRATEGY-033.md) | The brigand pass fights player armies on contact, rewards or punishes, and ends orders by date | superseded |
 | [FND-STRATEGY-034](../findings/FND-STRATEGY-034.md) | The brigand step 0x0004A61C loops its route and has no terrain or step-size stop | recorded |
 | [FND-STRATEGY-035](../findings/FND-STRATEGY-035.md) | A spy costs 80, only one is out at a time, and its report lists every active hostile force | recorded |
 | [FND-STRATEGY-036](../findings/FND-STRATEGY-036.md) | The strategic action hook 0x00021EEC turns conversation variables into map events | recorded |
 | [FND-STRATEGY-037](../findings/FND-STRATEGY-037.md) | Two conversation groups set variables 43 and 93 when the player accepts a raid | recorded |
 | [FND-STRATEGY-038](../findings/FND-STRATEGY-038.md) | The spy report names +0x1C the halberdiers and shows one converted number three times | recorded |
+| [FND-STRATEGY-039](../findings/FND-STRATEGY-039.md) | Routine 0x0003B9F4 issues a brigand order or an order from the king | recorded |
+| [FND-STRATEGY-040](../findings/FND-STRATEGY-040.md) | The property and person tables hold 14 records of 15 bytes and 176 records of 18 bytes | recorded |
+| [FND-STRATEGY-041](../findings/FND-STRATEGY-041.md) | The player pass at 0x00013168 moves each player record, then tests it against the hostile records and the dragon cells | recorded |
+| [FND-STRATEGY-042](../findings/FND-STRATEGY-042.md) | The brigand pass fights player armies on contact, rewards or punishes, and ends orders by date | recorded |
 | [FND-TALK-001](../findings/FND-TALK-001.md) | Conversation nodes are read by length from the .CBF file through a sorted .CIF index | recorded |
 | [FND-TALK-002](../findings/FND-TALK-002.md) | The conversation loop runs node actions, then the chosen response actions, then follows a redirect | recorded |
 | [FND-TALK-003](../findings/FND-TALK-003.md) | The prompt variant is drawn after reseeding the generator from the clock | recorded |
@@ -584,12 +598,13 @@ Entries by kind.
 | [FND-TALK-011](../findings/FND-TALK-011.md) | What the decoded conversations show about the inn, the priests, the lair variable, the lady variable and item gifts | recorded |
 | [FND-TOURNEY-001](../findings/FND-TOURNEY-001.md) | Each month the game picks a tournament site different from the last one | recorded |
 | [FND-TOURNEY-002](../findings/FND-TOURNEY-002.md) | The tournament tent picks five distinct opponents from rows 1 to 14, never row 8 | recorded |
-| [FND-TOURNEY-003](../findings/FND-TOURNEY-003.md) | The tent allows three jousts and one melee between clears of its counts, and rewards wins through 0x0009DC40 | recorded |
+| [FND-TOURNEY-003](../findings/FND-TOURNEY-003.md) | The tent allows three jousts and one melee between clears of its counts, and rewards wins through 0x0009DC40 | superseded |
 | [FND-TOURNEY-004](../findings/FND-TOURNEY-004.md) | The joust wager is 1 + a scaled draw of 30 + the opponent's lance experience, capped at the player's wealth | recorded |
 | [FND-TOURNEY-005](../findings/FND-TOURNEY-005.md) | The melee sets its wager from the average sword experience and settles it in wealth and the tallies | recorded |
 | [FND-TOURNEY-006](../findings/FND-TOURNEY-006.md) | The melee scene name repeats the site digit because both digits share one buffer | recorded |
 | [FND-TOURNEY-007](../findings/FND-TOURNEY-007.md) | The practice melee loads MELEE0 to MELEE2 with a draw of 0 to 2 | recorded |
 | [FND-TOURNEY-008](../findings/FND-TOURNEY-008.md) | Strings for the tournament refusals and the joust opponents' portraits | recorded |
+| [FND-TOURNEY-009](../findings/FND-TOURNEY-009.md) | The tent allows three jousts and one melee between clears of its counts, and rewards wins through 0x0009DC40 | recorded |
 | [FND-UI-001](../findings/FND-UI-001.md) | Startup registers 25 screens, each a HAT file and a setup routine | recorded |
 | [FND-UI-002](../findings/FND-UI-002.md) | The HAT loader reads a 40-byte header and 24-byte region records, taking the region count from the file size | recorded |
 | [FND-UI-003](../findings/FND-UI-003.md) | The setup routines bind four callback slots per region and name the screens a click switches to | recorded |

@@ -10,22 +10,22 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00059FA0..0x0005A17F
+    address: 0x00059FA0..0x0005A180
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0005A2A4..0x0005A413
+    address: 0x0005A2A4..0x0005A414
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00059D70..0x00059E75
+    address: 0x00059D70..0x00059E76
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00059C4C..0x00059C6D
+    address: 0x00059C4C..0x00059C6E
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00059C70..0x00059CDA
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00059D34..0x00059D4C
+    address: 0x00059D34..0x00059D4D
   - build: BLD-GOG-EN
     file: C1086.GOB
     offset: 0x00..0x21B93B2
@@ -74,3 +74,5 @@ What reads the region id and the enabled dword was not traced.
 
 Disassemble the listed ranges; decode the HAT entries of `C1086.GOB` and compare their sizes with the
 dword at `0x14`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

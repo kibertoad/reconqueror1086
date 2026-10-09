@@ -10,37 +10,37 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1C17:01AE..1C17:0400
+    address: 1C17:01AE..1C17:0401
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1C17:0401..1C17:0503
+    address: 1C17:0401..1C17:0504
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1C17:0504..1C17:0744
+    address: 1C17:0504..1C17:0745
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1C17:0745..1C17:0817
+    address: 1C17:0745..1C17:0818
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1C17:0818..1C17:0927
+    address: 1C17:0818..1C17:0928
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1C17:0928..1C17:0B34
+    address: 1C17:0928..1C17:0B35
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1C17:0B35..1C17:0CA1
+    address: 1C17:0B35..1C17:0CA2
   - build: BLD-GOG-EN
     file: CD:INST.EXE
     address: 1C17:1C09..1C17:1C16
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1000:6295..1000:62D1
+    address: 1000:6295..1000:62D2
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1000:632B..1000:636F
+    address: 1000:632B..1000:6370
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1000:63F7..1000:6415
+    address: 1000:63F7..1000:6416
   - build: BLD-GOG-EN
     file: CD:INST.EXE
     address: 3583:0CAE..3583:0D75
@@ -54,7 +54,7 @@ environment: null
 ## Observation
 
 The unpacked file, its notation, the object at DS:55D8 and the script buffer
-are as FND-RES-054 and FND-RES-045 give them: the whole of `install.scr` is
+are as FND-RES-066 and FND-RES-045 give them: the whole of `install.scr` is
 at the far pointer DS:534A, its length in DS:534E, with a 0 stored at the
 byte after the last one read. Vtable entry +0x30 of the object is 1C17:01AE.
 
@@ -63,7 +63,7 @@ byte equal to its character argument, testing equality before the end, or
 null at the first NUL; 1000:63F7 returns the length up to the first NUL, and
 0 for a null pointer; 1000:632B counts the leading bytes of its first string
 that are not in its second. 1000:63B6 compares without case and 1000:643A
-compares a given number of bytes keeping case, as FND-RES-054 gives;
+compares a given number of bytes keeping case, as FND-RES-066 gives;
 1000:62D2 compares two strings keeping case.
 
 Run loop, 1C17:01AE (this):
@@ -254,10 +254,14 @@ The shipped script reaches neither 0x1A line along straight-line flow, since
 
 ## How to reproduce
 
-Unpack `CD:INST.EXE` as FND-RES-054 gives. Disassemble the ranges in
+Unpack `CD:INST.EXE` as FND-RES-066 gives. Disassemble the ranges in
 Locations as 16-bit code with the load image at segment 0x1000 and relocation
 targets marked. Read the 10-byte entries from DS:0CAE to the null name and the
 strings from DS:0E2A to DS:0F32. Search the load image for the byte pairs
 0xAA 0x0C and 0xAC 0x0C and decode each hit. Split the shipped `INSTALL.SCR`
 at CR LF and count the lowercased first words. Keep listings in ignored local
 storage.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.
+
+Grouped whole-function exclusive bounds follow the extents recorded in FND-RES-063.

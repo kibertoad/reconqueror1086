@@ -10,16 +10,16 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 2DDA:000A..2DDA:02A7
+    address: 2DDA:000A..2DDA:02A8
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1C17:1EA8..1C17:1F1A
+    address: 1C17:1EA8..1C17:1F1B
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1C17:1F7F..1C17:202F
+    address: 1C17:1F7F..1C17:2030
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 2FBD:0009..2FBD:013E
+    address: 2FBD:0009..2FBD:013F
   - build: BLD-GOG-EN
     file: CD:INST.EXE
     address: 3583:11EE..3583:120D
@@ -100,7 +100,7 @@ first word, up to a `/`, space, tab or LF, is the program, and the rest is
 passed as one argument string, as a DOS command tail. When the program
 cannot be started that way, the whole line, without its redirection, goes to
 the command interpreter, which handles built-in commands and batch files.
-`errorlevel` (FND-RES-048) then sees the spawned program's exit code, and
+`errorlevel` (FND-RES-065) then sees the spawned program's exit code, and
 -1 after the command interpreter path, whose result is not kept. With `>`
 the file is deleted and created anew; with `>>` it is opened for appending
 and the open fails when the file does not exist, unlike `echo`'s `>>`
@@ -125,7 +125,11 @@ values.
 
 ## How to reproduce
 
-Unpack `CD:INST.EXE` as FND-RES-054 gives. Read the far pointers at DS:11EE,
+Unpack `CD:INST.EXE` as FND-RES-066 gives. Read the far pointers at DS:11EE,
 DS:11F6 and DS:1202 and the strings at DS:3A7E to DS:3A89. Disassemble the
 ranges in Locations as 16-bit code with the load image at segment 0x1000 and
 relocation targets marked. Keep listings in ignored local storage.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.
+
+Grouped whole-function exclusive bounds follow the extents recorded in FND-RES-063.

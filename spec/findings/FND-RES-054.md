@@ -1,9 +1,9 @@
 ---
 id: FND-RES-054
 title: INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case
-status: recorded
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
+superseded_by: [FND-RES-066]
 recorded_by: kibertoad
 reproduced_by: []
 method: static
@@ -13,31 +13,31 @@ locations:
     address: 1000:0138..1000:0151
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 20F3:2D61..20F3:2DA5
+    address: 20F3:2D61..20F3:2DA6
   - build: BLD-GOG-EN
     file: CD:INST.EXE
     address: 2487:000D..2487:015E
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 20F3:000E..20F3:01B3
+    address: 20F3:000E..20F3:01B4
   - build: BLD-GOG-EN
     file: CD:INST.EXE
     address: 20F3:029C..20F3:03D9
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 20F3:1093..20F3:1733
+    address: 20F3:1093..20F3:1734
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 27C0:01BB..27C0:0316
+    address: 27C0:01BB..27C0:0317
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 27C0:0510..27C0:0533
+    address: 27C0:0510..27C0:0534
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 2FD0:0492..2FD0:0593
+    address: 2FD0:0492..2FD0:0594
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 1000:63B6..1000:6471
+    address: 1000:63B6..1000:6472
   - build: BLD-GOG-EN
     file: CD:INST.EXE
     address: 3583:1846..3583:18C1
@@ -189,3 +189,7 @@ the far pointer at DS:1A04, the startup table from DS:5224 to DS:5272, and
 the strings at DS:14BD, DS:14D5, DS:14E8, DS:15CE to DS:1636, DS:2E4C and
 DS:2E71. Search the load image for the byte pairs 0xDA 0x01 and 0x04 0x1A and
 decode each hit. Keep listings in ignored local storage.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.
+
+Grouped whole-function exclusive bounds follow the extents recorded in FND-RES-063.

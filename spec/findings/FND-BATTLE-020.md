@@ -19,7 +19,7 @@ locations:
     address: 0x00084887..0x000848A5
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00063098..0x00063101
+    address: 0x00063098..0x00063102
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00063114..0x0006325E
@@ -66,4 +66,6 @@ None known.
 
 ## How to reproduce
 
-Disassemble `0x0008497C..0x00084A4B`, `0x00084A4C`, `0x00084887..0x000848A5`, `0x00063098..0x00063101`, `0x00063114..0x0006325E`, `0x0006306C`, `0x00069BDD..0x00069C03`, `0x00072329..0x00072332`, `0x0008492C..0x00084935`.
+Disassemble `0x0008497C..0x00084A4B`, `0x00084A4C`, `0x00084887..0x000848A5`, `0x00063098..0x00063102`, `0x00063114..0x0006325E`, `0x0006306C`, `0x00069BDD..0x00069C03`, `0x00072329..0x00072332`, `0x0008492C..0x00084935`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

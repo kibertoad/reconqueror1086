@@ -1,9 +1,9 @@
 ---
 id: FND-BATTLE-009
 title: The battle clock counts at 250 Hz and its reader returns four times the count
-status: recorded
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
+superseded_by: [FND-BATTLE-021]
 recorded_by: kibertoad
 reproduced_by: []
 method: static

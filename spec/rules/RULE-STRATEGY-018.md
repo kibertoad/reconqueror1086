@@ -4,7 +4,7 @@ title: Spies
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-STRATEGY-003, FND-STRATEGY-015, FND-STRATEGY-035, FND-STRATEGY-038, FND-ESTATE-002]
+evidence: [FND-STRATEGY-003, FND-STRATEGY-040, FND-STRATEGY-035, FND-STRATEGY-038, FND-ESTATE-002]
 conflicting: []
 split_with: []
 related: [RULE-PERSON-001, RULE-ESTATE-001]

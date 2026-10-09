@@ -1,9 +1,9 @@
 ---
 id: FND-SAVE-004
 title: What the saved files hold: forces, properties, persons, items, conversation variables, fief 0, armies, calendar and tournament
-status: recorded
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
+superseded_by: [FND-SAVE-006]
 recorded_by: kibertoad
 reproduced_by: []
 method: static

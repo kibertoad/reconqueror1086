@@ -10,16 +10,16 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00022564..0x0002258D
+    address: 0x00022564..0x0002258E
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00062610..0x0006280F
+    address: 0x00062610..0x00062810
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00062828..0x00062891
+    address: 0x00062828..0x00062892
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000628AC..0x00062915
+    address: 0x000628AC..0x00062916
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -47,3 +47,5 @@ None known.
 ## How to reproduce
 
 Run `tools/Conqueror.Inspect` against the installation with `--disassemble=ADDR --executable-only` for each address listed, and read the report.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

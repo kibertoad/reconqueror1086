@@ -9,7 +9,7 @@ byte_order: little
 size: 280
 text: false
 definition: fmt_strategy_001.ksy
-evidence: [FND-STRATEGY-003, FND-STRATEGY-006, FND-STRATEGY-007, FND-STRATEGY-008, FND-STRATEGY-009, FND-STRATEGY-010, FND-STRATEGY-011, FND-STRATEGY-019, FND-STRATEGY-020, FND-STRATEGY-021, FND-STRATEGY-023, FND-STRATEGY-024, FND-STRATEGY-025, FND-STRATEGY-026, FND-STRATEGY-029, FND-STRATEGY-030, FND-STRATEGY-032, FND-STRATEGY-033, FND-STRATEGY-034, FND-STRATEGY-038]
+evidence: [FND-STRATEGY-003, FND-STRATEGY-006, FND-STRATEGY-007, FND-STRATEGY-008, FND-STRATEGY-009, FND-STRATEGY-010, FND-STRATEGY-011, FND-STRATEGY-041, FND-STRATEGY-020, FND-STRATEGY-021, FND-STRATEGY-023, FND-STRATEGY-024, FND-STRATEGY-025, FND-STRATEGY-026, FND-STRATEGY-029, FND-STRATEGY-030, FND-STRATEGY-032, FND-STRATEGY-042, FND-STRATEGY-034, FND-STRATEGY-038]
 conflicting: []
 split_with: []
 related: []
@@ -23,7 +23,7 @@ A structure the game keeps only in memory, in three lists: the six `player_force
 | Offset | Size | Type | Name | Meaning | Status | Evidence |
 |---|---|---|---|---|---|---|
 | `0x00` | 4 | `INT32LE` | `active` | 1 while the force is on the map. | supported | FND-STRATEGY-003, FND-STRATEGY-020 |
-| `0x04` | 4 | `INT32LE` | `selected` | 1 for the selected player record. | supported | FND-STRATEGY-019, FND-STRATEGY-026 |
+| `0x04` | 4 | `INT32LE` | `selected` | 1 for the selected player record. | supported | FND-STRATEGY-041, FND-STRATEGY-026 |
 | `0x08` | 4 | `INT32LE` | `unk_08` | Purpose unknown; placing and removing a field army clear it. | supported | FND-STRATEGY-025 |
 | `0x0C` | 4 | `INT32LE` | `complete` | 1 when the force has no route left to follow. | supported | FND-STRATEGY-011, FND-STRATEGY-020 |
 | `0x10` | 4 | `INT32LE` | `reversed` | 1 when the route file was loaded in reverse order. | supported | FND-STRATEGY-007 |
@@ -42,7 +42,7 @@ A structure the game keeps only in memory, in three lists: the six `player_force
 | `0x44` | 4 | `INT32LE` | `cell_row` | Row of the terrain cell the force is on. | supported | FND-STRATEGY-003, FND-STRATEGY-009 |
 | `0x48` | 4 | `INT32LE` | `cell_col` | Column of that cell. | supported | FND-STRATEGY-003, FND-STRATEGY-009 |
 | `0x4C` | 8 | `BYTE[8]` | `unk_4C` | Purpose unknown. | supported | FND-STRATEGY-020 |
-| `0x54` | 4 | `INT32LE` | `cooldown` | Passes before a player record can fight or be warned again. | supported | FND-STRATEGY-019, FND-STRATEGY-021 |
+| `0x54` | 4 | `INT32LE` | `cooldown` | Passes before a player record can fight or be warned again. | supported | FND-STRATEGY-041, FND-STRATEGY-021 |
 | `0x58` | 4 | `INT32LE` | `terrain_kind` | Kind of the cell a player record last moved onto. | supported | FND-STRATEGY-020 |
 | `0x5C` | 4 | `FLOAT32LE` | `x` | Position x in route units. | supported | FND-STRATEGY-009, FND-STRATEGY-020 |
 | `0x60` | 4 | `FLOAT32LE` | `y` | Position y in route units. | supported | FND-STRATEGY-009, FND-STRATEGY-020 |

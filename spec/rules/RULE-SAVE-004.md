@@ -4,7 +4,7 @@ title: Starting values for a new game, default.dat
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-SAVE-005, FND-STRATEGY-008, FND-STRATEGY-015, FND-PERSON-007]
+evidence: [FND-SAVE-005, FND-STRATEGY-008, FND-STRATEGY-040, FND-PERSON-007]
 conflicting: []
 split_with: []
 related: [FMT-SAVE-008, RULE-TALK-001]

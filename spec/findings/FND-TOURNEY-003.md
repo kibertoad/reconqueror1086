@@ -1,9 +1,9 @@
 ---
 id: FND-TOURNEY-003
 title: The tent allows three jousts and one melee between clears of its counts, and rewards wins through 0x0009DC40
-status: recorded
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
+superseded_by: [FND-TOURNEY-009]
 recorded_by: kibertoad
 reproduced_by: []
 method: static

@@ -16,13 +16,13 @@ locations:
     address: 2D43:0003..2D43:05C3
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 2FEA:04FD..2FEA:059F
+    address: 2FEA:04FD..2FEA:05A0
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 1000:52C4..1000:5432
+    address: 1000:52C4..1000:5433
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 1000:5433..1000:5481
+    address: 1000:5433..1000:5482
 tool: capstone 5.0.7 bounded 16-bit disassembly with relocation targets marked
 environment: null
 ---
@@ -115,3 +115,5 @@ Disassemble `CD:CONFIG.EXE` as 16-bit code with the load image at segment
 0x1000 and relocation targets marked, at the ranges in Locations and at
 2D43:0282 to 2D43:0486; read the strings at DS:5181 to DS:52BE, DS:5352,
 DS:15DF and DS:1628. Keep listings in ignored local storage.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

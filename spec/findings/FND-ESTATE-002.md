@@ -43,7 +43,7 @@ locations:
     address: 0x00037300..0x0003735E
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00029E58..0x00029F85
+    address: 0x00029E58..0x00029F86
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00011280..0x0001133A
@@ -150,6 +150,8 @@ lists the kinds in agree with it.
 
 ## How to reproduce
 
-Disassemble `0x00035C60` and follow each routine it registers, and `0x00029E58` to `0x00029F85`,
+Disassemble `0x00035C60` and follow each routine it registers, and `0x00029E58` to `0x00029F86` (exclusive),
 `0x00037300` to `0x0003735E` and `0x00011280` to `0x0001133A`. Read the strings at the object-2
 offsets named above.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

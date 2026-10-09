@@ -13,7 +13,7 @@ locations:
     address: 0x00019A8C..0x00019B0E
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00043100..0x0004310B
+    address: 0x00043100..0x0004310C
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -36,3 +36,5 @@ None known.
 ## How to reproduce
 
 Disassemble `0x00019A8C` to `0x00019B0E` and `0x00043100`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

@@ -10,7 +10,7 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00050524..0x00050578
+    address: 0x00050524..0x00050579
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0004F49C
@@ -20,7 +20,7 @@ environment: null
 
 ## Observation
 
-Thinker `0x00050524`..`0x00050578` computes `(record_count - 10) >> 4`, where `record_count`
+Thinker `0x00050524`..`0x00050579` computes `(record_count - 10) >> 4`, where `record_count`
 counts the combatant records including the ten templates, and visits that many records starting
 at the index stored at `0x0009D5C4` (object 2 offset `0xD5C4`). It passes each live record to
 state routine `0x0004F49C`, advances the index, wraps it past the last record, and stores it
@@ -46,3 +46,5 @@ None known.
 
 Open `0x00050524`; the shift by 4 and the store back to `0x0009D5C4` bracket the loop. Follow
 its call to `0x0004F49C`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

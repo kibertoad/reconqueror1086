@@ -1,9 +1,9 @@
 ---
 id: FND-STRATEGY-002
 title: Routine 0x0003B9F4 issues a brigand order or an order from the king
-status: recorded
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
+superseded_by: [FND-STRATEGY-039]
 recorded_by: kibertoad
 reproduced_by: []
 method: static

@@ -1,9 +1,9 @@
 ---
 id: FND-BATTLE-017
 title: The resolver counts survivors by category and returns 1 for a win
-status: recorded
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
+superseded_by: [FND-BATTLE-022]
 recorded_by: kibertoad
 reproduced_by: []
 method: static

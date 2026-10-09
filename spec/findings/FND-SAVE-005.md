@@ -13,7 +13,7 @@ locations:
     address: 0x00042E4C..0x00042F35
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00042F64..0x00043000
+    address: 0x00042F64..0x00043001
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0002A74C..0x0002A751
@@ -59,3 +59,5 @@ Whether anything else writes `default.dat` was not searched beyond the two direc
 
 Disassemble the listed ranges; the strings are at object-2 offsets `0x71DC` to `0x7204` and
 `0x3A84` to `0x3AB4`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

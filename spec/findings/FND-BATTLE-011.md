@@ -10,7 +10,7 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00028408..0x000289C9
+    address: 0x00028408..0x000289CA
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -35,4 +35,6 @@ None known.
 
 ## How to reproduce
 
-Disassemble `0x00028408..0x000289C9`.
+Disassemble `0x00028408..0x000289CA`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

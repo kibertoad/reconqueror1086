@@ -10,7 +10,7 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0004C7F4..0x0004C8FC
+    address: 0x0004C7F4..0x0004C8FD
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x000530D0..0x00053D5F
@@ -55,3 +55,5 @@ None known.
 Open `0x000530D0`. The subtraction and strict comparison at `0x0005310D`, the three-part test
 before the call to `0x0004F070` at `0x00053365`, and the store of -1 before the call to
 `0x0004F49C` at `0x00053D47` are in that order.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

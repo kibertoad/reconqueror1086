@@ -22,10 +22,10 @@ locations:
     address: 220F:000E..220F:0103
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 2E86:0418..2E86:04DD
+    address: 2E86:0418..2E86:04DE
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 2E86:086C..2E86:0A5F
+    address: 2E86:086C..2E86:0A60
   - build: BLD-GOG-EN
     file: CD:INSTALL.DAT
     offset: 0x3A8..0x3F4
@@ -134,3 +134,5 @@ primary volume descriptor, reading each file whole, and search each file,
 each expanded SETUP.SOL member and the unpacked INST.EXE for the three names
 in 8-bit and UTF-16LE text, ignoring case; report offsets only. Keep
 listings in ignored local storage.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

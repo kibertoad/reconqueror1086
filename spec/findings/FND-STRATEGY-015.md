@@ -1,9 +1,9 @@
 ---
 id: FND-STRATEGY-015
 title: The property and person tables hold 14 records of 15 bytes and 176 records of 18 bytes
-status: recorded
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
+superseded_by: [FND-STRATEGY-040]
 recorded_by: kibertoad
 reproduced_by: []
 method: static
@@ -25,10 +25,10 @@ locations:
     address: 0x00043164..0x000431CF
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000431D0..0x00043247
+    address: 0x000431D0..0x00043248
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000435E8..0x000436DF
+    address: 0x000435E8..0x000436E0
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x000436E0..0x00043940
@@ -70,4 +70,8 @@ None known.
 
 ## How to reproduce
 
-Disassemble `0x0009B8EC`, `0x0009BA50`, `0x00042E4C..0x00043000`, `0x00043004..0x00043047`, `0x00043164..0x000431CF`, `0x000431D0..0x00043247`, `0x000435E8..0x000436DF`, `0x000436E0..0x00043940` in `CD:CONQUER.EXE`.
+Disassemble `0x0009B8EC`, `0x0009BA50`, `0x00042E4C..0x00043000`, `0x00043004..0x00043047`, `0x00043164..0x000431CF`, `0x000431D0..0x00043248`, `0x000435E8..0x000436E0`, `0x000436E0..0x00043940` in `CD:CONQUER.EXE`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.
+
+Grouped whole-function exclusive bounds follow the extents recorded in FND-RES-063.

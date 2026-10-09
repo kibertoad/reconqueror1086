@@ -41,7 +41,7 @@ This is the order of one pass of the strategic map. `0x0003B0E4` with a null arg
 brigand forces, `0x00038C84` is the spy report, `0x00013168` the player forces and `0x0003C088` the
 hostile forces. `0x0009AEF8` is a busy flag that holds back only the hostile pass, and `0x0009ADC0`
 is set when a battle has ended the campaign's current map session. `0x0003866C` returns the
-zero-based month and `0x00038684` the year (FND-STRATEGY-002). The last two blocks issue a yearly
+zero-based month and `0x00038684` the year (FND-STRATEGY-039). The last two blocks issue a yearly
 brigand order and a yearly order from the king.
 
 ## Alternatives

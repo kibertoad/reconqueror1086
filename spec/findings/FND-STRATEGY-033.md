@@ -1,9 +1,9 @@
 ---
 id: FND-STRATEGY-033
 title: The brigand pass fights player armies on contact, rewards or punishes, and ends orders by date
-status: recorded
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
+superseded_by: [FND-STRATEGY-042]
 recorded_by: kibertoad
 reproduced_by: []
 method: static

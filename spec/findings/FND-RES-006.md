@@ -16,7 +16,7 @@ locations:
     address: 0x0002A3D6..0x0002A409
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00062EA0..0x00062ECE
+    address: 0x00062EA0..0x00062ECF
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00024DB8..0x00024E49
@@ -85,3 +85,5 @@ reads the `.RES` file, but no run confirmed it.
 
 Disassemble the listed ranges and find the references to `0x000A9CF0`, `0x000A9D40`, `0x000A9D90`
 and `0x0009CB7C`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

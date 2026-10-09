@@ -10,22 +10,22 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0007CEB0..0x0007CF13
+    address: 0x0007CEB0..0x0007CF14
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0008A564..0x0008A5BC
+    address: 0x0008A564..0x0008A5BD
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0008A794..0x0008A7E4
+    address: 0x0008A794..0x0008A7E5
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0008A7E8..0x0008A86C
+    address: 0x0008A7E8..0x0008A86D
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0007DC00..0x0007DD14
+    address: 0x0007DC00..0x0007DD15
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0007CB24..0x0007CB95
+    address: 0x0007CB24..0x0007CB96
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0007E330..0x0007E444
@@ -84,3 +84,5 @@ from was not traced.
 ## How to reproduce
 
 Disassemble the listed addresses in `CD:CONQUER.EXE` and the table at `0x0007E310`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

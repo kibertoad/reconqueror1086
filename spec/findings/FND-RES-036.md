@@ -10,34 +10,34 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 2D9F:003D..2D9F:01D2
+    address: 2D9F:003D..2D9F:01D3
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 2D9F:0205..2D9F:03C4
+    address: 2D9F:0205..2D9F:03C5
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 2D9F:046D..2D9F:04BA
+    address: 2D9F:046D..2D9F:04BB
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
     address: 221F:0003..221F:035E
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 221F:0509..221F:0548
+    address: 221F:0509..221F:0549
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 3044:0000..3044:016C
+    address: 3044:0000..3044:016D
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
     address: 3044:01AD..3044:0263
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 1000:1839..1000:1864
+    address: 1000:1839..1000:1865
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 1000:5FF6..1000:60D4
+    address: 1000:5FF6..1000:60D5
   - build: BLD-GOG-EN
     file: CD:CONFIG.EXE
-    address: 1890:00A7..1890:00F1
+    address: 1890:00A7..1890:00F2
   - build: BLD-GOG-EN
     file: CD:INSTALL.DAT
     offset: 0x00..0xBDDB
@@ -164,3 +164,5 @@ Disassemble `CD:CONFIG.EXE` as 16-bit code with the load image at segment
 165 entries at DS:272F, the nine-word table at 221F:033B with its targets,
 and the class table at DS:6D7B. Walk INSTALL.DAT for `@` followed by letters
 and digits and report counts only. Keep listings in ignored local storage.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

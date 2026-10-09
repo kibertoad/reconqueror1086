@@ -10,31 +10,31 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00049200..0x0004945F
+    address: 0x00049200..0x00049460
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00049478..0x00049573
+    address: 0x00049478..0x00049574
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00049574..0x00049579
+    address: 0x00049574..0x0004957A
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0004957C..0x000495C1
+    address: 0x0004957C..0x000495C2
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000495C4..0x000495E0
+    address: 0x000495C4..0x000495E1
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x000495E4..0x000495F3
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000495F4..0x000497AA
+    address: 0x000495F4..0x000497AB
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00049460..0x00049476
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000733BF..0x000733FF
+    address: 0x000733BF..0x00073400
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -88,3 +88,5 @@ None known.
 
 Disassemble the listed ranges and follow the references to the five globals and to the table at
 `0x000495E4`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

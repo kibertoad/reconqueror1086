@@ -4,7 +4,7 @@ title: Retargeting after arrival
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-STRATEGY-003, FND-STRATEGY-007, FND-STRATEGY-012, FND-STRATEGY-015, FND-STRATEGY-019, FND-STRATEGY-023]
+evidence: [FND-STRATEGY-003, FND-STRATEGY-007, FND-STRATEGY-012, FND-STRATEGY-040, FND-STRATEGY-041, FND-STRATEGY-023]
 conflicting: []
 split_with: []
 related: [FMT-STRATEGY-001, RULE-STRATEGY-014]

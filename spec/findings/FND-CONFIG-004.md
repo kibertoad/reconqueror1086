@@ -13,10 +13,10 @@ locations:
     address: 0x00025C53..0x00025D86
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0006FF50..0x00070083
+    address: 0x0006FF50..0x00070084
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000700C0..0x0007010D
+    address: 0x000700C0..0x0007010E
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00070120..0x0007024A
@@ -79,3 +79,5 @@ when the key is present; the branch at `0x00025CE9` shows -1 goes to the same at
 
 Disassemble the listed ranges in `CD:CONQUER.EXE`; compare the `WAR_MODE` lines of `CONQUER.INI`
 and `CD:CONQUER.INI`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

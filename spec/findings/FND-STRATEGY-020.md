@@ -10,10 +10,10 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00011554..0x00011CAA
+    address: 0x00011554..0x00011CAB
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00063EC0..0x00063EDC
+    address: 0x00063EC0..0x00063EDD
 tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
 environment: null
 ---
@@ -60,4 +60,8 @@ None known.
 
 ## How to reproduce
 
-Disassemble `0x00011554..0x00011CAA`, `0x00063EC0..0x00063EDC` in `CD:CONQUER.EXE`.
+Disassemble `0x00011554..0x00011CAB`, `0x00063EC0..0x00063EDD` in `CD:CONQUER.EXE`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.
+
+Grouped whole-function exclusive bounds follow the extents recorded in FND-RES-063.

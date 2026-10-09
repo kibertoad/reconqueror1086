@@ -10,37 +10,37 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 20F3:2D61..20F3:2DA5
+    address: 20F3:2D61..20F3:2DA6
   - build: BLD-GOG-EN
     file: CD:INST.EXE
     address: 2852:000C..2852:004D
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 2852:004E..2852:00BC
+    address: 2852:004E..2852:00BD
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 2852:00BD..2852:048D
+    address: 2852:00BD..2852:048E
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 2852:048E..2852:0577
+    address: 2852:048E..2852:0578
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 2852:0578..2852:0A8A
+    address: 2852:0578..2852:0A8B
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 2852:0A8B..2852:0B70
+    address: 2852:0A8B..2852:0B71
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 2852:0B71..2852:0C2C
+    address: 2852:0B71..2852:0C2D
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 2852:0D33..2852:0DCA
+    address: 2852:0D33..2852:0DCB
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 27C0:0510..27C0:0533
+    address: 27C0:0510..27C0:0534
   - build: BLD-GOG-EN
     file: CD:INST.EXE
-    address: 2FD0:04B0..2FD0:05EC
+    address: 2FD0:04B0..2FD0:05ED
   - build: BLD-GOG-EN
     file: CD:INSTALL.TXT
     offset: 0x00000000..0x00002575
@@ -53,14 +53,14 @@ environment: null
 
 ## Observation
 
-The unpacked file and its notation are as FND-RES-054 gives them. Run-time
+The unpacked file and its notation are as FND-RES-066 gives them. Run-time
 routines named below with "(not read)" are known only by their arguments.
 
 The object at DS:53AC. 1E1A:0AA0 builds it through 2852:004E, which sets a
 far pointer array at +0, its count at +4 to 0, two strings at +6 and +0xA,
 and the word at +0xE to 0. Main, at 20F3:2D61, calls 2852:00BD with the
 object and `argv[0]` before it calls vtable entry +0x1C of the installer
-object (FND-RES-054).
+object (FND-RES-066).
 
 The loader, 2852:00BD (this, path):
 
@@ -176,10 +176,14 @@ it.
 
 ## How to reproduce
 
-Unpack `CD:INST.EXE` as FND-RES-054 gives. Read the strings at DS:2E71,
+Unpack `CD:INST.EXE` as FND-RES-066 gives. Read the strings at DS:2E71,
 DS:2F0F to DS:2F77, DS:2F7B, DS:2FF2 and DS:3004. Disassemble the ranges in
 Locations as 16-bit code with the load image at segment 0x1000 and relocation
 targets marked. Split each text file at CRLF, take the lines starting with two
 backslashes, trim space, tab, CR and LF from the rest and lower-case it, and
 cut each line plus LF into 99-byte pieces. Keep listings in ignored local
 storage.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.
+
+Grouped whole-function exclusive bounds follow the extents recorded in FND-RES-063.

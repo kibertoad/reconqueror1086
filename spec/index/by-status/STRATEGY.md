@@ -41,6 +41,17 @@ Entries by status.
 | [RULE-STRATEGY-018](../../rules/RULE-STRATEGY-018.md) | Spies |
 | [RULE-STRATEGY-019](../../rules/RULE-STRATEGY-019.md) | Map events from conversation variables |
 
+## superseded
+
+4 entries.
+
+| ID | Title |
+|---|---|
+| [FND-STRATEGY-002](../../findings/FND-STRATEGY-002.md) | Routine 0x0003B9F4 issues a brigand order or an order from the king |
+| [FND-STRATEGY-015](../../findings/FND-STRATEGY-015.md) | The property and person tables hold 14 records of 15 bytes and 176 records of 18 bytes |
+| [FND-STRATEGY-019](../../findings/FND-STRATEGY-019.md) | The player pass at 0x00013168 moves each player record, then tests it against the hostile records and the dragon cells |
+| [FND-STRATEGY-033](../../findings/FND-STRATEGY-033.md) | The brigand pass fights player armies on contact, rewards or punishes, and ends orders by date |
+
 ## recorded
 
 38 entries.
@@ -48,7 +59,6 @@ Entries by status.
 | ID | Title |
 |---|---|
 | [FND-STRATEGY-001](../../findings/FND-STRATEGY-001.md) | The strategic pass at 0x0003C290 runs brigands, the spy, the player forces and then the hostile pass |
-| [FND-STRATEGY-002](../../findings/FND-STRATEGY-002.md) | Routine 0x0003B9F4 issues a brigand order or an order from the king |
 | [FND-STRATEGY-003](../../findings/FND-STRATEGY-003.md) | The hostile pass at 0x0003C088 generates first, then moves slots 0 to 4 and resolves each arrival |
 | [FND-STRATEGY-004](../../findings/FND-STRATEGY-004.md) | The hostile generator 0x0003BE58 tries a reactive pursuit, then a timed movement every 5,000 speed units |
 | [FND-STRATEGY-005](../../findings/FND-STRATEGY-005.md) | The reactive finder 0x0003BB4C scans properties, then player forces, and marks alerted and approached properties |
@@ -61,11 +71,9 @@ Entries by status.
 | [FND-STRATEGY-012](../../findings/FND-STRATEGY-012.md) | The retargeter 0x0003A9BC sends an arrived force at the first player force within 300 units, else home or at the player |
 | [FND-STRATEGY-013](../../findings/FND-STRATEGY-013.md) | Terrain speed comes from a tile-kind table and four profile pointers, scaled by a speed from 1 to 15 |
 | [FND-STRATEGY-014](../../findings/FND-STRATEGY-014.md) | The month selects one of four terrain profiles through the table at 0x0009B720 |
-| [FND-STRATEGY-015](../../findings/FND-STRATEGY-015.md) | The property and person tables hold 14 records of 15 bytes and 176 records of 18 bytes |
 | [FND-STRATEGY-016](../../findings/FND-STRATEGY-016.md) | The route resources are a count followed by that many pairs of signed dwords |
 | [FND-STRATEGY-017](../../findings/FND-STRATEGY-017.md) | The strategic terrain is resource 292, icon.jp, a 200 by 400 grid of dwords |
 | [FND-STRATEGY-018](../../findings/FND-STRATEGY-018.md) | A route point maps to a grid cell through staggered diamonds, scanned in camera order, whose lower half is one line taller |
-| [FND-STRATEGY-019](../../findings/FND-STRATEGY-019.md) | The player pass at 0x00013168 moves each player record, then tests it against the hostile records and the dragon cells |
 | [FND-STRATEGY-020](../../findings/FND-STRATEGY-020.md) | Routine 0x00011554 moves one player record along its route or toward its target |
 | [FND-STRATEGY-021](../../findings/FND-STRATEGY-021.md) | The encounter routine 0x00039428 fights a player army against a hostile force and settles the result |
 | [FND-STRATEGY-022](../../findings/FND-STRATEGY-022.md) | The staging routine 0x00035924 trims both sides to 60 and hands six counters to the battle |
@@ -79,12 +87,15 @@ Entries by status.
 | [FND-STRATEGY-030](../../findings/FND-STRATEGY-030.md) | The hostile markers use a frame from a per-property table and brigands frame 3 |
 | [FND-STRATEGY-031](../../findings/FND-STRATEGY-031.md) | The route preview at 0x00011CC0 dots the selected record's route with marker frames |
 | [FND-STRATEGY-032](../../findings/FND-STRATEGY-032.md) | Routine 0x0003B0E4 with a descriptor creates a brigand force on one of three route families |
-| [FND-STRATEGY-033](../../findings/FND-STRATEGY-033.md) | The brigand pass fights player armies on contact, rewards or punishes, and ends orders by date |
 | [FND-STRATEGY-034](../../findings/FND-STRATEGY-034.md) | The brigand step 0x0004A61C loops its route and has no terrain or step-size stop |
 | [FND-STRATEGY-035](../../findings/FND-STRATEGY-035.md) | A spy costs 80, only one is out at a time, and its report lists every active hostile force |
 | [FND-STRATEGY-036](../../findings/FND-STRATEGY-036.md) | The strategic action hook 0x00021EEC turns conversation variables into map events |
 | [FND-STRATEGY-037](../../findings/FND-STRATEGY-037.md) | Two conversation groups set variables 43 and 93 when the player accepts a raid |
 | [FND-STRATEGY-038](../../findings/FND-STRATEGY-038.md) | The spy report names +0x1C the halberdiers and shows one converted number three times |
+| [FND-STRATEGY-039](../../findings/FND-STRATEGY-039.md) | Routine 0x0003B9F4 issues a brigand order or an order from the king |
+| [FND-STRATEGY-040](../../findings/FND-STRATEGY-040.md) | The property and person tables hold 14 records of 15 bytes and 176 records of 18 bytes |
+| [FND-STRATEGY-041](../../findings/FND-STRATEGY-041.md) | The player pass at 0x00013168 moves each player record, then tests it against the hostile records and the dragon cells |
+| [FND-STRATEGY-042](../../findings/FND-STRATEGY-042.md) | The brigand pass fights player armies on contact, rewards or punishes, and ends orders by date |
 
 ## Open questions
 

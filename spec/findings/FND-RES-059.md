@@ -1,25 +1,25 @@
 ---
 id: FND-RES-059
 title: An MVG entry holds the pointer shapes' hot spots; 0x00018850 loads it and the CSF of the same name
-status: recorded
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
+superseded_by: [FND-RES-067]
 recorded_by: kibertoad
 reproduced_by: []
 method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00018850..0x00018B0C
+    address: 0x00018850..0x00018B0D
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00063EE0..0x00063F47
+    address: 0x00063EE0..0x00063F48
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00063F9C..0x0006409D
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0006A5F0..0x0006A835
+    address: 0x0006A5F0..0x0006A836
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00084784..0x0008494F
@@ -95,3 +95,7 @@ data object loads at `0x00090000`; control: `FFMOUSE` at `0x00093A70`, as
 FND-UI-008 gives). Disassemble the ranges above. Scan object 1 for E8 and E9
 whose target is `0x00084784` and `0x00072180`, and list fixups to the same
 targets. Decode `ffmouse.mvg` from C1086.GOB.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.
+
+Grouped whole-function exclusive bounds follow the extents recorded in FND-RES-063.

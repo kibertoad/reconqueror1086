@@ -10,13 +10,13 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000497BC..0x00049AB6
+    address: 0x000497BC..0x00049AB7
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x000497AC..0x000497BB
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00048090..0x00048147
+    address: 0x00048090..0x00048148
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0004830C..0x00048657
@@ -25,7 +25,7 @@ locations:
     address: 0x00049124..0x000491D3
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x000491D4..0x000491FE
+    address: 0x000491D4..0x000491FF
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00048D18..0x00049123
@@ -379,3 +379,5 @@ was left from the scene editor, was not traced.
 ## How to reproduce
 
 Disassemble the listed ranges and follow the pushes before each call to `0x000497BC`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

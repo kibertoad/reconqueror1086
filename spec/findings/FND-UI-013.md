@@ -85,7 +85,7 @@ regions 3 and 4 (`0x0005BEFC`) store 0 or 1 in `0x000AFF44` and call `0x000596C0
 has no routine. Stands, screen 9: region 6 (`0x0005C2AC`) stores 0 in the byte at `0x0009DC24` and
 calls `0x000596C0(8, 1, 1)`. Tents, screen 10: region 0 (`0x0005CBF8`) calls `0x000596C0(8, 1, 1)`, and regions 1 to 5
 (`0x0005CA70`) play the sound at `0x000AFF40` and run on into `0x0005CA8C`, the routine of regions 6
-to 10 (FND-TOURNEY-003), with no return between them.
+to 10 (FND-TOURNEY-009), with no return between them.
 Inn, screen 12: regions 10 and 11 (`0x000604AC`) store 0 in the byte at `0x0009DEA8`, show pointer
 frame 0 and call `0x000596C0(11, 1, 1)`. Screen 5 (`CWAR.HAT`): region 0 (`0x00018B4C`) calls
 `0x000596C0(6, 1, 1)`. Screen 6 (`DKING.HAT`): region 0 (`0x00019C80`) stores 0 in `0x0009A708` and

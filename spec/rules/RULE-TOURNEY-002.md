@@ -4,7 +4,7 @@ title: Tournament tent opponents and actions
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-TOURNEY-002, FND-TOURNEY-003, SRC-GAMEFAQS-66730]
+evidence: [FND-TOURNEY-002, FND-TOURNEY-009, SRC-GAMEFAQS-66730]
 conflicting: []
 split_with: []
 related: [RULE-RNG-001, RULE-TOURNEY-003, RULE-TOURNEY-004]

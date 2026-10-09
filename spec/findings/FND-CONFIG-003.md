@@ -61,7 +61,7 @@ locations:
     address: 0x00061CFF..0x00061D3C
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00018334..0x00018391
+    address: 0x00018334..0x00018392
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0004EF88..0x0004EF9C
@@ -135,3 +135,5 @@ is longer than `movie3.smk` was not compared.
 
 Disassemble the listed ranges and read the strings at the object-2 offsets pushed before each call
 to `0x00062EA0`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

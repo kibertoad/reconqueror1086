@@ -10,7 +10,7 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00012A4C..0x00012AE9
+    address: 0x00012A4C..0x00012AEA
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00012F28
@@ -67,4 +67,6 @@ None known.
 
 ## How to reproduce
 
-Disassemble `0x00012A4C..0x00012AE9`, `0x00012F28`, `0x00014230`, `0x000145A4..0x0001464A`, `0x00015EF0`, `0x00018430`, `0x0006A190`, `0x0003F0A0` in `CD:CONQUER.EXE`.
+Disassemble `0x00012A4C..0x00012AEA`, `0x00012F28`, `0x00014230`, `0x000145A4..0x0001464A`, `0x00015EF0`, `0x00018430`, `0x0006A190`, `0x0003F0A0` in `CD:CONQUER.EXE`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

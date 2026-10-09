@@ -10,13 +10,13 @@ method: static
 locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0006B3EB..0x0006B412
+    address: 0x0006B3EB..0x0006B413
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0006B413..0x0006B422
+    address: 0x0006B413..0x0006B423
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00024C20..0x00024C35
+    address: 0x00024C20..0x00024C36
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00029FF4
@@ -52,3 +52,5 @@ prompt variant is drawn.
 ## How to reproduce
 
 Disassemble `0x0006B3EB`, `0x0006B413`, `0x00024C20` and `0x0001A14C`, then scan object 1 for `E8` calls whose target is `0x0006B3F1` or `0x0006B413`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

@@ -13,7 +13,7 @@ locations:
     address: 0x0005C99C..0x0005C9CB
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x0005C930..0x0005C998
+    address: 0x0005C930..0x0005C999
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x0005D318..0x0005D334
@@ -48,3 +48,5 @@ None known.
 
 Disassemble `0x0005C930` to `0x0005C9CB` and `0x0005D168` to `0x0005D334`, and read the six dwords
 at object-2 offset `0xDC48`.
+
+Whole-function exclusive bounds follow the body extents recorded in FND-RES-062.

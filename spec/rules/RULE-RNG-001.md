@@ -4,7 +4,7 @@ title: The game's random number generator
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-RNG-002, FND-RNG-003, FND-ASSAULT-031, FND-SAVE-004, FND-SOUND-003]
+evidence: [FND-RNG-002, FND-RNG-003, FND-ASSAULT-031, FND-SAVE-006, FND-SOUND-003]
 conflicting: []
 split_with: []
 related: [RULE-TALK-001, RULE-SOUND-002]
