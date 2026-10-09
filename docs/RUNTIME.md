@@ -203,6 +203,13 @@ there is no second-expiry cutoff. Every observation verifies the owned emulator
 is still alive. Transport failures propagate separately from observation expiry;
 the continuation is never restarted automatically.
 
+Once candidate entry breakpoints are installed, native recording also observes
+that same continuation until it stops, rather than spending the remaining
+mapping-survey samples on diagnostic pauses. If the survey never reaches the
+native recording entry, the command fails instead of reporting success without
+a journal. Bounded mapping-only surveys still take explicit diagnostic pauses;
+their startup wait catches only observation expiry, not transport timeouts.
+
 The current accepted policies cover initial seeding, character shifts and the
 home selector's directly read argument 7 (FND-STRATEGY-043). The complete
 selection rule remains disputed; capture preserves its native argument without

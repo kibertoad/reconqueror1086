@@ -7,7 +7,7 @@ import os
 import re
 from pathlib import Path
 import shutil
-from dosbox_session import AgentRuntime
+from dosbox_session import AgentRuntime, ObservationTimeout
 from emu.le_image import load_image
 from live_mapping import validate_snapshot
 
@@ -78,16 +78,20 @@ def main():
     probe_offset = 0x6b3f1 - images[0]['base']  # FND-RNG-003
     signature = bytes(images[0]['image'][probe_offset:probe_offset + 34])
     breakpoints_installed = False
+    native_recording_started = False
     try:
         with AgentRuntime(source, emulator, root, drive, 'CONQUER.EXE', installation / 'game.ins', args.cycles) as runtime:
             print('startup', runtime.registers())
             for attempt in range(args.samples):
                 operation = runtime.agent.continue_(runtime.session.id)
-                if breakpoints_installed:
+                if breakpoints_installed and args.record_native:
+                    runtime.wait_until_stopped(operation)
+                    observed = runtime.agent.wait(runtime.session.id, operation.id, timeout_ms=100)
+                elif breakpoints_installed:
                     try:
                         runtime.wait(operation, seconds=30)
                         observed = runtime.agent.wait(runtime.session.id, operation.id, timeout_ms=100)
-                    except TimeoutError:
+                    except ObservationTimeout:
                         # The same continuation remains live until the explicit
                         # pause below; allow uninterrupted loader progress.
                         observed = runtime.agent.wait(runtime.session.id, operation.id, timeout_ms=100)
@@ -128,6 +132,7 @@ def main():
                     print('instrumented entry breakpoint hit', runtime.session.stop_reason)
                     if args.record_native:
                         from native_rng_recorder import record
+                        native_recording_started = True
                         journal = record(runtime, live_map, ids, root, args.record_draw_limit,
                                          args.stop_at_screen, args.stop_after_screen)
                         print('native recording', journal['status'], 'events', len(journal['events']))
@@ -266,6 +271,8 @@ def main():
                         print('bounded startup trace events', len(trace.events), 'active', trace.active)
                 if registers.cpu_mode == 'real' and int(registers.segments['cs'], 16) == 0:
                     break
+            if args.record_native and not native_recording_started:
+                raise RuntimeError('Native recording entry was not reached within the mapping survey')
     finally:
         (root / 'mapping-observations.json').write_text(json.dumps(records, indent=2))
 

@@ -841,6 +841,12 @@ writer closes, and an existing capture cannot be overwritten or appended.
 The native recorder's seven synthetic boundary checks also passed with this
 writer integrated. These checks do not establish full-game recording.
 
+The six lifecycle tests and probe syntax check passed after narrowing the
+startup handler to ObservationTimeout and using continuous observation for
+native recording's candidate-entry wait. The probe now rejects a mapping survey
+that ends without entering the requested native recorder. These edits do not
+change a probe process that loaded the previous module version.
+
 The no-heavy pinned debugger completed the isolated native startup probe in
 artifacts/runtime-tools/native-rng-no-heavy-20261010-a. Its journal contains
 one seed, thirty RULE-PERSON-002 draws and one RULE-STRATEGY-012 draw, followed
