@@ -29,31 +29,26 @@ None known.
 
 ## Handover
 
-- Active: latest rules/libraries and full evidence conversion. Stage: Survey.
-- Dependencies, native inventories/sidecars, boundary conversions and citation
-  replacements are committed. FND-RES-062 and FND-RES-063 are the metadata
-  findings. Claims retain their statuses; uncertain historical findings have
-  replacements. No original game ran and no publication is authorized.
-- Last gate: 2026-10-09, documentation check with index regeneration passed;
-  canonical Invoke-Validation.ps1 passed with ResourceAndDefinitionTests filter
-  and MinimumExpectedTests 1. Coverage conversion regressions and all native
-  inventory/sidecar checks pass. Audit-RangeEnds.mjs reports no diagnostics.
-  These checks do not close the goal's wider migration requirements.
+- Active: full rules/library and evidence conversion. Stage: Survey.
+- Dependency adoption, native inventories/sidecars, active inventory commands,
+  shared unpacker, canonical path comparison and reviewed code/resource/value
+  boundary conversions are committed. Evidence entries include FND-RES-062,
+  FND-RES-063, FND-RES-069, FND-RES-070 and FND-ASSAULT-049. Claims retain their
+  statuses. No original game ran and publishing remains unauthorized.
+- Last gate: 2026-10-09, documentation write check and canonical
+  Invoke-Validation.ps1 passed with ResourceAndDefinitionTests and
+  MinimumExpectedTests 1. Native sidecars validate; code-boundary and complete
+  file/resource-boundary candidate audits report none. These checks do not
+  close the remaining acceptance audits.
 - Unfinished working tree: none. .claude/settings.json remains unrelated and
-  untracked. One-time migration scripts and proofs are retained only in ignored
-  artifacts/coverage-migration; durable exporters and checks are committed.
-- Raw exports and adoption contracts: artifacts/coverage-migration/{le,pe,ne,
-  config,inst}.json. Re-adoption validates source identities, snapshot digest
-  and completion marker. Raw output remains ignored and contains no Git assets.
-- LE snapshot: analysis/documentation-audit/ghidra/LeInventory2.
-  PE/NE: artifacts/launcher-inventory-{pe,ne}-20261005/Launcher{PE,NE}.
-  Rebuilt MZ snapshot: artifacts/coverage-migration/mz-project/MzCoverage,
-  programs CONFIG.EXE and INST.unpacked.exe. Repeated stable exports have the
-  suffix -stable. Mapping qualifications are in coverage/README.md. Historical
-  size-only bodies cannot prove a contiguous start-plus-size interval.
-- Next: migrate active inventory/report callers and obsolete metadata paths;
-  audit value/address ranges beyond the checker's function-boundary diagnostics;
-  reconcile ISO listing/build path accounting; audit complete-reading/progress
-  semantics and remaining workflow guidance; finish the explicit acceptance
-  audit in template-migration-plan.md, dependency freshness and final gates.
-- Blockers: none requiring an owner decision. Preserve MSBuild reusable workers.
+  untracked. One-time migration scripts and proofs remain ignored under
+  artifacts/coverage-migration, including iso-audit and value-audit.
+- Frozen adoption contracts: artifacts/coverage-migration/{le,pe,ne,config,
+  inst}.json. Durable exporters/checks and mappings are in coverage/README.md.
+  Re-adoption requires unchanged identities, digest and completion marker.
+- Next: audit complete-reading/progress semantics and missing-code baselines;
+  reconcile current planning and workflow guidance; finish the explicit
+  acceptance audit in template-migration-plan.md; verify dependency freshness
+  and run final applicable gates.
+- Blockers: none requiring an owner decision. Preserve unrelated processes
+  and reusable MSBuild workers. No push is authorized.
