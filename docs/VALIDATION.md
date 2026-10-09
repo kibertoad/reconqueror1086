@@ -1,5 +1,40 @@
 # Validation
 
+## Checker 4.1.1 and quiet probes (2026-10-10)
+
+Toolkit PR #398 was adopted after its npm publication as checker 4.1.1 at
+release commit ad551057265542a0ac5ad27b4abb4909305e7728. The tag contains the
+merged fix, and the lockfile's distribution integrity matches official release
+metadata. Frozen installation, offline snapshot/CI pin checks, package adoption
+verification and the complete canonical gate passed, including Node acceptance,
+solution build, xUnit and executable specifications. Reader and engine pins and
+the local rules snapshots were not refreshed.
+
+Both DOSBox probe commands now default to zero master mixer volume and the
+`none` host MIDI backend; `--sound-investigation` permits audio for a sound
+question. The six lifecycle checks and probe syntax passed. A synthetic
+structured session in artifacts/runtime-tools/silent-agent-synthetic-20261010-b
+reached startup and passed its stepped register control under this configuration.
+The earlier `nosound=true` attempt passed portable synthetic transport but
+failed readiness in both an original and a synthetic structured session; those
+attempts were cleaned up, and this setting is not used by the final default.
+These checks do not establish loaded-screen state or full-game recording.
+
+The final quiet portable transport passed its synthetic memory roundtrip and
+breakpoint control in artifacts/runtime-tools/silent-synthetic-20261010-c.
+The original's quiet native startup run in
+artifacts/runtime-tools/native-rng-silent-startup-20261010-b completed one seed
+and thirty character-shift draws. Its durable event log agrees with the final
+journal, RNG-formula replay matches the final state, and its generated
+configuration contains the zero-volume and no-host-MIDI controls. Both owned
+emulators stopped and their run locks were released.
+
+The earlier audible run was stopped at the owner's request. Its durable prefix
+remains local and incomplete; closing its server produced the recorded transport
+failure, and its wrapper released its own lock. Diagnostic secondary clients
+must use unique request IDs, because the pinned client restarts its default
+counter and a reused wait ID was rejected as conflicting with the recorder.
+
 ## Debugger and isolated function tooling (2026-10-09)
 
 The official DOSBox-X Windows x64 portable release 2026.10.01 was downloaded

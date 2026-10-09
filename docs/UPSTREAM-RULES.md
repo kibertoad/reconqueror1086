@@ -91,6 +91,12 @@ node_modules. Initialize a ZIP checkout with git init before validation.
 
 ## Current migration target
 
+The checker-only adoption requested for toolkit PR #398 uses checker 4.1.1
+at its release-tag commit `ad551057265542a0ac5ad27b4abb4909305e7728`.
+Its npm integrity, CI action and adoption records agree. The reader and Python
+engine retain their separately pinned versions. This adoption does not refresh
+the local Standard, Methodology or Protocol snapshots.
+
 The template adoption remains 25c5808bb497d863aded815e50838ee1e6d94256.
 The owner-requested rules and library migration advances beyond that template:
 the current rules revision and checker release are in `tools/upstream-lock.json`;

@@ -14,6 +14,10 @@ evidence requirements, restrictions on unsupported state writes, or push policy.
 Sandbox approval requests may still be required by the execution environment;
 they are not a requirement for renewed owner permission.
 
+Run probes with host sound disabled by default to avoid distracting the owner.
+Enable sound only when the probe specifically investigates sound. The DOSBox
+probe commands use `--sound-investigation` for that explicit exception.
+
 ## Runtime scope: preinstalled game
 
 The restoration starts from the owned preinstalled game. Setup and installation

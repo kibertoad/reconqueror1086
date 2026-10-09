@@ -34,7 +34,7 @@ def import_client(source):
 
 
 class AgentRuntime:
-    def __init__(self, source, emulator, output, workdir, target, disc=None, cycles=10000):
+    def __init__(self, source, emulator, output, workdir, target, disc=None, cycles=10000, sound_investigation=False):
         self.source = Path(source).resolve()
         self.emulator = Path(emulator).resolve()
         self.output = Path(output).resolve()
@@ -43,6 +43,7 @@ class AgentRuntime:
         if not isinstance(cycles, int) or not 1000 <= cycles <= 100000:
             raise ValueError('Diagnostic CPU cycles must be between 1000 and 100000')
         self.cycles = cycles
+        self.sound_investigation = sound_investigation
         self.disc = Path(disc).resolve() if disc else None
         self.process = self.agent = self.session = self.lock_handle = None
         self.lock_path = Path(os.environ.get('REFURBISHED_DINOSAURS_RUN_LOCK',
@@ -69,12 +70,15 @@ class AgentRuntime:
             if ready.exists():
                 raise SessionError('Private drive already has a startup readiness marker')
             autoexec = f'mount c "{self.workdir}"\n'
+            if not self.sound_investigation:
+                autoexec = 'mixer master 0:0 /noshow\n' + autoexec
             if self.disc:
                 autoexec += f'imgmount d "{self.disc}" -t iso\n'
             autoexec += 'echo RECONQUEROR-READY > C:\\AGENT.RDY\n'
             dosbox_config.write_text('[sdl]\nfullscreen=false\noutput=surface\nautolock=false\n'
                                      '[dosbox]\nmachine=svga_s3\nmemsize=16\n'
                                      f'[cpu]\ncore=normal\ncycles=fixed {self.cycles}\n'
+                                     f'[midi]\nmididevice={"default" if self.sound_investigation else "none"}\n'
                                      '[autoexec]\n' + autoexec)
             startup = subprocess.STARTUPINFO()
             startup.dwFlags |= subprocess.STARTF_USESHOWWINDOW

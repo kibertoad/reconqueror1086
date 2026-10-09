@@ -16,6 +16,8 @@ def main():
     parser.add_argument('--emulator', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--original', action='store_true')
+    parser.add_argument('--sound-investigation', action='store_true',
+                        help='Enable host audio only for a probe investigating sound')
     args = parser.parse_args()
     root = args.output.resolve()
     root.mkdir(parents=True, exist_ok=True)
@@ -44,7 +46,10 @@ def main():
     # Exclusive create; a held lock aborts immediately, without waiting.
     handle = lock.open('x')
     process = None
-    result = {'original': args.original, 'started': datetime.datetime.now().astimezone().isoformat()}
+    if not args.sound_investigation:
+        commands = 'mixer master 0:0 /noshow\n' + commands
+    result = {'original': args.original, 'sound_investigation': args.sound_investigation,
+              'started': datetime.datetime.now().astimezone().isoformat()}
     try:
         handle.write(json.dumps({'repository': str(Path.cwd()), 'session': 'debugger-capability-probe',
                                  'time': result['started'], 'pids': [os.getpid()]}))
@@ -54,6 +59,7 @@ def main():
             config.write_text(f'[sdl]\nfullscreen=false\noutput=surface\nautolock=false\n'
                               f'[dosbox]\nmachine=svga_s3\nmemsize=16\nmcp_server={control.port}\n'
                               f'[cpu]\ncore=normal\ncycles=fixed 10000\n'
+                              f'[midi]\nmididevice={"default" if args.sound_investigation else "none"}\n'
                               f'[autoexec]\n{commands}\n')
             startup = subprocess.STARTUPINFO()
             startup.dwFlags |= subprocess.STARTF_USESHOWWINDOW

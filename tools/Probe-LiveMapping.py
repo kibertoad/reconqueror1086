@@ -28,6 +28,8 @@ def main():
     parser.add_argument('--stop-at-screen', action='store_true')
     parser.add_argument('--stop-after-screen', action='store_true')
     parser.add_argument('--record-draw-limit', type=int, default=30)
+    parser.add_argument('--sound-investigation', action='store_true',
+                        help='Enable host audio only for a probe investigating sound')
     args = parser.parse_args()
     if (args.stop_at_screen or args.stop_after_screen) and not args.record_native:
         raise ValueError('Screen diagnostic boundary requires native recording')
@@ -80,7 +82,8 @@ def main():
     breakpoints_installed = False
     native_recording_started = False
     try:
-        with AgentRuntime(source, emulator, root, drive, 'CONQUER.EXE', installation / 'game.ins', args.cycles) as runtime:
+        with AgentRuntime(source, emulator, root, drive, 'CONQUER.EXE', installation / 'game.ins',
+                          args.cycles, sound_investigation=args.sound_investigation) as runtime:
             print('startup', runtime.registers())
             for attempt in range(args.samples):
                 operation = runtime.agent.continue_(runtime.session.id)

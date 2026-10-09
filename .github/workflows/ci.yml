@@ -100,7 +100,7 @@ jobs:
       # the commit and the @scientific-method/standard-checker version it carries, which package.json
       # pins for local runs; `node tools/upstream.mjs refresh` moves all three together. The commit
       # carries a package release tag rather than an action version, so the pin has no version comment.
-      - uses: kibertoad/refurbished-dinosaurs-toolkit/actions/check-documentation@74c682de203683d66c7e8bad652d73cf9bc3e2aa # zizmor: ignore[stale-action-refs,ref-version-mismatch]
+      - uses: kibertoad/refurbished-dinosaurs-toolkit/actions/check-documentation@ad551057265542a0ac5ad27b4abb4909305e7728 # zizmor: ignore[stale-action-refs,ref-version-mismatch]
 
       - name: Check narrative references
         run: node tools/Check-NarrativeReferences.mjs

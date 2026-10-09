@@ -2,5 +2,5 @@
 # takes a checker release as soon as it is tagged, so it keeps the checker's entry here on the
 # version package.json pins.
 minimumReleaseAgeExclude:
-  - '@scientific-method/standard-checker@3.0.1'
+  - '@scientific-method/standard-checker@4.1.1'
   - '@scientific-method/executable-reader@2.6.0'

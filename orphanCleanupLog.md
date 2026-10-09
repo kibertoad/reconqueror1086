@@ -16,3 +16,5 @@
   left running because they do not belong to this work.
 
 - 2026-09-30T17:43:15+03:00: stopped PID 32228 (DOSBox), started 2026-09-30T17:43:11.9480208+03:00 for documentation-audit-runtime. The bounded capability probe finished and its owned process did not exit on window close; no further work depended on it. Unrelated processes were left running.
+
+- 2026-10-10T01:22:15+03:00 — stopped PID 22524 (dosbox-x), started 2026-10-10T01:15:53. Owned live-rng probe native-rng-loaded-return-20261010-c stopped at the owner's request to silence probes; structured stop remained pending. Its owning Python wrapper is left running briefly to finalize the incomplete journal and release its own lock. Unrelated processes and reusable MSBuild workers are preserved.

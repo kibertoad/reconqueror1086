@@ -35,7 +35,7 @@ It describes the current environment, not every possible instrumentation method.
 | Load a patched save | none | No original-save patch/load workflow is verified; FMT-SAVE-001 through FMT-SAVE-005 retain gaps | Complete the needed structure and verify a reversible patch/load experiment |
 | Capture client frames | agent | Direct PrintWindow capture verified against an offscreen synthetic renderer and owned DOSBox client; blank/unsupported results fail | Recheck each different renderer and interpret each frame before using it as evidence |
 | Capture sound | person | Bundled DOSBox documentation specifies Ctrl-F6 WAV capture; no unattended audio adapter is verified | Verify a repeatable audio recording case |
-| Replay a recording with game draws | none | No original draw recorder or replay fixture workflow exists | Implement RNG instrumentation and a draw-by-draw replay case |
+| Replay a recording with game draws | none for full-game rebuild replay | Bounded original journals and RNG-formula replay are verified; actual rebuild replay is not | Complete caller ownership and verify draw-by-draw replay against the rebuild |
 | Call a function in an emulator harness | agent | Unicorn 2.1.4; fingerprinted BLD-GOG-EN LE loader and RULE-RNG-001 function smoke comparisons verified on 2026-10-09 | Add explicit service models only for functions that need them; unsupported accesses stop |
 
 The bundled DOSBOX/Documentation/dosbox_README.txt also specifies Ctrl-F5 PNG
@@ -244,6 +244,18 @@ verification. It does not establish input readiness or full-game completeness.
 
 ### Operating and interpreting a probe
 
+Both DOSBox probe commands mute host audio by default with `MIXER MASTER 0:0`
+and `[midi] mididevice=none`. Emulated sound devices remain available, so
+muting does not require changing the original's sound settings or driver paths.
+Use `--sound-investigation` only when the probe specifically investigates sound;
+its generated configuration then permits host audio. This is the owner's
+standing preference, recorded in AGENTS.md.
+
+Do not replace this with `nosound=true` in the structured build: native and
+synthetic readiness attempts with that setting failed before the guest marker.
+The portable debugger's synthetic check passed with it, so that result alone
+did not establish compatibility with the structured build.
+
 Before executable analysis, run `tools/Verify-Configuration.ps1
 -RequireAnalysisReady`. Use a fresh local-only output directory, a
 command-scoped GAME_DIR and the machine lock acquired by the wrapper. Keep
@@ -252,7 +264,11 @@ selected build's executable hash and actual capabilities; a configuration
 header alone does not prove a runtime feature is enabled.
 
 Keep the process/session identity and the pending operation together. Read
-session-identity.json rather than guessing a session identifier. Poll the
+session-identity.json rather than guessing a session identifier. A second
+diagnostic client must supply unique RPC request IDs on every call: the pinned
+Python client restarts its default counter for each instance, and reused IDs
+can conflict with requests from the recorder. An explicit UUID-based namespace
+avoids that collision. Poll the
 same owning command and debugger operation while it is live. An operation
 identifier or CPU-time measurement does not reveal how many draws completed;
 read the completed-event log or final journal for that. Observation expiry
