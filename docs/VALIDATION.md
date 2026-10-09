@@ -266,6 +266,23 @@ targets and targets without checkpoints are rejected. Original replacement
 return verification remains pending; these tests do not establish full-game
 coverage or actual rebuild replay.
 
+2026-10-10: the quiet `native-rng-title-continuation-20261010-a` run queued
+the guarded title input and continued. An explicit diagnostic pause retained
+a local memory snapshot showing screen identifier 1, history
+`[1, 0, -1, -1, -1]`, an empty pointer queue and RNG state 1017701081.
+Its 32 completed events agree exactly between the durable log and incomplete
+final journal and replay to that state. No RNG, archive or screen-load operation
+was pending. Its emulator and lock were cleaned up. This is a sampled final
+state after title input, not observation of the replacement return instruction.
+The fresh options-return probe adds the latter guard and is in progress.
+
+2026-10-10: 48 recorder and related safety tests passed after adding guarded
+new-game input. The synthetic sequence reaches initial title, options and
+character-options returns, queues one title input and one new-game input at
+their respective verified states, and preserves its RNG event prefix. New-game
+input without screen checkpoints is rejected. Native new-game traversal and
+its intervening RNG callers remain unverified.
+
 2026-10-10: native caller policy checks passed 29 recorder, journal,
 durable-event-log and mapping tests. The new synthetic cases record the
 scaled hit-check result and the busy-voice remainder register, and reject

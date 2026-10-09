@@ -257,7 +257,9 @@ at (10, 10) only after the verified initial screen identifier is zero.
 SCR-UI-001 supports that full-screen title region. The same queue timing,
 hash and readback guards apply, and RNG state must remain unchanged.
 The controller records this input locally before resuming. This option has
-synthetic checks; reaching game options through it still needs an original run.
+synthetic checks. A deliberately paused native continuation snapshot showed
+game-options identity/history after that input (VALIDATION.md); guarded
+replacement-return verification is a separate pending check.
 
 `--screen-checkpoints` requires `--continue-after-screen`. It retains separate
 entry/return guards for initial loading and replacement (FND-UI-017/020), checks
@@ -268,6 +270,15 @@ initial verified return; subsequent screen observations do not repeat it.
 Add `--stop-after-screen-id 1` to end on the verified game-options return.
 This target stop remains incomplete for full-game coverage. These guards have
 synthetic validation; native replacement-return verification is pending.
+
+`--new-game-click` requires screen checkpoints. After the first verified
+game-options return it queues a primary click at (100, 350), inside region 3
+of SCR-UI-002, once per run. FND-UI-012 supports that region's new-game route.
+The same empty-queue, supported-field, timing, expected-hash, readback and
+unchanged-RNG guards apply. The recorder does not bypass unsuitable timing
+or seed/draw ownership checks. With `--stop-after-screen-id 2`, the next probe
+can stop on verified character-options state or reject an unowned intervening
+draw. This input stage has synthetic checks; native verification is pending.
 
 ### Operating and interpreting a probe
 

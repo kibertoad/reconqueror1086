@@ -50,7 +50,7 @@ def runtime_and_mapping(screen_state=123, screen_number=0, record_pointer=0x3000
 
 
 class ScreenBoundaryTests(unittest.TestCase):
-    def replacement_sequence(self, wrong_return=False, wrong_frame=False, wrong_identity=False):
+    def replacement_sequence(self, wrong_return=False, wrong_frame=False, wrong_identity=False, new_game=False):
         runtime, mapping = runtime_and_mapping()
         original_wait, original_registers, original_read = (
             runtime.wait_until_stopped, runtime.registers, runtime.read)
@@ -60,24 +60,25 @@ class ScreenBoundaryTests(unittest.TestCase):
             else:
                 runtime.phase += 1
                 runtime.session.stop_reason.breakpoint_id = (
-                    'hook-596c0' if runtime.phase == 4 else 'hook-5975e')
+                    'hook-596c0' if runtime.phase % 2 == 0 else 'hook-5975e')
         def registers():
             if runtime.phase < 4:
                 return original_registers()
             return SimpleNamespace(general={'esp': '0x1004' if wrong_frame and runtime.phase == 5 else '0x1000'},
                                    segments={'cs': '0x180', 'ds': '0x188', 'ss': '0x188'},
                                    cpu_mode='protected', instruction_pointer=hex(
-                                       0x596c0 if runtime.phase == 4 else 0x5965f if wrong_return else 0x5975e))
+                                       0x596c0 if runtime.phase % 2 == 0 else 0x5965f if wrong_return else 0x5975e))
         def read(address, length):
             if runtime.phase >= 4:
+                screen = (runtime.phase - 2) // 2
                 if address == (0x188, 0x1004):
-                    return b''.join(word.to_bytes(4, 'little') for word in (1, 1, 1))
+                    return b''.join(word.to_bytes(4, 'little') for word in (screen, 1, 1))
                 if address == (0x188, 0x300000):
                     return b''.join(word.to_bytes(4, 'little') for word in
-                                    (0x300100, 1, 0, *([0xffffffff] * 3)))
+                                    (0x300100, *range(screen, -1, -1), *([0xffffffff] * (4 - screen))))
                 if address == (0x188, 0x300100):
                     block = bytearray(184)
-                    block[96:100] = (2 if wrong_identity else 1).to_bytes(4, 'little')
+                    block[96:100] = (2 if wrong_identity else screen).to_bytes(4, 'little')
                     return bytes(block)
             return original_read(address, length)
         runtime.wait_until_stopped, runtime.registers, runtime.read = wait, registers, read
@@ -88,10 +89,26 @@ class ScreenBoundaryTests(unittest.TestCase):
                    return_value={'action': 'primary-short-click'}) as click:
             report = record(runtime, mapping, ('draw', 'seed'), 'unused-output', stop_after_screen=True,
                             continue_after_screen=True, title_click=True, screen_checkpoints=True,
-                            stop_after_screen_id=1)
-        click.assert_called_once_with(runtime, mapping, x=10, y=10)
+                            stop_after_screen_id=2 if new_game else 1, new_game_click=new_game)
+        if new_game:
+            self.assertEqual(click.call_count, 2)
+            self.assertEqual([call.kwargs for call in click.call_args_list],
+                             [{'x': 10, 'y': 10}, {'x': 100, 'y': 350}])
+        else:
+            click.assert_called_once_with(runtime, mapping, x=10, y=10)
         runtime.agent.delete_breakpoint.assert_not_called()
         return report
+
+    def test_new_game_input_requires_screen_checkpoints(self):
+        with self.assertRaisesRegex(ValueError, 'verified screen checkpoints'):
+            record(None, None, (), 'unused-output', new_game_click=True)
+
+    def test_new_game_input_waits_for_verified_options_and_preserves_events(self):
+        report = self.replacement_sequence(new_game=True)
+        self.assertEqual([item['observation']['screen_id'] for item in report['screen_loads']], [0, 1, 2])
+        self.assertEqual([item['screen'] for item in report['supported_input']], [0, 1])
+        self.assertEqual(len(report['events']), 1)
+        self.assertFalse(report['full_game_complete'])
 
     def test_replacement_screen_target_checks_both_returns_without_repeating_title_input(self):
         report = self.replacement_sequence()
