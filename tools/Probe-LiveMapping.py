@@ -24,8 +24,11 @@ def main():
     parser.add_argument('--draw-check', action='store_true')
     parser.add_argument('--record-startup-shifts', action='store_true')
     parser.add_argument('--record-native', action='store_true')
+    parser.add_argument('--stop-at-screen', action='store_true')
     parser.add_argument('--record-draw-limit', type=int, default=30)
     args = parser.parse_args()
+    if args.stop_at_screen and not args.record_native:
+        raise ValueError('Screen diagnostic boundary requires native recording')
     if args.draw_check and not args.seed_check:
         raise ValueError('Draw identity check requires the seed identity check')
     if args.seed_check and not args.rng_break:
@@ -115,7 +118,7 @@ def main():
                     print('instrumented entry breakpoint hit', runtime.session.stop_reason)
                     if args.record_native:
                         from native_rng_recorder import record
-                        journal = record(runtime, live_map, ids, root, args.record_draw_limit)
+                        journal = record(runtime, live_map, ids, root, args.record_draw_limit, args.stop_at_screen)
                         print('native recording', journal['status'], 'events', len(journal['events']))
                         break
                     if args.record_startup_shifts and runtime.session.stop_reason.breakpoint_id != ids[1]:

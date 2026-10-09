@@ -1,6 +1,7 @@
 """Native entry/return breakpoint recorder; accepted caller coverage is explicit.
 
 FND-RNG-002/003/004, FND-PERSON-003, FND-TALK-003, FND-STRATEGY-043 support the current policies.
+FND-UI-001 supports the optional screen-loading diagnostic boundary.
 This transport does not claim full-game caller coverage or actual rebuild replay.
 """
 import dataclasses
@@ -11,7 +12,7 @@ from live_mapping import descriptor, tables_from_diagnostic
 from rng_recording import RecordingError, canonical_pc
 
 
-def record(runtime, mapping, entry_ids, output, maximum_draws=30):
+def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen=False):
     if type(maximum_draws) is not int or not 1 <= maximum_draws <= 100000:
         raise ValueError('Invalid recording draw limit')
     output = Path(output)
@@ -22,8 +23,18 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30):
         selector, offset = mapping.code_address(address)
         hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
         hooks[hook.id] = name
+    if stop_at_screen:
+        # FND-UI-001 names both screen-loading entries and their arguments.
+        # This boundary precedes loading/setup; it does not mean menu-ready.
+        for address in (0x595c0, 0x596c0):
+            selector, offset = mapping.code_address(address)
+            hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
+            hooks[hook.id] = 'screen-entry'
     controls = []
-    for start, end in ((0x6b3eb, 0x6b423), (0x24c38, 0x24c4c), (0x1a14c, 0x1a1ef), (0x43670, 0x436e0)):
+    code_ranges = [(0x6b3eb, 0x6b423), (0x24c38, 0x24c4c), (0x1a14c, 0x1a1ef), (0x43670, 0x436e0)]
+    if stop_at_screen:
+        code_ranges.extend(((0x595c0, 0x59660), (0x596c0, 0x5975f)))
+    for start, end in code_ranges:
         selector, offset = mapping.code_address(start, end - start)
         address = runtime.MemoryAddress.segmented(selector, offset)
         controls.append((address, runtime.read(address, end - start)))
@@ -60,6 +71,19 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30):
             stack_pointer = int(registers.general['esp'], 16)
             key = (int(registers.segments['ss'], 16), stack_pointer)
             kind = hooks[stop.breakpoint_id]
+            if kind == 'screen-entry':
+                if pc not in (0x595c0, 0x596c0) or frame is not None:
+                    raise RecordingError('Screen boundary/frame mismatch')
+                arguments = runtime.read(runtime.MemoryAddress.segmented(key[0], key[1] + 4), 12)
+                screen, draw, mode = (int.from_bytes(arguments[i:i + 4], 'little') for i in (0, 4, 8))
+                if not 0 <= screen <= 24:
+                    raise RecordingError('Unregistered requested screen at diagnostic boundary')
+                report['end_rng_state'] = journal.complete()
+                if state() != report['end_rng_state'] or replay(journal.events) != report['end_rng_state']:
+                    raise RecordingError('Screen-boundary RNG state differs from recorded events')
+                report['status'] = 'screen-load-entry-reached'
+                report['screen_request'] = {'screen': screen, 'draw': draw, 'mode': mode}
+                return report
             if kind.endswith('entry'):
                 if pc != (0x6b413 if kind == 'seed-entry' else 0x6b3f1):
                     raise RecordingError('Native entry breakpoint/map mismatch')

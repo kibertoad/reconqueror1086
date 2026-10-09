@@ -204,6 +204,14 @@ those guards. tools/rng_journal.py separately verifies reseeds, ordering and
 raw/bounded state transitions; run tools/test_rng_journal.py for synthetic checks.
 This remains intermediate transport verification, without actual rebuild replay.
 
+For a startup state diagnostic, add `--stop-at-screen` and increase
+`--record-draw-limit` above the startup prefix. The optional breakpoints stop
+before either screen-loading procedure runs (FND-UI-001), recording its requested
+screen, draw and mode arguments. The report remains incomplete for full-game
+coverage. This entry stop does not establish loaded screen state or readiness
+for input. `python -B tools/test_native_rng_recorder.py` checks the boundary and
+rejects an unrecorded RNG-state change or unregistered screen number.
+
 After full verification, propose reusable lifecycle, locking, operation-wait and
 debugger helpers upstream, together with a reproducible guide. Keep game-specific
 LE identity, field mapping and rule ownership here; check existing upstream

@@ -842,6 +842,16 @@ pending execution. Existing lifecycle cleanup and lock retention checks pass.
 The RNG journal and live-mapping synthetic suites also passed. These checks
 do not establish full-game recording or gameplay replay.
 
+The owned continuous-observation probe reached the initial seed and the same
+startup draw prefix including home selection, then retained one continuation
+through repeated observation expiries. An explicit diagnostic pause ended this
+case; it was not restarted on expiry. Diagnostics and the original journal
+remain local under artifacts/runtime-tools/native-rng-continuous-20261010-a.
+`python -B tools/test_native_rng_recorder.py` passed three synthetic
+screen-boundary cases: a tagged diagnostic result, unrecorded state-change
+rejection, and unregistered-screen rejection. Native screen-boundary reachability
+is a separate pending verification.
+
 ## Structured debugger tooling checkpoint (2026-10-09)
 
 `python -B tools/test_dosbox_session.py` passed four synthetic lifecycle checks:
