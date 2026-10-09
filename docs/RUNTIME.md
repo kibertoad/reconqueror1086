@@ -251,6 +251,12 @@ Use `--sound-investigation` only when the probe specifically investigates sound;
 its generated configuration then permits host audio. This is the owner's
 standing preference, recorded in AGENTS.md.
 
+`Probe-LiveMapping.py --animations-off` explicitly sets the supported
+`ANIMATIONS` switch to `OFF` in the private INI (FMT-CONFIG-001). Use it for
+a controlled run that does not investigate animated transitions. The default
+preserves the installed animation setting. The local `probe-configuration.json`
+records the selected animation and audio options; it is not RNG trace evidence.
+
 Do not replace this with `nosound=true` in the structured build: native and
 synthetic readiness attempts with that setting failed before the guest marker.
 The portable debugger's synthetic check passed with it, so that result alone

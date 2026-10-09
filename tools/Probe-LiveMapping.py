@@ -28,6 +28,8 @@ def main():
     parser.add_argument('--stop-at-screen', action='store_true')
     parser.add_argument('--stop-after-screen', action='store_true')
     parser.add_argument('--record-draw-limit', type=int, default=30)
+    parser.add_argument('--animations-off', action='store_true',
+                        help='Set the supported ANIMATIONS switch OFF in the private INI')
     parser.add_argument('--sound-investigation', action='store_true',
                         help='Enable host audio only for a probe investigating sound')
     args = parser.parse_args()
@@ -68,7 +70,18 @@ def main():
     # FMT-CONFIG-001: supported switches; modify only the private copy.
     ini = (drive / 'CONQUER.INI').read_text()
     ini = ini.replace('MOVIE=ON', 'MOVIE=OFF').replace('CREDITS=ON', 'CREDITS=OFF')
+    if args.animations_off:
+        # FMT-CONFIG-001: explicit controlled configuration, not a runtime patch.
+        lines = ini.splitlines()
+        if sum(line.split('=', 1)[0].strip() == 'ANIMATIONS' for line in lines) != 1:
+            raise RuntimeError('Expected exactly one private ANIMATIONS setting')
+        ini = '\n'.join('ANIMATIONS=OFF' if line.split('=', 1)[0].strip() == 'ANIMATIONS'
+                        else line for line in lines) + '\n'
     (drive / 'CONQUER.INI').write_text(ini)
+    (root / 'probe-configuration.json').write_text(json.dumps({
+        'movie': 'OFF', 'credits': 'OFF', 'animations_off': args.animations_off,
+        'sound_investigation': args.sound_investigation
+    }, indent=2))
     source = Path('artifacts/runtime-tools/dosbox-x-agent-source')
     configuration = 'Agent Debug SDL2' if args.debugger_build == 'heavy' else 'Agent Debug No Heavy SDL2'
     emulator = source / 'bin/x64' / configuration / 'dosbox-x.exe'
