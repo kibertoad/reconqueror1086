@@ -66,8 +66,14 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
             selector, offset = mapping.code_address(address)
             hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
             hooks[hook.id] = name
+    for address, name in ((0x445c1, 'scaled-return'), (0x5b454, 'sound-result')):
+        # FND-RNG-002 / FND-SOUND-008 locate the completed reductions.
+        selector, offset = mapping.code_address(address)
+        hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
+        hooks[hook.id] = name
     controls = []
     code_ranges = [(0x6b3eb, 0x6b423), (0x24c38, 0x24c4c), (0x1a14c, 0x1a1ef), (0x43670, 0x436e0)]
+    code_ranges.extend(((0x445b4, 0x445c2), (0x4f2ac, 0x4f2d6), (0x5b418, 0x5b470)))
     if stop_at_screen or stop_after_screen:
         code_ranges.extend(((0x595c0, 0x59660), (0x596c0, 0x5975f)))
     if stop_after_screen:
@@ -242,6 +248,20 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                     frame = {'key': key, 'return_pc': return_pc, 'phase': 'raw',
                              'bound_key': (key[0], key[1] + 4), 'bound_pc': 0x24c4b,
                              'outer_pc': outer_pc}
+                elif return_pc == 0x445b9:
+                    # FND-ASSAULT-031: this exact caller passes 200 for the hit check.
+                    if canonical_return(words[1]) != 0x4f2cf or words[2] != 200:
+                        raise RecordingError('Unowned scaled-helper caller or unexpected hit-check bound')
+                    journal.begin_draw('RULE-ASSAULT-023', 'scaled', 200, state())
+                    frame = {'key': key, 'return_pc': return_pc, 'phase': 'raw',
+                             'bound_key': (key[0], key[1] + 4), 'bound_pc': 0x445c1}
+                elif return_pc == 0x5b44d:
+                    # FND-SOUND-008: only the exhausted ten-voice scan reaches this call.
+                    if int(registers.general['esi'], 16) != 10:
+                        raise RecordingError('Busy-voice divisor differs from its supported reading')
+                    journal.begin_draw('RULE-SOUND-002', 'remainder', 10, state())
+                    frame = {'key': key, 'return_pc': return_pc, 'phase': 'raw',
+                             'bound_key': (key[0], key[1] + 4), 'bound_pc': 0x5b454}
                 elif return_pc == 0x1a183:
                     # FND-TALK-003: EDI carries the packed node word; its high
                     # byte is the signed prompt count used by the reduction.
@@ -268,7 +288,9 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
             else:
                 if frame is None or frame['phase'] != 'bound' or frame['bound_key'] != key or frame['bound_pc'] != pc:
                     raise RecordingError('Bounded result/frame mismatch')
-                result_register = 'edx' if kind == 'prompt-result' else 'eax'
+                if kind == 'sound-result' and int(registers.general['esi'], 16) != 10:
+                    raise RecordingError('Busy-voice divisor changed before reduction')
+                result_register = 'edx' if kind in ('prompt-result', 'sound-result') else 'eax'
                 if journal.pending['rule'] == 'RULE-PERSON-002':
                     shift_ordinal += 1
                 journal.finish_bound(state(), int(registers.general[result_register], 16))

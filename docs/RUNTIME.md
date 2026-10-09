@@ -269,6 +269,14 @@ an ordinal and returned length locally, without reading or publishing the
 extracted content. An outstanding extraction is marked explicitly in an
 incomplete journal. This progress observation is separate from RNG events.
 
+The native recorder also accepts the exact hit-check scaled draw of
+RULE-ASSAULT-023 (FND-ASSAULT-031) and the ten-busy-voice remainder draw of
+RULE-SOUND-002 (FND-SOUND-008). It checks the scaled helper's caller and bound,
+or the voice divisor, before allowing the draw, then verifies the raw state
+and the appropriate reduced-result register. Other scaled callers remain
+rejected. Synthetic verification of these policies does not establish that
+the corresponding original gameplay paths have been exercised.
+
 Do not replace this with `nosound=true` in the structured build: native and
 synthetic readiness attempts with that setting failed before the guest marker.
 The portable debugger's synthetic check passed with it, so that result alone

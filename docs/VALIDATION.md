@@ -209,6 +209,14 @@ including Kaitai compilation and base-branch comparison. Q-BATTLE-018 is closed.
 
 ## Local gate
 
+2026-10-10: native caller policy checks passed 29 recorder, journal,
+durable-event-log and mapping tests. The new synthetic cases record the
+scaled hit-check result and the busy-voice remainder register, and reject
+other scaled callers, changed hit-check bounds and an incorrect voice divisor.
+FND-ASSAULT-031 and FND-SOUND-008 provide the direct readings. These tests
+exercise transport policy and numeric replay; no original gameplay traversal
+or full-game coverage claim follows from them.
+
 2026-10-10: extraction progress instrumentation passed 25 native-recorder,
 journal, durable-event-log and live-mapping tests. The new controls accept a
 matched extraction return and reject a different stack frame; progress is

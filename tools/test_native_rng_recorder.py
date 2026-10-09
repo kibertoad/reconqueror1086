@@ -14,7 +14,7 @@ def runtime_and_mapping(screen_state=123, screen_number=0, record_pointer=0x3000
     value.session = SimpleNamespace(id='owned', state='stopped')
     value.session.stop_reason = SimpleNamespace(kind='breakpoint', breakpoint_id='seed')
     value.agent = Mock()
-    value.agent.create_execution_breakpoint.side_effect = [SimpleNamespace(id=f'hook-{i}') for i in range(6)]
+    value.agent.create_execution_breakpoint.side_effect = lambda session, selector, offset: SimpleNamespace(id=f'hook-{offset:x}')
     value.agent.execute_command.return_value.raw_output = 'synthetic'
     code = SimpleNamespace(selector=0x180, resolve=lambda offset: offset)
     data = SimpleNamespace(selector=0x188)
@@ -43,7 +43,7 @@ def runtime_and_mapping(screen_state=123, screen_number=0, record_pointer=0x3000
         cpu_mode='protected', instruction_pointer=hex((0x6b413, 0x6b422, 0x595c0, 0x5965f)[value.phase]))
     def wait(operation):
         value.phase += 1
-        value.session.stop_reason.breakpoint_id = ('seed', 'hook-1', 'hook-4', 'hook-5')[value.phase]
+        value.session.stop_reason.breakpoint_id = ('seed', 'hook-6b422', 'hook-595c0', 'hook-5965f')[value.phase]
     value.wait_until_stopped = wait
     return value, mapping
 
@@ -51,12 +51,11 @@ def runtime_and_mapping(screen_state=123, screen_number=0, record_pointer=0x3000
 class ScreenBoundaryTests(unittest.TestCase):
     def startup_sequence(self, corrupt_stack=False, extraction=False, corrupt_archive=False):
         runtime, mapping = runtime_and_mapping()
-        runtime.agent.create_execution_breakpoint.side_effect = [SimpleNamespace(id=f'hook-{i}') for i in range(11)]
         pcs = (0x6b413, 0x6b422, 0x2ac08, 0x2ac86, 0x2ad54, 0x595c0, 0x5965f)  # FND-UI-018/017
-        ids = ('seed', 'hook-1', 'hook-6', 'hook-7', 'hook-8', 'hook-4', 'hook-5')
+        ids = ('seed', 'hook-6b422', 'hook-2ac08', 'hook-2ac86', 'hook-2ad54', 'hook-595c0', 'hook-5965f')
         if extraction:
             pcs = pcs[:2] + (0x49ba8, 0x49c78) + pcs[2:]  # FND-SAVE-003
-            ids = ids[:2] + ('hook-9', 'hook-10') + ids[2:]
+            ids = ids[:2] + ('hook-49ba8', 'hook-49c78') + ids[2:]
         original_registers = runtime.registers
         def registers():
             saved_phase = runtime.phase
@@ -149,6 +148,59 @@ class ScreenBoundaryTests(unittest.TestCase):
     def test_unregistered_screen_fails(self):
         with self.assertRaisesRegex(RecordingError, 'Unregistered requested screen'):
             self.run_sequence(screen_number=25)
+
+
+class OwnedReductionTests(unittest.TestCase):
+    def run_draw(self, sound=False, bound=200, caller=0x4f2cf, divisor=10):
+        runtime, mapping = runtime_and_mapping()
+        raw_return = 0x5b44d if sound else 0x445b9  # FND-SOUND-008 / FND-RNG-002
+        endpoint = 0x5b454 if sound else 0x445c1
+        pcs = (0x6b413, 0x6b422, 0x6b3f1, 0x6b412, endpoint)
+        original_read = runtime.read
+        def read(address, length):
+            if address == (0x188, 0x9e044):
+                return (0 if runtime.phase == 0 else 1 if runtime.phase < 3 else 1103527590).to_bytes(4, 'little')
+            if address == (0x188, 0x1000):
+                words = (0x24c32, 1, 0) if runtime.phase == 0 else (raw_return, caller, bound)
+                return b''.join(word.to_bytes(4, 'little') for word in words)
+            return original_read(address, length)
+        runtime.read = read
+        runtime.registers = lambda: SimpleNamespace(
+            general={'esp': '0x1004' if runtime.phase == 4 else '0x1000',
+                     'eax': hex(102 if runtime.phase == 4 else 16838),
+                     'edx': '0x8', 'esi': hex(divisor)},
+            segments={'cs': '0x180', 'ds': '0x188', 'ss': '0x188'},
+            cpu_mode='protected', instruction_pointer=hex(pcs[runtime.phase]))
+        ids = ('seed', 'hook-6b422', 'draw', 'hook-6b412', f'hook-{endpoint:x}')
+        def wait(operation):
+            runtime.phase += 1
+            runtime.session.stop_reason.breakpoint_id = ids[runtime.phase]
+        runtime.wait_until_stopped = wait
+        with patch('native_rng_recorder.tables_from_diagnostic', return_value=(0, 16)), \
+             patch('native_rng_recorder.descriptor', side_effect=[mapping.code, mapping.data] * 5), \
+             patch('native_rng_recorder.EventLog'), patch('native_rng_recorder.Path.write_text'):
+            return record(runtime, mapping, ('draw', 'seed'), 'unused-output', maximum_draws=1)
+
+    def test_hit_check_records_the_scaled_result(self):
+        report = self.run_draw()
+        event = report['events'][-1]
+        self.assertEqual((event['rule'], event['reduction'], event['bound'], event['result']),
+                         ('RULE-ASSAULT-023', 'scaled', 200, 102))
+        self.assertFalse(report['full_game_complete'])
+
+    def test_busy_voice_records_remainder_register_instead_of_quotient(self):
+        event = self.run_draw(sound=True)['events'][-1]
+        self.assertEqual((event['rule'], event['reduction'], event['bound'], event['result']),
+                         ('RULE-SOUND-002', 'remainder', 10, 8))
+
+    def test_scaled_helper_rejects_other_callers_and_bounds(self):
+        for options in ({'caller': 0x4f2d0}, {'bound': 201}):
+            with self.subTest(options=options), self.assertRaisesRegex(RecordingError, 'Unowned scaled-helper'):
+                self.run_draw(**options)
+
+    def test_busy_voice_rejects_wrong_divisor_before_draw(self):
+        with self.assertRaisesRegex(RecordingError, 'Busy-voice divisor differs'):
+            self.run_draw(sound=True, divisor=9)
 
 
 if __name__ == '__main__':
