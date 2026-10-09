@@ -26,10 +26,13 @@ def main():
     parser.add_argument('--record-startup-shifts', action='store_true')
     parser.add_argument('--record-native', action='store_true')
     parser.add_argument('--stop-at-screen', action='store_true')
+    parser.add_argument('--stop-after-screen', action='store_true')
     parser.add_argument('--record-draw-limit', type=int, default=30)
     args = parser.parse_args()
-    if args.stop_at_screen and not args.record_native:
+    if (args.stop_at_screen or args.stop_after_screen) and not args.record_native:
         raise ValueError('Screen diagnostic boundary requires native recording')
+    if args.stop_at_screen and args.stop_after_screen:
+        raise ValueError('Choose one screen diagnostic boundary')
     if args.trace_loader and args.debugger_build != 'heavy':
         raise ValueError('CPU tracing requires the heavy debugger build')
     if args.draw_check and not args.seed_check:
@@ -125,7 +128,8 @@ def main():
                     print('instrumented entry breakpoint hit', runtime.session.stop_reason)
                     if args.record_native:
                         from native_rng_recorder import record
-                        journal = record(runtime, live_map, ids, root, args.record_draw_limit, args.stop_at_screen)
+                        journal = record(runtime, live_map, ids, root, args.record_draw_limit,
+                                         args.stop_at_screen, args.stop_after_screen)
                         print('native recording', journal['status'], 'events', len(journal['events']))
                         break
                     if args.record_startup_shifts and runtime.session.stop_reason.breakpoint_id != ids[1]:

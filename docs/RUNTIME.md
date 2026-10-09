@@ -223,6 +223,12 @@ coverage. This entry stop does not establish loaded screen state or readiness
 for input. `python -B tools/test_native_rng_recorder.py` checks the boundary and
 rejects an unrecorded RNG-state change or unregistered screen number.
 
+`--stop-after-screen` instead follows the initial loader to its return
+(FND-UI-017). It checks the returned record, screen-object identifier
+(FND-UI-002), history head and recorded RNG state, rejecting recursive loading
+or an invalid pointer. This mode is synthetically checked but awaits native
+verification. It does not establish input readiness or full-game completeness.
+
 After full verification, propose reusable lifecycle, locking, operation-wait and
 debugger helpers upstream, together with a reproducible guide. Keep game-specific
 LE identity, field mapping and rule ownership here; check existing upstream
