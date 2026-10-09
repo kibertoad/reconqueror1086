@@ -263,6 +263,11 @@ Each checkpoint verifies the original code, descriptors, stack position and
 unchanged recorded RNG state, records the guest's animation flag in local
 `startup-checkpoints.json`, then continues the same run. These checkpoints
 write no guest state and do not count as loaded-screen or full-game evidence.
+The same option observes archive-to-loose-file extraction entry and return
+from FND-SAVE-003, checking the saved frame and recorded RNG state. It records
+an ordinal and returned length locally, without reading or publishing the
+extracted content. An outstanding extraction is marked explicitly in an
+incomplete journal. This progress observation is separate from RNG events.
 
 Do not replace this with `nosound=true` in the structured build: native and
 synthetic readiness attempts with that setting failed before the guest marker.

@@ -209,6 +209,18 @@ including Kaitai compilation and base-branch comparison. Q-BATTLE-018 is closed.
 
 ## Local gate
 
+2026-10-10: extraction progress instrumentation passed 25 native-recorder,
+journal, durable-event-log and live-mapping tests. The new controls accept a
+matched extraction return and reject a different stack frame; progress is
+kept separate from rule-tagged RNG events. Full documentation validation passed
+including Kaitai compilation and base-branch comparison.
+The preceding `native-rng-startup-checkpoints-20261010-a` attempt reached the
+verified seed and recorded its startup prefix, ruling out a missed seed entry
+in that attempt. An explicit diagnostic pause finalized an incomplete journal
+before the startup preparation and screen-loading checkpoints. The durable
+events and diagnostic memory/register captures remain local. Cleanup stopped
+the owned emulator and released its lock. It is not a full-game pass.
+
 2026-10-10: startup checkpoint instrumentation passed 23 native-recorder,
 journal, durable-event-log and live-mapping tests, including acceptance of
 the verified preparation stack progression and rejection of an incorrect

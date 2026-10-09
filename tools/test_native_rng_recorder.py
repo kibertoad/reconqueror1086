@@ -49,11 +49,14 @@ def runtime_and_mapping(screen_state=123, screen_number=0, record_pointer=0x3000
 
 
 class ScreenBoundaryTests(unittest.TestCase):
-    def startup_sequence(self, corrupt_stack=False):
+    def startup_sequence(self, corrupt_stack=False, extraction=False, corrupt_archive=False):
         runtime, mapping = runtime_and_mapping()
-        runtime.agent.create_execution_breakpoint.side_effect = [SimpleNamespace(id=f'hook-{i}') for i in range(9)]
+        runtime.agent.create_execution_breakpoint.side_effect = [SimpleNamespace(id=f'hook-{i}') for i in range(11)]
         pcs = (0x6b413, 0x6b422, 0x2ac08, 0x2ac86, 0x2ad54, 0x595c0, 0x5965f)  # FND-UI-018/017
         ids = ('seed', 'hook-1', 'hook-6', 'hook-7', 'hook-8', 'hook-4', 'hook-5')
+        if extraction:
+            pcs = pcs[:2] + (0x49ba8, 0x49c78) + pcs[2:]  # FND-SAVE-003
+            ids = ids[:2] + ('hook-9', 'hook-10') + ids[2:]
         original_registers = runtime.registers
         def registers():
             saved_phase = runtime.phase
@@ -61,7 +64,10 @@ class ScreenBoundaryTests(unittest.TestCase):
             result = original_registers()
             runtime.phase = saved_phase
             result.instruction_pointer = hex(pcs[saved_phase])
-            if saved_phase in (3, 4):
+            result.general['eax'] = '0x100'
+            if corrupt_archive and pcs[saved_phase] == 0x49c78:
+                result.general['esp'] = '0x1004'
+            if pcs[saved_phase] in (0x2ac86, 0x2ad54):
                 result.general['esp'] = hex(0x1000 - (88 if corrupt_stack else 92))
             return result
         runtime.registers = registers
@@ -70,7 +76,7 @@ class ScreenBoundaryTests(unittest.TestCase):
             runtime.session.stop_reason.breakpoint_id = ids[runtime.phase]
         runtime.wait_until_stopped = wait
         with patch('native_rng_recorder.tables_from_diagnostic', return_value=(0, 16)), \
-             patch('native_rng_recorder.descriptor', side_effect=[mapping.code, mapping.data] * 7), \
+             patch('native_rng_recorder.descriptor', side_effect=[mapping.code, mapping.data] * len(pcs)), \
              patch('native_rng_recorder.EventLog'), patch('native_rng_recorder.Path.write_text'):
             return record(runtime, mapping, ('draw', 'seed'), 'unused-output',
                           stop_after_screen=True, startup_checkpoints=True)
@@ -85,6 +91,19 @@ class ScreenBoundaryTests(unittest.TestCase):
     def test_startup_checkpoint_rejects_changed_stack(self):
         with self.assertRaisesRegex(RecordingError, 'Startup preparation stack differs'):
             self.startup_sequence(corrupt_stack=True)
+
+    def test_archive_progress_is_separate_from_rng_and_screen_completion(self):
+        report = self.startup_sequence(extraction=True)
+        observed = report['startup_checkpoints'][:2]
+        self.assertEqual([item['boundary'] for item in observed], ['archive-entry', 'archive-return'])
+        self.assertEqual(observed[1]['returned_length'], 256)
+        self.assertFalse(report['pending_archive_extraction'])
+        self.assertEqual(len(report['events']), 1)
+        self.assertFalse(report['full_game_complete'])
+
+    def test_archive_progress_rejects_wrong_return_frame(self):
+        with self.assertRaisesRegex(RecordingError, 'Archive extraction return/frame mismatch'):
+            self.startup_sequence(extraction=True, corrupt_archive=True)
 
     def run_sequence(self, after=False, **options):
         runtime, mapping = runtime_and_mapping(**options)

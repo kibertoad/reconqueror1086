@@ -62,6 +62,10 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
             selector, offset = mapping.code_address(address)
             hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
             hooks[hook.id] = 'startup-checkpoint'
+        for address, name in ((0x49ba8, 'archive-entry'), (0x49c78, 'archive-return')):  # FND-SAVE-003
+            selector, offset = mapping.code_address(address)
+            hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
+            hooks[hook.id] = name
     controls = []
     code_ranges = [(0x6b3eb, 0x6b423), (0x24c38, 0x24c4c), (0x1a14c, 0x1a1ef), (0x43670, 0x436e0)]
     if stop_at_screen or stop_after_screen:
@@ -71,6 +75,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                             (0x59fa0, 0x5a180), (0x5a2a4, 0x5a414)))
     if startup_checkpoints:
         code_ranges.append((0x2ac08, 0x2ad5b))  # FND-UI-018
+        code_ranges.append((0x49ba8, 0x49c79))  # FND-SAVE-003
     for start, end in code_ranges:
         selector, offset = mapping.code_address(start, end - start)
         address = runtime.MemoryAddress.segmented(selector, offset)
@@ -86,6 +91,8 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
     frame = None
     screen_frame = None
     startup_key = None
+    archive_key = None
+    archive_ordinal = 0
     count = 0
     shift_ordinal = 0
     report = {'schema': 'conquer-native-rng-journal-v1', 'status': 'incomplete',
@@ -111,6 +118,28 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
             stack_pointer = int(registers.general['esp'], 16)
             key = (int(registers.segments['ss'], 16), stack_pointer)
             kind = hooks[stop.breakpoint_id]
+            if kind in ('archive-entry', 'archive-return'):
+                if frame is not None:
+                    raise RecordingError('Archive checkpoint overlaps a pending recorded operation')
+                if kind == 'archive-entry':
+                    if pc != 0x49ba8 or archive_key is not None:
+                        raise RecordingError('Archive extraction entry/frame mismatch')
+                    archive_key = key
+                    archive_ordinal += 1
+                elif pc != 0x49c78 or archive_key != key:
+                    raise RecordingError('Archive extraction return/frame mismatch')
+                current_state = journal.complete()
+                if state() != current_state or replay(journal.events) != current_state:
+                    raise RecordingError('Archive checkpoint RNG state differs from recorded events')
+                observation = {'boundary': kind, 'ordinal': archive_ordinal, 'rng_state': current_state}
+                if kind == 'archive-return':
+                    observation['returned_length'] = int(registers.general['eax'], 16)
+                    archive_key = None
+                report.setdefault('startup_checkpoints', []).append(observation)
+                (output / 'startup-checkpoints.json').write_text(json.dumps(report['startup_checkpoints'], indent=2))
+                print('Verified startup checkpoint:', observation, flush=True)
+                runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
+                continue
             if kind == 'startup-checkpoint':
                 if pc not in startup_points or frame is not None or screen_frame is not None:
                     raise RecordingError('Startup checkpoint/frame mismatch')
@@ -133,7 +162,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                 runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
                 continue
             if kind == 'screen-return':
-                if pc != 0x5965f or frame is not None or screen_frame is None or screen_frame['key'] != key:
+                if pc != 0x5965f or frame is not None or archive_key is not None or screen_frame is None or screen_frame['key'] != key:
                     raise RecordingError('Loaded-screen return/frame mismatch')
                 selector, offset = mapping.data_address(0xafe50, 4)  # FND-UI-017
                 pointer = int.from_bytes(runtime.read(runtime.MemoryAddress.segmented(selector, offset), 4), 'little')
@@ -271,4 +300,5 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         event_log.close()
         report['pending_operation'] = journal.pending is not None
         report['pending_screen_load'] = screen_frame is not None
+        report['pending_archive_extraction'] = archive_key is not None
         (output / 'native-rng-journal.json').write_text(json.dumps(report, indent=2))
