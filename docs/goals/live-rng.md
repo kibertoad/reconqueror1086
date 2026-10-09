@@ -50,7 +50,7 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
 - Unfinished: complete rule ownership, full-game recording/replay, prescribed
   observable gameplay state, and upstream/shared-helper proposal. No WIP branch.
 - Screen-loader entry verification passed on both debugger builds. An owned
-  quiet animation-off startup-checkpoint probe remains running with the machine
+  quiet animation-off extraction-checkpoint probe remains running with the machine
   lock held; preserve and observe its existing operation before another run.
   Quiet structured and portable
   synthetic controls and a bounded quiet native startup recording passed.
@@ -61,7 +61,10 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
 - Blockers: none established. RUNTIME.md is the current capability assessment.
 - Next: observe the active startup-checkpoint probe and verify whether a
   candidate RNG entry was reached before interpreting startup progress.
-  The read-only boundary instrumentation and 23 safety checks passed.
+  The read-only boundary and extraction instrumentation and 25 safety checks passed.
+  The preceding diagnostic confirmed the initial seed was reached; its completed
+  prefix and incomplete final journal agree. Preserve the current extraction
+  probe while taking independent static RNG ownership work.
   Then trace the original-input boundary in the latest quiet loaded-return
   diagnostic before another recorded run. The explicit animation-off control
   and guest configuration verification are documented in VALIDATION.md; the
