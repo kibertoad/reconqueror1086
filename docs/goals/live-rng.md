@@ -42,6 +42,7 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
 
 - Stage: Survey; this goal adds runtime research capabilities.
 - Last gate: 2026-10-10 complete documentation and repository gates passed;
+  complete canonical fast gate passed before the authorized main push.
   mapping, lifecycle, emulator, call-survey and RNG-journal synthetic checks
   passed. EXP-RNG-001 and native recorder transport checks are documented in
   VALIDATION.md. No full-game or actual rebuild replay gate has passed.
@@ -51,8 +52,8 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
   Python PID 18304 and DOSBox-X PID 50712. Poll that same handle first; do not
   launch another original while its machine lock is held. Observation expiry
   is not termination. The no-heavy debugger build completed; its original
-  verification is pending. tools/Probe-LiveMapping.py has uncommitted build
-  selection/identity metadata changes awaiting that verification.
+  verification is pending. The probe now selects and records debugger build
+  identity; its default remains heavy until alternate-build verification.
 - Blockers: none established. RUNTIME.md is the current capability assessment.
 - Next: Q-STRATEGY-043 / RULE-STRATEGY-012, complete the downstream
   consumer review from FND-STRATEGY-043/044/045 and resolve the disputed rule.
