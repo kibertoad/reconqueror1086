@@ -48,17 +48,16 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
   VALIDATION.md. No full-game or actual rebuild replay gate has passed.
 - Unfinished: complete rule ownership, full-game recording/replay, prescribed
   observable gameplay state, and upstream/shared-helper proposal. No WIP branch.
-- Screen-loader entry verification passed on the heavy build. The alternate
-  build is now running in exec session 86992, Python PID 4020, DOSBox-X PID
-  34628. Poll that same handle before another original run; observation expiry
-  is not termination. Its reported feature set matches no-heavy. The new
-  loaded-screen-return probe has passed synthetic checks but awaits native use.
+- Screen-loader entry verification passed on both debugger builds. The
+  loaded-screen-return probe is running in exec session 58350, Python PID
+  68576, DOSBox-X PID 67120, with the no-heavy build. Poll that same handle
+  before another original run; observation expiry is not termination. Its
+  completed-event prefix is durable; the final return result is still pending.
 - Blockers: none established. RUNTIME.md is the current capability assessment.
-- Next: finish alternate-build verification, then run the guarded
-  loaded-screen-return probe from FND-UI-017 and verify heap-object identity
+- Next: finish the guarded loaded-screen-return probe from FND-UI-017 and verify heap-object identity
   before attempting supported-state writes or gameplay input.
 - Q-STRATEGY-043 / RULE-STRATEGY-012: complete the downstream
-  consumer review from FND-STRATEGY-043/044/045 and resolve the disputed rule.
+  consumer review from FND-STRATEGY-043/044/045/046 and resolve the disputed rule.
   Its directly read bound is accepted by tools/native_rng_recorder.py; the
   extended native case is documented in VALIDATION.md.
 - Then continue beyond the home-selection result to the next unaccepted
@@ -66,7 +65,7 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
   local Survey-RngCalls.py output as leads, never as a complete caller audit.
 - Q-RNG-001 / RULE-RNG-001 remains open after FND-RNG-005; finish the adjustment
   provenance reading when needed for clock semantics.
-- Evidence references: EXP-RNG-001, FND-RNG-003/004/005, FND-STRATEGY-043/044/045.
+- Evidence references: EXP-RNG-001, FND-RNG-003/004/005, FND-STRATEGY-043/044/045/046.
   tools/live_mapping.py validates the initial native map;
   tools/native_rng_recorder.py rechecks code/descriptors at each stop.
   Capture paths belong to findings and validation documentation, not this file.
