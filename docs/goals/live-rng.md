@@ -42,14 +42,15 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
 
 - Stage: Survey; this goal adds runtime research capabilities.
 - Last gate: 2026-10-09 mapping, lifecycle and emulator synthetic checks passed;
-  the complete documentation gate passed without skips.
+  the complete documentation gate passed without skips. EXP-RNG-001 and the
+  recorder safety checks passed in the following research batch.
 - Unfinished: rule ownership, full-game recording/replay, prescribed observable
   gameplay state, and reproducible upstream/shared-helper proposal. No WIP branch.
 - Blockers: none established. RUNTIME.md is the current capability assessment.
 - Next: Q-RNG-001 / RULE-RNG-001, finish the static time-source reading; then
-  implement rule-tagged capture, starting with RULE-PERSON-002's bounded startup
-  shifts and rejecting unowned calls. Validate recorder completeness and ordering
+  extend the verified EXP-RNG-001 bounded recorder to additional supported
+  callers, rejecting unowned calls. Validate recorder completeness and ordering
   in two different-seed runs before proposing upstream extraction.
-- Evidence references: FND-RNG-004 and FND-RNG-003. Per-run checks live in
+- Evidence references: EXP-RNG-001, FND-RNG-004 and FND-RNG-003. Per-run checks live in
   tools/live_mapping.py; tools/Probe-LiveMapping.py verifies native seed/draw
   state identity. Capture paths and hashes belong to the finding, not this file.
