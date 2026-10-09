@@ -48,12 +48,10 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
   VALIDATION.md. No full-game or actual rebuild replay gate has passed.
 - Unfinished: complete rule ownership, full-game recording/replay, prescribed
   observable gameplay state, and upstream/shared-helper proposal. No WIP branch.
-- Active verification: owned screen-boundary probe, exec session 82508,
-  Python PID 18304 and DOSBox-X PID 50712. Poll that same handle first; do not
-  launch another original while its machine lock is held. Observation expiry
-  is not termination. The no-heavy debugger build completed; its original
-  verification is pending. The probe now selects and records debugger build
-  identity; its default remains heavy until alternate-build verification.
+- Screen-loader entry verification passed and its owned process/lock cleanup
+  completed. No original probe remains active. The no-heavy debugger build
+  completed; its original verification is pending. The probe selects and records
+  debugger build identity; its default remains heavy until alternate verification.
 - Blockers: none established. RUNTIME.md is the current capability assessment.
 - Next: Q-STRATEGY-043 / RULE-STRATEGY-012, complete the downstream
   consumer review from FND-STRATEGY-043/044/045 and resolve the disputed rule.
