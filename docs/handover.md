@@ -14,12 +14,20 @@ Evidence and parity statuses are preserved. Use the generated status indexes,
 PARITY.md and tools/Report-Coverage.mjs for progress and its explicit limits.
 Coverage does not establish a complete reading or completed restoration.
 
+Owner focus: CONQUER.EXE and its consumed resources. Other runtime analysis is
+Later in implementation-plan.md. DOSBox-X 2026.10.01 is installed locally and
+the debugger transport probe passes; Unicorn 2.1.4 function tooling is verified.
+RUNTIME.md records exact capability limits and commands.
+
 ## Next work
 
-- Continue Survey through Q-RES-017 / FMT-RES-015 and the area queues named by
-  [implementation-plan.md](implementation-plan.md).
-- Establish the unavailable code baselines and driver-payload scope recorded
-  in coverage/baseline.json; follow [coverage/README.md](../coverage/README.md).
+- Focus research on CONQUER.EXE and its consumed resources, following the
+  area queues within the scope in implementation-plan.md. Q-RES-017 and other
+  auxiliary-runtime analysis are Later; preserve their questions and baselines.
+- Verify live LE code/data mapping and rule-tagged full-game RNG recording.
+  The current probe stops in the protected-mode loader; use RUNTIME.md's verified
+  debugger transport and isolated function harness, without assuming a gameplay
+  state, replay fixture or complete branch/caller audit.
 - Audit complete readings only from entries' complete_reading findings; leave
   their function-level coverage unavailable until that audit exists.
 - The next implementation slice is strategic schema-two runtime integration,
@@ -35,8 +43,14 @@ installed-version verification, strict source readiness, native sidecars and
 boundary audits passed. Long-running tests and remote cross-platform CI were
 not run. [VALIDATION.md](VALIDATION.md) records the checks and limitations.
 
-Unfinished: none. .claude/settings.json remains unrelated and untracked.
-No original game ran and no push or publication was performed. Publishing
+The 2026-10-09 tooling checks in VALIDATION.md passed synthetic harness cases,
+RNG function smoke comparisons, debugger guest-memory/breakpoint tests,
+repository policy and full documentation checks. Live LE mapping and full-game
+RNG recording remain next work, not verified capabilities.
+
+Unfinished code: none. .claude/settings.json remains unrelated and untracked.
+The original capability probe ran under its lock and stopped its own emulator;
+no push or publication was performed. Publishing
 still requires the owner's explicit request and the canonical remote check.
 
 Local frozen adoption contracts, migration scripts and proof reports remain
