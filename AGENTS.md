@@ -14,7 +14,25 @@ evidence requirements, restrictions on unsupported state writes, or push policy.
 Sandbox approval requests may still be required by the execution environment;
 they are not a requirement for renewed owner permission.
 
+## Runtime scope: preinstalled game
+
+The restoration starts from the owned preinstalled game. Setup and installation
+executables (including SETUP.EXE, _SETUP.EXE and INST.EXE) need no further
+analysis or reimplementation. Preserve existing evidence and media accounting,
+but do not treat installer coverage or installer-only questions as completion
+requirements. Configuration and resources consumed by CONQUER.EXE remain in
+scope. Other auxiliary runtimes remain Later as the implementation plan records.
+
 ## Original technical-design documentation
+
+## Runtime scope: preinstalled game
+
+The restoration starts from the owned preinstalled game. Setup and installation
+executables (including SETUP.EXE, _SETUP.EXE and INST.EXE) need no further
+analysis or reimplementation. Preserve existing evidence and media accounting,
+but do not treat installer coverage or installer-only questions as completion
+requirements. Configuration and resources consumed by CONQUER.EXE remain in
+scope. Other auxiliary runtimes remain Later as the implementation plan records.
 
 The final reimplementation deliverable includes a documented technical map of
 the original game, not only working replacement code. It lives in `spec/` and

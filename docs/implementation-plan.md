@@ -588,9 +588,17 @@ Local source locations and analyzer setup belong in RUNTIME.md and ghidra.md.
 
 ## Later: auxiliary-runtime analysis
 
+Owner decision, 2026-10-10: the restoration starts from the preinstalled game.
+SETUP.EXE, _SETUP.EXE, INST.EXE and other setup/install executables are excluded
+from further analysis and recreation, superseding their earlier Later priority.
+Their existing evidence, inventories and media accounting remain historical
+records. Installer-only queue questions and coverage gaps are not completion
+requirements. Installed configuration and resources read by CONQUER.EXE remain
+in scope. The Later policy below applies to the other auxiliary runtimes.
+
 Owner decision, 2026-10-09: defer analysis of every runtime other than
 CONQUER.EXE as non-essential to current mapping. This includes AUTOPLAY.EXE,
-SETUP.EXE, _SETUP.EXE, INST.EXE, CONFIG.EXE, CONCFG.EXE, BOOTDISK.EXE,
+CONFIG.EXE, CONCFG.EXE, BOOTDISK.EXE,
 external wrappers and separate driver/library payload code. Resource data and
 calls within CONQUER.EXE remain current; tracing into another runtime is Later.
 

@@ -1,5 +1,14 @@
 # Decisions
 
+## 2026-10-10: Preinstalled game excludes installer recreation
+
+The owner confirmed that the restoration operates on the preinstalled game.
+Setup and installation executables are outside further analysis and
+reimplementation scope, rather than deferred requirements. Retain existing
+evidence and media accounting. Installer coverage gaps and installer-only
+questions do not block completion; configuration and resources consumed by
+CONQUER.EXE remain in scope. See AGENTS.md and implementation-plan.md.
+
 ## 2026-10-09: Standing DOSBox-X instrumentation authorization
 
 The owner authorized future programmatic DOSBox-X installation/builds and
