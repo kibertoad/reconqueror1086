@@ -1,45 +1,48 @@
-﻿# Reimplementation handover
+# Reimplementation handover
 
 ## Current state
 
-Stage: Survey. Template main 25c5808b is adopted. The Standard and protocol are
-at rules efa138ba (still v1), with checker 2.2.0 at toolkit 92a55920, reader
-2.3.0, engine 12.0.0 and the RefurbishedDinosaurs 10.0.0 runtime packages.
-Tooling installs through pnpm. The adoption record is in
+Stage: Survey. The rules/library and existing-evidence conversion goal is met.
+Current upstream provenance and exact dependency versions are authoritative in
+tools/upstream-lock.json, tools/toolkit-packages.json, Directory.Build.props,
+pnpm-lock.yaml and requirements-evidence.txt. The acceptance audit is in
 [template-migration-plan.md](template-migration-plan.md).
-The earlier documentation audit is in [documentation-audit.md](documentation-audit.md).
-Game identities, owned-source contracts, LE adapters, gameplay and evidence
-statuses are preserved. The staged-tree pre-commit hook is enabled.
+
+Existing native inventories, provenance/region sidecars, active report callers,
+shared unpacking, reviewed location notation and workflow guidance are current.
+Evidence and parity statuses are preserved. Use the generated status indexes,
+PARITY.md and tools/Report-Coverage.mjs for progress and its explicit limits.
+Coverage does not establish a complete reading or completed restoration.
 
 ## Next work
 
-Survey remains open for full installation/media, data-family and manual-screen
-reconciliation. Follow [implementation-plan.md](implementation-plan.md) and the
-area queues. Source provenance is established in SRC-PATCH-CATALOG; strict
-analysis readiness passes. [RUNTIME.md](RUNTIME.md) records runtime capabilities.
-
-The next implementation slice is strategic schema-two runtime integration.
-Keep it dormant until its remaining inputs, events, presentation and save/load
-integration are complete; follow the parity rows.
+- Continue Survey through Q-RES-017 / FMT-RES-015 and the area queues named by
+  [implementation-plan.md](implementation-plan.md).
+- Establish the unavailable code baselines and driver-payload scope recorded
+  in coverage/baseline.json; follow [coverage/README.md](../coverage/README.md).
+- Audit complete readings only from entries' complete_reading findings; leave
+  their function-level coverage unavailable until that audit exists.
+- The next implementation slice is strategic schema-two runtime integration,
+  with the rows and activation conditions in implementation-plan.md. Use an
+  implementation session working from the spec alone.
 
 ## Verification and local state
 
-The 2026-10-05 canonical fast gate passed after adopting shared runtime 6.2.0.
-Shared APIs now own import/install helpers, hashing, portable paths, palette and
-PCM conversion, settings recovery, content discovery, viewport scaling and text
-wrapping. Existing game manifest and settings contracts remain in adapters.
-The callback-based generated-file writer and game-specific verification remain
-local. Acceptance details and limits are in [VALIDATION.md](VALIDATION.md).
-Kaitai compilation was skipped because no compiler was available; owned-media
-comparisons and LongRunning tests were not run. No original game ran.
+The 2026-10-09 default canonical Invoke-Validation.ps1 gate passed documentation,
+Kaitai, migrated evidence regressions, solution build, non-long-running xUnit
+selection and executable specifications. Frozen dependency installation,
+installed-version verification, strict source readiness, native sidecars and
+boundary audits passed. Long-running tests and remote cross-platform CI were
+not run. [VALIDATION.md](VALIDATION.md) records the checks and limitations.
 
-The pinned Python engine 12.0.0 is installed in ignored
-artifacts/validation-python; set EVIDENCE_PYTHON to its Scripts/python.exe for
-this checkout's gate. The machine's global Python keeps engine 8.1.0 for other
-work. Tooling dependencies are installed
-from the existing locks. Remote CI has not been exercised for this update.
+Unfinished: none. .claude/settings.json remains unrelated and untracked.
+No original game ran and no push or publication was performed. Publishing
+still requires the owner's explicit request and the canonical remote check.
 
-Post-commit audits found no confirmed task orphans. Preserve unrelated processes
-and reusable MSBuild workers. Original source, captures and analysis artifacts
-remain ignored locally. No original-game run or release publication occurred.
-Push through the verified canonical remote as [AGENTS.md](../AGENTS.md) requires.
+Local frozen adoption contracts, migration scripts and proof reports remain
+ignored under artifacts/coverage-migration; its {le,pe,ne,config,inst}.json
+contracts retain the source/snapshot paths and identities for re-adoption.
+Original source, captures, decoded resources and analysis databases remain local.
+Post-commit audits found no confirmed repository orphans. Preserve unrelated
+processes and reusable MSBuild workers. RUNTIME.md records run capabilities
+and the original-game lock; emulated calls need no run lock.
