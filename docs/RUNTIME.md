@@ -123,6 +123,10 @@ This configuration has compiled successfully; original-run verification remains
 pending. It lacks CPU tracing and memory-change breakpoints. The probe rejects
 CPU tracing with this selection and records the selected executable hash in
 its local debugger-build.json. The default remains the verified heavy build.
+New structured sessions also save capabilities.json and session-identity.json
+locally, identifying the actual feature set, source revision, owned process and
+session. Use those records when diagnosing an owned run; feature availability
+still requires verification against the requested operation.
 
 Synthetic verification observed a stopped startup, a native breakpoint operation, register effects and
 a memory write/read with the expected-hash precondition. The process needs the

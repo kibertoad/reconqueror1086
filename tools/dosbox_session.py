@@ -105,9 +105,14 @@ class AgentRuntime:
             if not capabilities.get('debugger'):
                 raise SessionError('Structured debugger capability is unavailable')
             self.capabilities = capabilities
+            (self.output / 'capabilities.json').write_text(json.dumps(capabilities, indent=2))
             self.session = self.agent.start(self.target, mount_path=self.workdir)
             if self.session.state != 'stopped' or self.session.stop_reason.kind != 'startup':
                 raise SessionError('Target did not stop at its verified startup boundary')
+            (self.output / 'session-identity.json').write_text(json.dumps({
+                'session_id': self.session.id, 'owned_emulator_pid': self.process.pid,
+                'source_revision': SOURCE_REVISION
+            }, indent=2))
             return self
         except BaseException:
             self.close()
