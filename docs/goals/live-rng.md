@@ -41,16 +41,20 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
 ## Handover
 
 - Stage: Survey; this goal adds runtime research capabilities.
-- Last gate: 2026-10-09 mapping, lifecycle and emulator synthetic checks passed;
-  the complete documentation gate passed without skips. EXP-RNG-001 and the
-  recorder safety checks passed in the following research batch.
-- Unfinished: rule ownership, full-game recording/replay, prescribed observable
-  gameplay state, and reproducible upstream/shared-helper proposal. No WIP branch.
+- Last gate: 2026-10-09 complete documentation and repository gates passed;
+  mapping, lifecycle, emulator, call-survey and RNG-journal synthetic checks
+  passed. EXP-RNG-001 and native recorder transport checks are documented in
+  VALIDATION.md. No full-game or actual rebuild replay gate has passed.
+- Unfinished: complete rule ownership, full-game recording/replay, prescribed
+  observable gameplay state, and upstream/shared-helper proposal. No WIP branch.
 - Blockers: none established. RUNTIME.md is the current capability assessment.
-- Next: Q-RNG-001 / RULE-RNG-001, finish the static time-source reading; then
-  extend the verified EXP-RNG-001 bounded recorder to additional supported
-  callers, rejecting unowned calls. Validate recorder completeness and ordering
-  in two different-seed runs before proposing upstream extraction.
-- Evidence references: EXP-RNG-001, FND-RNG-004 and FND-RNG-003. Per-run checks live in
-  tools/live_mapping.py; tools/Probe-LiveMapping.py verifies native seed/draw
-  state identity. Capture paths and hashes belong to the finding, not this file.
+- Next: Q-STRATEGY-043 / RULE-STRATEGY-012, read selection-table extents and
+  consumers before accepting its caller in tools/native_rng_recorder.py.
+- Then extend evidence-backed caller policies and state reachability. Use the
+  local Survey-RngCalls.py output as leads, never as a complete caller audit.
+- Q-RNG-001 / RULE-RNG-001 remains open after FND-RNG-005; finish the adjustment
+  provenance reading when needed for clock semantics.
+- Evidence references: EXP-RNG-001, FND-RNG-003/004/005, FND-STRATEGY-043.
+  tools/live_mapping.py validates the initial native map;
+  tools/native_rng_recorder.py rechecks code/descriptors at each stop.
+  Capture paths belong to findings and validation documentation, not this file.
