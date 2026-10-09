@@ -9036,7 +9036,7 @@ files:
       size: 189616
       xxh3: bf7404f9532b9075dbe7004337db4119
       format: MZ
-      tool: tools/evidence/unlzexe.mjs at commit 0f1ac61
+      tool: "@scientific-method/executable-reader 2.6.0, unpack layout 1"
   - path: "CD:INSTALL.BAT"
     format: data
     size: 23

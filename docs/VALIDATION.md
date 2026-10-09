@@ -1,5 +1,19 @@
 # Validation
 
+## Shared unpacker integration (2026-10-09)
+
+The installer comparison verified the packed and unpacked identities in
+BLD-GOG-EN and found the shared executable-reader 2.6.0 layout-1 output
+byte-identical to the verified local unpacked reference. The compatibility CLI
+now delegates to that decoder, reports package/layout provenance and retains
+exclusive output creation. Its synthetic integration tests passed, including
+header/relocation reconstruction, malformed input rejection and existing-output
+protection. The synthetic packed header now supplies the required relocation
+table offset; the previous fixture had relied on a permissive local decoder.
+`tools/Check-Documentation.ps1 -Write` passed after the provenance update.
+The canonical Invoke-Validation.ps1 gate also passed with the
+ResourceAndDefinitionTests filter and MinimumExpectedTests 1.
+
 ## Native coverage bodies and evidence boundaries (2026-10-09)
 
 The five native inventories and their provenance/region sidecars passed

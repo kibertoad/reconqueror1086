@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { unpackLzexe } from "../../tools/evidence/unlzexe.mjs";
+import { readerTool } from "@scientific-method/executable-reader";
 
 // Writes the LZEXE 0.91 bit stream: a control word is reserved where the reader will read it,
 // which is at the start and right after the byte operand that follows its predecessor's last bit.
@@ -77,6 +78,7 @@ function packed({ tag = "LZ91", stream, relocs, minAlloc = 0x40 }) {
   header.writeUInt16LE(minAlloc, 0x0a);
   header.writeUInt16LE(0xffff, 0x0c);
   header.writeUInt16LE(paras, 0x16);
+  header.writeUInt16LE(0x1c, 0x18);
   header.write(tag, 0x1c, "latin1");
   return Buffer.concat([header, image]);
 }
@@ -127,20 +129,22 @@ test("unlzexe expands every code form and rebuilds the header and relocations", 
   const cli = spawnSync(process.execPath, [resolve(import.meta.dirname, "../../tools/evidence/unlzexe.mjs"), input, output], { encoding: "utf8" });
   assert.equal(cli.status, 0, cli.stderr);
   assert.equal(JSON.parse(cli.stdout).size, bytes.length);
+  assert.equal(JSON.parse(cli.stdout).tool, readerTool());
+  assert.equal(JSON.parse(cli.stdout).layout, 1);
+  assert.equal(JSON.parse(cli.stdout).packer, "LZEXE 0.91");
   assert.deepEqual(readFileSync(output), bytes);
   const again = spawnSync(process.execPath, [resolve(import.meta.dirname, "../../tools/evidence/unlzexe.mjs"), input, output], { encoding: "utf8" });
   assert.notEqual(again.status, 0, "an existing output file is not overwritten");
 });
 
-test("unlzexe rejects other versions, bad copies, truncated streams and stray relocations", () => {
+test("unlzexe rejects unknown packing, bad copies, truncated streams and stray relocations", () => {
   const { stream } = sample();
-  assert.throws(() => unpackLzexe(packed({ tag: "LZ09", stream, relocs: RELOCS })), /0\.90 is not supported/);
-  assert.throws(() => unpackLzexe(packed({ tag: "PKLI", stream, relocs: RELOCS })), /no LZ91 tag/);
+  assert.throws(() => unpackLzexe(packed({ tag: "PKLI", stream, relocs: RELOCS })), /No packer the reader unpacks/);
   const early = new Writer(); early.literal(1); early.short(2, 5);
-  assert.throws(() => unpackLzexe(packed({ stream: early.finish(), relocs: RELOCS })), /copy reaches 5 bytes back/);
+  assert.throws(() => unpackLzexe(packed({ stream: early.finish(), relocs: RELOCS })), /reaches 4 bytes before the start/);
   // one paragraph: a control word of sixteen literal bits and only fourteen literal bytes
   const noEnd = Buffer.from([0xff, 0xff, ...Array.from({ length: 14 }, (_, i) => i)]);
-  assert.throws(() => unpackLzexe(packed({ stream: noEnd, relocs: RELOCS })), /runs past/);
-  assert.throws(() => unpackLzexe(packed({ stream, relocs: [0x00, 0x00, 0x00, 0x05, 0x00, 0x01, 0x00] })), /outside the load module/);
-  assert.throws(() => unpackLzexe(Buffer.from("MZ")), /not a file/);
+  assert.throws(() => unpackLzexe(packed({ stream: noEnd, relocs: RELOCS })), /before its end mark/);
+  assert.throws(() => unpackLzexe(packed({ stream, relocs: [0x00, 0x00, 0x00, 0x05, 0x00, 0x01, 0x00] })), /past the unpacked load module/);
+  assert.throws(() => unpackLzexe(Buffer.from("MZ")), /expected MZ/);
 });

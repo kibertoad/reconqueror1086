@@ -31,7 +31,17 @@ effects, name every stop they depend on, and state any assumption that a callee
 returns or preserves state. Keep original-derived configurations and output local;
 shared reporter regressions use synthetic instructions and state.
 
-## Function inventories
+## Packed executables
+
+The compatibility `tools/evidence/unlzexe.mjs` command delegates decoding to the
+pinned executable-reader `unpack` API and retains exclusive output creation.
+Its report includes the reader version and layout rule alongside the unpacked
+identity. Use `report.mjs x86-unpack` with a hash-guarded local configuration
+when using the shared command contract. BLD-GOG-EN records the installer's
+unpacked identity and the package/layout that reproduces it. Historical findings
+retain the revision-specific procedures they originally recorded.
+
+## Native function inventories
 
 Use `ExportCoverageSnapshot.java` against a verified frozen project with
 `-readOnly -noanalysis`. It exports starts, body-byte counts, separate body
