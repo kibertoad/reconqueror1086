@@ -179,6 +179,25 @@ with tools/Export-RngFixture.py; this whitelist exporter emits only named rules,
 bounds, results and RNG states into the experiment fixture. Keep all guest
 snapshots and trace diagnostics local.
 
+### Native entry/return recording transport
+
+Use the same fresh-drive command with `--record-native --record-draw-limit 30`
+in place of `--seed-check --record-startup-shifts`. Native entry/return
+breakpoints observe the raw and bounded results without single-stepping through
+interrupts. Each stop rechecks protected mode, descriptors and the relevant
+original function code against the validated initial snapshot. A pending
+continuation is observed again on timeout; it is never restarted automatically.
+
+The current accepted policies cover initial seeding and character shifts. The
+prompt reseed/remainder policy is statically grounded in FND-TALK-003 but has
+not yet been verified in a live dialogue. Unaccepted callers, unexpected state
+writes and reentrant RNG invocations stop capture before further work and keep
+local memory/register diagnostics. The native journal marks full-game and
+accepted-caller completeness false. Increasing the draw limit does not bypass
+those guards. tools/rng_journal.py separately verifies reseeds, ordering and
+raw/bounded state transitions; run tools/test_rng_journal.py for synthetic checks.
+This remains intermediate transport verification, without actual rebuild replay.
+
 After full verification, propose reusable lifecycle, locking, operation-wait and
 debugger helpers upstream, together with a reproducible guide. Keep game-specific
 LE identity, field mapping and rule ownership here; check existing upstream

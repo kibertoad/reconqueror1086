@@ -23,6 +23,8 @@ def main():
     parser.add_argument('--seed-check', action='store_true')
     parser.add_argument('--draw-check', action='store_true')
     parser.add_argument('--record-startup-shifts', action='store_true')
+    parser.add_argument('--record-native', action='store_true')
+    parser.add_argument('--record-draw-limit', type=int, default=30)
     args = parser.parse_args()
     if args.draw_check and not args.seed_check:
         raise ValueError('Draw identity check requires the seed identity check')
@@ -30,6 +32,10 @@ def main():
         raise ValueError('Seed identity check requires RNG entry breakpoints')
     if args.record_startup_shifts and not args.seed_check:
         raise ValueError('Startup recording requires the verified initial seed check')
+    if args.record_native and (not args.rng_break or args.record_startup_shifts or args.draw_check):
+        raise ValueError('Native recording needs RNG breakpoints and its own recording mode')
+    if not 1 <= args.record_draw_limit <= 100000:
+        raise ValueError('Recording draw limit exceeds the bounded diagnostic')
     if not 1 <= args.samples <= 100:
         raise ValueError('Samples must be between 1 and 100')
     if not 1 <= args.observation_ms <= 1000:
@@ -107,6 +113,11 @@ def main():
                         int(registers.segments['ss'], 16), int(registers.general['esp'], 16)), 64)
                     (root / 'breakpoint-stack.bin').write_bytes(stack)
                     print('instrumented entry breakpoint hit', runtime.session.stop_reason)
+                    if args.record_native:
+                        from native_rng_recorder import record
+                        journal = record(runtime, live_map, ids, root, args.record_draw_limit)
+                        print('native recording', journal['status'], 'events', len(journal['events']))
+                        break
                     if args.record_startup_shifts and runtime.session.stop_reason.breakpoint_id != ids[1]:
                         raise RuntimeError('Startup recording did not reach its initial seed first')
                     if args.seed_check and runtime.session.stop_reason.breakpoint_id == ids[1]:

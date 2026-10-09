@@ -893,3 +893,16 @@ through inventory bodies. Every raw lead missed by the body searches lay
 outside those inventory bodies. These are diagnostic counts, not a complete
 caller audit or added mapping coverage. Unresolved indirect flow remains
 explicit in the local report. No guest process was started.
+
+## Native RNG recording transport (2026-10-09)
+
+Two fresh launches recorded an initial seed and thirty startup draws with
+native entry/return breakpoints, using different seeds. Both journals passed
+spec-based numeric replay. A third launch, using per-stop code/descriptor
+guards, retained the same complete startup prefix and rejected the next
+unaccepted caller before its draw. Its journal is explicitly incomplete;
+registers and stopped memory remain in the ignored original capture store.
+The five synthetic general-journal checks passed, including reseeding to zero,
+missing/pending operations, state discontinuity and forbidden diagnostic fields.
+Dialogue reseeding, reentrant writes, full-game completeness and actual rebuild
+replay have not been verified.
