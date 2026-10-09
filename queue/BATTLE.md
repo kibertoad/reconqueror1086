@@ -80,11 +80,6 @@ Next ID: Q-BATTLE-025
   findings, following data provenance, call effects and every exit relevant to this question.
   Blocks: none.
 
-- Q-BATTLE-018. RULE-BATTLE-010: Is it true that the accumulator subtracts `0x10000` or keeps
-  only its low 16 bits? Settles it: read the relevant branch and its callers from the entry's
-  cited findings, following data provenance, call effects and every exit relevant to this
-  question. Blocks: none.
-
 - Q-BATTLE-019. RULE-BATTLE-010: Does the timer condition read the same baseline that the
   eligible pass resets? Settles it: read the relevant branch and its callers from the entry's
   cited findings, following data provenance, call effects and every exit relevant to this

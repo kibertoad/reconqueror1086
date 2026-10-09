@@ -4,7 +4,7 @@ title: Battle clock
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-BATTLE-021, FND-BATTLE-020]
+evidence: [FND-BATTLE-021, FND-BATTLE-023]
 conflicting: []
 split_with: []
 related: []
@@ -35,8 +35,8 @@ clock battle_tick: 1193182 / 4772 Hz
 
 battle_clock_count = battle_clock_count + 1
 bios_chain_accumulator = bios_chain_accumulator + 4771
-if bios_chain_accumulator >= 0x10000:
-    bios_chain_accumulator = bios_chain_accumulator - 0x10000
+if (bios_chain_accumulator & 0x10000) != 0:
+    bios_chain_accumulator = bios_chain_accumulator & 0xFFFF
     # the chained BIOS timer interrupt raises INT 1Ch, whose handler adds one here
     pointer_clock = pointer_clock + 1
 
@@ -51,7 +51,7 @@ Changes `battle_clock_count` and, about once in 13.7 ticks, `pointer_clock`. `ba
 
 ## Edge cases
 
-The divisor `0x1234DC / 250` is 4772, so a tick is about 4.0 ms. The BIOS step `0x123333 / 250` is
+The divisor `0x1234DC / 250` is 4772, so a tick is about 4.0 ms. The BIOS step `0x123333 / (0x1234DC / 4772)` is
 4771 of 65536, which gives about 18.2 counts a second.
 
 ## What the sources say
@@ -65,8 +65,6 @@ None known.
 ## Open questions
 
 - When the game registers the 250 Hz callback, and whether it ever removes it. (Q-BATTLE-017)
-
-- Whether the accumulator subtracts `0x10000` or keeps only its low 16 bits; the two agree. (Q-BATTLE-018)
 
 - The order in which the timer service runs the callback and the chain on one tick. (Q-BATTLE-019)
 

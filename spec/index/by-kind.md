@@ -343,7 +343,7 @@ Entries by kind.
 
 ## findings
 
-307 entries.
+308 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -415,9 +415,10 @@ Entries by kind.
 | [FND-BATTLE-017](../findings/FND-BATTLE-017.md) | The resolver counts survivors by category and returns 1 for a win | superseded |
 | [FND-BATTLE-018](../findings/FND-BATTLE-018.md) | The resolver reads WAR_MODE and loads BATTLE.PCX and MEN8.CSF | recorded |
 | [FND-BATTLE-019](../findings/FND-BATTLE-019.md) | The renderer sorts dead units first then by y and x, and picks frames by lane, category, heading and phase | recorded |
-| [FND-BATTLE-020](../findings/FND-BATTLE-020.md) | Pointer events are queued with a timer count and classified into eight codes | recorded |
+| [FND-BATTLE-020](../findings/FND-BATTLE-020.md) | Pointer events are queued with a timer count and classified into eight codes | superseded |
 | [FND-BATTLE-021](../findings/FND-BATTLE-021.md) | The battle clock counts at 250 Hz and its reader returns four times the count | recorded |
 | [FND-BATTLE-022](../findings/FND-BATTLE-022.md) | The resolver counts survivors by category and returns 1 for a win | recorded |
+| [FND-BATTLE-023](../findings/FND-BATTLE-023.md) | Pointer events are queued with a timer count and classified into eight codes | recorded |
 | [FND-CONFIG-001](../findings/FND-CONFIG-001.md) | Startup finds CONQUER.INI in four places and loads it into a list of keys and values | recorded |
 | [FND-CONFIG-002](../findings/FND-CONFIG-002.md) | Keys match case-sensitively, and a write rewrites every stored line of CONQUER.INI | recorded |
 | [FND-CONFIG-003](../findings/FND-CONFIG-003.md) | The other keys: CD_PATH at eleven sites, the view window size, SLOWMACHINE, USE_CYBERMAN, FULL_MOVIE, DELAYVGA and an unused GRAPHICS | recorded |

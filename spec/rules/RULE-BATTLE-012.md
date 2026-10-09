@@ -4,7 +4,7 @@ title: Pointer events
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-BATTLE-020]
+evidence: [FND-BATTLE-023]
 conflicting: []
 split_with: []
 related: [RULE-BATTLE-010, FMT-BATTLE-002]

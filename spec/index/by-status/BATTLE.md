@@ -29,12 +29,13 @@ Entries by status.
 
 ## superseded
 
-2 entries.
+3 entries.
 
 | ID | Title |
 |---|---|
 | [FND-BATTLE-009](../../findings/FND-BATTLE-009.md) | The battle clock counts at 250 Hz and its reader returns four times the count |
 | [FND-BATTLE-017](../../findings/FND-BATTLE-017.md) | The resolver counts survivors by category and returns 1 for a win |
+| [FND-BATTLE-020](../../findings/FND-BATTLE-020.md) | Pointer events are queued with a timer count and classified into eight codes |
 
 ## recorded
 
@@ -59,9 +60,9 @@ Entries by status.
 | [FND-BATTLE-016](../../findings/FND-BATTLE-016.md) | The keyboard dispatcher selects by category, pauses, exits, and has two test switches |
 | [FND-BATTLE-018](../../findings/FND-BATTLE-018.md) | The resolver reads WAR_MODE and loads BATTLE.PCX and MEN8.CSF |
 | [FND-BATTLE-019](../../findings/FND-BATTLE-019.md) | The renderer sorts dead units first then by y and x, and picks frames by lane, category, heading and phase |
-| [FND-BATTLE-020](../../findings/FND-BATTLE-020.md) | Pointer events are queued with a timer count and classified into eight codes |
 | [FND-BATTLE-021](../../findings/FND-BATTLE-021.md) | The battle clock counts at 250 Hz and its reader returns four times the count |
 | [FND-BATTLE-022](../../findings/FND-BATTLE-022.md) | The resolver counts survivors by category and returns 1 for a win |
+| [FND-BATTLE-023](../../findings/FND-BATTLE-023.md) | Pointer events are queued with a timer count and classified into eight codes |
 
 ## Open questions
 

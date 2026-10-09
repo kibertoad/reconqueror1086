@@ -283,9 +283,10 @@ Entries by area.
 | [FND-BATTLE-017](../findings/FND-BATTLE-017.md) | The resolver counts survivors by category and returns 1 for a win | superseded |
 | [FND-BATTLE-018](../findings/FND-BATTLE-018.md) | The resolver reads WAR_MODE and loads BATTLE.PCX and MEN8.CSF | recorded |
 | [FND-BATTLE-019](../findings/FND-BATTLE-019.md) | The renderer sorts dead units first then by y and x, and picks frames by lane, category, heading and phase | recorded |
-| [FND-BATTLE-020](../findings/FND-BATTLE-020.md) | Pointer events are queued with a timer count and classified into eight codes | recorded |
+| [FND-BATTLE-020](../findings/FND-BATTLE-020.md) | Pointer events are queued with a timer count and classified into eight codes | superseded |
 | [FND-BATTLE-021](../findings/FND-BATTLE-021.md) | The battle clock counts at 250 Hz and its reader returns four times the count | recorded |
 | [FND-BATTLE-022](../findings/FND-BATTLE-022.md) | The resolver counts survivors by category and returns 1 for a win | recorded |
+| [FND-BATTLE-023](../findings/FND-BATTLE-023.md) | Pointer events are queued with a timer count and classified into eight codes | recorded |
 | [RULE-BATTLE-001](../rules/RULE-BATTLE-001.md) | Field battle resolution | supported |
 | [RULE-BATTLE-002](../rules/RULE-BATTLE-002.md) | Field battle units and formations | supported |
 | [RULE-BATTLE-003](../rules/RULE-BATTLE-003.md) | Field battle pass | supported |
