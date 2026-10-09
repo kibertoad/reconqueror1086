@@ -852,6 +852,13 @@ screen-boundary cases: a tagged diagnostic result, unrecorded state-change
 rejection, and unregistered-screen rejection. Native screen-boundary reachability
 is a separate pending verification.
 
+The pinned upstream `Agent Debug No Heavy SDL2|x64` configuration built
+successfully with the same v142 toolset and Windows SDK as the heavy build.
+Its local build log is artifacts/runtime-tools/dosbox-agent-no-heavy-build-20261010.log.
+The upstream adapter retains execution breakpoints but requires heavy debug
+for memory-change breakpoints and CPU tracing. Original-run verification of
+this alternate configuration is pending; no performance improvement is claimed.
+
 ## Structured debugger tooling checkpoint (2026-10-09)
 
 `python -B tools/test_dosbox_session.py` passed four synthetic lifecycle checks:
