@@ -860,7 +860,12 @@ remain local under artifacts/runtime-tools/native-rng-continuous-20261010-a.
 `python -B tools/test_native_rng_recorder.py` passed three synthetic
 screen-boundary cases: a tagged diagnostic result, unrecorded state-change
 rejection, and unregistered-screen rejection. Native screen-boundary reachability
-is a separate pending verification.
+was subsequently verified in the owned screen-boundary case under
+artifacts/runtime-tools/native-rng-screen-boundary-20261010-a: the initial seed
+and 31 draws completed, then the guarded entry stop reported screen 0, draw 0,
+mode 1 with matching recorded RNG state and journal replay. The process exited
+successfully and released its run lock. This stops before screen loading and
+does not establish menu readiness or full-game recording.
 
 The pinned upstream `Agent Debug No Heavy SDL2|x64` configuration built
 successfully with the same v142 toolset and Windows SDK as the heavy build.
