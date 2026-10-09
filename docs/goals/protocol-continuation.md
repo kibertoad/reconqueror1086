@@ -30,26 +30,18 @@ None known.
 ## Handover
 
 - Active: latest rules/libraries and full evidence conversion. Stage: Survey.
-- Dependency adoption and inventory-export/range-audit tooling are committed.
-  No publication is authorized. No evidence status changed; no original game ran.
-- Checks: six conversion/sidecar regressions pass. ExportCoverageSnapshot.java
-  compiled in installed Ghidra, and repeated exports of all five sources are
-  identical. Verified stable project digests and source SHA-256/XXH3 identities.
-  All five converted inventories pass the shared canonical reader and the new
-  Check-Coverage.mjs sidecar/body-intersection validation.
-- Documentation gate on the current unfinished conversion FAILS on legacy range
-  ends. Audit-RangeEnds.mjs reports all candidates without the diagnostic cap;
-  its ignored report is the review set. Remaining candidates need intended-scope
-  review, the entry's own last-item/size evidence, or whole-entry supersession.
-  Grouped function extents are review hints only. Do not increment every end.
-- Uncommitted migration work: five canonical start/size/ranges inventories, ten
-  provenance/regions sidecars, the replacement tools/Check-Coverage.mjs,
-  the new extent finding and the notation conversions citing it. Conversion helpers and
-  ExportBoundaryMetadata.java are uncommitted, as are coverage/tool guidance
-  and regenerated spec indexes. The draft finding approaches its line limit;
-  put additional extents in a separately allocated finding.
-  Keep these together with their evidence corrections for final validation.
-  .claude/settings.json was already untracked and remains unrelated.
+- Dependencies, native inventories/sidecars, boundary conversions and citation
+  replacements are committed. FND-RES-062 and FND-RES-063 are the metadata
+  findings. Claims retain their statuses; uncertain historical findings have
+  replacements. No original game ran and no publication is authorized.
+- Last gate: 2026-10-09, documentation check with index regeneration passed;
+  canonical Invoke-Validation.ps1 passed with ResourceAndDefinitionTests filter
+  and MinimumExpectedTests 1. Coverage conversion regressions and all native
+  inventory/sidecar checks pass. Audit-RangeEnds.mjs reports no diagnostics.
+  These checks do not close the goal's wider migration requirements.
+- Unfinished working tree: none. .claude/settings.json remains unrelated and
+  untracked. One-time migration scripts and proofs are retained only in ignored
+  artifacts/coverage-migration; durable exporters and checks are committed.
 - Raw exports and adoption contracts: artifacts/coverage-migration/{le,pe,ne,
   config,inst}.json. Re-adoption validates source identities, snapshot digest
   and completion marker. Raw output remains ignored and contains no Git assets.
@@ -57,20 +49,11 @@ None known.
   PE/NE: artifacts/launcher-inventory-{pe,ne}-20261005/Launcher{PE,NE}.
   Rebuilt MZ snapshot: artifacts/coverage-migration/mz-project/MzCoverage,
   programs CONFIG.EXE and INST.unpacked.exe. Repeated stable exports have the
-  suffix -stable; source/mapping qualifications and boundary changes still need
-  documentation in coverage/README.md. Historical size-only bodies cannot prove
-  that their start-plus-size interval was contiguous.
-- Origin refs were fetched on 2026-10-09. The new RES extent finding is a draft;
-  its next sequential ID was checked unused but has not been allocated.
-  Recheck IDs before taking additional findings. LE project digest remained
-  unchanged after the metadata-only boundary probe. All six conversion tests
-  and all five native inventory/sidecar checks pass on the unfinished tree.
-- Next: record verified native function extents and review/correct legacy ends;
-  reconcile ambiguous candidates without changing evidence claims silently;
-  update coverage/caller documentation and remove obsolete metadata paths;
-  audit all value/address ranges and ISO listing/accounting; finish the full
-  requirement-by-requirement acceptance audit in template-migration-plan.md.
-- Remaining scope includes existing report configurations/active callers,
-  complete-reading claims, progress semantics and all workflow guidance. A green
-  sidecar check alone does not prove the goal complete.
+  suffix -stable. Mapping qualifications are in coverage/README.md. Historical
+  size-only bodies cannot prove a contiguous start-plus-size interval.
+- Next: migrate active inventory/report callers and obsolete metadata paths;
+  audit value/address ranges beyond the checker's function-boundary diagnostics;
+  reconcile ISO listing/build path accounting; audit complete-reading/progress
+  semantics and remaining workflow guidance; finish the explicit acceptance
+  audit in template-migration-plan.md, dependency freshness and final gates.
 - Blockers: none requiring an owner decision. Preserve MSBuild reusable workers.
