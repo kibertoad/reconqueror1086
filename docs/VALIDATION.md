@@ -209,6 +209,13 @@ including Kaitai compilation and base-branch comparison. Q-BATTLE-018 is closed.
 
 ## Local gate
 
+2026-10-10: startup checkpoint instrumentation passed 23 native-recorder,
+journal, durable-event-log and live-mapping tests, including acceptance of
+the verified preparation stack progression and rejection of an incorrect
+stack position. Full documentation validation passed with Kaitai compilation
+and base-branch comparison. This validates the transport checks, not completion
+of an original run or any full-game recording claim.
+
 2026-10-10: the explicit `--animations-off` option passed Python syntax/CLI
 checks, the 21 native-recorder, journal, durable-event-log and live-mapping
 checks, and the full documentation check including Kaitai compilation.
