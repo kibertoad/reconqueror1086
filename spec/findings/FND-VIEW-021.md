@@ -143,7 +143,7 @@ environment: null
 Across the 42 `MELEE*` and `DEFEND*` archives, the placed knight, champion and footman actor
 blocks name a first texture (`+0x2C`) that starts a run of 15 textures: three walking poses,
 each at five angles from rear to front, and no images for the other side. The attack, hit and
-death state blocks that follow each actor block (FND-ASSAULT-002) start runs of 9, 3 and 8
+death state blocks that follow each actor block (FND-ASSAULT-049) start runs of 9, 3 and 8
 textures, showing a sword blow, a flinch and a collapse. The angle counts at `+0x34` are 8, 4,
 4 and 2 for the four blocks.
 

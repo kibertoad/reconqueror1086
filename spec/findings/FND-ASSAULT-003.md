@@ -140,7 +140,7 @@ environment: null
 
 ## Observation
 
-In the 42 archives of FND-ASSAULT-002, each of the 144 actor base blocks and each of their 432
+In the 42 archives of FND-ASSAULT-049, each of the 144 actor base blocks and each of their 432
 adjacent attack, hit and death state blocks (576 blocks in all) has behaviour byte `0x87`. Of
 the 688,128 placed map cells (42 maps of 128 by 128), 52,278 name a block with behaviour bit
 `0x02` and 635,850 do not.

@@ -150,7 +150,7 @@ In the player's weapon path at `0x000559CA`..`0x00055A4E`, after the depth is co
 combat row's reach plus `0x40`, the test of behaviour bit `0x20` at `0x00055A02` is the only
 test of that bit in the executable. When it is set, the path calls `0x0004C900`, which writes
 the low word of the block's state target `+0x40` into the contacted map cell. In the 42 archives
-of FND-ASSAULT-002, the placed kind-4 blocks with bit `0x20` have behaviour 33 or 35.
+of FND-ASSAULT-049, the placed kind-4 blocks with bit `0x20` have behaviour 33 or 35.
 
 ## Interpretation
 

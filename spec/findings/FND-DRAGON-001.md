@@ -1,6 +1,6 @@
 ---
 id: FND-DRAGON-001
-title: The dragon encounter wrapper limits lance experience to 0..20, stores it back after the run, and reports failure for results 1 and 2
+title: The dragon encounter wrapper limits lance experience to 0..21, stores it back after the run, and reports failure for results 1 and 2
 status: recorded
 builds: [BLD-GOG-EN]
 superseded_by: []

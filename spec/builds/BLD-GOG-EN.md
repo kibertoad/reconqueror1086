@@ -61,6 +61,8 @@ track for hashing. The source image itself is also in the manifest.
 
 Every listed file or audio track occurs either in the manifest or in
 `BLD-GOG-EN.other-files.yaml`, whose explicit paths each give an exclusion reason.
+FND-RES-069 verifies that canonical primary-volume ISO name normalization leaves
+this accounting unchanged, with every manifest identity matching the owned files.
 That list accounts for the installed DOSBox wrapper, host launch/configuration
 files, distributor metadata, documentation and uninstaller. `Manual.pdf` is the
 owned source SRC-MANUAL. The empty `SAVEGAME` directory has no file to list.

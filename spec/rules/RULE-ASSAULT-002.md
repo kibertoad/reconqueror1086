@@ -4,7 +4,7 @@ title: Load the combatants of a scene and remove retainers above the cap
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-ASSAULT-001, FND-ASSAULT-002, FND-ASSAULT-006, FND-ASSAULT-009, FND-VIEW-002]
+evidence: [FND-ASSAULT-001, FND-ASSAULT-049, FND-ASSAULT-006, FND-ASSAULT-009, FND-VIEW-002]
 conflicting: []
 split_with: []
 related: [RULE-ASSAULT-025, RULE-ASSAULT-027, RULE-ASSAULT-030, FMT-ASSAULT-001, FMT-VIEW-001, FMT-VIEW-002]
@@ -79,7 +79,7 @@ Fills `combatants` and sets `player_index`. The number of retainers left is at m
   keeps all three under a cap of 3.
 - Across the shipped scenes templates 0 to 2 are always placed on side 0 and templates 3, 5, 8
   and 9 never are, although the side comes from the block's colour rather than from the
-  template (FND-ASSAULT-002).
+  template (FND-ASSAULT-049).
 
 ## What the sources say
 

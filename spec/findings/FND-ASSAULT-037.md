@@ -140,7 +140,7 @@ environment: null
 
 ## Observation
 
-In the 42 archives of FND-ASSAULT-002, every placed kind-4 block with behaviour bit `0x10` and
+In the 42 archives of FND-ASSAULT-049, every placed kind-4 block with behaviour bit `0x10` and
 interaction selector 5, 7, 9 or 10 (block word `+0x48`) has these arguments (block words `+0x4A`
 and `+0x4C`):
 

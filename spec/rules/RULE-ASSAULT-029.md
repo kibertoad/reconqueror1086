@@ -4,7 +4,7 @@ title: Change an actor's look
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-ASSAULT-034, FND-ASSAULT-002]
+evidence: [FND-ASSAULT-034, FND-ASSAULT-049]
 conflicting: []
 split_with: []
 related: [RULE-ASSAULT-027, FMT-VIEW-001]

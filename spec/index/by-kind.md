@@ -343,12 +343,12 @@ Entries by kind.
 
 ## findings
 
-295 entries.
+297 entries.
 
 | ID | Title | Status |
 |---|---|---|
 | [FND-ASSAULT-001](../findings/FND-ASSAULT-001.md) | The combat loader clones placed actor blocks into combatant records in x-major order and promotes the first friendly to player | recorded |
-| [FND-ASSAULT-002](../findings/FND-ASSAULT-002.md) | All 1,002 actor placements in the 42 melee and defence scene archives use templates 0 to 2 as friendly and 3, 5, 8 and 9 as hostile | recorded |
+| [FND-ASSAULT-002](../findings/FND-ASSAULT-002.md) | All 1,002 actor placements in the 42 melee and defence scene archives use templates 0 to 2 as friendly and 3, 5, 8 and 9 as hostile | superseded |
 | [FND-ASSAULT-003](../findings/FND-ASSAULT-003.md) | Placed actor blocks and their state blocks all have behaviour 0x87, and 52,278 of the 688,128 placed cells block movement | recorded |
 | [FND-ASSAULT-004](../findings/FND-ASSAULT-004.md) | Every placed actor selects movement descriptor 7 or 10, both three 200 ms ticks of 64 units with flags 0x142 | recorded |
 | [FND-ASSAULT-005](../findings/FND-ASSAULT-005.md) | Campaign castle assaults pass a retainer cap of one per three soldiers of each type, at most three per type, and at least one | recorded |
@@ -395,6 +395,7 @@ Entries by kind.
 | [FND-ASSAULT-046](../findings/FND-ASSAULT-046.md) | A combatant's armour is the dword at offset 0x3C, read beside its health at 0x40 | recorded |
 | [FND-ASSAULT-047](../findings/FND-ASSAULT-047.md) | Walking into a block with behaviour bit 0x40 uses it, and in the shipped scenes only the exit or gate cell of each melee has that bit | recorded |
 | [FND-ASSAULT-048](../findings/FND-ASSAULT-048.md) | The moneylender's scene places the player and four hostile thugs | recorded |
+| [FND-ASSAULT-049](../findings/FND-ASSAULT-049.md) | All 1,002 actor placements in the 42 melee and defence scene archives use templates 0 to 2 as friendly and 3, 5, 8 and 9 as hostile | recorded |
 | [FND-BATTLE-001](../findings/FND-BATTLE-001.md) | The field battle resolver takes the player's three counts, the foe's three, and two morale values | recorded |
 | [FND-BATTLE-002](../findings/FND-BATTLE-002.md) | The automatic battle compares totals plus the remainder of each morale value by 3 | recorded |
 | [FND-BATTLE-003](../findings/FND-BATTLE-003.md) | The battle choice gate offers five rectangles and maps the first four to formation codes 2, 3, 1 and 0 | recorded |
@@ -422,7 +423,7 @@ Entries by kind.
 | [FND-CONFIG-003](../findings/FND-CONFIG-003.md) | The other keys: CD_PATH at eleven sites, the view window size, SLOWMACHINE, USE_CYBERMAN, FULL_MOVIE, DELAYVGA and an unused GRAPHICS | recorded |
 | [FND-CONFIG-004](../findings/FND-CONFIG-004.md) | WAR_MODE 640 keeps the field battle at 640 by 480; any other value or none tries 1024 by 768 first | recorded |
 | [FND-CONFIG-005](../findings/FND-CONFIG-005.md) | The disc and the installation ship different CONQUER.INI files, written by two setup programs | recorded |
-| [FND-DRAGON-001](../findings/FND-DRAGON-001.md) | The dragon encounter wrapper limits lance experience to 0..20, stores it back after the run, and reports failure for results 1 and 2 | recorded |
+| [FND-DRAGON-001](../findings/FND-DRAGON-001.md) | The dragon encounter wrapper limits lance experience to 0..21, stores it back after the run, and reports failure for results 1 and 2 | recorded |
 | [FND-DRAGON-002](../findings/FND-DRAGON-002.md) | The dragon media routine adds 2 to the lance copy on a win and plays the win or loss movie | recorded |
 | [FND-DRAGON-003](../findings/FND-DRAGON-003.md) | After a won dragon run the lair shows the victory text and plays champl30.smk | recorded |
 | [FND-DRAGON-004](../findings/FND-DRAGON-004.md) | Winning the siege of person 100's castle is the crown ending | recorded |
@@ -450,7 +451,7 @@ Entries by kind.
 | [FND-MEDIA-008](../findings/FND-MEDIA-008.md) | The CD holds 2,131 Smacker movies, all SMK2, most 196x204 at 100 ms with one 22,050 Hz track | recorded |
 | [FND-MEDIA-009](../findings/FND-MEDIA-009.md) | Movies play through a Smacker wrapper at 0x0002FCB0 and a frame loop at 0x0002FCF0 that a callback can stop | recorded |
 | [FND-MEDIA-010](../findings/FND-MEDIA-010.md) | Owner screenshots match FLUFF.PCX, V66_1111.PCX, INNPEOPL.PCX and COMSCRN1.PCX, and the executable names the inn patrons | recorded |
-| [FND-PERSON-001](../findings/FND-PERSON-001.md) | Character attributes are read by 0x00015EF0 and written by 0x00015F0C, which limits the first 15 to 0..20 | recorded |
+| [FND-PERSON-001](../findings/FND-PERSON-001.md) | Character attributes are read by 0x00015EF0 and written by 0x00015F0C, which limits the first 15 to 0..21 | recorded |
 | [FND-PERSON-002](../findings/FND-PERSON-002.md) | CHARACTR.DAT lists 15 characters and 30 attributes | recorded |
 | [FND-PERSON-003](../findings/FND-PERSON-003.md) | CHARACTR.DAT is parsed by 0x00015920 and 0x00016124, which shift row 0 by up to 8 on each of the first 15 fields | recorded |
 | [FND-PERSON-004](../findings/FND-PERSON-004.md) | The generation screen draws the first dilemma, sets COLOR from three shields, rerolls and continues by age | recorded |
@@ -528,6 +529,7 @@ Entries by kind.
 | [FND-RES-066](../findings/FND-RES-066.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case | recorded |
 | [FND-RES-067](../findings/FND-RES-067.md) | An MVG entry holds the pointer shapes' hot spots; 0x00018850 loads it and the CSF of the same name | recorded |
 | [FND-RES-068](../findings/FND-RES-068.md) | Every use of the name FFONTA2.FNT ends in a property call that stores nothing, so the game never reads the .FNT entry | recorded |
+| [FND-RES-069](../findings/FND-RES-069.md) | Canonical primary-volume paths agree with the owned build accounting | recorded |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |

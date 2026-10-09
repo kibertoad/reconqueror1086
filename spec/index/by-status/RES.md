@@ -167,7 +167,7 @@ Entries by status.
 
 ## recorded
 
-61 entries.
+62 entries.
 
 | ID | Title |
 |---|---|
@@ -232,6 +232,7 @@ Entries by status.
 | [FND-RES-066](../../findings/FND-RES-066.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case |
 | [FND-RES-067](../../findings/FND-RES-067.md) | An MVG entry holds the pointer shapes' hot spots; 0x00018850 loads it and the CSF of the same name |
 | [FND-RES-068](../../findings/FND-RES-068.md) | Every use of the name FFONTA2.FNT ends in a property call that stores nothing, so the game never reads the .FNT entry |
+| [FND-RES-069](../../findings/FND-RES-069.md) | Canonical primary-volume paths agree with the owned build accounting |
 
 ## Open questions
 

@@ -51,11 +51,11 @@ that terminator are printable ASCII. Bytes after the first terminator are not
 always zero: this occurs in 13, 23 and 2 records respectively. Treating those
 bytes as required zero padding would reject the owned files.
 
-| File | Records inspected | Payload size range | Last record start | Last payload size | Values at record offset 44 |
-|---|---:|---:|---:|---:|---|
-| CD:HMIDET.386 | 76 | 393..3320 | 79947 | 1961 | 16384, 32768, 49152 |
-| CD:HMIDRV.386 | 96 | 371..9762 | 259577 | 1680 | 16384, 32768, 49152 |
-| CD:HMIMDRV.386 | 8 | 503..47988 | 111108 | 772 | 0 |
+| File | Records inspected | Minimum payload size | Maximum payload size | Last record start | Last payload size | Values at record offset 44 |
+|---|---:|---:|---:|---:|---:|---|
+| CD:HMIDET.386 | 76 | 393 | 3320 | 79947 | 1961 | 16384, 32768, 49152 |
+| CD:HMIDRV.386 | 96 | 371 | 9762 | 259577 | 1680 | 16384, 32768, 49152 |
+| CD:HMIMDRV.386 | 8 | 503 | 47988 | 111108 | 772 | 0 |
 
 Each record header and complete payload was bounded by the file length. There
 was no sampling or record cap. No trailing bytes remained. This traversal did

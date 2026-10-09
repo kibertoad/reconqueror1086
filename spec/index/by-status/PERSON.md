@@ -32,7 +32,7 @@ Entries by status.
 
 | ID | Title |
 |---|---|
-| [FND-PERSON-001](../../findings/FND-PERSON-001.md) | Character attributes are read by 0x00015EF0 and written by 0x00015F0C, which limits the first 15 to 0..20 |
+| [FND-PERSON-001](../../findings/FND-PERSON-001.md) | Character attributes are read by 0x00015EF0 and written by 0x00015F0C, which limits the first 15 to 0..21 |
 | [FND-PERSON-002](../../findings/FND-PERSON-002.md) | CHARACTR.DAT lists 15 characters and 30 attributes |
 | [FND-PERSON-003](../../findings/FND-PERSON-003.md) | CHARACTR.DAT is parsed by 0x00015920 and 0x00016124, which shift row 0 by up to 8 on each of the first 15 fields |
 | [FND-PERSON-004](../../findings/FND-PERSON-004.md) | The generation screen draws the first dilemma, sets COLOR from three shields, rerolls and continues by age |

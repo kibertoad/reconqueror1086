@@ -9,7 +9,7 @@ byte_order: little
 size: 96
 text: false
 definition: fmt_view_001.ksy
-evidence: [FND-VIEW-001, FND-VIEW-006, FND-VIEW-007, FND-VIEW-008, FND-VIEW-009, FND-VIEW-010, FND-VIEW-011, FND-ASSAULT-001, FND-ASSAULT-004, FND-ASSAULT-022, FND-ASSAULT-029, FND-ASSAULT-034, FND-ASSAULT-035, FND-ASSAULT-036, FND-ASSAULT-037, FND-ASSAULT-038, FND-ASSAULT-039, FND-ASSAULT-002, FND-ASSAULT-003, FND-ASSAULT-008, FND-ASSAULT-027, FND-ASSAULT-044, FND-VIEW-019, FND-VIEW-021, FND-ASSAULT-047]
+evidence: [FND-VIEW-001, FND-VIEW-006, FND-VIEW-007, FND-VIEW-008, FND-VIEW-009, FND-VIEW-010, FND-VIEW-011, FND-ASSAULT-001, FND-ASSAULT-004, FND-ASSAULT-022, FND-ASSAULT-029, FND-ASSAULT-034, FND-ASSAULT-035, FND-ASSAULT-036, FND-ASSAULT-037, FND-ASSAULT-038, FND-ASSAULT-039, FND-ASSAULT-049, FND-ASSAULT-003, FND-ASSAULT-008, FND-ASSAULT-027, FND-ASSAULT-044, FND-VIEW-019, FND-VIEW-021, FND-ASSAULT-047]
 conflicting: []
 split_with: []
 related: [RULE-VIEW-003, RULE-ASSAULT-021]
@@ -37,7 +37,7 @@ use this layout for the blocks the game copies and changes while the scene runs.
 | `0x05 bits 0..1` | | `bits[1]` | `selected` | Set: the combatant is selected for orders. | supported | FND-ASSAULT-008, FND-ASSAULT-035 |
 | `0x05 bits 1..8` | | `bits[7]` | `unk_05_1` | Purpose unknown. | supported | FND-VIEW-001 |
 | `0x06` | 2 | `BYTE[2]` | `unk_06` | Purpose unknown. | supported | FND-VIEW-001 |
-| `0x08` | 2 | `INT16LE` | `color_family` | First of the 32 colour maps used for the block: 0, 32, 64 or 96 on actors. | supported | FND-ASSAULT-002, FND-ASSAULT-039 |
+| `0x08` | 2 | `INT16LE` | `color_family` | First of the 32 colour maps used for the block: 0, 32, 64 or 96 on actors. | supported | FND-ASSAULT-049, FND-ASSAULT-039 |
 | `0x0A` | 2 | `BYTE[2]` | `unk_0A` | Purpose unknown. | supported | FND-VIEW-001 |
 | `0x0C` | 4 | `INT32LE` | `color_offset` | Subtracted from the distance colour map index. | supported | FND-VIEW-011 |
 | `0x10` | 4 | `INT32LE` | `texture_width` | Texture width in pixels. | supported | FND-VIEW-001, FND-VIEW-010 |

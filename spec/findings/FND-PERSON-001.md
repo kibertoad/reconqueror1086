@@ -1,6 +1,6 @@
 ---
 id: FND-PERSON-001
-title: Character attributes are read by 0x00015EF0 and written by 0x00015F0C, which limits the first 15 to 0..20
+title: Character attributes are read by 0x00015EF0 and written by 0x00015F0C, which limits the first 15 to 0..21
 status: recorded
 builds: [BLD-GOG-EN]
 superseded_by: []

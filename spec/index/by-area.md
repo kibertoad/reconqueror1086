@@ -13,7 +13,7 @@ Entries by area.
 | [FMT-ASSAULT-003](../formats/FMT-ASSAULT-003.md) | Scene effect descriptor, one record of the SFXDEFS resource | supported |
 | [FMT-ASSAULT-004](../formats/FMT-ASSAULT-004.md) | Live effect record, one of the 64 effects the scheduler runs | unknown |
 | [FND-ASSAULT-001](../findings/FND-ASSAULT-001.md) | The combat loader clones placed actor blocks into combatant records in x-major order and promotes the first friendly to player | recorded |
-| [FND-ASSAULT-002](../findings/FND-ASSAULT-002.md) | All 1,002 actor placements in the 42 melee and defence scene archives use templates 0 to 2 as friendly and 3, 5, 8 and 9 as hostile | recorded |
+| [FND-ASSAULT-002](../findings/FND-ASSAULT-002.md) | All 1,002 actor placements in the 42 melee and defence scene archives use templates 0 to 2 as friendly and 3, 5, 8 and 9 as hostile | superseded |
 | [FND-ASSAULT-003](../findings/FND-ASSAULT-003.md) | Placed actor blocks and their state blocks all have behaviour 0x87, and 52,278 of the 688,128 placed cells block movement | recorded |
 | [FND-ASSAULT-004](../findings/FND-ASSAULT-004.md) | Every placed actor selects movement descriptor 7 or 10, both three 200 ms ticks of 64 units with flags 0x142 | recorded |
 | [FND-ASSAULT-005](../findings/FND-ASSAULT-005.md) | Campaign castle assaults pass a retainer cap of one per three soldiers of each type, at most three per type, and at least one | recorded |
@@ -60,6 +60,7 @@ Entries by area.
 | [FND-ASSAULT-046](../findings/FND-ASSAULT-046.md) | A combatant's armour is the dword at offset 0x3C, read beside its health at 0x40 | recorded |
 | [FND-ASSAULT-047](../findings/FND-ASSAULT-047.md) | Walking into a block with behaviour bit 0x40 uses it, and in the shipped scenes only the exit or gate cell of each melee has that bit | recorded |
 | [FND-ASSAULT-048](../findings/FND-ASSAULT-048.md) | The moneylender's scene places the player and four hostile thugs | recorded |
+| [FND-ASSAULT-049](../findings/FND-ASSAULT-049.md) | All 1,002 actor placements in the 42 melee and defence scene archives use templates 0 to 2 as friendly and 3, 5, 8 and 9 as hostile | recorded |
 | [RULE-ASSAULT-001](../rules/RULE-ASSAULT-001.md) | Retainer cap for a campaign castle assault | supported |
 | [RULE-ASSAULT-002](../rules/RULE-ASSAULT-002.md) | Load the combatants of a scene and remove retainers above the cap | supported |
 | [RULE-ASSAULT-003](../rules/RULE-ASSAULT-003.md) | Soldiers lost with the retainers who died | supported |
@@ -317,7 +318,7 @@ Entries by area.
 |---|---|---|
 | [FMT-PERSON-001](../formats/FMT-PERSON-001.md) | Character table, CHARACTR.DAT and saved copies | supported |
 | [FMT-PERSON-002](../formats/FMT-PERSON-002.md) | Youth dilemma, DILEM0.DAT to DILEM29.DAT | supported |
-| [FND-PERSON-001](../findings/FND-PERSON-001.md) | Character attributes are read by 0x00015EF0 and written by 0x00015F0C, which limits the first 15 to 0..20 | recorded |
+| [FND-PERSON-001](../findings/FND-PERSON-001.md) | Character attributes are read by 0x00015EF0 and written by 0x00015F0C, which limits the first 15 to 0..21 | recorded |
 | [FND-PERSON-002](../findings/FND-PERSON-002.md) | CHARACTR.DAT lists 15 characters and 30 attributes | recorded |
 | [FND-PERSON-003](../findings/FND-PERSON-003.md) | CHARACTR.DAT is parsed by 0x00015920 and 0x00016124, which shift row 0 by up to 8 on each of the first 15 fields | recorded |
 | [FND-PERSON-004](../findings/FND-PERSON-004.md) | The generation screen draws the first dilemma, sets COLOR from three shields, rerolls and continues by age | recorded |
@@ -368,7 +369,7 @@ Entries by area.
 
 | ID | Title | Status |
 |---|---|---|
-| [FND-DRAGON-001](../findings/FND-DRAGON-001.md) | The dragon encounter wrapper limits lance experience to 0..20, stores it back after the run, and reports failure for results 1 and 2 | recorded |
+| [FND-DRAGON-001](../findings/FND-DRAGON-001.md) | The dragon encounter wrapper limits lance experience to 0..21, stores it back after the run, and reports failure for results 1 and 2 | recorded |
 | [FND-DRAGON-002](../findings/FND-DRAGON-002.md) | The dragon media routine adds 2 to the lance copy on a win and plays the win or loss movie | recorded |
 | [FND-DRAGON-003](../findings/FND-DRAGON-003.md) | After a won dragon run the lair shows the victory text and plays champl30.smk | recorded |
 | [FND-DRAGON-004](../findings/FND-DRAGON-004.md) | Winning the siege of person 100's castle is the crown ending | recorded |
@@ -641,6 +642,7 @@ Entries by area.
 | [FND-RES-066](../findings/FND-RES-066.md) | INST.EXE reads RESOURCE.CFG from the current directory through a line reader that splits each line at its first equals sign, trims both sides and compares keys without case | recorded |
 | [FND-RES-067](../findings/FND-RES-067.md) | An MVG entry holds the pointer shapes' hot spots; 0x00018850 loads it and the CSF of the same name | recorded |
 | [FND-RES-068](../findings/FND-RES-068.md) | Every use of the name FFONTA2.FNT ends in a property call that stores nothing, so the game never reads the .FNT entry | recorded |
+| [FND-RES-069](../findings/FND-RES-069.md) | Canonical primary-volume paths agree with the owned build accounting | recorded |
 | [RULE-RES-001](../rules/RULE-RES-001.md) | Opening, searching, reading and writing the open archive | supported |
 | [RULE-RES-002](../rules/RULE-RES-002.md) | Kind-1 decoding | supported |
 | [RULE-RES-003](../rules/RULE-RES-003.md) | Kind-2 decoding | supported |

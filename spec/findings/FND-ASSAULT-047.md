@@ -184,7 +184,7 @@ jumps to for values above 19, so interaction 0 changes nothing before the cell i
 The only other test of bit `0x40` in object 1 is at `0x000536A2`, where a moving effect record that
 has just written its block into a new cell calls the same two routines when that block has the bit.
 
-In the 42 archives of FND-ASSAULT-002, the only placed blocks with behaviour bit `0x40` are block
+In the 42 archives of FND-ASSAULT-049, the only placed blocks with behaviour bit `0x40` are block
 129 of each `MELEE*` archive, one placement each: labelled `exit` in the 24 archives of the
 `MELEE0` and `MELEE1` families and `gate` in the 12 of the `MELEE2` family. All 36 have behaviour
 `0x53`, kind 3, interaction 0 and a state target labelled `carpet` (exits) or `grass` (gates), each

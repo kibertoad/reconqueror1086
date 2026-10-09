@@ -53,6 +53,14 @@ Entries by status.
 | [RULE-ASSAULT-029](../../rules/RULE-ASSAULT-029.md) | Change an actor's look |
 | [RULE-ASSAULT-031](../../rules/RULE-ASSAULT-031.md) | The player's weapon breaking on a miss |
 
+## superseded
+
+1 entries.
+
+| ID | Title |
+|---|---|
+| [FND-ASSAULT-002](../../findings/FND-ASSAULT-002.md) | All 1,002 actor placements in the 42 melee and defence scene archives use templates 0 to 2 as friendly and 3, 5, 8 and 9 as hostile |
+
 ## recorded
 
 48 entries.
@@ -60,7 +68,6 @@ Entries by status.
 | ID | Title |
 |---|---|
 | [FND-ASSAULT-001](../../findings/FND-ASSAULT-001.md) | The combat loader clones placed actor blocks into combatant records in x-major order and promotes the first friendly to player |
-| [FND-ASSAULT-002](../../findings/FND-ASSAULT-002.md) | All 1,002 actor placements in the 42 melee and defence scene archives use templates 0 to 2 as friendly and 3, 5, 8 and 9 as hostile |
 | [FND-ASSAULT-003](../../findings/FND-ASSAULT-003.md) | Placed actor blocks and their state blocks all have behaviour 0x87, and 52,278 of the 688,128 placed cells block movement |
 | [FND-ASSAULT-004](../../findings/FND-ASSAULT-004.md) | Every placed actor selects movement descriptor 7 or 10, both three 200 ms ticks of 64 units with flags 0x142 |
 | [FND-ASSAULT-005](../../findings/FND-ASSAULT-005.md) | Campaign castle assaults pass a retainer cap of one per three soldiers of each type, at most three per type, and at least one |
@@ -107,6 +114,7 @@ Entries by status.
 | [FND-ASSAULT-046](../../findings/FND-ASSAULT-046.md) | A combatant's armour is the dword at offset 0x3C, read beside its health at 0x40 |
 | [FND-ASSAULT-047](../../findings/FND-ASSAULT-047.md) | Walking into a block with behaviour bit 0x40 uses it, and in the shipped scenes only the exit or gate cell of each melee has that bit |
 | [FND-ASSAULT-048](../../findings/FND-ASSAULT-048.md) | The moneylender's scene places the player and four hostile thugs |
+| [FND-ASSAULT-049](../../findings/FND-ASSAULT-049.md) | All 1,002 actor placements in the 42 melee and defence scene archives use templates 0 to 2 as friendly and 3, 5, 8 and 9 as hostile |
 
 ## Open questions
 

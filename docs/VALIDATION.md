@@ -1,5 +1,20 @@
 # Validation
 
+## Canonical paths and value bounds (2026-10-09)
+
+The adopted primary-volume reader reproduced the earlier full installation and
+media listing path-for-path, size-for-size and hash-for-hash. Comparison with the
+manifest and Other files found no missing, unaccounted or overlapping path and
+no manifest identity mismatch (FND-RES-069). A new complete scene census retained
+the actor/template totals and confirmed a maximum combat row of 23, including
+placed actors with that value (FND-ASSAULT-049). Its ambiguous predecessor is
+superseded; claims retain their statuses. Experience titles now express the
+already recorded inclusive clamp with half-open notation. Payload size extrema
+are separate minimum and maximum columns, with unchanged values.
+The documentation write check and canonical Invoke-Validation.ps1 gate passed
+with ResourceAndDefinitionTests and MinimumExpectedTests 1. Original programs
+were not executed; generated listings and decoded resources remain local.
+
 ## Native inventory command migration (2026-10-09)
 
 The synthetic frozen-snapshot command tests passed: adoption preserves separate

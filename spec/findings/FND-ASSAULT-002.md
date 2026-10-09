@@ -1,9 +1,9 @@
 ---
 id: FND-ASSAULT-002
 title: All 1,002 actor placements in the 42 melee and defence scene archives use templates 0 to 2 as friendly and 3, 5, 8 and 9 as hostile
-status: recorded
+status: superseded
 builds: [BLD-GOG-EN]
-superseded_by: []
+superseded_by: [FND-ASSAULT-049]
 recorded_by: kibertoad
 reproduced_by: []
 method: static

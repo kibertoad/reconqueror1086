@@ -1,6 +1,6 @@
 ---
-id: FND-ASSAULT-038
-title: An accepted object action replaces the block at once with its state target, and 1,086 placed doors carry the action bit
+id: FND-ASSAULT-049
+title: All 1,002 actor placements in the 42 melee and defence scene archives use templates 0 to 2 as friendly and 3, 5, 8 and 9 as hostile
 status: recorded
 builds: [BLD-GOG-EN]
 superseded_by: []
@@ -8,12 +8,6 @@ recorded_by: kibertoad
 reproduced_by: []
 method: static
 locations:
-  - build: BLD-GOG-EN
-    file: CD:CONQUER.EXE
-    address: 0x0005568D..0x000556E9
-  - build: BLD-GOG-EN
-    file: CD:CONQUER.EXE
-    address: 0x0004C900
   - build: BLD-GOG-EN
     file: CD:CONQUER/DEFEND0.LOW
     offset: 0x00..0x47700
@@ -140,34 +134,47 @@ locations:
   - build: BLD-GOG-EN
     file: CD:CONQUER/MELEE24.RES
     offset: 0x00..0x912CB
-tool: Ghidra 12.1.3 and a scene resource decoder written for this project
+tool: Scene resource decoder written for this project
 environment: null
 ---
 
 ## Observation
 
-At `0x0005568D`..`0x000556E9` an accepted action on a block with behaviour bit `0x10` calls the
-active player's feedback callback and passes the block to `0x0004C900`, which writes the low
-word of the block's state target `+0x40` into the map cell. Nothing else changes the cell later;
-no timer or neighbouring block is involved.
+Decoding the `Map` and `Blocks` resources of every `CD:CONQUER/MELEE*` and `CD:CONQUER/DEFEND*`
+archive (21 scenes, each as `.RES` and `.LOW`) and applying the actor predicate of
+FND-ASSAULT-001 gives 144 actor base blocks and 1,002 placed actors.
 
-In the 42 archives of FND-ASSAULT-049, 1,086 placed door cells have behaviour values 17, 18 or 19
-(bit `0x10` set). Their state targets name blocks labelled carpet (664 placements), grass (336),
-wall (26), flagstones (20), floor (14), water (14) and ground (12). Another 632 placed door
-cells have behaviour 1 or 3 (bit `0x10` clear).
+| Template | Side | Base blocks | Placements |
+|---:|---|---:|---:|
+| 0 | friendly | 32 | 356 |
+| 1 | friendly | 10 | 108 |
+| 2 | friendly | 2 | 6 |
+| 3 | hostile | 42 | 334 |
+| 5 | hostile | 2 | 4 |
+| 8 | hostile | 14 | 152 |
+| 9 | hostile | 42 | 42 |
+
+Templates 4, 6 and 7 are never placed. Every placed actor's block state target (`+0x40`) names a
+block without behaviour bit `0x02`: floor, ground, grass, dirt, flagstones or stone. The raw
+colour selector at block `+0x08` of the actor bases is 0 on 38 bases (360 placements), 32 on 26
+(176), 64 on 34 (262) and 96 on 46 (204). Every actor base has adjacent attack, hit and death
+state blocks at base + 1, + 2 and + 3. Every placed actor's combat row (block `+0x4C`) lies in `4..24` (minimum 4, maximum 23).
 
 ## Interpretation
 
-Opening a door replaces it immediately with what its state target names, which is usually floor
-but can be a wall or water. Doors without the action bit cannot be opened.
+In the shipped scenes the side a placed actor gets is the side its template implies: templates
+0, 1 and 2 are friendly and 3, 5, 8 and 9 hostile. Every actor stands on a floor block that it
+restores when it moves.
 
 ## Alternatives
 
-Doors were once thought to animate through neighbouring block records on a 360 ms timer. The
-replacement is a single write.
+This replaces FND-ASSAULT-002, whose value-range end did not say whether 23 was included. A new complete scene census observes a minimum of 4 and maximum of 23, including placed actors with row 23. The other census observations and interpretation are retained.
+
+The raw `+0x08` selector before normalisation does not equal the side group, so the census
+cannot tell the side from the raw colour alone; the partition by template is what holds.
 
 ## How to reproduce
 
-Open `0x0005568D` and follow the call to `0x0004C900`. For the census, decode each archive's
-`Map` and `Blocks` and follow the state target of each placed block with behaviour bit `0x10`
-that is labelled as a door.
+Decode each archive's `Map` (FMT-VIEW-002) and `Blocks` (FMT-VIEW-001), count map cells whose
+block has behaviour bit `0x80` and interaction selector 1, and group them by template word
+`+0x4A`.

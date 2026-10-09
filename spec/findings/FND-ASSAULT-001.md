@@ -44,7 +44,7 @@ actor is a retainer.
 ## Alternatives
 
 The side could have come from the template index. It comes from the colour group, and
-FND-ASSAULT-002 shows that across the supported scenes templates 0 to 2 are always side 0 and
+FND-ASSAULT-049 shows that across the supported scenes templates 0 to 2 are always side 0 and
 the others never are, so the two readings agree on every placement the game ships.
 
 ## How to reproduce

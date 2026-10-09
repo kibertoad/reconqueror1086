@@ -38,7 +38,7 @@ A cloned combatant starts with its template's values.
 ## Interpretation
 
 Friendly templates use kinds 0 and 1; the placed hostile templates use kinds 2, 4, 2 and 7. No
-placed template (FND-ASSAULT-002) starts in mode 9 or 10.
+placed template (FND-ASSAULT-049) starts in mode 9 or 10.
 
 ## Alternatives
 
