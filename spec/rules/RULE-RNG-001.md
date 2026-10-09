@@ -4,7 +4,7 @@ title: The game's random number generator
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-RNG-002, FND-RNG-003, FND-RNG-004, EXP-RNG-001, FND-ASSAULT-031, FND-SAVE-006, FND-SOUND-003]
+evidence: [FND-RNG-002, FND-RNG-003, FND-RNG-004, FND-RNG-006, EXP-RNG-001, FND-ASSAULT-031, FND-SAVE-006, FND-SOUND-003]
 conflicting: []
 split_with: []
 related: [RULE-TALK-001, RULE-SOUND-002]
@@ -91,3 +91,5 @@ None known.
   before that interpretation is supported. EXP-RNG-001 does not settle those
   dependencies. A raw tick/hundredths return is ruled out by FND-RNG-005.
   (Q-RNG-001)
+  FND-RNG-006 traces the environment lookup and adjustment-parser wrapper;
+  its shipped adjustment values do not establish the values after startup.

@@ -758,4 +758,5 @@ Entries by area.
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |
 | [FND-RNG-004](../findings/FND-RNG-004.md) | Live LE relocations and native seed and draw stops identify the loaded RNG state | recorded |
 | [FND-RNG-005](../findings/FND-RNG-005.md) | The seed source reads DOS calendar time and rounds its seconds before conversion | recorded |
+| [FND-RNG-006](../findings/FND-RNG-006.md) | Calendar seed conversion consults the DOS environment before applying adjustments | recorded |
 | [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number generator | supported |

@@ -10,6 +10,9 @@ Next ID: Q-RNG-002
   Tried: FND-RNG-005 reads the DOS calendar/time reader, rounding and converter
   wrapper; the calendar tables, adjustment initialization and record-offset-32
   write remain for the next static reading. No complete timestamp claim yet.
+  FND-RNG-006 follows the environment lookup and parser wrapper, including
+  shipped adjustment values. The parser syntax, environment initialization,
+  record normalization and offset-32 classification still require reading.
 
 ## Emulated call
 
