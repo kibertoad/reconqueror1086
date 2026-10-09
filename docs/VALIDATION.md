@@ -849,6 +849,17 @@ tools/rng_journal.py replay against its recorded final RNG state. The owned
 emulator and run lock were cleaned up. This verifies the startup recording
 path only; full-game and accepted-caller completeness remain false.
 
+The loaded-return attempt in
+artifacts/runtime-tools/native-rng-loaded-return-20261010-a was deliberately
+paused for diagnostics after its completed startup prefix. It ended as
+incomplete, with the recorder's expected rejection of an unmodelled stop.
+The snapshot had no screen record (FND-UI-017), and the journal reported no
+pending screen load: the return-boundary test had not yet begun. Execution was
+in a non-flat 16-bit service segment, not at the mapped game screen loader.
+This does not identify a hang or its cause. The completed event log agrees
+with the final journal and passes RNG-formula replay. Cleanup stopped the
+owned emulator and released its run lock.
+
 The loaded-screen-return transport added after FND-UI-017 passed seven
 synthetic cases in tools/test_native_rng_recorder.py. The checks reject null
 record pointers, a wrong screen-object identity and an unrecorded RNG-state
