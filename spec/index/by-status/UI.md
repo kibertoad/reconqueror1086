@@ -65,7 +65,7 @@ Entries by status.
 
 ## recorded
 
-16 entries.
+17 entries.
 
 | ID | Title |
 |---|---|
@@ -85,6 +85,7 @@ Entries by status.
 | [FND-UI-014](../../findings/FND-UI-014.md) | The forge hides the smith without a tournament, and the store buys at the listed price and sells at three quarters |
 | [FND-UI-015](../../findings/FND-UI-015.md) | The office, overview and estate map regions open the report pictures, the orders message and the map controls |
 | [FND-UI-016](../../findings/FND-UI-016.md) | The four fief tables share row, terrain, full-screen, OK and Cancel routines, and the village table sets the tax in steps of 5 |
+| [FND-UI-017](../../findings/FND-UI-017.md) | Initial screen loading stores a screen object and pushes its number into a five-slot history |
 
 ## Open questions
 
