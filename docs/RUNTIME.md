@@ -257,6 +257,13 @@ a controlled run that does not investigate animated transitions. The default
 preserves the installed animation setting. The local `probe-configuration.json`
 records the selected animation and audio options; it is not RNG trace evidence.
 
+With `--stop-after-screen`, add `--startup-checkpoints` to observe the
+preparation entry, animation test and shared epilogue of FND-UI-018.
+Each checkpoint verifies the original code, descriptors, stack position and
+unchanged recorded RNG state, records the guest's animation flag in local
+`startup-checkpoints.json`, then continues the same run. These checkpoints
+write no guest state and do not count as loaded-screen or full-game evidence.
+
 Do not replace this with `nosound=true` in the structured build: native and
 synthetic readiness attempts with that setting failed before the guest marker.
 The portable debugger's synthetic check passed with it, so that result alone

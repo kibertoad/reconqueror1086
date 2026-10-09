@@ -49,6 +49,43 @@ def runtime_and_mapping(screen_state=123, screen_number=0, record_pointer=0x3000
 
 
 class ScreenBoundaryTests(unittest.TestCase):
+    def startup_sequence(self, corrupt_stack=False):
+        runtime, mapping = runtime_and_mapping()
+        runtime.agent.create_execution_breakpoint.side_effect = [SimpleNamespace(id=f'hook-{i}') for i in range(9)]
+        pcs = (0x6b413, 0x6b422, 0x2ac08, 0x2ac86, 0x2ad54, 0x595c0, 0x5965f)  # FND-UI-018/017
+        ids = ('seed', 'hook-1', 'hook-6', 'hook-7', 'hook-8', 'hook-4', 'hook-5')
+        original_registers = runtime.registers
+        def registers():
+            saved_phase = runtime.phase
+            runtime.phase = min(saved_phase, 3)
+            result = original_registers()
+            runtime.phase = saved_phase
+            result.instruction_pointer = hex(pcs[saved_phase])
+            if saved_phase in (3, 4):
+                result.general['esp'] = hex(0x1000 - (88 if corrupt_stack else 92))
+            return result
+        runtime.registers = registers
+        def wait(operation):
+            runtime.phase += 1
+            runtime.session.stop_reason.breakpoint_id = ids[runtime.phase]
+        runtime.wait_until_stopped = wait
+        with patch('native_rng_recorder.tables_from_diagnostic', return_value=(0, 16)), \
+             patch('native_rng_recorder.descriptor', side_effect=[mapping.code, mapping.data] * 7), \
+             patch('native_rng_recorder.EventLog'), patch('native_rng_recorder.Path.write_text'):
+            return record(runtime, mapping, ('draw', 'seed'), 'unused-output',
+                          stop_after_screen=True, startup_checkpoints=True)
+
+    def test_startup_checkpoints_continue_to_verified_screen(self):
+        report = self.startup_sequence()
+        self.assertEqual([item['boundary'] for item in report['startup_checkpoints']],
+                         ['preparation-entry', 'animation-test', 'preparation-epilogue'])
+        self.assertEqual(report['status'], 'screen-load-return-reached')
+        self.assertFalse(report['full_game_complete'])
+
+    def test_startup_checkpoint_rejects_changed_stack(self):
+        with self.assertRaisesRegex(RecordingError, 'Startup preparation stack differs'):
+            self.startup_sequence(corrupt_stack=True)
+
     def run_sequence(self, after=False, **options):
         runtime, mapping = runtime_and_mapping(**options)
         with patch('native_rng_recorder.tables_from_diagnostic', return_value=(0, 16)), \

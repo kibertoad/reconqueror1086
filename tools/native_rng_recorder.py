@@ -28,9 +28,12 @@ class EventLog:
         self.file.close()
 
 
-def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen=False, stop_after_screen=False):
+def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen=False, stop_after_screen=False,
+           startup_checkpoints=False):
     if stop_at_screen and stop_after_screen:
         raise ValueError('Choose one screen diagnostic boundary')
+    if startup_checkpoints and not stop_after_screen:
+        raise ValueError('Startup checkpoints require the loaded-screen diagnostic')
     if type(maximum_draws) is not int or not 1 <= maximum_draws <= 100000:
         raise ValueError('Invalid recording draw limit')
     output = Path(output)
@@ -52,6 +55,13 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         selector, offset = mapping.code_address(0x5965f)  # FND-UI-017
         hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
         hooks[hook.id] = 'screen-return'
+    startup_points = {0x2ac08: 'preparation-entry', 0x2ac86: 'animation-test',
+                      0x2ad54: 'preparation-epilogue'}  # FND-UI-018
+    if startup_checkpoints:
+        for address in startup_points:
+            selector, offset = mapping.code_address(address)
+            hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
+            hooks[hook.id] = 'startup-checkpoint'
     controls = []
     code_ranges = [(0x6b3eb, 0x6b423), (0x24c38, 0x24c4c), (0x1a14c, 0x1a1ef), (0x43670, 0x436e0)]
     if stop_at_screen or stop_after_screen:
@@ -59,6 +69,8 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
     if stop_after_screen:
         code_ranges.extend(((0x59ce4, 0x59d11), (0x63d20, 0x63d3e),
                             (0x59fa0, 0x5a180), (0x5a2a4, 0x5a414)))
+    if startup_checkpoints:
+        code_ranges.append((0x2ac08, 0x2ad5b))  # FND-UI-018
     for start, end in code_ranges:
         selector, offset = mapping.code_address(start, end - start)
         address = runtime.MemoryAddress.segmented(selector, offset)
@@ -73,6 +85,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         return value - mapping.code_base + 0x10000
     frame = None
     screen_frame = None
+    startup_key = None
     count = 0
     shift_ordinal = 0
     report = {'schema': 'conquer-native-rng-journal-v1', 'status': 'incomplete',
@@ -98,6 +111,27 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
             stack_pointer = int(registers.general['esp'], 16)
             key = (int(registers.segments['ss'], 16), stack_pointer)
             kind = hooks[stop.breakpoint_id]
+            if kind == 'startup-checkpoint':
+                if pc not in startup_points or frame is not None or screen_frame is not None:
+                    raise RecordingError('Startup checkpoint/frame mismatch')
+                if pc == 0x2ac08:
+                    if startup_key is not None:
+                        raise RecordingError('Repeated startup preparation requires separate evidence')
+                    startup_key = key
+                elif startup_key is None or key != (startup_key[0], startup_key[1] - 92):
+                    raise RecordingError('Startup preparation stack differs from its reading')
+                current_state = journal.complete()
+                if state() != current_state or replay(journal.events) != current_state:
+                    raise RecordingError('Startup checkpoint RNG state differs from recorded events')
+                selector, offset = mapping.data_address(0x9adb8, 4)  # FND-SOUND-004
+                animation_flag = int.from_bytes(runtime.read(runtime.MemoryAddress.segmented(selector, offset), 4), 'little')
+                observation = {'boundary': startup_points[pc], 'animation_flag': animation_flag,
+                               'rng_state': current_state}
+                report.setdefault('startup_checkpoints', []).append(observation)
+                (output / 'startup-checkpoints.json').write_text(json.dumps(report['startup_checkpoints'], indent=2))
+                print('Verified startup checkpoint:', observation, flush=True)
+                runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
+                continue
             if kind == 'screen-return':
                 if pc != 0x5965f or frame is not None or screen_frame is None or screen_frame['key'] != key:
                     raise RecordingError('Loaded-screen return/frame mismatch')
