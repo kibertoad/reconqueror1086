@@ -407,6 +407,7 @@ Entries by area.
 | [FND-UI-015](../findings/FND-UI-015.md) | The office, overview and estate map regions open the report pictures, the orders message and the map controls | recorded |
 | [FND-UI-016](../findings/FND-UI-016.md) | The four fief tables share row, terrain, full-screen, OK and Cancel routines, and the village table sets the tax in steps of 5 | recorded |
 | [FND-UI-017](../findings/FND-UI-017.md) | Initial screen loading stores a screen object and pushes its number into a five-slot history | recorded |
+| [FND-UI-018](../findings/FND-UI-018.md) | Startup performs display preparation before testing the animation switch and entering the initial screen loader | recorded |
 | [RULE-UI-001](../rules/RULE-UI-001.md) | Village exterior hot spots | supported |
 | [RULE-UI-002](../rules/RULE-UI-002.md) | Village exterior actions | supported |
 | [RULE-UI-003](../rules/RULE-UI-003.md) | Store stock | supported |

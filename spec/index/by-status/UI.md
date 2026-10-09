@@ -65,7 +65,7 @@ Entries by status.
 
 ## recorded
 
-17 entries.
+18 entries.
 
 | ID | Title |
 |---|---|
@@ -86,6 +86,7 @@ Entries by status.
 | [FND-UI-015](../../findings/FND-UI-015.md) | The office, overview and estate map regions open the report pictures, the orders message and the map controls |
 | [FND-UI-016](../../findings/FND-UI-016.md) | The four fief tables share row, terrain, full-screen, OK and Cancel routines, and the village table sets the tax in steps of 5 |
 | [FND-UI-017](../../findings/FND-UI-017.md) | Initial screen loading stores a screen object and pushes its number into a five-slot history |
+| [FND-UI-018](../../findings/FND-UI-018.md) | Startup performs display preparation before testing the animation switch and entering the initial screen loader |
 
 ## Open questions
 
