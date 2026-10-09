@@ -30,28 +30,42 @@ None known.
 ## Handover
 
 - Active: latest rules/libraries and full evidence conversion. Stage: Survey.
-- Adopted dependency locks and rules snapshots are in their authoritative lock
-  files. The dependency-adoption batch is committed; full acceptance is pending.
-- Last checks: 2026-10-09 canonical gate passed with
-  FullyQualifiedName~ResourceAndDefinitionTests, minimum discovery 1; startup
-  failure reporter regression passed separately. Kaitai compiled. Upstream
-  freshness matched rules/checker main. No original program ran.
-- Unfinished: inventory body ranges, provenance and region sidecars; complete
-  half-open-range and build/listing accounting audits; conversion guidance and
-  final acceptance. docs/template-migration-plan.md lists the requirements.
-- Local state: .claude/settings.json was already untracked; preserve it.
-- Existing LE project: analysis/documentation-audit/ghidra/LeInventory2.
-  PE/NE projects: artifacts/launcher-inventory-pe-20261005/LauncherPE and
-  artifacts/launcher-inventory-ne-20261005/LauncherNE. MZ snapshot folder
-  analysis/original/mz-inventory/proj is empty; recover or rebuild it with
-  verified source/mapping rather than inventing provenance.
-- Shared ExportFunctionInventory.java still exports only starts and sizes;
-  the new protocol needs a project exporter/adapter with actual body ranges
-  and the denominator partition. Existing Check-Coverage.mjs does not prove it.
-- No rule, format, screen or bug is established; complete-reading claims must
-  not be inferred from evidence citations. No legacy root validation record
-  or original-reading parity test requires migration.
-- Next: implement and validate inventory export/sidecar tooling; re-export all
-  five inventories; audit range ends and primary ISO path/accounting; update
-  remaining guidance; perform the full requirement-by-requirement audit.
-- Blockers: none requiring an owner decision. No push is authorized.
+- Dependency adoption and inventory-export/range-audit tooling are committed.
+  No publication is authorized. No evidence status changed; no original game ran.
+- Checks: six conversion/sidecar regressions pass. ExportCoverageSnapshot.java
+  compiled in installed Ghidra, and repeated exports of all five sources are
+  identical. Verified stable project digests and source SHA-256/XXH3 identities.
+  All five converted inventories pass the shared canonical reader and the new
+  Check-Coverage.mjs sidecar/body-intersection validation.
+- Documentation gate on the current unfinished conversion FAILS on legacy range
+  ends. Audit-RangeEnds.mjs reports all candidates without the checker diagnostic
+  cap. artifacts/coverage-migration/range-end-audit.json is the local review set:
+  complete-body candidates need a finding recording their extents and intended
+  scope review; other candidates need the entry's own last-item/size evidence,
+  or whole-entry supersession. Do not blindly increment every flagged endpoint.
+- Uncommitted migration work: five canonical start/size/ranges inventories, ten
+  provenance/regions sidecars, and the replacement tools/Check-Coverage.mjs.
+  Keep these together with their evidence corrections for final validation.
+  .claude/settings.json was already untracked and remains unrelated.
+- Raw exports and adoption contracts: artifacts/coverage-migration/{le,pe,ne,
+  config,inst}.json. Re-adoption validates source identities, snapshot digest
+  and completion marker. Raw output remains ignored and contains no Git assets.
+- LE snapshot: analysis/documentation-audit/ghidra/LeInventory2.
+  PE/NE: artifacts/launcher-inventory-{pe,ne}-20261005/Launcher{PE,NE}.
+  Rebuilt MZ snapshot: artifacts/coverage-migration/mz-project/MzCoverage,
+  programs CONFIG.EXE and INST.unpacked.exe. Repeated stable exports have the
+  suffix -stable; source/mapping qualifications and boundary changes still need
+  documentation in coverage/README.md. Historical size-only bodies cannot prove
+  that their start-plus-size interval was contiguous.
+- Remote branches were fetched and open PR heads checked on 2026-10-09 before
+  the next new finding. Recheck the proposed ID across every origin ref before
+  allocating it; no migration finding ID has yet been taken.
+- Next: record verified native function extents and review/correct legacy ends;
+  reconcile ambiguous candidates without changing evidence claims silently;
+  update coverage/caller documentation and remove obsolete metadata paths;
+  audit all value/address ranges and ISO listing/accounting; finish the full
+  requirement-by-requirement acceptance audit in template-migration-plan.md.
+- Remaining scope includes existing report configurations/active callers,
+  complete-reading claims, progress semantics and all workflow guidance. A green
+  sidecar check alone does not prove the goal complete.
+- Blockers: none requiring an owner decision. Preserve MSBuild reusable workers.
