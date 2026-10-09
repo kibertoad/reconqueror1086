@@ -835,6 +835,14 @@ was performed.
 
 ## Continuous debugger observation checks (2026-10-10)
 
+The loaded-screen-return transport added after FND-UI-017 passed seven
+synthetic cases in tools/test_native_rng_recorder.py. The checks reject null
+record pointers, a wrong screen-object identity and an unrecorded RNG-state
+change, and retain full-game completeness as false. Probe syntax, documentation
+and repository-policy checks passed. Native use of the return boundary remains
+pending. The running alternate debugger separately reported CPU tracing and
+memory-change breakpoints disabled, confirming its intended feature set.
+
 The canonical gate runs Node acceptance files sequentially by default, with
 `-NodeTestConcurrency` available to choose a higher limit. This retains every
 check while avoiding simultaneous synthetic GUI acceptance sessions on Windows.
