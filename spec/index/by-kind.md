@@ -343,7 +343,7 @@ Entries by kind.
 
 ## findings
 
-300 entries.
+301 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -535,6 +535,7 @@ Entries by kind.
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |
+| [FND-RNG-004](../findings/FND-RNG-004.md) | Live LE relocations and native seed and draw stops identify the loaded RNG state | recorded |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV | recorded |
 | [FND-SAVE-002](../findings/FND-SAVE-002.md) | A save writes ten temporary files and packs them with a title and version into one resource container | recorded |
 | [FND-SAVE-003](../findings/FND-SAVE-003.md) | A load checks VERSION 2.1, unpacks the entries and runs the component loaders; temp.jap must be present | recorded |

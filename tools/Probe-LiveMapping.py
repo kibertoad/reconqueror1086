@@ -19,7 +19,11 @@ def main():
     parser.add_argument('--rng-break', action='store_true')
     parser.add_argument('--cycles', type=int, default=10000)
     parser.add_argument('--trace-loader', action='store_true')
+    parser.add_argument('--seed-check', action='store_true')
+    parser.add_argument('--draw-check', action='store_true')
     args = parser.parse_args()
+    if args.draw_check and not args.seed_check:
+        raise ValueError('Draw identity check requires the seed identity check')
     if not 1 <= args.samples <= 100:
         raise ValueError('Samples must be between 1 and 100')
     if not 1 <= args.observation_ms <= 1000:
@@ -84,6 +88,58 @@ def main():
                         int(registers.segments['ss'], 16), int(registers.general['esp'], 16)), 64)
                     (root / 'breakpoint-stack.bin').write_bytes(stack)
                     print('instrumented entry breakpoint hit', runtime.session.stop_reason)
+                    if args.seed_check and runtime.session.stop_reason.breakpoint_id == ids[1]:
+                        # FND-RNG-003: the pointer-return function carries the
+                        # relocated state address, independently of an assumed
+                        # delta between the two loaded objects.
+                        pointer = int.from_bytes(runtime.read(runtime.MemoryAddress.segmented(
+                            int(registers.segments['cs'], 16), code_base + 0x6b3ec - images[0]['base']
+                            - code_segment['base']), 4), 'little')
+                        state_address = runtime.MemoryAddress.segmented(int(registers.segments['ds'], 16), pointer)
+                        initial = int.from_bytes(runtime.read(state_address, 4), 'little')
+                        return_address, seed = (int.from_bytes(stack[i:i + 4], 'little') for i in (0, 4))
+                        completed = False
+                        for step_index in range(16):
+                            runtime.session, after = runtime.agent.step(runtime.session.id)
+                            if int(after.instruction_pointer, 16) == return_address:
+                                completed = True
+                                break
+                        if not completed:
+                            raise RuntimeError('Seed routine did not return within its instruction bound')
+                        final = int.from_bytes(runtime.read(state_address, 4), 'little')
+                        if final != seed:
+                            raise RuntimeError('Native seed/state identity check failed')
+                        records[-1]['seed_identity_check'] = {'before': initial, 'seed': seed,
+                            'after': final, 'steps': step_index + 1,
+                            'state_pointer': hex(pointer), 'return_address': hex(return_address),
+                            'return_registers': dataclasses.asdict(after)}
+                        print('native seed write verified', 'steps', step_index + 1)
+                        if args.draw_check:
+                            continue
+                    elif args.draw_check and runtime.session.stop_reason.breakpoint_id == ids[0]:
+                        pointer = int.from_bytes(runtime.read(runtime.MemoryAddress.segmented(
+                            int(registers.segments['cs'], 16), code_base + 0x6b3ec - images[0]['base']
+                            - code_segment['base']), 4), 'little')
+                        state_address = runtime.MemoryAddress.segmented(int(registers.segments['ds'], 16), pointer)
+                        initial = int.from_bytes(runtime.read(state_address, 4), 'little')
+                        return_address = int.from_bytes(stack[:4], 'little')
+                        completed = False
+                        for step_index in range(32):
+                            runtime.session, after = runtime.agent.step(runtime.session.id)
+                            if int(after.instruction_pointer, 16) == return_address:
+                                completed = True
+                                break
+                        if not completed:
+                            raise RuntimeError('Draw routine did not return within its instruction bound')
+                        final = int.from_bytes(runtime.read(state_address, 4), 'little')
+                        expected = (initial * 0x41c64e6d + 0x3039) & 0xffffffff
+                        result = int(after.general['eax'], 16)
+                        if final != expected or result != (expected >> 16) & 0x7fff:
+                            raise RuntimeError('Native draw state/result identity check failed')
+                        records[-1]['draw_identity_check'] = {'before': initial, 'after': final,
+                            'result': result, 'steps': step_index + 1, 'state_pointer': hex(pointer),
+                            'return_address': hex(return_address), 'return_registers': dataclasses.asdict(after)}
+                        print('native draw state/result verified', 'steps', step_index + 1)
                     break
                 # Preserve diagnostics locally even if the loader returns to
                 # real mode; no guest text or bytes enter committed reports.

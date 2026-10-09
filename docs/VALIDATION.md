@@ -844,6 +844,9 @@ and a bounded structured CPU trace completed, and an instrumented process-exit
 entry stopped natively. No full-game RNG fixture or gameplay parity was validated.
 The analysis-readiness, repository-policy and documentation gates passed; the
 documentation gate completed without skipped compiler or base-branch checks.
+FND-RNG-004 records native seed/state comparisons in two fresh original launches
+and the first native draw/state/result comparison in one of them. These are
+identity controls, not full-game recordings or parity validation.
 
 ## Shared runtime 10.0.0 adoption (2026-10-07)
 

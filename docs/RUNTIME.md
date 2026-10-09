@@ -31,7 +31,7 @@ It describes the current environment, not every possible instrumentation method.
 | Send game input: keyboard | person | SRC-MANUAL describes keyboard input; Windows accepted a posted Escape message, but game consumption was not verified | Verify keyboard input through an observable game-state transition |
 | Send game input: mouse | person | SRC-MANUAL describes mouse input; no mouse message has been tried on its own, so this answer is carried over from the earlier single input answer and names no attempt | Try a mouse message and verify it through an observable game-state transition |
 | Read guest memory and control breakpoints | agent | DOSBox-X 2026.10.01 native TCP debugger: synthetic memory roundtrip and breakpoint hit verified; original relocated DOS entry and protected-mode guest memory read verified on 2026-10-09 | Map live LE game addresses before using spec fields or game-function breakpoints |
-| Map live guest memory to spec fields | none | The capability probe stops in the protected-mode loader; its selectors are not an audited mapping of the running LE game | Verify code/data selectors, relocation bases and independent positive controls |
+| Map live guest memory to spec fields | agent, limited to the checked RNG state | FND-RNG-004: full relocated code comparison, separate object bases, native seed/draw stops and observed state changes | Build a per-run map validator and verify additional fields before using them |
 | Load a patched save | none | No original-save patch/load workflow is verified; FMT-SAVE-001 through FMT-SAVE-005 retain gaps | Complete the needed structure and verify a reversible patch/load experiment |
 | Capture client frames | agent | Direct PrintWindow capture verified against an offscreen synthetic renderer and owned DOSBox client; blank/unsupported results fail | Recheck each different renderer and interpret each frame before using it as evidence |
 | Capture sound | person | Bundled DOSBox documentation specifies Ctrl-F6 WAV capture; no unattended audio adapter is verified | Verify a repeatable audio recording case |
@@ -62,8 +62,9 @@ when its owned DOSBox process ended. [orphanCleanupLog.md](../orphanCleanupLog.m
 records forced cleanup. Captures, configurations and probe logs remain local.
 
 There is no unattended gameplay-state probe or full-game RNG recorder yet.
-Debugger transport is verified, but the live LE game mapping and rule-tagged
-draw capture remain unverified. Research must not assume those capabilities.
+Debugger transport and the observed RNG mapping are verified (FND-RNG-004), but
+a general per-run map validator and rule-tagged draw capture are absent.
+Research must not assume arbitrary state fields or full recording capabilities.
 An emulated call starts no game process and requires no run lock.
 
 ## DOSBox-X debugger installation and probe
