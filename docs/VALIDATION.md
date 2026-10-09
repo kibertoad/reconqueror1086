@@ -1,5 +1,28 @@
 # Validation
 
+## Debugger and isolated function tooling (2026-10-09)
+
+The official DOSBox-X Windows x64 portable release 2026.10.01 was downloaded
+and extracted under ignored artifacts/runtime-tools. Its native TCP control
+answered PING and HELP. The synthetic Probe-DosBoxDebugger.py run passed guest
+memory write/dump comparison and a breakpoint/register-state check. The original
+probe passed relocated DOS-entry comparison, protected-mode stop and a bounded
+guest-memory read using the read-only owned disc and isolated writable C: drive.
+Each run held the exclusive machine lock, stopped its own emulator and released
+its own lock. No gameplay claim, live LE address mapping or RNG recording was
+established. RUNTIME.md records the hidden-console requirement and limits.
+
+Unicorn 2.1.4 is pinned in tools/emu/requirements.txt with official PyPI hashes.
+The nine synthetic harness checks passed, including interruption/port rejection,
+instruction-budget termination, page-padding rejection, relocations, zero fill
+and truncation rejection. With GAME_DIR set to analysis/original, verify_rng.py
+passed 1,155 isolated function cases against RULE-RNG-001 using fixed edge seeds
+and reproducible seeded cases. Results and instruction traces remain ignored;
+these are tooling smoke checks, not branch/caller audits or parity validation.
+Repository policy and the final documentation check, including Kaitai,
+narrative-reference, research-tracking and inventory checks passed. No rebuild
+code changed; solution and gameplay tests were not rerun for this tooling batch.
+
 ## Final migration acceptance (2026-10-09)
 
 Official npm/PyPI/NuGet release metadata and upstream-main refs still match the

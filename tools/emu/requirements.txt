@@ -1,0 +1,4 @@
+# Windows x64 wheel and source archive; install after requirements-evidence.txt.
+unicorn==2.1.4 \
+    --hash=sha256:d7107500c64ce5c168fbff6bef9485b5db1350050036f4cea568650cf8bdbdf5 \
+    --hash=sha256:00567a70e323f749b419cd86bee4f9115beab7ebba32194581c090cbb7c59cff
