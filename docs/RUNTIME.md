@@ -64,7 +64,8 @@ records forced cleanup. Captures, configurations and probe logs remain local.
 There is no unattended gameplay-state probe or full-game RNG recorder yet.
 Debugger transport and the observed RNG mapping are verified (FND-RNG-004), and
 a per-run validator is available for the observed unpaged, flat-selector layout.
-Rule-tagged draw capture is absent.
+Rule-tagged draw capture is verified only for the bounded startup case of
+EXP-RNG-001. Full-game capture and rebuild replay remain unverified.
 Research must not assume arbitrary state fields or full recording capabilities.
 An emulated call starts no game process and requires no run lock.
 
@@ -155,6 +156,28 @@ survey limit. The Debug configuration progresses timed startup slowly at high
 cycle budgets; the 1,000-cycle diagnostic reached the seed entry described in
 FND-RNG-003. This is a breakpoint transport check, not evidence of all draws.
 The original content and traces remain local and must never be committed.
+
+### Bounded startup RNG recording
+
+EXP-RNG-001 records two fresh launches with different seeds. The probe stops
+after RULE-PERSON-002's startup draws, before character selection. It verifies
+each native raw result, bounded result and state transition against RULE-RNG-001;
+it rejects every caller outside this prescribed case before executing its draw.
+This does not verify full-game completeness or replay against the rebuild.
+
+```powershell
+$env:GAME_DIR = 'C:/GOG Games/Conqueror AD1086'
+python -B tools/Probe-LiveMapping.py --output artifacts/runtime-tools/startup-new `
+  --samples 8 --observation-ms 1000 --rng-break --cycles 1000 `
+  --seed-check --record-startup-shifts
+python -B tools/test_rng_recording.py
+```
+
+Use a fresh output directory for each launch. The address-free local journal
+separates events from local register/memory diagnostics. Export a passed case
+with tools/Export-RngFixture.py; this whitelist exporter emits only named rules,
+bounds, results and RNG states into the experiment fixture. Keep all guest
+snapshots and trace diagnostics local.
 
 After full verification, propose reusable lifecycle, locking, operation-wait and
 debugger helpers upstream, together with a reproducible guide. Keep game-specific

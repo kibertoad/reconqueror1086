@@ -4,7 +4,7 @@ title: Loading and saving the character table
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-PERSON-001, FND-PERSON-002, FND-PERSON-003, FND-RNG-002]
+evidence: [FND-PERSON-001, FND-PERSON-002, FND-PERSON-003, FND-RNG-002, EXP-RNG-001]
 conflicting: []
 split_with: []
 related: [RULE-PERSON-001, RULE-RNG-001, FMT-PERSON-001]

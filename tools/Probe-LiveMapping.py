@@ -22,11 +22,14 @@ def main():
     parser.add_argument('--trace-loader', action='store_true')
     parser.add_argument('--seed-check', action='store_true')
     parser.add_argument('--draw-check', action='store_true')
+    parser.add_argument('--record-startup-shifts', action='store_true')
     args = parser.parse_args()
     if args.draw_check and not args.seed_check:
         raise ValueError('Draw identity check requires the seed identity check')
     if args.seed_check and not args.rng_break:
         raise ValueError('Seed identity check requires RNG entry breakpoints')
+    if args.record_startup_shifts and not args.seed_check:
+        raise ValueError('Startup recording requires the verified initial seed check')
     if not 1 <= args.samples <= 100:
         raise ValueError('Samples must be between 1 and 100')
     if not 1 <= args.observation_ms <= 1000:
@@ -104,6 +107,8 @@ def main():
                         int(registers.segments['ss'], 16), int(registers.general['esp'], 16)), 64)
                     (root / 'breakpoint-stack.bin').write_bytes(stack)
                     print('instrumented entry breakpoint hit', runtime.session.stop_reason)
+                    if args.record_startup_shifts and runtime.session.stop_reason.breakpoint_id != ids[1]:
+                        raise RuntimeError('Startup recording did not reach its initial seed first')
                     if args.seed_check and runtime.session.stop_reason.breakpoint_id == ids[1]:
                         # FND-RNG-003: the pointer-return function carries the
                         # relocated state address, independently of an assumed
@@ -114,6 +119,8 @@ def main():
                         state_address = runtime.MemoryAddress.segmented(int(registers.segments['ds'], 16), pointer)
                         initial = int.from_bytes(runtime.read(state_address, 4), 'little')
                         return_address, seed = (int.from_bytes(stack[i:i + 4], 'little') for i in (0, 4))
+                        if args.record_startup_shifts and return_address != live_map.code_address(0x24c32)[1]:
+                            raise RuntimeError('Startup recording reached an unowned seed caller')
                         completed = False
                         for step_index in range(16):
                             runtime.session, after = runtime.agent.step(runtime.session.id)
@@ -130,6 +137,11 @@ def main():
                             'state_pointer': hex(pointer), 'return_address': hex(return_address),
                             'return_registers': dataclasses.asdict(after)}
                         print('native seed write verified', 'steps', step_index + 1)
+                        if args.record_startup_shifts:
+                            from rng_recording import record_startup_shifts
+                            journal = record_startup_shifts(runtime, live_map, ids, seed, root)
+                            print('startup shift recording', journal['case_status'], 'draws', len(journal['events']) - 1)
+                            break
                         if args.draw_check:
                             continue
                     elif args.draw_check and runtime.session.stop_reason.breakpoint_id == ids[0]:

@@ -852,6 +852,14 @@ The per-run validator passed at both native seed and draw stops in another fresh
 launch, followed by the bounded native state/result comparisons. The original
 diagnostics remain local; no gameplay fixture or parity status changed.
 
+## Bounded startup RNG recording (2026-10-09)
+
+EXP-RNG-001 records two fresh original launches with different seeds. Both
+captured the prescribed ordered startup draws and passed native raw/bounded
+result and RNG-state comparisons. tools/Export-RngFixture.py produced the
+address-free fixture. This validates the bounded recorder case against the
+spec formula; it does not validate full-game coverage or actual rebuild replay.
+
 ## Shared runtime 10.0.0 adoption (2026-10-07)
 
 The common exact runtime pin moves from 6.2.0 to 10.0.0 with template main

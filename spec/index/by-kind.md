@@ -651,7 +651,11 @@ Entries by kind.
 
 ## experiments
 
-0 entries.
+1 entries.
+
+| ID | Title | Status |
+|---|---|---|
+| [EXP-RNG-001](../experiments/EXP-RNG-001.md) | Native startup character shifts yield thirty ordered rule-tagged draws from each recorded seed | recorded |
 
 ## bugs
 

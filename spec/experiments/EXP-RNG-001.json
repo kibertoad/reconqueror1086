@@ -1,0 +1,346 @@
+{
+  "experiment": "EXP-RNG-001",
+  "build": "BLD-GOG-EN",
+  "starting_state": {
+    "kind": "new-game",
+    "stage": "startup-seed-return",
+    "choices": {
+      "MOVIE": "OFF",
+      "CREDITS": "OFF"
+    }
+  },
+  "recording_xxh3": null,
+  "clock": "draw_sequence",
+  "inputs": [],
+  "seeds": [],
+  "runs": [
+    {
+      "rng_state": 895800949,
+      "events": [],
+      "draws": [
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 3
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 8
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 6
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 2
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 3
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 4
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 8
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 6
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 8
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 8
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 2
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 7
+        }
+      ],
+      "end_state": [
+        {
+          "global": "rng_state",
+          "value": 326636863
+        }
+      ]
+    },
+    {
+      "rng_state": 895801004,
+      "events": [],
+      "draws": [
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 5
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 6
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 3
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 4
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 7
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 2
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 2
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 7
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 6
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 4
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 3
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 6
+        }
+      ],
+      "end_state": [
+        {
+          "global": "rng_state",
+          "value": 3965157982
+        }
+      ]
+    }
+  ],
+  "comparison": {
+    "outcome": "ordered startup shift draws and final rng_state",
+    "test": "exact"
+  }
+}
