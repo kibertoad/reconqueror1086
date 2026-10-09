@@ -58,7 +58,11 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
   quiet output; audio is enabled only for an explicit sound investigation.
 - Blockers: none established. RUNTIME.md is the current capability assessment.
 - Next: trace the original-input boundary in the latest quiet loaded-return
-  diagnostic before another recorded run. FND-BATTLE-023 records the current pointer input provenance; use the
+  diagnostic before another recorded run. The explicit animation-off control
+  and guest configuration verification are documented in VALIDATION.md; the
+  screen-loading boundary remains unverified. Follow the startup path from
+  FND-MEDIA-009 with that controlled configuration before another live attempt.
+  FND-BATTLE-023 records the current pointer input provenance; use the
   current glossary when adding supported input state.
   Verify heap-object identity from FND-UI-017 before gameplay writes.
 - Q-STRATEGY-043 / RULE-STRATEGY-012: complete the downstream
