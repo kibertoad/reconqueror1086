@@ -15,8 +15,8 @@ not proof of a complete reading, all callers or instruction identity.
 
 ## Reusable reports
 
-`tools/evidence/report.mjs` implements bounded flow/table reports and the
-MZ/FBOV identity and inventory resolver. `@scientific-method/executable-reader`
+`tools/evidence/report.mjs` implements bounded flow/table reports, native inventory
+adoption and checking, and the MZ/FBOV identity resolver. `@scientific-method/executable-reader`
 is the separately locked toolkit package instruction-derived reporter. Its supported
 formats and query contracts are in
 [BOUNDED-EVIDENCE-REPORTERS.md](BOUNDED-EVIDENCE-REPORTERS.md). Every command
@@ -59,10 +59,13 @@ spec and native body notation with the pinned Standard checker, then validates
 the sidecars, source identities, executable partitions and unique body unions.
 Starts have no manifest prefix: LE/PE use virtual addresses; MZ uses native
 segment:offset addresses; NE uses table segment:offset addresses. The manifest
-is identified by the inventory path. The older `report.mjs inventory` and
-`inventory-check` contracts describe historical size-only metadata and must not
-generate or validate the current inventory format. Their output cannot supply
-missing body ranges or establish a complete reading.
+is identified by the inventory path. `report.mjs inventory` uses the same frozen
+snapshot contract as `coverage-snapshot.mjs adopt`. `report.mjs inventory-check`
+takes a local JSON object with `repositoryRoot` and optional `build` and
+`manifest` selectors, and checks committed metadata without the original files.
+`x86-inventory-check` is the shared source-derived call-target report.
+Historical size-only contracts are refused: byte counts cannot supply missing
+body ranges or establish a complete reading.
 
 Use `x86-target` before citing a far call's target: it keeps the raw operand,
 the relocation or FBOV fixup, the stored descriptor word and decoded index, the

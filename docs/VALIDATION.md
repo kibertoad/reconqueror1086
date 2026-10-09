@@ -1,5 +1,16 @@
 # Validation
 
+## Native inventory command migration (2026-10-09)
+
+The synthetic frozen-snapshot command tests passed: adoption preserves separate
+native body ranges and rejects changed snapshots before writing, committed
+inventory checking needs no original files, and legacy size-only contracts fail
+with migration guidance. Source identity rejection remains covered. The obsolete
+launcher metadata file is replaced by the validated per-inventory sidecars.
+`node tools/Check-Coverage.mjs` passed for every committed bundle. The canonical
+Invoke-Validation.ps1 gate passed with ResourceAndDefinitionTests and
+MinimumExpectedTests 1, including the build and executable specifications.
+
 ## Shared unpacker integration (2026-10-09)
 
 The installer comparison verified the packed and unpacked identities in

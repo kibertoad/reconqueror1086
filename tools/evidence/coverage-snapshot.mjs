@@ -1,5 +1,5 @@
 // Convert address/count-only Ghidra exports to the Standard's inventory notation.
-import { readFileSync, readdirSync, statSync, lstatSync, writeFileSync, renameSync, unlinkSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync, lstatSync, writeFileSync, renameSync, unlinkSync, mkdirSync } from 'node:fs';
 import { resolve, relative, join, dirname } from 'node:path';
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
@@ -134,6 +134,9 @@ export function convertSnapshot(input, contract) {
 export function adoptSnapshot(configPath) {
   const configFile = resolve(configPath), base = dirname(configFile);
   const config = JSON.parse(boundedFile(configFile,1024*1024).toString('utf8'));
+  if (!config || typeof config!=='object' || Array.isArray(config)) throw new Error('Coverage snapshot contract must be a JSON object');
+  for (const key of ['source','sourceSha256','snapshot','snapshotSha256','export','log','xxh3','writeRoot'])
+    if (typeof config[key]!=='string' || !config[key].trim()) throw new Error(`Coverage snapshot requires ${key}`);
   const local = path => resolve(base, path);
   const source = boundedFile(local(config.source),256*1024*1024);
   if (sourceXxh3(source) !== config.xxh3 || hash(source) !== config.sourceSha256) throw new Error('Source identity mismatch');
@@ -158,6 +161,7 @@ export function adoptSnapshot(configPath) {
     analyzer_body_bytes_outside_executable: metadata.body_bytes_outside_executable };
   if (Object.values(provenance).some(value=>/[\t\r\n]/.test(String(value)))) throw new Error('Invalid provenance field');
   const path = local(config.writeRoot + '/' + inventoryPath(config.build, config.manifest));
+  mkdirSync(dirname(path),{recursive:true});
   // All validation is complete before any destination is replaced.
   const outputs = [[path,result.inventory],[path.replace(/\.tsv$/,'.regions.tsv'),result.regions],
     [path.replace(/\.tsv$/,'.provenance.tsv'),Object.entries(provenance).map(([k,v]) => `${k}\t${v}\n`).join('')]];

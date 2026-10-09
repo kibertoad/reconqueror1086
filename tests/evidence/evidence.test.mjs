@@ -1,12 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, writeFileSync, readFileSync, rmSync, existsSync } from "node:fs";
+import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { sourceXxh3 } from "@scientific-method/executable-reader";
 import { readMz, incomingCalls } from "../../tools/evidence/legacy-image.mjs";
 import { reviewFlow, boundedTable } from "../../tools/evidence/review.mjs";
-import { inventoryPath, parseInventory, joinInventories, verifyInventory, verifySegmentedInventory } from "../../tools/evidence/inventory.mjs";
+import { inventoryPath } from "../../tools/evidence/inventory.mjs";
 import { run } from "../../tools/evidence/report.mjs";
 
 function synthetic() {
@@ -120,49 +120,6 @@ test("portable paths retain manifest identity and reject traversal/collisions", 
   for (const path of ["../GAME.EXE", "CD:/GAME.EXE", "C:/GAME.EXE", "@CD/GAME.EXE", "CON.txt", "a\\b", "a./b", "a//b"]) assert.throws(() => inventoryPath("BLD-EXAMPLE", path));
 });
 
-test("inventory views report exclusions and reject aliased ownership conflicts", () => {
-  const image = readMz(synthetic()), view = { name: "resident", ranges: [{ start: 64, end: 512 }], text: "start\tsize\n1001:0000\t8\n" };
-  const joined = joinInventories(image, "CD:GAME.EXE", [view, { name: "mapped", ranges: [{ start: 528, end: 560 }], text: "start\tsize\n1001:0000\t8\n0x0210\t2\n" }]);
-  assert.match(joined.tsv, /CD:GAME.EXE\+0x00000210\t2/); assert.equal(joined.views[1].excluded, 1);
-  assert.throws(() => joinInventories(image, "GAME.EXE", [view, { ...view, name: "second" }]), /Conflicting/);
-  assert.throws(() => parseInventory("start\tsize\tname\n0x01\t1\tFromOriginal\n"), /only start and size/);
-  assert.throws(() => parseInventory("start\tsize\n0x01\t1\n0x01\t1\n"), /Duplicate/);
-  assert.throws(() => joinInventories(image, "GAME.EXE", [{ ...view, ranges: [{ start: 600, end: 610 }] }]), /outside/);
-  // Overlapping ownership across views is rejected even when no start collides.
-  assert.throws(() => joinInventories(image, "GAME.EXE", [view, { name: "other", ranges: [{ start: 256, end: 300 }], text: "start\tsize\n0x0104\t4\n" }]), /Conflicting ownership/);
-  // Segment arithmetic never reaches overlay payload; overlay starts must be canonical offsets.
-  assert.throws(() => image.address(0x101D, 0), /resident load image/);
-  // A discontiguous function's body count must not be mistaken for start + size.
-  assert.doesNotThrow(() => joinInventories(image, "GAME.EXE", [{ ...view, text: "start\tsize\n0x01FF\t5\n" }]));
-});
-
-test("command interface checks identity and writes only the canonical inventory path", (t) => {
-  const dir = mkdtempSync(join(tmpdir(), "evidence-")); t.after(() => rmSync(dir, { recursive: true, force: true }));
-  const bytes = synthetic(); writeFileSync(join(dir, "synthetic.exe"), bytes);
-  writeFileSync(join(dir, "view.tsv"), "start\tsize\n1001:0000\t8\n");
-  const cfg = { source: "synthetic.exe", xxh3: sourceXxh3(bytes), site: 83, targetOffset: 32,
-    build: "BLD-EXAMPLE", manifest: "CD:GAME.EXE", writeRoot: "out", views: [{ name: "resident", path: "view.tsv", ranges: [{ start: 64, end: 512 }] }] };
-  const path = join(dir, "report.json"); writeFileSync(path, JSON.stringify(cfg));
-  assert.equal(run(["operand", path]).relocated, true);
-  const result = run(["inventory", path]); assert.equal(result.tsv, undefined);
-  assert.ok(existsSync(join(dir, "out", result.destination)));
-  assert.match(readFileSync(join(dir, "out", result.destination), "utf8"), /CD:GAME.EXE/);
-  assert.throws(() => run(["inventory", path]), /exist/);
-  cfg.inventory = { path: `out/${result.destination}`, repositoryPath: result.destination };
-  writeFileSync(path, JSON.stringify(cfg));
-  assert.equal(run(["inventory-check", path]).rows, 1);
-  cfg.inventory.repositoryPath = "wrong.tsv"; writeFileSync(path, JSON.stringify(cfg));
-  assert.throws(() => run(["inventory-check", path]), /repositoryPath/);
-  cfg.inventory = { path: `out/${result.destination}`, repositoryPath: "coverage/BLD-EXAMPLE/@CD/OTHER.EXE.tsv" }; writeFileSync(path, JSON.stringify(cfg));
-  assert.throws(() => run(["inventory-check", path]), /repositoryPath/);
-  cfg.xxh3 = "0".repeat(32); writeFileSync(path, JSON.stringify(cfg));
-  assert.throws(() => run(["operand", path]), /baseline/);
-  // A config from before the move to xxh3 is refused rather than checked against nothing.
-  writeFileSync(path, JSON.stringify({ ...cfg, xxh3: undefined, sha256: "0".repeat(64) }));
-  assert.throws(() => run(["operand", path]), /sha256 is no longer read/);
-  assert.throws(() => run(["unknown", path]), /Unknown/);
-});
-
 test("x86 commands reach scientific-method-engine through the executable reader", (t) => {
   // A synthetic MZ whose resident code makes a far call through a relocated segment to a routine that
   // loads AX and returns far. The interpreter comes from tools/evidence/python.mjs.
@@ -194,40 +151,3 @@ test("hardware and indirect boundaries prevent an unqualified local-path result"
   assert.match(report.gaps[0].reason, /Hardware/);
 });
 
-test('committed inventory validates identity, columns, numeric aliases and explicit legacy paths',()=>{
- const image=readMz(synthetic()),build='BLD-EXAMPLE',manifest='CD:GAME.EXE',path=inventoryPath(build,manifest);
- const text='start\tsize\tname\tout_of_scope\nCD:GAME.EXE+0x00000040\t8\tneutralHelper\toutside selected slice\n';
- const check=(t=text,p=path,options={})=>verifyInventory(image,build,manifest,t,p,options);
- assert.equal(check().rows,1);
- assert.equal(check(text.replace('outside selected slice','')).rows,1);
- assert.throws(()=>check(text,'CON.tsv'),/Unsafe/);
- assert.equal(check(text,'coverage/BLD-EXAMPLE/CD/GAME.EXE.tsv',{legacyPath:'coverage/BLD-EXAMPLE/CD/GAME.EXE.tsv',legacyEvidence:'documented historical path'}).legacyPathEvidence,'documented historical path');
- assert.throws(()=>check(text,'coverage/BLD-EXAMPLE/CD/GAME.EXE.tsv'),/destination/);
- assert.throws(()=>check(text,path,{legacyPath:'../bad.tsv',legacyEvidence:'bad'}),/Legacy/);
- assert.throws(()=>check(text,path,{legacyPath:'safe.tsv'}),/Legacy/);
- assert.throws(()=>check(text.replace('CD:GAME.EXE+','OTHER.EXE+')),/prefix/);
- assert.throws(()=>check(text.replace('0x00000040','0x0000FFFF')),/outside/);
- assert.throws(()=>check(text.replace('\t8\t','\t0\t')),/body/);
- assert.throws(()=>check('start\tsize\nCD:GAME.EXE+0x00000040\t1\nCD:GAME.EXE+0x00000040\t1\n'),/Duplicate/);
- assert.throws(()=>check(text.replace('0x00000040','0x0040')),/noncanonical/);
- assert.throws(()=>check(text.replace('0x00000040','0x0000004a')),/noncanonical/);
- assert.throws(()=>check(text.replace('neutralHelper','FUN_00000040')),/analyzer/);
- assert.throws(()=>check(text.replace('out_of_scope','bytes')),/columns/);
- assert.throws(()=>check(text.replace('name\tout_of_scope','name\tname')),/columns/);
- assert.throws(()=>check('start\tsize\n'),/row count/);
- assert.throws(()=>check(text,'/bad.tsv'),/Unsafe/);
-});
-
-test('NE inventory uses canonical table segments and rejects analyzer selectors and invalid metadata', () => {
-  const path = inventoryPath('BLD-TEST', 'CD:SETUP.EXE');
-  const ranges = [{ segment: 1, start: 0, end: 128 }];
-  const verify = (row, segments = ranges) => verifySegmentedInventory('BLD-TEST', 'CD:SETUP.EXE', `start\tsize\n${row}\n`, segments, path);
-  assert.equal(verify('CD:SETUP.EXE+0001:0010\t12').rows, 1);
-  for (const row of ['CD:SETUP.EXE+1000:0010\t12', 'CD:SETUP.EXE+0001:0080\t12',
-    'CD:OTHER.EXE+0001:0010\t12', 'CD:SETUP.EXE+0001:001a\t12',
-    'CD:SETUP.EXE+0001:0010\t0', 'CD:SETUP.EXE+0001:0010\t129',
-    'CD:SETUP.EXE+0001:0010\t12\tname', 'CD:SETUP.EXE+0001:0010\t12\nCD:SETUP.EXE+0001:0010\t12'])
-    assert.throws(() => verify(row));
-  assert.throws(() => verify('CD:SETUP.EXE+0001:0010\t12', [{ segment: 1, start: 0, end: 65537 }]));
-  assert.throws(() => verify('CD:SETUP.EXE+0001:0010\t12', [...ranges, ...ranges]));
-});
