@@ -343,7 +343,7 @@ Entries by kind.
 
 ## findings
 
-310 entries.
+311 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -636,6 +636,7 @@ Entries by kind.
 | [FND-UI-016](../findings/FND-UI-016.md) | The four fief tables share row, terrain, full-screen, OK and Cancel routines, and the village table sets the tax in steps of 5 | recorded |
 | [FND-UI-017](../findings/FND-UI-017.md) | Initial screen loading stores a screen object and pushes its number into a five-slot history | recorded |
 | [FND-UI-018](../findings/FND-UI-018.md) | Startup performs display preparation before testing the animation switch and entering the initial screen loader | recorded |
+| [FND-UI-019](../findings/FND-UI-019.md) | Startup preparation waits on the battle clock and lets a click or key end the wait | recorded |
 | [FND-VIEW-001](../findings/FND-VIEW-001.md) | Every combat scene archive holds its blocks as 96-byte records ending in 0xCC 0xCC with a 16-byte label at offset 78 | recorded |
 | [FND-VIEW-002](../findings/FND-VIEW-002.md) | Every combat scene map is 128 by 128 block numbers stored column by column | recorded |
 | [FND-VIEW-003](../findings/FND-VIEW-003.md) | The heading helper folds the vector into octants around floor(0x20 * minor / major), and callers pass (-dy, dx) | recorded |
