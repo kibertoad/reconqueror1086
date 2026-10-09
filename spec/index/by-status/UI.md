@@ -65,7 +65,7 @@ Entries by status.
 
 ## recorded
 
-19 entries.
+20 entries.
 
 | ID | Title |
 |---|---|
@@ -88,6 +88,7 @@ Entries by status.
 | [FND-UI-017](../../findings/FND-UI-017.md) | Initial screen loading stores a screen object and pushes its number into a five-slot history |
 | [FND-UI-018](../../findings/FND-UI-018.md) | Startup performs display preparation before testing the animation switch and entering the initial screen loader |
 | [FND-UI-019](../../findings/FND-UI-019.md) | Startup preparation waits on the battle clock and lets a click or key end the wait |
+| [FND-UI-020](../../findings/FND-UI-020.md) | Title callbacks replace the current screen and the replacement loader returns after its history update |
 
 ## Open questions
 

@@ -409,6 +409,7 @@ Entries by area.
 | [FND-UI-017](../findings/FND-UI-017.md) | Initial screen loading stores a screen object and pushes its number into a five-slot history | recorded |
 | [FND-UI-018](../findings/FND-UI-018.md) | Startup performs display preparation before testing the animation switch and entering the initial screen loader | recorded |
 | [FND-UI-019](../findings/FND-UI-019.md) | Startup preparation waits on the battle clock and lets a click or key end the wait | recorded |
+| [FND-UI-020](../findings/FND-UI-020.md) | Title callbacks replace the current screen and the replacement loader returns after its history update | recorded |
 | [RULE-UI-001](../rules/RULE-UI-001.md) | Village exterior hot spots | supported |
 | [RULE-UI-002](../rules/RULE-UI-002.md) | Village exterior actions | supported |
 | [RULE-UI-003](../rules/RULE-UI-003.md) | Store stock | supported |
