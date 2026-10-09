@@ -41,20 +41,23 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
 ## Handover
 
 - Stage: Survey; this goal adds runtime research capabilities.
-- Last gate: 2026-10-09 complete documentation and repository gates passed;
+- Last gate: 2026-10-10 complete documentation and repository gates passed;
   mapping, lifecycle, emulator, call-survey and RNG-journal synthetic checks
   passed. EXP-RNG-001 and native recorder transport checks are documented in
   VALIDATION.md. No full-game or actual rebuild replay gate has passed.
 - Unfinished: complete rule ownership, full-game recording/replay, prescribed
   observable gameplay state, and upstream/shared-helper proposal. No WIP branch.
 - Blockers: none established. RUNTIME.md is the current capability assessment.
-- Next: Q-STRATEGY-043 / RULE-STRATEGY-012, read selection-table extents and
-  consumers before accepting its caller in tools/native_rng_recorder.py.
-- Then extend evidence-backed caller policies and state reachability. Use the
+- Next: Q-STRATEGY-043 / RULE-STRATEGY-012, complete the downstream
+  consumer review from FND-STRATEGY-043/044/045 and resolve the disputed rule.
+  Its directly read bound is accepted by tools/native_rng_recorder.py; the
+  extended native case is documented in VALIDATION.md.
+- Then continue beyond the home-selection result to the next unaccepted
+  caller or observable input boundary; extend policies and state reachability. Use the
   local Survey-RngCalls.py output as leads, never as a complete caller audit.
 - Q-RNG-001 / RULE-RNG-001 remains open after FND-RNG-005; finish the adjustment
   provenance reading when needed for clock semantics.
-- Evidence references: EXP-RNG-001, FND-RNG-003/004/005, FND-STRATEGY-043.
+- Evidence references: EXP-RNG-001, FND-RNG-003/004/005, FND-STRATEGY-043/044/045.
   tools/live_mapping.py validates the initial native map;
   tools/native_rng_recorder.py rechecks code/descriptors at each stop.
   Capture paths belong to findings and validation documentation, not this file.
