@@ -1,0 +1,208 @@
+{
+  "experiment": "EXP-RNG-006",
+  "cases": [
+    {
+      "mode": "direct",
+      "initial_words": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        70,
+        -100,
+        -101,
+        -2
+      ],
+      "final_words": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        70,
+        -100,
+        -101,
+        0
+      ],
+      "return_u32": 0,
+      "first_adjustment": 18000,
+      "secondary_adjustment": 3600
+    },
+    {
+      "mode": "direct",
+      "initial_words": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        70,
+        -100,
+        -101,
+        -1
+      ],
+      "final_words": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        70,
+        -100,
+        -101,
+        0
+      ],
+      "return_u32": 0,
+      "first_adjustment": 18000,
+      "secondary_adjustment": 3600
+    },
+    {
+      "mode": "direct",
+      "initial_words": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        70,
+        -100,
+        -101,
+        0
+      ],
+      "final_words": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        70,
+        -100,
+        -101,
+        0
+      ],
+      "return_u32": 0,
+      "first_adjustment": 18000,
+      "secondary_adjustment": 3600
+    },
+    {
+      "mode": "direct",
+      "initial_words": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        70,
+        -100,
+        -101,
+        1
+      ],
+      "final_words": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        70,
+        -100,
+        -101,
+        0
+      ],
+      "return_u32": 0,
+      "first_adjustment": 18000,
+      "secondary_adjustment": 3600
+    },
+    {
+      "mode": "conversion",
+      "initial_words": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        70,
+        -100,
+        -101,
+        -1
+      ],
+      "final_words": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        70,
+        4,
+        0,
+        0
+      ],
+      "return_u32": 18000,
+      "first_adjustment": 18000,
+      "secondary_adjustment": 3600
+    },
+    {
+      "mode": "conversion",
+      "initial_words": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        70,
+        -100,
+        -101,
+        0
+      ],
+      "final_words": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        70,
+        4,
+        0,
+        0
+      ],
+      "return_u32": 18000,
+      "first_adjustment": 18000,
+      "secondary_adjustment": 3600
+    },
+    {
+      "mode": "conversion",
+      "initial_words": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        70,
+        -100,
+        -101,
+        1
+      ],
+      "final_words": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        70,
+        4,
+        0,
+        1
+      ],
+      "return_u32": 14400,
+      "first_adjustment": 18000,
+      "secondary_adjustment": 3600
+    }
+  ],
+  "classification_name_empty": true,
+  "environment_array": null,
+  "stubs": [],
+  "ports": [],
+  "video_ram": false,
+  "draws": [],
+  "segment_model": "authored flat 32-bit CS/DS/ES/SS"
+}

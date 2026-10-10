@@ -22,7 +22,7 @@ Entries by status.
 
 ## recorded
 
-16 entries.
+18 entries.
 
 | ID | Title |
 |---|---|
@@ -31,6 +31,7 @@ Entries by status.
 | [EXP-RNG-003](../../experiments/EXP-RNG-003.md) | Isolated suffix parsing retains unselected fields and supplies default clock components |
 | [EXP-RNG-004](../../experiments/EXP-RNG-004.md) | Isolated zero-classification conversion reaches the 1970 epoch and exposes a post-century discrepancy |
 | [EXP-RNG-005](../../experiments/EXP-RNG-005.md) | Isolated initializer dispatch selects priorities and updates completion markers |
+| [EXP-RNG-006](../../experiments/EXP-RNG-006.md) | Empty-name classification clears negative input and controls secondary adjustment |
 | [FND-RNG-002](../../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-RNG-004](../../findings/FND-RNG-004.md) | Live LE relocations and native seed and draw stops identify the loaded RNG state |
@@ -42,6 +43,7 @@ Entries by status.
 | [FND-RNG-010](../../findings/FND-RNG-010.md) | Seed conversion combines a four-year day-count term with a 1970 epoch and normalizes before adjustments |
 | [FND-RNG-011](../../findings/FND-RNG-011.md) | The environment array is lazily constructed from a selector-offset source |
 | [FND-RNG-012](../../findings/FND-RNG-012.md) | Startup publishes the environment source and dispatches its constructor through an initializer table |
+| [FND-RNG-013](../../findings/FND-RNG-013.md) | An empty classification name clears calendar classification before conversion applies its secondary adjustment |
 
 ## Open questions
 

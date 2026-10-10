@@ -1680,3 +1680,13 @@ callback stubs. Exact callback order, all table bytes, unchanged authored code,
 bounded writes and declared instruction paths passed. These controls do not
 run actual initialization callbacks or establish original-game startup
 environment provenance. Q-RNG-001 remains open; no parity status changed.
+
+### 2026-10-10 isolated empty-name classification
+
+With GAME_DIR=analysis/original, the private interpreter passed
+tools/emu/verify_empty_classification.py. FND-RNG-013 and EXP-RNG-006 record
+direct classifier and calendar-conversion inputs. Full fabricated RAM, unchanged
+globals, bounded writes and instruction paths passed without stubs. Positive
+classification retained secondary subtraction despite an empty name; negative
+classification was cleared. Actual startup and nonempty-name behavior remain
+under Q-RNG-001. No native game or rebuild replay ran for these controls.

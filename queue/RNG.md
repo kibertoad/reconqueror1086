@@ -35,6 +35,12 @@ Next ID: Q-RNG-002
   startup environment provenance; allocator and classification paths remain.
   EXP-RNG-005 corroborates the dispatcher with explicit preserving callback
   stubs. Actual callbacks and source provenance remain unread.
+  FND-RNG-013 and EXP-RNG-006 cover the empty-name classification exit and
+  converter's negative/zero/positive stored-field tests. Nonempty-name rules,
+  actual startup inputs and the broader normalizer domain remain unresolved.
+  FND-RNG-013 and EXP-RNG-006 cover the empty-name classification exit and
+  converter's negative/zero/positive stored-field tests. Nonempty-name rules,
+  actual startup inputs and the broader normalizer domain remain unresolved.
 
 ## Emulated call
 
