@@ -2,6 +2,11 @@
 
 ## Checker 4.1.1 and quiet probes (2026-10-10)
 
+2026-10-10: 40 native-recorder checks passed after adding refusal cases for
+answer and Continue return-stack mismatches and changed youth history before
+Continue readiness/input. These checks exercise rejection, not native gameplay
+completion. The owned first-answer probe remains in progress.
+
 2026-10-10: 37 native-recorder and seven supported-pointer tests passed after
 adding Continue. The synthetic sequence covers a not-ready classifier pass
 followed by readiness, one queued Continue, temporary-hook removal and the

@@ -51,7 +51,8 @@ def runtime_and_mapping(screen_state=123, screen_number=0, record_pointer=0x3000
 
 class ScreenBoundaryTests(unittest.TestCase):
     def replacement_sequence(self, wrong_return=False, wrong_frame=False, wrong_identity=False, new_game=False,
-                             generation=False, youth=False, continuation=False):
+                             generation=False, youth=False, continuation=False, bad_callback_frame=None,
+                             changed_youth_history=False):
         runtime, mapping = runtime_and_mapping()
         original_wait, original_registers, original_read = (
             runtime.wait_until_stopped, runtime.registers, runtime.read)
@@ -70,7 +71,8 @@ class ScreenBoundaryTests(unittest.TestCase):
         def registers():
             if runtime.phase < 4:
                 return original_registers()
-            return SimpleNamespace(general={'esp': '0x1004' if wrong_frame and runtime.phase == 5 else '0x1000'},
+            return SimpleNamespace(general={'esp': '0x1004' if
+                                   (wrong_frame and runtime.phase == 5 or runtime.phase == bad_callback_frame) else '0x1000'},
                                    segments={'cs': '0x180', 'ds': '0x188', 'ss': '0x188'},
                                    cpu_mode='protected', instruction_pointer=hex(
                                        0x63114 if continuation and runtime.phase in (12, 13) else
@@ -85,6 +87,9 @@ class ScreenBoundaryTests(unittest.TestCase):
                 if address == (0x188, 0x1004):
                     return b''.join(word.to_bytes(4, 'little') for word in (screen, 1, 1))
                 if address == (0x188, 0x300000):
+                    if changed_youth_history and runtime.phase == 12:
+                        return b''.join(word.to_bytes(4, 'little') for word in
+                                        (0x300100, 2, 1, 0, 0xffffffff, 0xffffffff))
                     return b''.join(word.to_bytes(4, 'little') for word in
                                     (0x300100, *range(screen, -1, -1), *([0xffffffff] * (4 - screen))))
                 if address == (0x188, 0x300100):
@@ -129,6 +134,20 @@ class ScreenBoundaryTests(unittest.TestCase):
         self.assertEqual(report['status'], 'youth-continue-return-reached')
         self.assertFalse(report['pending_youth_continue'])
         self.assertFalse(report['full_game_complete'])
+
+    def test_answer_rejects_a_different_return_stack(self):
+        with self.assertRaisesRegex(RecordingError, 'answer return/frame mismatch'):
+            self.replacement_sequence(new_game=True, generation=True, youth=True, bad_callback_frame=11)
+
+    def test_continue_rejects_a_different_return_stack(self):
+        with self.assertRaisesRegex(RecordingError, 'Continue return/frame mismatch'):
+            self.replacement_sequence(new_game=True, generation=True, youth=True, continuation=True,
+                                      bad_callback_frame=15)
+
+    def test_continue_rejects_changed_youth_history_before_readiness_or_input(self):
+        with self.assertRaisesRegex(RecordingError, 'requires the verified youth screen'):
+            self.replacement_sequence(new_game=True, generation=True, youth=True, continuation=True,
+                                      changed_youth_history=True)
 
     def test_youth_answer_requires_generation_and_cannot_stop_before_input(self):
         for arguments in ({}, {'generation_click': True, 'new_game_click': True,
