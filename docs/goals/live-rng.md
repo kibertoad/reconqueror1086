@@ -37,20 +37,26 @@ only native command transport; the pinned Agent Debug SDL2 build adds structured
 operations. RPC readiness before AUTOEXEC completion can launch without D:;
 observe the guest-written drive-setup marker before starting the original.
 Debugger memory commands require numeric addresses and explicit dump filenames.
+The default Python environment is shared with toolkit development and may hold
+an editable engine. Use command-scoped EVIDENCE_PYTHON pointing to
+artifacts/validation-python/Scripts/python.exe for evidence gates; update that
+private environment with the hash-locked requirements, never the shared one.
 
 ## Handover
 
 - Stage: Survey; research-side runtime tooling session.
 - Last gate: 2026-10-10 analysis-ready configuration, full documentation check,
   native-recorder, supported-pointer, journal and terminal-validator checks passed. Canonical
-  fast gate passed with -NoRestore; its build and test artifacts are local.
+  fast gate passed with -NoRestore and EVIDENCE_PYTHON selecting the private
+  hash-pinned validation interpreter; its build and test artifacts are local.
 - Continue verification finished successfully; its terminal journal check,
   cleanup and limits are recorded in docs/VALIDATION.md. No full-game gate passed.
 - Active probe: exec session 4782, quiet fresh six-cycle youth verification under
   artifacts/runtime-tools/native-rng-youth-six-cycles-20261010-a. Controller PID
   61028 owns emulator PID 19484 and the machine run lock. Local
-  session-identity.json identifies debugger session ses-1. Startup mapping
-  is underway; repeated-cycle and dubbing verification remain pending.
+  session-identity.json identifies debugger session ses-1. Native recording
+  reached startup preparation; debugger operation op-117 remains pending.
+  Repeated-cycle and dubbing verification remain pending.
   Poll this same owning handle; do not launch another original or remove its
   lock while it is live. Diagnostic files and original content stay local.
 - Unfinished: repeated youth traversal, complete caller
@@ -59,9 +65,14 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
   issue #403 is linked from docs/dosbox-x-helper-proposal.md.
 - Blockers: none established. No WIP branch. The untracked
   .claude/settings.json is pre-existing and was left untouched.
+- Shared Python drift was bypassed with the existing private environment after
+  hash-locked installation. The template improvement is issue #94:
+  https://github.com/kibertoad/refurbished-dinosaurs-template/issues/94.
 - Next: finish observing the active six-cycle probe and run
   tools/verify_native_recording.py with expected youth-sequence-return-reached;
   inspect matching cycle count, dubbing screen identity and process/lock cleanup.
+- Next: supported dubbing-to-village input instrumentation from FND-UI-024 and
+  SCR-UI-019. Q-UI-044 retains the sample-identity question separately.
 - Next: Q-STRATEGY-043 / RULE-STRATEGY-012 downstream consumer review;
   Q-RNG-001 / RULE-RNG-001 seed-source provenance when required.
 - Next: verify two prescribed full-game recordings and trace completeness,
