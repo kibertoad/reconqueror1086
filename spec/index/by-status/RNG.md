@@ -22,7 +22,7 @@ Entries by status.
 
 ## recorded
 
-18 entries.
+20 entries.
 
 | ID | Title |
 |---|---|
@@ -32,6 +32,7 @@ Entries by status.
 | [EXP-RNG-004](../../experiments/EXP-RNG-004.md) | Isolated zero-classification conversion reaches the 1970 epoch and exposes a post-century discrepancy |
 | [EXP-RNG-005](../../experiments/EXP-RNG-005.md) | Isolated initializer dispatch selects priorities and updates completion markers |
 | [EXP-RNG-006](../../experiments/EXP-RNG-006.md) | Empty-name classification clears negative input and controls secondary adjustment |
+| [EXP-RNG-007](../../experiments/EXP-RNG-007.md) | Nonzero suffix-selector ordinals and signed ordering ignore year |
 | [FND-RNG-002](../../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-RNG-004](../../findings/FND-RNG-004.md) | Live LE relocations and native seed and draw stops identify the loaded RNG state |
@@ -44,6 +45,7 @@ Entries by status.
 | [FND-RNG-011](../../findings/FND-RNG-011.md) | The environment array is lazily constructed from a selector-offset source |
 | [FND-RNG-012](../../findings/FND-RNG-012.md) | Startup publishes the environment source and dispatches its constructor through an initializer table |
 | [FND-RNG-013](../../findings/FND-RNG-013.md) | An empty classification name clears calendar classification before conversion applies its secondary adjustment |
+| [FND-RNG-014](../../findings/FND-RNG-014.md) | Nonzero suffix selectors give ordinal values for signed transition ordering |
 
 ## Open questions
 

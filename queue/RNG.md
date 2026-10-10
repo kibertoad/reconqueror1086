@@ -38,6 +38,12 @@ Next ID: Q-RNG-002
   FND-RNG-013 and EXP-RNG-006 cover the empty-name classification exit and
   converter's negative/zero/positive stored-field tests. Nonempty-name rules,
   actual startup inputs and the broader normalizer domain remain unresolved.
+  FND-RNG-014 and EXP-RNG-007 cover nonzero-selector ordinals and signed
+  transition ordering, with wrapping edges and distinct years. The zero-selector
+  month/weekday path and remaining classifier logic still require reading.
+  FND-RNG-014 and EXP-RNG-007 cover nonzero-selector ordinals and signed
+  transition ordering, with wrapping edges and distinct years. The zero-selector
+  month/weekday path and remaining classifier logic still require reading.
   FND-RNG-013 and EXP-RNG-006 cover the empty-name classification exit and
   converter's negative/zero/positive stored-field tests. Nonempty-name rules,
   actual startup inputs and the broader normalizer domain remain unresolved.

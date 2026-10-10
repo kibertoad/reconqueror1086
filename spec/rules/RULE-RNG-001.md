@@ -4,7 +4,7 @@ title: The game's random number generator
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-RNG-002, FND-RNG-003, FND-RNG-004, FND-RNG-006, FND-RNG-007, FND-RNG-008, FND-RNG-009, FND-RNG-010, FND-RNG-011, FND-RNG-012, FND-RNG-013, EXP-RNG-001, EXP-RNG-002, EXP-RNG-003, EXP-RNG-004, EXP-RNG-005, EXP-RNG-006, FND-ASSAULT-031, FND-SAVE-006, FND-SOUND-003]
+evidence: [FND-RNG-002, FND-RNG-003, FND-RNG-004, FND-RNG-006, FND-RNG-007, FND-RNG-008, FND-RNG-009, FND-RNG-010, FND-RNG-011, FND-RNG-012, FND-RNG-013, FND-RNG-014, EXP-RNG-001, EXP-RNG-002, EXP-RNG-003, EXP-RNG-004, EXP-RNG-005, EXP-RNG-006, EXP-RNG-007, FND-ASSAULT-031, FND-SAVE-006, FND-SOUND-003]
 conflicting: []
 split_with: []
 related: [RULE-TALK-001, RULE-SOUND-002]
@@ -106,6 +106,10 @@ None known.
   callback stubs, not native initialization or actual callback effects.
   FND-RNG-013 and EXP-RNG-006 cover empty-name classification and the converter's
   stored-field decision; nonempty-name rules and actual startup inputs remain open.
+  FND-RNG-014 and EXP-RNG-007 cover nonzero suffix-selector ordinals and signed
+  ordering; month/weekday selectors and the remaining classifier still need reading.
+  FND-RNG-014 and EXP-RNG-007 cover nonzero suffix-selector ordinals and signed
+  ordering; month/weekday selectors and the remaining classifier still need reading.
   FND-RNG-013 and EXP-RNG-006 cover empty-name classification and the converter's
   stored-field decision; nonempty-name rules and actual startup inputs remain open.
   Suffix-rule consumers, environment initialization and calendar record normalization

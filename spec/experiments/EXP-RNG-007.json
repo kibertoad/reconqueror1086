@@ -1,0 +1,314 @@
+{
+  "experiment": "EXP-RNG-007",
+  "cases": [
+    {
+      "mode": "ordinal",
+      "records": [
+        {
+          "selector": 1,
+          "ordinal": 0
+        }
+      ],
+      "year_since_1900": 0,
+      "return_u32": 4294967295
+    },
+    {
+      "mode": "ordinal",
+      "records": [
+        {
+          "selector": 1,
+          "ordinal": 0
+        }
+      ],
+      "year_since_1900": 124,
+      "return_u32": 4294967295
+    },
+    {
+      "mode": "ordinal",
+      "records": [
+        {
+          "selector": 1,
+          "ordinal": -2147483648
+        }
+      ],
+      "year_since_1900": 0,
+      "return_u32": 2147483647
+    },
+    {
+      "mode": "ordinal",
+      "records": [
+        {
+          "selector": 1,
+          "ordinal": -2147483648
+        }
+      ],
+      "year_since_1900": 124,
+      "return_u32": 2147483647
+    },
+    {
+      "mode": "ordinal",
+      "records": [
+        {
+          "selector": 1,
+          "ordinal": 2147483647
+        }
+      ],
+      "year_since_1900": 0,
+      "return_u32": 2147483646
+    },
+    {
+      "mode": "ordinal",
+      "records": [
+        {
+          "selector": 1,
+          "ordinal": 2147483647
+        }
+      ],
+      "year_since_1900": 124,
+      "return_u32": 2147483646
+    },
+    {
+      "mode": "ordinal",
+      "records": [
+        {
+          "selector": -1,
+          "ordinal": 0
+        }
+      ],
+      "year_since_1900": 0,
+      "return_u32": 0
+    },
+    {
+      "mode": "ordinal",
+      "records": [
+        {
+          "selector": -1,
+          "ordinal": 0
+        }
+      ],
+      "year_since_1900": 124,
+      "return_u32": 0
+    },
+    {
+      "mode": "ordinal",
+      "records": [
+        {
+          "selector": -1,
+          "ordinal": -2147483648
+        }
+      ],
+      "year_since_1900": 0,
+      "return_u32": 2147483648
+    },
+    {
+      "mode": "ordinal",
+      "records": [
+        {
+          "selector": -1,
+          "ordinal": -2147483648
+        }
+      ],
+      "year_since_1900": 124,
+      "return_u32": 2147483648
+    },
+    {
+      "mode": "ordinal",
+      "records": [
+        {
+          "selector": 2,
+          "ordinal": 365
+        }
+      ],
+      "year_since_1900": 0,
+      "return_u32": 365
+    },
+    {
+      "mode": "ordinal",
+      "records": [
+        {
+          "selector": 2,
+          "ordinal": 365
+        }
+      ],
+      "year_since_1900": 124,
+      "return_u32": 365
+    },
+    {
+      "mode": "ordinal",
+      "records": [
+        {
+          "selector": -2,
+          "ordinal": 400
+        }
+      ],
+      "year_since_1900": 0,
+      "return_u32": 400
+    },
+    {
+      "mode": "ordinal",
+      "records": [
+        {
+          "selector": -2,
+          "ordinal": 400
+        }
+      ],
+      "year_since_1900": 124,
+      "return_u32": 400
+    },
+    {
+      "mode": "order",
+      "records": [
+        {
+          "selector": 1,
+          "ordinal": 1
+        },
+        {
+          "selector": -1,
+          "ordinal": 0
+        }
+      ],
+      "year_since_1900": 0,
+      "return_u32": 0
+    },
+    {
+      "mode": "order",
+      "records": [
+        {
+          "selector": 1,
+          "ordinal": 1
+        },
+        {
+          "selector": -1,
+          "ordinal": 0
+        }
+      ],
+      "year_since_1900": 124,
+      "return_u32": 0
+    },
+    {
+      "mode": "order",
+      "records": [
+        {
+          "selector": -1,
+          "ordinal": 0
+        },
+        {
+          "selector": 1,
+          "ordinal": 0
+        }
+      ],
+      "year_since_1900": 0,
+      "return_u32": 1
+    },
+    {
+      "mode": "order",
+      "records": [
+        {
+          "selector": -1,
+          "ordinal": 0
+        },
+        {
+          "selector": 1,
+          "ordinal": 0
+        }
+      ],
+      "year_since_1900": 124,
+      "return_u32": 1
+    },
+    {
+      "mode": "order",
+      "records": [
+        {
+          "selector": 1,
+          "ordinal": -2147483648
+        },
+        {
+          "selector": -1,
+          "ordinal": 2147483647
+        }
+      ],
+      "year_since_1900": 0,
+      "return_u32": 0
+    },
+    {
+      "mode": "order",
+      "records": [
+        {
+          "selector": 1,
+          "ordinal": -2147483648
+        },
+        {
+          "selector": -1,
+          "ordinal": 2147483647
+        }
+      ],
+      "year_since_1900": 124,
+      "return_u32": 0
+    },
+    {
+      "mode": "order",
+      "records": [
+        {
+          "selector": -1,
+          "ordinal": -2147483648
+        },
+        {
+          "selector": -1,
+          "ordinal": 1
+        }
+      ],
+      "year_since_1900": 0,
+      "return_u32": 0
+    },
+    {
+      "mode": "order",
+      "records": [
+        {
+          "selector": -1,
+          "ordinal": -2147483648
+        },
+        {
+          "selector": -1,
+          "ordinal": 1
+        }
+      ],
+      "year_since_1900": 124,
+      "return_u32": 0
+    },
+    {
+      "mode": "order",
+      "records": [
+        {
+          "selector": -1,
+          "ordinal": 5
+        },
+        {
+          "selector": 2,
+          "ordinal": 4
+        }
+      ],
+      "year_since_1900": 0,
+      "return_u32": 1
+    },
+    {
+      "mode": "order",
+      "records": [
+        {
+          "selector": -1,
+          "ordinal": 5
+        },
+        {
+          "selector": 2,
+          "ordinal": 4
+        }
+      ],
+      "year_since_1900": 124,
+      "return_u32": 1
+    }
+  ],
+  "stubs": [],
+  "ports": [],
+  "video_ram": false,
+  "draws": [],
+  "segment_model": "authored flat 32-bit CS/DS/ES/SS"
+}

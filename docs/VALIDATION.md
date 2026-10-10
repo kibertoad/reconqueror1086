@@ -1703,3 +1703,12 @@ read-only and remain local. The proposed toolkit PR #458's real/v86-mode
 restriction therefore excludes this consumer; those details were added to
 existing issue #456. No guest state, breakpoint or recording module changed,
 and no gated native success or performance ratio is claimed.
+
+### 2026-10-10 isolated suffix ordinal and order helpers
+
+With GAME_DIR=analysis/original, the private interpreter passed
+tools/emu/verify_suffix_order.py. FND-RNG-014 and EXP-RNG-007 record the authored
+nonzero-selector inputs, two years, wrapping ordinal results and signed ordering.
+Full-RAM, stack-only writes, instruction paths and budgets passed without stubs.
+Zero-selector month/weekday calculations and complete classifier behavior remain
+under Q-RNG-001. No native game or rebuild replay ran for these controls.

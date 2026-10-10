@@ -344,7 +344,7 @@ Entries by kind.
 
 ## findings
 
-333 entries.
+334 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -550,6 +550,7 @@ Entries by kind.
 | [FND-RNG-011](../findings/FND-RNG-011.md) | The environment array is lazily constructed from a selector-offset source | recorded |
 | [FND-RNG-012](../findings/FND-RNG-012.md) | Startup publishes the environment source and dispatches its constructor through an initializer table | recorded |
 | [FND-RNG-013](../findings/FND-RNG-013.md) | An empty classification name clears calendar classification before conversion applies its secondary adjustment | recorded |
+| [FND-RNG-014](../findings/FND-RNG-014.md) | Nonzero suffix selectors give ordinal values for signed transition ordering | recorded |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV | recorded |
 | [FND-SAVE-002](../findings/FND-SAVE-002.md) | A save writes ten temporary files and packs them with a title and version into one resource container | recorded |
 | [FND-SAVE-003](../findings/FND-SAVE-003.md) | A load checks VERSION 2.1, unpacks the entries and runs the component loaders; temp.jap must be present | recorded |
@@ -684,7 +685,7 @@ Entries by kind.
 
 ## experiments
 
-13 entries.
+14 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -696,6 +697,7 @@ Entries by kind.
 | [EXP-RNG-004](../experiments/EXP-RNG-004.md) | Isolated zero-classification conversion reaches the 1970 epoch and exposes a post-century discrepancy | recorded |
 | [EXP-RNG-005](../experiments/EXP-RNG-005.md) | Isolated initializer dispatch selects priorities and updates completion markers | recorded |
 | [EXP-RNG-006](../experiments/EXP-RNG-006.md) | Empty-name classification clears negative input and controls secondary adjustment | recorded |
+| [EXP-RNG-007](../experiments/EXP-RNG-007.md) | Nonzero suffix-selector ordinals and signed ordering ignore year | recorded |
 | [EXP-STRATEGY-001](../experiments/EXP-STRATEGY-001.md) | Drawn home indices leave fabricated fief lists unchanged while person 28 initializes them | recorded |
 | [EXP-STRATEGY-002](../experiments/EXP-STRATEGY-002.md) | All eight isolated home selections preserve the chosen person through their actual callees | recorded |
 | [EXP-STRATEGY-003](../experiments/EXP-STRATEGY-003.md) | Eight isolated new-game setups retain selected-person group and coordinate results | recorded |
