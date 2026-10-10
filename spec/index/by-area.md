@@ -411,6 +411,7 @@ Entries by area.
 | [FND-UI-019](../findings/FND-UI-019.md) | Startup preparation waits on the battle clock and lets a click or key end the wait | recorded |
 | [FND-UI-020](../findings/FND-UI-020.md) | Title callbacks replace the current screen and the replacement loader returns after its history update | recorded |
 | [FND-UI-021](../findings/FND-UI-021.md) | Youth Continue and Reroll bind file-order indices rather than stored region IDs | recorded |
+| [FND-UI-022](../findings/FND-UI-022.md) | Youth Continue returns after replacing the screen or resetting the next dilemma's controls | recorded |
 | [RULE-UI-001](../rules/RULE-UI-001.md) | Village exterior hot spots | supported |
 | [RULE-UI-002](../rules/RULE-UI-002.md) | Village exterior actions | supported |
 | [RULE-UI-003](../rules/RULE-UI-003.md) | Store stock | supported |

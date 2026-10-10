@@ -5,7 +5,7 @@ status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
 resolution: 640x480
-evidence: [FND-PERSON-004, FND-PERSON-005, FND-UI-001, FND-UI-002, FND-UI-003, FND-UI-010, FND-UI-013, FND-UI-021]
+evidence: [FND-PERSON-004, FND-PERSON-005, FND-UI-001, FND-UI-002, FND-UI-003, FND-UI-010, FND-UI-013, FND-UI-021, FND-UI-022]
 conflicting: []
 split_with: []
 related: [RULE-PERSON-003, RULE-PERSON-004, SCR-UI-019]
@@ -27,7 +27,7 @@ related: [RULE-PERSON-003, RULE-PERSON-004, SCR-UI-019]
 | region 2 | (478, 310, 100, 150) | Always | Applies the third answer, enables region 5 and disables regions 0 to 2. | FND-UI-013 |
 | region 3 | (3, 184, 632, 16) | Always | Moves the text five lines one way. | FND-UI-013 |
 | region 4 | (3, 289, 632, 16) | Always | Moves the text five lines the other way. | FND-UI-013 |
-| index 5 (stored ID 6) | (473, 132, 97, 40) | The resource starts enabled; answer callbacks enable this index and Reroll disables it. | Continues: at age 18 switches to SCR-UI-019, otherwise loads the next dilemma. | FND-PERSON-004, FND-UI-013, FND-UI-021 |
+| index 5 (stored ID 6) | (473, 132, 97, 40) | The resource starts enabled; answer callbacks enable this index. Reroll and Continue's next-dilemma path disable it. | Continues: at age 18 switches to SCR-UI-019, otherwise loads the next dilemma and re-enables the three answers. | FND-PERSON-004, FND-UI-013, FND-UI-021, FND-UI-022 |
 | index 6 (stored ID 5) | (470, 48, 110, 30) | Always | Rerolls the statistics and the dilemmas (RULE-PERSON-003), keeping the name and field 19. | FND-UI-013, FND-UI-021 |
 
 ## Keyboard input
