@@ -72,33 +72,42 @@ if ($leaked.Count) {
 
 
 function Invoke-PackagedGame([string] $executable, [string[]] $gameArguments, [string] $failure) {
-    $stdout = [IO.Path]::GetTempFileName()
-    $stderr = [IO.Path]::GetTempFileName()
+    $process = New-Object Diagnostics.Process
     try {
-        $process = Start-Process -FilePath $executable -ArgumentList $gameArguments -PassThru `
-            -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr
-        # Windows PowerShell otherwise may lose the exit code of a short-lived
-        # GUI process. Retain its handle before waiting for it.
-        $null = $process.Handle
+        # Own the Process object before launch. Start-Process -PassThru can
+        # return a short-lived GUI process after its exit handle was released.
+        $process.StartInfo.FileName = $executable
+        $process.StartInfo.Arguments = $gameArguments -join ' '
+        $process.StartInfo.WorkingDirectory = (Get-Location).ProviderPath
+        $process.StartInfo.UseShellExecute = $false
+        $process.StartInfo.CreateNoWindow = $true
+        $process.StartInfo.WindowStyle = [Diagnostics.ProcessWindowStyle]::Hidden
+        $process.StartInfo.RedirectStandardOutput = $true
+        $process.StartInfo.RedirectStandardError = $true
+        if (-not $process.Start()) { throw "$failure The packaged game did not start." }
+        # Drain both pipes concurrently so either stream can exceed its buffer.
+        $stdout = $process.StandardOutput.ReadToEndAsync()
+        $stderr = $process.StandardError.ReadToEndAsync()
         $exited = $process.WaitForExit(120000)
         if (-not $exited) {
-            $process.Kill($true)
+            $process.Kill()
+            $process.WaitForExit()
             throw "$failure The packaged game did not exit within 120 seconds."
         }
         # Always surface stderr: it is empty on an ordinary run and carries the software-renderer
         # banner otherwise, which is the only record of which renderer a passing run exercised.
-        if ((Test-Path -LiteralPath $stderr) -and (Get-Item -LiteralPath $stderr).Length -gt 0) {
-            Get-Content -LiteralPath $stderr | Write-Host
+        if ($stderr.Result.Length -gt 0) {
+            Write-Host $stderr.Result
         }
         if ($process.ExitCode -ne 0) {
-            if ((Test-Path -LiteralPath $stdout) -and (Get-Item -LiteralPath $stdout).Length -gt 0) {
-                Get-Content -LiteralPath $stdout | Write-Host
+            if ($stdout.Result.Length -gt 0) {
+                Write-Host $stdout.Result
             }
             throw "$failure It exited with $($process.ExitCode)."
         }
     }
     finally {
-        Remove-Item -LiteralPath $stdout, $stderr -Force -ErrorAction SilentlyContinue
+        $process.Dispose()
     }
 }
 

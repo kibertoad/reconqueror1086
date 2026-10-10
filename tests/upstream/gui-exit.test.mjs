@@ -21,7 +21,9 @@ if (-not $helper -or $errors.Count) { throw 'Packaging helper did not parse.' }
 . ([scriptblock]::Create($helper.Extent.Text))
 foreach ($exit in @(0, 7)) {
     $exe = Join-Path $Scratch "exit-$exit.exe"
-    Add-Type -TypeDefinition "public static class Exit$exit { public static int Main(string[] args) { return $exit; } }" -OutputAssembly $exe -OutputType WindowsApplication
+    $source = 'public static class Exit{0} {{ public static int Main(string[] args) {{ System.Console.Write(new string((char)120, 32768)); System.Console.WriteLine("synthetic stdout {0}"); System.Console.Error.Write(new string((char)121, 32768)); System.Console.Error.WriteLine("synthetic stderr {0}"); return {0}; }} }}' -f $exit
+    Add-Type -TypeDefinition $source -OutputAssembly $exe -OutputType WindowsApplication
+    foreach ($attempt in 1..3) {
     $rejected = $false
     try { Invoke-PackagedGame $exe @('--synthetic') 'Synthetic GUI failure.' }
     catch {
@@ -29,10 +31,14 @@ foreach ($exit in @(0, 7)) {
         $rejected = $true
     }
     if ($exit -eq 7 -and -not $rejected) { throw 'Nonzero GUI exit was incorrectly accepted.' }
+    }
 }
 `);
     const result = spawnSync('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass',
       '-File', script, '-PublishScript', resolve(root, 'tools/Publish-Windows.ps1'), '-Scratch', scratch],
     { encoding: 'utf8', timeout: 30000 });
     assert.equal(result.status, 0, result.error?.message ?? result.stdout + result.stderr);
+    assert.match(result.stdout, /synthetic stderr 0/);
+    assert.match(result.stdout, /synthetic stderr 7/);
+    assert.match(result.stdout, /synthetic stdout 7/);
   });
