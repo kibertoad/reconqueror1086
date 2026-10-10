@@ -40,60 +40,28 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
 
 ## Handover
 
-- Stage: Survey; this goal adds runtime research capabilities.
-- Last gate: 2026-10-10 full documentation and recorder-related safety checks
-  passed with checker 4.1.1. Prior canonical configuration/build gates remain
-  recorded in VALIDATION.md.
-- Native startup input and guarded initial loaded-screen return passed in two
-  fresh quiet runs with different seeds. A subsequent title-to-options probe
-  verified ordered initial/replacement returns and matching journal replay.
-  Those owned processes and locks were cleaned up. No full-game or actual
-  rebuild replay gate has passed.
-- The guarded New Game probe passed character-options return with matching
-  durable events and numeric replay. Its emulator and lock were cleaned up.
-- The quiet generation probe passed screen 3 return, durable-log agreement and
-  numeric replay, including its initial RULE-PERSON-003 draw. Session 88537
-  completed; the owned emulator/controller exited and the machine lock is absent.
-  Shutdown's pending transport diagnostic is retained locally.
-- The first-answer probe passed its matching callback return and durable-log/
-  numeric-replay checks. Session 92758 completed and its processes/lock exited.
-- The owner requested stopping for today. Continue session 27133 was paused
-  during startup extraction and ended incomplete, with matching durable-log/
-  numeric replay of its prefix and local diagnostics preserved. Its owned
-  controller/emulator exited and the machine lock is absent. No active probe.
-- Unfinished: native dilemma traversal, complete rule ownership,
-  prescribed gameplay state and full-game recording/replay. Shared helper
-  extraction is not implemented. The proposal is toolkit issue #403, linked
-  from docs/dosbox-x-helper-proposal.md.
-- Blockers: none established. RUNTIME.md is the capability assessment. Audio
-  remains muted except for an explicit sound investigation. No WIP branch.
-- Next on owner resumption: run a fresh quiet Continue probe, then verify the
-  repeated youth sequence through dubbing. Keep unknown callers rejected and
-  journals incomplete; interrupted session 27133 supplies no Continue result.
-- Continue instrumentation is committed: it waits at a temporary pointer
-  classifier entry hook for supported queue/timing readiness, queues the
-  prescribed click, then verifies its matching callback return. Native
-  verification is pending. Its 37 recorder and seven pointer tests and full
-  documentation gate passed.
-- Repeated-cycle instrumentation is committed with --youth-cycles, bounded to
-  six. It alternates guarded inputs and requires the verified dubbing endpoint
-  for six-cycle success. Its 42 native-recorder checks passed; original
-  repeated-cycle traversal remains unverified. Work is stopped for today.
-- Extend supported input reachability from FND-UI-020, SCR-UI-002/003 and
-  FND-PERSON-004. The three dilemma caller policies have synthetic validation;
-  initial dilemma traversal passed; Continue and Reroll remain unverified.
-- FND-UI-021 corrects SCR-UI-004's callback-index/rectangle association. Use
-  file-order indices; CHARGEN's stored IDs differ from its last two indices.
-- FND-UI-022 records both Continue returns and the next-dilemma control reset.
-  Full documentation regeneration/check passed for this research batch.
-  Queue the next input only after a completed callback and an observed empty
-  queue with suitable pointer timing; never treat its RNG return as UI readiness.
-- FND-UI-023 explicitly locates the first-answer epilogue beyond the earlier
-  scoring finding. Full documentation regeneration/check passed; the probe's
-  code control and return comment now cite that precise record.
-- Q-STRATEGY-043 / RULE-STRATEGY-012: finish the downstream consumer review
-  from FND-STRATEGY-043/044/045/046 before resolving its disputed status.
-- Q-RNG-001 / RULE-RNG-001: continue seed-source provenance from
-  FND-RNG-005/006 when complete clock/environment semantics are needed.
-- Complete two prescribed full-game runs, trace ordering/completeness and actual
-  draw-by-draw rebuild replay; startup/menu verification does not meet this condition.
+- Stage: Survey; research-side runtime tooling session.
+- Last gate: 2026-10-10 analysis-ready configuration, full documentation check,
+  native-recorder, supported-pointer and journal checks passed. Canonical
+  fast gate passed with -NoRestore; its build and test artifacts are local.
+- Active probe: exec session 12234, quiet fresh Continue verification under
+  artifacts/runtime-tools/native-rng-youth-continue-20261010-b. Controller PID
+  81504 owns emulator PID 87560 and the machine run lock. Local
+  session-identity.json identifies debugger session ses-1. Native recording
+  has started; no Continue target or full-game completion is verified yet.
+  Poll this same owning handle; do not launch another original or remove its
+  lock while it is live. Diagnostic files and original content stay local.
+- Unfinished: native Continue and repeated youth traversal, complete caller
+  ownership, prescribed full-game state, two full-game recordings and actual
+  rebuild replay. Shared helper extraction remains unimplemented; toolkit
+  issue #403 is linked from docs/dosbox-x-helper-proposal.md.
+- Blockers: none established. No WIP branch. The untracked
+  .claude/settings.json is pre-existing and was left untouched.
+- Next: finish observing the active Continue probe and validate its terminal
+  journal against the durable log and numeric replay; then verify bounded
+  youth cycles through dubbing if Continue passes.
+- Next: Q-STRATEGY-043 / RULE-STRATEGY-012 downstream consumer review;
+  Q-RNG-001 / RULE-RNG-001 seed-source provenance when required.
+- Next: verify two prescribed full-game recordings and trace completeness,
+  then actual draw-by-draw rebuild replay. Startup and menu checks do not
+  satisfy this condition.
