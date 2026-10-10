@@ -343,7 +343,7 @@ Entries by kind.
 
 ## findings
 
-316 entries.
+317 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -642,6 +642,7 @@ Entries by kind.
 | [FND-UI-021](../findings/FND-UI-021.md) | Youth Continue and Reroll bind file-order indices rather than stored region IDs | recorded |
 | [FND-UI-022](../findings/FND-UI-022.md) | Youth Continue returns after replacing the screen or resetting the next dilemma's controls | recorded |
 | [FND-UI-023](../findings/FND-UI-023.md) | The first youth-answer callback enables Continue before its restored-stack return | recorded |
+| [FND-UI-024](../findings/FND-UI-024.md) | Dubbing's full-screen callback clears its stored sound value and returns after village replacement | recorded |
 | [FND-VIEW-001](../findings/FND-VIEW-001.md) | Every combat scene archive holds its blocks as 96-byte records ending in 0xCC 0xCC with a 16-byte label at offset 78 | recorded |
 | [FND-VIEW-002](../findings/FND-VIEW-002.md) | Every combat scene map is 128 by 128 block numbers stored column by column | recorded |
 | [FND-VIEW-003](../findings/FND-VIEW-003.md) | The heading helper folds the vector into octants around floor(0x20 * minor / major), and callers pass (-dy, dx) | recorded |

@@ -1,8 +1,12 @@
 # UI
 
-Next ID: Q-UI-044
+Next ID: Q-UI-045
 
 ## Static
+
+- Q-UI-044. SCR-UI-019: Which sample does the full-screen click request through
+  g_0009A708? Settles it: follow the stored value's initialization and resource
+  loading to identify the sample passed at offset 4. Blocks: dubbing sound identity.
 
 - Q-UI-001. BUG-UI-001: Is it true that the runtime library of the original stops at the space
   as the standard C library does? Settles it: trace the cited path and its callers through the
