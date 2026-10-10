@@ -16,6 +16,8 @@ Next ID: Q-STRATEGY-044
   index passed to fief initialization from the selected person held in ESI;
   EXP-STRATEGY-001 corroborates the unchanged drawn-index cases against the
   explicit person-28 branch using fabricated fief memory.
+  FND-STRATEGY-048 follows the selected person through coordinates, assignment,
+  place and the duplicate-refusing list insertion calls.
   The full downstream consumer review
   remains unfinished.
 

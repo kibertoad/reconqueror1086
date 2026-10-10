@@ -63,7 +63,7 @@ Entries by status.
 
 ## recorded
 
-42 entries.
+43 entries.
 
 | ID | Title |
 |---|---|
@@ -109,6 +109,7 @@ Entries by status.
 | [FND-STRATEGY-045](../../findings/FND-STRATEGY-045.md) | New-game setup 0x000110E8 places the player at one of eight homes and clears the strategic records |
 | [FND-STRATEGY-046](../../findings/FND-STRATEGY-046.md) | The home-route branch uses the selected route without a seven-home clamp |
 | [FND-STRATEGY-047](../../findings/FND-STRATEGY-047.md) | Home selection passes the drawn index rather than the selected person to fief initialization |
+| [FND-STRATEGY-048](../../findings/FND-STRATEGY-048.md) | Home selection links the selected person twice, with the second call refusing a duplicate |
 
 ## Open questions
 

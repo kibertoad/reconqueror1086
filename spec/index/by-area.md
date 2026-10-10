@@ -238,6 +238,7 @@ Entries by area.
 | [FND-STRATEGY-045](../findings/FND-STRATEGY-045.md) | New-game setup 0x000110E8 places the player at one of eight homes and clears the strategic records | recorded |
 | [FND-STRATEGY-046](../findings/FND-STRATEGY-046.md) | The home-route branch uses the selected route without a seven-home clamp | recorded |
 | [FND-STRATEGY-047](../findings/FND-STRATEGY-047.md) | Home selection passes the drawn index rather than the selected person to fief initialization | recorded |
+| [FND-STRATEGY-048](../findings/FND-STRATEGY-048.md) | Home selection links the selected person twice, with the second call refusing a duplicate | recorded |
 | [RULE-STRATEGY-001](../rules/RULE-STRATEGY-001.md) | Strategic pass and the yearly orders | supported |
 | [RULE-STRATEGY-002](../rules/RULE-STRATEGY-002.md) | Hostile pass and arrival | supported |
 | [RULE-STRATEGY-003](../rules/RULE-STRATEGY-003.md) | Hostile generator and reactive finder | supported |
