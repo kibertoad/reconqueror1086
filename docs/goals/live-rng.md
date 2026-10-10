@@ -45,45 +45,34 @@ private environment with the hash-locked requirements, never the shared one.
 ## Handover
 
 - Stage: Survey; research-side runtime tooling session.
-- Last gate: 2026-10-10 analysis-ready configuration, full documentation check,
-  native-recorder, supported-pointer, journal and terminal-validator checks passed. Canonical
-  fast gate passed with -NoRestore and EVIDENCE_PYTHON selecting the private
-  hash-pinned validation interpreter; its build and test artifacts are local.
-- Continue verification finished successfully; its terminal journal check,
-  cleanup and limits are recorded in docs/VALIDATION.md. No full-game gate passed.
-- Active original probe: exec session 40292, controller PID 25284, emulator
-  PID 33764, debugger session ses-1. The quiet six-cycle attempt under
-  artifacts/runtime-tools/native-rng-youth-six-cycles-20261010-b owns the run
-  lock and includes the FND-UI-025 preparation-service return guards.
-  Observe the same handle; do not launch a second probe or remove its lock.
-  The earlier attempt is terminal and incomplete; its owned processes and lock
-  were cleaned up. Diagnostics remain in its local capture directory.
-  Repeated-cycle and dubbing verification remain pending.
-- Unfinished: repeated youth traversal, complete caller
-  ownership, prescribed full-game state, two full-game recordings and actual
-  rebuild replay. Shared helper extraction remains unimplemented; toolkit
-  issue #403 is linked from docs/dosbox-x-helper-proposal.md.
-- Blockers: none established. No WIP branch. The untracked
-  .claude/settings.json is pre-existing and was left untouched.
-- Shared Python drift was bypassed with the existing private environment after
-  hash-locked installation. The template improvement is issue #94:
-  https://github.com/kibertoad/refurbished-dinosaurs-template/issues/94.
-- The GUI exit-status regression was reproduced and fixed with owned Process
-  startup and concurrent output draining. The focused controls and full fast
-  gate passed. The upstream report and local positive control are issue #95:
-  https://github.com/kibertoad/refurbished-dinosaurs-template/issues/95.
-- Next: observe the active six-cycle probe through its preparation checkpoints; run
-  tools/verify_native_recording.py with --expect-status youth-sequence-return-reached
-  --expect-youth-cycles 6. Its cycle/endpoint guards and the one-cycle native
-  positive control passed; six-cycle original traversal remains unverified.
-  Inspect matching cycle count, dubbing screen identity and process/lock cleanup.
-- Next: after successful six-cycle traversal, verify a fresh
-  --dubbing-click run using the six-cycle command with that additional option.
-  Its readiness/callback guards and schema-v2 outcome have synthetic checks;
-  actual traversal remains unverified. Validate with --expect-status
-  dubbing-return-reached --expect-youth-cycles 6. Q-UI-044 retains sample identity.
-- Next: Q-STRATEGY-043 / RULE-STRATEGY-012 downstream consumer review;
-  Q-RNG-001 / RULE-RNG-001 seed-source provenance when required.
+- Last gate: 2026-10-10 canonical validation with -NoRestore passed using
+  EVIDENCE_PYTHON=artifacts/validation-python/Scripts/python.exe. Shared session
+  0.2.0 published-source Windows suite, adapter, pointer-input, native-recorder
+  and terminal-validator checks passed. No full-game gate passed.
+- Active original probe: exec session 45602, controller PID 127744, emulator
+  PID 132920, debugger session ses-1. The quiet normal-core GOG-cycle control
+  under artifacts/runtime-tools/native-rng-shared-startup-gog-normal-20261010-a
+  owns the machine lock. Observe the same handle; do not launch another probe
+  or remove its lock. This process loaded session 0.1.0 before the 0.2.0 upgrade.
+  Native guarded-write verification requires a subsequent 0.2.0 run.
+- Earlier six-cycle and auto-core comparisons are terminal and incomplete;
+  their owned processes and locks were cleaned up. Dated diagnostic limits
+  are in docs/VALIDATION.md; captures remain local.
+- Shared lifecycle and guarded writes are adopted from published session 0.2.0
+  (PRs #414/#419); obsolete local helper and raw write extension were removed.
+  Native consumer completion remains pending. Toolkit issue #403 received the
+  release/synthetic results; event logging remains issue #409. Verified startup
+  reuse feasibility is tracked in issue #420.
+- Unfinished: repeated youth and dubbing traversal, complete caller ownership,
+  prescribed full-game state, two full-game recordings and actual rebuild replay.
+- Blockers: none established. No WIP branch. The pre-existing untracked
+  .claude/settings.json remains untouched.
+- Next: finish the owned normal-core startup control and validate its terminal
+  journal, then verify published 0.2.0 guarded pointer writes in a fresh run.
+  Record process/lock cleanup and send the terminal consumer result to #403.
+- Next: verify six-cycle traversal and dubbing with the terminal validator's
+  matching outcome contracts. Q-UI-044 retains the sample-identity question.
+- Next: Q-STRATEGY-043 / RULE-STRATEGY-012 downstream consumer review.
+- Next: Q-RNG-001 / RULE-RNG-001 seed-source provenance where required.
 - Next: verify two prescribed full-game recordings and trace completeness,
-  then actual draw-by-draw rebuild replay. Startup and menu checks do not
-  satisfy this condition.
+  then actual draw-by-draw rebuild replay. Startup checks do not satisfy this.
