@@ -281,6 +281,13 @@ or seed/draw ownership checks. With `--stop-after-screen-id 2`, the next probe
 can stop on verified character-options state or reject an unowned intervening
 draw. This input stage has synthetic checks; native verification is pending.
 
+`--generation-click` requires `--new-game-click`. After verified character
+options it queues one primary click at (200, 250), inside region 0 of
+SCR-UI-003, to open youth generation. It uses the same queue and RNG guards.
+With screen target 3, a probe verifies the generation return while recording
+its initial dilemma draw under RULE-PERSON-003. Synthetic input checks passed;
+native generation traversal remains unverified.
+
 The native inclusive-draw policies also accept the three fixed-bound dilemma
 selection calls of FND-PERSON-004. Initial selection and reroll carry
 RULE-PERSON-003, and continued selection carries RULE-PERSON-004. Each requires

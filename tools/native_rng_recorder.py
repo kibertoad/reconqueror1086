@@ -31,7 +31,7 @@ class EventLog:
 
 def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen=False, stop_after_screen=False,
            startup_checkpoints=False, startup_click=False, continue_after_screen=False, title_click=False,
-           screen_checkpoints=False, stop_after_screen_id=None, new_game_click=False):
+           screen_checkpoints=False, stop_after_screen_id=None, new_game_click=False, generation_click=False):
     if stop_at_screen and stop_after_screen:
         raise ValueError('Choose one screen diagnostic boundary')
     if startup_checkpoints and not stop_after_screen:
@@ -46,6 +46,8 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         raise ValueError('Screen checkpoints require guarded recording continuation')
     if new_game_click and not screen_checkpoints:
         raise ValueError('New-game input requires verified screen checkpoints')
+    if generation_click and not new_game_click:
+        raise ValueError('Generation input requires the guarded new-game sequence')
     if stop_after_screen_id is not None and (not screen_checkpoints or
             type(stop_after_screen_id) is not int or not 0 <= stop_after_screen_id <= 24):
         raise ValueError('Screen target requires checkpoints and a registered screen identifier')
@@ -127,6 +129,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
     screen_frame = None
     initial_screen_seen = False
     new_game_click_done = False
+    generation_click_done = False
     startup_key = None
     archive_key = None
     archive_ordinal = 0
@@ -282,6 +285,15 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                         if state() != report['end_rng_state']:
                             raise RecordingError('RNG state changed while queuing new-game input')
                         new_game_click_done = True
+                    if generation_click and screen_id == 2 and not generation_click_done:
+                        # SCR-UI-003: region 0 opens youth generation.
+                        click = queue_primary_click(runtime, mapping, x=200, y=250)
+                        report.setdefault('supported_input', []).append(dict(click, screen=2))
+                        (output / 'supported-input.json').write_text(
+                            json.dumps(report['supported_input'], indent=2) + '\n')
+                        if state() != report['end_rng_state']:
+                            raise RecordingError('RNG state changed while queuing generation input')
+                        generation_click_done = True
                     # These are one-time startup observations, not policies for
                     # subsequent screen transitions or archive requests.
                     for hook_id, hook_kind in list(hooks.items()):

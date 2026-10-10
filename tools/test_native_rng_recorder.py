@@ -50,7 +50,8 @@ def runtime_and_mapping(screen_state=123, screen_number=0, record_pointer=0x3000
 
 
 class ScreenBoundaryTests(unittest.TestCase):
-    def replacement_sequence(self, wrong_return=False, wrong_frame=False, wrong_identity=False, new_game=False):
+    def replacement_sequence(self, wrong_return=False, wrong_frame=False, wrong_identity=False, new_game=False,
+                             generation=False):
         runtime, mapping = runtime_and_mapping()
         original_wait, original_registers, original_read = (
             runtime.wait_until_stopped, runtime.registers, runtime.read)
@@ -83,21 +84,34 @@ class ScreenBoundaryTests(unittest.TestCase):
             return original_read(address, length)
         runtime.wait_until_stopped, runtime.registers, runtime.read = wait, registers, read
         with patch('native_rng_recorder.tables_from_diagnostic', return_value=(0, 16)), \
-             patch('native_rng_recorder.descriptor', side_effect=[mapping.code, mapping.data] * 8), \
+             patch('native_rng_recorder.descriptor', side_effect=[mapping.code, mapping.data] * 12), \
              patch('native_rng_recorder.EventLog'), patch('native_rng_recorder.Path.write_text'), \
              patch('native_rng_recorder.queue_primary_click',
                    return_value={'action': 'primary-short-click'}) as click:
             report = record(runtime, mapping, ('draw', 'seed'), 'unused-output', stop_after_screen=True,
                             continue_after_screen=True, title_click=True, screen_checkpoints=True,
-                            stop_after_screen_id=2 if new_game else 1, new_game_click=new_game)
+                            stop_after_screen_id=3 if generation else 2 if new_game else 1,
+                            new_game_click=new_game, generation_click=generation)
         if new_game:
-            self.assertEqual(click.call_count, 2)
+            self.assertEqual(click.call_count, 3 if generation else 2)
             self.assertEqual([call.kwargs for call in click.call_args_list],
-                             [{'x': 10, 'y': 10}, {'x': 100, 'y': 350}])
+                             [{'x': 10, 'y': 10}, {'x': 100, 'y': 350}] +
+                             ([{'x': 200, 'y': 250}] if generation else []))
         else:
             click.assert_called_once_with(runtime, mapping, x=10, y=10)
         runtime.agent.delete_breakpoint.assert_not_called()
         return report
+
+    def test_generation_input_requires_the_guarded_new_game_sequence(self):
+        with self.assertRaisesRegex(ValueError, 'guarded new-game sequence'):
+            record(None, None, (), 'unused-output', generation_click=True)
+
+    def test_generation_input_waits_for_character_options(self):
+        report = self.replacement_sequence(new_game=True, generation=True)
+        self.assertEqual([item['observation']['screen_id'] for item in report['screen_loads']], [0, 1, 2, 3])
+        self.assertEqual([item['screen'] for item in report['supported_input']], [0, 1, 2])
+        self.assertFalse(report['pending_screen_load'])
+        self.assertFalse(report['full_game_complete'])
 
     def test_new_game_input_requires_screen_checkpoints(self):
         with self.assertRaisesRegex(ValueError, 'verified screen checkpoints'):

@@ -36,6 +36,8 @@ def main():
                         help='Verify initial and replacement screen returns while recording')
     parser.add_argument('--new-game-click', action='store_true',
                         help='Queue one supported-state new-game click after verified game-options loading')
+    parser.add_argument('--generation-click', action='store_true',
+                        help='Queue one supported-state youth-generation click after verified character options')
     parser.add_argument('--stop-after-screen-id', type=int,
                         help='Stop after a verified loaded screen identifier, requiring screen checkpoints')
     parser.add_argument('--startup-checkpoints', action='store_true',
@@ -64,6 +66,8 @@ def main():
         raise ValueError('Screen checkpoints require --continue-after-screen')
     if args.new_game_click and not args.screen_checkpoints:
         raise ValueError('New-game input requires --screen-checkpoints')
+    if args.generation_click and not args.new_game_click:
+        raise ValueError('Generation input requires --new-game-click')
     if args.stop_after_screen_id is not None and (not args.screen_checkpoints or
             not 0 <= args.stop_after_screen_id <= 24):
         raise ValueError('Screen target requires --screen-checkpoints and a registered identifier')
@@ -121,7 +125,7 @@ def main():
         'startup_checkpoints': args.startup_checkpoints, 'startup_click': args.startup_click,
         'continue_after_screen': args.continue_after_screen, 'title_click': args.title_click,
         'screen_checkpoints': args.screen_checkpoints, 'stop_after_screen_id': args.stop_after_screen_id,
-        'new_game_click': args.new_game_click
+        'new_game_click': args.new_game_click, 'generation_click': args.generation_click
     }, indent=2))
     source = Path('artifacts/runtime-tools/dosbox-x-agent-source')
     configuration = 'Agent Debug SDL2' if args.debugger_build == 'heavy' else 'Agent Debug No Heavy SDL2'
@@ -192,7 +196,8 @@ def main():
                         journal = record(runtime, live_map, ids, root, args.record_draw_limit,
                                  args.stop_at_screen, args.stop_after_screen, args.startup_checkpoints,
                                  args.startup_click, args.continue_after_screen, args.title_click,
-                                 args.screen_checkpoints, args.stop_after_screen_id, args.new_game_click)
+                                 args.screen_checkpoints, args.stop_after_screen_id, args.new_game_click,
+                                 args.generation_click)
                         print('native recording', journal['status'], 'events', len(journal['events']))
                         break
                     if args.record_startup_shifts and runtime.session.stop_reason.breakpoint_id != ids[1]:

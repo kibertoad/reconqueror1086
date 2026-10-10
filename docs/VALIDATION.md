@@ -290,6 +290,13 @@ A changed bound or unknown return site is rejected before the draw. An initial
 test attempt exposed a syntax error in the changed policy branch; it was
 corrected before the passing run. No original dilemma traversal is claimed.
 
+2026-10-10: 53 recorder-related safety tests passed after adding generation
+input. The synthetic sequence records ordered screens 0, 1, 2 and 3, queues
+the title, new-game and generation inputs only at their verified states, and
+retains explicit incomplete full-game status. Generation input without the
+guarded new-game sequence is rejected. This does not establish an original
+generation traversal or change any spec status.
+
 2026-10-10: `native-rng-options-return-20261010-a` passed the guarded initial
 and replacement returns, with ordered screen identifiers 0 and 1. The final
 history was `[1, 0, -1, -1, -1]`. Its initial seed was 895807504; all 32
