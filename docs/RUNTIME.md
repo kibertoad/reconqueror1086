@@ -288,7 +288,8 @@ options it queues one primary click at (200, 250), inside region 0 of
 SCR-UI-003, to open youth generation. It uses the same queue and RNG guards.
 With screen target 3, a probe verifies the generation return while recording
 its initial dilemma draw under RULE-PERSON-003. Synthetic input checks passed;
-native generation traversal remains unverified.
+native generation traversal passed the target-return check in VALIDATION.md.
+Youth answers, Continue and Reroll still need their own native checks.
 
 The native inclusive-draw policies also accept the three fixed-bound dilemma
 selection calls of FND-PERSON-004. Initial selection and reroll carry

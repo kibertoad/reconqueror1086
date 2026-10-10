@@ -314,6 +314,16 @@ operation flags were false, and the owned emulator and lock were cleaned up.
 This verifies character-options reachability, not generation, full-game draw
 coverage or actual rebuild replay. The next quiet probe targets youth generation.
 
+2026-10-10: `native-rng-generation-return-20261010-a` passed guarded screen
+returns 0, 1, 2 and 3 with final history `[3, 2, 1, 0, -1]`. Seed 895807912
+and all 33 completed events agree between the durable log and final journal.
+The final event belongs to RULE-PERSON-003 with inclusive bound 4 and result 4;
+independent numeric replay matches end state 3541722120. All pending recording
+flags were false. Shutdown reported a pending transport operation, but the
+subsequent process audit confirmed that the owned emulator and controller had
+exited and the machine lock was absent. This verifies initial youth-generation
+reachability and its recorded draw, not subsequent answers or full-game replay.
+
 2026-10-10: native caller policy checks passed 29 recorder, journal,
 durable-event-log and mapping tests. The new synthetic cases record the
 scaled hit-check result and the busy-voice remainder register, and reject
