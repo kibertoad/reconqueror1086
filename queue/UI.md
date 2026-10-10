@@ -4,9 +4,6 @@ Next ID: Q-UI-045
 
 ## Static
 
-- Q-UI-044. SCR-UI-019: Which sample does the full-screen click request through
-  g_0009A708? Settles it: follow the stored value's initialization and resource
-  loading to identify the sample passed at offset 4. Blocks: dubbing sound identity.
 
 - Q-UI-001. BUG-UI-001: Is it true that the runtime library of the original stops at the space
   as the standard C library does? Settles it: trace the cited path and its callers through the
@@ -115,9 +112,10 @@ Next ID: Q-UI-045
   Settles it: follow the screen entry, input handlers and drawing paths named by the cited
   findings, retaining branch conditions and resource references. Blocks: none.
 
-- Q-UI-026. SCR-UI-019: What the entry routine `0x00019A8C` plays or shows? Settles it: follow
-  the screen entry, input handlers and drawing paths named by the cited findings, retaining
-  branch conditions and resource references. Blocks: none.
+- Q-UI-026. SCR-UI-019: What pixels and text layout do the entry's drawing helpers produce?
+  Tried: FND-UI-026 follows both animation branches, identifies resource requests and two
+  input waits on the animations-disabled path. Settles it: follow the remaining drawing
+  helpers and their resource layout, retaining branch conditions. Blocks: none.
 
 - Q-UI-027. SCR-UI-020: Which routine switches to screen 5, and what it shows? Settles it:
   follow the screen entry, input handlers and drawing paths named by the cited findings,

@@ -5,7 +5,7 @@ status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
 resolution: 640x480
-evidence: [FND-PERSON-004, FND-PERSON-006, FND-UI-001, FND-UI-002, FND-UI-003, FND-UI-010, FND-UI-013, FND-UI-024]
+evidence: [FND-PERSON-004, FND-PERSON-006, FND-UI-001, FND-UI-002, FND-UI-003, FND-UI-010, FND-UI-013, FND-UI-019, FND-UI-024, FND-UI-026, FND-MEDIA-009]
 conflicting: []
 split_with: []
 related: [SCR-UI-006]
@@ -25,7 +25,9 @@ related: [SCR-UI-006]
 
 ## Keyboard input
 
-None known.
+| Key | Enabled when | Effect | Evidence |
+|---|---|---|---|
+| Keyboard availability; individual keys untraced | During either entry presentation wait | Ends that wait | FND-UI-019, FND-UI-026 |
 
 ## Other input
 
@@ -35,11 +37,20 @@ None known.
 
 | Sound | Resource | Played when | Evidence |
 |---|---|---|---|
-| Full-screen click sample | The value at g_0009A708; sample identity untraced | The full-screen click requests playback when this value is nonzero | FND-UI-024 |
+| Full-screen click sample | First sample of `C1086.GOB#dking.666`, through g_0009A708 | The full-screen click requests playback when this value is nonzero | FND-UI-024, FND-UI-026 |
+| Entry sample | First sample of `C1086.GOB#dubb3.666` | Animations-disabled entry requests playback when its temporary bank is nonzero | FND-UI-026 |
 
 ## States
 
-None known.
+| State | Entered when | Left when | Evidence |
+|---|---|---|---|
+| Text and temporary sample presentation | Entry with animations disabled; requests four text lines over the current object | Accepted input | FND-UI-026 |
+| Movie presentation | Entry with animations enabled; requests `dubb3.smk` | Movie helper returns | FND-UI-026, FND-MEDIA-009 |
+| Briefing picture | Either presentation path completes; requests `C1086.GOB#FLUFF.PCX` | Accepted input, followed by entry return | FND-UI-026 |
+
+A short primary or secondary release can end each input wait (FND-UI-019,
+FND-UI-026). These are static requests; their rendered appearance has not
+been verified.
 
 ## Timing
 
@@ -51,5 +62,4 @@ None known.
 
 ## Open questions
 
-- What the entry routine `0x00019A8C` plays or shows. (Q-UI-026)
-- Which sample the full-screen click requests through g_0009A708. (Q-UI-044)
+- What pixels and text layout the entry's drawing helpers produce. (Q-UI-026)

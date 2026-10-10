@@ -65,7 +65,7 @@ Entries by status.
 
 ## recorded
 
-25 entries.
+26 entries.
 
 | ID | Title |
 |---|---|
@@ -94,6 +94,7 @@ Entries by status.
 | [FND-UI-023](../../findings/FND-UI-023.md) | The first youth-answer callback enables Continue before its restored-stack return |
 | [FND-UI-024](../../findings/FND-UI-024.md) | Dubbing's full-screen callback clears its stored sound value and returns after village replacement |
 | [FND-UI-025](../../findings/FND-UI-025.md) | Startup preparation has distinct service return boundaries before its animation test |
+| [FND-UI-026](../../findings/FND-UI-026.md) | Dubbing entry selects its sound bank and waits for input before returning |
 
 ## Open questions
 
