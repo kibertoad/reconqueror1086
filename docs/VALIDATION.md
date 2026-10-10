@@ -1541,3 +1541,22 @@ transition completion remains unverified.
 Canonical -NoRestore validation passed. The final live-record/object guard and its
 changed-history refusal also passed the recorder, verifier and entry-input controls.
 
+
+### 2026-10-10 shared-library issue review: argument-count diagnostics
+
+The installed shared-library pins remain the latest published releases:
+executable-reader 4.0.0, engine 18.2.0, checker 4.2.0 and dosbox-session
+0.3.0. The adoption revision remains
+`e150fc1153c5572a71f3c9c1174bf75666212c88`; no dependency change was needed.
+
+`node tools/upstream.mjs docs --check` passed. RULE-ASSAULT-026 now has
+separate parameter items and the current checker run produced no argument-count
+skipped steps. Independent synthetic caller/callee controls through the
+installed checker's `checkArgumentCounts` exercised the reported multi-name
+item in positions one and two. Both produced exactly one skipped step,
+quoted `None.`, and named the correct item as naming more than one parameter.
+Local scripts and output are in `artifacts/check-issue-319.mjs`,
+`artifacts/check-issue-319.log` and `artifacts/shared-issue-review-docs.log`.
+Toolkit issue #319 was closed with these downstream results. Issue #416
+still requires the unreleased owner-lifetime fix and a killed-owner native
+control; normal successful session cleanup does not validate that condition.
