@@ -2,6 +2,14 @@
 
 ## Checker 4.1.1 and quiet probes (2026-10-10)
 
+2026-10-10: `native-rng-youth-answer-20261010-a` reached the matching
+first-answer callback return after guarded screen returns 0, 1, 2 and 3.
+All 33 completed events agree with the durable log and independently replay
+from seed 895808188 to recorded state 3771236124. All pending recording flags
+were false. The owned controller/emulator exited and the machine lock was
+absent at the subsequent process audit. This verifies one first-answer return,
+not all dilemma outcomes, Continue traversal or full-game completeness.
+
 2026-10-10: 40 native-recorder checks passed after adding refusal cases for
 answer and Continue return-stack mismatches and changed youth history before
 Continue readiness/input. These checks exercise rejection, not native gameplay

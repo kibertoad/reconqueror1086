@@ -102,7 +102,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
         hooks[hook.id] = 'startup-wait'
     if youth_answer:
-        # FND-PERSON-005: first answer entry and final return.
+        # FND-PERSON-005 / FND-UI-023: first answer entry and final return.
         for address, name in ((0x14b38, 'answer-entry'), (0x14cdd, 'answer-return')):
             selector, offset = mapping.code_address(address)
             hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
@@ -123,7 +123,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
     if youth_answer:
         selector, offset = mapping.code_address(0x14b38, 0x14cde - 0x14b38)
         address = runtime.MemoryAddress.segmented(selector, offset)
-        controls.append((address, runtime.read(address, 0x14cde - 0x14b38)))  # FND-PERSON-005
+        controls.append((address, runtime.read(address, 0x14cde - 0x14b38)))  # FND-UI-023
     code_ranges = [(0x6b3eb, 0x6b423), (0x24c38, 0x24c4c), (0x1a14c, 0x1a1ef), (0x43670, 0x436e0)]
     code_ranges.extend(((0x445b4, 0x445c2), (0x4f2ac, 0x4f2d6), (0x5b418, 0x5b470)))
     # FND-PERSON-004: initial, rerolled and continued dilemma-selection draws.

@@ -293,11 +293,12 @@ Youth answers, Continue and Reroll still need their own native checks.
 
 `--youth-answer` requires generation input and continuation beyond screen 3.
 It queues the first answer at (100, 350), inside SCR-UI-004's first-answer
-rectangle. FND-PERSON-005 supports its callback entry and return. The recorder
+rectangle. FND-PERSON-005 and FND-UI-023 support its callback entry and return. The recorder
 checks the callback's matching stack frame, unchanged code, complete journal
 and numeric RNG replay before ending with `youth-answer-return-reached`.
 It never treats that boundary as full-game completion or queues Continue yet.
-Synthetic sequence checks passed; original answer traversal remains unverified.
+Synthetic sequence checks and the native first-answer return check passed;
+the dated result is in VALIDATION.md. This does not verify later answers.
 
 `--youth-continue` requires `--youth-answer`. After the matching answer return
 it adds a temporary breakpoint at the pointer classifier entry of
