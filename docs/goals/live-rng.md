@@ -73,6 +73,10 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
   initial dilemma traversal passed; Continue and Reroll remain unverified.
 - FND-UI-021 corrects SCR-UI-004's callback-index/rectangle association. Use
   file-order indices; CHARGEN's stored IDs differ from its last two indices.
+- FND-UI-022 records both Continue returns and the next-dilemma control reset.
+  Full documentation regeneration/check passed for this research batch.
+  Queue the next input only after a completed callback and an observed empty
+  queue with suitable pointer timing; never treat its RNG return as UI readiness.
 - Q-STRATEGY-043 / RULE-STRATEGY-012: finish the downstream consumer review
   from FND-STRATEGY-043/044/045/046 before resolving its disputed status.
 - Q-RNG-001 / RULE-RNG-001: continue seed-source provenance from
