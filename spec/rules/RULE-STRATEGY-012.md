@@ -4,7 +4,7 @@ title: New game, joining armies and field placement
 status: disputed
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-STRATEGY-001, FND-STRATEGY-039, FND-STRATEGY-003, FND-STRATEGY-004, FND-STRATEGY-006, FND-STRATEGY-007, FND-STRATEGY-013, FND-STRATEGY-040, FND-STRATEGY-044, FND-STRATEGY-041, FND-STRATEGY-021, FND-STRATEGY-045, FND-STRATEGY-024, FND-STRATEGY-025, FND-STRATEGY-026, FND-STRATEGY-029, FND-STRATEGY-030, FND-STRATEGY-031, FND-STRATEGY-032, FND-STRATEGY-035, FND-TOURNEY-001, FND-TOURNEY-009, FND-STRATEGY-043, FND-STRATEGY-044, FND-STRATEGY-047, EXP-STRATEGY-001, FND-STRATEGY-048, EXP-STRATEGY-002]
+evidence: [FND-STRATEGY-001, FND-STRATEGY-039, FND-STRATEGY-003, FND-STRATEGY-004, FND-STRATEGY-006, FND-STRATEGY-007, FND-STRATEGY-013, FND-STRATEGY-040, FND-STRATEGY-044, FND-STRATEGY-041, FND-STRATEGY-021, FND-STRATEGY-045, FND-STRATEGY-024, FND-STRATEGY-025, FND-STRATEGY-026, FND-STRATEGY-029, FND-STRATEGY-030, FND-STRATEGY-031, FND-STRATEGY-032, FND-STRATEGY-035, FND-TOURNEY-001, FND-TOURNEY-009, FND-STRATEGY-043, FND-STRATEGY-044, FND-STRATEGY-047, EXP-STRATEGY-001, FND-STRATEGY-048, EXP-STRATEGY-002, FND-STRATEGY-049, EXP-STRATEGY-003]
 conflicting: [FND-STRATEGY-043, FND-STRATEGY-044]
 split_with: []
 related: [RULE-RNG-001, RULE-STRATEGY-007, RULE-STRATEGY-014]
@@ -19,7 +19,9 @@ reading so the disagreement is explicit. FND-STRATEGY-047 additionally records
 that fief initialization receives the drawn index rather than the selected
 person identifier; its downstream effects remain under Q-STRATEGY-043.
 FND-STRATEGY-048 follows the selected person through the local link handling
-without changing this entry's disputed status.
+without changing this entry's disputed status. FND-STRATEGY-049 and
+EXP-STRATEGY-003 follow the immediate whole-setup group, rating and coordinate
+consumers; later downstream behavior remains unread.
 
 A new game places the player at one of seven homes, drawn at random, and clears every strategic
 record. The player can place up to five armies round the home, join one to ride with it, leave it

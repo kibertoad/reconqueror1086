@@ -1,0 +1,472 @@
+{
+  "experiment": "EXP-STRATEGY-003",
+  "build": "BLD-GOG-EN",
+  "starting_state": {
+    "kind": "emulated-call",
+    "person_list_head": 255,
+    "fief_root": null,
+    "selected_assignment": 9,
+    "selected_rating": 199,
+    "selected_next": 10,
+    "g_000AB0F8": 80,
+    "g_000AB100": 80
+  },
+  "recording_xxh3": null,
+  "clock": "draw_sequence",
+  "inputs": [],
+  "seeds": [],
+  "runs": [
+    {
+      "rng_state": 0,
+      "events": [],
+      "draws": [
+        {
+          "rule": "RULE-STRATEGY-012",
+          "bound": 7,
+          "result": 0
+        }
+      ],
+      "end_state": [
+        {
+          "global": "rng_state",
+          "value": 12345
+        },
+        {
+          "global": "start_home",
+          "value": 0
+        },
+        {
+          "global": "fallback_person",
+          "value": 17
+        },
+        {
+          "global": "fallback_origin",
+          "value": 1
+        },
+        {
+          "global": "home_row",
+          "value": 4
+        },
+        {
+          "global": "home_col",
+          "value": 3
+        },
+        {
+          "format": "FMT-STRATEGY-003",
+          "record": 17,
+          "field": "rating",
+          "value": 12
+        }
+      ],
+      "inputs": [
+        {
+          "name": "selected_group",
+          "value": 1
+        },
+        {
+          "name": "selected_coordinates",
+          "value": [
+            4,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "rng_state": 4,
+      "events": [],
+      "draws": [
+        {
+          "rule": "RULE-STRATEGY-012",
+          "bound": 7,
+          "result": 1
+        }
+      ],
+      "end_state": [
+        {
+          "global": "rng_state",
+          "value": 119106029
+        },
+        {
+          "global": "start_home",
+          "value": 1
+        },
+        {
+          "global": "fallback_person",
+          "value": 18
+        },
+        {
+          "global": "fallback_origin",
+          "value": 2
+        },
+        {
+          "global": "home_row",
+          "value": 5
+        },
+        {
+          "global": "home_col",
+          "value": 4
+        },
+        {
+          "format": "FMT-STRATEGY-003",
+          "record": 18,
+          "field": "rating",
+          "value": 12
+        }
+      ],
+      "inputs": [
+        {
+          "name": "selected_group",
+          "value": 2
+        },
+        {
+          "name": "selected_coordinates",
+          "value": [
+            5,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "rng_state": 8,
+      "events": [],
+      "draws": [
+        {
+          "rule": "RULE-STRATEGY-012",
+          "bound": 7,
+          "result": 2
+        }
+      ],
+      "end_state": [
+        {
+          "global": "rng_state",
+          "value": 238199713
+        },
+        {
+          "global": "start_home",
+          "value": 2
+        },
+        {
+          "global": "fallback_person",
+          "value": 24
+        },
+        {
+          "global": "fallback_origin",
+          "value": 3
+        },
+        {
+          "global": "home_row",
+          "value": 6
+        },
+        {
+          "global": "home_col",
+          "value": 5
+        },
+        {
+          "format": "FMT-STRATEGY-003",
+          "record": 24,
+          "field": "rating",
+          "value": 12
+        }
+      ],
+      "inputs": [
+        {
+          "name": "selected_group",
+          "value": 3
+        },
+        {
+          "name": "selected_coordinates",
+          "value": [
+            6,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "rng_state": 3,
+      "events": [],
+      "draws": [
+        {
+          "rule": "RULE-STRATEGY-012",
+          "bound": 7,
+          "result": 3
+        }
+      ],
+      "end_state": [
+        {
+          "global": "rng_state",
+          "value": 3310558080
+        },
+        {
+          "global": "start_home",
+          "value": 3
+        },
+        {
+          "global": "fallback_person",
+          "value": 29
+        },
+        {
+          "global": "fallback_origin",
+          "value": 4
+        },
+        {
+          "global": "home_row",
+          "value": 7
+        },
+        {
+          "global": "home_col",
+          "value": 6
+        },
+        {
+          "format": "FMT-STRATEGY-003",
+          "record": 29,
+          "field": "rating",
+          "value": 12
+        }
+      ],
+      "inputs": [
+        {
+          "name": "selected_group",
+          "value": 4
+        },
+        {
+          "name": "selected_coordinates",
+          "value": [
+            7,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "rng_state": 2,
+      "events": [],
+      "draws": [
+        {
+          "rule": "RULE-STRATEGY-012",
+          "bound": 7,
+          "result": 4
+        }
+      ],
+      "end_state": [
+        {
+          "global": "rng_state",
+          "value": 2207042835
+        },
+        {
+          "global": "start_home",
+          "value": 4
+        },
+        {
+          "global": "fallback_person",
+          "value": 86
+        },
+        {
+          "global": "fallback_origin",
+          "value": 5
+        },
+        {
+          "global": "home_row",
+          "value": 8
+        },
+        {
+          "global": "home_col",
+          "value": 7
+        },
+        {
+          "format": "FMT-STRATEGY-003",
+          "record": 86,
+          "field": "rating",
+          "value": 12
+        }
+      ],
+      "inputs": [
+        {
+          "name": "selected_group",
+          "value": 5
+        },
+        {
+          "name": "selected_coordinates",
+          "value": [
+            8,
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "rng_state": 11,
+      "events": [],
+      "draws": [
+        {
+          "rule": "RULE-STRATEGY-012",
+          "bound": 7,
+          "result": 5
+        }
+      ],
+      "end_state": [
+        {
+          "global": "rng_state",
+          "value": 3548745448
+        },
+        {
+          "global": "start_home",
+          "value": 5
+        },
+        {
+          "global": "fallback_person",
+          "value": 144
+        },
+        {
+          "global": "fallback_origin",
+          "value": 6
+        },
+        {
+          "global": "home_row",
+          "value": 9
+        },
+        {
+          "global": "home_col",
+          "value": 8
+        },
+        {
+          "format": "FMT-STRATEGY-003",
+          "record": 144,
+          "field": "rating",
+          "value": 12
+        }
+      ],
+      "inputs": [
+        {
+          "name": "selected_group",
+          "value": 6
+        },
+        {
+          "name": "selected_coordinates",
+          "value": [
+            9,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "rng_state": 1,
+      "events": [],
+      "draws": [
+        {
+          "rule": "RULE-STRATEGY-012",
+          "bound": 7,
+          "result": 6
+        }
+      ],
+      "end_state": [
+        {
+          "global": "rng_state",
+          "value": 1103527590
+        },
+        {
+          "global": "start_home",
+          "value": 6
+        },
+        {
+          "global": "fallback_person",
+          "value": 166
+        },
+        {
+          "global": "fallback_origin",
+          "value": 7
+        },
+        {
+          "global": "home_row",
+          "value": 10
+        },
+        {
+          "global": "home_col",
+          "value": 9
+        },
+        {
+          "format": "FMT-STRATEGY-003",
+          "record": 166,
+          "field": "rating",
+          "value": 12
+        }
+      ],
+      "inputs": [
+        {
+          "name": "selected_group",
+          "value": 7
+        },
+        {
+          "name": "selected_coordinates",
+          "value": [
+            10,
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "rng_state": 5,
+      "events": [],
+      "draws": [
+        {
+          "rule": "RULE-STRATEGY-012",
+          "bound": 7,
+          "result": 7
+        }
+      ],
+      "end_state": [
+        {
+          "global": "rng_state",
+          "value": 1222621274
+        },
+        {
+          "global": "start_home",
+          "value": 7
+        },
+        {
+          "global": "fallback_person",
+          "value": 28
+        },
+        {
+          "global": "fallback_origin",
+          "value": 8
+        },
+        {
+          "global": "home_row",
+          "value": 11
+        },
+        {
+          "global": "home_col",
+          "value": 10
+        },
+        {
+          "format": "FMT-STRATEGY-003",
+          "record": 28,
+          "field": "rating",
+          "value": 12
+        }
+      ],
+      "inputs": [
+        {
+          "name": "selected_group",
+          "value": 8
+        },
+        {
+          "name": "selected_coordinates",
+          "value": [
+            11,
+            10
+          ]
+        }
+      ]
+    }
+  ],
+  "comparison": {
+    "outcome": "whole setup selected-person consumers and reset fields",
+    "test": "exact"
+  }
+}

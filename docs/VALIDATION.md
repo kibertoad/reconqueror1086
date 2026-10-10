@@ -1499,3 +1499,16 @@ these synthetic results do not establish gameplay completeness or replay.
 
 The canonical -NoRestore validation passed with the v4 tooling on 2026-10-10.
 
+
+## Whole home-setup isolated consumers (2026-10-10)
+
+FND-STRATEGY-049 and EXP-STRATEGY-003 record the next Q-STRATEGY-043
+consumer checks. The fingerprint-checked original setup and actual callees
+passed all eight draw outcomes with fabricated group and coordinate fields,
+including the group/rating, integer and floating anchors, reset fields and
+write whitelist. The harness skipped without GAME_DIR. Documentation and
+research-side evidence checks passed using the private pinned interpreter.
+The first evidence-check invocation omitted EVIDENCE_PYTHON and failed against
+the shared editable environment; the corrected invocation passed.
+Later fallback-origin and route consumers remain unverified. These isolated
+calls do not establish native gameplay coverage or settle the disputed rule.

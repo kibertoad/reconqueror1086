@@ -344,7 +344,7 @@ Entries by kind.
 
 ## findings
 
-324 entries.
+325 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -605,6 +605,7 @@ Entries by kind.
 | [FND-STRATEGY-046](../findings/FND-STRATEGY-046.md) | The home-route branch uses the selected route without a seven-home clamp | recorded |
 | [FND-STRATEGY-047](../findings/FND-STRATEGY-047.md) | Home selection passes the drawn index rather than the selected person to fief initialization | recorded |
 | [FND-STRATEGY-048](../findings/FND-STRATEGY-048.md) | Home selection links the selected person twice, with the second call refusing a duplicate | recorded |
+| [FND-STRATEGY-049](../findings/FND-STRATEGY-049.md) | New-game setup retains the selected person's group, rating and coordinate outputs | recorded |
 | [FND-TALK-001](../findings/FND-TALK-001.md) | Conversation nodes are read by length from the .CBF file through a sorted .CIF index | recorded |
 | [FND-TALK-002](../findings/FND-TALK-002.md) | The conversation loop runs node actions, then the chosen response actions, then follows a redirect | recorded |
 | [FND-TALK-003](../findings/FND-TALK-003.md) | The prompt variant is drawn after reseeding the generator from the clock | recorded |
@@ -675,7 +676,7 @@ Entries by kind.
 
 ## experiments
 
-6 entries.
+7 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -684,6 +685,7 @@ Entries by kind.
 | [EXP-RNG-001](../experiments/EXP-RNG-001.md) | Native startup character shifts yield thirty ordered rule-tagged draws from each recorded seed | recorded |
 | [EXP-STRATEGY-001](../experiments/EXP-STRATEGY-001.md) | Drawn home indices leave fabricated fief lists unchanged while person 28 initializes them | recorded |
 | [EXP-STRATEGY-002](../experiments/EXP-STRATEGY-002.md) | All eight isolated home selections preserve the chosen person through their actual callees | recorded |
+| [EXP-STRATEGY-003](../experiments/EXP-STRATEGY-003.md) | Eight isolated new-game setups retain selected-person group and coordinate results | recorded |
 | [EXP-UI-001](../experiments/EXP-UI-001.md) | Two controlled short clicks let the animations-disabled dubbing entry return | recorded |
 
 ## bugs

@@ -186,6 +186,7 @@ Entries by area.
 | [BUG-STRATEGY-005](../bugs/BUG-STRATEGY-005.md) | The spy report shows the swordsmen count in place of all three troop counts | supported |
 | [EXP-STRATEGY-001](../experiments/EXP-STRATEGY-001.md) | Drawn home indices leave fabricated fief lists unchanged while person 28 initializes them | recorded |
 | [EXP-STRATEGY-002](../experiments/EXP-STRATEGY-002.md) | All eight isolated home selections preserve the chosen person through their actual callees | recorded |
+| [EXP-STRATEGY-003](../experiments/EXP-STRATEGY-003.md) | Eight isolated new-game setups retain selected-person group and coordinate results | recorded |
 | [FMT-STRATEGY-001](../formats/FMT-STRATEGY-001.md) | Strategic movement record, one force on the strategic map | supported |
 | [FMT-STRATEGY-002](../formats/FMT-STRATEGY-002.md) | Property record, one castle of the strategic map | supported |
 | [FMT-STRATEGY-003](../formats/FMT-STRATEGY-003.md) | Person record, one character of the strategic map | supported |
@@ -240,6 +241,7 @@ Entries by area.
 | [FND-STRATEGY-046](../findings/FND-STRATEGY-046.md) | The home-route branch uses the selected route without a seven-home clamp | recorded |
 | [FND-STRATEGY-047](../findings/FND-STRATEGY-047.md) | Home selection passes the drawn index rather than the selected person to fief initialization | recorded |
 | [FND-STRATEGY-048](../findings/FND-STRATEGY-048.md) | Home selection links the selected person twice, with the second call refusing a duplicate | recorded |
+| [FND-STRATEGY-049](../findings/FND-STRATEGY-049.md) | New-game setup retains the selected person's group, rating and coordinate outputs | recorded |
 | [RULE-STRATEGY-001](../rules/RULE-STRATEGY-001.md) | Strategic pass and the yearly orders | supported |
 | [RULE-STRATEGY-002](../rules/RULE-STRATEGY-002.md) | Hostile pass and arrival | supported |
 | [RULE-STRATEGY-003](../rules/RULE-STRATEGY-003.md) | Hostile generator and reactive finder | supported |

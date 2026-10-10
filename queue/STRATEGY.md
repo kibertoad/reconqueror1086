@@ -20,8 +20,10 @@ Next ID: Q-STRATEGY-044
   place and the duplicate-refusing list insertion calls.
   EXP-STRATEGY-002 corroborates all eight selected-person outcomes through
   the actual callees, including the endpoint's coordinates and place value.
-  The full downstream consumer review
-  remains unfinished.
+  FND-STRATEGY-049 and EXP-STRATEGY-003 follow all eight outcomes through
+  the immediate setup, group, rating and coordinate consumers with fabricated
+  group and coordinate inputs. Later fallback-origin and route consumers
+  remain unfinished.
 
 - Q-STRATEGY-001. BUG-STRATEGY-001: What the local holds at the start of a session? Settles it:
   trace the cited path and its callers through the boundary case; distinguish executable

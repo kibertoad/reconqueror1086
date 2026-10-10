@@ -63,12 +63,13 @@ Entries by status.
 
 ## recorded
 
-44 entries.
+46 entries.
 
 | ID | Title |
 |---|---|
 | [EXP-STRATEGY-001](../../experiments/EXP-STRATEGY-001.md) | Drawn home indices leave fabricated fief lists unchanged while person 28 initializes them |
 | [EXP-STRATEGY-002](../../experiments/EXP-STRATEGY-002.md) | All eight isolated home selections preserve the chosen person through their actual callees |
+| [EXP-STRATEGY-003](../../experiments/EXP-STRATEGY-003.md) | Eight isolated new-game setups retain selected-person group and coordinate results |
 | [FND-STRATEGY-001](../../findings/FND-STRATEGY-001.md) | The strategic pass at 0x0003C290 runs brigands, the spy, the player forces and then the hostile pass |
 | [FND-STRATEGY-003](../../findings/FND-STRATEGY-003.md) | The hostile pass at 0x0003C088 generates first, then moves slots 0 to 4 and resolves each arrival |
 | [FND-STRATEGY-004](../../findings/FND-STRATEGY-004.md) | The hostile generator 0x0003BE58 tries a reactive pursuit, then a timed movement every 5,000 speed units |
@@ -111,6 +112,7 @@ Entries by status.
 | [FND-STRATEGY-046](../../findings/FND-STRATEGY-046.md) | The home-route branch uses the selected route without a seven-home clamp |
 | [FND-STRATEGY-047](../../findings/FND-STRATEGY-047.md) | Home selection passes the drawn index rather than the selected person to fief initialization |
 | [FND-STRATEGY-048](../../findings/FND-STRATEGY-048.md) | Home selection links the selected person twice, with the second call refusing a duplicate |
+| [FND-STRATEGY-049](../../findings/FND-STRATEGY-049.md) | New-game setup retains the selected person's group, rating and coordinate outputs |
 
 ## Open questions
 
