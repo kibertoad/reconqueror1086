@@ -1635,3 +1635,19 @@ Local scripts/status/facts stay under artifacts/; the native recording is
 still pending and is not accepted as a completed traversal. The bounded
 readiness observation supports toolkit proposal #456 for reducing repeated
 host stops, without a claimed speed ratio or native success.
+
+### 2026-10-10 owned timer-wait breakpoint manager controls
+
+The standalone tools/timer_gated_wait.py manager passed its synthetic controls
+with the private interpreter: `python -B tools/test_timer_gated_wait.py` and
+command-scoped PYTHONPATH=tools. They verify preservation of RNG/evidence
+breakpoints, restoration of the original poll boundary, refusal of running
+or foreign state, bounded addresses, and conservative pending/faulted state
+after ambiguous creation/deletion or corrupt breakpoint identities. The helper
+makes no guest-field writes and refuses reuse after a failed RPC.
+
+It is not yet integrated into the native recorder; the existing owned v5
+run and its imported module hashes remain unchanged. A caller must still prove
+the timer boundary and readiness relation, and a future native control must
+verify the optimization before any speed or traversal-completeness claim.
+Toolkit proposal #456 records the reusable boundary.
