@@ -49,28 +49,28 @@ private environment with the hash-locked requirements, never the shared one.
   EVIDENCE_PYTHON=artifacts/validation-python/Scripts/python.exe. Shared session
   0.2.0 published-source Windows suite, adapter, pointer-input, native-recorder
   and terminal-validator checks passed. No full-game gate passed.
-- Active original probe: exec session 27952, controller PID 98544, emulator
-  PID 96568, debugger session ses-1. The quiet combined traversal under
-  artifacts/runtime-tools/native-rng-shared-dubbing-fixed10000-20261010-a owns
+- Active original probe: exec session 11602, controller PID 65940, emulator
+  PID 62364, debugger session ses-1. The quiet combined traversal under
+  artifacts/runtime-tools/native-rng-shared-dubbing-entry-fixed10000-20261010-a owns
   the machine lock. It uses session 0.2.0, normal core and fixed 10000 cycles.
   Observe the same handle; do not launch another probe or remove its lock.
-- Earlier six-cycle, auto-core and GOG-cycle comparisons are terminal and incomplete;
+- Earlier six-cycle, auto-core, GOG-cycle and first shared fixed-cycle comparisons are terminal and incomplete;
   their owned processes and locks were cleaned up. Dated diagnostic limits
   are in docs/VALIDATION.md; captures remain local.
 - Shared lifecycle and guarded writes are adopted from published session 0.2.0
   (PRs #414/#419); obsolete local helper and raw write extension were removed.
-  Native consumer completion remains pending. Toolkit issue #403 received the
-  release/synthetic results; event logging remains issue #409. Verified startup
+  Native traversal completion remains pending. Toolkit issue #403 received the
+  release/synthetic and terminal native consumer results; event logging remains issue #409. Verified startup
   reuse feasibility is tracked in issue #420.
 - Unfinished: repeated youth and dubbing traversal, complete caller ownership,
   prescribed full-game state, two full-game recordings and actual rebuild replay.
 - Blockers: none established. No WIP branch. The pre-existing untracked
   .claude/settings.json remains untouched.
-- Next: finish the owned combined traversal and validate its terminal
+- Next: finish the owned combined traversal with FND-UI-026 entry input guards and validate its terminal
   journal and published 0.2.0 guarded pointer-write record.
   Record process/lock cleanup and send the terminal consumer result to #403.
-- Next: verify six-cycle traversal and dubbing with the terminal validator's
-  matching outcome contracts. Q-UI-044 retains the sample-identity question.
+- Next: verify youth traversal and dubbing with the terminal validator's
+  matching outcome contracts; resolve any observed cycle-count mismatch before accepting completion.
 - Next: Q-STRATEGY-043 / RULE-STRATEGY-012 downstream consumer review.
 - Next: Q-RNG-001 / RULE-RNG-001 seed-source provenance where required.
 - Next: verify two prescribed full-game recordings and trace completeness,
