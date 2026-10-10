@@ -44,35 +44,28 @@ private environment with the hash-locked requirements, never the shared one.
 
 ## Handover
 
-- Stage: Survey; research-side runtime tooling session.
+- Stage: Survey; research-side runtime tooling.
 - Last gate: 2026-10-10 canonical -NoRestore validation passed with
   EVIDENCE_PYTHON=artifacts/validation-python-latest/Scripts/python.exe,
-  engine 18.0.0 and session 0.3.0. Published-session Windows tests and consumer
-  recorder/input/event-log/terminal-validator controls passed. No full-game gate passed.
-- Active original probe: exec session 8919, controller PID 87724, emulator
-  PID 43948, session token 02075155a048, debugger session ses-1. The quiet
-  startup control under artifacts/runtime-tools/native-rng-session03-startup-fixed10000-20261010-a
-  owns the machine lock. It uses session 0.3.0, normal core and fixed 10000 cycles.
-  Observe the same handle; do not launch another probe or remove its lock.
-- Earlier six-cycle, auto-core, GOG-cycle, entry-control and AGE comparisons
-  are terminal and incomplete; their owned processes and locks were cleaned up.
-  EXP-UI-001 records the narrow successful entry-control observation.
-  Q-PERSON-021 remains open; the newer AGE capture and transport diagnostic
-  remain local. No WIP branch.
-- Shared lifecycle, guarded writes, event logging and module hashes are adopted
-  from published session 0.3.0. Toolkit issues #385, #388 and #392 were validated
-  and closed. #403 received synthetic logging-adoption results and remains open
-  for the native startup control. Verified checkpoint reuse remains deferred in #420.
-- Unfinished: native 0.3.0 startup verification, Q-PERSON-021 reconciliation,
-  repeated youth/dubbing traversal, complete caller ownership, prescribed full-game
-  state, two full-game recordings and actual rebuild replay.
+  executable-reader 4.0.0, engine 18.2.0, checker 4.2.0 and session 0.3.0.
+  No full-game gate passed.
+- Original probes are terminal. The session 0.3.0 startup control and its
+  package-log/journal verification passed; owned processes exited and the
+  machine lock was absent. No original session remains owned by this task.
+- Q-PERSON-021 is closed. FND-PERSON-012, FND-PERSON-013,
+  EXP-PERSON-001, EXP-PERSON-002 and RULE-PERSON-007 are committed;
+  Q-PERSON-022 remains open. EXP-UI-001 remains the entry-control reference.
+- Toolkit issues #385, #388, #392 and #403 were consumer-validated and closed.
+  PR #419 is adopted. #402, #412, #413 and #420 remain open with their
+  original-game confirmation, feature or upstream prerequisites unresolved.
+- Unfinished: recorder completion-contract reconciliation, repeated
+  youth/dubbing traversal, complete caller ownership, prescribed full-game
+  state, two full-game recordings and actual rebuild replay. No WIP branch.
 - Blockers: none established. The pre-existing untracked .claude/settings.json
   remains untouched. No push is authorized.
-- Next: finish the owned 0.3.0 startup control, validate the package log and
-  matching terminal journal, audit cleanup, and provide the native result to #403.
-- Next: Q-PERSON-021 / RULE-PERSON-004 reconciliation before changing the
-  recorder's prescribed completion contract.
+- Next: RULE-PERSON-004 / RULE-PERSON-007 recorder completion-contract tooling.
+- Next: Q-PERSON-022 lifecycle review.
 - Next: Q-STRATEGY-043 / RULE-STRATEGY-012 downstream consumer review.
 - Next: Q-RNG-001 / RULE-RNG-001 seed-source provenance where required.
-- Next: two prescribed full-game recordings and trace completeness, followed
-  by actual draw-by-draw rebuild replay. Startup controls do not satisfy this.
+- Next: prescribed full-game recordings and trace completeness, followed
+  by actual draw-by-draw rebuild replay.
