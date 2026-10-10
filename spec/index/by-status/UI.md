@@ -65,7 +65,7 @@ Entries by status.
 
 ## recorded
 
-20 entries.
+21 entries.
 
 | ID | Title |
 |---|---|
@@ -89,6 +89,7 @@ Entries by status.
 | [FND-UI-018](../../findings/FND-UI-018.md) | Startup performs display preparation before testing the animation switch and entering the initial screen loader |
 | [FND-UI-019](../../findings/FND-UI-019.md) | Startup preparation waits on the battle clock and lets a click or key end the wait |
 | [FND-UI-020](../../findings/FND-UI-020.md) | Title callbacks replace the current screen and the replacement loader returns after its history update |
+| [FND-UI-021](../../findings/FND-UI-021.md) | Youth Continue and Reroll bind file-order indices rather than stored region IDs |
 
 ## Open questions
 
