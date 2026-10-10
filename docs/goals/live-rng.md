@@ -49,14 +49,15 @@ private environment with the hash-locked requirements, never the shared one.
   EVIDENCE_PYTHON=artifacts/validation-python-latest/Scripts/python.exe,
   executable-reader 4.0.0, engine 18.2.0, checker 4.2.0 and session 0.3.0.
   No full-game gate passed.
-- Active original control: exec 69289, controller PID 326496, emulator
-  PID 327628, token 81661d89db22, debugger ses-1, under
-  artifacts/runtime-tools/native-rng-youth-v4-fixed10000-20261010-a.
-  It owns the machine lock and uses quiet normal-core fixed 10000 cycles,
-  session 0.3.0, v4 AGE checkpoints, five cycles and guarded dubbing input.
-  Observe the same handle; do not restart or remove its lock.
+- Active original control: exec 19256, controller PID 59896, emulator
+  PID 80336, token 5007366d0cf2, debugger ses-1, under
+  artifacts/runtime-tools/native-rng-youth-v5-fixed100000-20261010-a.
+  It owns the machine lock and uses quiet normal-core fixed 100000 cycles,
+  session 0.3.0, v5 AGE checkpoints, five cycles and guarded entry/update
+  traversal. Observe the same handle; do not restart or remove its lock.
 - Earlier original controls are terminal; owned processes and locks were
-  cleaned up. The session 0.3.0 startup log/journal verification passed.
+  cleaned up. EXP-UI-002 and FND-UI-027 are committed. The v4 control
+  ended incomplete; its failure log/journal and numeric-prefix checks passed.
 - Q-PERSON-021 is closed. FND-PERSON-012, FND-PERSON-013,
   EXP-PERSON-001, EXP-PERSON-002 and RULE-PERSON-007 are committed;
   Q-PERSON-022 remains open. EXP-UI-001 remains the entry-control reference.
@@ -65,14 +66,14 @@ private environment with the hash-locked requirements, never the shared one.
 - Toolkit issues #385, #388, #392 and #403 were consumer-validated and closed.
   PR #419 is adopted. #402, #412, #413 and #420 remain open with their
   original-game confirmation, feature or upstream prerequisites unresolved.
-- The AGE-checked v4 recorder contract and its synthetic controls are
-  committed. Canonical validation passed; fresh native validation is running.
+- The AGE-checked v4 and registered-update v5 tooling contracts are committed.
+  Canonical validation and final consumer controls passed; native v5 is running.
 - Unfinished: native youth/dubbing traversal, complete caller ownership, prescribed full-game
   state, two full-game recordings and actual rebuild replay. No WIP branch.
 - Blockers: none established. The pre-existing untracked .claude/settings.json
   remains untouched. No push is authorized.
-- Next: observe and verify the owned v4 native control for
-  RULE-PERSON-004 / RULE-PERSON-007.
+- Next: observe and verify the owned v5 native control for
+  RULE-PERSON-004 / SCR-UI-019.
 - Next: Q-PERSON-022 lifecycle review.
 - Next: Q-STRATEGY-043 / RULE-STRATEGY-012 downstream consumer review.
 - Next: Q-RNG-001 / RULE-RNG-001 seed-source provenance where required.
