@@ -1,13 +1,13 @@
 {
   "repository": "kibertoad/refurbished-dinosaurs-toolkit",
-  "revision": "e150fc1153c5572a71f3c9c1174bf75666212c88",
+  "revision": "889294a5c832a79a141f845b218fe88c92873590",
   "packages": {
     "@scientific-method/executable-reader": "4.0.0",
     "@scientific-method/standard-checker": "4.2.0"
   },
-  "engine": "18.2.0",
+  "engine": "18.3.0",
   "dosbox_session": {
-    "version": "0.3.0",
-    "revision": "ab984cbe6ef7522306098ea91290c49cdf1348da"
+    "version": "0.4.0",
+    "revision": "884a3cc755b7069e3f87a38f189b77fefb88a1f8"
   }
 }

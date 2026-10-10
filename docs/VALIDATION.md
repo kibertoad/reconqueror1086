@@ -1651,3 +1651,20 @@ run and its imported module hashes remain unchanged. A caller must still prove
 the timer boundary and readiness relation, and a future native control must
 verify the optimization before any speed or traversal-completeness claim.
 Toolkit proposal #456 records the reusable boundary.
+
+### 2026-10-10 engine 18.3.0 and session 0.4.0 adoption
+
+The hash-locked releases were installed into the separate private interpreter
+artifacts/validation-python-183-session04/Scripts/python.exe. Frozen pnpm
+installation and canonical Invoke-Validation.ps1 -NoRestore passed with this
+command-scoped EVIDENCE_PYTHON. The build passed without warnings or errors.
+The downstream transport, supported-input, recorder, recording-validator,
+event-log, dubbing, AGE and timer-wait suites passed 118 controls. All 87 tests
+from the hash-verified published session 0.4.0 source distribution also passed,
+including its Windows process-ownership controls using stand-in processes.
+Logs remain under artifacts/shared-183-04-* and session-040-source-tests.log.
+
+The active native v5 recording retains its original session 0.3.0 interpreter
+and imported modules. These synthetic ownership controls do not replace the
+original-game killed-owner acceptance check on toolkit issue #416. Issue #413
+also retains its original consumer-specific inventory confirmation requirement.
