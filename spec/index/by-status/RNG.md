@@ -22,7 +22,7 @@ Entries by status.
 
 ## recorded
 
-10 entries.
+11 entries.
 
 | ID | Title |
 |---|---|
@@ -36,6 +36,7 @@ Entries by status.
 | [FND-RNG-006](../../findings/FND-RNG-006.md) | Calendar seed conversion consults the DOS environment before applying adjustments |
 | [FND-RNG-007](../../findings/FND-RNG-007.md) | The environment adjustment parser consumes a bounded name and wrapping hours, minutes and seconds |
 | [FND-RNG-008](../../findings/FND-RNG-008.md) | Environment suffix parsing writes selector-dependent record fields and default clock components |
+| [FND-RNG-009](../../findings/FND-RNG-009.md) | Seed conversion uses common-year and leap-year cumulative month-day tables |
 
 ## Open questions
 

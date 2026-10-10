@@ -4,7 +4,7 @@ title: The game's random number generator
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-RNG-002, FND-RNG-003, FND-RNG-004, FND-RNG-006, FND-RNG-007, FND-RNG-008, EXP-RNG-001, EXP-RNG-002, EXP-RNG-003, FND-ASSAULT-031, FND-SAVE-006, FND-SOUND-003]
+evidence: [FND-RNG-002, FND-RNG-003, FND-RNG-004, FND-RNG-006, FND-RNG-007, FND-RNG-008, FND-RNG-009, EXP-RNG-001, EXP-RNG-002, EXP-RNG-003, FND-ASSAULT-031, FND-SAVE-006, FND-SOUND-003]
 conflicting: []
 split_with: []
 related: [RULE-TALK-001, RULE-SOUND-002]
@@ -95,5 +95,6 @@ None known.
   its shipped adjustment values do not establish the values after startup.
   FND-RNG-007 and EXP-RNG-002 cover the isolated name/adjustment helper;
   FND-RNG-008 and EXP-RNG-003 cover the suffix parser's partial record writes.
+  FND-RNG-009 maps the converter's two month tables with a positive control.
   Suffix-rule consumers, environment initialization and calendar record normalization
   still prevent a complete conversion interpretation.

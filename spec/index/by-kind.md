@@ -344,7 +344,7 @@ Entries by kind.
 
 ## findings
 
-328 entries.
+329 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -545,6 +545,7 @@ Entries by kind.
 | [FND-RNG-006](../findings/FND-RNG-006.md) | Calendar seed conversion consults the DOS environment before applying adjustments | recorded |
 | [FND-RNG-007](../findings/FND-RNG-007.md) | The environment adjustment parser consumes a bounded name and wrapping hours, minutes and seconds | recorded |
 | [FND-RNG-008](../findings/FND-RNG-008.md) | Environment suffix parsing writes selector-dependent record fields and default clock components | recorded |
+| [FND-RNG-009](../findings/FND-RNG-009.md) | Seed conversion uses common-year and leap-year cumulative month-day tables | recorded |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV | recorded |
 | [FND-SAVE-002](../findings/FND-SAVE-002.md) | A save writes ten temporary files and packs them with a title and version into one resource container | recorded |
 | [FND-SAVE-003](../findings/FND-SAVE-003.md) | A load checks VERSION 2.1, unpacks the entries and runs the component loaders; temp.jap must be present | recorded |

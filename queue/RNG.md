@@ -19,6 +19,9 @@ Next ID: Q-RNG-002
   FND-RNG-008 and EXP-RNG-003 cover the suffix parser's selectors, partial
   record writes, default clock components and remaining input. Its calendar
   classification consumers and their initialization still need completion.
+  FND-RNG-009 records the common/leap cumulative month tables through their
+  shipped file locations, with the previously recorded environment key as
+  a positive control. Classification, normalization and initialization remain.
 
 ## Emulated call
 
