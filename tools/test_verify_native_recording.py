@@ -110,6 +110,48 @@ class NativeVerificationTests(unittest.TestCase):
         with self.assertRaises(json.JSONDecodeError):
             self.check()
 
+    def youth_report(self, cycles):
+        screen = 6 if cycles == 6 else 3
+        return {**self.report,
+                'status': 'youth-continue-return-reached' if cycles == 1 else 'youth-sequence-return-reached',
+                'completed_youth_cycles': cycles,
+                'screen_observation': {'screen_id': screen, 'history': [screen, 2, 1, 0, -1]}}
+
+    def test_prescribed_cycles_and_dubbing_endpoint(self):
+        for cycles in range(1, 7):
+            report = self.youth_report(cycles)
+            self.write(report)
+            result = verify(self.path, report['status'], cycles)
+            self.assertEqual(result['completed_youth_cycles'], cycles)
+            self.assertEqual(result['screen_id'], 6 if cycles == 6 else 3)
+
+    def test_missing_mismatched_and_noninteger_cycle_count_rejected(self):
+        for value in (None, 5, True, 6.0, '6'):
+            report = {**self.youth_report(6), 'completed_youth_cycles': value}
+            self.write(report)
+            with self.assertRaisesRegex(RecordingError, 'requested youth cycles'):
+                verify(self.path, report['status'], 6)
+
+    def test_wrong_or_missing_endpoint_screen_and_history_rejected(self):
+        for cycles in (1, 6):
+            report = self.youth_report(cycles)
+            for observation in (None, {}, {'screen_id': 3 if cycles == 6 else 6, 'history': [3] * 5},
+                                {'screen_id': report['screen_observation']['screen_id'], 'history': []},
+                                {'screen_id': report['screen_observation']['screen_id'], 'history': [2] * 5}):
+                self.write({**report, 'screen_observation': observation})
+                with self.assertRaisesRegex(RecordingError, 'screen'):
+                    verify(self.path, report['status'], cycles)
+
+    def test_cycle_request_requires_valid_count_and_matching_boundary(self):
+        for value in (0, 7, True, 1.5):
+            with self.assertRaisesRegex(RecordingError, 'integer'):
+                verify(self.path, 'youth-sequence-return-reached', value)
+        for status, cycles in (('youth-answer-return-reached', 1),
+                               ('youth-continue-return-reached', 6),
+                               ('youth-sequence-return-reached', 1)):
+            with self.assertRaisesRegex(RecordingError, 'corresponding Continue boundary'):
+                verify(self.path, status, cycles)
+
 
 if __name__ == '__main__':
     unittest.main()

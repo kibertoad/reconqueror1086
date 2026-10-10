@@ -423,6 +423,7 @@ event order and numeric RNG replay with an explicit expected boundary:
 
 ```powershell
 python -B tools/verify_native_recording.py artifacts/runtime-tools/continue-fresh --expect-status youth-continue-return-reached
+python -B tools/verify_native_recording.py artifacts/runtime-tools/six-cycles-fresh --expect-status youth-sequence-return-reached --expect-youth-cycles 6
 python -B tools/test_verify_native_recording.py
 ```
 
@@ -433,6 +434,14 @@ do not amend a capture to satisfy the check. File reads are bounded. This check
 does not establish process cleanup, original trace completeness, input reachability
 or replay against the rebuild; check those separately. Diagnostic journals must
 keep full-game and accepted-caller completeness false.
+
+Use `--expect-youth-cycles N` to additionally require the exact completed-cycle
+count and endpoint screen identity/history head. For one through five cycles the
+endpoint remains youth; six requires dubbing. A cycle-count expectation of one
+requires the Continue-return status; larger counts require the sequence-return
+status. This checks recorded boundary data, not the screen's pixels or all youth
+outcomes. Without that option, the command checks terminal status and event
+consistency only and makes no cycle-count or endpoint claim.
 
 Tool edits do not update Python modules already loaded by a running probe.
 Finish observing that run under its original code, and test the new version

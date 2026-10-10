@@ -2,6 +2,15 @@
 
 ## Checker 4.1.1 and quiet probes (2026-10-10)
 
+2026-10-10: the terminal validator's prescribed-youth-cycle checks passed
+synthetic acceptance cases for one through six cycles and refusal cases for
+missing, wrong or noninteger counts, incompatible status requests and absent
+or mismatched endpoint screen/history head. Rechecking
+`native-rng-youth-continue-20261010-b` with `--expect-youth-cycles 1` passed
+and retained the 34-event durable/numeric agreement, one completed Continue
+and youth screen identity. Six-cycle native verification remains pending;
+synthetic acceptance of its endpoint does not verify original traversal.
+
 2026-10-10: `native-rng-youth-continue-20261010-b` passed the matching
 Continue callback return after verified screen returns 0, 1, 2 and 3 and the
 first-answer return. The terminal validator confirmed that all 34 events agree
