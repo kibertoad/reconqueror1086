@@ -70,13 +70,20 @@ private environment with the hash-locked requirements, never the shared one.
 - Shared Python drift was bypassed with the existing private environment after
   hash-locked installation. The template improvement is issue #94:
   https://github.com/kibertoad/refurbished-dinosaurs-template/issues/94.
+- The GUI exit-status regression was reproduced and fixed with owned Process
+  startup and concurrent output draining. The focused controls and full fast
+  gate passed. The upstream report and local positive control are issue #95:
+  https://github.com/kibertoad/refurbished-dinosaurs-template/issues/95.
 - Next: finish observing the active six-cycle probe and run
   tools/verify_native_recording.py with --expect-status youth-sequence-return-reached
   --expect-youth-cycles 6. Its cycle/endpoint guards and the one-cycle native
   positive control passed; six-cycle original traversal remains unverified.
-  inspect matching cycle count, dubbing screen identity and process/lock cleanup.
-- Next: supported dubbing-to-village input instrumentation from FND-UI-024 and
-  SCR-UI-019. Q-UI-044 retains the sample-identity question separately.
+  Inspect matching cycle count, dubbing screen identity and process/lock cleanup.
+- Next: after the current owned run reaches a terminal state, verify a fresh
+  --dubbing-click run using the six-cycle command with that additional option.
+  Its readiness/callback guards and schema-v2 outcome have synthetic checks;
+  actual traversal remains unverified. Validate with --expect-status
+  dubbing-return-reached --expect-youth-cycles 6. Q-UI-044 retains sample identity.
 - Next: Q-STRATEGY-043 / RULE-STRATEGY-012 downstream consumer review;
   Q-RNG-001 / RULE-RNG-001 seed-source provenance when required.
 - Next: verify two prescribed full-game recordings and trace completeness,
