@@ -54,15 +54,20 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
 - The quiet generation probe passed screen 3 return, durable-log agreement and
   numeric replay, including its initial RULE-PERSON-003 draw. Session 88537
   completed; the owned emulator/controller exited and the machine lock is absent.
-  Shutdown's pending transport diagnostic is retained locally. No active probe.
+  Shutdown's pending transport diagnostic is retained locally.
+- An owned quiet first-youth-answer probe is active in unified session 92758,
+  output native-rng-youth-answer-20261010-a. Preserve its existing operation
+  and machine lock; its source fingerprints identify the loaded controllers.
 - Unfinished: native dilemma traversal, complete rule ownership,
   prescribed gameplay state and full-game recording/replay. Shared helper
   extraction is not implemented. The proposal is toolkit issue #403, linked
   from docs/dosbox-x-helper-proposal.md.
 - Blockers: none established. RUNTIME.md is the capability assessment. Audio
   remains muted except for an explicit sound investigation. No WIP branch.
-- Next: add guarded youth-answer/Continue reachability and test the next native
-  boundary. Keep unknown callers rejected and journals incomplete.
+- Next: observe session 92758 for its answer return or rejected caller, then
+  add guarded Continue reachability. Keep unknown callers rejected and journals
+  incomplete. The answer stage stops at its matching callback return and does
+  not yet queue Continue. Its synthetic native-recorder gate passed 35 tests.
 - Extend supported input reachability from FND-UI-020, SCR-UI-002/003 and
   FND-PERSON-004. The three dilemma caller policies have synthetic validation;
   initial dilemma traversal passed; Continue and Reroll remain unverified.
