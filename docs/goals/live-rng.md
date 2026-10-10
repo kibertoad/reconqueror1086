@@ -51,9 +51,13 @@ private environment with the hash-locked requirements, never the shared one.
   hash-pinned validation interpreter; its build and test artifacts are local.
 - Continue verification finished successfully; its terminal journal check,
   cleanup and limits are recorded in docs/VALIDATION.md. No full-game gate passed.
-- No active original probe. The six-cycle attempt is terminal and incomplete;
-  its owned controller, emulator and run lock have been cleaned up. Diagnostics
-  remain under artifacts/runtime-tools/native-rng-youth-six-cycles-20261010-a.
+- Active original probe: exec session 40292, controller PID 25284, emulator
+  PID 33764, debugger session ses-1. The quiet six-cycle attempt under
+  artifacts/runtime-tools/native-rng-youth-six-cycles-20261010-b owns the run
+  lock and includes the FND-UI-025 preparation-service return guards.
+  Observe the same handle; do not launch a second probe or remove its lock.
+  The earlier attempt is terminal and incomplete; its owned processes and lock
+  were cleaned up. Diagnostics remain in its local capture directory.
   Repeated-cycle and dubbing verification remain pending.
 - Unfinished: repeated youth traversal, complete caller
   ownership, prescribed full-game state, two full-game recordings and actual
@@ -68,7 +72,7 @@ private environment with the hash-locked requirements, never the shared one.
   startup and concurrent output draining. The focused controls and full fast
   gate passed. The upstream report and local positive control are issue #95:
   https://github.com/kibertoad/refurbished-dinosaurs-template/issues/95.
-- Next: add preparation-service checkpoints before a fresh six-cycle probe; run
+- Next: observe the active six-cycle probe through its preparation checkpoints; run
   tools/verify_native_recording.py with --expect-status youth-sequence-return-reached
   --expect-youth-cycles 6. Its cycle/endpoint guards and the one-cycle native
   positive control passed; six-cycle original traversal remains unverified.
