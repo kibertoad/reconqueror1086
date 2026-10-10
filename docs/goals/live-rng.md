@@ -60,6 +60,8 @@ private environment with the hash-locked requirements, never the shared one.
 - Q-PERSON-021 is closed. FND-PERSON-012, FND-PERSON-013,
   EXP-PERSON-001, EXP-PERSON-002 and RULE-PERSON-007 are committed;
   Q-PERSON-022 remains open. EXP-UI-001 remains the entry-control reference.
+- Q-STRATEGY-043 remains open after FND-STRATEGY-049 and EXP-STRATEGY-003.
+  RULE-STRATEGY-012 remains disputed. Documentation and evidence checks passed.
 - Toolkit issues #385, #388, #392 and #403 were consumer-validated and closed.
   PR #419 is adopted. #402, #412, #413 and #420 remain open with their
   original-game confirmation, feature or upstream prerequisites unresolved.
@@ -76,3 +78,4 @@ private environment with the hash-locked requirements, never the shared one.
 - Next: Q-RNG-001 / RULE-RNG-001 seed-source provenance where required.
 - Next: prescribed full-game recordings and trace completeness, followed
   by actual draw-by-draw rebuild replay.
+
