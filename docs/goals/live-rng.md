@@ -39,39 +39,40 @@ observe the guest-written drive-setup marker before starting the original.
 Debugger memory commands require numeric addresses and explicit dump filenames.
 The default Python environment is shared with toolkit development and may hold
 an editable engine. Use command-scoped EVIDENCE_PYTHON pointing to
-artifacts/validation-python/Scripts/python.exe for evidence gates; update that
+artifacts/validation-python-latest/Scripts/python.exe for evidence gates; update that
 private environment with the hash-locked requirements, never the shared one.
 
 ## Handover
 
 - Stage: Survey; research-side runtime tooling session.
-- Last gate: 2026-10-10 canonical validation with -NoRestore passed using
-  EVIDENCE_PYTHON=artifacts/validation-python/Scripts/python.exe. Shared session
-  0.2.0 published-source Windows suite, adapter, pointer-input, native-recorder
-  and terminal-validator checks passed. No full-game gate passed.
-- Active original probe: exec session 11602, controller PID 65940, emulator
-  PID 62364, debugger session ses-1. The quiet combined traversal under
-  artifacts/runtime-tools/native-rng-shared-dubbing-entry-fixed10000-20261010-a owns
-  the machine lock. It uses session 0.2.0, normal core and fixed 10000 cycles.
+- Last gate: 2026-10-10 canonical -NoRestore validation passed with
+  EVIDENCE_PYTHON=artifacts/validation-python-latest/Scripts/python.exe,
+  engine 18.0.0 and session 0.3.0. Published-session Windows tests and consumer
+  recorder/input/event-log/terminal-validator controls passed. No full-game gate passed.
+- Active original probe: exec session 8919, controller PID 87724, emulator
+  PID 43948, session token 02075155a048, debugger session ses-1. The quiet
+  startup control under artifacts/runtime-tools/native-rng-session03-startup-fixed10000-20261010-a
+  owns the machine lock. It uses session 0.3.0, normal core and fixed 10000 cycles.
   Observe the same handle; do not launch another probe or remove its lock.
-- Earlier six-cycle, auto-core, GOG-cycle and first shared fixed-cycle comparisons are terminal and incomplete;
-  their owned processes and locks were cleaned up. Dated diagnostic limits
-  are in docs/VALIDATION.md; captures remain local.
-- Shared lifecycle and guarded writes are adopted from published session 0.2.0
-  (PRs #414/#419); obsolete local helper and raw write extension were removed.
-  Native traversal completion remains pending. Toolkit issue #403 received the
-  release/synthetic and terminal native consumer results; event logging remains issue #409. Verified startup
-  reuse feasibility is tracked in issue #420.
-- Unfinished: repeated youth and dubbing traversal, complete caller ownership,
-  prescribed full-game state, two full-game recordings and actual rebuild replay.
-- Blockers: none established. No WIP branch. The pre-existing untracked
-  .claude/settings.json remains untouched.
-- Next: finish the owned combined traversal with FND-UI-026 entry input guards and validate its terminal
-  journal and published 0.2.0 guarded pointer-write record.
-  Record process/lock cleanup and send the terminal consumer result to #403.
-- Next: verify youth traversal and dubbing with the terminal validator's
-  matching outcome contracts; resolve any observed cycle-count mismatch before accepting completion.
+- Earlier six-cycle, auto-core, GOG-cycle, entry-control and AGE comparisons
+  are terminal and incomplete; their owned processes and locks were cleaned up.
+  EXP-UI-001 records the narrow successful entry-control observation.
+  Q-PERSON-021 remains open; the newer AGE capture and transport diagnostic
+  remain local. No WIP branch.
+- Shared lifecycle, guarded writes, event logging and module hashes are adopted
+  from published session 0.3.0. Toolkit issues #385, #388 and #392 were validated
+  and closed. #403 received synthetic logging-adoption results and remains open
+  for the native startup control. Verified checkpoint reuse remains deferred in #420.
+- Unfinished: native 0.3.0 startup verification, Q-PERSON-021 reconciliation,
+  repeated youth/dubbing traversal, complete caller ownership, prescribed full-game
+  state, two full-game recordings and actual rebuild replay.
+- Blockers: none established. The pre-existing untracked .claude/settings.json
+  remains untouched. No push is authorized.
+- Next: finish the owned 0.3.0 startup control, validate the package log and
+  matching terminal journal, audit cleanup, and provide the native result to #403.
+- Next: Q-PERSON-021 / RULE-PERSON-004 reconciliation before changing the
+  recorder's prescribed completion contract.
 - Next: Q-STRATEGY-043 / RULE-STRATEGY-012 downstream consumer review.
 - Next: Q-RNG-001 / RULE-RNG-001 seed-source provenance where required.
-- Next: verify two prescribed full-game recordings and trace completeness,
-  then actual draw-by-draw rebuild replay. Startup checks do not satisfy this.
+- Next: two prescribed full-game recordings and trace completeness, followed
+  by actual draw-by-draw rebuild replay. Startup controls do not satisfy this.
