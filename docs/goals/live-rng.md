@@ -72,13 +72,16 @@ never update the shared environment.
   ownership controls passed, without a new original-game killed-owner run. The flat
   isolated-call segment-model controls are committed; their reusable setup
   result was added to existing toolkit issue #7 after duplicate checking.
-- Q-RNG-001 remains open after FND-RNG-007 through FND-RNG-011 and
-  EXP-RNG-002 through EXP-RNG-004. Documentation, isolated controls and
+- Q-RNG-001 remains open after FND-RNG-007 through FND-RNG-013 and
+  EXP-RNG-002 through EXP-RNG-006. Documentation, isolated controls and
   evidence/package checks passed; RULE-RNG-001 remains supported.
 - Toolkit #456 records the timer-gated readiness proposal. The standalone owned
   breakpoint manager passed synthetic controls but is not integrated into v5.
   The active recording remains pending; its coherent read-only readiness
   diagnostic does not establish a completed traversal or a speed ratio.
+  Later coherent readiness showed three elapsed ticks against four required.
+  The proposed upstream PR #458 refuses protected-mode guests; this owned
+  consumer reports protected mode. Additional facts were sent to #456.
 - The AGE-checked v4 and registered-update v5 tooling contracts are committed.
   Canonical validation and final consumer controls passed; native v5 is running.
 - Unfinished: native youth/dubbing traversal, complete caller ownership, prescribed full-game
