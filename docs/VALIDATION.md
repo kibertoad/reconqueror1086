@@ -1592,3 +1592,14 @@ isolated original-function experiment, not a rebuild comparison listed in a
 validated parity row; the latter's `validation/` run-file workflow does not
 apply. The initial fixture was missing its required experiment identifier;
 adding it and rerunning the experiment and checker resolved that failure.
+
+### 2026-10-10 isolated seed-suffix record parser
+
+With GAME_DIR=analysis/original and the private hashed interpreter,
+`tools/emu/verify_seed_suffix.py --output artifacts/seed-suffix-controls.json`
+passed. FND-RNG-008 and EXP-RNG-003 record the parser, authored initial/output
+words, returned positions and unchanged-field cases. Whole fabricated RAM,
+instruction paths and record/stack write bounds passed without a service or
+hardware stub. The documentation check passed; the complete calendar and
+classification consumers remain under Q-RNG-001. No native game or rebuild
+comparison ran for this experiment and no parity status changed.

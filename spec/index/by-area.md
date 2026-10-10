@@ -776,6 +776,7 @@ Entries by area.
 |---|---|---|
 | [EXP-RNG-001](../experiments/EXP-RNG-001.md) | Native startup character shifts yield thirty ordered rule-tagged draws from each recorded seed | recorded |
 | [EXP-RNG-002](../experiments/EXP-RNG-002.md) | Isolated environment adjustment parsing preserves missing values and wraps numeric components | recorded |
+| [EXP-RNG-003](../experiments/EXP-RNG-003.md) | Isolated suffix parsing retains unselected fields and supplies default clock components | recorded |
 | [FND-RNG-001](../findings/FND-RNG-001.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | superseded |
 | [FND-RNG-002](../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice | recorded |
 | [FND-RNG-003](../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 | recorded |
@@ -783,4 +784,5 @@ Entries by area.
 | [FND-RNG-005](../findings/FND-RNG-005.md) | The seed source reads DOS calendar time and rounds its seconds before conversion | recorded |
 | [FND-RNG-006](../findings/FND-RNG-006.md) | Calendar seed conversion consults the DOS environment before applying adjustments | recorded |
 | [FND-RNG-007](../findings/FND-RNG-007.md) | The environment adjustment parser consumes a bounded name and wrapping hours, minutes and seconds | recorded |
+| [FND-RNG-008](../findings/FND-RNG-008.md) | Environment suffix parsing writes selector-dependent record fields and default clock components | recorded |
 | [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number generator | supported |

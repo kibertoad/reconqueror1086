@@ -344,7 +344,7 @@ Entries by kind.
 
 ## findings
 
-327 entries.
+328 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -544,6 +544,7 @@ Entries by kind.
 | [FND-RNG-005](../findings/FND-RNG-005.md) | The seed source reads DOS calendar time and rounds its seconds before conversion | recorded |
 | [FND-RNG-006](../findings/FND-RNG-006.md) | Calendar seed conversion consults the DOS environment before applying adjustments | recorded |
 | [FND-RNG-007](../findings/FND-RNG-007.md) | The environment adjustment parser consumes a bounded name and wrapping hours, minutes and seconds | recorded |
+| [FND-RNG-008](../findings/FND-RNG-008.md) | Environment suffix parsing writes selector-dependent record fields and default clock components | recorded |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV | recorded |
 | [FND-SAVE-002](../findings/FND-SAVE-002.md) | A save writes ten temporary files and packs them with a title and version into one resource container | recorded |
 | [FND-SAVE-003](../findings/FND-SAVE-003.md) | A load checks VERSION 2.1, unpacks the entries and runs the component loaders; temp.jap must be present | recorded |
@@ -678,7 +679,7 @@ Entries by kind.
 
 ## experiments
 
-9 entries.
+10 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -686,6 +687,7 @@ Entries by kind.
 | [EXP-PERSON-002](../experiments/EXP-PERSON-002.md) | A fresh youth traversal observes AGE 13 before its first answer and AGE 18 after five | recorded |
 | [EXP-RNG-001](../experiments/EXP-RNG-001.md) | Native startup character shifts yield thirty ordered rule-tagged draws from each recorded seed | recorded |
 | [EXP-RNG-002](../experiments/EXP-RNG-002.md) | Isolated environment adjustment parsing preserves missing values and wraps numeric components | recorded |
+| [EXP-RNG-003](../experiments/EXP-RNG-003.md) | Isolated suffix parsing retains unselected fields and supplies default clock components | recorded |
 | [EXP-STRATEGY-001](../experiments/EXP-STRATEGY-001.md) | Drawn home indices leave fabricated fief lists unchanged while person 28 initializes them | recorded |
 | [EXP-STRATEGY-002](../experiments/EXP-STRATEGY-002.md) | All eight isolated home selections preserve the chosen person through their actual callees | recorded |
 | [EXP-STRATEGY-003](../experiments/EXP-STRATEGY-003.md) | Eight isolated new-game setups retain selected-person group and coordinate results | recorded |

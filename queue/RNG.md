@@ -16,6 +16,9 @@ Next ID: Q-RNG-002
   FND-RNG-007 and EXP-RNG-002 cover the name/adjustment helper, missing-number
   preservation, clipped names and wrapping numeric components. Suffix syntax,
   environment initialization, calendar tables and record normalization remain.
+  FND-RNG-008 and EXP-RNG-003 cover the suffix parser's selectors, partial
+  record writes, default clock components and remaining input. Its calendar
+  classification consumers and their initialization still need completion.
 
 ## Emulated call
 

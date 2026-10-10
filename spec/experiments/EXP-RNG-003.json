@@ -1,0 +1,541 @@
+{
+  "experiment": "EXP-RNG-003",
+  "cases": [
+    {
+      "case": "empty",
+      "input": "",
+      "initial_words": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "output_words": [
+        0,
+        0,
+        2,
+        104,
+        105,
+        106,
+        107,
+        0,
+        -1
+      ],
+      "consumed": 0,
+      "remainder": ""
+    },
+    {
+      "case": "numeric",
+      "input": "60",
+      "initial_words": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "output_words": [
+        0,
+        0,
+        2,
+        104,
+        105,
+        106,
+        107,
+        60,
+        -1
+      ],
+      "consumed": 2,
+      "remainder": ""
+    },
+    {
+      "case": "julian",
+      "input": "J60",
+      "initial_words": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "output_words": [
+        0,
+        0,
+        2,
+        104,
+        105,
+        106,
+        107,
+        60,
+        1
+      ],
+      "consumed": 3,
+      "remainder": ""
+    },
+    {
+      "case": "month",
+      "input": "M3.2.0",
+      "initial_words": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "output_words": [
+        0,
+        0,
+        2,
+        2,
+        2,
+        106,
+        0,
+        0,
+        0
+      ],
+      "consumed": 6,
+      "remainder": ""
+    },
+    {
+      "case": "month-only",
+      "input": "M3",
+      "initial_words": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "output_words": [
+        0,
+        0,
+        2,
+        104,
+        2,
+        106,
+        107,
+        0,
+        0
+      ],
+      "consumed": 2,
+      "remainder": ""
+    },
+    {
+      "case": "month-one-dot",
+      "input": "M3.2",
+      "initial_words": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "output_words": [
+        0,
+        0,
+        2,
+        2,
+        2,
+        106,
+        107,
+        0,
+        0
+      ],
+      "consumed": 4,
+      "remainder": ""
+    },
+    {
+      "case": "empty-month",
+      "input": "M",
+      "initial_words": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "output_words": [
+        0,
+        0,
+        2,
+        104,
+        -1,
+        106,
+        107,
+        0,
+        0
+      ],
+      "consumed": 1,
+      "remainder": ""
+    },
+    {
+      "case": "empty-dot-fields",
+      "input": "M..",
+      "initial_words": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "output_words": [
+        0,
+        0,
+        2,
+        0,
+        -1,
+        106,
+        0,
+        0,
+        0
+      ],
+      "consumed": 3,
+      "remainder": ""
+    },
+    {
+      "case": "prefix-overridden",
+      "input": "JM3.2.0",
+      "initial_words": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "output_words": [
+        0,
+        0,
+        2,
+        2,
+        2,
+        106,
+        0,
+        0,
+        0
+      ],
+      "consumed": 7,
+      "remainder": ""
+    },
+    {
+      "case": "clock",
+      "input": "J60/1:2:3",
+      "initial_words": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "output_words": [
+        3,
+        2,
+        1,
+        104,
+        105,
+        106,
+        107,
+        60,
+        1
+      ],
+      "consumed": 9,
+      "remainder": ""
+    },
+    {
+      "case": "hour-only",
+      "input": "60/5",
+      "initial_words": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "output_words": [
+        0,
+        0,
+        5,
+        104,
+        105,
+        106,
+        107,
+        60,
+        -1
+      ],
+      "consumed": 4,
+      "remainder": ""
+    },
+    {
+      "case": "empty-hour",
+      "input": "60/",
+      "initial_words": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "output_words": [
+        0,
+        0,
+        0,
+        104,
+        105,
+        106,
+        107,
+        60,
+        -1
+      ],
+      "consumed": 3,
+      "remainder": ""
+    },
+    {
+      "case": "empty-minute",
+      "input": "60/5:",
+      "initial_words": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "output_words": [
+        0,
+        0,
+        5,
+        104,
+        105,
+        106,
+        107,
+        60,
+        -1
+      ],
+      "consumed": 5,
+      "remainder": ""
+    },
+    {
+      "case": "empty-minute-seconds",
+      "input": "60/5::7",
+      "initial_words": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "output_words": [
+        7,
+        0,
+        5,
+        104,
+        105,
+        106,
+        107,
+        60,
+        -1
+      ],
+      "consumed": 7,
+      "remainder": ""
+    },
+    {
+      "case": "no-clock-sign",
+      "input": "60/-1",
+      "initial_words": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "output_words": [
+        0,
+        0,
+        0,
+        104,
+        105,
+        106,
+        107,
+        60,
+        -1
+      ],
+      "consumed": 3,
+      "remainder": "-1"
+    },
+    {
+      "case": "unbounded-clock",
+      "input": "60/99:90:90",
+      "initial_words": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "output_words": [
+        90,
+        90,
+        99,
+        104,
+        105,
+        106,
+        107,
+        60,
+        -1
+      ],
+      "consumed": 11,
+      "remainder": ""
+    },
+    {
+      "case": "unrecognized-prefix",
+      "input": "q60",
+      "initial_words": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "output_words": [
+        0,
+        0,
+        2,
+        104,
+        105,
+        106,
+        107,
+        0,
+        -1
+      ],
+      "consumed": 0,
+      "remainder": "q60"
+    },
+    {
+      "case": "remaining-comma",
+      "input": "J60,tail",
+      "initial_words": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "output_words": [
+        0,
+        0,
+        2,
+        104,
+        105,
+        106,
+        107,
+        60,
+        1
+      ],
+      "consumed": 3,
+      "remainder": ",tail"
+    },
+    {
+      "case": "decimal-wrap",
+      "input": "4294967296",
+      "initial_words": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "output_words": [
+        0,
+        0,
+        2,
+        104,
+        105,
+        106,
+        107,
+        0,
+        -1
+      ],
+      "consumed": 10,
+      "remainder": ""
+    }
+  ],
+  "stubs": [],
+  "ports": [],
+  "video_ram": false,
+  "segment_model": "authored flat 32-bit CS/DS/ES/SS"
+}
