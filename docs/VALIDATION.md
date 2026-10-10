@@ -1578,3 +1578,17 @@ passing. With command-scoped GAME_DIR=analysis/original, the existing March
 age-pass and all eight home-setup controls also passed on the same model;
 outputs are local in `artifacts/flat-segment-march-controls.json` and
 `artifacts/flat-segment-home-controls.json`. No spec status changed.
+
+### 2026-10-10 isolated seed-adjustment parser
+
+With GAME_DIR=analysis/original and the private hashed interpreter,
+`tools/emu/verify_seed_adjustment.py --output
+artifacts/seed-adjustment-controls.json` passed. FND-RNG-007 and EXP-RNG-002
+record the reading, authored cases, complete fabricated-RAM comparisons,
+returned positions, instruction ranges and output/stack write bounds.
+The documentation check and evidence/package controls passed. No native game
+was launched for this experiment and no parity status changed. This is an
+isolated original-function experiment, not a rebuild comparison listed in a
+validated parity row; the latter's `validation/` run-file workflow does not
+apply. The initial fixture was missing its required experiment identifier;
+adding it and rerunning the experiment and checker resolved that failure.

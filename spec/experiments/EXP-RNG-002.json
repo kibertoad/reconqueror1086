@@ -1,0 +1,225 @@
+{
+  "experiment": "EXP-RNG-002",
+  "cases": [
+    {
+      "case": "empty",
+      "input": "",
+      "name": "",
+      "initial_adjustment": 123456,
+      "adjustment": 123456,
+      "consumed": 0,
+      "remainder": ""
+    },
+    {
+      "case": "leading-colon",
+      "input": ":ABC8",
+      "name": "ABC",
+      "initial_adjustment": 123456,
+      "adjustment": 28800,
+      "consumed": 5,
+      "remainder": ""
+    },
+    {
+      "case": "colon-only",
+      "input": ":",
+      "name": "",
+      "initial_adjustment": 123456,
+      "adjustment": 123456,
+      "consumed": 1,
+      "remainder": ""
+    },
+    {
+      "case": "comma",
+      "input": ",tail",
+      "name": "",
+      "initial_adjustment": 123456,
+      "adjustment": 123456,
+      "consumed": 0,
+      "remainder": ",tail"
+    },
+    {
+      "case": "name-only",
+      "input": "ABC",
+      "name": "ABC",
+      "initial_adjustment": 123456,
+      "adjustment": 123456,
+      "consumed": 3,
+      "remainder": ""
+    },
+    {
+      "case": "minus-without-number",
+      "input": "ABC-",
+      "name": "ABC",
+      "initial_adjustment": 123456,
+      "adjustment": 123456,
+      "consumed": 4,
+      "remainder": ""
+    },
+    {
+      "case": "plus-without-number",
+      "input": "ABC+q",
+      "name": "ABC",
+      "initial_adjustment": 123456,
+      "adjustment": 123456,
+      "consumed": 4,
+      "remainder": "q"
+    },
+    {
+      "case": "hours",
+      "input": "ABC8",
+      "name": "ABC",
+      "initial_adjustment": 123456,
+      "adjustment": 28800,
+      "consumed": 4,
+      "remainder": ""
+    },
+    {
+      "case": "positive-sign",
+      "input": "ABC+8",
+      "name": "ABC",
+      "initial_adjustment": 123456,
+      "adjustment": 28800,
+      "consumed": 5,
+      "remainder": ""
+    },
+    {
+      "case": "negative-hms",
+      "input": ":ABC-5:30:15",
+      "name": "ABC",
+      "initial_adjustment": 123456,
+      "adjustment": -19815,
+      "consumed": 12,
+      "remainder": ""
+    },
+    {
+      "case": "empty-minutes",
+      "input": "ABC8:",
+      "name": "ABC",
+      "initial_adjustment": 123456,
+      "adjustment": 28800,
+      "consumed": 5,
+      "remainder": ""
+    },
+    {
+      "case": "empty-minutes-with-seconds",
+      "input": "ABC8::7",
+      "name": "ABC",
+      "initial_adjustment": 123456,
+      "adjustment": 28807,
+      "consumed": 7,
+      "remainder": ""
+    },
+    {
+      "case": "unbounded-minute-second",
+      "input": "ABC8:90:90",
+      "name": "ABC",
+      "initial_adjustment": 123456,
+      "adjustment": 34290,
+      "consumed": 10,
+      "remainder": ""
+    },
+    {
+      "case": "colon-in-name",
+      "input": "ABC:8",
+      "name": "ABC:",
+      "initial_adjustment": 123456,
+      "adjustment": 28800,
+      "consumed": 5,
+      "remainder": ""
+    },
+    {
+      "case": "remaining-comma",
+      "input": "ABC8,DEF",
+      "name": "ABC",
+      "initial_adjustment": 123456,
+      "adjustment": 28800,
+      "consumed": 4,
+      "remainder": ",DEF"
+    },
+    {
+      "case": "short-name",
+      "input": "X9",
+      "name": "X",
+      "initial_adjustment": 123456,
+      "adjustment": 32400,
+      "consumed": 2,
+      "remainder": ""
+    },
+    {
+      "case": "word-plus-tail",
+      "input": "ABCDE9",
+      "name": "ABCDE",
+      "initial_adjustment": 123456,
+      "adjustment": 32400,
+      "consumed": 6,
+      "remainder": ""
+    },
+    {
+      "case": "low-name-bytes",
+      "input": "\t!A8",
+      "name": "\t!A",
+      "initial_adjustment": 123456,
+      "adjustment": 28800,
+      "consumed": 4,
+      "remainder": ""
+    },
+    {
+      "case": "high-name-bytes",
+      "input": "z_~8",
+      "name": "z_~",
+      "initial_adjustment": 123456,
+      "adjustment": 28800,
+      "consumed": 4,
+      "remainder": ""
+    },
+    {
+      "case": "name-at-bound",
+      "input": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX9",
+      "name": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "initial_adjustment": 123456,
+      "adjustment": 32400,
+      "consumed": 31,
+      "remainder": ""
+    },
+    {
+      "case": "name-past-bound",
+      "input": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX9",
+      "name": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "initial_adjustment": 123456,
+      "adjustment": 32400,
+      "consumed": 32,
+      "remainder": ""
+    },
+    {
+      "case": "long-name",
+      "input": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX9",
+      "name": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "initial_adjustment": 123456,
+      "adjustment": 32400,
+      "consumed": 41,
+      "remainder": ""
+    },
+    {
+      "case": "decimal-wrap",
+      "input": "ABC4294967296",
+      "name": "ABC",
+      "initial_adjustment": 123456,
+      "adjustment": 0,
+      "consumed": 13,
+      "remainder": ""
+    },
+    {
+      "case": "arithmetic-wrap",
+      "input": "ABC999999999999999999999999999",
+      "name": "ABC",
+      "initial_adjustment": 123456,
+      "adjustment": 2147480048,
+      "consumed": 30,
+      "remainder": ""
+    }
+  ],
+  "stubs": [],
+  "ports": [],
+  "video_ram": false,
+  "segment_model": "authored flat 32-bit CS/DS/ES/SS"
+}

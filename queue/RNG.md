@@ -13,6 +13,9 @@ Next ID: Q-RNG-002
   FND-RNG-006 follows the environment lookup and parser wrapper, including
   shipped adjustment values. The parser syntax, environment initialization,
   record normalization and offset-32 classification still require reading.
+  FND-RNG-007 and EXP-RNG-002 cover the name/adjustment helper, missing-number
+  preservation, clipped names and wrapping numeric components. Suffix syntax,
+  environment initialization, calendar tables and record normalization remain.
 
 ## Emulated call
 
