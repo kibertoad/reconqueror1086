@@ -1729,3 +1729,12 @@ nonzero-selector inputs, two years, wrapping ordinal results and signed ordering
 Full-RAM, stack-only writes, instruction paths and budgets passed without stubs.
 Zero-selector month/weekday calculations and complete classifier behavior remain
 under Q-RNG-001. No native game or rebuild replay ran for these controls.
+
+### 2026-10-10 final wrap-up gate
+
+Invoke-Validation.ps1 -NoRestore passed with command-scoped EVIDENCE_PYTHON
+pointing to artifacts/validation-python-183-session04/Scripts/python.exe.
+Repository/configuration, documentation, tooling tests, evidence pins, build,
+implementation tests and executable specifications passed. The detailed log is
+local at artifacts/wrapup-20261010-validation.log. This gate does not establish
+full-game recorder completion; the owner's paused goal retains that unfinished work.
