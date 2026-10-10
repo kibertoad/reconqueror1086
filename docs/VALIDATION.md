@@ -2,6 +2,12 @@
 
 ## Checker 4.1.1 and quiet probes (2026-10-10)
 
+2026-10-10: native-recorder tests passed 35 synthetic checks after adding the
+guarded first-youth-answer stage. They cover refusal without generation or
+with an earlier screen-3 stop, input after the ordered screen returns, and
+matching answer entry/return frames. This does not verify the original callback
+traversal. Analysis-ready configuration verification also passed.
+
 Toolkit PR #398 was adopted after its npm publication as checker 4.1.1 at
 release commit ad551057265542a0ac5ad27b4abb4909305e7728. The tag contains the
 merged fix, and the lockfile's distribution integrity matches official release

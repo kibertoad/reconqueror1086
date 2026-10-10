@@ -291,6 +291,14 @@ its initial dilemma draw under RULE-PERSON-003. Synthetic input checks passed;
 native generation traversal passed the target-return check in VALIDATION.md.
 Youth answers, Continue and Reroll still need their own native checks.
 
+`--youth-answer` requires generation input and continuation beyond screen 3.
+It queues the first answer at (100, 350), inside SCR-UI-004's first-answer
+rectangle. FND-PERSON-005 supports its callback entry and return. The recorder
+checks the callback's matching stack frame, unchanged code, complete journal
+and numeric RNG replay before ending with `youth-answer-return-reached`.
+It never treats that boundary as full-game completion or queues Continue yet.
+Synthetic sequence checks passed; original answer traversal remains unverified.
+
 The native inclusive-draw policies also accept the three fixed-bound dilemma
 selection calls of FND-PERSON-004. Initial selection and reroll carry
 RULE-PERSON-003, and continued selection carries RULE-PERSON-004. Each requires

@@ -31,7 +31,8 @@ class EventLog:
 
 def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen=False, stop_after_screen=False,
            startup_checkpoints=False, startup_click=False, continue_after_screen=False, title_click=False,
-           screen_checkpoints=False, stop_after_screen_id=None, new_game_click=False, generation_click=False):
+           screen_checkpoints=False, stop_after_screen_id=None, new_game_click=False, generation_click=False,
+           youth_answer=False):
     if stop_at_screen and stop_after_screen:
         raise ValueError('Choose one screen diagnostic boundary')
     if startup_checkpoints and not stop_after_screen:
@@ -48,6 +49,8 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         raise ValueError('New-game input requires verified screen checkpoints')
     if generation_click and not new_game_click:
         raise ValueError('Generation input requires the guarded new-game sequence')
+    if youth_answer and (not generation_click or stop_after_screen_id == 3):
+        raise ValueError('Youth answer requires generation input and continuation beyond screen three')
     if stop_after_screen_id is not None and (not screen_checkpoints or
             type(stop_after_screen_id) is not int or not 0 <= stop_after_screen_id <= 24):
         raise ValueError('Screen target requires checkpoints and a registered screen identifier')
@@ -96,7 +99,17 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         selector, offset = mapping.code_address(0x5b790)  # FND-UI-019
         hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
         hooks[hook.id] = 'startup-wait'
+    if youth_answer:
+        # FND-PERSON-005: first answer entry and final return.
+        for address, name in ((0x14b38, 'answer-entry'), (0x14cdd, 'answer-return')):
+            selector, offset = mapping.code_address(address)
+            hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
+            hooks[hook.id] = name
     controls = []
+    if youth_answer:
+        selector, offset = mapping.code_address(0x14b38, 0x14cde - 0x14b38)
+        address = runtime.MemoryAddress.segmented(selector, offset)
+        controls.append((address, runtime.read(address, 0x14cde - 0x14b38)))  # FND-PERSON-005
     code_ranges = [(0x6b3eb, 0x6b423), (0x24c38, 0x24c4c), (0x1a14c, 0x1a1ef), (0x43670, 0x436e0)]
     code_ranges.extend(((0x445b4, 0x445c2), (0x4f2ac, 0x4f2d6), (0x5b418, 0x5b470)))
     # FND-PERSON-004: initial, rerolled and continued dilemma-selection draws.
@@ -130,6 +143,8 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
     initial_screen_seen = False
     new_game_click_done = False
     generation_click_done = False
+    youth_answer_queued = False
+    answer_key = None
     startup_key = None
     archive_key = None
     archive_ordinal = 0
@@ -158,6 +173,24 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
             stack_pointer = int(registers.general['esp'], 16)
             key = (int(registers.segments['ss'], 16), stack_pointer)
             kind = hooks[stop.breakpoint_id]
+            if kind in ('answer-entry', 'answer-return'):
+                if not youth_answer_queued or frame is not None or screen_frame is not None or archive_key is not None:
+                    raise RecordingError('Youth answer boundary lacks prescribed input or has an unfinished operation')
+                if kind == 'answer-entry':
+                    if pc != 0x14b38 or answer_key is not None:
+                        raise RecordingError('Unexpected or reentrant youth answer entry')
+                    answer_key = key
+                else:
+                    if pc != 0x14cdd or answer_key != key:
+                        raise RecordingError('Youth answer return/frame mismatch')
+                    report['end_rng_state'] = journal.complete()
+                    if state() != report['end_rng_state'] or replay(journal.events) != report['end_rng_state']:
+                        raise RecordingError('Youth answer RNG state differs from journal')
+                    answer_key = None
+                    report['status'] = 'youth-answer-return-reached'
+                    return report
+                runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
+                continue
             if kind == 'startup-wait':
                 if pc != 0x5b790 or frame is not None or archive_key is not None or screen_frame is not None or startup_key is None:
                     raise RecordingError('Startup input boundary/frame mismatch')
@@ -294,6 +327,15 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                         if state() != report['end_rng_state']:
                             raise RecordingError('RNG state changed while queuing generation input')
                         generation_click_done = True
+                    if youth_answer and screen_id == 3 and not youth_answer_queued:
+                        # SCR-UI-004 / FND-PERSON-005: first answer rectangle.
+                        click = queue_primary_click(runtime, mapping, x=100, y=350)
+                        report.setdefault('supported_input', []).append(dict(click, screen=3))
+                        (output / 'supported-input.json').write_text(
+                            json.dumps(report['supported_input'], indent=2) + '\n')
+                        if state() != report['end_rng_state']:
+                            raise RecordingError('RNG state changed while queuing youth answer')
+                        youth_answer_queued = True
                     # These are one-time startup observations, not policies for
                     # subsequent screen transitions or archive requests.
                     for hook_id, hook_kind in list(hooks.items()):
@@ -438,4 +480,5 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         report['pending_operation'] = journal.pending is not None
         report['pending_screen_load'] = screen_frame is not None
         report['pending_archive_extraction'] = archive_key is not None
+        report['pending_youth_answer'] = answer_key is not None
         (output / 'native-rng-journal.json').write_text(json.dumps(report, indent=2))

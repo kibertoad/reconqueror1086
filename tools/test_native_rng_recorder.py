@@ -51,7 +51,7 @@ def runtime_and_mapping(screen_state=123, screen_number=0, record_pointer=0x3000
 
 class ScreenBoundaryTests(unittest.TestCase):
     def replacement_sequence(self, wrong_return=False, wrong_frame=False, wrong_identity=False, new_game=False,
-                             generation=False):
+                             generation=False, youth=False):
         runtime, mapping = runtime_and_mapping()
         original_wait, original_registers, original_read = (
             runtime.wait_until_stopped, runtime.registers, runtime.read)
@@ -61,6 +61,8 @@ class ScreenBoundaryTests(unittest.TestCase):
             else:
                 runtime.phase += 1
                 runtime.session.stop_reason.breakpoint_id = (
+                    'hook-14b38' if youth and runtime.phase == 10 else
+                    'hook-14cdd' if youth and runtime.phase == 11 else
                     'hook-596c0' if runtime.phase % 2 == 0 else 'hook-5975e')
         def registers():
             if runtime.phase < 4:
@@ -68,6 +70,8 @@ class ScreenBoundaryTests(unittest.TestCase):
             return SimpleNamespace(general={'esp': '0x1004' if wrong_frame and runtime.phase == 5 else '0x1000'},
                                    segments={'cs': '0x180', 'ds': '0x188', 'ss': '0x188'},
                                    cpu_mode='protected', instruction_pointer=hex(
+                                       0x14b38 if youth and runtime.phase == 10 else
+                                       0x14cdd if youth and runtime.phase == 11 else
                                        0x596c0 if runtime.phase % 2 == 0 else 0x5965f if wrong_return else 0x5975e))
         def read(address, length):
             if runtime.phase >= 4:
@@ -84,23 +88,38 @@ class ScreenBoundaryTests(unittest.TestCase):
             return original_read(address, length)
         runtime.wait_until_stopped, runtime.registers, runtime.read = wait, registers, read
         with patch('native_rng_recorder.tables_from_diagnostic', return_value=(0, 16)), \
-             patch('native_rng_recorder.descriptor', side_effect=[mapping.code, mapping.data] * 12), \
+             patch('native_rng_recorder.descriptor', side_effect=[mapping.code, mapping.data] * 16), \
              patch('native_rng_recorder.EventLog'), patch('native_rng_recorder.Path.write_text'), \
              patch('native_rng_recorder.queue_primary_click',
                    return_value={'action': 'primary-short-click'}) as click:
             report = record(runtime, mapping, ('draw', 'seed'), 'unused-output', stop_after_screen=True,
                             continue_after_screen=True, title_click=True, screen_checkpoints=True,
-                            stop_after_screen_id=3 if generation else 2 if new_game else 1,
-                            new_game_click=new_game, generation_click=generation)
+                            stop_after_screen_id=None if youth else 3 if generation else 2 if new_game else 1,
+                            new_game_click=new_game, generation_click=generation, youth_answer=youth)
         if new_game:
-            self.assertEqual(click.call_count, 3 if generation else 2)
+            self.assertEqual(click.call_count, 4 if youth else 3 if generation else 2)
             self.assertEqual([call.kwargs for call in click.call_args_list],
                              [{'x': 10, 'y': 10}, {'x': 100, 'y': 350}] +
-                             ([{'x': 200, 'y': 250}] if generation else []))
+                             ([{'x': 200, 'y': 250}] if generation else []) +
+                             ([{'x': 100, 'y': 350}] if youth else []))
         else:
             click.assert_called_once_with(runtime, mapping, x=10, y=10)
         runtime.agent.delete_breakpoint.assert_not_called()
         return report
+
+    def test_youth_answer_requires_generation_and_cannot_stop_before_input(self):
+        for arguments in ({}, {'generation_click': True, 'new_game_click': True,
+                              'screen_checkpoints': True, 'continue_after_screen': True,
+                              'stop_after_screen': True, 'stop_after_screen_id': 3}):
+            with self.assertRaisesRegex(ValueError, 'Youth answer requires'):
+                record(None, None, (), 'unused-output', youth_answer=True, **arguments)
+
+    def test_youth_answer_waits_for_verified_generation_and_callback_return(self):
+        report = self.replacement_sequence(new_game=True, generation=True, youth=True)
+        self.assertEqual(report['status'], 'youth-answer-return-reached')
+        self.assertEqual([item['screen'] for item in report['supported_input']], [0, 1, 2, 3])
+        self.assertFalse(report['pending_youth_answer'])
+        self.assertFalse(report['full_game_complete'])
 
     def test_generation_input_requires_the_guarded_new_game_sequence(self):
         with self.assertRaisesRegex(ValueError, 'guarded new-game sequence'):
