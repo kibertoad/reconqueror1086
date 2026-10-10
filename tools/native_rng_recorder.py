@@ -7,7 +7,6 @@ This transport does not claim full-game caller coverage or actual rebuild replay
 """
 import dataclasses
 import json
-import os
 from pathlib import Path
 from rng_journal import Journal, replay
 from live_mapping import descriptor, tables_from_diagnostic
@@ -15,20 +14,7 @@ from rng_recording import RecordingError, canonical_pc
 from supported_pointer_input import queue_primary_click, primary_click_ready
 from dubbing_entry_input import DubbingEntryInput, POINTS as DUBBING_ENTRY_POINTS
 from youth_age_checkpoint import read_youth_age
-
-
-class EventLog:
-    """Append only completed rule events; retain them if capture is interrupted."""
-    def __init__(self, path):
-        self.file = Path(path).open('x', encoding='utf-8', newline='\n')
-
-    def append(self, event):
-        self.file.write(json.dumps(event, separators=(',', ':'), allow_nan=False) + '\n')
-        self.file.flush()
-        os.fsync(self.file.fileno())
-
-    def close(self):
-        self.file.close()
+from native_event_log import EventLog, LOG_FORMAT
 
 
 def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen=False, stop_after_screen=False,
@@ -218,7 +204,8 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                          'conquer-native-rng-journal-v2' if dubbing_click else 'conquer-native-rng-journal-v1'), 'status': 'incomplete',
               'full_game_complete': False, 'accepted_callers_complete': False,
               'events': journal.events}
-    event_log = EventLog(output / 'native-rng-events.jsonl')
+    report['event_log_format'] = LOG_FORMAT
+    event_log = EventLog(runtime)
     try:
         while True:
             stop = runtime.session.stop_reason
@@ -677,7 +664,6 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
             report['diagnostic_failure'] = type(diagnostic_error).__name__
         raise
     finally:
-        event_log.close()
         report['pending_operation'] = journal.pending is not None
         report['pending_screen_load'] = screen_frame is not None
         report['pending_archive_extraction'] = archive_key is not None
@@ -689,3 +675,4 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
             report['pending_dubbing_entry'] = presentation.key is not None
             report['dubbing_entry_complete'] = presentation.completed
         (output / 'native-rng-journal.json').write_text(json.dumps(report, indent=2))
+        event_log.finish(report)

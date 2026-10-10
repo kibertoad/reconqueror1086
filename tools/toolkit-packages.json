@@ -5,7 +5,7 @@
     "@scientific-method/executable-reader": "2.10.1",
     "@scientific-method/standard-checker": "4.2.0"
   },
-  "engine": "17.0.1",
+  "engine": "18.0.0",
   "dosbox_session": {
     "version": "0.3.0",
     "revision": "ab984cbe6ef7522306098ea91290c49cdf1348da"

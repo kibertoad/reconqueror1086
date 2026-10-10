@@ -1392,8 +1392,21 @@ The fabricated return-report fixture was migrated to engine 16's explicit
 partial-register join widths. Numeric return behavior and package/wrapper
 agreement remain checked. The canonical -NoRestore gate passed in the new
 environment, including the Node controls, build and .NET checks.
-Session 0.3.0 event-log adoption and its native
-positive control are separate from installing the release pins.
+Engine 18.0.0 was published during this validation session and was then adopted
+with Capstone 5.0.9 and pypcode 4.0.1. The original synthetic return-query
+control passed. Fabricated D1/C1 SHR-with-JO and carry-set RCR queries passed
+against independent Unicorn 2.1.4 controls: the D1 branch and rotate result
+agree; C1 retains both overflow-dependent branch outcomes. Toolkit issue #392
+was closed with these published-release consumer results.
+
+Session 0.3.0 now owns the recorder's durable event log and module hashes.
+The local append/sync writer and its duplicate tests were removed. Our schemas,
+pending-operation meaning, numeric replay and final-journal comparison remain
+local. The published source's 85 Windows tests passed against the installed
+wheel. Consumer controls passed for package-written logs, changed event order,
+missing outcomes, failure outcomes, outcome mismatch and numeric semantics.
+The older raw-log captures retain their recorded contract. Native 0.3.0 startup
+validation is still pending; toolkit issue #403 remains open for that result.
 
 ## Home-selection recorder extension (2026-10-10)
 

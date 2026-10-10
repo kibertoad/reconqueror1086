@@ -11,6 +11,7 @@ from shared_dosbox_runtime import AgentRuntime, ObservationTimeout
 from emu.le_image import load_image
 from live_mapping import validate_snapshot
 from native_rng_recorder import record
+from native_event_log import settings as log_settings
 
 
 def main():
@@ -126,13 +127,6 @@ def main():
     if hashlib.sha256(executable.read_bytes()).hexdigest() != '5d7231758766204ad061e6b82cf2f0e0cbe28899b35d095f13e4aad75c8b79d6':
         raise RuntimeError('Wrong BLD-GOG-EN source identity')
     root.mkdir(parents=True, exist_ok=True)
-    tool_names = ('Probe-LiveMapping.py', 'shared_dosbox_runtime.py', 'live_mapping.py',
-                  'native_rng_recorder.py', 'rng_journal.py', 'rng_recording.py',
-                  'supported_pointer_input.py', 'dubbing_entry_input.py', 'youth_age_checkpoint.py', 'emu/le_image.py')
-    (root / 'probe-source.json').write_text(json.dumps({
-        'tool_sha256': {name: hashlib.sha256((Path(__file__).parent / name).read_bytes()).hexdigest()
-                        for name in tool_names}
-    }, indent=2))
     def prepare_drive(drive):
         for name in ('C1086.GOB', 'CONQUER.INI'):
             shutil.copyfile(installation / name, drive / name)
@@ -179,7 +173,11 @@ def main():
         with AgentRuntime(source, emulator, root, drive, 'CONQUER.EXE', installation / 'game.ins',
                           args.cycles, sound_investigation=args.sound_investigation,
                           cpu_profile=args.cpu_profile, cpu_core=args.cpu_core,
-                          prepare_drive=prepare_drive) as runtime:
+                          prepare_drive=prepare_drive,
+                          event_log=log_settings(('__main__', 'shared_dosbox_runtime', 'live_mapping',
+                              'native_rng_recorder', 'native_event_log', 'rng_journal', 'rng_recording',
+                              'supported_pointer_input', 'dubbing_entry_input', 'youth_age_checkpoint',
+                              'emu.le_image'))) as runtime:
             print('startup', runtime.registers())
             for attempt in range(args.samples):
                 operation = runtime.agent.continue_(runtime.session.id)

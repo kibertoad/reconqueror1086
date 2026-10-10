@@ -239,10 +239,15 @@ those guards. tools/rng_journal.py separately verifies reseeds, ordering and
 raw/bounded state transitions; run tools/test_rng_journal.py for synthetic checks.
 This remains intermediate transport verification, without actual rebuild replay.
 
-Completed seeds and bounded results are also appended to native-rng-events.jsonl
-and flushed to disk before continuing the guest. Existing event logs are never
-reused. This preserves completed events after interruption; a surviving prefix
-does not establish recording completeness or authorize resuming a guest from it.
+Completed seeds and bounded results are appended through session 0.3.0's
+`log_event` and synced before continuing the guest. Its `session/events.jsonl`
+header records our schemas, versioned outcome contract and imported module hashes.
+The terminal validator delegates envelope checks to `read_event_log`, then compares
+its events with our journal and replays their numeric semantics. Historical
+unwrapped `native-rng-events.jsonl` captures retain their original contract.
+Existing logs are never reused. An interrupted prefix does not establish recording
+completeness or authorize resuming a guest. Mapping-only probes leave an incomplete
+event log with their module identity; they do not claim a recorder outcome.
 
 For a startup state diagnostic, add `--stop-at-screen` and increase
 `--record-draw-limit` above the startup prefix. The optional breakpoints stop
@@ -438,7 +443,8 @@ assume a cycle count from the observation. Use it to investigate a traversal
 that reaches its endpoint earlier than the prescribed count.
 
 The probe imports its recorder and input helper before starting the guest and
-writes their authored-source hashes in local `probe-source.json`. Later source
+passes the imported module names to the session, which hashes them into its event
+log header before starting the emulator. Historical runs use `probe-source.json`. Later source
 edits do not change those loaded modules. A traceback may display lines from an
 edited file, so use the run's hashes and its recorded state when diagnosing it.
 

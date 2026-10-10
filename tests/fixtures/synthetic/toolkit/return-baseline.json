@@ -1,6 +1,6 @@
 {
   "schema": "bounded-x86-v1",
-  "decoder": "capstone 5.0.7",
+  "decoder": "capstone 5.0.9",
   "sourceIdentity": {
     "size": 4,
     "xxh3": "717f7731686f3b26dd1b65c5a4d01b48"

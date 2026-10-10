@@ -8,6 +8,8 @@ from unittest.mock import patch
 
 from rng_recording import RecordingError
 from verify_native_recording import PENDING_FIELDS, verify
+from native_event_log import CONTRACT, SCHEMAS, LOG_FORMAT, outcome
+from dinorefurb_dosbox_session import EventLogWriter
 
 
 class NativeVerificationTests(unittest.TestCase):
@@ -38,6 +40,62 @@ class NativeVerificationTests(unittest.TestCase):
 
     def check(self):
         return verify(self.path, 'youth-continue-return-reached')
+
+    def write_shared(self, events=None, failure=None):
+        self.report['event_log_format'] = LOG_FORMAT
+        (self.path / 'native-rng-journal.json').write_text(json.dumps(self.report), encoding='utf-8')
+        folder = self.path / 'session'
+        folder.mkdir(exist_ok=True)
+        target = folder / 'events.jsonl'
+        if target.exists():
+            target.unlink()
+        log = EventLogWriter.create(target, CONTRACT, SCHEMAS, package_version='0.3.0')
+        try:
+            for event in self.events if events is None else events:
+                log.append(event['kind'], {key: value for key, value in event.items() if key != 'kind'})
+            if failure is None:
+                log.finish(outcome(self.report))
+            else:
+                log.fail(failure, outcome(self.report))
+        finally:
+            log.close()
+        return target
+
+    def test_shared_log_positive_and_journal_agreement(self):
+        self.write_shared()
+        self.assertEqual(self.check()['events'], 2)
+        different = [self.events[0], dict(self.events[1], rule='RULE-RNG-001')]
+        self.write_shared(different)
+        with self.assertRaisesRegex(RecordingError, 'Durable events differ'):
+            self.check()
+
+    def test_shared_log_reordering_and_incomplete_refused(self):
+        target = self.write_shared()
+        lines = target.read_text().splitlines(keepends=True)
+        target.write_text(''.join([lines[0], lines[2], lines[1], lines[3]]))
+        with self.assertRaisesRegex(RecordingError, 'Shared event log refused'):
+            self.check()
+        target.write_text(''.join(lines[:-1]))
+        with self.assertRaisesRegex(RecordingError, 'Shared event log refused'):
+            self.check()
+
+    def test_shared_failure_outcome_is_not_terminal_success(self):
+        self.write_shared(failure='Synthetic interrupted capture')
+        with self.assertRaisesRegex(RecordingError, 'Shared event log refused'):
+            self.check()
+
+    def test_shared_outcome_must_match_whole_journal(self):
+        self.write_shared()
+        self.report['completed_youth_cycles'] = 1
+        (self.path / 'native-rng-journal.json').write_text(json.dumps(self.report))
+        with self.assertRaisesRegex(RecordingError, 'Shared event log refused'):
+            self.check()
+
+    def test_shared_transport_does_not_replace_numeric_semantics(self):
+        self.events[1]['result'] = 7
+        self.write_shared()
+        with self.assertRaises(RecordingError):
+            self.check()
 
     def test_terminal_numeric_and_durable_agreement(self):
         self.write()

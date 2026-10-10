@@ -54,7 +54,7 @@ class _GameClient:
 class AgentRuntime:
     def __init__(self, source, emulator, output, workdir, target, disc=None,
                  cycles=10000, sound_investigation=False, cpu_profile='fixed', prepare_drive=None,
-                 cpu_core='normal'):
+                 cpu_core='normal', event_log=None):
         if type(cycles) is not int or not 1000 <= cycles <= 100000:
             raise ValueError('Diagnostic CPU cycles must be between 1000 and 100000')
         if cpu_profile not in ('fixed', 'gog'):
@@ -78,7 +78,7 @@ class AgentRuntime:
         self.owned = DosboxSession(SessionSettings(
             checkout=self.source, emulator=self.emulator, run_directory=self.output / 'session',
             target=Target(target), client_factory=lambda endpoint: self.AgentClient.from_config(endpoint.agent_config),
-            prepare_drive=prepare_drive or prepare, emulator_config=config))
+            prepare_drive=prepare_drive or prepare, emulator_config=config, event_log=event_log))
 
     def __enter__(self):
         self.owned.start()

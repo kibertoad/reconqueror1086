@@ -5,6 +5,8 @@ from pathlib import Path
 
 from rng_journal import replay
 from rng_recording import RecordingError
+from native_event_log import CONTRACT, LOG_FORMAT, outcome
+from dinorefurb_dosbox_session import read_event_log, LogRejected
 
 
 TERMINAL_STATUSES = frozenset({
@@ -68,8 +70,20 @@ def verify(directory, expected_status, expected_youth_cycles=None):
     if any(report.get(name) is not False for name in
            ('full_game_complete', 'accepted_callers_complete')):
         raise RecordingError('Diagnostic must not claim full-game or caller completeness')
-    durable = [json.loads(line) for line in
-               read_bounded(directory / 'native-rng-events.jsonl').splitlines()]
+    if 'event_log_format' in report:
+        if report['event_log_format'] != LOG_FORMAT:
+            raise RecordingError('Unexpected shared event-log format')
+        try:
+            log = read_event_log(directory / 'session' / 'events.jsonl', outcome(report))
+        except LogRejected as error:
+            raise RecordingError(f'Shared event log refused: {error}') from error
+        if log.contract.to_json() != CONTRACT.to_json():
+            raise RecordingError('Unexpected native outcome contract')
+        durable = [dict(event.data, kind=event.kind) for event in log.events]
+    else:
+        # Historical captures retain their recorded unwrapped transport contract.
+        durable = [json.loads(line) for line in
+                   read_bounded(directory / 'native-rng-events.jsonl').splitlines()]
     if durable != report.get('events'):
         raise RecordingError('Durable events differ from native journal order or contents')
     # RULE-RNG-001: numeric replay checks recorded state transitions/reductions;
