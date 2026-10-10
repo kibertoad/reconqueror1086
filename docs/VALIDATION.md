@@ -1691,6 +1691,23 @@ classification retained secondary subtraction despite an empty name; negative
 classification was cleared. Actual startup and nonempty-name behavior remain
 under Q-RNG-001. No native game or rebuild replay ran for these controls.
 
+### 2026-10-10 owner-requested native wrap-up
+
+The owner requested wrap-up and paused the goal. The owned v5 emulator was
+stopped through the supported API; controller and wrapper processes exited
+and their machine lock was released. The controller finalized an incomplete
+journal with a mode/selector guard failure during shutdown. Its outcome retains
+four completed youth cycles, pending fifth Continue, pending screen load and
+pending dubbing entry; it makes no full-game or caller-completeness claim.
+Failure registers and memory remain local.
+
+The old session-0.3.0 interpreter verified header/event hashes, exact journal
+and durable-event order, numeric replay of the 37-event prefix to 3173154213,
+and the AGE prefix through the fifth Continue entry. The shared reader rejected
+the failure outcome as successful. This is failure/prefix validation, not the
+requested dubbing-return traversal or actual rebuild replay. Cleanup is recorded
+in orphanCleanupLog.md; unrelated work and reusable MSBuild nodes were preserved.
+
 ### 2026-10-10 later pending native timer and mode observations
 
 The same owned v5 control remained live on handle 19256. A coherent stopped

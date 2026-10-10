@@ -239,7 +239,7 @@ those guards. tools/rng_journal.py separately verifies reseeds, ordering and
 raw/bounded state transitions; run tools/test_rng_journal.py for synthetic checks.
 This remains intermediate transport verification, without actual rebuild replay.
 
-Completed seeds and bounded results are appended through session 0.3.0's
+Completed seeds and bounded results are appended through the shared session's
 `log_event` and synced before continuing the guest. Its `session/events.jsonl`
 header records our schemas, versioned outcome contract and imported module hashes.
 The terminal validator delegates envelope checks to `read_event_log`, then compares
@@ -492,7 +492,7 @@ private hash-locked Python environment. Keep host sound disabled:
 
 ```powershell
 $env:GAME_DIR = 'C:/GOG Games/Conqueror AD1086'
-& artifacts/validation-python-latest/Scripts/python.exe -B tools/Probe-LiveMapping.py `
+& artifacts/validation-python-183-session04/Scripts/python.exe -B tools/Probe-LiveMapping.py `
   --output artifacts/runtime-tools/dubbing-fresh --samples 8 --observation-ms 1000 `
   --rng-break --cycles 10000 --debugger-build no-heavy --record-native `
   --record-draw-limit 1000 --animations-off --startup-checkpoints --startup-click `
