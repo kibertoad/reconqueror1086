@@ -40,59 +40,42 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
 The default Python environment is shared with toolkit development and may hold
 an editable engine. Use command-scoped EVIDENCE_PYTHON pointing to
 artifacts/validation-python-183-session04/Scripts/python.exe for new evidence gates.
-Preserve validation-python-latest unchanged while the active native v5 run uses it;
+Preserve validation-python-latest for the historical native v5 recording;
 never update the shared environment.
 
 ## Handover
 
 - Stage: Survey; research-side runtime tooling.
-- Last gate: 2026-10-10 canonical -NoRestore validation passed with
-  EVIDENCE_PYTHON=artifacts/validation-python-183-session04/Scripts/python.exe,
-  executable-reader 4.0.0, engine 18.3.0, checker 4.2.0 and session 0.4.0.
-  No full-game gate passed.
-- Active original control: exec 19256, controller PID 59896, emulator
-  PID 80336, token 5007366d0cf2, debugger ses-1, under
-  artifacts/runtime-tools/native-rng-youth-v5-fixed100000-20261010-a.
-  It owns the machine lock and uses quiet normal-core fixed 100000 cycles,
-  session 0.3.0, v5 AGE checkpoints, five cycles and guarded entry/update
-  traversal. Observe the same handle; do not restart or remove its lock.
-- Earlier original controls are terminal; owned processes and locks were
-  cleaned up. EXP-UI-002 and FND-UI-027 are committed. The v4 control
-  ended incomplete; its failure log/journal and numeric-prefix checks passed.
-- Q-PERSON-021 is closed. FND-PERSON-012, FND-PERSON-013,
-  EXP-PERSON-001, EXP-PERSON-002 and RULE-PERSON-007 are committed;
-  Q-PERSON-022 remains open. EXP-UI-001 remains the entry-control reference.
-- Q-STRATEGY-043 remains open after FND-STRATEGY-049 and EXP-STRATEGY-003.
-  RULE-STRATEGY-012 remains disputed. Documentation and evidence checks passed.
-- Toolkit issues #319, #385, #388, #392 and #403 were consumer-validated and closed;
-  released debugger tracker #406 is also closed.
-  PR #419 is adopted. #402, #412, #413 and #420 remain open with their
-  original-game confirmation, feature or upstream prerequisites unresolved.
-  Upstream closed #416 on the session 0.4.0 release; local published-source
-  ownership controls passed, without a new original-game killed-owner run. The flat
-  isolated-call segment-model controls are committed; their reusable setup
-  result was added to existing toolkit issue #7 after duplicate checking.
-- Q-RNG-001 remains open after FND-RNG-007 through FND-RNG-013 and
-  EXP-RNG-002 through EXP-RNG-006. Documentation, isolated controls and
-  evidence/package checks passed; RULE-RNG-001 remains supported.
-- Toolkit #456 records the timer-gated readiness proposal. The standalone owned
-  breakpoint manager passed synthetic controls but is not integrated into v5.
-  The active recording remains pending; its coherent read-only readiness
-  diagnostic does not establish a completed traversal or a speed ratio.
-  Later coherent readiness showed three elapsed ticks against four required.
-  The proposed upstream PR #458 refuses protected-mode guests; this owned
-  consumer reports protected mode. Additional facts were sent to #456.
-- The AGE-checked v4 and registered-update v5 tooling contracts are committed.
-  Canonical validation and final consumer controls passed; native v5 is running.
-- Unfinished: native youth/dubbing traversal, complete caller ownership, prescribed full-game
-  state, two full-game recordings and actual rebuild replay. No WIP branch.
-- Blockers: none established. The pre-existing untracked .claude/settings.json
-  remains untouched. No push is authorized.
-- Next: observe and verify the owned v5 native control for
-  RULE-PERSON-004 / SCR-UI-019.
+- Stopped: owner asked to wrap up for today and paused the goal. Its condition
+  remains unmet. No new item or session starts during this wrap-up.
+- Last gate: canonical validation passed on 2026-10-10 with engine 18.3.0,
+  executable-reader 4.0.0, checker 4.2.0 and session 0.4.0, including the final
+  wrap-up rerun. Use command-scoped EVIDENCE_PYTHON pointing to
+  artifacts/validation-python-183-session04/Scripts/python.exe.
+- The owned native v5 control under
+  artifacts/runtime-tools/native-rng-youth-v5-fixed100000-20261010-a is terminal
+  and incomplete. Its failed log, ordered numeric prefix and AGE prefix were
+  checked with its historical session-0.3.0 interpreter. Controller/emulator
+  processes exited and the owned machine lock was released. Local captures stay
+  ignored; no successful dubbing-return or full-game gate passed.
+- FND-RNG-007 through FND-RNG-014 and EXP-RNG-002 through EXP-RNG-007 are
+  committed; Q-RNG-001 remains open and RULE-RNG-001 remains supported.
+- Q-PERSON-021 is closed; Q-PERSON-022 remains open. EXP-UI-002 and FND-UI-027
+  are committed. Q-STRATEGY-043 remains open; RULE-STRATEGY-012 remains disputed.
+- Shared library adoption and issue review are committed. Toolkit #319 and
+  #406 were validated and closed; upstream closed #416 with session 0.4.0.
+  #402, #412, #413 and #420 retain their unmet acceptance requirements.
+- Toolkit #456 retains the protected-mode gating acceptance gap. The standalone
+  timer-wait helper is not integrated into the recorder. Consult the issue's
+  latest response before adopting a future shared gate.
+- Unfinished: verified youth/dubbing traversal, complete caller ownership,
+  prescribed full-game state, two different-seed full-game recordings, trace
+  completeness/order checks and actual draw-by-draw rebuild replay. No WIP branch.
+- Blockers: no new owner decision required. The pre-existing untracked
+  .claude/settings.json remains untouched.
+- Next: verify timer-wait instrumentation for RULE-PERSON-004 / SCR-UI-019,
+  then run a fresh owned v5 control after explicit resumption.
 - Next: Q-PERSON-022 lifecycle review.
 - Next: Q-STRATEGY-043 / RULE-STRATEGY-012 downstream consumer review.
-- Next: Q-RNG-001 / RULE-RNG-001 seed-source provenance where required.
-- Next: prescribed full-game recordings and trace completeness, followed
-  by actual draw-by-draw rebuild replay.
-
+- Next: Q-RNG-001 / RULE-RNG-001 remaining seed-source provenance.
+- Next: prescribed full-game recordings, completeness and actual rebuild replay.
