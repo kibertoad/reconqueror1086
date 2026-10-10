@@ -4,6 +4,11 @@ Published after duplicate checking as
 [toolkit issue #403](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/403).
 No shared package has been extracted or adopted yet.
 
+The [terminal-envelope follow-up](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/403#issuecomment-6096124031)
+adds expected-boundary verification, final-journal/durable-log agreement and
+explicit versioning of required pending-operation fields to the accepted
+durable-log request. Semantic replay and game-specific boundaries stay local.
+
 Reconqueror has verified structured debugger transport, owned runtime lifecycle,
 live mapping and a guarded startup-input/screen-return probe. The commands and
 limits are in [RUNTIME.md](RUNTIME.md), with dated checks in

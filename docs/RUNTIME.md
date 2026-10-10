@@ -289,7 +289,7 @@ SCR-UI-003, to open youth generation. It uses the same queue and RNG guards.
 With screen target 3, a probe verifies the generation return while recording
 its initial dilemma draw under RULE-PERSON-003. Synthetic input checks passed;
 native generation traversal passed the target-return check in VALIDATION.md.
-Youth answers, Continue and Reroll still need their own native checks.
+The first answer and Continue have native checks below; Reroll remains unverified.
 
 `--youth-answer` requires generation input and continuation beyond screen 3.
 It queues the first answer at (100, 350), inside SCR-UI-004's first-answer
@@ -308,7 +308,9 @@ It writes no timer or release state. Once ready, it queues (500, 150) inside
 the Continue rectangle of SCR-UI-004/FND-UI-021 and removes that temporary
 breakpoint. FND-UI-022 supports its entry and two restored-stack returns.
 The matching return and journal replay end this diagnostic with
-`youth-continue-return-reached`; native traversal remains unverified.
+`youth-continue-return-reached`. A quiet native run passed this boundary and
+durable-event/numeric-replay verification (VALIDATION.md); it verifies one
+Continue traversal, not the complete youth sequence.
 
 `--youth-cycles N` extends that sequence for one through six prescribed
 first-answer/Continue pairs and requires Continue when N exceeds one.
@@ -415,6 +417,22 @@ If a deliberate pause is needed, verify the owned session and process first.
 After terminal completion, check both the journal's status/completeness fields
 and cleanup: the owned process must have stopped before its lock is released.
 Never use that check to stop another task's emulator or remove its lock.
+
+For a current native recorder's terminal diagnostic, verify durable-log agreement,
+event order and numeric RNG replay with an explicit expected boundary:
+
+```powershell
+python -B tools/verify_native_recording.py artifacts/runtime-tools/continue-fresh --expect-status youth-continue-return-reached
+python -B tools/test_verify_native_recording.py
+```
+
+The validator rejects a different or incomplete boundary, recorded failures,
+pending or missing operation flags, changed event contents/order and an incorrect
+final RNG state. Older journals missing flags added after their run are rejected;
+do not amend a capture to satisfy the check. File reads are bounded. This check
+does not establish process cleanup, original trace completeness, input reachability
+or replay against the rebuild; check those separately. Diagnostic journals must
+keep full-game and accepted-caller completeness false.
 
 Tool edits do not update Python modules already loaded by a running probe.
 Finish observing that run under its original code, and test the new version

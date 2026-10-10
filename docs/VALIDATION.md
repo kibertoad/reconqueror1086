@@ -2,6 +2,25 @@
 
 ## Checker 4.1.1 and quiet probes (2026-10-10)
 
+2026-10-10: `native-rng-youth-continue-20261010-b` passed the matching
+Continue callback return after verified screen returns 0, 1, 2 and 3 and the
+first-answer return. The terminal validator confirmed that all 34 events agree
+with the durable log and numerically replay to state 1027531061. Every current
+pending-operation flag was false. The owning command completed successfully;
+the controller/emulator exited and the machine lock was absent. This verifies
+one Continue traversal, not six cycles, trace completeness or rebuild replay.
+The canonical fast gate passed with `-NoRestore` for the validator tooling batch.
+
+2026-10-10: the terminal native-diagnostic validator passed its synthetic
+acceptance and refusal checks. It requires the requested terminal boundary,
+all current pending-operation flags, durable-log agreement and numeric replay
+with the reported final state. It rejects incomplete/failure reports, missing
+flags, reordered or altered events, malformed JSON and oversized files.
+The earlier first-answer capture lacks the later Continue pending flag and is
+therefore refused without changing that capture. The interrupted Continue
+capture is also refused for failing to reach the requested boundary. These
+checks make no gameplay, process-cleanup or full-game completeness claim.
+
 2026-10-10: the owner requested wrap-up while
 `native-rng-youth-continue-20261010-a` was extracting startup resources. An
 explicit owned-session pause ended recording as incomplete, before Continue
