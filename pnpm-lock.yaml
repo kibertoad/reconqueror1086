@@ -167,11 +167,11 @@ importers:
   .:
     devDependencies:
       '@scientific-method/executable-reader':
-        specifier: 2.8.0
-        version: 2.8.0
+        specifier: 2.10.1
+        version: 2.10.1
       '@scientific-method/standard-checker':
-        specifier: 4.1.1
-        version: 4.1.1
+        specifier: 4.2.0
+        version: 4.2.0
 
 packages:
 
@@ -261,13 +261,13 @@ packages:
     resolution: {integrity: sha512-sXiVUI18qaCei5Y5qXty7xfEKrk4Vx89qKNZkG2sGWZG/iTThO3Xmnp5IjQpXCy941IksVDcl41HhvWRuhDLyw==}
     engines: {node: '>= 12'}
 
-  '@scientific-method/executable-reader@2.8.0':
-    resolution: {integrity: sha512-F+9YCx8FmWv6nkOrQRyS8p0lFGmhF3Dyq/GZZFt0fzMpWQPhwJfuVAchepLD3F36Bibwcf1vkLEEZXbnvURLKQ==}
+  '@scientific-method/executable-reader@2.10.1':
+    resolution: {integrity: sha512-EswzRa9vwyy7WAvjKnfffk2wp9CT2rk3eltd6RUY1hxc7+TLGIAAtvyjUa83ZaXGRXLiQH/2X8JnhTsvKhQSjA==}
     engines: {node: '>=22'}
     hasBin: true
 
-  '@scientific-method/standard-checker@4.1.1':
-    resolution: {integrity: sha512-AjtBBxB0zzjY4gX5Kv9WxqNKYQKfumu7TZFh+Zb0D9wJ8d4MC5pEEM1cSS5h1LCXpNbWM3ge2If19EgfCj3iBA==}
+  '@scientific-method/standard-checker@4.2.0':
+    resolution: {integrity: sha512-6+rbQmUXgG2m5hpxgzptJjhQ7nLKZnvIT0Y8mylgNAsUVSSEonQr7NGE1jruZqjfuq/0XcgV+RG68EDBDGzuxA==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -328,8 +328,8 @@ snapshots:
       '@node-rs/xxhash-win32-ia32-msvc': 1.7.8
       '@node-rs/xxhash-win32-x64-msvc': 1.7.8
 
-  '@scientific-method/executable-reader@2.8.0':
+  '@scientific-method/executable-reader@2.10.1':
     dependencies:
       '@node-rs/xxhash': 1.7.8
 
-  '@scientific-method/standard-checker@4.1.1': {}
+  '@scientific-method/standard-checker@4.2.0': {}

@@ -1,7 +1,7 @@
 # Exact toolkit engine, session and decoder releases; hashes include wheels and source archives.
-scientific-method-engine==15.3.0 \
-    --hash=sha256:63f590b28981c01e01b3f1bffca5ec67e22c00ae010d977f68b7310737173352 \
-    --hash=sha256:9d4c200071f8aafb805ea31bf769f2588ae2a945c744c808291e20f978aefe6e
+scientific-method-engine==17.0.1 \
+    --hash=sha256:f9f2a5e0364360e35393d86471f04247a0008228fe41308298d543ed7cdafa06 \
+    --hash=sha256:fb20e6bd80c026569dcf468a0c3c3a8411426cae0de7ecf74610a7a276d129d7
 capstone==5.0.7 \
     --hash=sha256:388af4ddb9224d3b4f9269673ee575b3f94f77774d48b3f1a283ad13c29a106a \
     --hash=sha256:a9f64e3d75d8c4d7b3d26bba153b2992aadcf6b8d57674b4ef176b4ecdd9822f \
@@ -246,6 +246,6 @@ xxhash==4.0.1 \
     --hash=sha256:d1e0d1ea6e44f51808a9e8469c8afdebcdf6fa23d1ea524a0303d57d23919712 \
     --hash=sha256:764b32d52d15b8b95ac8160e540772fa1adeb611fe40bffaeb42e7bf98279e44 \
     --hash=sha256:d55bf4ef10eb09b8b6866790e083d26d087d84caa3cc0946ba87c3ca7ecaf7b7
-dinorefurb-dosbox-session==0.2.0 \
-    --hash=sha256:f040ba9e42e76a73e1245e651666cc98b5f9cf04fbd7357c6450997775787cc4 \
-    --hash=sha256:1c6b9caa6485440758d7a813df9901643910055da7948b78034b5f1c02cc4067
+dinorefurb-dosbox-session==0.3.0 \
+    --hash=sha256:7b571f68ab587425b1acf5b012081eedebe56cd5871a44811b34ce322995d9fb \
+    --hash=sha256:a872ca40a659c281eddd6abdd2fbd24029a245d8a11e12b647aa130b62e200b1

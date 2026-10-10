@@ -53,11 +53,7 @@
                 [
                   [
                     "constant",
-                    52
-                  ],
-                  [
-                    "constant",
-                    18
+                    4660
                   ],
                   [
                     "extract",
@@ -66,19 +62,13 @@
                       "initial:eax"
                     ],
                     16,
-                    8,
-                    32
-                  ],
-                  [
-                    "extract",
-                    [
-                      "unknown",
-                      "initial:eax"
-                    ],
-                    24,
-                    8,
+                    16,
                     32
                   ]
+                ],
+                [
+                  16,
+                  16
                 ]
               ],
               "value": null,
@@ -247,24 +237,8 @@
                 "join",
                 [
                   [
-                    "extract",
-                    [
-                      "unknown",
-                      "entry:sp"
-                    ],
-                    0,
-                    8,
-                    16
-                  ],
-                  [
-                    "extract",
-                    [
-                      "unknown",
-                      "entry:sp"
-                    ],
-                    8,
-                    8,
-                    16
+                    "unknown",
+                    "entry:sp"
                   ],
                   [
                     "extract",
@@ -278,24 +252,13 @@
                       32
                     ],
                     16,
-                    8,
-                    32
-                  ],
-                  [
-                    "extract",
-                    [
-                      "zeroExtend",
-                      [
-                        "unknown",
-                        "entry:sp"
-                      ],
-                      16,
-                      32
-                    ],
-                    24,
-                    8,
+                    16,
                     32
                   ]
+                ],
+                [
+                  16,
+                  16
                 ]
               ],
               "value": null,
@@ -489,11 +452,7 @@
             [
               [
                 "constant",
-                52
-              ],
-              [
-                "constant",
-                18
+                4660
               ],
               [
                 "extract",
@@ -502,19 +461,13 @@
                   "initial:eax"
                 ],
                 16,
-                8,
-                32
-              ],
-              [
-                "extract",
-                [
-                  "unknown",
-                  "initial:eax"
-                ],
-                24,
-                8,
+                16,
                 32
               ]
+            ],
+            [
+              16,
+              16
             ]
           ],
           "value": null,
@@ -683,24 +636,8 @@
             "join",
             [
               [
-                "extract",
-                [
-                  "unknown",
-                  "entry:sp"
-                ],
-                0,
-                8,
-                16
-              ],
-              [
-                "extract",
-                [
-                  "unknown",
-                  "entry:sp"
-                ],
-                8,
-                8,
-                16
+                "unknown",
+                "entry:sp"
               ],
               [
                 "extract",
@@ -714,24 +651,13 @@
                   32
                 ],
                 16,
-                8,
-                32
-              ],
-              [
-                "extract",
-                [
-                  "zeroExtend",
-                  [
-                    "unknown",
-                    "entry:sp"
-                  ],
-                  16,
-                  32
-                ],
-                24,
-                8,
+                16,
                 32
               ]
+            ],
+            [
+              16,
+              16
             ]
           ],
           "value": null,

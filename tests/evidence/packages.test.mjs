@@ -44,7 +44,8 @@ test("Conqueror x86 wrapper forwards package reports and retains synthetic retur
   const report = run(["x86-returns", file]);
   assert.deepEqual(report, withEvidencePython(() => packageRun(["returns", file])));
   // Baseline was produced entirely from the fabricated four-byte source above.
-  // New return-flow fields are allowed, but every prior field and value must survive.
+  // New return-flow fields are allowed. Partial-register expressions use engine 16's
+  // explicit part-width join representation; numeric behavior stays fixed.
   const baseline = JSON.parse(readFileSync(join(root, "tests/fixtures/synthetic/toolkit/return-baseline.json")));
   const retain = (actual, previous) => Array.isArray(previous) ? actual.map((value, i) => retain(value, previous[i])) :
     previous && typeof previous === "object" ? Object.fromEntries(Object.entries(previous).map(([key, value]) => [key, retain(actual[key], value)])) : actual;

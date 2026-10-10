@@ -7,7 +7,7 @@
     "node": ">=22"
   },
   "devDependencies": {
-    "@scientific-method/executable-reader": "2.8.0",
-    "@scientific-method/standard-checker": "4.1.1"
+    "@scientific-method/executable-reader": "2.10.1",
+    "@scientific-method/standard-checker": "4.2.0"
   }
 }

@@ -1371,6 +1371,30 @@ missing/pending operations, state discontinuity and forbidden diagnostic fields.
 Dialogue reseeding, reentrant writes, full-game completeness and actual rebuild
 replay have not been verified.
 
+## Shared-library release validation (2026-10-10)
+
+The release pins now select executable-reader 2.10.1, standard-checker 4.2.0,
+scientific-method-engine 17.0.1 and dosbox-session 0.3.0. Python archives are
+hash locked; the published engine still requires Capstone 5.0.7 and pypcode
+4.0.0. Decoder-upgrade PR #435 was open when these packages were checked.
+Use EVIDENCE_PYTHON=artifacts/validation-python-latest/Scripts/python.exe for
+this release environment; the earlier live probe keeps its 0.2.0 environment.
+
+The original synthetic BOM reproduction passed with equal plain/BOM pointer
+reports; UTF-16 and invalid UTF-8 controls produced specific refusals. Toolkit
+issue #385 was closed with these consumer results. An isolated two-branch
+control invoked the installed checker's base comparison before the second
+branch committed: independent content under the same finding ID failed
+IDENTIFIERS-6, identical content passed, and the base tip's addition was not
+reported deleted. Issue #388 was closed with those results.
+
+The fabricated return-report fixture was migrated to engine 16's explicit
+partial-register join widths. Numeric return behavior and package/wrapper
+agreement remain checked. The canonical -NoRestore gate passed in the new
+environment, including the Node controls, build and .NET checks.
+Session 0.3.0 event-log adoption and its native
+positive control are separate from installing the release pins.
+
 ## Home-selection recorder extension (2026-10-10)
 
 A fresh original launch recorded the startup prefix and the following home
