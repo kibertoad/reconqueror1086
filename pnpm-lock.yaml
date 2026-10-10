@@ -167,8 +167,8 @@ importers:
   .:
     devDependencies:
       '@scientific-method/executable-reader':
-        specifier: 2.6.0
-        version: 2.6.0
+        specifier: 2.8.0
+        version: 2.8.0
       '@scientific-method/standard-checker':
         specifier: 4.1.1
         version: 4.1.1
@@ -261,8 +261,8 @@ packages:
     resolution: {integrity: sha512-sXiVUI18qaCei5Y5qXty7xfEKrk4Vx89qKNZkG2sGWZG/iTThO3Xmnp5IjQpXCy941IksVDcl41HhvWRuhDLyw==}
     engines: {node: '>= 12'}
 
-  '@scientific-method/executable-reader@2.6.0':
-    resolution: {integrity: sha512-1MmT/fbb61EZ/p0PvOhDZMuytNN8qVvdG/+k5vFvmdXlF3oUQp8NQtCbAYIocbsgCPh2P3yll3KYgtXpVHbKtg==}
+  '@scientific-method/executable-reader@2.8.0':
+    resolution: {integrity: sha512-F+9YCx8FmWv6nkOrQRyS8p0lFGmhF3Dyq/GZZFt0fzMpWQPhwJfuVAchepLD3F36Bibwcf1vkLEEZXbnvURLKQ==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -328,7 +328,7 @@ snapshots:
       '@node-rs/xxhash-win32-ia32-msvc': 1.7.8
       '@node-rs/xxhash-win32-x64-msvc': 1.7.8
 
-  '@scientific-method/executable-reader@2.6.0':
+  '@scientific-method/executable-reader@2.8.0':
     dependencies:
       '@node-rs/xxhash': 1.7.8
 

@@ -29,6 +29,9 @@ export function verifyToolkitPackages(root = ROOT) {
   }
   const requirements = text(root, "requirements-evidence.txt");
   if (!/^\d+\.\d+\.\d+$/.test(adoption.engine ?? "") || !requirements.includes(`scientific-method-engine==${adoption.engine} \\`)) throw new Error("Engine requirement differs from toolkit adoption");
+  const session = adoption.dosbox_session;
+  if (!/^\d+\.\d+\.\d+$/.test(session?.version ?? "") || !/^[a-f0-9]{40}$/.test(session?.revision ?? "") ||
+      !requirements.includes(`dinorefurb-dosbox-session==${session.version} \\`)) throw new Error("Session requirement differs from toolkit adoption");
   return adoption;
 }
 const direct = (() => { try { return process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href; } catch { return false; } })();

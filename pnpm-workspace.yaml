@@ -3,4 +3,4 @@
 # version package.json pins.
 minimumReleaseAgeExclude:
   - '@scientific-method/standard-checker@4.1.1'
-  - '@scientific-method/executable-reader@2.6.0'
+  - '@scientific-method/executable-reader@2.8.0'

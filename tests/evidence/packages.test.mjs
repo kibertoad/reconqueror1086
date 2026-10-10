@@ -79,6 +79,8 @@ test("package adoption rejects manifest, lock, integrity, installed-version and 
   change("node_modules/@scientific-method/executable-reader/package.json", x=>x.version="0.0.0", /Installed toolkit/);
   change("tools/upstream-lock.json", x=>x.checker.revision="a".repeat(40), /checker the upstream lock pins/);
   change("tools/upstream-lock.json", x=>x.checker.version="0.0.1", /checker the upstream lock pins/);
+  change("tools/toolkit-packages.json", x=>x.dosbox_session.version="0.0.1", /Session requirement differs/);
+  change("tools/toolkit-packages.json", x=>x.dosbox_session.revision="unpinned", /Session requirement differs/);
 });
 test("Conqueror x86 wrapper forwards the reader's PE import and pointer-table reports", t => {
   // Both run in the reader without the engine; the refusals name each command's own query fields.

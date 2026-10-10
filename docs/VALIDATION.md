@@ -1,5 +1,25 @@
 # Validation
 
+## Shared library releases and interrupted traversal (2026-10-10)
+
+The hash-locked private environment now contains engine 15.3.0 and
+dinorefurb-dosbox-session 0.1.0; the executable reader is pinned to 2.8.0.
+Checker 4.1.1 remains current. Exact-pin controls and the canonical
+`Invoke-Validation.ps1 -NoRestore` gate passed with EVIDENCE_PYTHON pointing
+to that environment. The engine's required decoder versions were retained.
+The published session source's Windows synthetic lifecycle suite also passed.
+The initial PyPI publisher mismatch was corrected by the owner; release attempt
+2 succeeded, so no source-install fallback remains in the requirements.
+
+The old-helper six-cycle attempt under native-rng-youth-six-cycles-20261010-b
+was explicitly paused for migration diagnostics, ending as incomplete. Its
+37 completed events agree with the durable JSONL and replay to 1539018294.
+Four Continue cycles completed; a screen load and the fifth Continue remained
+pending. The recorded startup service returns all passed their stack and RNG
+guards. Neither six-cycle completion nor full-game completeness is established.
+Its controller and emulator exited, and the machine run lock was absent after
+cleanup. The diagnostic registers and memory remain local only.
+
 ## Checker 4.1.1 and quiet probes (2026-10-10)
 
 2026-10-10: guarded dubbing-to-village instrumentation passed synthetic

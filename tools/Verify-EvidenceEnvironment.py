@@ -23,6 +23,9 @@ def verify(root):
     adoption = json.loads((root / "tools/toolkit-packages.json").read_text(encoding="utf-8"))
     if expected.get("scientific-method-engine") != adoption.get("engine"):
         raise ValueError("Engine requirement differs from toolkit adoption")
+    session = adoption.get("dosbox_session")
+    if session is not None and expected.get("dinorefurb-dosbox-session") != session.get("version"):
+        raise ValueError("Session requirement differs from toolkit adoption")
     for name, version in expected.items():
         try:
             actual = importlib.metadata.version(name)
