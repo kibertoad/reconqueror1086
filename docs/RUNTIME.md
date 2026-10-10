@@ -429,6 +429,14 @@ the screen-return guard refuses a return that skipped these observations.
 This control is separate from the later `--dubbing-click` callback input.
 Its synthetic checks pass; native traversal remains unfinished.
 
+`--youth-age-checkpoints` adds read-only observations at the youth screen
+return and each prescribed answer/Continue entry and return. It follows
+FND-PERSON-001 and FND-PERSON-003's row-zero AGE field with bounded pointers
+and table counts. The local report records the boundary, completed cycle
+count, AGE and RNG state. It does not alter AGE, timers or RNG and does not
+assume a cycle count from the observation. Use it to investigate a traversal
+that reaches its endpoint earlier than the prescribed count.
+
 The probe imports its recorder and input helper before starting the guest and
 writes their authored-source hashes in local `probe-source.json`. Later source
 edits do not change those loaded modules. A traceback may display lines from an

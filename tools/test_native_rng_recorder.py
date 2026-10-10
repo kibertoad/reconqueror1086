@@ -54,7 +54,8 @@ class ScreenBoundaryTests(unittest.TestCase):
                              generation=False, youth=False, continuation=False, bad_callback_frame=None,
                              changed_youth_history=False, cycles=1, dubbing=False,
                              changed_dubbing_history=False, changed_dubbing_object=False,
-                             missing_village=False, unprescribed_dubbing=False, presentation=False):
+                             missing_village=False, unprescribed_dubbing=False, presentation=False,
+                             age_checkpoints=False):
         runtime, mapping = runtime_and_mapping()
         entry_phase = -1
         entry_points = (0x19a8c, 0x19bbf, 0x19bcc, 0x19c51, 0x19c5e, 0x19c61)
@@ -137,6 +138,7 @@ class ScreenBoundaryTests(unittest.TestCase):
         with patch('native_rng_recorder.tables_from_diagnostic', return_value=(0, 16)), \
              patch('native_rng_recorder.descriptor', side_effect=[mapping.code, mapping.data] * 100), \
              patch('native_rng_recorder.EventLog'), patch('native_rng_recorder.Path.write_text'), \
+             patch('native_rng_recorder.read_youth_age', return_value=12) as age_read, \
              patch('dubbing_entry_input.primary_click_ready', return_value=True), \
              patch('dubbing_entry_input.queue_primary_click', return_value={'action': 'primary-short-click'}) as entry_click, \
              patch('native_rng_recorder.primary_click_ready', side_effect=[False, True] * (2 * cycles - 1 + int(dubbing))) as ready, \
@@ -147,7 +149,11 @@ class ScreenBoundaryTests(unittest.TestCase):
                             stop_after_screen_id=None if youth else 3 if generation else 2 if new_game else 1,
                             new_game_click=new_game, generation_click=generation, youth_answer=youth,
                             youth_continue=continuation, youth_cycles=cycles, dubbing_click=dubbing,
-                            dubbing_entry_input=presentation)
+                            dubbing_entry_input=presentation, youth_age_checkpoints=age_checkpoints)
+        if age_checkpoints:
+            self.assertEqual(age_read.call_count, 1 + 4 * cycles)
+            self.assertEqual(report['youth_ages'][0]['boundary'], 'youth-screen-return')
+            self.assertEqual(report['youth_ages'][-1]['boundary'], 'continue-return')
         if presentation:
             self.assertEqual(entry_click.call_count, 2)
             self.assertTrue(report['dubbing_entry_complete'])
@@ -531,6 +537,12 @@ class ScreenBoundaryTests(unittest.TestCase):
                                            continuation=True, cycles=6, dubbing=True, presentation=True)
         self.assertEqual(report['schema'], 'conquer-native-rng-journal-v3')
         self.assertEqual(report['status'], 'dubbing-return-reached')
+
+    def test_age_observations_cover_screen_and_callback_boundaries(self):
+        report = self.replacement_sequence(new_game=True, generation=True, youth=True,
+                                           continuation=True, cycles=2, age_checkpoints=True)
+        self.assertEqual(report['youth_ages'][1]['completed_cycles'], 0)
+        self.assertEqual(report['youth_ages'][-1]['completed_cycles'], 1)
 
 
 class OwnedReductionTests(unittest.TestCase):

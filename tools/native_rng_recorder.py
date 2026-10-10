@@ -14,6 +14,7 @@ from live_mapping import descriptor, tables_from_diagnostic
 from rng_recording import RecordingError, canonical_pc
 from supported_pointer_input import queue_primary_click, primary_click_ready
 from dubbing_entry_input import DubbingEntryInput, POINTS as DUBBING_ENTRY_POINTS
+from youth_age_checkpoint import read_youth_age
 
 
 class EventLog:
@@ -34,7 +35,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
            startup_checkpoints=False, startup_click=False, continue_after_screen=False, title_click=False,
            screen_checkpoints=False, stop_after_screen_id=None, new_game_click=False, generation_click=False,
            youth_answer=False, youth_continue=False, youth_cycles=1, dubbing_click=False,
-           dubbing_entry_input=False):
+           dubbing_entry_input=False, youth_age_checkpoints=False):
     if stop_at_screen and stop_after_screen:
         raise ValueError('Choose one screen diagnostic boundary')
     if startup_checkpoints and not stop_after_screen:
@@ -55,6 +56,8 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         raise ValueError('Youth answer requires generation input and continuation beyond screen three')
     if youth_continue and not youth_answer:
         raise ValueError('Youth Continue requires the guarded answer stage')
+    if youth_age_checkpoints and not youth_answer:
+        raise ValueError('Youth AGE checkpoints require the guarded answer stage')
     if type(youth_cycles) is not int or not 1 <= youth_cycles <= 6 or (youth_cycles != 1 and not youth_continue):
         raise ValueError('Youth cycles require Continue and an integer from one to six')
     if dubbing_click and (not youth_continue or youth_cycles != 6 or stop_after_screen_id is not None):
@@ -235,6 +238,13 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
             stack_pointer = int(registers.general['esp'], 16)
             key = (int(registers.segments['ss'], 16), stack_pointer)
             kind = hooks[stop.breakpoint_id]
+            if youth_age_checkpoints and kind in ('answer-entry', 'answer-return', 'continue-entry', 'continue-return'):
+                if frame is not None or state() != journal.complete() or replay(journal.events) != state():
+                    raise RecordingError('Youth AGE checkpoint requires completed RNG events')
+                report.setdefault('youth_ages', []).append({
+                    'boundary': kind, 'completed_cycles': completed_youth_cycles,
+                    'age': read_youth_age(runtime, mapping), 'rng_state': state()})
+                (output / 'youth-age-checkpoints.json').write_text(json.dumps(report['youth_ages'], indent=2) + '\n')
             if kind == 'dubbing-presentation':
                 if presentation is None or frame is not None or archive_key is not None or \
                         answer_key is not None or continue_key is None or screen_frame is None:
@@ -465,6 +475,11 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                 report['screen_request'] = screen_frame['request']
                 report['screen_observation'] = {'record_pointer': pointer, 'object_pointer': object_pointer,
                                                 'screen_id': screen_id, 'history': history}
+                if youth_age_checkpoints and screen_id == 3:
+                    report.setdefault('youth_ages', []).append({
+                        'boundary': 'youth-screen-return', 'completed_cycles': completed_youth_cycles,
+                        'age': read_youth_age(runtime, mapping), 'rng_state': report['end_rng_state']})
+                    (output / 'youth-age-checkpoints.json').write_text(json.dumps(report['youth_ages'], indent=2) + '\n')
                 screen_frame = None
                 if screen_checkpoints:
                     observation = {'request': report['screen_request'],

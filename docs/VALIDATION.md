@@ -73,6 +73,12 @@ Schema v3 explicitly records pending entry state and entry completion;
 historical v1/v2 journals keep their original meaning. This instrumentation
 has not yet completed a native dubbing traversal.
 
+Optional read-only youth AGE checkpoints passed bounded lookup and malformed
+pointer/count refusal controls, plus the integrated recorder boundary check.
+They are for diagnosing the observed traversal count before changing its
+terminal contract. The currently running probe imported its recorder before
+these controls were added and does not exercise them.
+
 ## Shared library releases and interrupted traversal (2026-10-10)
 
 The hash-locked private environment now contains engine 15.3.0 and
