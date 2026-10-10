@@ -1281,3 +1281,16 @@ bound 7. Native state/raw/bounded comparisons and numeric journal replay passed.
 The journal and map diagnostics remain in the local original capture store.
 This does not settle Q-STRATEGY-043's complete downstream review or establish
 full-game coverage or actual rebuild replay.
+
+## Incomplete six-cycle preparation diagnostic (2026-10-10)
+
+The six-cycle attempt under the local native-rng-youth-six-cycles-20261010-a
+capture directory remained in startup preparation. An explicit diagnostic pause
+ended recording as incomplete with an unmodelled native stop. Its 32 completed
+events agree with the durable JSONL and numeric replay ends at 2124446143.
+Neither repeated youth traversal nor the terminal cycle check succeeded.
+The controller and owned emulator exited, and the machine run lock was absent
+after cleanup. Registers, memory and the diagnostic image remain local only.
+The paused CPU was in a real-mode BIOS keyboard-check service. A reconstruction
+of the captured screen buffer showed the publisher logo; neither observation
+establishes which preparation call was responsible or a blocking cause.
