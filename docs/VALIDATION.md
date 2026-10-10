@@ -2,6 +2,19 @@
 
 ## Checker 4.1.1 and quiet probes (2026-10-10)
 
+2026-10-10: guarded dubbing-to-village instrumentation passed synthetic
+recorder, terminal-validator and supported-pointer checks. The sequence covers
+six youth pairs, verified dubbing replacement, an unsuitable then suitable
+pointer-readiness observation, one full-screen input, village replacement and
+the matching dubbing callback return. Refusal checks cover changed dubbing
+history/object identity, mismatched callback stack, missing village replacement
+and incompatible cycle/target options. The terminal checks require schema v2's
+explicit false pending-dubbing flag, six completed cycles and the village
+endpoint; the v1 native Continue capture still passes its own contract.
+The already-running six-cycle probe retains its original loaded code and has
+not reached its target. Neither native dubbing traversal nor full-game recording
+or rebuild replay is established by these synthetic checks.
+
 2026-10-10: the terminal validator's prescribed-youth-cycle checks passed
 synthetic acceptance cases for one through six cycles and refusal cases for
 missing, wrong or noninteger counts, incompatible status requests and absent

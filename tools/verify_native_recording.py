@@ -12,6 +12,7 @@ TERMINAL_STATUSES = frozenset({
     'screen-load-return-reached', 'screen-target-return-reached',
     'youth-answer-return-reached', 'youth-continue-return-reached',
     'youth-sequence-return-reached',
+    'dubbing-return-reached',
 })
 PENDING_FIELDS = (
     'pending_operation', 'pending_screen_load', 'pending_archive_extraction',
@@ -36,11 +37,12 @@ def verify(directory, expected_status, expected_youth_cycles=None):
             raise RecordingError('Expected youth cycles must be an integer from one to six')
         cycle_status = ('youth-continue-return-reached' if expected_youth_cycles == 1
                         else 'youth-sequence-return-reached')
-        if expected_status != cycle_status:
+        if expected_status != cycle_status and not (expected_status == 'dubbing-return-reached' and expected_youth_cycles == 6):
             raise RecordingError('Expected youth cycles require the corresponding Continue boundary')
     directory = Path(directory)
     report = json.loads(read_bounded(directory / 'native-rng-journal.json'))
-    if not isinstance(report, dict) or report.get('schema') != 'conquer-native-rng-journal-v1':
+    if not isinstance(report, dict) or report.get('schema') not in (
+            'conquer-native-rng-journal-v1', 'conquer-native-rng-journal-v2'):
         raise RecordingError('Unexpected native journal schema')
     if report.get('status') != expected_status:
         raise RecordingError('Native journal did not reach the requested diagnostic boundary')
@@ -48,6 +50,13 @@ def verify(directory, expected_status, expected_youth_cycles=None):
         raise RecordingError('Native journal records a failure')
     if any(report.get(name) is not False for name in PENDING_FIELDS):
         raise RecordingError('Native journal has a pending or unreported operation')
+    if report['schema'] == 'conquer-native-rng-journal-v1' and 'pending_dubbing' in report:
+        raise RecordingError('Dubbing state requires schema v2')
+    if report['schema'] == 'conquer-native-rng-journal-v2' and report.get('pending_dubbing') is not False:
+        raise RecordingError('Native journal has a pending or unreported dubbing operation')
+    if expected_status == 'dubbing-return-reached' and (
+            report['schema'] != 'conquer-native-rng-journal-v2' or expected_youth_cycles != 6):
+        raise RecordingError('Dubbing verification requires schema v2 and six prescribed cycles')
     if any(report.get(name) is not False for name in
            ('full_game_complete', 'accepted_callers_complete')):
         raise RecordingError('Diagnostic must not claim full-game or caller completeness')
@@ -73,7 +82,8 @@ def verify(directory, expected_status, expected_youth_cycles=None):
             raise RecordingError('Native journal did not complete the requested youth cycles')
         # FND-UI-022 / RULE-PERSON-004: the sixth Continue replaces youth
         # with dubbing; earlier Continue returns retain the youth screen.
-        expected_screen = 6 if expected_youth_cycles == 6 else 3
+        expected_screen = (11 if expected_status == 'dubbing-return-reached' else
+                           6 if expected_youth_cycles == 6 else 3)
         observation = report.get('screen_observation')
         if not isinstance(observation, dict):
             raise RecordingError('Youth cycle endpoint has no screen observation')

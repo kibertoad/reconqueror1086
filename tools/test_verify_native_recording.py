@@ -152,6 +152,38 @@ class NativeVerificationTests(unittest.TestCase):
             with self.assertRaisesRegex(RecordingError, 'corresponding Continue boundary'):
                 verify(self.path, status, cycles)
 
+    def dubbing_report(self):
+        return {**self.youth_report(6), 'schema': 'conquer-native-rng-journal-v2',
+                'status': 'dubbing-return-reached', 'pending_dubbing': False,
+                'screen_observation': {'screen_id': 11, 'history': [11, 6, 3, 2, 1]}}
+
+    def test_v2_dubbing_requires_six_cycles_and_village_endpoint(self):
+        self.write(self.dubbing_report())
+        result = verify(self.path, 'dubbing-return-reached', 6)
+        self.assertEqual(result['screen_id'], 11)
+        self.assertEqual(result['completed_youth_cycles'], 6)
+        with self.assertRaisesRegex(RecordingError, 'schema v2 and six'):
+            verify(self.path, 'dubbing-return-reached')
+
+    def test_v2_dubbing_pending_flag_must_be_explicit_and_false(self):
+        for value in (True, None, 0):
+            self.write({**self.dubbing_report(), 'pending_dubbing': value})
+            with self.assertRaisesRegex(RecordingError, 'pending or unreported dubbing'):
+                verify(self.path, 'dubbing-return-reached', 6)
+        report = self.dubbing_report()
+        del report['pending_dubbing']
+        self.write(report)
+        with self.assertRaisesRegex(RecordingError, 'pending or unreported dubbing'):
+            verify(self.path, 'dubbing-return-reached', 6)
+
+    def test_dubbing_rejects_v1_schema_or_youth_endpoint(self):
+        self.write({**self.dubbing_report(), 'schema': 'conquer-native-rng-journal-v1'})
+        with self.assertRaisesRegex(RecordingError, 'schema v2'):
+            verify(self.path, 'dubbing-return-reached', 6)
+        self.write({**self.dubbing_report(), 'screen_observation': self.youth_report(6)['screen_observation']})
+        with self.assertRaisesRegex(RecordingError, 'endpoint screen'):
+            verify(self.path, 'dubbing-return-reached', 6)
+
 
 if __name__ == '__main__':
     unittest.main()

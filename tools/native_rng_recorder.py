@@ -32,7 +32,7 @@ class EventLog:
 def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen=False, stop_after_screen=False,
            startup_checkpoints=False, startup_click=False, continue_after_screen=False, title_click=False,
            screen_checkpoints=False, stop_after_screen_id=None, new_game_click=False, generation_click=False,
-           youth_answer=False, youth_continue=False, youth_cycles=1):
+           youth_answer=False, youth_continue=False, youth_cycles=1, dubbing_click=False):
     if stop_at_screen and stop_after_screen:
         raise ValueError('Choose one screen diagnostic boundary')
     if startup_checkpoints and not stop_after_screen:
@@ -55,6 +55,8 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         raise ValueError('Youth Continue requires the guarded answer stage')
     if type(youth_cycles) is not int or not 1 <= youth_cycles <= 6 or (youth_cycles != 1 and not youth_continue):
         raise ValueError('Youth cycles require Continue and an integer from one to six')
+    if dubbing_click and (not youth_continue or youth_cycles != 6 or stop_after_screen_id is not None):
+        raise ValueError('Dubbing input requires six youth cycles and no earlier screen target')
     if stop_after_screen_id is not None and (not screen_checkpoints or
             type(stop_after_screen_id) is not int or not 0 <= stop_after_screen_id <= 24):
         raise ValueError('Screen target requires checkpoints and a registered screen identifier')
@@ -117,6 +119,15 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
             hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
             hooks[hook.id] = name
     controls = []
+    if dubbing_click:
+        # FND-UI-024: full-screen dubbing callback and restored-stack return.
+        for address, name in ((0x19c80, 'dubbing-entry'), (0x19cb1, 'dubbing-return')):
+            selector, offset = mapping.code_address(address)
+            hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
+            hooks[hook.id] = name
+        selector, offset = mapping.code_address(0x19c80, 0x19cb2 - 0x19c80)
+        address = runtime.MemoryAddress.segmented(selector, offset)
+        controls.append((address, runtime.read(address, 0x19cb2 - 0x19c80)))
     if youth_continue:
         for start, end in ((0x15054, 0x151f6), (0x63114, 0x63267)):
             selector, offset = mapping.code_address(start, end - start)
@@ -163,6 +174,8 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
     answer_key = None
     continue_key = None
     continue_queued = False
+    dubbing_key = None
+    dubbing_queued = False
     readiness_hook = None
     readiness_stage = None
     completed_youth_cycles = 0
@@ -176,7 +189,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
     archive_ordinal = 0
     count = 0
     shift_ordinal = 0
-    report = {'schema': 'conquer-native-rng-journal-v1', 'status': 'incomplete',
+    report = {'schema': 'conquer-native-rng-journal-v2' if dubbing_click else 'conquer-native-rng-journal-v1', 'status': 'incomplete',
               'full_game_complete': False, 'accepted_callers_complete': False,
               'events': journal.events}
     event_log = EventLog(output / 'native-rng-events.jsonl')
@@ -200,35 +213,71 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
             key = (int(registers.segments['ss'], 16), stack_pointer)
             kind = hooks[stop.breakpoint_id]
             if kind == 'continue-readiness':
-                if pc != 0x63114 or frame is not None or screen_frame is not None or answer_key is not None:
+                if pc != 0x63114 or frame is not None or screen_frame is not None or answer_key is not None or \
+                        continue_key is not None or dubbing_key is not None or archive_key is not None:
                     raise RecordingError('Continue readiness boundary/frame mismatch')
-                # FND-UI-017 / FND-UI-002: retain the verified youth screen identity.
+                if readiness_stage not in ('answer', 'continue', 'dubbing'):
+                    raise RecordingError('Unsupported pointer readiness stage')
+                expected_screen = 6 if readiness_stage == 'dubbing' else 3
+                # FND-UI-017 / FND-UI-002: retain the verified screen identity.
                 selector, offset = mapping.data_address(0xafe50, 4)
                 pointer = int.from_bytes(runtime.read(runtime.MemoryAddress.segmented(selector, offset), 4), 'little')
                 if pointer != report['screen_observation']['record_pointer']:
                     raise RecordingError('Continue readiness screen record changed')
                 record_bytes = runtime.read(runtime.MemoryAddress.segmented(selector, pointer), 24)
                 object_pointer = int.from_bytes(record_bytes[:4], 'little')
-                if object_pointer != report['screen_observation']['object_pointer'] or int.from_bytes(record_bytes[4:8], 'little') != 3:
-                    raise RecordingError('Continue readiness requires the verified youth screen')
+                if object_pointer != report['screen_observation']['object_pointer'] or \
+                        int.from_bytes(record_bytes[4:8], 'little') != expected_screen:
+                    raise RecordingError('Continue readiness requires the verified youth screen' if expected_screen == 3
+                                         else 'Dubbing readiness requires the verified dubbing screen')
+                object_bytes = runtime.read(runtime.MemoryAddress.segmented(selector, object_pointer), 184)
+                if int.from_bytes(object_bytes[96:100], 'little') != expected_screen:
+                    raise RecordingError('Pointer readiness screen object identity changed')
                 if primary_click_ready(runtime, mapping):
                     current = journal.complete()
                     if state() != current or replay(journal.events) != current:
                         raise RecordingError('Continue readiness RNG state differs from journal')
-                    x, y = (500, 150) if readiness_stage == 'continue' else (100, 350)
-                    click = queue_primary_click(runtime, mapping, x=x, y=y)  # SCR-UI-004 / FND-UI-021
+                    x, y = ((500, 150) if readiness_stage == 'continue' else
+                            (10, 10) if readiness_stage == 'dubbing' else (100, 350))
+                    # SCR-UI-004 / FND-UI-021; SCR-UI-019's full-screen dubbing region.
+                    click = queue_primary_click(runtime, mapping, x=x, y=y)
                     if state() != current:
                         raise RecordingError('RNG state changed while queuing Continue')
-                    report.setdefault('supported_input', []).append(dict(click, screen=3, stage=readiness_stage))
+                    report.setdefault('supported_input', []).append(dict(click, screen=expected_screen, stage=readiness_stage))
                     (output / 'supported-input.json').write_text(json.dumps(report['supported_input'], indent=2) + '\n')
                     if readiness_stage == 'continue':
                         continue_queued = True
+                    elif readiness_stage == 'dubbing':
+                        dubbing_queued = True
                     else:
                         youth_answer_queued = True
                     runtime.agent.delete_breakpoint(runtime.session.id, readiness_hook)
                     del hooks[readiness_hook]
                     readiness_hook = None
                     readiness_stage = None
+                runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
+                continue
+            if kind in ('dubbing-entry', 'dubbing-return'):
+                if not dubbing_queued or frame is not None or screen_frame is not None or \
+                        answer_key is not None or continue_key is not None or archive_key is not None:
+                    raise RecordingError('Dubbing boundary lacks prescribed input or has an unfinished operation')
+                if kind == 'dubbing-entry':
+                    if pc != 0x19c80 or dubbing_key is not None:
+                        raise RecordingError('Unexpected or reentrant dubbing entry')
+                    dubbing_key = key
+                else:
+                    if pc != 0x19cb1 or key != dubbing_key:
+                        raise RecordingError('Dubbing return/frame mismatch')
+                    # FND-UI-024: callback return follows village replacement.
+                    if report['screen_observation']['screen_id'] != 11:
+                        raise RecordingError('Dubbing return requires verified village replacement')
+                    report['end_rng_state'] = journal.complete()
+                    if state() != report['end_rng_state'] or replay(journal.events) != report['end_rng_state']:
+                        raise RecordingError('Dubbing RNG state differs from journal')
+                    dubbing_key = None
+                    dubbing_queued = False
+                    report['status'] = 'dubbing-return-reached'
+                    return report
                 runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
                 continue
             if kind in ('continue-entry', 'continue-return'):
@@ -254,9 +303,13 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                     if completed_youth_cycles == youth_cycles:
                         if youth_cycles == 6 and pc != 0x150a7:
                             raise RecordingError('Six youth cycles must finish at the dubbing transition return')
-                        report['status'] = 'youth-sequence-return-reached' if youth_cycles > 1 else 'youth-continue-return-reached'
-                        return report
-                    readiness_hook, readiness_stage = arm_youth_input('answer')
+                        if dubbing_click:
+                            readiness_hook, readiness_stage = arm_youth_input('dubbing')
+                        else:
+                            report['status'] = 'youth-sequence-return-reached' if youth_cycles > 1 else 'youth-continue-return-reached'
+                            return report
+                    else:
+                        readiness_hook, readiness_stage = arm_youth_input('answer')
                 runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
                 continue
             if kind in ('answer-entry', 'answer-return'):
@@ -572,4 +625,6 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         report['pending_archive_extraction'] = archive_key is not None
         report['pending_youth_answer'] = answer_key is not None
         report['pending_youth_continue'] = continue_key is not None
+        if dubbing_click:
+            report['pending_dubbing'] = dubbing_key is not None
         (output / 'native-rng-journal.json').write_text(json.dumps(report, indent=2))

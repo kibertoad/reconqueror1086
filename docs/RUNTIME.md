@@ -321,6 +321,24 @@ screen 6 identity from FND-UI-022/RULE-PERSON-004. A multi-cycle diagnostic
 ends as `youth-sequence-return-reached`, with full-game completion still false.
 Repeated-cycle tooling has synthetic checks only; native traversal is pending.
 
+`--dubbing-click` requires six youth cycles and no `--stop-after-screen-id`.
+After the sixth matching Continue return and verified dubbing load, it waits
+at the supported pointer-classifier boundary for an empty queue and suitable
+observed timing. It rechecks the screen record, object identity and history head
+before queuing (10, 10) inside SCR-UI-019's full-screen region. Only the supported
+pointer fields change; the game performs its own callback and screen transition.
+FND-UI-024 locates the dubbing callback entry and restored-stack return. The
+probe requires the matching return after a verified village screen load and
+numeric RNG replay, ending as `dubbing-return-reached`. Unknown RNG callers
+remain rejected. The sequence has synthetic validation; native dubbing-to-village
+traversal remains unverified.
+
+Dubbing-enabled captures use `conquer-native-rng-journal-v2`, adding the explicit
+`pending_dubbing` outcome field. Runs without that stage retain v1. The terminal
+validator accepts both versions under their own required fields, rejects dubbing
+state in v1 and requires v2, `--expect-youth-cycles 6` and village identity/history
+head for dubbing-return verification. Keep historical captures unchanged.
+
 The native inclusive-draw policies also accept the three fixed-bound dilemma
 selection calls of FND-PERSON-004. Initial selection and reroll carry
 RULE-PERSON-003, and continued selection carries RULE-PERSON-004. Each requires
@@ -424,6 +442,7 @@ event order and numeric RNG replay with an explicit expected boundary:
 ```powershell
 python -B tools/verify_native_recording.py artifacts/runtime-tools/continue-fresh --expect-status youth-continue-return-reached
 python -B tools/verify_native_recording.py artifacts/runtime-tools/six-cycles-fresh --expect-status youth-sequence-return-reached --expect-youth-cycles 6
+python -B tools/verify_native_recording.py artifacts/runtime-tools/dubbing-fresh --expect-status dubbing-return-reached --expect-youth-cycles 6
 python -B tools/test_verify_native_recording.py
 ```
 
