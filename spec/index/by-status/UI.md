@@ -65,7 +65,7 @@ Entries by status.
 
 ## recorded
 
-24 entries.
+25 entries.
 
 | ID | Title |
 |---|---|
@@ -93,6 +93,7 @@ Entries by status.
 | [FND-UI-022](../../findings/FND-UI-022.md) | Youth Continue returns after replacing the screen or resetting the next dilemma's controls |
 | [FND-UI-023](../../findings/FND-UI-023.md) | The first youth-answer callback enables Continue before its restored-stack return |
 | [FND-UI-024](../../findings/FND-UI-024.md) | Dubbing's full-screen callback clears its stored sound value and returns after village replacement |
+| [FND-UI-025](../../findings/FND-UI-025.md) | Startup preparation has distinct service return boundaries before its animation test |
 
 ## Open questions
 
