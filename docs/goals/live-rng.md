@@ -49,22 +49,28 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
   verified ordered initial/replacement returns and matching journal replay.
   Those owned processes and locks were cleaned up. No full-game or actual
   rebuild replay gate has passed.
-- An owned quiet new-game probe is running with the machine lock held.
+- The guarded New Game probe passed character-options return with matching
+  durable events and numeric replay. Its emulator and lock were cleaned up.
+- An owned quiet generation probe is running with the machine lock held.
   Preserve its existing operation. It uses fixed cycles 1000, disabled
   animations, startup checkpoints/click, loaded-screen continuation, title
-  input, screen checkpoints and new-game input, targeting character options.
+  input, screen checkpoints, new-game input and generation input, targeting
+  youth generation. Its unified session is 88537 and emulator PID is 63084.
   Its eagerly loaded controllers are identified by local source fingerprints.
-- Unfinished: native new-game/dilemma traversal, complete rule ownership,
+- Unfinished: native dilemma traversal, complete rule ownership,
   prescribed gameplay state and full-game recording/replay. Shared helper
   extraction is not implemented. The proposal is toolkit issue #403, linked
   from docs/dosbox-x-helper-proposal.md.
 - Blockers: none established. RUNTIME.md is the capability assessment. Audio
   remains muted except for an explicit sound investigation. No WIP branch.
-- Next: observe the existing new-game operation for its verified target or
+- Next: observe the existing generation operation for its verified target or
   next unaccepted caller. Keep unknown callers rejected and journals incomplete.
 - Extend supported input reachability from FND-UI-020, SCR-UI-002/003 and
   FND-PERSON-004. The three dilemma caller policies have synthetic validation;
   their original traversal is not yet verified.
+- Before scripting youth answers or Continue, recheck SCR-UI-004's button
+  rectangles against file-order callback indices from FND-UI-002. Do not infer
+  a callback index from the HAT record's stored ID; these differ in CHARGEN.
 - Q-STRATEGY-043 / RULE-STRATEGY-012: finish the downstream consumer review
   from FND-STRATEGY-043/044/045/046 before resolving its disputed status.
 - Q-RNG-001 / RULE-RNG-001: continue seed-source provenance from
