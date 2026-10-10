@@ -49,21 +49,28 @@ private environment with the hash-locked requirements, never the shared one.
   EVIDENCE_PYTHON=artifacts/validation-python-latest/Scripts/python.exe,
   executable-reader 4.0.0, engine 18.2.0, checker 4.2.0 and session 0.3.0.
   No full-game gate passed.
-- Original probes are terminal. The session 0.3.0 startup control and its
-  package-log/journal verification passed; owned processes exited and the
-  machine lock was absent. No original session remains owned by this task.
+- Active original control: exec 69289, controller PID 326496, emulator
+  PID 327628, token 81661d89db22, debugger ses-1, under
+  artifacts/runtime-tools/native-rng-youth-v4-fixed10000-20261010-a.
+  It owns the machine lock and uses quiet normal-core fixed 10000 cycles,
+  session 0.3.0, v4 AGE checkpoints, five cycles and guarded dubbing input.
+  Observe the same handle; do not restart or remove its lock.
+- Earlier original controls are terminal; owned processes and locks were
+  cleaned up. The session 0.3.0 startup log/journal verification passed.
 - Q-PERSON-021 is closed. FND-PERSON-012, FND-PERSON-013,
   EXP-PERSON-001, EXP-PERSON-002 and RULE-PERSON-007 are committed;
   Q-PERSON-022 remains open. EXP-UI-001 remains the entry-control reference.
 - Toolkit issues #385, #388, #392 and #403 were consumer-validated and closed.
   PR #419 is adopted. #402, #412, #413 and #420 remain open with their
   original-game confirmation, feature or upstream prerequisites unresolved.
-- Unfinished: recorder completion-contract reconciliation, repeated
-  youth/dubbing traversal, complete caller ownership, prescribed full-game
+- The AGE-checked v4 recorder contract and its synthetic controls are
+  committed. Canonical validation passed; fresh native validation is running.
+- Unfinished: native youth/dubbing traversal, complete caller ownership, prescribed full-game
   state, two full-game recordings and actual rebuild replay. No WIP branch.
 - Blockers: none established. The pre-existing untracked .claude/settings.json
   remains untouched. No push is authorized.
-- Next: RULE-PERSON-004 / RULE-PERSON-007 recorder completion-contract tooling.
+- Next: observe and verify the owned v4 native control for
+  RULE-PERSON-004 / RULE-PERSON-007.
 - Next: Q-PERSON-022 lifecycle review.
 - Next: Q-STRATEGY-043 / RULE-STRATEGY-012 downstream consumer review.
 - Next: Q-RNG-001 / RULE-RNG-001 seed-source provenance where required.
