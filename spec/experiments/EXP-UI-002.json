@@ -1,0 +1,569 @@
+{
+  "experiment": "EXP-UI-002",
+  "build": "BLD-GOG-EN",
+  "starting_state": {
+    "kind": "new-game",
+    "choices": {
+      "MOVIE": "OFF",
+      "CREDITS": "OFF",
+      "ANIMATIONS": "OFF"
+    }
+  },
+  "recording_xxh3": null,
+  "clock": "input_sequence",
+  "inputs": [
+    {
+      "tick": 0,
+      "name": "primary_short_click",
+      "value": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "tick": 1,
+      "name": "primary_short_click",
+      "value": {
+        "x": 10,
+        "y": 10
+      }
+    },
+    {
+      "tick": 2,
+      "name": "primary_short_click",
+      "value": {
+        "x": 100,
+        "y": 350
+      }
+    },
+    {
+      "tick": 3,
+      "name": "primary_short_click",
+      "value": {
+        "x": 200,
+        "y": 250
+      }
+    },
+    {
+      "tick": 4,
+      "name": "primary_short_click",
+      "value": {
+        "x": 100,
+        "y": 350
+      }
+    },
+    {
+      "tick": 5,
+      "name": "primary_short_click",
+      "value": {
+        "x": 500,
+        "y": 150
+      }
+    },
+    {
+      "tick": 6,
+      "name": "primary_short_click",
+      "value": {
+        "x": 100,
+        "y": 350
+      }
+    },
+    {
+      "tick": 7,
+      "name": "primary_short_click",
+      "value": {
+        "x": 500,
+        "y": 150
+      }
+    },
+    {
+      "tick": 8,
+      "name": "primary_short_click",
+      "value": {
+        "x": 100,
+        "y": 350
+      }
+    },
+    {
+      "tick": 9,
+      "name": "primary_short_click",
+      "value": {
+        "x": 500,
+        "y": 150
+      }
+    },
+    {
+      "tick": 10,
+      "name": "primary_short_click",
+      "value": {
+        "x": 100,
+        "y": 350
+      }
+    },
+    {
+      "tick": 11,
+      "name": "primary_short_click",
+      "value": {
+        "x": 500,
+        "y": 150
+      }
+    },
+    {
+      "tick": 12,
+      "name": "primary_short_click",
+      "value": {
+        "x": 100,
+        "y": 350
+      }
+    },
+    {
+      "tick": 13,
+      "name": "primary_short_click",
+      "value": {
+        "x": 500,
+        "y": 150
+      }
+    },
+    {
+      "tick": 14,
+      "name": "primary_short_click",
+      "value": {
+        "x": 10,
+        "y": 10
+      }
+    },
+    {
+      "tick": 15,
+      "name": "primary_short_click",
+      "value": {
+        "x": 10,
+        "y": 10
+      }
+    }
+  ],
+  "seeds": [],
+  "runs": [
+    {
+      "rng_state": 895832521,
+      "events": [
+        {
+          "tick": 3,
+          "event": "youth_age_observed",
+          "args": [
+            "youth-screen-return",
+            0,
+            13,
+            196831401
+          ]
+        },
+        {
+          "tick": 4,
+          "event": "youth_age_observed",
+          "args": [
+            "answer-entry",
+            0,
+            13,
+            196831401
+          ]
+        },
+        {
+          "tick": 4,
+          "event": "youth_age_observed",
+          "args": [
+            "answer-return",
+            0,
+            14,
+            196831401
+          ]
+        },
+        {
+          "tick": 5,
+          "event": "youth_age_observed",
+          "args": [
+            "continue-entry",
+            0,
+            14,
+            196831401
+          ]
+        },
+        {
+          "tick": 5,
+          "event": "youth_age_observed",
+          "args": [
+            "continue-return",
+            0,
+            14,
+            4100275758
+          ]
+        },
+        {
+          "tick": 6,
+          "event": "youth_age_observed",
+          "args": [
+            "answer-entry",
+            1,
+            14,
+            4100275758
+          ]
+        },
+        {
+          "tick": 6,
+          "event": "youth_age_observed",
+          "args": [
+            "answer-return",
+            1,
+            15,
+            4100275758
+          ]
+        },
+        {
+          "tick": 7,
+          "event": "youth_age_observed",
+          "args": [
+            "continue-entry",
+            1,
+            15,
+            4100275758
+          ]
+        },
+        {
+          "tick": 7,
+          "event": "youth_age_observed",
+          "args": [
+            "continue-return",
+            1,
+            15,
+            2913054159
+          ]
+        },
+        {
+          "tick": 8,
+          "event": "youth_age_observed",
+          "args": [
+            "answer-entry",
+            2,
+            15,
+            2913054159
+          ]
+        },
+        {
+          "tick": 8,
+          "event": "youth_age_observed",
+          "args": [
+            "answer-return",
+            2,
+            16,
+            2913054159
+          ]
+        },
+        {
+          "tick": 9,
+          "event": "youth_age_observed",
+          "args": [
+            "continue-entry",
+            2,
+            16,
+            2913054159
+          ]
+        },
+        {
+          "tick": 9,
+          "event": "youth_age_observed",
+          "args": [
+            "continue-return",
+            2,
+            16,
+            770065244
+          ]
+        },
+        {
+          "tick": 10,
+          "event": "youth_age_observed",
+          "args": [
+            "answer-entry",
+            3,
+            16,
+            770065244
+          ]
+        },
+        {
+          "tick": 10,
+          "event": "youth_age_observed",
+          "args": [
+            "answer-return",
+            3,
+            17,
+            770065244
+          ]
+        },
+        {
+          "tick": 11,
+          "event": "youth_age_observed",
+          "args": [
+            "continue-entry",
+            3,
+            17,
+            770065244
+          ]
+        },
+        {
+          "tick": 11,
+          "event": "youth_age_observed",
+          "args": [
+            "continue-return",
+            3,
+            17,
+            683206245
+          ]
+        },
+        {
+          "tick": 12,
+          "event": "youth_age_observed",
+          "args": [
+            "answer-entry",
+            4,
+            17,
+            683206245
+          ]
+        },
+        {
+          "tick": 12,
+          "event": "youth_age_observed",
+          "args": [
+            "answer-return",
+            4,
+            18,
+            683206245
+          ]
+        },
+        {
+          "tick": 13,
+          "event": "youth_age_observed",
+          "args": [
+            "continue-entry",
+            4,
+            18,
+            683206245
+          ]
+        },
+        {
+          "tick": 13,
+          "event": "youth_age_observed",
+          "args": [
+            "continue-return",
+            4,
+            18,
+            683206245
+          ]
+        },
+        {
+          "tick": 16,
+          "event": "enter_dubbing_return",
+          "args": []
+        },
+        {
+          "tick": 16,
+          "event": "dubbing_update_entry",
+          "args": []
+        }
+      ],
+      "draws": [
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 4
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 4
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 4
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 6
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 2
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 4
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 4
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 7
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 4
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 3
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 6
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 4
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 4
+        },
+        {
+          "rule": "RULE-STRATEGY-012",
+          "bound": 7,
+          "result": 4
+        },
+        {
+          "rule": "RULE-PERSON-003",
+          "bound": 4,
+          "result": 3
+        },
+        {
+          "rule": "RULE-PERSON-004",
+          "bound": 4,
+          "result": 2
+        },
+        {
+          "rule": "RULE-PERSON-004",
+          "bound": 4,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-004",
+          "bound": 4,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-004",
+          "bound": 4,
+          "result": 4
+        }
+      ],
+      "end_state": [
+        {
+          "global": "character_attributes",
+          "value": [
+            {
+              "AGE": 18
+            }
+          ]
+        },
+        {
+          "global": "rng_state",
+          "value": 683206245
+        }
+      ]
+    }
+  ],
+  "distribution": null
+}

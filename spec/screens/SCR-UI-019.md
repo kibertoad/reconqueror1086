@@ -5,7 +5,7 @@ status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
 resolution: 640x480
-evidence: [FND-PERSON-013, FND-PERSON-006, FND-UI-001, FND-UI-002, FND-UI-003, FND-UI-010, FND-UI-013, FND-UI-019, FND-UI-024, FND-UI-026, FND-MEDIA-009, EXP-UI-001]
+evidence: [FND-PERSON-013, FND-PERSON-006, FND-UI-001, FND-UI-002, FND-UI-003, FND-UI-010, FND-UI-013, FND-UI-019, FND-UI-024, FND-UI-026, FND-MEDIA-009, EXP-UI-001, FND-UI-027, EXP-UI-002]
 conflicting: []
 split_with: []
 related: [SCR-UI-006]
@@ -37,7 +37,7 @@ None known.
 
 | Sound | Resource | Played when | Evidence |
 |---|---|---|---|
-| Full-screen click sample | First sample of `C1086.GOB#dking.666`, through g_0009A708 | The full-screen click requests playback when this value is nonzero | FND-UI-024, FND-UI-026 |
+| Transition sample | First sample of `C1086.GOB#dking.666`, through g_0009A708 | The full-screen click or per-screen update requests playback when this value is nonzero | FND-UI-024, FND-UI-026, FND-UI-027 |
 | Entry sample | First sample of `C1086.GOB#dubb3.666` | Animations-disabled entry requests playback when its temporary bank is nonzero | FND-UI-026 |
 
 ## States
@@ -58,7 +58,10 @@ the later full-screen callback.
 
 ## Timing
 
-None known.
+After entry presentation returns, the registered per-screen update invokes
+the same transition as the full-screen click, without requiring another
+click on that path (FND-UI-027). EXP-UI-002 observes entry to that update
+callback; its village return remains unobserved. No wall-time duration is established.
 
 ## Differences between builds
 

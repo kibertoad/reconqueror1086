@@ -1512,3 +1512,16 @@ The first evidence-check invocation omitted EVIDENCE_PYTHON and failed against
 the shared editable environment; the corrected invocation passed.
 Later fallback-origin and route consumers remain unverified. These isolated
 calls do not establish native gameplay coverage or settle the disputed rule.
+
+## Native AGE traversal and automatic dubbing callback (2026-10-10)
+
+EXP-UI-002 records the fresh v4 control: five youth pairs completed with
+AGE 13 through 18, both dubbing entry waits accepted their input, and screen 6
+identity/history passed. The original then called the transition through its
+registered per-screen update, located in FND-UI-027, before the separate-click
+recorder guard allowed it. The run ended incomplete at callback entry.
+The shared reader reached its expected failure refusal after hash/count checks;
+ordered log/journal equality, whole outcome and AGE digest agreement, and numeric
+prefix replay to 683206245 passed. Owned processes exited and the lock was absent.
+No village callback return or full-game success is claimed. The next tooling
+batch must admit the evidenced update caller and verify it on a fresh run.

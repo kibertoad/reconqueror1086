@@ -399,6 +399,7 @@ Entries by area.
 |---|---|---|
 | [BUG-UI-001](../bugs/BUG-UI-001.md) | The lender of village record 37 takes three of its numbers from record 36 | supported |
 | [EXP-UI-001](../experiments/EXP-UI-001.md) | Two controlled short clicks let the animations-disabled dubbing entry return | recorded |
+| [EXP-UI-002](../experiments/EXP-UI-002.md) | Five AGE-checked youth pairs and both dubbing waits precede the automatic update callback | recorded |
 | [FMT-UI-001](../formats/FMT-UI-001.md) | Screen layout, a HAT file | supported |
 | [FMT-UI-002](../formats/FMT-UI-002.md) | Screen region, one record of a HAT file | supported |
 | [FMT-UI-003](../formats/FMT-UI-003.md) | Exterior catalogs, VILLAGE.DAT and TVILLAGE.DAT | supported |
@@ -429,6 +430,7 @@ Entries by area.
 | [FND-UI-024](../findings/FND-UI-024.md) | Dubbing's full-screen callback clears its stored sound value and returns after village replacement | recorded |
 | [FND-UI-025](../findings/FND-UI-025.md) | Startup preparation has distinct service return boundaries before its animation test | recorded |
 | [FND-UI-026](../findings/FND-UI-026.md) | Dubbing entry selects its sound bank and waits for input before returning | recorded |
+| [FND-UI-027](../findings/FND-UI-027.md) | Dubbing binds its village transition to the per-screen update as well as the click region | recorded |
 | [RULE-UI-001](../rules/RULE-UI-001.md) | Village exterior hot spots | supported |
 | [RULE-UI-002](../rules/RULE-UI-002.md) | Village exterior actions | supported |
 | [RULE-UI-003](../rules/RULE-UI-003.md) | Store stock | supported |

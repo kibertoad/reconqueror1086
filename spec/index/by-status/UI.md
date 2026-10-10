@@ -65,11 +65,12 @@ Entries by status.
 
 ## recorded
 
-27 entries.
+29 entries.
 
 | ID | Title |
 |---|---|
 | [EXP-UI-001](../../experiments/EXP-UI-001.md) | Two controlled short clicks let the animations-disabled dubbing entry return |
+| [EXP-UI-002](../../experiments/EXP-UI-002.md) | Five AGE-checked youth pairs and both dubbing waits precede the automatic update callback |
 | [FND-UI-001](../../findings/FND-UI-001.md) | Startup registers 25 screens, each a HAT file and a setup routine |
 | [FND-UI-002](../../findings/FND-UI-002.md) | The HAT loader reads a 40-byte header and 24-byte region records, taking the region count from the file size |
 | [FND-UI-003](../../findings/FND-UI-003.md) | The setup routines bind four callback slots per region and name the screens a click switches to |
@@ -96,6 +97,7 @@ Entries by status.
 | [FND-UI-024](../../findings/FND-UI-024.md) | Dubbing's full-screen callback clears its stored sound value and returns after village replacement |
 | [FND-UI-025](../../findings/FND-UI-025.md) | Startup preparation has distinct service return boundaries before its animation test |
 | [FND-UI-026](../../findings/FND-UI-026.md) | Dubbing entry selects its sound bank and waits for input before returning |
+| [FND-UI-027](../../findings/FND-UI-027.md) | Dubbing binds its village transition to the per-screen update as well as the click region |
 
 ## Open questions
 
