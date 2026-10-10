@@ -1,8 +1,18 @@
 # PERSON
 
-Next ID: Q-PERSON-022
+Next ID: Q-PERSON-023
 
 ## Static
+
+- Q-PERSON-022. RULE-PERSON-007: Which other callers write the calendar and
+  March flags, and how do reroll and the calendar update control complete their
+  lifecycle? Tried: FND-PERSON-012 records the age pass, startup constructor,
+  loader flag initialization and the observed pre-input main-loop ordering;
+  EXP-PERSON-001 checks the isolated branches and EXP-PERSON-002 observes the
+  initial year. Settles it: bounded caller and store searches with independent
+  positive controls, followed through each argument and state transition.
+  Blocks: complete calendar/aging and reroll timing claims, not the verified
+  initial-year discrepancy.
 
 - Q-PERSON-001. FMT-PERSON-001: Is it true that anything removes the line end that `strncpy`
   copies into a name? Settles it: trace the named record or file through its loader and every
@@ -104,15 +114,7 @@ None.
 
 ## Agent run
 
-- Q-PERSON-021. RULE-PERSON-004: Why did EXP-UI-001 reach dubbing after five
-  prescribed first-answer/Continue pairs? Tried: FND-PERSON-011 verifies initial
-  table AGE 12; FND-PERSON-005 and FND-PERSON-010 describe the modifiers. The
-  scripted entry-wait controls and restored returns passed. Competing readings:
-  an additional AGE change before the first observed answer, an additional
-  answer outside the watched callback, or an untraced modifier/callback effect.
-  Settles it: read AGE at the youth screen and every prescribed answer/Continue
-  entry and return, then statically trace the first differing interval. Blocks:
-  prescribed youth-count and subsequent dubbing traversal validation.
+None.
 
 ## Live session
 

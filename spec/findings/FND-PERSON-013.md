@@ -1,9 +1,9 @@
 ---
-id: FND-PERSON-004
-title: The generation screen draws the first dilemma, sets COLOR from three shields, rerolls and continues by age
-status: superseded
+id: FND-PERSON-013
+title: Generation draws the first dilemma independently of AGE and continues until AGE equals 18
+status: recorded
 builds: [BLD-GOG-EN]
-superseded_by: [FND-PERSON-013]
+superseded_by: []
 recorded_by: kibertoad
 reproduced_by: []
 method: static
@@ -19,11 +19,11 @@ locations:
     address: 0x000148C0..0x00014902
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
-    address: 0x00015228..0x000152A5
+    address: 0x000151F8..0x000153B7
   - build: BLD-GOG-EN
     file: CD:CONQUER.EXE
     address: 0x00015054..0x000150E9
-tool: Conqueror.Inspect disassembler (tools/Conqueror.Inspect)
+tool: Bounded Capstone 5.0.9 reading and reconciliation with FND-PERSON-012
 environment: null
 ---
 
@@ -51,9 +51,23 @@ object-2 offset `0x185C`.
 
 ## Interpretation
 
-The generation screen offers six dilemmas, one for each age from 12 to 17, choosing among the five
-of that age at random. The manual's Reroll is the path at `0x0001523D`: it rolls row 0 again and
-starts over at age 12 while keeping the name and colour. The three shields give COLOR 0, 3 and 5.
+The first and rerolled dilemma draws use a fixed bound of 4, independently
+of current AGE. Continue tests actual AGE for equality with 18 and otherwise
+uses that AGE in its group calculation. Those operations do not alone guarantee
+six answers or establish AGE at the first answer.
+
+FND-PERSON-011 records the loaded file value of 12; FND-PERSON-012 identifies
+the separate March increment before input. EXP-PERSON-001 corroborates that
+pass on fabricated state, and EXP-PERSON-002 records first-answer AGE 13 and
+five successive one-year answer changes to 18 in an owned new-game traversal.
+Its initial dilemma still comes from numbers 0 through 4; subsequent group
+starts at observed ages 14, 15, 16 and 17 are 10, 15, 20 and 25. The group
+starting at 5 is consequently not selected on that traversal.
+
+Reroll reloads the file and keeps name and colour, rather than guaranteeing
+that a later answer sees the file's AGE unchanged. The three shields give
+COLOR 0, 3 and 5. This reading replaces the earlier inferred fixed six-answer
+count; the observed call arguments and AGE-dependent selection remain.
 
 ## Alternatives
 

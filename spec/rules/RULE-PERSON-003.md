@@ -4,15 +4,15 @@ title: Character generation, the pre-generated knights and dubbing
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-PERSON-001, FND-PERSON-003, FND-PERSON-004, FND-PERSON-006, FND-PERSON-007, FND-RNG-002, FND-STRATEGY-041, SRC-MANUAL, FND-STRATEGY-036, FND-TALK-007]
+evidence: [FND-PERSON-001, FND-PERSON-003, FND-PERSON-013, FND-PERSON-006, FND-PERSON-007, FND-RNG-002, FND-STRATEGY-041, SRC-MANUAL, FND-STRATEGY-036, FND-TALK-007, FND-PERSON-012, EXP-PERSON-001, EXP-PERSON-002]
 conflicting: []
 split_with: []
-related: [RULE-PERSON-001, RULE-PERSON-002, RULE-PERSON-004, RULE-RNG-001]
+related: [RULE-PERSON-001, RULE-PERSON-002, RULE-PERSON-004, RULE-PERSON-007, RULE-RNG-001]
 ---
 
 ## Summary
 
-A new player picks a colour and either generates a knight through six youth dilemmas or takes one
+A new player picks a colour and either generates a knight through youth dilemmas or takes one
 of six pre-generated knights. Sir Chaunce Norman, the first, is random: each skill moves by up to 8
 and his purse is 0 to 1,000 shillings. Dubbing then makes every character 18, gives the player five
 starting items and adds 240 shillings.
@@ -89,6 +89,13 @@ The character table and `item_counts`.
 Sir Chaunce Norman starts from row 0 as loaded, which already carries the shift of RULE-PERSON-002,
 and moves fields 0 to 16 again, held to their limits by `set_attr`; only the last of his 17 wealth
 draws counts. The generated knight's wealth before dubbing is row 0's WEALTH after the dilemmas.
+
+The loaded AGE 12 is not necessarily the first answer's AGE: RULE-PERSON-007's
+March pass can increment it before input. EXP-PERSON-002 observes first-answer
+AGE 13 and five prescribed answers to AGE 18. The first dilemma selection is
+independent of AGE; Continue's later selections use actual AGE as
+RULE-PERSON-004 describes. Reroll reloads the initial data and zero March flags,
+without guaranteeing the AGE seen at a later input boundary.
 
 ## What the sources say
 

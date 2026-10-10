@@ -577,7 +577,7 @@ class OwnedReductionTests(unittest.TestCase):
             return record(runtime, mapping, ('draw', 'seed'), 'unused-output', maximum_draws=1)
 
     def test_dilemma_draws_preserve_initial_reroll_and_continue_ownership(self):
-        # FND-PERSON-004 records all three call sites and the fixed argument.
+        # FND-PERSON-013 records all three call sites and the fixed argument.
         for caller, rule in ((0x148f6, 'RULE-PERSON-003'), (0x15299, 'RULE-PERSON-003'),
                              (0x150db, 'RULE-PERSON-004')):
             with self.subTest(caller=caller):

@@ -361,11 +361,12 @@ state in v1 and requires v2, `--expect-youth-cycles 6` and village identity/hist
 head for dubbing-return verification. Keep historical captures unchanged.
 
 The native inclusive-draw policies also accept the three fixed-bound dilemma
-selection calls of FND-PERSON-004. Initial selection and reroll carry
+selection calls of FND-PERSON-013. Initial selection and reroll carry
 RULE-PERSON-003, and continued selection carries RULE-PERSON-004. Each requires
 the exact return site and argument 4 and verifies both raw state/result and
 the inclusive reduction. Other callers or changed arguments remain rejected.
-Synthetic policy checks passed; original traversal of these calls is pending.
+Synthetic policy checks passed; native draws at these calls are recorded in
+EXP-UI-001 and EXP-PERSON-002. Full-game coverage remains separate.
 
 ### Operating and interpreting a probe
 

@@ -4,16 +4,19 @@ title: Youth dilemmas
 status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-PERSON-001, FND-PERSON-004, FND-PERSON-005, FND-PERSON-010, FND-RNG-002, FND-STRATEGY-041, SRC-MANUAL, FND-STRATEGY-036, FND-PERSON-006, FND-PERSON-007, FND-PERSON-003, FND-TALK-007]
+evidence: [FND-PERSON-001, FND-PERSON-013, FND-PERSON-005, FND-PERSON-010, FND-RNG-002, FND-STRATEGY-041, SRC-MANUAL, FND-STRATEGY-036, FND-PERSON-006, FND-PERSON-007, FND-PERSON-003, FND-TALK-007, FND-PERSON-011, FND-PERSON-012, EXP-PERSON-001, EXP-PERSON-002]
 conflicting: []
 split_with: []
-related: [RULE-PERSON-001, RULE-PERSON-003, RULE-RNG-001, FMT-PERSON-002]
+related: [RULE-PERSON-001, RULE-PERSON-003, RULE-PERSON-007, RULE-RNG-001, FMT-PERSON-002]
 ---
 
 ## Summary
 
-The generated knight answers one dilemma for each age from 12 to 17, drawn from the five of that
-age. Each answer scores one attribute against two breakpoints for a win, draw or loss, and the
+The first dilemma is drawn from numbers 0 through 4 independently of AGE;
+later selections use actual AGE, and Continue leaves youth when AGE equals 18.
+The observed new-game March pass makes first-answer AGE 13, so five answers
+reach 18 and the number group 5 through 9 is skipped on that traversal.
+Each answer scores one attribute against two breakpoints for a win, draw or loss, and the
 outcome changes attributes, including AGE, and may give an item.
 
 ## When it runs
@@ -83,8 +86,11 @@ define field_index(name):
 ## Edge cases
 
 A score equal to a breakpoint reaches it. A field named twice in one outcome would get its first
-change twice; none of the files does this. Every outcome in the files adds 1 to AGE, so six answers
-reach 18; without that, Continue would draw from the same age again.
+change twice; none of the files does this. Every outcome in the files adds 1
+to AGE. Starting the first answer at AGE 12 would require six answers to reach
+18; the observed AGE 13 requires five. The extra initial year comes from
+RULE-PERSON-007, before the first watched answer, not from an extra answer
+modifier. Without an AGE change, Continue would draw from the same age again.
 
 ## What the sources say
 
@@ -96,10 +102,6 @@ wealth, adds a year of age, and may give items, and that the six dilemmas start 
 None known.
 
 ## Open questions
-
-- Why EXP-UI-001 reaches dubbing after five prescribed first-answer/Continue
-  pairs, and whether an additional AGE change or unobserved answer precedes
-  them. FND-PERSON-011 verifies the initial data value, not later AGE. (Q-PERSON-021)
 
 - The field `unlisted_field` gives for `NONE`. (Q-PERSON-013)
 

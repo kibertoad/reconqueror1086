@@ -1,5 +1,23 @@
 # Validation
 
+## March-pass and initial youth AGE controls (2026-10-10)
+
+The owned tools/emu/verify_march_age.py run passed with the hash-pinned private
+interpreter and Unicorn dependencies. EXP-PERSON-001 records its fabricated
+calendar/table cases, original helper paths and exact field outcomes. Whole
+fabricated-region, root and bounded write-domain controls passed without a
+stub or hardware model. This supports the isolated reading of FND-PERSON-012,
+without a full calendar lifecycle or parity validation claim.
+
+EXP-PERSON-002 records the read-only AGE observations from the original
+native-rng-shared-youth-age-fixed100000-20261010-a diagnostic. Its completed
+prefix passed numeric RNG replay. The broader run ended incomplete with a
+named-pipe timeout during the attempted diagnostic at the second entry wait;
+the pending operations were not accepted as a terminal traversal. The owned
+controller and emulator exited, and the lock was absent before the next run.
+Original diagnostics remain local. This run supplies no CPU-speed improvement
+or shared-package defect claim.
+
 ## Isolated home-selector outcomes (2026-10-10)
 
 The local tools/emu/verify_home_selection.py run passed with the private
@@ -465,7 +483,7 @@ input without screen checkpoints is rejected. Native new-game traversal and
 its intervening RNG callers remain unverified.
 
 2026-10-10: 51 recorder and related safety tests passed with the three
-FND-PERSON-004 dilemma caller policies. Synthetic initial, reroll and continued
+FND-PERSON-013 dilemma caller policies. Synthetic initial, reroll and continued
 draws retain their respective rule IDs and verify inclusive bound 4/result 3.
 A changed bound or unknown return site is rejected before the draw. An initial
 test attempt exposed a syntax error in the changed policy branch; it was
@@ -1405,8 +1423,14 @@ pending-operation meaning, numeric replay and final-journal comparison remain
 local. The published source's 85 Windows tests passed against the installed
 wheel. Consumer controls passed for package-written logs, changed event order,
 missing outcomes, failure outcomes, outcome mismatch and numeric semantics.
-The older raw-log captures retain their recorded contract. Native 0.3.0 startup
-validation is still pending; toolkit issue #403 remains open for that result.
+The older raw-log captures retain their recorded contract. The fresh native
+0.3.0 startup control then reached screen-load-return-reached with verified
+screen 0 and history, all pending flags false, 32 seed/draw events and three
+verified field writes for its prescribed click. Package-log verification,
+final-journal agreement and numeric replay to 2414099301 passed. Its owned
+processes exited and the lock was absent. Toolkit issue #403 was closed with
+this native result. This is startup verification, not full-game coverage or
+actual rebuild replay.
 
 ## Home-selection recorder extension (2026-10-10)
 

@@ -5,7 +5,7 @@ status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
 resolution: 640x480
-evidence: [FND-PERSON-004, FND-UI-001, FND-UI-002, FND-UI-003, FND-UI-010, FND-UI-013]
+evidence: [FND-PERSON-013, FND-UI-001, FND-UI-002, FND-UI-003, FND-UI-010, FND-UI-013]
 conflicting: []
 split_with: []
 related: [SCR-UI-004, SCR-UI-005, RULE-PERSON-003]
@@ -25,9 +25,9 @@ related: [SCR-UI-004, SCR-UI-005, RULE-PERSON-003]
 | region 0 | (132, 209, 175, 95) | Always | Switches to SCR-UI-004. | FND-UI-003 |
 | region 1 | (192, 342, 223, 106) | Always | Switches to SCR-UI-005. | FND-UI-003 |
 | region 2 | (75, 38, 231, 144) | Always | Reads the knight's name from the keyboard. | FND-UI-013 |
-| region 3 | (501, 102, 34, 39) | Always | Stores 0 in field 19 of row 0 (RULE-PERSON-003) and draws the choice. | FND-PERSON-004 |
-| region 4 | (552, 102, 34, 39) | Always | Stores 3 in field 19 of row 0 and draws the choice. | FND-PERSON-004 |
-| region 5 | (525, 150, 34, 39) | Always | Stores 5 in field 19 of row 0 and draws the choice. | FND-PERSON-004 |
+| region 3 | (501, 102, 34, 39) | Always | Stores 0 in field 19 of row 0 (RULE-PERSON-003) and draws the choice. | FND-PERSON-013 |
+| region 4 | (552, 102, 34, 39) | Always | Stores 3 in field 19 of row 0 and draws the choice. | FND-PERSON-013 |
+| region 5 | (525, 150, 34, 39) | Always | Stores 5 in field 19 of row 0 and draws the choice. | FND-PERSON-013 |
 
 ## Keyboard input
 

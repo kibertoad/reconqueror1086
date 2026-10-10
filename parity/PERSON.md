@@ -10,3 +10,4 @@
 | `RULE-PERSON-004` | Youth dilemmas | supported | partial | None | None | supported | Selection by age and the ordered breakpoints match; NONE scores 0 and changes nothing, and the handlers' item grants are not given. |
 | `RULE-PERSON-005` | Courtship and marriage | sourced | partial | None | None | sourced | Colours need a per-lady honour minimum and piety maximum, rewards are indexed by wins and marriage follows a win count, all guesses in `Balance.Courtships`; imported lady conversations take over the rewards when present. |
 | `RULE-PERSON-006` | Retirement at 30 | supported | partial | None | None | supported | The campaign ends when the yearly birthday takes AGE to 30 or more, without the movie. |
+| `RULE-PERSON-007` | March aging and milestone skill increases | supported | missing | None | None | supported | The table-wide first-row flag, pre-input initial year and milestone changes have no implementation mapped to this entry. |

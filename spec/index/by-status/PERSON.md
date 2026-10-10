@@ -14,7 +14,7 @@ Entries by status.
 
 ## supported
 
-7 entries.
+8 entries.
 
 | ID | Title |
 |---|---|
@@ -25,17 +25,27 @@ Entries by status.
 | [RULE-PERSON-003](../../rules/RULE-PERSON-003.md) | Character generation, the pre-generated knights and dubbing |
 | [RULE-PERSON-004](../../rules/RULE-PERSON-004.md) | Youth dilemmas |
 | [RULE-PERSON-006](../../rules/RULE-PERSON-006.md) | Retirement at 30 |
+| [RULE-PERSON-007](../../rules/RULE-PERSON-007.md) | March aging and milestone skill increases |
 
-## recorded
+## superseded
 
-11 entries.
+1 entries.
 
 | ID | Title |
 |---|---|
+| [FND-PERSON-004](../../findings/FND-PERSON-004.md) | The generation screen draws the first dilemma, sets COLOR from three shields, rerolls and continues by age |
+
+## recorded
+
+14 entries.
+
+| ID | Title |
+|---|---|
+| [EXP-PERSON-001](../../experiments/EXP-PERSON-001.md) | Isolated March aging follows the first-row flag, milestones and signed count |
+| [EXP-PERSON-002](../../experiments/EXP-PERSON-002.md) | A fresh youth traversal observes AGE 13 before its first answer and AGE 18 after five |
 | [FND-PERSON-001](../../findings/FND-PERSON-001.md) | Character attributes are read by 0x00015EF0 and written by 0x00015F0C, which limits the first 15 to 0..21 |
 | [FND-PERSON-002](../../findings/FND-PERSON-002.md) | CHARACTR.DAT lists 15 characters and 30 attributes |
 | [FND-PERSON-003](../../findings/FND-PERSON-003.md) | CHARACTR.DAT is parsed by 0x00015920 and 0x00016124, which shift row 0 by up to 8 on each of the first 15 fields |
-| [FND-PERSON-004](../../findings/FND-PERSON-004.md) | The generation screen draws the first dilemma, sets COLOR from three shields, rerolls and continues by age |
 | [FND-PERSON-005](../../findings/FND-PERSON-005.md) | A dilemma choice scores one attribute against ordered breakpoints and applies its outcome through 0x00015F0C |
 | [FND-PERSON-006](../../findings/FND-PERSON-006.md) | The pre-generated handler randomises row 0 for the first shield and stores constants for the other five |
 | [FND-PERSON-007](../../findings/FND-PERSON-007.md) | Dubbing sets every AGE to 18, gives five items and adds 240 to WEALTH |
@@ -43,6 +53,8 @@ Entries by status.
 | [FND-PERSON-009](../../findings/FND-PERSON-009.md) | The tournament melee turns COLOR 3, 0 and 5 into colour index 0, 1 and 2 at 0x0009D498 |
 | [FND-PERSON-010](../../findings/FND-PERSON-010.md) | DILEM0.DAT to DILEM29.DAT are marker-line text files with three choices of three outcomes |
 | [FND-PERSON-011](../../findings/FND-PERSON-011.md) | The shipped character table gives row zero AGE 12 |
+| [FND-PERSON-012](../../findings/FND-PERSON-012.md) | The March age pass runs before input and increments freshly loaded characters |
+| [FND-PERSON-013](../../findings/FND-PERSON-013.md) | Generation draws the first dilemma independently of AGE and continues until AGE equals 18 |
 
 ## Open questions
 
@@ -58,3 +70,4 @@ Entries whose Open questions section says more than None known.
 | [RULE-PERSON-004](../../rules/RULE-PERSON-004.md) | Youth dilemmas | supported |
 | [RULE-PERSON-005](../../rules/RULE-PERSON-005.md) | Courtship and marriage | sourced |
 | [RULE-PERSON-006](../../rules/RULE-PERSON-006.md) | Retirement at 30 | supported |
+| [RULE-PERSON-007](../../rules/RULE-PERSON-007.md) | March aging and milestone skill increases | supported |

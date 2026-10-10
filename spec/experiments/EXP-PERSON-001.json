@@ -1,0 +1,538 @@
+{
+  "experiment": "EXP-PERSON-001",
+  "build": "BLD-GOG-EN",
+  "starting_state": {
+    "kind": "emulated-call",
+    "character_table": "fabricated-two-row-pointees",
+    "skills": {
+      "STR": 0,
+      "DEX": 19,
+      "STAM": 20,
+      "INT": -1,
+      "PIETY": 17
+    }
+  },
+  "recording_xxh3": null,
+  "clock": "instruction",
+  "inputs": [],
+  "seeds": [],
+  "runs": [
+    {
+      "parameters": {
+        "current_month": 2,
+        "character_count": 2,
+        "march_age_flags": [
+          0,
+          1
+        ],
+        "AGE": [
+          12,
+          19
+        ]
+      },
+      "events": [],
+      "end_state": [
+        {
+          "global": "character_attributes",
+          "value": [
+            {
+              "AGE": 13,
+              "STR": 0,
+              "DEX": 19,
+              "STAM": 20,
+              "INT": -1
+            },
+            {
+              "AGE": 20,
+              "STR": 1,
+              "DEX": 20,
+              "STAM": 20,
+              "INT": 0
+            }
+          ]
+        },
+        {
+          "global": "march_age_flags",
+          "value": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "parameters": {
+        "current_month": 2,
+        "character_count": 2,
+        "march_age_flags": [
+          1,
+          0
+        ],
+        "AGE": [
+          12,
+          19
+        ]
+      },
+      "events": [],
+      "end_state": [
+        {
+          "global": "character_attributes",
+          "value": [
+            {
+              "AGE": 12,
+              "STR": 0,
+              "DEX": 19,
+              "STAM": 20,
+              "INT": -1
+            },
+            {
+              "AGE": 19,
+              "STR": 0,
+              "DEX": 19,
+              "STAM": 20,
+              "INT": -1
+            }
+          ]
+        },
+        {
+          "global": "march_age_flags",
+          "value": [
+            1,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "parameters": {
+        "current_month": 1,
+        "character_count": 2,
+        "march_age_flags": [
+          0,
+          1
+        ],
+        "AGE": [
+          12,
+          19
+        ]
+      },
+      "events": [],
+      "end_state": [
+        {
+          "global": "character_attributes",
+          "value": [
+            {
+              "AGE": 12,
+              "STR": 0,
+              "DEX": 19,
+              "STAM": 20,
+              "INT": -1
+            },
+            {
+              "AGE": 19,
+              "STR": 0,
+              "DEX": 19,
+              "STAM": 20,
+              "INT": -1
+            }
+          ]
+        },
+        {
+          "global": "march_age_flags",
+          "value": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "parameters": {
+        "current_month": 3,
+        "character_count": 2,
+        "march_age_flags": [
+          1,
+          0
+        ],
+        "AGE": [
+          12,
+          19
+        ]
+      },
+      "events": [],
+      "end_state": [
+        {
+          "global": "character_attributes",
+          "value": [
+            {
+              "AGE": 12,
+              "STR": 0,
+              "DEX": 19,
+              "STAM": 20,
+              "INT": -1
+            },
+            {
+              "AGE": 19,
+              "STR": 0,
+              "DEX": 19,
+              "STAM": 20,
+              "INT": -1
+            }
+          ]
+        },
+        {
+          "global": "march_age_flags",
+          "value": [
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "parameters": {
+        "current_month": 2,
+        "character_count": 2,
+        "march_age_flags": [
+          0,
+          0
+        ],
+        "AGE": [
+          19,
+          12
+        ]
+      },
+      "events": [],
+      "end_state": [
+        {
+          "global": "character_attributes",
+          "value": [
+            {
+              "AGE": 20,
+              "STR": 1,
+              "DEX": 20,
+              "STAM": 20,
+              "INT": 0
+            },
+            {
+              "AGE": 13,
+              "STR": 0,
+              "DEX": 19,
+              "STAM": 20,
+              "INT": -1
+            }
+          ]
+        },
+        {
+          "global": "march_age_flags",
+          "value": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "parameters": {
+        "current_month": 2,
+        "character_count": 2,
+        "march_age_flags": [
+          0,
+          0
+        ],
+        "AGE": [
+          22,
+          12
+        ]
+      },
+      "events": [],
+      "end_state": [
+        {
+          "global": "character_attributes",
+          "value": [
+            {
+              "AGE": 23,
+              "STR": 1,
+              "DEX": 20,
+              "STAM": 20,
+              "INT": 0
+            },
+            {
+              "AGE": 13,
+              "STR": 0,
+              "DEX": 19,
+              "STAM": 20,
+              "INT": -1
+            }
+          ]
+        },
+        {
+          "global": "march_age_flags",
+          "value": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "parameters": {
+        "current_month": 2,
+        "character_count": 2,
+        "march_age_flags": [
+          0,
+          0
+        ],
+        "AGE": [
+          25,
+          12
+        ]
+      },
+      "events": [],
+      "end_state": [
+        {
+          "global": "character_attributes",
+          "value": [
+            {
+              "AGE": 26,
+              "STR": 1,
+              "DEX": 20,
+              "STAM": 20,
+              "INT": 0
+            },
+            {
+              "AGE": 13,
+              "STR": 0,
+              "DEX": 19,
+              "STAM": 20,
+              "INT": -1
+            }
+          ]
+        },
+        {
+          "global": "march_age_flags",
+          "value": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "parameters": {
+        "current_month": 2,
+        "character_count": 2,
+        "march_age_flags": [
+          0,
+          0
+        ],
+        "AGE": [
+          28,
+          12
+        ]
+      },
+      "events": [],
+      "end_state": [
+        {
+          "global": "character_attributes",
+          "value": [
+            {
+              "AGE": 29,
+              "STR": 1,
+              "DEX": 20,
+              "STAM": 20,
+              "INT": 0
+            },
+            {
+              "AGE": 13,
+              "STR": 0,
+              "DEX": 19,
+              "STAM": 20,
+              "INT": -1
+            }
+          ]
+        },
+        {
+          "global": "march_age_flags",
+          "value": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "parameters": {
+        "current_month": 2,
+        "character_count": 2,
+        "march_age_flags": [
+          0,
+          0
+        ],
+        "AGE": [
+          2147483647,
+          -1
+        ]
+      },
+      "events": [],
+      "end_state": [
+        {
+          "global": "character_attributes",
+          "value": [
+            {
+              "AGE": 0,
+              "STR": 0,
+              "DEX": 19,
+              "STAM": 20,
+              "INT": -1
+            },
+            {
+              "AGE": 0,
+              "STR": 0,
+              "DEX": 19,
+              "STAM": 20,
+              "INT": -1
+            }
+          ]
+        },
+        {
+          "global": "march_age_flags",
+          "value": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "parameters": {
+        "current_month": 2,
+        "character_count": 0,
+        "march_age_flags": [
+          0,
+          1
+        ],
+        "AGE": [
+          12,
+          19
+        ]
+      },
+      "events": [],
+      "end_state": [
+        {
+          "global": "character_attributes",
+          "value": [
+            {
+              "AGE": 12,
+              "STR": 0,
+              "DEX": 19,
+              "STAM": 20,
+              "INT": -1
+            },
+            {
+              "AGE": 19,
+              "STR": 0,
+              "DEX": 19,
+              "STAM": 20,
+              "INT": -1
+            }
+          ]
+        },
+        {
+          "global": "march_age_flags",
+          "value": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "parameters": {
+        "current_month": 2,
+        "character_count": -1,
+        "march_age_flags": [
+          0,
+          1
+        ],
+        "AGE": [
+          12,
+          19
+        ]
+      },
+      "events": [],
+      "end_state": [
+        {
+          "global": "character_attributes",
+          "value": [
+            {
+              "AGE": 12,
+              "STR": 0,
+              "DEX": 19,
+              "STAM": 20,
+              "INT": -1
+            },
+            {
+              "AGE": 19,
+              "STR": 0,
+              "DEX": 19,
+              "STAM": 20,
+              "INT": -1
+            }
+          ]
+        },
+        {
+          "global": "march_age_flags",
+          "value": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "parameters": {
+        "current_month": 1,
+        "character_count": 0,
+        "march_age_flags": [
+          1,
+          1
+        ],
+        "AGE": [
+          12,
+          19
+        ]
+      },
+      "events": [],
+      "end_state": [
+        {
+          "global": "character_attributes",
+          "value": [
+            {
+              "AGE": 12,
+              "STR": 0,
+              "DEX": 19,
+              "STAM": 20,
+              "INT": -1
+            },
+            {
+              "AGE": 19,
+              "STR": 0,
+              "DEX": 19,
+              "STAM": 20,
+              "INT": -1
+            }
+          ]
+        },
+        {
+          "global": "march_age_flags",
+          "value": [
+            1,
+            1
+          ]
+        }
+      ]
+    }
+  ],
+  "distribution": null
+}
