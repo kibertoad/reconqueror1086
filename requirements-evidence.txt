@@ -1,7 +1,7 @@
 # Exact toolkit engine, session and decoder releases; hashes include wheels and source archives.
-scientific-method-engine==18.0.0 \
-    --hash=sha256:ba2c1b8d1a3874eab6331952b74a7a7563b938159c8e703135a80c0df0c47eec \
-    --hash=sha256:f9b3e1ae929a3d77776e7f0e086e56c799069080d36009cf94064dd7744060e3
+scientific-method-engine==18.2.0 \
+    --hash=sha256:e7c7bcbe5079a492f8f9798ca33dbf47c05c908f4b5298fc6e634947ef1a79a8 \
+    --hash=sha256:6513dacda13c949476431b5b30bcd4ef2f62219c4ef75ef9db357920c3583ae9
 capstone==5.0.9 \
     --hash=sha256:58a874d9a6cb15122135b1385a782e5b54c8a4d9396161b6498465046d2e0442 \
     --hash=sha256:8c4a1d7134d7d5290e5d77066500385f2c7a4bf66835ccbfde5180042d508b3c \

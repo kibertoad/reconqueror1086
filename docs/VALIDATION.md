@@ -1460,3 +1460,25 @@ FND-UI-025. Synthetic controls pass for their distinct deferred-argument stack
 depths and reject a mismatched depth. The native-recorder checks passed on
 2026-10-10. Actual preparation traversal with these finer checkpoints remains
 unverified; synthetic success does not explain the interrupted run.
+
+## Latest reader and engine releases (2026-10-10)
+
+The adoption pins now select executable-reader 4.0.0 and engine 18.2.0 at
+revision e150fc1153c5572a71f3c9c1174bf75666212c88. Standard-checker remains
+4.2.0 and dosbox-session remains 0.3.0. Published PyPI hashes lock the engine
+artifacts; installation uses the private validation environment.
+
+The reader's FBOV layout and PKLITE metadata changes require no existing
+consumer-field migration: no repository consumer reads the removed `scrambled`
+field. New engine instruction controls and non-returning reach declarations
+leave existing query semantics intact. Prepared protocol 3, the package/wrapper
+return fixture and package-adoption drift controls passed.
+
+Review retained #402 for its reported resident-span overlap, #412 for its
+original-game positive control, #413 for inventory support and #420 for verified
+checkpoints. Consumer validations closed #385, #388, #392 and #403. The earlier
+requested PR #419 is included in the session release and guarded-write adoption.
+
+The canonical tools/Invoke-Validation.ps1 -NoRestore gate passed against these
+installed releases, including documentation, package controls, build and .NET checks.
+
