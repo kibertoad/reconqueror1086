@@ -351,10 +351,16 @@ class ScreenBoundaryTests(unittest.TestCase):
             self.assertEqual(final['supported_input'], [{'action': 'primary-short-click', 'screen': 0}])
 
     def startup_sequence(self, corrupt_stack=False, extraction=False, corrupt_archive=False,
-                         startup_click=False, wrong_callback=False):
+                         startup_click=False, wrong_callback=False, service_returns=False):
         runtime, mapping = runtime_and_mapping()
         pcs = (0x6b413, 0x6b422, 0x2ac08, 0x2ac86, 0x2ad54, 0x595c0, 0x5965f)  # FND-UI-018/017
         ids = ('seed', 'hook-6b422', 'hook-2ac08', 'hook-2ac86', 'hook-2ad54', 'hook-595c0', 'hook-5965f')
+        service_depths = {0x2ac1a: 100, 0x2ac2f: 104, 0x2ac3b: 100,
+                          0x2ac4d: 108, 0x2ac61: 100, 0x2ac75: 100,
+                          0x2ac7e: 96}  # FND-UI-025
+        if service_returns:
+            pcs = pcs[:3] + tuple(service_depths) + pcs[3:]
+            ids = ids[:3] + tuple(f'hook-{pc:x}' for pc in service_depths) + ids[3:]
         if startup_click:
             pcs = pcs[:3] + (0x5b790,) + pcs[3:]  # FND-UI-019
             ids = ids[:3] + ('hook-5b790',) + ids[3:]
@@ -382,6 +388,9 @@ class ScreenBoundaryTests(unittest.TestCase):
                 result.general['esp'] = hex(0x1000 - (88 if corrupt_stack else 92))
             elif pcs[saved_phase] == 0x5b790:
                 result.general['esp'] = hex(0x1000 - 104)
+            elif pcs[saved_phase] in service_depths:
+                result.general['esp'] = hex(0x1000 - service_depths[pcs[saved_phase]] +
+                                            (4 if corrupt_stack else 0))
             return result
         runtime.registers = registers
         def wait(operation):
@@ -414,6 +423,19 @@ class ScreenBoundaryTests(unittest.TestCase):
     def test_startup_checkpoint_rejects_changed_stack(self):
         with self.assertRaisesRegex(RecordingError, 'Startup preparation stack differs'):
             self.startup_sequence(corrupt_stack=True)
+
+    def test_preparation_services_verify_deferred_argument_depths(self):
+        report = self.startup_sequence(service_returns=True)
+        self.assertEqual([item['boundary'] for item in report['startup_checkpoints']],
+                         ['preparation-entry', 'resource-return', 'picture-return',
+                          'service-63270-return', 'sample-return', 'wait-return',
+                          'service-64bcf-return', 'resource-release-return',
+                          'animation-test', 'preparation-epilogue'])
+        self.assertEqual(report['status'], 'screen-load-return-reached')
+
+    def test_preparation_service_rejects_wrong_argument_depth(self):
+        with self.assertRaisesRegex(RecordingError, 'Startup preparation stack differs'):
+            self.startup_sequence(service_returns=True, corrupt_stack=True)
 
     def test_archive_progress_is_separate_from_rng_and_screen_completion(self):
         report = self.startup_sequence(extraction=True)

@@ -362,7 +362,9 @@ preserves the installed animation setting. The local `probe-configuration.json`
 records the selected animation and audio options; it is not RNG trace evidence.
 
 With `--stop-after-screen`, add `--startup-checkpoints` to observe the
-preparation entry, animation test and shared epilogue of FND-UI-018.
+preparation entry, animation test and shared epilogue of FND-UI-018, plus
+the intervening service return boundaries of FND-UI-025. Each return checks
+its own stack displacement before deferred argument cleanup.
 Each checkpoint verifies the original code, descriptors, stack position and
 unchanged recorded RNG state, records the guest's animation flag in local
 `startup-checkpoints.json`, then continues the same run. These checkpoints

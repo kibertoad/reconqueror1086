@@ -87,6 +87,13 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
             hooks[hook.id] = 'screen-return'
     startup_points = {0x2ac08: 'preparation-entry', 0x2ac86: 'animation-test',
                       0x2ad54: 'preparation-epilogue'}  # FND-UI-018
+    startup_services = {  # FND-UI-025: return boundaries before argument cleanup.
+        0x2ac1a: ('resource-return', 100), 0x2ac2f: ('picture-return', 104),
+        0x2ac3b: ('service-63270-return', 100), 0x2ac4d: ('sample-return', 108),
+        0x2ac61: ('wait-return', 100), 0x2ac75: ('service-64bcf-return', 100),
+        0x2ac7e: ('resource-release-return', 96),
+    }
+    startup_points.update({pc: item[0] for pc, item in startup_services.items()})
     if startup_checkpoints:
         for address in startup_points:
             selector, offset = mapping.code_address(address)
@@ -384,7 +391,8 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                     if startup_key is not None:
                         raise RecordingError('Repeated startup preparation requires separate evidence')
                     startup_key = key
-                elif startup_key is None or key != (startup_key[0], startup_key[1] - 92):
+                elif startup_key is None or key != (
+                        startup_key[0], startup_key[1] - startup_services.get(pc, ('', 92))[1]):
                     raise RecordingError('Startup preparation stack differs from its reading')
                 current_state = journal.complete()
                 if state() != current_state or replay(journal.events) != current_state:

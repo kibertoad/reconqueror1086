@@ -1294,3 +1294,9 @@ after cleanup. Registers, memory and the diagnostic image remain local only.
 The paused CPU was in a real-mode BIOS keyboard-check service. A reconstruction
 of the captured screen buffer showed the publisher logo; neither observation
 establishes which preparation call was responsible or a blocking cause.
+
+The recorder now observes the intervening service return boundaries from
+FND-UI-025. Synthetic controls pass for their distinct deferred-argument stack
+depths and reject a mismatched depth. The native-recorder checks passed on
+2026-10-10. Actual preparation traversal with these finer checkpoints remains
+unverified; synthetic success does not explain the interrupted run.
