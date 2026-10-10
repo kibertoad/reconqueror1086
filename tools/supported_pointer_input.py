@@ -14,6 +14,17 @@ FIELDS = {'pointer_events': 0xb0530, 'pointer_count': 0x9df38,
           'long_press_limit': 0x9df4c, 'double_click_limit': 0x9df50}
 
 
+def primary_click_ready(runtime, mapping):
+    """Observe readiness without changing queue or timer fields (FND-BATTLE-023)."""
+    if runtime.session.state != 'stopped':
+        raise RecordingError('Pointer readiness requires a stopped owned guest')
+    def word(name):
+        selector, offset = mapping.data_address(FIELDS[name], 4)
+        return int.from_bytes(runtime.read(runtime.MemoryAddress.segmented(selector, offset), 4), 'little')
+    return (word('pointer_count') == 0 and word('long_press_limit') != 0 and
+            ((word('pointer_clock') - word('primary_release_time')) & 0xffffffff) >= word('double_click_limit'))
+
+
 def queue_primary_click(runtime, mapping, x=0, y=0):
     if runtime.session.state != 'stopped':
         raise RecordingError('Supported pointer input requires a stopped owned guest')

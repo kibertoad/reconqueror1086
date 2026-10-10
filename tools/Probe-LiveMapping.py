@@ -40,6 +40,8 @@ def main():
                         help='Queue one supported-state youth-generation click after verified character options')
     parser.add_argument('--youth-answer', action='store_true',
                         help='Queue the first youth answer and verify its callback return')
+    parser.add_argument('--youth-continue', action='store_true',
+                        help='After the answer, wait for pointer readiness and verify Continue return')
     parser.add_argument('--stop-after-screen-id', type=int,
                         help='Stop after a verified loaded screen identifier, requiring screen checkpoints')
     parser.add_argument('--startup-checkpoints', action='store_true',
@@ -72,6 +74,8 @@ def main():
         raise ValueError('Generation input requires --new-game-click')
     if args.youth_answer and (not args.generation_click or args.stop_after_screen_id == 3):
         raise ValueError('Youth answer requires --generation-click and continuation beyond screen three')
+    if args.youth_continue and not args.youth_answer:
+        raise ValueError('Youth Continue requires --youth-answer')
     if args.stop_after_screen_id is not None and (not args.screen_checkpoints or
             not 0 <= args.stop_after_screen_id <= 24):
         raise ValueError('Screen target requires --screen-checkpoints and a registered identifier')
@@ -130,7 +134,7 @@ def main():
         'continue_after_screen': args.continue_after_screen, 'title_click': args.title_click,
         'screen_checkpoints': args.screen_checkpoints, 'stop_after_screen_id': args.stop_after_screen_id,
         'new_game_click': args.new_game_click, 'generation_click': args.generation_click,
-        'youth_answer': args.youth_answer
+        'youth_answer': args.youth_answer, 'youth_continue': args.youth_continue
     }, indent=2))
     source = Path('artifacts/runtime-tools/dosbox-x-agent-source')
     configuration = 'Agent Debug SDL2' if args.debugger_build == 'heavy' else 'Agent Debug No Heavy SDL2'
@@ -202,7 +206,7 @@ def main():
                                  args.stop_at_screen, args.stop_after_screen, args.startup_checkpoints,
                                  args.startup_click, args.continue_after_screen, args.title_click,
                                  args.screen_checkpoints, args.stop_after_screen_id, args.new_game_click,
-                                 args.generation_click, args.youth_answer)
+                                 args.generation_click, args.youth_answer, args.youth_continue)
                         print('native recording', journal['status'], 'events', len(journal['events']))
                         break
                     if args.record_startup_shifts and runtime.session.stop_reason.breakpoint_id != ids[1]:

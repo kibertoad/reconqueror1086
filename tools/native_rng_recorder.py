@@ -12,7 +12,7 @@ from pathlib import Path
 from rng_journal import Journal, replay
 from live_mapping import descriptor, tables_from_diagnostic
 from rng_recording import RecordingError, canonical_pc
-from supported_pointer_input import queue_primary_click
+from supported_pointer_input import queue_primary_click, primary_click_ready
 
 
 class EventLog:
@@ -32,7 +32,7 @@ class EventLog:
 def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen=False, stop_after_screen=False,
            startup_checkpoints=False, startup_click=False, continue_after_screen=False, title_click=False,
            screen_checkpoints=False, stop_after_screen_id=None, new_game_click=False, generation_click=False,
-           youth_answer=False):
+           youth_answer=False, youth_continue=False):
     if stop_at_screen and stop_after_screen:
         raise ValueError('Choose one screen diagnostic boundary')
     if startup_checkpoints and not stop_after_screen:
@@ -51,6 +51,8 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         raise ValueError('Generation input requires the guarded new-game sequence')
     if youth_answer and (not generation_click or stop_after_screen_id == 3):
         raise ValueError('Youth answer requires generation input and continuation beyond screen three')
+    if youth_continue and not youth_answer:
+        raise ValueError('Youth Continue requires the guarded answer stage')
     if stop_after_screen_id is not None and (not screen_checkpoints or
             type(stop_after_screen_id) is not int or not 0 <= stop_after_screen_id <= 24):
         raise ValueError('Screen target requires checkpoints and a registered screen identifier')
@@ -105,7 +107,19 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
             selector, offset = mapping.code_address(address)
             hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
             hooks[hook.id] = name
+    if youth_continue:
+        # FND-UI-022: both restored-stack returns of the Continue callback.
+        for address, name in ((0x15054, 'continue-entry'), (0x150a7, 'continue-return'),
+                              (0x151f5, 'continue-return')):
+            selector, offset = mapping.code_address(address)
+            hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
+            hooks[hook.id] = name
     controls = []
+    if youth_continue:
+        for start, end in ((0x15054, 0x151f6), (0x63114, 0x63267)):
+            selector, offset = mapping.code_address(start, end - start)
+            address = runtime.MemoryAddress.segmented(selector, offset)
+            controls.append((address, runtime.read(address, end - start)))  # FND-UI-022 / FND-BATTLE-023
     if youth_answer:
         selector, offset = mapping.code_address(0x14b38, 0x14cde - 0x14b38)
         address = runtime.MemoryAddress.segmented(selector, offset)
@@ -145,6 +159,9 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
     generation_click_done = False
     youth_answer_queued = False
     answer_key = None
+    continue_key = None
+    continue_queued = False
+    readiness_hook = None
     startup_key = None
     archive_key = None
     archive_ordinal = 0
@@ -173,6 +190,51 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
             stack_pointer = int(registers.general['esp'], 16)
             key = (int(registers.segments['ss'], 16), stack_pointer)
             kind = hooks[stop.breakpoint_id]
+            if kind == 'continue-readiness':
+                if pc != 0x63114 or frame is not None or screen_frame is not None or answer_key is not None:
+                    raise RecordingError('Continue readiness boundary/frame mismatch')
+                # FND-UI-017 / FND-UI-002: retain the verified youth screen identity.
+                selector, offset = mapping.data_address(0xafe50, 4)
+                pointer = int.from_bytes(runtime.read(runtime.MemoryAddress.segmented(selector, offset), 4), 'little')
+                if pointer != report['screen_observation']['record_pointer']:
+                    raise RecordingError('Continue readiness screen record changed')
+                record_bytes = runtime.read(runtime.MemoryAddress.segmented(selector, pointer), 24)
+                object_pointer = int.from_bytes(record_bytes[:4], 'little')
+                if object_pointer != report['screen_observation']['object_pointer'] or int.from_bytes(record_bytes[4:8], 'little') != 3:
+                    raise RecordingError('Continue readiness requires the verified youth screen')
+                if primary_click_ready(runtime, mapping):
+                    current = journal.complete()
+                    if state() != current or replay(journal.events) != current:
+                        raise RecordingError('Continue readiness RNG state differs from journal')
+                    click = queue_primary_click(runtime, mapping, x=500, y=150)  # SCR-UI-004 / FND-UI-021
+                    if state() != current:
+                        raise RecordingError('RNG state changed while queuing Continue')
+                    report.setdefault('supported_input', []).append(dict(click, screen=3, stage='continue'))
+                    (output / 'supported-input.json').write_text(json.dumps(report['supported_input'], indent=2) + '\n')
+                    continue_queued = True
+                    runtime.agent.delete_breakpoint(runtime.session.id, readiness_hook)
+                    del hooks[readiness_hook]
+                    readiness_hook = None
+                runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
+                continue
+            if kind in ('continue-entry', 'continue-return'):
+                if not continue_queued or frame is not None or screen_frame is not None or answer_key is not None:
+                    raise RecordingError('Continue boundary lacks prescribed input or has an unfinished operation')
+                if kind == 'continue-entry':
+                    if pc != 0x15054 or continue_key is not None:
+                        raise RecordingError('Unexpected or reentrant Continue entry')
+                    continue_key = key
+                else:
+                    if pc not in (0x150a7, 0x151f5) or key != continue_key:
+                        raise RecordingError('Continue return/frame mismatch')
+                    report['end_rng_state'] = journal.complete()
+                    if state() != report['end_rng_state'] or replay(journal.events) != report['end_rng_state']:
+                        raise RecordingError('Continue RNG state differs from journal')
+                    continue_key = None
+                    report['status'] = 'youth-continue-return-reached'
+                    return report
+                runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
+                continue
             if kind in ('answer-entry', 'answer-return'):
                 if not youth_answer_queued or frame is not None or screen_frame is not None or archive_key is not None:
                     raise RecordingError('Youth answer boundary lacks prescribed input or has an unfinished operation')
@@ -188,7 +250,13 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                         raise RecordingError('Youth answer RNG state differs from journal')
                     answer_key = None
                     report['status'] = 'youth-answer-return-reached'
-                    return report
+                    if not youth_continue:
+                        return report
+                    selector, offset = mapping.code_address(0x63114)  # FND-BATTLE-023
+                    hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
+                    readiness_hook = hook.id
+                    hooks[hook.id] = 'continue-readiness'
+                    report['status'] = 'incomplete'
                 runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
                 continue
             if kind == 'startup-wait':
@@ -481,4 +549,5 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         report['pending_screen_load'] = screen_frame is not None
         report['pending_archive_extraction'] = archive_key is not None
         report['pending_youth_answer'] = answer_key is not None
+        report['pending_youth_continue'] = continue_key is not None
         (output / 'native-rng-journal.json').write_text(json.dumps(report, indent=2))

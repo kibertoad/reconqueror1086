@@ -2,6 +2,13 @@
 
 ## Checker 4.1.1 and quiet probes (2026-10-10)
 
+2026-10-10: 37 native-recorder and seven supported-pointer tests passed after
+adding Continue. The synthetic sequence covers a not-ready classifier pass
+followed by readiness, one queued Continue, temporary-hook removal and the
+callback return. Readiness checks leave all synthetic memory unchanged and
+cover nonempty queues, insufficient gaps, zero long-press limits and unsigned
+timer wrap. Native answer and Continue traversal remain unverified.
+
 2026-10-10: native-recorder tests passed 35 synthetic checks after adding the
 guarded first-youth-answer stage. They cover refusal without generation or
 with an earlier screen-3 stop, input after the ordered screen returns, and

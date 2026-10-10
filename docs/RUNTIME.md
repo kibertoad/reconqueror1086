@@ -299,6 +299,16 @@ and numeric RNG replay before ending with `youth-answer-return-reached`.
 It never treats that boundary as full-game completion or queues Continue yet.
 Synthetic sequence checks passed; original answer traversal remains unverified.
 
+`--youth-continue` requires `--youth-answer`. After the matching answer return
+it adds a temporary breakpoint at the pointer classifier entry of
+FND-BATTLE-023. It observes the same screen record and youth history, and waits
+for an empty queue and an unsigned release gap sufficient for a short click.
+It writes no timer or release state. Once ready, it queues (500, 150) inside
+the Continue rectangle of SCR-UI-004/FND-UI-021 and removes that temporary
+breakpoint. FND-UI-022 supports its entry and two restored-stack returns.
+The matching return and journal replay end this diagnostic with
+`youth-continue-return-reached`; native traversal remains unverified.
+
 The native inclusive-draw policies also accept the three fixed-bound dilemma
 selection calls of FND-PERSON-004. Initial selection and reroll carry
 RULE-PERSON-003, and continued selection carries RULE-PERSON-004. Each requires

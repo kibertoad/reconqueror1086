@@ -51,7 +51,7 @@ def runtime_and_mapping(screen_state=123, screen_number=0, record_pointer=0x3000
 
 class ScreenBoundaryTests(unittest.TestCase):
     def replacement_sequence(self, wrong_return=False, wrong_frame=False, wrong_identity=False, new_game=False,
-                             generation=False, youth=False):
+                             generation=False, youth=False, continuation=False):
         runtime, mapping = runtime_and_mapping()
         original_wait, original_registers, original_read = (
             runtime.wait_until_stopped, runtime.registers, runtime.read)
@@ -61,6 +61,9 @@ class ScreenBoundaryTests(unittest.TestCase):
             else:
                 runtime.phase += 1
                 runtime.session.stop_reason.breakpoint_id = (
+                    'hook-63114' if continuation and runtime.phase in (12, 13) else
+                    'hook-15054' if continuation and runtime.phase == 14 else
+                    'hook-151f5' if continuation and runtime.phase == 15 else
                     'hook-14b38' if youth and runtime.phase == 10 else
                     'hook-14cdd' if youth and runtime.phase == 11 else
                     'hook-596c0' if runtime.phase % 2 == 0 else 'hook-5975e')
@@ -70,12 +73,15 @@ class ScreenBoundaryTests(unittest.TestCase):
             return SimpleNamespace(general={'esp': '0x1004' if wrong_frame and runtime.phase == 5 else '0x1000'},
                                    segments={'cs': '0x180', 'ds': '0x188', 'ss': '0x188'},
                                    cpu_mode='protected', instruction_pointer=hex(
+                                       0x63114 if continuation and runtime.phase in (12, 13) else
+                                       0x15054 if continuation and runtime.phase == 14 else
+                                       0x151f5 if continuation and runtime.phase == 15 else
                                        0x14b38 if youth and runtime.phase == 10 else
                                        0x14cdd if youth and runtime.phase == 11 else
                                        0x596c0 if runtime.phase % 2 == 0 else 0x5965f if wrong_return else 0x5975e))
         def read(address, length):
             if runtime.phase >= 4:
-                screen = (runtime.phase - 2) // 2
+                screen = min(3, (runtime.phase - 2) // 2) if continuation else (runtime.phase - 2) // 2
                 if address == (0x188, 0x1004):
                     return b''.join(word.to_bytes(4, 'little') for word in (screen, 1, 1))
                 if address == (0x188, 0x300000):
@@ -90,22 +96,39 @@ class ScreenBoundaryTests(unittest.TestCase):
         with patch('native_rng_recorder.tables_from_diagnostic', return_value=(0, 16)), \
              patch('native_rng_recorder.descriptor', side_effect=[mapping.code, mapping.data] * 16), \
              patch('native_rng_recorder.EventLog'), patch('native_rng_recorder.Path.write_text'), \
+             patch('native_rng_recorder.primary_click_ready', side_effect=[False, True]) as ready, \
              patch('native_rng_recorder.queue_primary_click',
                    return_value={'action': 'primary-short-click'}) as click:
             report = record(runtime, mapping, ('draw', 'seed'), 'unused-output', stop_after_screen=True,
                             continue_after_screen=True, title_click=True, screen_checkpoints=True,
                             stop_after_screen_id=None if youth else 3 if generation else 2 if new_game else 1,
-                            new_game_click=new_game, generation_click=generation, youth_answer=youth)
+                            new_game_click=new_game, generation_click=generation, youth_answer=youth,
+                            youth_continue=continuation)
         if new_game:
-            self.assertEqual(click.call_count, 4 if youth else 3 if generation else 2)
+            self.assertEqual(click.call_count, 5 if continuation else 4 if youth else 3 if generation else 2)
             self.assertEqual([call.kwargs for call in click.call_args_list],
                              [{'x': 10, 'y': 10}, {'x': 100, 'y': 350}] +
                              ([{'x': 200, 'y': 250}] if generation else []) +
-                             ([{'x': 100, 'y': 350}] if youth else []))
+                             ([{'x': 100, 'y': 350}] if youth else []) +
+                             ([{'x': 500, 'y': 150}] if continuation else []))
         else:
             click.assert_called_once_with(runtime, mapping, x=10, y=10)
-        runtime.agent.delete_breakpoint.assert_not_called()
+        if continuation:
+            self.assertEqual(ready.call_count, 2)
+            runtime.agent.delete_breakpoint.assert_called_once_with('owned', 'hook-63114')
+        else:
+            runtime.agent.delete_breakpoint.assert_not_called()
         return report
+
+    def test_continue_requires_answer_stage(self):
+        with self.assertRaisesRegex(ValueError, 'Continue requires'):
+            record(None, None, (), 'unused-output', youth_continue=True)
+
+    def test_continue_waits_for_readiness_and_matching_callback_return(self):
+        report = self.replacement_sequence(new_game=True, generation=True, youth=True, continuation=True)
+        self.assertEqual(report['status'], 'youth-continue-return-reached')
+        self.assertFalse(report['pending_youth_continue'])
+        self.assertFalse(report['full_game_complete'])
 
     def test_youth_answer_requires_generation_and_cannot_stop_before_input(self):
         for arguments in ({}, {'generation_click': True, 'new_game_click': True,

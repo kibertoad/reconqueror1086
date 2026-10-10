@@ -4,7 +4,7 @@ import struct
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
-from supported_pointer_input import queue_primary_click
+from supported_pointer_input import queue_primary_click, primary_click_ready
 from rng_recording import RecordingError
 
 
@@ -36,6 +36,15 @@ def fixture(clock=10, release=0, count=0, long_limit=4, double_limit=4):
 
 
 class SupportedPointerInputTests(unittest.TestCase):
+    def test_readiness_waits_without_writes_for_empty_queue_and_elapsed_unsigned_gap(self):
+        for options, ready in (({}, True), ({'count': 2}, False), ({'release': 9}, False),
+                               ({'long_limit': 0}, False), ({'clock': 2, 'release': 4294967289}, True)):
+            runtime, mapping, memory, writes = fixture(**options)
+            before = bytes(memory)
+            with self.subTest(options=options), patch('supported_pointer_input.FIELDS', LAYOUT):
+                self.assertEqual(primary_click_ready(runtime, mapping), ready)
+            self.assertEqual(bytes(memory), before)
+            self.assertEqual(writes, [])
     def invoke(self, runtime, mapping):
         with patch('supported_pointer_input.FIELDS', LAYOUT):
             return queue_primary_click(runtime, mapping, 12, 34)
