@@ -63,9 +63,14 @@ private environment with the hash-locked requirements, never the shared one.
   Q-PERSON-022 remains open. EXP-UI-001 remains the entry-control reference.
 - Q-STRATEGY-043 remains open after FND-STRATEGY-049 and EXP-STRATEGY-003.
   RULE-STRATEGY-012 remains disputed. Documentation and evidence checks passed.
-- Toolkit issues #385, #388, #392 and #403 were consumer-validated and closed.
+- Toolkit issues #319, #385, #388, #392 and #403 were consumer-validated and closed.
   PR #419 is adopted. #402, #412, #413 and #420 remain open with their
   original-game confirmation, feature or upstream prerequisites unresolved.
+  #416 awaits its next session release and killed-owner control. The flat
+  isolated-call segment-model controls are committed; their reusable setup
+  result was added to existing toolkit issue #7 after duplicate checking.
+- Q-RNG-001 remains open after FND-RNG-007 and EXP-RNG-002. Documentation,
+  parser controls and evidence/package checks passed; no parity status changed.
 - The AGE-checked v4 and registered-update v5 tooling contracts are committed.
   Canonical validation and final consumer controls passed; native v5 is running.
 - Unfinished: native youth/dubbing traversal, complete caller ownership, prescribed full-game
