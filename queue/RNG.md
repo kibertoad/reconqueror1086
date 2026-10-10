@@ -26,6 +26,9 @@ Next ID: Q-RNG-002
   with a null environment array and classification zero. The negative-
   classification path, environment initialization and broader normalizer domain
   remain; a general Gregorian timestamp claim would contradict these controls.
+  FND-RNG-011 reads the lazy environment constructor and two direct-reference
+  searches with a positive control. The source selector/offset's writers,
+  constructor startup ordering and allocator/segment effects remain unread.
 
 ## Emulated call
 

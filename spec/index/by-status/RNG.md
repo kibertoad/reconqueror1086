@@ -22,7 +22,7 @@ Entries by status.
 
 ## recorded
 
-13 entries.
+14 entries.
 
 | ID | Title |
 |---|---|
@@ -39,6 +39,7 @@ Entries by status.
 | [FND-RNG-008](../../findings/FND-RNG-008.md) | Environment suffix parsing writes selector-dependent record fields and default clock components |
 | [FND-RNG-009](../../findings/FND-RNG-009.md) | Seed conversion uses common-year and leap-year cumulative month-day tables |
 | [FND-RNG-010](../../findings/FND-RNG-010.md) | Seed conversion combines a four-year day-count term with a 1970 epoch and normalizes before adjustments |
+| [FND-RNG-011](../../findings/FND-RNG-011.md) | The environment array is lazily constructed from a selector-offset source |
 
 ## Open questions
 
