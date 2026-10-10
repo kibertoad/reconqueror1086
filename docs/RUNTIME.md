@@ -549,6 +549,11 @@ internal 32-bit offset relocation forms. Unsupported formats, page flags,
 relocations, interrupts and hardware/service instructions stop with errors.
 There are no import, interrupt, port, timer or video models. Loaded state is
 fresh for every call, code is protected, and an instruction budget bounds it.
+The CPU model explicitly supplies flat 32-bit code/data descriptors with base
+zero and a 4 GiB limit for CS, DS, ES and SS. Its authored descriptor table is
+read-only; it does not reproduce the original operating system's descriptor
+table. Reloading a segment therefore preserves the modeled 32-bit stack and
+string-copy addressing. FS and GS have no supplied service model.
 
 Run `python tools/emu/test_harness.py` without original files. To smoke-check
 RULE-RNG-001's functions, set GAME_DIR for that command to the local original

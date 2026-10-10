@@ -1560,3 +1560,21 @@ Local scripts and output are in `artifacts/check-issue-319.mjs`,
 Toolkit issue #319 was closed with these downstream results. Issue #416
 still requires the unreleased owner-lifetime fix and a killed-owner native
 control; normal successful session cleanup does not validate that condition.
+
+### 2026-10-10 explicit isolated-call segment model
+
+The Unicorn function harness now initializes an authored, read-only GDT with
+flat 32-bit code/data descriptors for CS, DS, ES and SS. This fixes the harness
+context in which a segment reload could otherwise replace Unicorn's initial
+implicit segment cache and make a later stack access fail. It does not model
+the original OS or change the owned executable.
+
+`artifacts/validation-python-latest/Scripts/python.exe -B
+ tools/emu/test_harness.py` passed. Authored controls reload ES from DS, retain
+the 32-bit stack and return marker, and copy zero, one or six dwords with
+untouched destination tails. Another control refuses a write to the descriptor
+table. Interrupt, port, instruction-budget and loaded-image bounds checks remain
+passing. With command-scoped GAME_DIR=analysis/original, the existing March
+age-pass and all eight home-setup controls also passed on the same model;
+outputs are local in `artifacts/flat-segment-march-controls.json` and
+`artifacts/flat-segment-home-controls.json`. No spec status changed.

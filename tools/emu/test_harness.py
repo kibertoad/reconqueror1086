@@ -44,6 +44,30 @@ class HarnessTests(unittest.TestCase):
         with self.assertRaisesRegex(CallError,'interrupt'):
             call(self.objects(bytes.fromhex('cd21c3')),0x10000)
 
+    def test_segment_reload_preserves_32_bit_stack_and_copy(self):
+        # Authored function: save ES/ESI/EDI, reload ES from DS, copy ECX
+        # dwords from two stack arguments, restore registers, return marker.
+        code = bytes.fromhex(
+            '0656571e07'  # push es; push esi; push edi; push ds; pop es
+            '8b7424108b7c24148b4c2418f3a5'
+            '5f5e07b878563412c3')
+        objects = self.objects(code) + [
+            dict(base=0x90000,size=4096,image=bytes(4096),flags=3)]
+        source = bytes(range(24))
+        for count in (0, 1, 6):
+            with self.subTest(count=count):
+                result = call(objects,0x10000,(0x90000,0x90100,count),
+                              writes=((0x90000,source),
+                                      (0x90100,b'?' * len(source))))
+                self.assertEqual(result['result'],0x12345678)
+                self.assertEqual(result['read'](0x90100,len(source)),
+                                 source[:4*count] + b'?'*(len(source)-4*count))
+
+    def test_descriptor_table_is_not_writable(self):
+        # Authored absolute byte store into the synthetic descriptor page.
+        with self.assertRaises(CallError):
+            call(self.objects(bytes.fromhex('c6050000000400c3')),0x10000)
+
     def test_port_rejected(self):
         with self.assertRaisesRegex(CallError,'hardware/service'):
             call(self.objects(bytes.fromhex('e460c3')),0x10000)

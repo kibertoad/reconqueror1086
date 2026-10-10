@@ -30,6 +30,19 @@ def call(objects, entry, arguments=(), writes=(), instruction_limit=100000):
         spans.append((base, base + size))
     if not any(o['flags'] & 4 and o['base'] <= entry < o['base'] + o['size'] for o in objects):
         raise CallError('Entry outside executable object')
+    # Explicit flat protected-mode descriptors keep segment reloads from
+    # replacing Unicorn's implicit initial cache with a 16-bit stack model.
+    # This is an authored CPU model, not a model of the guest OS or its GDT.
+    gdt = 0x4000000
+    cpu.mem_map(gdt, 4096)
+    cpu.mem_write(gdt, struct.pack('<QQQ', 0, 0x00cf9b000000ffff,
+                                   0x00cf93000000ffff))
+    cpu.mem_protect(gdt, 4096, unicorn.UC_PROT_READ)
+    cpu.reg_write(reg.UC_X86_REG_GDTR, (0, gdt, 23, 0))
+    cpu.reg_write(reg.UC_X86_REG_CS, 8)
+    for segment in (reg.UC_X86_REG_DS, reg.UC_X86_REG_ES, reg.UC_X86_REG_SS):
+        cpu.reg_write(segment, 16)
+    spans.append((gdt, gdt + 24))
     cpu.mem_map(stack, stack_size)
     cpu.mem_map(stop, 4096, unicorn.UC_PROT_READ | unicorn.UC_PROT_EXEC)
     spans.extend([(stack, stack + stack_size)])
