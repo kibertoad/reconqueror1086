@@ -418,6 +418,17 @@ $env:GAME_DIR = 'C:/GOG Games/Conqueror AD1086'
 python -u -B tools/Probe-LiveMapping.py --output artifacts/runtime-tools/startup-click-fresh --samples 8 --observation-ms 1000 --rng-break --cycles 1000 --record-native --record-draw-limit 1000 --stop-after-screen --debugger-build no-heavy --animations-off --startup-checkpoints --startup-click
 ```
 
+`--dubbing-entry-input` requires native recording, animations disabled and
+the prescribed youth traversal. At FND-UI-026's two entry input waits it
+verifies the active screen request, saved stack depth, original code, data
+selectors and recorded RNG state. It observes pointer readiness and queues
+one supported short click for each wait. Accepted input must return one and
+drain the queue before the next phase. The final entry return restores its
+entry stack. Schema v3 retains pending entry state and explicit completion;
+the screen-return guard refuses a return that skipped these observations.
+This control is separate from the later `--dubbing-click` callback input.
+Its synthetic checks pass; native traversal remains unfinished.
+
 The probe imports its recorder and input helper before starting the guest and
 writes their authored-source hashes in local `probe-source.json`. Later source
 edits do not change those loaded modules. A traceback may display lines from an

@@ -50,6 +50,8 @@ def main():
                         help='Prescribed answer/Continue cycles, one through six; requires youth Continue')
     parser.add_argument('--dubbing-click', action='store_true',
                         help='After six youth cycles, queue guarded dubbing input and verify village callback return')
+    parser.add_argument('--dubbing-entry-input', action='store_true',
+                        help='With animations disabled, provide guarded input at both dubbing entry waits')
     parser.add_argument('--stop-after-screen-id', type=int,
                         help='Stop after a verified loaded screen identifier, requiring screen checkpoints')
     parser.add_argument('--startup-checkpoints', action='store_true',
@@ -88,6 +90,9 @@ def main():
         raise ValueError('Youth cycles require --youth-continue and a count from one to six')
     if args.dubbing_click and (not args.youth_continue or args.youth_cycles != 6 or args.stop_after_screen_id is not None):
         raise ValueError('Dubbing input requires six youth cycles and no earlier screen target')
+    if args.dubbing_entry_input and (not args.record_native or not args.animations_off or
+            not args.youth_continue or args.youth_cycles != 6 or args.stop_after_screen_id is not None):
+        raise ValueError('Dubbing entry input requires native youth traversal with animations disabled')
     if args.stop_after_screen_id is not None and (not args.screen_checkpoints or
             not 0 <= args.stop_after_screen_id <= 24):
         raise ValueError('Screen target requires --screen-checkpoints and a registered identifier')
@@ -119,7 +124,7 @@ def main():
     root.mkdir(parents=True, exist_ok=True)
     tool_names = ('Probe-LiveMapping.py', 'shared_dosbox_runtime.py', 'live_mapping.py',
                   'native_rng_recorder.py', 'rng_journal.py', 'rng_recording.py',
-                  'supported_pointer_input.py', 'emu/le_image.py')
+                  'supported_pointer_input.py', 'dubbing_entry_input.py', 'emu/le_image.py')
     (root / 'probe-source.json').write_text(json.dumps({
         'tool_sha256': {name: hashlib.sha256((Path(__file__).parent / name).read_bytes()).hexdigest()
                         for name in tool_names}
@@ -150,7 +155,8 @@ def main():
         'screen_checkpoints': args.screen_checkpoints, 'stop_after_screen_id': args.stop_after_screen_id,
         'new_game_click': args.new_game_click, 'generation_click': args.generation_click,
         'youth_answer': args.youth_answer, 'youth_continue': args.youth_continue,
-        'youth_cycles': args.youth_cycles, 'dubbing_click': args.dubbing_click
+        'youth_cycles': args.youth_cycles, 'dubbing_click': args.dubbing_click,
+        'dubbing_entry_input': args.dubbing_entry_input
     }, indent=2))
     source = Path('artifacts/runtime-tools/dosbox-x-agent-source')
     configuration = 'Agent Debug SDL2' if args.debugger_build == 'heavy' else 'Agent Debug No Heavy SDL2'
@@ -225,7 +231,7 @@ def main():
                                  args.startup_click, args.continue_after_screen, args.title_click,
                                  args.screen_checkpoints, args.stop_after_screen_id, args.new_game_click,
                                  args.generation_click, args.youth_answer, args.youth_continue, args.youth_cycles,
-                                 args.dubbing_click)
+                                 args.dubbing_click, args.dubbing_entry_input)
                         print('native recording', journal['status'], 'events', len(journal['events']))
                         break
                     if args.record_startup_shifts and runtime.session.stop_reason.breakpoint_id != ids[1]:

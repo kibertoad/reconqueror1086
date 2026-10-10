@@ -54,8 +54,24 @@ processes exited and its lock was absent before the next launch. No archive
 return, startup completion or speed improvement is established by this attempt.
 
 The combined traversal under native-rng-shared-dubbing-fixed10000-20261010-a
-has started using the published 0.2.0 package, normal core and fixed 10000
-cycles. Native startup completion and released guarded writes remain pending.
+used the published 0.2.0 package, normal core and fixed 10000 cycles. It
+verified startup archive returns, preparation guards and screen returns
+through youth generation. The released package verified 42 supported-field
+writes for 14 prescribed clicks. Four Continue callbacks completed; the next
+Continue and its screen replacement remained pending. The run was explicitly
+paused for a local diagnostic, then ended incomplete. Its owned processes
+exited and the machine lock was absent. The diagnostic is retained locally;
+FND-UI-026 records the relevant entry-wait behavior. Native startup and guarded
+writes are verified, but youth completion, dubbing completion and full-game
+recording are not.
+
+The subsequent dubbing-entry input controls passed synthetic checks for both
+input waits, repeated readiness observations, stack and ordering refusal,
+animation settings, queue consumption and RNG preservation. The integrated
+native-recorder synthetic sequence passed, as did the terminal schema checks.
+Schema v3 explicitly records pending entry state and entry completion;
+historical v1/v2 journals keep their original meaning. This instrumentation
+has not yet completed a native dubbing traversal.
 
 ## Shared library releases and interrupted traversal (2026-10-10)
 

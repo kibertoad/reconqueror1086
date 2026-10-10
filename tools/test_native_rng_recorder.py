@@ -54,11 +54,15 @@ class ScreenBoundaryTests(unittest.TestCase):
                              generation=False, youth=False, continuation=False, bad_callback_frame=None,
                              changed_youth_history=False, cycles=1, dubbing=False,
                              changed_dubbing_history=False, changed_dubbing_object=False,
-                             missing_village=False, unprescribed_dubbing=False):
+                             missing_village=False, unprescribed_dubbing=False, presentation=False):
         runtime, mapping = runtime_and_mapping()
+        entry_phase = -1
+        entry_points = (0x19a8c, 0x19bbf, 0x19bcc, 0x19c51, 0x19c5e, 0x19c61)
         original_wait, original_registers, original_read = (
             runtime.wait_until_stopped, runtime.registers, runtime.read)
         def repeated_pc():
+            if entry_phase >= 0:
+                return entry_points[entry_phase]
             if cycles == 6 and runtime.phase >= 55:
                 # FND-UI-020/022/024: synthetic stops at recorded return boundaries.
                 points = {55: 0x596c0, 56: 0x5975e, 57: 0x150a7,
@@ -71,6 +75,13 @@ class ScreenBoundaryTests(unittest.TestCase):
                         0x63114, 0x63114, 0x15054, 0x151f5)[(runtime.phase - 16) % 8]
             return None
         def wait(operation):
+            nonlocal entry_phase
+            if presentation and runtime.phase == 55 and entry_phase < 5:
+                entry_phase += 1
+                runtime.session.stop_reason.breakpoint_id = f'hook-{entry_points[entry_phase]:x}'
+                return
+            if entry_phase == 5:
+                entry_phase = -1
             if runtime.phase < 3:
                 original_wait(operation)
             else:
@@ -86,7 +97,7 @@ class ScreenBoundaryTests(unittest.TestCase):
         def registers():
             if runtime.phase < 4:
                 return original_registers()
-            return SimpleNamespace(general={'esp': '0x1004' if
+            return SimpleNamespace(general={'eax': '0x1', 'esp': '0xff4' if 1 <= entry_phase <= 4 else '0x1004' if
                                    (wrong_frame and runtime.phase == 5 or runtime.phase == bad_callback_frame) else '0x1000'},
                                    segments={'cs': '0x180', 'ds': '0x188', 'ss': '0x188'},
                                    cpu_mode='protected', instruction_pointer=hex(
@@ -103,6 +114,8 @@ class ScreenBoundaryTests(unittest.TestCase):
                           6 if cycles == 6 and runtime.phase >= 55 else
                           min(3, (runtime.phase - 2) // 2) if continuation else (runtime.phase - 2) // 2)
                 if address == (0x188, 0x1004):
+                    if presentation and runtime.phase == 55:
+                        return b''.join(word.to_bytes(4, 'little') for word in (6, 0, 1))
                     return b''.join(word.to_bytes(4, 'little') for word in (screen, 1, 1))
                 if address == (0x188, 0x300000):
                     if screen > 3:
@@ -124,6 +137,8 @@ class ScreenBoundaryTests(unittest.TestCase):
         with patch('native_rng_recorder.tables_from_diagnostic', return_value=(0, 16)), \
              patch('native_rng_recorder.descriptor', side_effect=[mapping.code, mapping.data] * 100), \
              patch('native_rng_recorder.EventLog'), patch('native_rng_recorder.Path.write_text'), \
+             patch('dubbing_entry_input.primary_click_ready', return_value=True), \
+             patch('dubbing_entry_input.queue_primary_click', return_value={'action': 'primary-short-click'}) as entry_click, \
              patch('native_rng_recorder.primary_click_ready', side_effect=[False, True] * (2 * cycles - 1 + int(dubbing))) as ready, \
              patch('native_rng_recorder.queue_primary_click',
                    return_value={'action': 'primary-short-click'}) as click:
@@ -131,7 +146,12 @@ class ScreenBoundaryTests(unittest.TestCase):
                             continue_after_screen=True, title_click=True, screen_checkpoints=True,
                             stop_after_screen_id=None if youth else 3 if generation else 2 if new_game else 1,
                             new_game_click=new_game, generation_click=generation, youth_answer=youth,
-                            youth_continue=continuation, youth_cycles=cycles, dubbing_click=dubbing)
+                            youth_continue=continuation, youth_cycles=cycles, dubbing_click=dubbing,
+                            dubbing_entry_input=presentation)
+        if presentation:
+            self.assertEqual(entry_click.call_count, 2)
+            self.assertTrue(report['dubbing_entry_complete'])
+            self.assertFalse(report['pending_dubbing_entry'])
         if new_game:
             self.assertEqual(click.call_count, 3 + 2 * cycles + int(dubbing) if continuation else 4 if youth else 3 if generation else 2)
             self.assertEqual([call.kwargs for call in click.call_args_list],
@@ -504,6 +524,13 @@ class ScreenBoundaryTests(unittest.TestCase):
     def test_unregistered_screen_fails(self):
         with self.assertRaisesRegex(RecordingError, 'Unregistered requested screen'):
             self.run_sequence(screen_number=25)
+
+
+    def test_prescribed_dubbing_entry_precedes_loaded_screen_and_callback(self):
+        report = self.replacement_sequence(new_game=True, generation=True, youth=True,
+                                           continuation=True, cycles=6, dubbing=True, presentation=True)
+        self.assertEqual(report['schema'], 'conquer-native-rng-journal-v3')
+        self.assertEqual(report['status'], 'dubbing-return-reached')
 
 
 class OwnedReductionTests(unittest.TestCase):

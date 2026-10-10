@@ -13,6 +13,7 @@ from rng_journal import Journal, replay
 from live_mapping import descriptor, tables_from_diagnostic
 from rng_recording import RecordingError, canonical_pc
 from supported_pointer_input import queue_primary_click, primary_click_ready
+from dubbing_entry_input import DubbingEntryInput, POINTS as DUBBING_ENTRY_POINTS
 
 
 class EventLog:
@@ -32,7 +33,8 @@ class EventLog:
 def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen=False, stop_after_screen=False,
            startup_checkpoints=False, startup_click=False, continue_after_screen=False, title_click=False,
            screen_checkpoints=False, stop_after_screen_id=None, new_game_click=False, generation_click=False,
-           youth_answer=False, youth_continue=False, youth_cycles=1, dubbing_click=False):
+           youth_answer=False, youth_continue=False, youth_cycles=1, dubbing_click=False,
+           dubbing_entry_input=False):
     if stop_at_screen and stop_after_screen:
         raise ValueError('Choose one screen diagnostic boundary')
     if startup_checkpoints and not stop_after_screen:
@@ -57,6 +59,8 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         raise ValueError('Youth cycles require Continue and an integer from one to six')
     if dubbing_click and (not youth_continue or youth_cycles != 6 or stop_after_screen_id is not None):
         raise ValueError('Dubbing input requires six youth cycles and no earlier screen target')
+    if dubbing_entry_input and (not youth_continue or youth_cycles != 6 or stop_after_screen_id is not None):
+        raise ValueError('Dubbing entry input requires the prescribed youth traversal')
     if stop_after_screen_id is not None and (not screen_checkpoints or
             type(stop_after_screen_id) is not int or not 0 <= stop_after_screen_id <= 24):
         raise ValueError('Screen target requires checkpoints and a registered screen identifier')
@@ -126,6 +130,17 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
             hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
             hooks[hook.id] = name
     controls = []
+    presentation = DubbingEntryInput() if dubbing_entry_input else None
+    if presentation is not None:
+        for address in DUBBING_ENTRY_POINTS:
+            selector, offset = mapping.code_address(address)
+            hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
+            hooks[hook.id] = 'dubbing-presentation'
+        # FND-UI-026 / FND-UI-019: verify entry and input-poll code throughout.
+        for start, end in ((0x19a8c, 0x19c62), (0x24d14, 0x24d54)):
+            selector, offset = mapping.code_address(start, end - start)
+            address = runtime.MemoryAddress.segmented(selector, offset)
+            controls.append((address, runtime.read(address, end - start)))
     if dubbing_click:
         # FND-UI-024: full-screen dubbing callback and restored-stack return.
         for address, name in ((0x19c80, 'dubbing-entry'), (0x19cb1, 'dubbing-return')):
@@ -196,7 +211,8 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
     archive_ordinal = 0
     count = 0
     shift_ordinal = 0
-    report = {'schema': 'conquer-native-rng-journal-v2' if dubbing_click else 'conquer-native-rng-journal-v1', 'status': 'incomplete',
+    report = {'schema': ('conquer-native-rng-journal-v3' if presentation is not None else
+                         'conquer-native-rng-journal-v2' if dubbing_click else 'conquer-native-rng-journal-v1'), 'status': 'incomplete',
               'full_game_complete': False, 'accepted_callers_complete': False,
               'events': journal.events}
     event_log = EventLog(output / 'native-rng-events.jsonl')
@@ -219,6 +235,22 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
             stack_pointer = int(registers.general['esp'], 16)
             key = (int(registers.segments['ss'], 16), stack_pointer)
             kind = hooks[stop.breakpoint_id]
+            if kind == 'dubbing-presentation':
+                if presentation is None or frame is not None or archive_key is not None or \
+                        answer_key is not None or continue_key is None or screen_frame is None:
+                    raise RecordingError('Dubbing presentation overlaps an unexpected operation')
+                current = journal.complete()
+                if state() != current or replay(journal.events) != current:
+                    raise RecordingError('Dubbing presentation RNG state differs from journal')
+                click = presentation.observe(runtime, mapping, pc, key,
+                                             int(registers.general.get('eax', '0x0'), 16),
+                                             screen_frame['request'], state)
+                if click is not None:
+                    report.setdefault('supported_input', []).append(click)
+                    (output / 'supported-input.json').write_text(json.dumps(report['supported_input'], indent=2) + '\n')
+                report['dubbing_entry_complete'] = presentation.completed
+                runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
+                continue
             if kind == 'continue-readiness':
                 if pc != 0x63114 or frame is not None or screen_frame is not None or answer_key is not None or \
                         continue_key is not None or dubbing_key is not None or archive_key is not None:
@@ -407,6 +439,9 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                 runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
                 continue
             if kind == 'screen-return':
+                if presentation is not None and screen_frame is not None and \
+                        screen_frame['request']['screen'] == 6 and not presentation.completed:
+                    raise RecordingError('Dubbing screen returned before prescribed entry input completed')
                 if frame is not None or archive_key is not None or screen_frame is None or \
                         pc != screen_frame['return_pc'] or screen_frame['key'] != key:
                     raise RecordingError('Loaded-screen return/frame mismatch')
@@ -633,6 +668,9 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         report['pending_archive_extraction'] = archive_key is not None
         report['pending_youth_answer'] = answer_key is not None
         report['pending_youth_continue'] = continue_key is not None
-        if dubbing_click:
+        if dubbing_click or presentation is not None:
             report['pending_dubbing'] = dubbing_key is not None
+        if presentation is not None:
+            report['pending_dubbing_entry'] = presentation.key is not None
+            report['dubbing_entry_complete'] = presentation.completed
         (output / 'native-rng-journal.json').write_text(json.dumps(report, indent=2))

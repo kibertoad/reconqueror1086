@@ -42,7 +42,7 @@ def verify(directory, expected_status, expected_youth_cycles=None):
     directory = Path(directory)
     report = json.loads(read_bounded(directory / 'native-rng-journal.json'))
     if not isinstance(report, dict) or report.get('schema') not in (
-            'conquer-native-rng-journal-v1', 'conquer-native-rng-journal-v2'):
+            'conquer-native-rng-journal-v1', 'conquer-native-rng-journal-v2', 'conquer-native-rng-journal-v3'):
         raise RecordingError('Unexpected native journal schema')
     if report.get('status') != expected_status:
         raise RecordingError('Native journal did not reach the requested diagnostic boundary')
@@ -52,10 +52,18 @@ def verify(directory, expected_status, expected_youth_cycles=None):
         raise RecordingError('Native journal has a pending or unreported operation')
     if report['schema'] == 'conquer-native-rng-journal-v1' and 'pending_dubbing' in report:
         raise RecordingError('Dubbing state requires schema v2')
-    if report['schema'] == 'conquer-native-rng-journal-v2' and report.get('pending_dubbing') is not False:
+    if report['schema'] in ('conquer-native-rng-journal-v2', 'conquer-native-rng-journal-v3') and report.get('pending_dubbing') is not False:
         raise RecordingError('Native journal has a pending or unreported dubbing operation')
+    if report['schema'] != 'conquer-native-rng-journal-v3' and any(
+            field in report for field in ('pending_dubbing_entry', 'dubbing_entry_complete')):
+        raise RecordingError('Dubbing entry state requires schema v3')
+    if report['schema'] == 'conquer-native-rng-journal-v3':
+        if report.get('pending_dubbing_entry') is not False or type(report.get('dubbing_entry_complete')) is not bool:
+            raise RecordingError('Native journal has pending or unreported dubbing entry state')
+        if expected_youth_cycles == 6 and report['dubbing_entry_complete'] is not True:
+            raise RecordingError('Prescribed traversal did not complete dubbing entry input')
     if expected_status == 'dubbing-return-reached' and (
-            report['schema'] != 'conquer-native-rng-journal-v2' or expected_youth_cycles != 6):
+            report['schema'] not in ('conquer-native-rng-journal-v2', 'conquer-native-rng-journal-v3') or expected_youth_cycles != 6):
         raise RecordingError('Dubbing verification requires schema v2 and six prescribed cycles')
     if any(report.get(name) is not False for name in
            ('full_game_complete', 'accepted_callers_complete')):

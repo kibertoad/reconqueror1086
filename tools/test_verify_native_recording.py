@@ -185,5 +185,29 @@ class NativeVerificationTests(unittest.TestCase):
             verify(self.path, 'dubbing-return-reached', 6)
 
 
+    def test_v3_requires_completed_and_explicit_entry_state(self):
+        report = {**self.dubbing_report(), 'schema': 'conquer-native-rng-journal-v3',
+                  'pending_dubbing_entry': False, 'dubbing_entry_complete': True}
+        self.write(report)
+        self.assertEqual(verify(self.path, 'dubbing-return-reached', 6)['screen_id'], 11)
+        for field, values in (('pending_dubbing_entry', (True, None, 0)),
+                              ('dubbing_entry_complete', (False, None, 1))):
+            for value in values:
+                with self.subTest(field=field, value=value):
+                    self.write({**report, field: value})
+                    with self.assertRaises(RecordingError):
+                        verify(self.path, 'dubbing-return-reached', 6)
+            missing = dict(report)
+            del missing[field]
+            self.write(missing)
+            with self.assertRaises(RecordingError):
+                verify(self.path, 'dubbing-return-reached', 6)
+
+    def test_entry_fields_cannot_reinterpret_historical_v2(self):
+        self.write({**self.dubbing_report(), 'dubbing_entry_complete': True})
+        with self.assertRaisesRegex(RecordingError, 'schema v3'):
+            verify(self.path, 'dubbing-return-reached', 6)
+
+
 if __name__ == '__main__':
     unittest.main()
