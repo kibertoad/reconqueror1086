@@ -57,23 +57,28 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
   Shutdown's pending transport diagnostic is retained locally.
 - The first-answer probe passed its matching callback return and durable-log/
   numeric-replay checks. Session 92758 completed and its processes/lock exited.
-- An owned quiet Continue probe is active in unified session 27133,
-  output native-rng-youth-continue-20261010-a. Preserve its existing operation
-  and machine lock; its source fingerprints identify the loaded controllers.
+- The owner requested stopping for today. Continue session 27133 was paused
+  during startup extraction and ended incomplete, with matching durable-log/
+  numeric replay of its prefix and local diagnostics preserved. Its owned
+  controller/emulator exited and the machine lock is absent. No active probe.
 - Unfinished: native dilemma traversal, complete rule ownership,
   prescribed gameplay state and full-game recording/replay. Shared helper
   extraction is not implemented. The proposal is toolkit issue #403, linked
   from docs/dosbox-x-helper-proposal.md.
 - Blockers: none established. RUNTIME.md is the capability assessment. Audio
   remains muted except for an explicit sound investigation. No WIP branch.
-- Next: observe session 27133 for its Continue return or rejected caller.
-  Keep unknown callers rejected and journals incomplete. Source edits do not
-  alter the active run's loaded controllers.
+- Next on owner resumption: run a fresh quiet Continue probe, then verify the
+  repeated youth sequence through dubbing. Keep unknown callers rejected and
+  journals incomplete; interrupted session 27133 supplies no Continue result.
 - Continue instrumentation is committed: it waits at a temporary pointer
   classifier entry hook for supported queue/timing readiness, queues the
   prescribed click, then verifies its matching callback return. Native
   verification is pending. Its 37 recorder and seven pointer tests and full
   documentation gate passed.
+- Repeated-cycle instrumentation is committed with --youth-cycles, bounded to
+  six. It alternates guarded inputs and requires the verified dubbing endpoint
+  for six-cycle success. Its 42 native-recorder checks passed; original
+  repeated-cycle traversal remains unverified. Work is stopped for today.
 - Extend supported input reachability from FND-UI-020, SCR-UI-002/003 and
   FND-PERSON-004. The three dilemma caller policies have synthetic validation;
   initial dilemma traversal passed; Continue and Reroll remain unverified.
