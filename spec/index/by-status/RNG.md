@@ -22,13 +22,14 @@ Entries by status.
 
 ## recorded
 
-11 entries.
+13 entries.
 
 | ID | Title |
 |---|---|
 | [EXP-RNG-001](../../experiments/EXP-RNG-001.md) | Native startup character shifts yield thirty ordered rule-tagged draws from each recorded seed |
 | [EXP-RNG-002](../../experiments/EXP-RNG-002.md) | Isolated environment adjustment parsing preserves missing values and wraps numeric components |
 | [EXP-RNG-003](../../experiments/EXP-RNG-003.md) | Isolated suffix parsing retains unselected fields and supplies default clock components |
+| [EXP-RNG-004](../../experiments/EXP-RNG-004.md) | Isolated zero-classification conversion reaches the 1970 epoch and exposes a post-century discrepancy |
 | [FND-RNG-002](../../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-RNG-004](../../findings/FND-RNG-004.md) | Live LE relocations and native seed and draw stops identify the loaded RNG state |
@@ -37,6 +38,7 @@ Entries by status.
 | [FND-RNG-007](../../findings/FND-RNG-007.md) | The environment adjustment parser consumes a bounded name and wrapping hours, minutes and seconds |
 | [FND-RNG-008](../../findings/FND-RNG-008.md) | Environment suffix parsing writes selector-dependent record fields and default clock components |
 | [FND-RNG-009](../../findings/FND-RNG-009.md) | Seed conversion uses common-year and leap-year cumulative month-day tables |
+| [FND-RNG-010](../../findings/FND-RNG-010.md) | Seed conversion combines a four-year day-count term with a 1970 epoch and normalizes before adjustments |
 
 ## Open questions
 

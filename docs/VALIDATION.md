@@ -1603,3 +1603,16 @@ instruction paths and record/stack write bounds passed without a service or
 hardware stub. The documentation check passed; the complete calendar and
 classification consumers remain under Q-RNG-001. No native game or rebuild
 comparison ran for this experiment and no parity status changed.
+
+### 2026-10-10 bounded calendar conversion
+
+With GAME_DIR=analysis/original and the private hashed interpreter,
+`tools/emu/verify_seed_calendar.py --output artifacts/seed-calendar-controls.json`
+passed. FND-RNG-010 and EXP-RNG-004 record the prescribed null environment
+array, zero classification, chosen adjustment, exact normalized records and
+returned values. Whole fabricated RAM, unchanged globals, allowed instruction
+paths and record/stack writes passed without stubs. Independent Gregorian
+arithmetic agreed with the accepted ordinary cases and confirmed the prescribed
+one-day post-2100 discrepancy. These cases do not establish native date inputs,
+startup adjustments or the untested classification path. Documentation passed;
+no parity status changed and no native game was launched for this experiment.

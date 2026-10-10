@@ -22,6 +22,10 @@ Next ID: Q-RNG-002
   FND-RNG-009 records the common/leap cumulative month tables through their
   shipped file locations, with the previously recorded environment key as
   a positive control. Classification, normalization and initialization remain.
+  FND-RNG-010 and EXP-RNG-004 cover bounded epoch arithmetic and normalization
+  with a null environment array and classification zero. The negative-
+  classification path, environment initialization and broader normalizer domain
+  remain; a general Gregorian timestamp claim would contradict these controls.
 
 ## Emulated call
 
