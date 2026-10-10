@@ -303,8 +303,16 @@ history was `[1, 0, -1, -1, -1]`. Its initial seed was 895807504; all 32
 completed events agree between durable log and final journal and numerically
 replay to state 1708486835. All pending-operation flags were false. The target
 return is deliberately incomplete for full-game coverage. The owned emulator
-and lock were cleaned up. The next quiet probe exercises New Game and targets
-character-options identity; its native result is still pending.
+and lock were cleaned up.
+
+2026-10-10: `native-rng-new-game-return-20261010-a` passed the guarded screen
+returns in order 0, 1 and 2 after startup, title and New Game inputs. The final
+history was `[2, 1, 0, -1, -1]`. Seed 895807691 and all 32 completed events
+agree between the durable event log and final journal; independent numeric
+replay ends at 2262258426, matching the recorded target state. All pending
+operation flags were false, and the owned emulator and lock were cleaned up.
+This verifies character-options reachability, not generation, full-game draw
+coverage or actual rebuild replay. The next quiet probe targets youth generation.
 
 2026-10-10: native caller policy checks passed 29 recorder, journal,
 durable-event-log and mapping tests. The new synthetic cases record the

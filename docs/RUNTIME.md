@@ -270,7 +270,8 @@ initial verified return; subsequent screen observations do not repeat it.
 Add `--stop-after-screen-id 1` to end on the verified game-options return.
 This target stop remains incomplete for full-game coverage. These guards have
 synthetic validation and native initial/title-to-options return verification.
-Transitions beyond game options still require their own original checks.
+The guarded New Game transition to character options also passed a native check;
+later transitions still require their own original checks.
 
 `--new-game-click` requires screen checkpoints. After the first verified
 game-options return it queues a primary click at (100, 350), inside region 3
@@ -279,7 +280,8 @@ The same empty-queue, supported-field, timing, expected-hash, readback and
 unchanged-RNG guards apply. The recorder does not bypass unsuitable timing
 or seed/draw ownership checks. With `--stop-after-screen-id 2`, the next probe
 can stop on verified character-options state or reject an unowned intervening
-draw. This input stage has synthetic checks; native verification is pending.
+draw. This input stage has synthetic checks and a passing native target-return
+check recorded in VALIDATION.md. It does not establish later gameplay coverage.
 
 `--generation-click` requires `--new-game-click`. After verified character
 options it queues one primary click at (200, 250), inside region 0 of
