@@ -1666,5 +1666,7 @@ Logs remain under artifacts/shared-183-04-* and session-040-source-tests.log.
 
 The active native v5 recording retains its original session 0.3.0 interpreter
 and imported modules. These synthetic ownership controls do not replace the
-original-game killed-owner acceptance check on toolkit issue #416. Issue #413
-also retains its original consumer-specific inventory confirmation requirement.
+original-game killed-owner check. Upstream subsequently closed toolkit issue
+#416 on the release, explicitly noting that it had no external requester;
+this project makes no new native killed-owner claim. Issue #413 retains its
+original consumer-specific inventory confirmation requirement.

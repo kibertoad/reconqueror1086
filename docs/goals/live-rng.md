@@ -68,7 +68,8 @@ never update the shared environment.
   released debugger tracker #406 is also closed.
   PR #419 is adopted. #402, #412, #413 and #420 remain open with their
   original-game confirmation, feature or upstream prerequisites unresolved.
-  #416 awaits its native killed-owner control on released session 0.4.0. The flat
+  Upstream closed #416 on the session 0.4.0 release; local published-source
+  ownership controls passed, without a new original-game killed-owner run. The flat
   isolated-call segment-model controls are committed; their reusable setup
   result was added to existing toolkit issue #7 after duplicate checking.
 - Q-RNG-001 remains open after FND-RNG-007 through FND-RNG-011 and
