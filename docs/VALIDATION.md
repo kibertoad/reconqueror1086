@@ -1690,3 +1690,16 @@ globals, bounded writes and instruction paths passed without stubs. Positive
 classification retained secondary subtraction despite an empty name; negative
 classification was cleared. Actual startup and nonempty-name behavior remain
 under Q-RNG-001. No native game or rebuild replay ran for these controls.
+
+### 2026-10-10 later pending native timer and mode observations
+
+The same owned v5 control remained live on handle 19256. A coherent stopped
+status/memory read at revision 9427 gave pointer_clock 124 and release time
+121, elapsed three against the four-tick readiness guard, with an empty pointer
+queue. This is progress beyond the earlier two-tick observation, not a completed
+traversal. A separate coherent stopped status/register read at revision 9616
+reported protected CPU mode and CS selector 0x0180. Both diagnostics were
+read-only and remain local. The proposed toolkit PR #458's real/v86-mode
+restriction therefore excludes this consumer; those details were added to
+existing issue #456. No guest state, breakpoint or recording module changed,
+and no gated native success or performance ratio is claimed.
