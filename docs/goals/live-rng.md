@@ -65,9 +65,14 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
 - Blockers: none established. RUNTIME.md is the capability assessment. Audio
   remains muted except for an explicit sound investigation. No WIP branch.
 - Next: observe session 92758 for its answer return or rejected caller, then
-  add guarded Continue reachability. Keep unknown callers rejected and journals
-  incomplete. The answer stage stops at its matching callback return and does
-  not yet queue Continue. Its synthetic native-recorder gate passed 35 tests.
+  run a fresh probe with --youth-continue. Keep unknown callers rejected and
+  journals incomplete. The current loaded answer controller stops at its
+  matching callback return; source edits do not alter that active run.
+- Continue instrumentation is committed: it waits at a temporary pointer
+  classifier entry hook for supported queue/timing readiness, queues the
+  prescribed click, then verifies its matching callback return. Native
+  verification is pending. Its 37 recorder and seven pointer tests and full
+  documentation gate passed.
 - Extend supported input reachability from FND-UI-020, SCR-UI-002/003 and
   FND-PERSON-004. The three dilemma caller policies have synthetic validation;
   initial dilemma traversal passed; Continue and Reroll remain unverified.
