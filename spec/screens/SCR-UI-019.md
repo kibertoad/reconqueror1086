@@ -5,7 +5,7 @@ status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
 resolution: 640x480
-evidence: [FND-PERSON-004, FND-PERSON-006, FND-UI-001, FND-UI-002, FND-UI-003, FND-UI-010, FND-UI-013, FND-UI-019, FND-UI-024, FND-UI-026, FND-MEDIA-009]
+evidence: [FND-PERSON-004, FND-PERSON-006, FND-UI-001, FND-UI-002, FND-UI-003, FND-UI-010, FND-UI-013, FND-UI-019, FND-UI-024, FND-UI-026, FND-MEDIA-009, EXP-UI-001]
 conflicting: []
 split_with: []
 related: [SCR-UI-006]
@@ -51,6 +51,10 @@ None known.
 A short primary or secondary release can end each input wait (FND-UI-019,
 FND-UI-026). These are static requests; their rendered appearance has not
 been verified.
+
+EXP-UI-001 records accepted controlled input at both waits and the restored
+entry return on the animations-disabled path. It does not verify pixels or
+the later full-screen callback.
 
 ## Timing
 

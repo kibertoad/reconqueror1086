@@ -65,10 +65,11 @@ Entries by status.
 
 ## recorded
 
-26 entries.
+27 entries.
 
 | ID | Title |
 |---|---|
+| [EXP-UI-001](../../experiments/EXP-UI-001.md) | Two controlled short clicks let the animations-disabled dubbing entry return |
 | [FND-UI-001](../../findings/FND-UI-001.md) | Startup registers 25 screens, each a HAT file and a setup routine |
 | [FND-UI-002](../../findings/FND-UI-002.md) | The HAT loader reads a 40-byte header and 24-byte region records, taking the region count from the file size |
 | [FND-UI-003](../../findings/FND-UI-003.md) | The setup routines bind four callback slots per region and name the screens a click switches to |

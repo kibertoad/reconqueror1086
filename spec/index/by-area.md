@@ -337,6 +337,7 @@ Entries by area.
 | [FND-PERSON-008](../findings/FND-PERSON-008.md) | The game ends the campaign when row 0 AGE is 30 | recorded |
 | [FND-PERSON-009](../findings/FND-PERSON-009.md) | The tournament melee turns COLOR 3, 0 and 5 into colour index 0, 1 and 2 at 0x0009D498 | recorded |
 | [FND-PERSON-010](../findings/FND-PERSON-010.md) | DILEM0.DAT to DILEM29.DAT are marker-line text files with three choices of three outcomes | recorded |
+| [FND-PERSON-011](../findings/FND-PERSON-011.md) | The shipped character table gives row zero AGE 12 | recorded |
 | [RULE-PERSON-001](../rules/RULE-PERSON-001.md) | Character attributes | supported |
 | [RULE-PERSON-002](../rules/RULE-PERSON-002.md) | Loading and saving the character table | supported |
 | [RULE-PERSON-003](../rules/RULE-PERSON-003.md) | Character generation, the pre-generated knights and dubbing | supported |
@@ -390,6 +391,7 @@ Entries by area.
 | ID | Title | Status |
 |---|---|---|
 | [BUG-UI-001](../bugs/BUG-UI-001.md) | The lender of village record 37 takes three of its numbers from record 36 | supported |
+| [EXP-UI-001](../experiments/EXP-UI-001.md) | Two controlled short clicks let the animations-disabled dubbing entry return | recorded |
 | [FMT-UI-001](../formats/FMT-UI-001.md) | Screen layout, a HAT file | supported |
 | [FMT-UI-002](../formats/FMT-UI-002.md) | Screen region, one record of a HAT file | supported |
 | [FMT-UI-003](../formats/FMT-UI-003.md) | Exterior catalogs, VILLAGE.DAT and TVILLAGE.DAT | supported |

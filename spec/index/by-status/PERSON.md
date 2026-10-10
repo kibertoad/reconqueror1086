@@ -28,7 +28,7 @@ Entries by status.
 
 ## recorded
 
-10 entries.
+11 entries.
 
 | ID | Title |
 |---|---|
@@ -42,6 +42,7 @@ Entries by status.
 | [FND-PERSON-008](../../findings/FND-PERSON-008.md) | The game ends the campaign when row 0 AGE is 30 |
 | [FND-PERSON-009](../../findings/FND-PERSON-009.md) | The tournament melee turns COLOR 3, 0 and 5 into colour index 0, 1 and 2 at 0x0009D498 |
 | [FND-PERSON-010](../../findings/FND-PERSON-010.md) | DILEM0.DAT to DILEM29.DAT are marker-line text files with three choices of three outcomes |
+| [FND-PERSON-011](../../findings/FND-PERSON-011.md) | The shipped character table gives row zero AGE 12 |
 
 ## Open questions
 

@@ -1,0 +1,346 @@
+{
+  "experiment": "EXP-UI-001",
+  "build": "BLD-GOG-EN",
+  "starting_state": {
+    "kind": "new-game",
+    "choices": {
+      "MOVIE": "OFF",
+      "CREDITS": "OFF",
+      "ANIMATIONS": "OFF"
+    }
+  },
+  "recording_xxh3": null,
+  "clock": "input_sequence",
+  "inputs": [
+    {
+      "tick": 0,
+      "name": "primary_short_click",
+      "value": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "tick": 1,
+      "name": "primary_short_click",
+      "value": {
+        "x": 10,
+        "y": 10
+      }
+    },
+    {
+      "tick": 2,
+      "name": "primary_short_click",
+      "value": {
+        "x": 100,
+        "y": 350
+      }
+    },
+    {
+      "tick": 3,
+      "name": "primary_short_click",
+      "value": {
+        "x": 200,
+        "y": 250
+      }
+    },
+    {
+      "tick": 4,
+      "name": "primary_short_click",
+      "value": {
+        "x": 100,
+        "y": 350
+      }
+    },
+    {
+      "tick": 5,
+      "name": "primary_short_click",
+      "value": {
+        "x": 500,
+        "y": 150
+      }
+    },
+    {
+      "tick": 6,
+      "name": "primary_short_click",
+      "value": {
+        "x": 100,
+        "y": 350
+      }
+    },
+    {
+      "tick": 7,
+      "name": "primary_short_click",
+      "value": {
+        "x": 500,
+        "y": 150
+      }
+    },
+    {
+      "tick": 8,
+      "name": "primary_short_click",
+      "value": {
+        "x": 100,
+        "y": 350
+      }
+    },
+    {
+      "tick": 9,
+      "name": "primary_short_click",
+      "value": {
+        "x": 500,
+        "y": 150
+      }
+    },
+    {
+      "tick": 10,
+      "name": "primary_short_click",
+      "value": {
+        "x": 100,
+        "y": 350
+      }
+    },
+    {
+      "tick": 11,
+      "name": "primary_short_click",
+      "value": {
+        "x": 500,
+        "y": 150
+      }
+    },
+    {
+      "tick": 12,
+      "name": "primary_short_click",
+      "value": {
+        "x": 100,
+        "y": 350
+      }
+    },
+    {
+      "tick": 13,
+      "name": "primary_short_click",
+      "value": {
+        "x": 500,
+        "y": 150
+      }
+    },
+    {
+      "tick": 14,
+      "name": "primary_short_click",
+      "value": {
+        "x": 10,
+        "y": 10
+      }
+    },
+    {
+      "tick": 15,
+      "name": "primary_short_click",
+      "value": {
+        "x": 10,
+        "y": 10
+      }
+    }
+  ],
+  "seeds": [],
+  "runs": [
+    {
+      "rng_state": 895829156,
+      "events": [
+        {
+          "tick": 16,
+          "event": "enter_dubbing_return",
+          "args": []
+        }
+      ],
+      "draws": [
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 5
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 3
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 7
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 5
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 3
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 4
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 6
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 6
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 5
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 6
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 2
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 1,
+          "result": 1
+        },
+        {
+          "rule": "RULE-PERSON-002",
+          "bound": 8,
+          "result": 1
+        },
+        {
+          "rule": "RULE-STRATEGY-012",
+          "bound": 7,
+          "result": 3
+        },
+        {
+          "rule": "RULE-PERSON-003",
+          "bound": 4,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-004",
+          "bound": 4,
+          "result": 0
+        },
+        {
+          "rule": "RULE-PERSON-004",
+          "bound": 4,
+          "result": 3
+        },
+        {
+          "rule": "RULE-PERSON-004",
+          "bound": 4,
+          "result": 2
+        },
+        {
+          "rule": "RULE-PERSON-004",
+          "bound": 4,
+          "result": 4
+        }
+      ],
+      "end_state": [
+        {
+          "global": "rng_state",
+          "value": 3735047536
+        }
+      ]
+    }
+  ],
+  "distribution": null
+}

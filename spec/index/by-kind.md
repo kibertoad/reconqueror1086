@@ -343,7 +343,7 @@ Entries by kind.
 
 ## findings
 
-321 entries.
+322 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -463,6 +463,7 @@ Entries by kind.
 | [FND-PERSON-008](../findings/FND-PERSON-008.md) | The game ends the campaign when row 0 AGE is 30 | recorded |
 | [FND-PERSON-009](../findings/FND-PERSON-009.md) | The tournament melee turns COLOR 3, 0 and 5 into colour index 0, 1 and 2 at 0x0009D498 | recorded |
 | [FND-PERSON-010](../findings/FND-PERSON-010.md) | DILEM0.DAT to DILEM29.DAT are marker-line text files with three choices of three outcomes | recorded |
+| [FND-PERSON-011](../findings/FND-PERSON-011.md) | The shipped character table gives row zero AGE 12 | recorded |
 | [FND-RES-001](../findings/FND-RES-001.md) | All 100 containers share one layout: a header, the entry data packed from offset 8, and a directory of 52-byte records at the end | recorded |
 | [FND-RES-002](../findings/FND-RES-002.md) | One archive is open at a time; the game opens it, finds an entry by name or index, and reads it by its kind | recorded |
 | [FND-RES-003](../findings/FND-RES-003.md) | Kind 1 is a sequence of length-prefixed blocks, each stored or compressed with literals, back-references and runs | recorded |
@@ -671,13 +672,14 @@ Entries by kind.
 
 ## experiments
 
-3 entries.
+4 entries.
 
 | ID | Title | Status |
 |---|---|---|
 | [EXP-RNG-001](../experiments/EXP-RNG-001.md) | Native startup character shifts yield thirty ordered rule-tagged draws from each recorded seed | recorded |
 | [EXP-STRATEGY-001](../experiments/EXP-STRATEGY-001.md) | Drawn home indices leave fabricated fief lists unchanged while person 28 initializes them | recorded |
 | [EXP-STRATEGY-002](../experiments/EXP-STRATEGY-002.md) | All eight isolated home selections preserve the chosen person through their actual callees | recorded |
+| [EXP-UI-001](../experiments/EXP-UI-001.md) | Two controlled short clicks let the animations-disabled dubbing entry return | recorded |
 
 ## bugs
 

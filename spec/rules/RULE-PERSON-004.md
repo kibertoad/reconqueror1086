@@ -97,6 +97,10 @@ None known.
 
 ## Open questions
 
+- Why EXP-UI-001 reaches dubbing after five prescribed first-answer/Continue
+  pairs, and whether an additional AGE change or unobserved answer precedes
+  them. FND-PERSON-011 verifies the initial data value, not later AGE. (Q-PERSON-021)
+
 - The field `unlisted_field` gives for `NONE`. (Q-PERSON-013)
 
 - Which dilemma numbers, choices and outcomes `dilemma_item_grants` covers in each of the three

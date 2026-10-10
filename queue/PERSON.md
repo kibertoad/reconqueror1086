@@ -1,6 +1,6 @@
 # PERSON
 
-Next ID: Q-PERSON-021
+Next ID: Q-PERSON-022
 
 ## Static
 
@@ -104,7 +104,15 @@ None.
 
 ## Agent run
 
-None.
+- Q-PERSON-021. RULE-PERSON-004: Why did EXP-UI-001 reach dubbing after five
+  prescribed first-answer/Continue pairs? Tried: FND-PERSON-011 verifies initial
+  table AGE 12; FND-PERSON-005 and FND-PERSON-010 describe the modifiers. The
+  scripted entry-wait controls and restored returns passed. Competing readings:
+  an additional AGE change before the first observed answer, an additional
+  answer outside the watched callback, or an untraced modifier/callback effect.
+  Settles it: read AGE at the youth screen and every prescribed answer/Continue
+  entry and return, then statically trace the first differing interval. Blocks:
+  prescribed youth-count and subsequent dubbing traversal validation.
 
 ## Live session
 
