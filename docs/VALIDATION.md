@@ -36,10 +36,17 @@ failed the archive-overlapping-operation recording guard after the seed entry.
 It ended incomplete; its owned processes exited and the machine lock was absent.
 Cleanup retained a diagnostic that debugger shutdown was still pending before
 process termination. This does not establish the cause of the recording failure.
-A normal-core control using the same cycle profile remains running under
-native-rng-shared-startup-gog-normal-20261010-a. It has passed the seed return
-and first archive-entry guard. Native startup completion and the new released
-guarded writes have not yet been verified in the original.
+A normal-core control using the same cycle profile under
+native-rng-shared-startup-gog-normal-20261010-a passed the seed return and
+first archive-entry guard, then was explicitly paused for cycle-comparison
+diagnostics. It ended incomplete with archive extraction pending and one
+completed seed event. The stopped-state capture remains local. Its owned
+processes exited and its lock was absent before the next launch. No archive
+return, startup completion or speed improvement is established by this attempt.
+
+The combined traversal under native-rng-shared-dubbing-fixed10000-20261010-a
+has started using the published 0.2.0 package, normal core and fixed 10000
+cycles. Native startup completion and released guarded writes remain pending.
 
 ## Shared library releases and interrupted traversal (2026-10-10)
 
