@@ -42,24 +42,26 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
 
 - Stage: Survey; research-side runtime tooling session.
 - Last gate: 2026-10-10 analysis-ready configuration, full documentation check,
-  native-recorder, supported-pointer and journal checks passed. Canonical
+  native-recorder, supported-pointer, journal and terminal-validator checks passed. Canonical
   fast gate passed with -NoRestore; its build and test artifacts are local.
-- Active probe: exec session 12234, quiet fresh Continue verification under
-  artifacts/runtime-tools/native-rng-youth-continue-20261010-b. Controller PID
-  81504 owns emulator PID 87560 and the machine run lock. Local
-  session-identity.json identifies debugger session ses-1. Native recording
-  has started; no Continue target or full-game completion is verified yet.
+- Continue verification finished successfully; its terminal journal check,
+  cleanup and limits are recorded in docs/VALIDATION.md. No full-game gate passed.
+- Active probe: exec session 4782, quiet fresh six-cycle youth verification under
+  artifacts/runtime-tools/native-rng-youth-six-cycles-20261010-a. Controller PID
+  61028 owns emulator PID 19484 and the machine run lock. Local
+  session-identity.json identifies debugger session ses-1. Startup mapping
+  is underway; repeated-cycle and dubbing verification remain pending.
   Poll this same owning handle; do not launch another original or remove its
   lock while it is live. Diagnostic files and original content stay local.
-- Unfinished: native Continue and repeated youth traversal, complete caller
+- Unfinished: repeated youth traversal, complete caller
   ownership, prescribed full-game state, two full-game recordings and actual
   rebuild replay. Shared helper extraction remains unimplemented; toolkit
   issue #403 is linked from docs/dosbox-x-helper-proposal.md.
 - Blockers: none established. No WIP branch. The untracked
   .claude/settings.json is pre-existing and was left untouched.
-- Next: finish observing the active Continue probe and validate its terminal
-  journal against the durable log and numeric replay; then verify bounded
-  youth cycles through dubbing if Continue passes.
+- Next: finish observing the active six-cycle probe and run
+  tools/verify_native_recording.py with expected youth-sequence-return-reached;
+  inspect matching cycle count, dubbing screen identity and process/lock cleanup.
 - Next: Q-STRATEGY-043 / RULE-STRATEGY-012 downstream consumer review;
   Q-RNG-001 / RULE-RNG-001 seed-source provenance when required.
 - Next: verify two prescribed full-game recordings and trace completeness,
