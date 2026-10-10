@@ -56,6 +56,8 @@ class ScreenBoundaryTests(unittest.TestCase):
                              changed_dubbing_history=False, changed_dubbing_object=False,
                              missing_village=False, unprescribed_dubbing=False, presentation=False,
                              age_checkpoints=False):
+        terminal_cycles = 5 if age_checkpoints else 6
+        terminal_phase = 7 + 8 * terminal_cycles
         runtime, mapping = runtime_and_mapping()
         entry_phase = -1
         entry_points = (0x19a8c, 0x19bbf, 0x19bcc, 0x19c51, 0x19c5e, 0x19c61)
@@ -64,12 +66,12 @@ class ScreenBoundaryTests(unittest.TestCase):
         def repeated_pc():
             if entry_phase >= 0:
                 return entry_points[entry_phase]
-            if cycles == 6 and runtime.phase >= 55:
+            if cycles == terminal_cycles and runtime.phase >= (terminal_phase + 0):
                 # FND-UI-020/022/024: synthetic stops at recorded return boundaries.
-                points = {55: 0x596c0, 56: 0x5975e, 57: 0x150a7,
-                          58: 0x19c80 if unprescribed_dubbing else 0x63114, 59: 0x63114, 60: 0x19c80,
-                          61: 0x19cb1 if missing_village else 0x596c0,
-                          62: 0x5975e, 63: 0x19cb1}
+                points = {(terminal_phase + 0): 0x596c0, (terminal_phase + 1): 0x5975e, (terminal_phase + 2): 0x150a7,
+                          (terminal_phase + 3): 0x19c80 if unprescribed_dubbing else 0x63114, (terminal_phase + 4): 0x63114, (terminal_phase + 5): 0x19c80,
+                          (terminal_phase + 6): 0x19cb1 if missing_village else 0x596c0,
+                          (terminal_phase + 7): 0x5975e, (terminal_phase + 8): 0x19cb1}
                 return points[runtime.phase]
             if cycles > 1 and runtime.phase >= 16:
                 return (0x63114, 0x63114, 0x14b38, 0x14cdd,
@@ -77,7 +79,7 @@ class ScreenBoundaryTests(unittest.TestCase):
             return None
         def wait(operation):
             nonlocal entry_phase
-            if presentation and runtime.phase == 55 and entry_phase < 5:
+            if presentation and runtime.phase == (terminal_phase + 0) and entry_phase < 5:
                 entry_phase += 1
                 runtime.session.stop_reason.breakpoint_id = f'hook-{entry_points[entry_phase]:x}'
                 return
@@ -111,17 +113,17 @@ class ScreenBoundaryTests(unittest.TestCase):
                                        0x596c0 if runtime.phase % 2 == 0 else 0x5965f if wrong_return else 0x5975e))
         def read(address, length):
             if runtime.phase >= 4:
-                screen = (11 if cycles == 6 and runtime.phase >= 61 and not missing_village else
-                          6 if cycles == 6 and runtime.phase >= 55 else
+                screen = (11 if cycles == terminal_cycles and runtime.phase >= (terminal_phase + 6) and not missing_village else
+                          6 if cycles == terminal_cycles and runtime.phase >= (terminal_phase + 0) else
                           min(3, (runtime.phase - 2) // 2) if continuation else (runtime.phase - 2) // 2)
                 if address == (0x188, 0x1004):
-                    if presentation and runtime.phase == 55:
+                    if presentation and runtime.phase == (terminal_phase + 0):
                         return b''.join(word.to_bytes(4, 'little') for word in (6, 0, 1))
                     return b''.join(word.to_bytes(4, 'little') for word in (screen, 1, 1))
                 if address == (0x188, 0x300000):
                     if screen > 3:
                         return b''.join(word.to_bytes(4, 'little') for word in
-                                        (0x300100, 3 if changed_dubbing_history and runtime.phase == 58 else screen,
+                                        (0x300100, 3 if changed_dubbing_history and runtime.phase == (terminal_phase + 3) else screen,
                                          3, 2, 1, 0))
                     if changed_youth_history and runtime.phase == 12:
                         return b''.join(word.to_bytes(4, 'little') for word in
@@ -130,7 +132,7 @@ class ScreenBoundaryTests(unittest.TestCase):
                                     (0x300100, *range(screen, -1, -1), *([0xffffffff] * (4 - screen))))
                 if address == (0x188, 0x300100):
                     block = bytearray(184)
-                    block[96:100] = (3 if changed_dubbing_object and runtime.phase == 58 else
+                    block[96:100] = (3 if changed_dubbing_object and runtime.phase == (terminal_phase + 3) else
                                      2 if wrong_identity else screen).to_bytes(4, 'little')
                     return bytes(block)
             return original_read(address, length)
@@ -138,7 +140,7 @@ class ScreenBoundaryTests(unittest.TestCase):
         with patch('native_rng_recorder.tables_from_diagnostic', return_value=(0, 16)), \
              patch('native_rng_recorder.descriptor', side_effect=[mapping.code, mapping.data] * 100), \
              patch('native_rng_recorder.EventLog'), patch('native_rng_recorder.Path.write_text'), \
-             patch('native_rng_recorder.read_youth_age', return_value=12) as age_read, \
+             patch('native_rng_recorder.read_youth_age', side_effect=[13] + [age for cycle in range(cycles) for age in (13+cycle, 14+cycle, 14+cycle, 14+cycle)]) as age_read, \
              patch('dubbing_entry_input.primary_click_ready', return_value=True), \
              patch('dubbing_entry_input.queue_primary_click', return_value={'action': 'primary-short-click'}) as entry_click, \
              patch('native_rng_recorder.primary_click_ready', side_effect=[False, True] * (2 * cycles - 1 + int(dubbing))) as ready, \
@@ -175,6 +177,16 @@ class ScreenBoundaryTests(unittest.TestCase):
         else:
             runtime.agent.delete_breakpoint.assert_not_called()
         return report
+
+    def test_age_checked_five_cycles_reach_dubbing_and_village(self):
+        report = self.replacement_sequence(new_game=True, generation=True, youth=True,
+            continuation=True, cycles=5, dubbing=True, presentation=True, age_checkpoints=True)
+        self.assertEqual(report['schema'], 'conquer-native-rng-journal-v4')
+        self.assertEqual(report['status'], 'dubbing-return-reached')
+        self.assertEqual(report['completed_youth_cycles'], 5)
+        self.assertEqual(report['youth_ages'][0]['age'], 13)
+        self.assertEqual(report['youth_ages'][-1]['age'], 18)
+        self.assertEqual(report['screen_observation']['screen_id'], 11)
 
     def test_continue_requires_answer_stage(self):
         with self.assertRaisesRegex(ValueError, 'Continue requires'):

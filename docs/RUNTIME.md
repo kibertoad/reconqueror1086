@@ -333,32 +333,34 @@ The matching return and journal replay end this diagnostic with
 durable-event/numeric-replay verification (VALIDATION.md); it verifies one
 Continue traversal, not the complete youth sequence.
 
-`--youth-cycles N` extends that sequence for one through six prescribed
-first-answer/Continue pairs and requires Continue when N exceeds one.
-After each nonterminal Continue return, the next answer waits at the same
-supported pointer-readiness boundary; its matching return then arms Continue.
-The six-cycle endpoint additionally requires the age-18 return and verified
-screen 6 identity from FND-UI-022/RULE-PERSON-004. A multi-cycle diagnostic
-ends as `youth-sequence-return-reached`, with full-game completion still false.
-Repeated-cycle tooling has synthetic checks only; native traversal is pending.
+`--youth-cycles N` prescribes answer/Continue pairs. Current fresh-game traversal
+uses `--youth-age-checkpoints --youth-cycles 5`: RULE-PERSON-004 and
+RULE-PERSON-007 support the observed initial AGE 13 and terminal AGE 18.
+The recorder checks the initial youth-screen AGE, each answer's entry and
+return, and each Continue's entry and return. An answer must add exactly one
+year and Continue must preserve it. A changed or missing boundary fails.
+After each nonterminal Continue return, the next answer waits at the supported
+pointer-readiness boundary. The fifth Continue must return after verified
+screen 6 replacement; a multi-cycle diagnostic ends as
+youth-sequence-return-reached. Full-game completion remains false.
 
-`--dubbing-click` requires six youth cycles and no `--stop-after-screen-id`.
-After the sixth matching Continue return and verified dubbing load, it waits
-at the supported pointer-classifier boundary for an empty queue and suitable
-observed timing. It rechecks the screen record, object identity and history head
-before queuing (10, 10) inside SCR-UI-019's full-screen region. Only the supported
-pointer fields change; the game performs its own callback and screen transition.
-FND-UI-024 locates the dubbing callback entry and restored-stack return. The
-probe requires the matching return after a verified village screen load and
-numeric RNG replay, ending as `dubbing-return-reached`. Unknown RNG callers
-remain rejected. The sequence has synthetic validation; native dubbing-to-village
-traversal remains unverified.
+`--dubbing-entry-input` supplies the guarded entry waits with animations disabled.
+`--dubbing-click` requires the prescribed terminal cycle count and no earlier
+screen target. After the terminal Continue return it waits at the supported
+pointer-classifier boundary for an empty queue and suitable observed timing,
+then checks record, object and history before queuing the full-screen click.
+FND-UI-024 locates its callback and restored-stack return. A matching callback
+return after verified village loading and numeric RNG replay ends as
+dubbing-return-reached. Unknown RNG callers remain rejected.
 
-Dubbing-enabled captures use `conquer-native-rng-journal-v2`, adding the explicit
-`pending_dubbing` outcome field. Runs without that stage retain v1. The terminal
-validator accepts both versions under their own required fields, rejects dubbing
-state in v1 and requires v2, `--expect-youth-cycles 6` and village identity/history
-head for dubbing-return verification. Keep historical captures unchanged.
+AGE-checked captures use conquer-native-rng-journal-v4 and outcome contract 2.
+The shared terminal outcome binds the ordered AGE observations by SHA-256;
+the verifier checks the observations as well as log/journal agreement and
+numeric replay. Older v1/v2/v3 captures retain their six-cycle endpoint meaning;
+they are not reinterpreted as v4. Omitting AGE checkpoints selects the historical
+diagnostic contract, not the current prescribed fresh-game traversal.
+Five-cycle transport has synthetic validation; a fresh complete native
+five-cycle and dubbing-to-village control is still required.
 
 The native inclusive-draw policies also accept the three fixed-bound dilemma
 selection calls of FND-PERSON-013. Initial selection and reroll carry
@@ -480,13 +482,27 @@ After terminal completion, check both the journal's status/completeness fields
 and cleanup: the owned process must have stopped before its lock is released.
 Never use that check to stop another task's emulator or remove its lock.
 
+For the current AGE-checked traversal, use a fresh output directory and the
+private hash-locked Python environment. Keep host sound disabled:
+
+```powershell
+$env:GAME_DIR = 'C:/GOG Games/Conqueror AD1086'
+& artifacts/validation-python-latest/Scripts/python.exe -B tools/Probe-LiveMapping.py `
+  --output artifacts/runtime-tools/dubbing-fresh --samples 8 --observation-ms 1000 `
+  --rng-break --cycles 10000 --debugger-build no-heavy --record-native `
+  --record-draw-limit 1000 --animations-off --startup-checkpoints --startup-click `
+  --stop-after-screen --continue-after-screen --title-click --screen-checkpoints `
+  --new-game-click --generation-click --youth-answer --youth-continue `
+  --youth-cycles 5 --youth-age-checkpoints --dubbing-entry-input --dubbing-click
+```
+
 For a current native recorder's terminal diagnostic, verify durable-log agreement,
 event order and numeric RNG replay with an explicit expected boundary:
 
 ```powershell
 python -B tools/verify_native_recording.py artifacts/runtime-tools/continue-fresh --expect-status youth-continue-return-reached
-python -B tools/verify_native_recording.py artifacts/runtime-tools/six-cycles-fresh --expect-status youth-sequence-return-reached --expect-youth-cycles 6
-python -B tools/verify_native_recording.py artifacts/runtime-tools/dubbing-fresh --expect-status dubbing-return-reached --expect-youth-cycles 6
+python -B tools/verify_native_recording.py artifacts/runtime-tools/five-cycles-fresh --expect-status youth-sequence-return-reached --expect-youth-cycles 5
+python -B tools/verify_native_recording.py artifacts/runtime-tools/dubbing-fresh --expect-status dubbing-return-reached --expect-youth-cycles 5
 python -B tools/test_verify_native_recording.py
 ```
 

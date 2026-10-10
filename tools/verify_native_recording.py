@@ -3,9 +3,10 @@ import argparse
 import json
 from pathlib import Path
 
+from youth_age_checkpoint import validate_youth_ages
 from rng_journal import replay
 from rng_recording import RecordingError
-from native_event_log import CONTRACT, LOG_FORMAT, outcome
+from native_event_log import CONTRACT, AGE_CONTRACT, LOG_FORMAT, outcome
 from dinorefurb_dosbox_session import read_event_log, LogRejected
 
 
@@ -39,12 +40,12 @@ def verify(directory, expected_status, expected_youth_cycles=None):
             raise RecordingError('Expected youth cycles must be an integer from one to six')
         cycle_status = ('youth-continue-return-reached' if expected_youth_cycles == 1
                         else 'youth-sequence-return-reached')
-        if expected_status != cycle_status and not (expected_status == 'dubbing-return-reached' and expected_youth_cycles == 6):
+        if expected_status != cycle_status and not (expected_status == 'dubbing-return-reached' and expected_youth_cycles in (5, 6)):
             raise RecordingError('Expected youth cycles require the corresponding Continue boundary')
     directory = Path(directory)
     report = json.loads(read_bounded(directory / 'native-rng-journal.json'))
     if not isinstance(report, dict) or report.get('schema') not in (
-            'conquer-native-rng-journal-v1', 'conquer-native-rng-journal-v2', 'conquer-native-rng-journal-v3'):
+            'conquer-native-rng-journal-v1', 'conquer-native-rng-journal-v2', 'conquer-native-rng-journal-v3', 'conquer-native-rng-journal-v4'):
         raise RecordingError('Unexpected native journal schema')
     if report.get('status') != expected_status:
         raise RecordingError('Native journal did not reach the requested diagnostic boundary')
@@ -54,22 +55,29 @@ def verify(directory, expected_status, expected_youth_cycles=None):
         raise RecordingError('Native journal has a pending or unreported operation')
     if report['schema'] == 'conquer-native-rng-journal-v1' and 'pending_dubbing' in report:
         raise RecordingError('Dubbing state requires schema v2')
-    if report['schema'] in ('conquer-native-rng-journal-v2', 'conquer-native-rng-journal-v3') and report.get('pending_dubbing') is not False:
+    if report['schema'] in ('conquer-native-rng-journal-v2', 'conquer-native-rng-journal-v3', 'conquer-native-rng-journal-v4') and report.get('pending_dubbing') is not False:
         raise RecordingError('Native journal has a pending or unreported dubbing operation')
-    if report['schema'] != 'conquer-native-rng-journal-v3' and any(
+    if report['schema'] not in ('conquer-native-rng-journal-v3', 'conquer-native-rng-journal-v4') and any(
             field in report for field in ('pending_dubbing_entry', 'dubbing_entry_complete')):
         raise RecordingError('Dubbing entry state requires schema v3')
-    if report['schema'] == 'conquer-native-rng-journal-v3':
+    march = report['schema'] == 'conquer-native-rng-journal-v4'
+    terminal_cycles = 5 if march else 6
+    if march:
+        validate_youth_ages(report.get('youth_ages'), report.get('completed_youth_cycles', 0)
+                            if expected_youth_cycles is not None else None)
+    if report['schema'] in ('conquer-native-rng-journal-v3', 'conquer-native-rng-journal-v4'):
         if report.get('pending_dubbing_entry') is not False or type(report.get('dubbing_entry_complete')) is not bool:
             raise RecordingError('Native journal has pending or unreported dubbing entry state')
-        if expected_youth_cycles == 6 and report['dubbing_entry_complete'] is not True:
+        if expected_youth_cycles == terminal_cycles and (not march or expected_status == 'dubbing-return-reached') and report['dubbing_entry_complete'] is not True:
             raise RecordingError('Prescribed traversal did not complete dubbing entry input')
     if expected_status == 'dubbing-return-reached' and (
-            report['schema'] not in ('conquer-native-rng-journal-v2', 'conquer-native-rng-journal-v3') or expected_youth_cycles != 6):
+            report['schema'] not in ('conquer-native-rng-journal-v2', 'conquer-native-rng-journal-v3', 'conquer-native-rng-journal-v4') or expected_youth_cycles != terminal_cycles):
         raise RecordingError('Dubbing verification requires schema v2 and six prescribed cycles')
     if any(report.get(name) is not False for name in
            ('full_game_complete', 'accepted_callers_complete')):
         raise RecordingError('Diagnostic must not claim full-game or caller completeness')
+    if march and 'event_log_format' not in report:
+        raise RecordingError('AGE-checked journal requires the shared event log')
     if 'event_log_format' in report:
         if report['event_log_format'] != LOG_FORMAT:
             raise RecordingError('Unexpected shared event-log format')
@@ -77,7 +85,7 @@ def verify(directory, expected_status, expected_youth_cycles=None):
             log = read_event_log(directory / 'session' / 'events.jsonl', outcome(report))
         except LogRejected as error:
             raise RecordingError(f'Shared event log refused: {error}') from error
-        if log.contract.to_json() != CONTRACT.to_json():
+        if log.contract.to_json() != (AGE_CONTRACT if march else CONTRACT).to_json():
             raise RecordingError('Unexpected native outcome contract')
         durable = [dict(event.data, kind=event.kind) for event in log.events]
     else:
@@ -102,10 +110,10 @@ def verify(directory, expected_status, expected_youth_cycles=None):
         completed = report.get('completed_youth_cycles')
         if type(completed) is not int or completed != expected_youth_cycles:
             raise RecordingError('Native journal did not complete the requested youth cycles')
-        # FND-UI-022 / RULE-PERSON-004: the sixth Continue replaces youth
-        # with dubbing; earlier Continue returns retain the youth screen.
+        # RULE-PERSON-004/007: v4 checks observed AGE 13..18; older
+        # journals retain their historical six-cycle endpoint contract.
         expected_screen = (11 if expected_status == 'dubbing-return-reached' else
-                           6 if expected_youth_cycles == 6 else 3)
+                           6 if expected_youth_cycles == terminal_cycles else 3)
         observation = report.get('screen_observation')
         if not isinstance(observation, dict):
             raise RecordingError('Youth cycle endpoint has no screen observation')

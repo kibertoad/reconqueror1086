@@ -50,7 +50,7 @@ def main():
     parser.add_argument('--youth-cycles', type=int, default=1,
                         help='Prescribed answer/Continue cycles, one through six; requires youth Continue')
     parser.add_argument('--dubbing-click', action='store_true',
-                        help='After six youth cycles, queue guarded dubbing input and verify village callback return')
+                        help='After the prescribed youth cycles, queue guarded dubbing input and verify village callback return')
     parser.add_argument('--dubbing-entry-input', action='store_true',
                         help='With animations disabled, provide guarded input at both dubbing entry waits')
     parser.add_argument('--youth-age-checkpoints', action='store_true',
@@ -93,10 +93,13 @@ def main():
         raise ValueError('Youth AGE checkpoints require native guarded youth input')
     if not 1 <= args.youth_cycles <= 6 or (args.youth_cycles != 1 and not args.youth_continue):
         raise ValueError('Youth cycles require --youth-continue and a count from one to six')
-    if args.dubbing_click and (not args.youth_continue or args.youth_cycles != 6 or args.stop_after_screen_id is not None):
-        raise ValueError('Dubbing input requires six youth cycles and no earlier screen target')
+    terminal_cycles = 5 if args.youth_age_checkpoints else 6
+    if args.youth_age_checkpoints and args.youth_cycles > 5:
+        raise ValueError('AGE-checked March traversal permits at most five youth cycles')
+    if args.dubbing_click and (not args.youth_continue or args.youth_cycles != terminal_cycles or args.stop_after_screen_id is not None):
+        raise ValueError('Dubbing input requires the prescribed youth cycles and no earlier screen target')
     if args.dubbing_entry_input and (not args.record_native or not args.animations_off or
-            not args.youth_continue or args.youth_cycles != 6 or args.stop_after_screen_id is not None):
+            not args.youth_continue or args.youth_cycles != terminal_cycles or args.stop_after_screen_id is not None):
         raise ValueError('Dubbing entry input requires native youth traversal with animations disabled')
     if args.stop_after_screen_id is not None and (not args.screen_checkpoints or
             not 0 <= args.stop_after_screen_id <= 24):
@@ -177,7 +180,7 @@ def main():
                           event_log=log_settings(('__main__', 'shared_dosbox_runtime', 'live_mapping',
                               'native_rng_recorder', 'native_event_log', 'rng_journal', 'rng_recording',
                               'supported_pointer_input', 'dubbing_entry_input', 'youth_age_checkpoint',
-                              'emu.le_image'))) as runtime:
+                              'emu.le_image'), age_checked=args.youth_age_checkpoints)) as runtime:
             print('startup', runtime.registers())
             for attempt in range(args.samples):
                 operation = runtime.agent.continue_(runtime.session.id)

@@ -1,4 +1,6 @@
 """Conqueror's event schemas and outcome meaning for the shared log transport."""
+import hashlib
+import json
 from dinorefurb_dosbox_session import EventSchema, OutcomeContract, EventLogSettings, LOG_FORMAT
 
 
@@ -13,6 +15,9 @@ CONTRACT = OutcomeContract('conquer-native-rng-diagnostic', 1, {
        'pending_dubbing_entry', 'dubbing_entry_complete', 'full_game_complete',
        'accepted_callers_complete')},
 })
+AGE_CONTRACT = OutcomeContract('conquer-native-rng-diagnostic', 2, {
+    **CONTRACT.to_json()['fields'], 'youth_age_sha256': 'string',
+})
 SCHEMAS = (
     EventSchema('seed', {'rule': 'string', 'seed': 'integer'}),
     EventSchema('draw', {'rule': 'string', 'reduction': 'string', 'bound': 'integer',
@@ -21,8 +26,8 @@ SCHEMAS = (
 )
 
 
-def settings(modules):
-    return EventLogSettings(CONTRACT, SCHEMAS, tuple(modules))
+def settings(modules, age_checked=False):
+    return EventLogSettings(AGE_CONTRACT if age_checked else CONTRACT, SCHEMAS, tuple(modules))
 
 
 def outcome(report):
@@ -31,11 +36,14 @@ def outcome(report):
               'full_game_complete', 'accepted_callers_complete')}
     result.update(end_rng_state=report.get('end_rng_state'),
                   completed_youth_cycles=report.get('completed_youth_cycles', 0))
-    presentation = report['schema'] == 'conquer-native-rng-journal-v3'
-    dubbing = report['schema'] in ('conquer-native-rng-journal-v2', 'conquer-native-rng-journal-v3')
+    presentation = report['schema'] in ('conquer-native-rng-journal-v3', 'conquer-native-rng-journal-v4')
+    dubbing = report['schema'] in ('conquer-native-rng-journal-v2', 'conquer-native-rng-journal-v3', 'conquer-native-rng-journal-v4')
     result['pending_dubbing'] = report['pending_dubbing'] if dubbing else False
     result['pending_dubbing_entry'] = report['pending_dubbing_entry'] if presentation else False
     result['dubbing_entry_complete'] = report['dubbing_entry_complete'] if presentation else False
+    if report['schema'] == 'conquer-native-rng-journal-v4':
+        result['youth_age_sha256'] = hashlib.sha256(json.dumps(
+            report.get('youth_ages', []), sort_keys=True, separators=(',', ':')).encode()).hexdigest()
     return result
 
 

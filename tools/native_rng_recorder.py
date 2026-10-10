@@ -13,7 +13,7 @@ from live_mapping import descriptor, tables_from_diagnostic
 from rng_recording import RecordingError, canonical_pc
 from supported_pointer_input import queue_primary_click, primary_click_ready
 from dubbing_entry_input import DubbingEntryInput, POINTS as DUBBING_ENTRY_POINTS
-from youth_age_checkpoint import read_youth_age
+from youth_age_checkpoint import read_youth_age, validate_youth_ages
 from native_event_log import EventLog, LOG_FORMAT
 
 
@@ -46,9 +46,12 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         raise ValueError('Youth AGE checkpoints require the guarded answer stage')
     if type(youth_cycles) is not int or not 1 <= youth_cycles <= 6 or (youth_cycles != 1 and not youth_continue):
         raise ValueError('Youth cycles require Continue and an integer from one to six')
-    if dubbing_click and (not youth_continue or youth_cycles != 6 or stop_after_screen_id is not None):
-        raise ValueError('Dubbing input requires six youth cycles and no earlier screen target')
-    if dubbing_entry_input and (not youth_continue or youth_cycles != 6 or stop_after_screen_id is not None):
+    terminal_cycles = 5 if youth_age_checkpoints else 6
+    if youth_age_checkpoints and youth_cycles > 5:
+        raise ValueError('AGE-checked March traversal permits at most five youth cycles')
+    if dubbing_click and (not youth_continue or youth_cycles != terminal_cycles or stop_after_screen_id is not None):
+        raise ValueError('Dubbing input requires the prescribed youth cycles and no earlier screen target')
+    if dubbing_entry_input and (not youth_continue or youth_cycles != terminal_cycles or stop_after_screen_id is not None):
         raise ValueError('Dubbing entry input requires the prescribed youth traversal')
     if stop_after_screen_id is not None and (not screen_checkpoints or
             type(stop_after_screen_id) is not int or not 0 <= stop_after_screen_id <= 24):
@@ -200,7 +203,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
     archive_ordinal = 0
     count = 0
     shift_ordinal = 0
-    report = {'schema': ('conquer-native-rng-journal-v3' if presentation is not None else
+    report = {'schema': ('conquer-native-rng-journal-v4' if youth_age_checkpoints else 'conquer-native-rng-journal-v3' if presentation is not None else
                          'conquer-native-rng-journal-v2' if dubbing_click else 'conquer-native-rng-journal-v1'), 'status': 'incomplete',
               'full_game_complete': False, 'accepted_callers_complete': False,
               'events': journal.events}
@@ -231,6 +234,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                 report.setdefault('youth_ages', []).append({
                     'boundary': kind, 'completed_cycles': completed_youth_cycles,
                     'age': read_youth_age(runtime, mapping), 'rng_state': state()})
+                validate_youth_ages(report['youth_ages'])
                 (output / 'youth-age-checkpoints.json').write_text(json.dumps(report['youth_ages'], indent=2) + '\n')
             if kind == 'dubbing-presentation':
                 if presentation is None or frame is not None or archive_key is not None or \
@@ -333,12 +337,12 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                     continue_queued = False
                     completed_youth_cycles += 1
                     report['completed_youth_cycles'] = completed_youth_cycles
-                    if pc == 0x150a7 and (completed_youth_cycles != 6 or
+                    if pc == 0x150a7 and (completed_youth_cycles != terminal_cycles or
                             report['screen_observation']['screen_id'] != 6):
-                        raise RecordingError('Youth completion requires six cycles and verified dubbing screen')
+                        raise RecordingError('Youth completion requires prescribed cycles and verified dubbing screen')
                     if completed_youth_cycles == youth_cycles:
-                        if youth_cycles == 6 and pc != 0x150a7:
-                            raise RecordingError('Six youth cycles must finish at the dubbing transition return')
+                        if youth_cycles == terminal_cycles and pc != 0x150a7:
+                            raise RecordingError('Prescribed youth cycles must finish at the dubbing transition return')
                         if dubbing_click:
                             readiness_hook, readiness_stage = arm_youth_input('dubbing')
                         else:
@@ -466,6 +470,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                     report.setdefault('youth_ages', []).append({
                         'boundary': 'youth-screen-return', 'completed_cycles': completed_youth_cycles,
                         'age': read_youth_age(runtime, mapping), 'rng_state': report['end_rng_state']})
+                    validate_youth_ages(report['youth_ages'])
                     (output / 'youth-age-checkpoints.json').write_text(json.dumps(report['youth_ages'], indent=2) + '\n')
                 screen_frame = None
                 if screen_checkpoints:
@@ -669,8 +674,11 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         report['pending_archive_extraction'] = archive_key is not None
         report['pending_youth_answer'] = answer_key is not None
         report['pending_youth_continue'] = continue_key is not None
-        if dubbing_click or presentation is not None:
+        if youth_age_checkpoints or dubbing_click or presentation is not None:
             report['pending_dubbing'] = dubbing_key is not None
+        if youth_age_checkpoints and presentation is None:
+            report['pending_dubbing_entry'] = False
+            report['dubbing_entry_complete'] = False
         if presentation is not None:
             report['pending_dubbing_entry'] = presentation.key is not None
             report['dubbing_entry_complete'] = presentation.completed

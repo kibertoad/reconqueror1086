@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 from rng_recording import RecordingError
 from verify_native_recording import PENDING_FIELDS, verify
-from native_event_log import CONTRACT, SCHEMAS, LOG_FORMAT, outcome
+from native_event_log import CONTRACT, AGE_CONTRACT, SCHEMAS, LOG_FORMAT, outcome
 from dinorefurb_dosbox_session import EventLogWriter
 
 
@@ -49,7 +49,7 @@ class NativeVerificationTests(unittest.TestCase):
         target = folder / 'events.jsonl'
         if target.exists():
             target.unlink()
-        log = EventLogWriter.create(target, CONTRACT, SCHEMAS, package_version='0.3.0')
+        log = EventLogWriter.create(target, AGE_CONTRACT if self.report['schema'] == 'conquer-native-rng-journal-v4' else CONTRACT, SCHEMAS, package_version='0.3.0')
         try:
             for event in self.events if events is None else events:
                 log.append(event['kind'], {key: value for key, value in event.items() if key != 'kind'})
@@ -214,6 +214,45 @@ class NativeVerificationTests(unittest.TestCase):
         return {**self.youth_report(6), 'schema': 'conquer-native-rng-journal-v2',
                 'status': 'dubbing-return-reached', 'pending_dubbing': False,
                 'screen_observation': {'screen_id': 11, 'history': [11, 6, 3, 2, 1]}}
+
+    def march_report(self):
+        rows = [{'boundary': 'youth-screen-return', 'completed_cycles': 0, 'age': 13, 'rng_state': 1}]
+        for cycle in range(5):
+            rows.extend({'boundary': boundary, 'completed_cycles': cycle, 'age': age,
+                         'rng_state': 1103527590} for boundary, age in (
+                ('answer-entry', 13+cycle), ('answer-return', 14+cycle),
+                ('continue-entry', 14+cycle), ('continue-return', 14+cycle)))
+        return {**self.dubbing_report(), 'schema': 'conquer-native-rng-journal-v4',
+                'completed_youth_cycles': 5, 'pending_dubbing_entry': False,
+                'dubbing_entry_complete': True, 'youth_ages': rows}
+
+    def test_v4_accepts_five_age_checked_cycles_with_shared_log(self):
+        report = self.march_report()
+        self.report = report
+        self.write_shared()
+        self.assertEqual(verify(self.path, 'dubbing-return-reached', 5)['screen_id'], 11)
+
+    def test_v4_shared_outcome_binds_age_observation_rng_states(self):
+        self.report = self.march_report()
+        self.write_shared()
+        self.report['youth_ages'][3]['rng_state'] = 2
+        self.write(self.report)
+        with self.assertRaisesRegex(RecordingError, 'Shared event log refused'):
+            verify(self.path, 'dubbing-return-reached', 5)
+
+    def test_v4_rejects_missing_reordered_or_changed_age_boundaries(self):
+        original = self.march_report()
+        for index, field, value in ((0, 'age', 12), (2, 'age', 13), (3, 'age', 15),
+                                   (20, 'age', 19), (4, 'completed_cycles', True),
+                                   (8, 'boundary', 'answer-return')):
+            report = copy.deepcopy(original)
+            report['youth_ages'][index][field] = value
+            self.write(report)
+            with self.assertRaisesRegex(RecordingError, 'AGE boundary'):
+                verify(self.path, 'dubbing-return-reached', 5)
+        self.write({**original, 'youth_ages': original['youth_ages'][:-1]})
+        with self.assertRaisesRegex(RecordingError, 'AGE boundary'):
+            verify(self.path, 'dubbing-return-reached', 5)
 
     def test_v2_dubbing_requires_six_cycles_and_village_endpoint(self):
         self.write(self.dubbing_report())

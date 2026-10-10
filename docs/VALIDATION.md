@@ -1482,3 +1482,20 @@ requested PR #419 is included in the session release and guarded-write adoption.
 The canonical tools/Invoke-Validation.ps1 -NoRestore gate passed against these
 installed releases, including documentation, package controls, build and .NET checks.
 
+
+
+## AGE-checked youth completion contract (2026-10-10)
+
+The recorder's v4 contract checks the fresh-game AGE trajectory described by
+RULE-PERSON-004 and RULE-PERSON-007, with five answer/Continue pairs.
+Synthetic native stops reached verified dubbing entry, both guarded entry
+waits and the village callback return. Terminal-verifier controls rejected
+wrong starting AGE, missed increments, changed Continue AGE, wrong boundary
+order, boolean cycle counts and truncated observations. The shared outcome
+contract binds AGE observations by SHA-256; changing a valid observation's
+RNG state after log completion was rejected. Historical v1/v2/v3 acceptance
+controls still passed. A fresh native complete traversal remains pending;
+these synthetic results do not establish gameplay completeness or replay.
+
+The canonical -NoRestore validation passed with the v4 tooling on 2026-10-10.
+
