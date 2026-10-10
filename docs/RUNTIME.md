@@ -345,22 +345,27 @@ screen 6 replacement; a multi-cycle diagnostic ends as
 youth-sequence-return-reached. Full-game completion remains false.
 
 `--dubbing-entry-input` supplies the guarded entry waits with animations disabled.
-`--dubbing-click` requires the prescribed terminal cycle count and no earlier
-screen target. After the terminal Continue return it waits at the supported
-pointer-classifier boundary for an empty queue and suitable observed timing,
-then checks record, object and history before queuing the full-screen click.
-FND-UI-024 locates its callback and restored-stack return. A matching callback
-return after verified village loading and numeric RNG replay ends as
-dubbing-return-reached. Unknown RNG callers remain rejected.
+The current traversal uses `--dubbing-update`, which requires five AGE-checked
+cycles and those entry controls. FND-UI-027 identifies the registered per-screen
+update as an additional caller of the transition procedure. The recorder verifies
+completed entry, screen 6, the object's update pointer and the saved dispatcher
+return before accepting that call. It queues no separate transition click.
+FND-UI-024 locates the matching callback return after village replacement;
+unknown RNG callers and mismatched frames remain rejected.
 
-AGE-checked captures use conquer-native-rng-journal-v4 and outcome contract 2.
-The shared terminal outcome binds the ordered AGE observations by SHA-256;
-the verifier checks the observations as well as log/journal agreement and
-numeric replay. Older v1/v2/v3 captures retain their six-cycle endpoint meaning;
-they are not reinterpreted as v4. Omitting AGE checkpoints selects the historical
-diagnostic contract, not the current prescribed fresh-game traversal.
-Five-cycle transport has synthetic validation; a fresh complete native
-five-cycle and dubbing-to-village control is still required.
+`--dubbing-click` retains the historical separately queued pointer-input diagnostic.
+It cannot be combined with `--dubbing-update`. EXP-UI-002 shows why that old guard
+refused the observed original path: the registered update arrived first.
+
+AGE-checked captures use v4; update-enabled captures use
+conquer-native-rng-journal-v5 and outcome contract 3. The shared terminal outcome
+binds the ordered AGE observations by SHA-256 and records the screen-update
+trigger. Verification requires five pairs, accepted entry, village identity,
+matching journal/log, the recorded trigger and numeric replay. Older v1/v2/v3
+captures retain their six-cycle endpoint meaning; v4 retains its separate-click
+contract. Historical captures are not reinterpreted.
+EXP-UI-002 verifies the complete five-pair youth and dubbing-entry prefix;
+a fresh native update-to-village return still requires validation.
 
 The native inclusive-draw policies also accept the three fixed-bound dilemma
 selection calls of FND-PERSON-013. Initial selection and reroll carry
@@ -493,7 +498,7 @@ $env:GAME_DIR = 'C:/GOG Games/Conqueror AD1086'
   --record-draw-limit 1000 --animations-off --startup-checkpoints --startup-click `
   --stop-after-screen --continue-after-screen --title-click --screen-checkpoints `
   --new-game-click --generation-click --youth-answer --youth-continue `
-  --youth-cycles 5 --youth-age-checkpoints --dubbing-entry-input --dubbing-click
+  --youth-cycles 5 --youth-age-checkpoints --dubbing-entry-input --dubbing-update
 ```
 
 For a current native recorder's terminal diagnostic, verify durable-log agreement,

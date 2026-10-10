@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 from rng_recording import RecordingError
 from verify_native_recording import PENDING_FIELDS, verify
-from native_event_log import CONTRACT, AGE_CONTRACT, SCHEMAS, LOG_FORMAT, outcome
+from native_event_log import CONTRACT, AGE_CONTRACT, UPDATE_CONTRACT, SCHEMAS, LOG_FORMAT, outcome
 from dinorefurb_dosbox_session import EventLogWriter
 
 
@@ -49,7 +49,7 @@ class NativeVerificationTests(unittest.TestCase):
         target = folder / 'events.jsonl'
         if target.exists():
             target.unlink()
-        log = EventLogWriter.create(target, AGE_CONTRACT if self.report['schema'] == 'conquer-native-rng-journal-v4' else CONTRACT, SCHEMAS, package_version='0.3.0')
+        log = EventLogWriter.create(target, UPDATE_CONTRACT if self.report['schema'] == 'conquer-native-rng-journal-v5' else AGE_CONTRACT if self.report['schema'] == 'conquer-native-rng-journal-v4' else CONTRACT, SCHEMAS, package_version='0.3.0')
         try:
             for event in self.events if events is None else events:
                 log.append(event['kind'], {key: value for key, value in event.items() if key != 'kind'})
@@ -231,6 +231,16 @@ class NativeVerificationTests(unittest.TestCase):
         self.report = report
         self.write_shared()
         self.assertEqual(verify(self.path, 'dubbing-return-reached', 5)['screen_id'], 11)
+
+    def test_v5_update_return_is_bound_to_shared_outcome(self):
+        self.report = {**self.march_report(), 'schema':'conquer-native-rng-journal-v5',
+                       'dubbing_trigger':'screen-update'}
+        self.write_shared()
+        self.assertEqual(verify(self.path, 'dubbing-return-reached', 5)['screen_id'], 11)
+        for trigger in ('not-reached', 'prescribed-click', None, True):
+            self.write({**self.report, 'dubbing_trigger':trigger})
+            with self.assertRaisesRegex(RecordingError, 'screen-update'):
+                verify(self.path, 'dubbing-return-reached', 5)
 
     def test_v4_shared_outcome_binds_age_observation_rng_states(self):
         self.report = self.march_report()

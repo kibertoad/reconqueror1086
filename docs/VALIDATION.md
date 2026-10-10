@@ -1525,3 +1525,19 @@ ordered log/journal equality, whole outcome and AGE digest agreement, and numeri
 prefix replay to 683206245 passed. Owned processes exited and the lock was absent.
 No village callback return or full-game success is claimed. The next tooling
 batch must admit the evidenced update caller and verify it on a fresh run.
+
+
+## Registered dubbing update recorder mode (2026-10-10)
+
+The v5 recorder mode follows FND-UI-027's automatic per-screen update without
+queuing a separate transition click. Synthetic stops reached village replacement
+and callback return. Controls refused a region-call return in place of the update
+caller, a changed registered update pointer and a wrong callback return frame.
+The shared outcome contract records the screen-update trigger alongside the
+AGE digest; terminal verification refuses missing or different trigger values.
+Historical separately queued click and v4 controls still passed. Native v5
+transition completion remains unverified.
+
+Canonical -NoRestore validation passed. The final live-record/object guard and its
+changed-history refusal also passed the recorder, verifier and entry-input controls.
+

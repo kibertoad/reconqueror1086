@@ -21,7 +21,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
            startup_checkpoints=False, startup_click=False, continue_after_screen=False, title_click=False,
            screen_checkpoints=False, stop_after_screen_id=None, new_game_click=False, generation_click=False,
            youth_answer=False, youth_continue=False, youth_cycles=1, dubbing_click=False,
-           dubbing_entry_input=False, youth_age_checkpoints=False):
+           dubbing_entry_input=False, youth_age_checkpoints=False, dubbing_update=False):
     if stop_at_screen and stop_after_screen:
         raise ValueError('Choose one screen diagnostic boundary')
     if startup_checkpoints and not stop_after_screen:
@@ -49,6 +49,9 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
     terminal_cycles = 5 if youth_age_checkpoints else 6
     if youth_age_checkpoints and youth_cycles > 5:
         raise ValueError('AGE-checked March traversal permits at most five youth cycles')
+    if dubbing_update and (dubbing_click or not dubbing_entry_input or not youth_age_checkpoints or
+                           not youth_continue or youth_cycles != 5 or stop_after_screen_id is not None):
+        raise ValueError('Dubbing update requires AGE-checked five-cycle entry traversal without a separate click')
     if dubbing_click and (not youth_continue or youth_cycles != terminal_cycles or stop_after_screen_id is not None):
         raise ValueError('Dubbing input requires the prescribed youth cycles and no earlier screen target')
     if dubbing_entry_input and (not youth_continue or youth_cycles != terminal_cycles or stop_after_screen_id is not None):
@@ -133,7 +136,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
             selector, offset = mapping.code_address(start, end - start)
             address = runtime.MemoryAddress.segmented(selector, offset)
             controls.append((address, runtime.read(address, end - start)))
-    if dubbing_click:
+    if dubbing_click or dubbing_update:
         # FND-UI-024: full-screen dubbing callback and restored-stack return.
         for address, name in ((0x19c80, 'dubbing-entry'), (0x19cb1, 'dubbing-return')):
             selector, offset = mapping.code_address(address)
@@ -142,6 +145,12 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         selector, offset = mapping.code_address(0x19c80, 0x19cb2 - 0x19c80)
         address = runtime.MemoryAddress.segmented(selector, offset)
         controls.append((address, runtime.read(address, 0x19cb2 - 0x19c80)))
+    if dubbing_update:
+        # FND-UI-027: setup binding, update setter and dispatcher call.
+        for start, end in ((0x19a50, 0x19a89), (0x59c24, 0x59c36), (0x59bc0, 0x59bd4)):
+            selector, offset = mapping.code_address(start, end - start)
+            address = runtime.MemoryAddress.segmented(selector, offset)
+            controls.append((address, runtime.read(address, end - start)))
     if youth_continue:
         for start, end in ((0x15054, 0x151f6), (0x63114, 0x63267)):
             selector, offset = mapping.code_address(start, end - start)
@@ -203,7 +212,7 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
     archive_ordinal = 0
     count = 0
     shift_ordinal = 0
-    report = {'schema': ('conquer-native-rng-journal-v4' if youth_age_checkpoints else 'conquer-native-rng-journal-v3' if presentation is not None else
+    report = {'schema': ('conquer-native-rng-journal-v5' if dubbing_update else 'conquer-native-rng-journal-v4' if youth_age_checkpoints else 'conquer-native-rng-journal-v3' if presentation is not None else
                          'conquer-native-rng-journal-v2' if dubbing_click else 'conquer-native-rng-journal-v1'), 'status': 'incomplete',
               'full_game_complete': False, 'accepted_callers_complete': False,
               'events': journal.events}
@@ -298,6 +307,33 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                 runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
                 continue
             if kind in ('dubbing-entry', 'dubbing-return'):
+                if dubbing_update and kind == 'dubbing-entry':
+                    # FND-UI-027: admit the registered update caller, not an arbitrary call.
+                    observation = report.get('screen_observation', {})
+                    if completed_youth_cycles != 5 or not presentation.completed or \
+                            observation.get('screen_id') != 6 or observation.get('history', [None])[0] != 6:
+                        raise RecordingError('Dubbing update requires completed entry and verified screen 6')
+                    selector, offset = mapping.data_address(0xafe50, 4)  # FND-UI-001
+                    current_record = int.from_bytes(runtime.read(
+                        runtime.MemoryAddress.segmented(selector, offset), 4), 'little')
+                    current = heap_read(current_record, 24)
+                    obj = heap_read(observation['object_pointer'], 184)
+                    if current_record != observation['record_pointer'] or \
+                            int.from_bytes(current[:4], 'little') != observation['object_pointer'] or \
+                            int.from_bytes(current[4:8], 'little', signed=True) != 6 or \
+                            int.from_bytes(obj[96:100], 'little') != 6:
+                        raise RecordingError('Dubbing update screen record/object identity changed')
+                    if readiness_hook is not None or dubbing_queued:
+                        raise RecordingError('Dubbing update has unexpected prescribed pointer input')
+                    raw_return = int.from_bytes(runtime.read(
+                        runtime.MemoryAddress.segmented(mapping.data.selector, stack_pointer), 4), 'little')
+                    _, expected_return = mapping.code_address(0x59bcd)
+                    _, expected_target = mapping.code_address(0x19c80)
+                    if raw_return != expected_return or int.from_bytes(heap_read(
+                            observation['object_pointer'] + 176, 4), 'little') != expected_target:
+                        raise RecordingError('Dubbing update caller or registered binding differs')
+                    dubbing_queued = True
+                    report['dubbing_trigger'] = 'screen-update'
                 if not dubbing_queued or frame is not None or screen_frame is not None or \
                         answer_key is not None or continue_key is not None or archive_key is not None:
                     raise RecordingError('Dubbing boundary lacks prescribed input or has an unfinished operation')
@@ -343,7 +379,9 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                     if completed_youth_cycles == youth_cycles:
                         if youth_cycles == terminal_cycles and pc != 0x150a7:
                             raise RecordingError('Prescribed youth cycles must finish at the dubbing transition return')
-                        if dubbing_click:
+                        if dubbing_update:
+                            report['status'] = 'incomplete'
+                        elif dubbing_click:
                             readiness_hook, readiness_stage = arm_youth_input('dubbing')
                         else:
                             report['status'] = 'youth-sequence-return-reached' if youth_cycles > 1 else 'youth-continue-return-reached'

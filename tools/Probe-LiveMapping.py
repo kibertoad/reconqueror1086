@@ -49,6 +49,8 @@ def main():
                         help='After the answer, wait for pointer readiness and verify Continue return')
     parser.add_argument('--youth-cycles', type=int, default=1,
                         help='Prescribed answer/Continue cycles, one through six; requires youth Continue')
+    parser.add_argument('--dubbing-update', action='store_true',
+                        help='Observe the registered per-screen transition after AGE-checked dubbing entry')
     parser.add_argument('--dubbing-click', action='store_true',
                         help='After the prescribed youth cycles, queue guarded dubbing input and verify village callback return')
     parser.add_argument('--dubbing-entry-input', action='store_true',
@@ -96,6 +98,10 @@ def main():
     terminal_cycles = 5 if args.youth_age_checkpoints else 6
     if args.youth_age_checkpoints and args.youth_cycles > 5:
         raise ValueError('AGE-checked March traversal permits at most five youth cycles')
+    if args.dubbing_update and (args.dubbing_click or not args.dubbing_entry_input or
+            not args.youth_age_checkpoints or not args.youth_continue or args.youth_cycles != 5 or
+            args.stop_after_screen_id is not None):
+        raise ValueError('Dubbing update requires AGE-checked five-cycle entry traversal without a separate click')
     if args.dubbing_click and (not args.youth_continue or args.youth_cycles != terminal_cycles or args.stop_after_screen_id is not None):
         raise ValueError('Dubbing input requires the prescribed youth cycles and no earlier screen target')
     if args.dubbing_entry_input and (not args.record_native or not args.animations_off or
@@ -157,7 +163,7 @@ def main():
         'new_game_click': args.new_game_click, 'generation_click': args.generation_click,
         'youth_answer': args.youth_answer, 'youth_continue': args.youth_continue,
         'youth_cycles': args.youth_cycles, 'dubbing_click': args.dubbing_click,
-        'dubbing_entry_input': args.dubbing_entry_input,
+        'dubbing_entry_input': args.dubbing_entry_input, 'dubbing_update': args.dubbing_update,
         'youth_age_checkpoints': args.youth_age_checkpoints
     }, indent=2))
     source = Path('artifacts/runtime-tools/dosbox-x-agent-source')
@@ -180,7 +186,7 @@ def main():
                           event_log=log_settings(('__main__', 'shared_dosbox_runtime', 'live_mapping',
                               'native_rng_recorder', 'native_event_log', 'rng_journal', 'rng_recording',
                               'supported_pointer_input', 'dubbing_entry_input', 'youth_age_checkpoint',
-                              'emu.le_image'), age_checked=args.youth_age_checkpoints)) as runtime:
+                              'emu.le_image'), age_checked=args.youth_age_checkpoints, update_checked=args.dubbing_update)) as runtime:
             print('startup', runtime.registers())
             for attempt in range(args.samples):
                 operation = runtime.agent.continue_(runtime.session.id)
@@ -237,7 +243,7 @@ def main():
                                  args.startup_click, args.continue_after_screen, args.title_click,
                                  args.screen_checkpoints, args.stop_after_screen_id, args.new_game_click,
                                  args.generation_click, args.youth_answer, args.youth_continue, args.youth_cycles,
-                                 args.dubbing_click, args.dubbing_entry_input, args.youth_age_checkpoints)
+                                 args.dubbing_click, args.dubbing_entry_input, args.youth_age_checkpoints, args.dubbing_update)
                         print('native recording', journal['status'], 'events', len(journal['events']))
                         break
                     if args.record_startup_shifts and runtime.session.stop_reason.breakpoint_id != ids[1]:

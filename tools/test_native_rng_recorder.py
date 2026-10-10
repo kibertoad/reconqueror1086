@@ -55,7 +55,7 @@ class ScreenBoundaryTests(unittest.TestCase):
                              changed_youth_history=False, cycles=1, dubbing=False,
                              changed_dubbing_history=False, changed_dubbing_object=False,
                              missing_village=False, unprescribed_dubbing=False, presentation=False,
-                             age_checkpoints=False):
+                             age_checkpoints=False, update=False, wrong_update_return=False, wrong_update_binding=False):
         terminal_cycles = 5 if age_checkpoints else 6
         terminal_phase = 7 + 8 * terminal_cycles
         runtime, mapping = runtime_and_mapping()
@@ -66,6 +66,9 @@ class ScreenBoundaryTests(unittest.TestCase):
         def repeated_pc():
             if entry_phase >= 0:
                 return entry_points[entry_phase]
+            if update and runtime.phase >= terminal_phase + 3:
+                return {terminal_phase+3:0x19c80, terminal_phase+4:0x596c0,
+                        terminal_phase+5:0x5975e, terminal_phase+6:0x19cb1}[runtime.phase]
             if cycles == terminal_cycles and runtime.phase >= (terminal_phase + 0):
                 # FND-UI-020/022/024: synthetic stops at recorded return boundaries.
                 points = {(terminal_phase + 0): 0x596c0, (terminal_phase + 1): 0x5975e, (terminal_phase + 2): 0x150a7,
@@ -112,8 +115,13 @@ class ScreenBoundaryTests(unittest.TestCase):
                                        0x14cdd if youth and runtime.phase == 11 else
                                        0x596c0 if runtime.phase % 2 == 0 else 0x5965f if wrong_return else 0x5975e))
         def read(address, length):
+            if update and runtime.phase == terminal_phase+3 and address == (0x188, 0x1000):
+                return (0x59bcd if not wrong_update_return else 0x59b8f).to_bytes(4, 'little')
+            if update and address == (0x188, 0x300100+176):
+                return (0x19c80 if not wrong_update_binding else 0x19a8c).to_bytes(4, 'little')
             if runtime.phase >= 4:
-                screen = (11 if cycles == terminal_cycles and runtime.phase >= (terminal_phase + 6) and not missing_village else
+                screen = (11 if update and runtime.phase >= terminal_phase+4 else
+                          11 if cycles == terminal_cycles and runtime.phase >= (terminal_phase + 6) and not missing_village else
                           6 if cycles == terminal_cycles and runtime.phase >= (terminal_phase + 0) else
                           min(3, (runtime.phase - 2) // 2) if continuation else (runtime.phase - 2) // 2)
                 if address == (0x188, 0x1004):
@@ -151,7 +159,7 @@ class ScreenBoundaryTests(unittest.TestCase):
                             stop_after_screen_id=None if youth else 3 if generation else 2 if new_game else 1,
                             new_game_click=new_game, generation_click=generation, youth_answer=youth,
                             youth_continue=continuation, youth_cycles=cycles, dubbing_click=dubbing,
-                            dubbing_entry_input=presentation, youth_age_checkpoints=age_checkpoints)
+                            dubbing_entry_input=presentation, youth_age_checkpoints=age_checkpoints, dubbing_update=update)
         if age_checkpoints:
             self.assertEqual(age_read.call_count, 1 + 4 * cycles)
             self.assertEqual(report['youth_ages'][0]['boundary'], 'youth-screen-return')
@@ -177,6 +185,33 @@ class ScreenBoundaryTests(unittest.TestCase):
         else:
             runtime.agent.delete_breakpoint.assert_not_called()
         return report
+
+    def test_registered_update_reaches_village_without_separate_click(self):
+        report = self.replacement_sequence(new_game=True, generation=True, youth=True,
+            continuation=True, cycles=5, presentation=True, age_checkpoints=True, update=True)
+        self.assertEqual(report['schema'], 'conquer-native-rng-journal-v5')
+        self.assertEqual(report['dubbing_trigger'], 'screen-update')
+        self.assertEqual(report['status'], 'dubbing-return-reached')
+        self.assertEqual(report['screen_observation']['screen_id'], 11)
+        self.assertNotIn('dubbing', [click['stage'] for click in report['supported_input'] if 'stage' in click])
+
+    def test_update_rejects_wrong_caller_and_binding(self):
+        for options in ({'wrong_update_return':True}, {'wrong_update_binding':True}):
+            with self.subTest(options=options), self.assertRaisesRegex(RecordingError, 'caller or registered binding'):
+                self.replacement_sequence(new_game=True, generation=True, youth=True,
+                    continuation=True, cycles=5, presentation=True, age_checkpoints=True, update=True, **options)
+
+    def test_update_rejects_changed_screen_record(self):
+        with self.assertRaisesRegex(RecordingError, 'screen record/object identity'):
+            self.replacement_sequence(new_game=True, generation=True, youth=True,
+                continuation=True, cycles=5, presentation=True, age_checkpoints=True,
+                update=True, changed_dubbing_history=True)
+
+    def test_update_still_requires_matching_return_frame(self):
+        with self.assertRaisesRegex(RecordingError, 'Dubbing return/frame mismatch'):
+            self.replacement_sequence(new_game=True, generation=True, youth=True,
+                continuation=True, cycles=5, presentation=True, age_checkpoints=True,
+                update=True, bad_callback_frame=53)
 
     def test_age_checked_five_cycles_reach_dubbing_and_village(self):
         report = self.replacement_sequence(new_game=True, generation=True, youth=True,
