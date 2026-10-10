@@ -1616,3 +1616,22 @@ arithmetic agreed with the accepted ordinary cases and confirmed the prescribed
 one-day post-2100 discrepancy. These cases do not establish native date inputs,
 startup adjustments or the untested classification path. Documentation passed;
 no parity status changed and no native game was launched for this experiment.
+
+### 2026-10-10 released debugger tracker and pending readiness diagnostic
+
+Toolkit tracking issue #406 was closed after checking all three released
+slice issues and the successful native downstream consumer result on #403.
+The separate owner-lifetime issue #416 and deferred checkpoints #420 remain.
+
+During the owned v5 recording, a read-only status observation identified the
+briefing input-loop breakpoint. A source-verified mapping and one bounded
+memory read captured pointer_count 0, long_press_limit 4, double_click_limit 4,
+pointer_clock 123 and primary_release_time 121. The preceding stopped state
+and the memory response had the same revision, 3849. The unsigned elapsed
+count was two ticks, so the existing four-tick readiness requirement was
+correctly false. A previous diagnostic whose subsequent status had changed
+was discarded. No guest field, breakpoint or owner operation was changed.
+Local scripts/status/facts stay under artifacts/; the native recording is
+still pending and is not accepted as a completed traversal. The bounded
+readiness observation supports toolkit proposal #456 for reducing repeated
+host stops, without a claimed speed ratio or native success.
