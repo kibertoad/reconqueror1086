@@ -55,8 +55,10 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
   numeric replay, including its initial RULE-PERSON-003 draw. Session 88537
   completed; the owned emulator/controller exited and the machine lock is absent.
   Shutdown's pending transport diagnostic is retained locally.
-- An owned quiet first-youth-answer probe is active in unified session 92758,
-  output native-rng-youth-answer-20261010-a. Preserve its existing operation
+- The first-answer probe passed its matching callback return and durable-log/
+  numeric-replay checks. Session 92758 completed and its processes/lock exited.
+- An owned quiet Continue probe is active in unified session 27133,
+  output native-rng-youth-continue-20261010-a. Preserve its existing operation
   and machine lock; its source fingerprints identify the loaded controllers.
 - Unfinished: native dilemma traversal, complete rule ownership,
   prescribed gameplay state and full-game recording/replay. Shared helper
@@ -64,10 +66,9 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
   from docs/dosbox-x-helper-proposal.md.
 - Blockers: none established. RUNTIME.md is the capability assessment. Audio
   remains muted except for an explicit sound investigation. No WIP branch.
-- Next: observe session 92758 for its answer return or rejected caller, then
-  run a fresh probe with --youth-continue. Keep unknown callers rejected and
-  journals incomplete. The current loaded answer controller stops at its
-  matching callback return; source edits do not alter that active run.
+- Next: observe session 27133 for its Continue return or rejected caller.
+  Keep unknown callers rejected and journals incomplete. Source edits do not
+  alter the active run's loaded controllers.
 - Continue instrumentation is committed: it waits at a temporary pointer
   classifier entry hook for supported queue/timing readiness, queues the
   prescribed click, then verifies its matching callback return. Native
@@ -82,6 +83,9 @@ Debugger memory commands require numeric addresses and explicit dump filenames.
   Full documentation regeneration/check passed for this research batch.
   Queue the next input only after a completed callback and an observed empty
   queue with suitable pointer timing; never treat its RNG return as UI readiness.
+- FND-UI-023 explicitly locates the first-answer epilogue beyond the earlier
+  scoring finding. Full documentation regeneration/check passed; the probe's
+  code control and return comment now cite that precise record.
 - Q-STRATEGY-043 / RULE-STRATEGY-012: finish the downstream consumer review
   from FND-STRATEGY-043/044/045/046 before resolving its disputed status.
 - Q-RNG-001 / RULE-RNG-001: continue seed-source provenance from
