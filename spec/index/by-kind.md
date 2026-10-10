@@ -669,11 +669,12 @@ Entries by kind.
 
 ## experiments
 
-1 entries.
+2 entries.
 
 | ID | Title | Status |
 |---|---|---|
 | [EXP-RNG-001](../experiments/EXP-RNG-001.md) | Native startup character shifts yield thirty ordered rule-tagged draws from each recorded seed | recorded |
+| [EXP-STRATEGY-001](../experiments/EXP-STRATEGY-001.md) | Drawn home indices leave fabricated fief lists unchanged while person 28 initializes them | recorded |
 
 ## bugs
 

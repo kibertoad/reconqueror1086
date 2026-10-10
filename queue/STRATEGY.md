@@ -13,7 +13,9 @@ Next ID: Q-STRATEGY-044
   pairs, including index 7; FND-STRATEGY-045 corrects the prior setup reading.
   FND-STRATEGY-046 follows the home-route branch through its forward-copy
   path without a seven-home clamp. FND-STRATEGY-047 distinguishes the drawn
-  index passed to fief initialization from the selected person held in ESI.
+  index passed to fief initialization from the selected person held in ESI;
+  EXP-STRATEGY-001 corroborates the unchanged drawn-index cases against the
+  explicit person-28 branch using fabricated fief memory.
   The full downstream consumer review
   remains unfinished.
 

@@ -1,5 +1,15 @@
 # Validation
 
+## Isolated home-initialization dispatch (2026-10-10)
+
+The owned local run of tools/emu/verify_home_init.py passed with the
+hash-pinned private interpreter and harness dependencies. It corroborates
+EXP-STRATEGY-001 using fabricated fief memory, confined instruction paths and
+strict write bounds. Its report remains under artifacts/runtime-tools/.
+No additional original process was launched and no full-game or parity
+validation is claimed. The disputed rule and remaining consumer review stay
+open.
+
 ## Released session lifecycle and guarded writes (2026-10-10)
 
 PR #419 released dinorefurb-dosbox-session 0.2.0. Its published wheel and
