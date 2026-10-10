@@ -2,6 +2,12 @@
 
 ## Checker 4.1.1 and quiet probes (2026-10-10)
 
+2026-10-10: 42 native-recorder checks passed after adding bounded repeated
+youth cycles. The synthetic two-cycle sequence checks alternating inputs,
+readiness waits, matching callback returns and temporary-hook removal.
+Invalid cycle counts and repetition without Continue are rejected. This does
+not verify six original dilemmas or a native dubbing transition.
+
 2026-10-10: `native-rng-youth-answer-20261010-a` reached the matching
 first-answer callback return after guarded screen returns 0, 1, 2 and 3.
 All 33 completed events agree with the durable log and independently replay

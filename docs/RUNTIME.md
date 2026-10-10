@@ -310,6 +310,15 @@ breakpoint. FND-UI-022 supports its entry and two restored-stack returns.
 The matching return and journal replay end this diagnostic with
 `youth-continue-return-reached`; native traversal remains unverified.
 
+`--youth-cycles N` extends that sequence for one through six prescribed
+first-answer/Continue pairs and requires Continue when N exceeds one.
+After each nonterminal Continue return, the next answer waits at the same
+supported pointer-readiness boundary; its matching return then arms Continue.
+The six-cycle endpoint additionally requires the age-18 return and verified
+screen 6 identity from FND-UI-022/RULE-PERSON-004. A multi-cycle diagnostic
+ends as `youth-sequence-return-reached`, with full-game completion still false.
+Repeated-cycle tooling has synthetic checks only; native traversal is pending.
+
 The native inclusive-draw policies also accept the three fixed-bound dilemma
 selection calls of FND-PERSON-004. Initial selection and reroll carry
 RULE-PERSON-003, and continued selection carries RULE-PERSON-004. Each requires

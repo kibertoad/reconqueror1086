@@ -32,7 +32,7 @@ class EventLog:
 def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen=False, stop_after_screen=False,
            startup_checkpoints=False, startup_click=False, continue_after_screen=False, title_click=False,
            screen_checkpoints=False, stop_after_screen_id=None, new_game_click=False, generation_click=False,
-           youth_answer=False, youth_continue=False):
+           youth_answer=False, youth_continue=False, youth_cycles=1):
     if stop_at_screen and stop_after_screen:
         raise ValueError('Choose one screen diagnostic boundary')
     if startup_checkpoints and not stop_after_screen:
@@ -53,6 +53,8 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
         raise ValueError('Youth answer requires generation input and continuation beyond screen three')
     if youth_continue and not youth_answer:
         raise ValueError('Youth Continue requires the guarded answer stage')
+    if type(youth_cycles) is not int or not 1 <= youth_cycles <= 6 or (youth_cycles != 1 and not youth_continue):
+        raise ValueError('Youth cycles require Continue and an integer from one to six')
     if stop_after_screen_id is not None and (not screen_checkpoints or
             type(stop_after_screen_id) is not int or not 0 <= stop_after_screen_id <= 24):
         raise ValueError('Screen target requires checkpoints and a registered screen identifier')
@@ -162,6 +164,13 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
     continue_key = None
     continue_queued = False
     readiness_hook = None
+    readiness_stage = None
+    completed_youth_cycles = 0
+    def arm_youth_input(stage):
+        selector, offset = mapping.code_address(0x63114)  # FND-BATTLE-023
+        hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
+        hooks[hook.id] = 'continue-readiness'
+        return hook.id, stage
     startup_key = None
     archive_key = None
     archive_ordinal = 0
@@ -206,15 +215,20 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                     current = journal.complete()
                     if state() != current or replay(journal.events) != current:
                         raise RecordingError('Continue readiness RNG state differs from journal')
-                    click = queue_primary_click(runtime, mapping, x=500, y=150)  # SCR-UI-004 / FND-UI-021
+                    x, y = (500, 150) if readiness_stage == 'continue' else (100, 350)
+                    click = queue_primary_click(runtime, mapping, x=x, y=y)  # SCR-UI-004 / FND-UI-021
                     if state() != current:
                         raise RecordingError('RNG state changed while queuing Continue')
-                    report.setdefault('supported_input', []).append(dict(click, screen=3, stage='continue'))
+                    report.setdefault('supported_input', []).append(dict(click, screen=3, stage=readiness_stage))
                     (output / 'supported-input.json').write_text(json.dumps(report['supported_input'], indent=2) + '\n')
-                    continue_queued = True
+                    if readiness_stage == 'continue':
+                        continue_queued = True
+                    else:
+                        youth_answer_queued = True
                     runtime.agent.delete_breakpoint(runtime.session.id, readiness_hook)
                     del hooks[readiness_hook]
                     readiness_hook = None
+                    readiness_stage = None
                 runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
                 continue
             if kind in ('continue-entry', 'continue-return'):
@@ -231,8 +245,18 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                     if state() != report['end_rng_state'] or replay(journal.events) != report['end_rng_state']:
                         raise RecordingError('Continue RNG state differs from journal')
                     continue_key = None
-                    report['status'] = 'youth-continue-return-reached'
-                    return report
+                    continue_queued = False
+                    completed_youth_cycles += 1
+                    report['completed_youth_cycles'] = completed_youth_cycles
+                    if pc == 0x150a7 and (completed_youth_cycles != 6 or
+                            report['screen_observation']['screen_id'] != 6):
+                        raise RecordingError('Youth completion requires six cycles and verified dubbing screen')
+                    if completed_youth_cycles == youth_cycles:
+                        if youth_cycles == 6 and pc != 0x150a7:
+                            raise RecordingError('Six youth cycles must finish at the dubbing transition return')
+                        report['status'] = 'youth-sequence-return-reached' if youth_cycles > 1 else 'youth-continue-return-reached'
+                        return report
+                    readiness_hook, readiness_stage = arm_youth_input('answer')
                 runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
                 continue
             if kind in ('answer-entry', 'answer-return'):
@@ -249,13 +273,11 @@ def record(runtime, mapping, entry_ids, output, maximum_draws=30, stop_at_screen
                     if state() != report['end_rng_state'] or replay(journal.events) != report['end_rng_state']:
                         raise RecordingError('Youth answer RNG state differs from journal')
                     answer_key = None
+                    youth_answer_queued = False
                     report['status'] = 'youth-answer-return-reached'
                     if not youth_continue:
                         return report
-                    selector, offset = mapping.code_address(0x63114)  # FND-BATTLE-023
-                    hook = runtime.agent.create_execution_breakpoint(runtime.session.id, selector, offset)
-                    readiness_hook = hook.id
-                    hooks[hook.id] = 'continue-readiness'
+                    readiness_hook, readiness_stage = arm_youth_input('continue')
                     report['status'] = 'incomplete'
                 runtime.wait_until_stopped(runtime.agent.continue_(runtime.session.id))
                 continue
