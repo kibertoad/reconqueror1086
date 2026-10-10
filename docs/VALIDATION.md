@@ -2,6 +2,15 @@
 
 ## Checker 4.1.1 and quiet probes (2026-10-10)
 
+2026-10-10: the owner requested wrap-up while
+`native-rng-youth-continue-20261010-a` was extracting startup resources. An
+explicit owned-session pause ended recording as incomplete, before Continue
+traversal. All 32 completed events agree with the durable log and numerically
+replay from seed 895808445 to 3392661364. The incomplete extraction flag and
+stopped-memory/register diagnostics remain local. Process audit confirmed the
+owned controller/emulator exited and the run lock was absent. This was an
+owner-requested interruption, not a verified Continue result or a blocker.
+
 2026-10-10: 42 native-recorder checks passed after adding bounded repeated
 youth cycles. The synthetic two-cycle sequence checks alternating inputs,
 readiness waits, matching callback returns and temporary-hook removal.
