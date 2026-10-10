@@ -1,0 +1,377 @@
+{
+  "experiment": "EXP-RNG-005",
+  "cases": [
+    {
+      "case": "shipped-priorities",
+      "threshold": 255,
+      "initial_rows": [
+        {
+          "marker": 0,
+          "priority": 32,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 1,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 2,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 32,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 32,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 32,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 32,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 32,
+          "callback_present": true
+        }
+      ],
+      "callback_order": [
+        1,
+        2,
+        7,
+        6,
+        5,
+        4,
+        3,
+        0
+      ],
+      "final_markers": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "case": "no-eligible",
+      "threshold": 0,
+      "initial_rows": [
+        {
+          "marker": 0,
+          "priority": 1,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 1,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 1,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 1,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 1,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 1,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 1,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 1,
+          "callback_present": true
+        }
+      ],
+      "callback_order": [],
+      "final_markers": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case": "all-completed",
+      "threshold": 255,
+      "initial_rows": [
+        {
+          "marker": 2,
+          "priority": 0,
+          "callback_present": true
+        },
+        {
+          "marker": 2,
+          "priority": 0,
+          "callback_present": true
+        },
+        {
+          "marker": 2,
+          "priority": 0,
+          "callback_present": true
+        },
+        {
+          "marker": 2,
+          "priority": 0,
+          "callback_present": true
+        },
+        {
+          "marker": 2,
+          "priority": 0,
+          "callback_present": true
+        },
+        {
+          "marker": 2,
+          "priority": 0,
+          "callback_present": true
+        },
+        {
+          "marker": 2,
+          "priority": 0,
+          "callback_present": true
+        },
+        {
+          "marker": 2,
+          "priority": 0,
+          "callback_present": true
+        }
+      ],
+      "callback_order": [],
+      "final_markers": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "case": "ties-and-other-markers",
+      "threshold": 7,
+      "initial_rows": [
+        {
+          "marker": 0,
+          "priority": 7,
+          "callback_present": true
+        },
+        {
+          "marker": 1,
+          "priority": 7,
+          "callback_present": true
+        },
+        {
+          "marker": 2,
+          "priority": 7,
+          "callback_present": true
+        },
+        {
+          "marker": 3,
+          "priority": 7,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 7,
+          "callback_present": true
+        },
+        {
+          "marker": 1,
+          "priority": 7,
+          "callback_present": true
+        },
+        {
+          "marker": 2,
+          "priority": 7,
+          "callback_present": true
+        },
+        {
+          "marker": 3,
+          "priority": 7,
+          "callback_present": true
+        }
+      ],
+      "callback_order": [
+        7,
+        5,
+        4,
+        3,
+        1,
+        0
+      ],
+      "final_markers": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "case": "null-target",
+      "threshold": 255,
+      "initial_rows": [
+        {
+          "marker": 0,
+          "priority": 1,
+          "callback_present": false
+        },
+        {
+          "marker": 2,
+          "priority": 0,
+          "callback_present": true
+        },
+        {
+          "marker": 2,
+          "priority": 0,
+          "callback_present": true
+        },
+        {
+          "marker": 2,
+          "priority": 0,
+          "callback_present": true
+        },
+        {
+          "marker": 2,
+          "priority": 0,
+          "callback_present": true
+        },
+        {
+          "marker": 2,
+          "priority": 0,
+          "callback_present": true
+        },
+        {
+          "marker": 2,
+          "priority": 0,
+          "callback_present": true
+        },
+        {
+          "marker": 2,
+          "priority": 0,
+          "callback_present": true
+        }
+      ],
+      "callback_order": [],
+      "final_markers": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "case": "bounded-threshold",
+      "threshold": 2,
+      "initial_rows": [
+        {
+          "marker": 0,
+          "priority": 0,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 1,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 2,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 3,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 255,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 2,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 1,
+          "callback_present": true
+        },
+        {
+          "marker": 0,
+          "priority": 0,
+          "callback_present": true
+        }
+      ],
+      "callback_order": [
+        7,
+        0,
+        6,
+        1,
+        5,
+        2
+      ],
+      "final_markers": [
+        2,
+        2,
+        2,
+        0,
+        0,
+        2,
+        2,
+        2
+      ]
+    }
+  ],
+  "stubs": [
+    "eight distinct register/segment/memory-preserving immediate-return callbacks"
+  ],
+  "segment_model": "authored flat 32-bit CS/DS/ES/SS",
+  "ports": [],
+  "video_ram": false,
+  "draws": []
+}

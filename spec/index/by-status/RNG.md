@@ -22,7 +22,7 @@ Entries by status.
 
 ## recorded
 
-15 entries.
+16 entries.
 
 | ID | Title |
 |---|---|
@@ -30,6 +30,7 @@ Entries by status.
 | [EXP-RNG-002](../../experiments/EXP-RNG-002.md) | Isolated environment adjustment parsing preserves missing values and wraps numeric components |
 | [EXP-RNG-003](../../experiments/EXP-RNG-003.md) | Isolated suffix parsing retains unselected fields and supplies default clock components |
 | [EXP-RNG-004](../../experiments/EXP-RNG-004.md) | Isolated zero-classification conversion reaches the 1970 epoch and exposes a post-century discrepancy |
+| [EXP-RNG-005](../../experiments/EXP-RNG-005.md) | Isolated initializer dispatch selects priorities and updates completion markers |
 | [FND-RNG-002](../../findings/FND-RNG-002.md) | Three helpers reduce a draw to a range: scaled, remainder and dice |
 | [FND-RNG-003](../../findings/FND-RNG-003.md) | The random number generator is a linear congruential generator with its state at 0x0009E044 |
 | [FND-RNG-004](../../findings/FND-RNG-004.md) | Live LE relocations and native seed and draw stops identify the loaded RNG state |

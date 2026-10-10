@@ -33,6 +33,8 @@ Next ID: Q-RNG-002
   dispatch route, including conditional priority and tie order. Incoming source
   values, OS selector behavior and other callback effects still prevent complete
   startup environment provenance; allocator and classification paths remain.
+  EXP-RNG-005 corroborates the dispatcher with explicit preserving callback
+  stubs. Actual callbacks and source provenance remain unread.
 
 ## Emulated call
 

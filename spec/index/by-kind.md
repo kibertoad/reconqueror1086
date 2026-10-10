@@ -683,7 +683,7 @@ Entries by kind.
 
 ## experiments
 
-11 entries.
+12 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -693,6 +693,7 @@ Entries by kind.
 | [EXP-RNG-002](../experiments/EXP-RNG-002.md) | Isolated environment adjustment parsing preserves missing values and wraps numeric components | recorded |
 | [EXP-RNG-003](../experiments/EXP-RNG-003.md) | Isolated suffix parsing retains unselected fields and supplies default clock components | recorded |
 | [EXP-RNG-004](../experiments/EXP-RNG-004.md) | Isolated zero-classification conversion reaches the 1970 epoch and exposes a post-century discrepancy | recorded |
+| [EXP-RNG-005](../experiments/EXP-RNG-005.md) | Isolated initializer dispatch selects priorities and updates completion markers | recorded |
 | [EXP-STRATEGY-001](../experiments/EXP-STRATEGY-001.md) | Drawn home indices leave fabricated fief lists unchanged while person 28 initializes them | recorded |
 | [EXP-STRATEGY-002](../experiments/EXP-STRATEGY-002.md) | All eight isolated home selections preserve the chosen person through their actual callees | recorded |
 | [EXP-STRATEGY-003](../experiments/EXP-STRATEGY-003.md) | Eight isolated new-game setups retain selected-person group and coordinate results | recorded |

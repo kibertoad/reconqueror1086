@@ -1670,3 +1670,13 @@ original-game killed-owner check. Upstream subsequently closed toolkit issue
 #416 on the release, explicitly noting that it had no external requester;
 this project makes no new native killed-owner claim. Issue #413 retains its
 original consumer-specific inventory confirmation requirement.
+
+### 2026-10-10 isolated startup initializer dispatch
+
+With GAME_DIR=analysis/original, the private 18.3.0/session-0.4.0 interpreter
+passed tools/emu/verify_initializer_dispatch.py. FND-RNG-012 and EXP-RNG-005
+record the bounded original dispatcher, authored table inputs and preserving
+callback stubs. Exact callback order, all table bytes, unchanged authored code,
+bounded writes and declared instruction paths passed. These controls do not
+run actual initialization callbacks or establish original-game startup
+environment provenance. Q-RNG-001 remains open; no parity status changed.
