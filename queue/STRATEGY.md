@@ -12,7 +12,9 @@ Next ID: Q-STRATEGY-044
   unclamped store/read. FND-STRATEGY-044 records nine consecutive person/route
   pairs, including index 7; FND-STRATEGY-045 corrects the prior setup reading.
   FND-STRATEGY-046 follows the home-route branch through its forward-copy
-  path without a seven-home clamp. The full downstream consumer review
+  path without a seven-home clamp. FND-STRATEGY-047 distinguishes the drawn
+  index passed to fief initialization from the selected person held in ESI.
+  The full downstream consumer review
   remains unfinished.
 
 - Q-STRATEGY-001. BUG-STRATEGY-001: What the local holds at the start of a session? Settles it:

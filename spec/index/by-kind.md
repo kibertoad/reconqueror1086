@@ -343,7 +343,7 @@ Entries by kind.
 
 ## findings
 
-318 entries.
+319 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -599,6 +599,7 @@ Entries by kind.
 | [FND-STRATEGY-044](../findings/FND-STRATEGY-044.md) | Route resources and nine home-selection table entries, of which eight are selectable | recorded |
 | [FND-STRATEGY-045](../findings/FND-STRATEGY-045.md) | New-game setup 0x000110E8 places the player at one of eight homes and clears the strategic records | recorded |
 | [FND-STRATEGY-046](../findings/FND-STRATEGY-046.md) | The home-route branch uses the selected route without a seven-home clamp | recorded |
+| [FND-STRATEGY-047](../findings/FND-STRATEGY-047.md) | Home selection passes the drawn index rather than the selected person to fief initialization | recorded |
 | [FND-TALK-001](../findings/FND-TALK-001.md) | Conversation nodes are read by length from the .CBF file through a sorted .CIF index | recorded |
 | [FND-TALK-002](../findings/FND-TALK-002.md) | The conversation loop runs node actions, then the chosen response actions, then follows a redirect | recorded |
 | [FND-TALK-003](../findings/FND-TALK-003.md) | The prompt variant is drawn after reseeding the generator from the clock | recorded |
