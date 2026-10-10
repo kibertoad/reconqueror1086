@@ -18,6 +18,8 @@ Next ID: Q-STRATEGY-044
   explicit person-28 branch using fabricated fief memory.
   FND-STRATEGY-048 follows the selected person through coordinates, assignment,
   place and the duplicate-refusing list insertion calls.
+  EXP-STRATEGY-002 corroborates all eight selected-person outcomes through
+  the actual callees, including the endpoint's coordinates and place value.
   The full downstream consumer review
   remains unfinished.
 
@@ -119,11 +121,6 @@ Next ID: Q-STRATEGY-044
 - Q-STRATEGY-022. RULE-STRATEGY-011, RULE-STRATEGY-017: What does `fn_0003CED8` do? Settles it:
   read the relevant branch and its callers from the entry's cited findings, following data
   provenance, call effects and every exit relevant to this question. Blocks: none.
-
-- Q-STRATEGY-023. RULE-STRATEGY-012: What value `new_strategic_game` stores in `place_person`?
-  Settles it: read the relevant branch and its callers from the entry's cited findings,
-  following data provenance, call effects and every exit relevant to this question. Blocks:
-  none.
 
 - Q-STRATEGY-024. RULE-STRATEGY-012: Is it true that the reset routine clears the freed route
   pointers? Settles it: read the relevant branch and its callers from the entry's cited

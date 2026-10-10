@@ -1,5 +1,14 @@
 # Validation
 
+## Isolated home-selector outcomes (2026-10-10)
+
+The local tools/emu/verify_home_selection.py run passed with the private
+hash-pinned interpreter and harness dependencies. EXP-STRATEGY-002 records
+the exact selector outcomes through the original callees, with bounded
+instruction and write domains and synthetic initial mutable fields.
+Its report stays under artifacts/runtime-tools/. No additional native game
+was launched and no full-game or parity validation is claimed.
+
 ## Isolated home-initialization dispatch (2026-10-10)
 
 The owned local run of tools/emu/verify_home_init.py passed with the

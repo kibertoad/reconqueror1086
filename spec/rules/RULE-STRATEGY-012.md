@@ -4,7 +4,7 @@ title: New game, joining armies and field placement
 status: disputed
 builds: [BLD-GOG-EN]
 superseded_by: []
-evidence: [FND-STRATEGY-001, FND-STRATEGY-039, FND-STRATEGY-003, FND-STRATEGY-004, FND-STRATEGY-006, FND-STRATEGY-007, FND-STRATEGY-013, FND-STRATEGY-040, FND-STRATEGY-044, FND-STRATEGY-041, FND-STRATEGY-021, FND-STRATEGY-045, FND-STRATEGY-024, FND-STRATEGY-025, FND-STRATEGY-026, FND-STRATEGY-029, FND-STRATEGY-030, FND-STRATEGY-031, FND-STRATEGY-032, FND-STRATEGY-035, FND-TOURNEY-001, FND-TOURNEY-009, FND-STRATEGY-043, FND-STRATEGY-044, FND-STRATEGY-047, EXP-STRATEGY-001, FND-STRATEGY-048]
+evidence: [FND-STRATEGY-001, FND-STRATEGY-039, FND-STRATEGY-003, FND-STRATEGY-004, FND-STRATEGY-006, FND-STRATEGY-007, FND-STRATEGY-013, FND-STRATEGY-040, FND-STRATEGY-044, FND-STRATEGY-041, FND-STRATEGY-021, FND-STRATEGY-045, FND-STRATEGY-024, FND-STRATEGY-025, FND-STRATEGY-026, FND-STRATEGY-029, FND-STRATEGY-030, FND-STRATEGY-031, FND-STRATEGY-032, FND-STRATEGY-035, FND-TOURNEY-001, FND-TOURNEY-009, FND-STRATEGY-043, FND-STRATEGY-044, FND-STRATEGY-047, EXP-STRATEGY-001, FND-STRATEGY-048, EXP-STRATEGY-002]
 conflicting: [FND-STRATEGY-043, FND-STRATEGY-044]
 split_with: []
 related: [RULE-RNG-001, RULE-STRATEGY-007, RULE-STRATEGY-014]
@@ -214,7 +214,9 @@ define remove_army(i):
 
 ## Outputs
 
-The records and globals named. `new_strategic_game` also sets `place_person`, and the home person
+The records and globals named. `new_strategic_game`'s home selector sets
+`place_person` to the selected person `s` before returning (FND-STRATEGY-048,
+EXP-STRATEGY-002), and the home person
 keeps its cell.
 
 ## Edge cases
@@ -233,8 +235,6 @@ None of the sources describe this.
 None known.
 
 ## Open questions
-
-- What value `new_strategic_game` stores in `place_person`. (Q-STRATEGY-023)
 
 - Whether the reset routine clears the freed route pointers. (Q-STRATEGY-024)
 
