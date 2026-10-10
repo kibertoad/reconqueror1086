@@ -39,15 +39,16 @@ observe the guest-written drive-setup marker before starting the original.
 Debugger memory commands require numeric addresses and explicit dump filenames.
 The default Python environment is shared with toolkit development and may hold
 an editable engine. Use command-scoped EVIDENCE_PYTHON pointing to
-artifacts/validation-python-latest/Scripts/python.exe for evidence gates; update that
-private environment with the hash-locked requirements, never the shared one.
+artifacts/validation-python-183-session04/Scripts/python.exe for new evidence gates.
+Preserve validation-python-latest unchanged while the active native v5 run uses it;
+never update the shared environment.
 
 ## Handover
 
 - Stage: Survey; research-side runtime tooling.
 - Last gate: 2026-10-10 canonical -NoRestore validation passed with
-  EVIDENCE_PYTHON=artifacts/validation-python-latest/Scripts/python.exe,
-  executable-reader 4.0.0, engine 18.2.0, checker 4.2.0 and session 0.3.0.
+  EVIDENCE_PYTHON=artifacts/validation-python-183-session04/Scripts/python.exe,
+  executable-reader 4.0.0, engine 18.3.0, checker 4.2.0 and session 0.4.0.
   No full-game gate passed.
 - Active original control: exec 19256, controller PID 59896, emulator
   PID 80336, token 5007366d0cf2, debugger ses-1, under
@@ -63,14 +64,20 @@ private environment with the hash-locked requirements, never the shared one.
   Q-PERSON-022 remains open. EXP-UI-001 remains the entry-control reference.
 - Q-STRATEGY-043 remains open after FND-STRATEGY-049 and EXP-STRATEGY-003.
   RULE-STRATEGY-012 remains disputed. Documentation and evidence checks passed.
-- Toolkit issues #319, #385, #388, #392 and #403 were consumer-validated and closed.
+- Toolkit issues #319, #385, #388, #392 and #403 were consumer-validated and closed;
+  released debugger tracker #406 is also closed.
   PR #419 is adopted. #402, #412, #413 and #420 remain open with their
   original-game confirmation, feature or upstream prerequisites unresolved.
-  #416 awaits its next session release and killed-owner control. The flat
+  #416 awaits its native killed-owner control on released session 0.4.0. The flat
   isolated-call segment-model controls are committed; their reusable setup
   result was added to existing toolkit issue #7 after duplicate checking.
-- Q-RNG-001 remains open after FND-RNG-007 and EXP-RNG-002. Documentation,
-  parser controls and evidence/package checks passed; no parity status changed.
+- Q-RNG-001 remains open after FND-RNG-007 through FND-RNG-011 and
+  EXP-RNG-002 through EXP-RNG-004. Documentation, isolated controls and
+  evidence/package checks passed; RULE-RNG-001 remains supported.
+- Toolkit #456 records the timer-gated readiness proposal. The standalone owned
+  breakpoint manager passed synthetic controls but is not integrated into v5.
+  The active recording remains pending; its coherent read-only readiness
+  diagnostic does not establish a completed traversal or a speed ratio.
 - The AGE-checked v4 and registered-update v5 tooling contracts are committed.
   Canonical validation and final consumer controls passed; native v5 is running.
 - Unfinished: native youth/dubbing traversal, complete caller ownership, prescribed full-game
