@@ -65,7 +65,7 @@ Entries by status.
 
 ## recorded
 
-22 entries.
+23 entries.
 
 | ID | Title |
 |---|---|
@@ -91,6 +91,7 @@ Entries by status.
 | [FND-UI-020](../../findings/FND-UI-020.md) | Title callbacks replace the current screen and the replacement loader returns after its history update |
 | [FND-UI-021](../../findings/FND-UI-021.md) | Youth Continue and Reroll bind file-order indices rather than stored region IDs |
 | [FND-UI-022](../../findings/FND-UI-022.md) | Youth Continue returns after replacing the screen or resetting the next dilemma's controls |
+| [FND-UI-023](../../findings/FND-UI-023.md) | The first youth-answer callback enables Continue before its restored-stack return |
 
 ## Open questions
 

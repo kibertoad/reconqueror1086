@@ -5,7 +5,7 @@ status: supported
 builds: [BLD-GOG-EN]
 superseded_by: []
 resolution: 640x480
-evidence: [FND-PERSON-004, FND-PERSON-005, FND-UI-001, FND-UI-002, FND-UI-003, FND-UI-010, FND-UI-013, FND-UI-021, FND-UI-022]
+evidence: [FND-PERSON-004, FND-PERSON-005, FND-UI-001, FND-UI-002, FND-UI-003, FND-UI-010, FND-UI-013, FND-UI-021, FND-UI-022, FND-UI-023]
 conflicting: []
 split_with: []
 related: [RULE-PERSON-003, RULE-PERSON-004, SCR-UI-019]
@@ -22,7 +22,7 @@ related: [RULE-PERSON-003, RULE-PERSON-004, SCR-UI-019]
 
 | Region | Rectangle | Enabled when | Effect | Evidence |
 |---|---|---|---|---|
-| region 0 | (62, 310, 100, 150) | Always | Applies the first answer (RULE-PERSON-004), enables region 5 and disables regions 0 to 2. | FND-PERSON-005 |
+| region 0 | (62, 310, 100, 150) | Always | Applies the first answer (RULE-PERSON-004), enables region 5 and disables regions 0 to 2. | FND-PERSON-005, FND-UI-023 |
 | region 1 | (268, 310, 100, 150) | Always | Applies the second answer, enables region 5 and disables regions 0 to 2. | FND-UI-013 |
 | region 2 | (478, 310, 100, 150) | Always | Applies the third answer, enables region 5 and disables regions 0 to 2. | FND-UI-013 |
 | region 3 | (3, 184, 632, 16) | Always | Moves the text five lines one way. | FND-UI-013 |
