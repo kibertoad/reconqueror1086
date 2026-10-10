@@ -51,16 +51,10 @@ private environment with the hash-locked requirements, never the shared one.
   hash-pinned validation interpreter; its build and test artifacts are local.
 - Continue verification finished successfully; its terminal journal check,
   cleanup and limits are recorded in docs/VALIDATION.md. No full-game gate passed.
-- Active probe: exec session 4782, quiet fresh six-cycle youth verification under
-  artifacts/runtime-tools/native-rng-youth-six-cycles-20261010-a. Controller PID
-  61028 owns emulator PID 19484 and the machine run lock. Local
-  session-identity.json identifies debugger session ses-1. Native recording
-  reached startup preparation; debugger operation op-117 remains pending.
-  A read-only diagnostic confirmed session state running, revision 139, and
-  that same operation still running. No guest pause or restart was performed.
+- No active original probe. The six-cycle attempt is terminal and incomplete;
+  its owned controller, emulator and run lock have been cleaned up. Diagnostics
+  remain under artifacts/runtime-tools/native-rng-youth-six-cycles-20261010-a.
   Repeated-cycle and dubbing verification remain pending.
-  Poll this same owning handle; do not launch another original or remove its
-  lock while it is live. Diagnostic files and original content stay local.
 - Unfinished: repeated youth traversal, complete caller
   ownership, prescribed full-game state, two full-game recordings and actual
   rebuild replay. Shared helper extraction remains unimplemented; toolkit
@@ -74,12 +68,12 @@ private environment with the hash-locked requirements, never the shared one.
   startup and concurrent output draining. The focused controls and full fast
   gate passed. The upstream report and local positive control are issue #95:
   https://github.com/kibertoad/refurbished-dinosaurs-template/issues/95.
-- Next: finish observing the active six-cycle probe and run
+- Next: add preparation-service checkpoints before a fresh six-cycle probe; run
   tools/verify_native_recording.py with --expect-status youth-sequence-return-reached
   --expect-youth-cycles 6. Its cycle/endpoint guards and the one-cycle native
   positive control passed; six-cycle original traversal remains unverified.
   Inspect matching cycle count, dubbing screen identity and process/lock cleanup.
-- Next: after the current owned run reaches a terminal state, verify a fresh
+- Next: after successful six-cycle traversal, verify a fresh
   --dubbing-click run using the six-cycle command with that additional option.
   Its readiness/callback guards and schema-v2 outcome have synthetic checks;
   actual traversal remains unverified. Validate with --expect-status
