@@ -56,6 +56,8 @@ private environment with the hash-locked requirements, never the shared one.
   61028 owns emulator PID 19484 and the machine run lock. Local
   session-identity.json identifies debugger session ses-1. Native recording
   reached startup preparation; debugger operation op-117 remains pending.
+  A read-only diagnostic confirmed session state running, revision 139, and
+  that same operation still running. No guest pause or restart was performed.
   Repeated-cycle and dubbing verification remain pending.
   Poll this same owning handle; do not launch another original or remove its
   lock while it is live. Diagnostic files and original content stay local.
@@ -69,7 +71,9 @@ private environment with the hash-locked requirements, never the shared one.
   hash-locked installation. The template improvement is issue #94:
   https://github.com/kibertoad/refurbished-dinosaurs-template/issues/94.
 - Next: finish observing the active six-cycle probe and run
-  tools/verify_native_recording.py with expected youth-sequence-return-reached;
+  tools/verify_native_recording.py with --expect-status youth-sequence-return-reached
+  --expect-youth-cycles 6. Its cycle/endpoint guards and the one-cycle native
+  positive control passed; six-cycle original traversal remains unverified.
   inspect matching cycle count, dubbing screen identity and process/lock cleanup.
 - Next: supported dubbing-to-village input instrumentation from FND-UI-024 and
   SCR-UI-019. Q-UI-044 retains the sample-identity question separately.
