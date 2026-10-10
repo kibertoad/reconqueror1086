@@ -49,13 +49,12 @@ private environment with the hash-locked requirements, never the shared one.
   EVIDENCE_PYTHON=artifacts/validation-python/Scripts/python.exe. Shared session
   0.2.0 published-source Windows suite, adapter, pointer-input, native-recorder
   and terminal-validator checks passed. No full-game gate passed.
-- Active original probe: exec session 45602, controller PID 127744, emulator
-  PID 132920, debugger session ses-1. The quiet normal-core GOG-cycle control
-  under artifacts/runtime-tools/native-rng-shared-startup-gog-normal-20261010-a
-  owns the machine lock. Observe the same handle; do not launch another probe
-  or remove its lock. This process loaded session 0.1.0 before the 0.2.0 upgrade.
-  Native guarded-write verification requires a subsequent 0.2.0 run.
-- Earlier six-cycle and auto-core comparisons are terminal and incomplete;
+- Active original probe: exec session 27952, controller PID 98544, emulator
+  PID 96568, debugger session ses-1. The quiet combined traversal under
+  artifacts/runtime-tools/native-rng-shared-dubbing-fixed10000-20261010-a owns
+  the machine lock. It uses session 0.2.0, normal core and fixed 10000 cycles.
+  Observe the same handle; do not launch another probe or remove its lock.
+- Earlier six-cycle, auto-core and GOG-cycle comparisons are terminal and incomplete;
   their owned processes and locks were cleaned up. Dated diagnostic limits
   are in docs/VALIDATION.md; captures remain local.
 - Shared lifecycle and guarded writes are adopted from published session 0.2.0
@@ -67,8 +66,8 @@ private environment with the hash-locked requirements, never the shared one.
   prescribed full-game state, two full-game recordings and actual rebuild replay.
 - Blockers: none established. No WIP branch. The pre-existing untracked
   .claude/settings.json remains untouched.
-- Next: finish the owned normal-core startup control and validate its terminal
-  journal, then verify published 0.2.0 guarded pointer writes in a fresh run.
+- Next: finish the owned combined traversal and validate its terminal
+  journal and published 0.2.0 guarded pointer-write record.
   Record process/lock cleanup and send the terminal consumer result to #403.
 - Next: verify six-cycle traversal and dubbing with the terminal validator's
   matching outcome contracts. Q-UI-044 retains the sample-identity question.
