@@ -789,4 +789,5 @@ Entries by area.
 | [FND-RNG-009](../findings/FND-RNG-009.md) | Seed conversion uses common-year and leap-year cumulative month-day tables | recorded |
 | [FND-RNG-010](../findings/FND-RNG-010.md) | Seed conversion combines a four-year day-count term with a 1970 epoch and normalizes before adjustments | recorded |
 | [FND-RNG-011](../findings/FND-RNG-011.md) | The environment array is lazily constructed from a selector-offset source | recorded |
+| [FND-RNG-012](../findings/FND-RNG-012.md) | Startup publishes the environment source and dispatches its constructor through an initializer table | recorded |
 | [RULE-RNG-001](../rules/RULE-RNG-001.md) | The game's random number generator | supported |

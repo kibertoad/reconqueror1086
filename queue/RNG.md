@@ -29,6 +29,10 @@ Next ID: Q-RNG-002
   FND-RNG-011 reads the lazy environment constructor and two direct-reference
   searches with a positive control. The source selector/offset's writers,
   constructor startup ordering and allocator/segment effects remain unread.
+  FND-RNG-012 identifies both startup source stores and the initializer-table
+  dispatch route, including conditional priority and tie order. Incoming source
+  values, OS selector behavior and other callback effects still prevent complete
+  startup environment provenance; allocator and classification paths remain.
 
 ## Emulated call
 

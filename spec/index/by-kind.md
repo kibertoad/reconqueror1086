@@ -344,7 +344,7 @@ Entries by kind.
 
 ## findings
 
-331 entries.
+332 entries.
 
 | ID | Title | Status |
 |---|---|---|
@@ -548,6 +548,7 @@ Entries by kind.
 | [FND-RNG-009](../findings/FND-RNG-009.md) | Seed conversion uses common-year and leap-year cumulative month-day tables | recorded |
 | [FND-RNG-010](../findings/FND-RNG-010.md) | Seed conversion combines a four-year day-count term with a 1970 epoch and normalizes before adjustments | recorded |
 | [FND-RNG-011](../findings/FND-RNG-011.md) | The environment array is lazily constructed from a selector-offset source | recorded |
+| [FND-RNG-012](../findings/FND-RNG-012.md) | Startup publishes the environment source and dispatches its constructor through an initializer table | recorded |
 | [FND-SAVE-001](../findings/FND-SAVE-001.md) | The load and save screens list five titled slots, SAVEGAME\CONQ1.SAV to CONQ5.SAV | recorded |
 | [FND-SAVE-002](../findings/FND-SAVE-002.md) | A save writes ten temporary files and packs them with a title and version into one resource container | recorded |
 | [FND-SAVE-003](../findings/FND-SAVE-003.md) | A load checks VERSION 2.1, unpacks the entries and runs the component loaders; temp.jap must be present | recorded |
