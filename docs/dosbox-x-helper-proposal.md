@@ -53,11 +53,19 @@ marker after mounts and AUTOEXEC setup; RPC readiness alone is insufficient.
 - Synthetic lifecycle/transport tests requiring no licensed game or original
   content, plus a separately invoked owner-local verification procedure.
 
-The existing authored candidates are `tools/dosbox_session.py` and the event
-logging/source-fingerprint portions of the probe controller. Extract interfaces
-only after separating repository paths, source identity, drive setup and the
-evidence review contract. Start with shared lifecycle and transport rather than
-shipping an allegedly universal gameplay recorder.
+Toolkit PRs #414 and #419 published the lifecycle and guarded-write interfaces
+as `dinorefurb-dosbox-session` 0.1.0 and 0.2.0. This repository now pins 0.2.0
+and delegates those operations through `tools/shared_dosbox_runtime.py`.
+Game mapping, input readiness and pointer-field contracts stay local. Native
+consumer verification remains in progress; the library's synthetic checks
+cannot establish the recorder's gameplay boundaries. Durable event logging
+remains a downstream candidate for issue #409.
+
+Verified emulator checkpoint feasibility is tracked separately in
+[toolkit issue #420](https://github.com/kibertoad/refurbished-dinosaurs-toolkit/issues/420).
+Host preparation can be reused with isolated writable drives; bypassing guest
+startup requires validated CPU, device, timer, RNG and drive state. A memory
+copy alone cannot establish equivalent startup state.
 
 ## Keep in each restoration
 

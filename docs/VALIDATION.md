@@ -1,5 +1,36 @@
 # Validation
 
+## Released session lifecycle and guarded writes (2026-10-10)
+
+PR #419 released dinorefurb-dosbox-session 0.2.0. Its published wheel and
+source hashes are pinned in requirements-evidence.txt, with release revision
+9f33aa5c5a240f469b70ae499eb1cce39da3e054 in the adoption record. The private
+interpreter installed the hashed wheel. The published source's Windows suite
+passed 52 synthetic checks against the installed release, including guarded
+write refusal and failed-run continuation controls. The downstream adapter,
+supported-pointer, native-recorder and terminal-validator checks passed.
+The canonical Invoke-Validation.ps1 -NoRestore gate passed with the private
+EVIDENCE_PYTHON interpreter, including package pins, documentation, Node checks,
+build and application tests.
+
+The probe delegates owned lifecycle to the released package instead of the
+retired local helper. Supported pointer input declares the two event payloads
+and queue count as a caller-owned contract and uses session.write; the full
+queue relationship remains checked downstream. Drive preparation writes once
+into the package-owned private C: directory. The bounded read-only CPU
+descriptor diagnostic remains local. Full-game recording and rebuild replay
+remain unfinished.
+
+The first native shared-session comparison using core=auto and auto 30% cycles
+failed the archive-overlapping-operation recording guard after the seed entry.
+It ended incomplete; its owned processes exited and the machine lock was absent.
+Cleanup retained a diagnostic that debugger shutdown was still pending before
+process termination. This does not establish the cause of the recording failure.
+A normal-core control using the same cycle profile remains running under
+native-rng-shared-startup-gog-normal-20261010-a. It has passed the seed return
+and first archive-entry guard. Native startup completion and the new released
+guarded writes have not yet been verified in the original.
+
 ## Shared library releases and interrupted traversal (2026-10-10)
 
 The hash-locked private environment now contains engine 15.3.0 and

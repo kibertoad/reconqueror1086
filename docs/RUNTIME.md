@@ -101,8 +101,11 @@ The portable release does not include the structured Agent API. A local source
 build uses official DOSBox-X revision
 `b6abbd5980a885f5f310a4088c59a8688d1b116c` (tag `dosbox-x-v2026.10.01`),
 configuration `Agent Debug SDL2`, x64. The upstream Python client from that same
-checkout supplies JSON-RPC transport and models; `tools/dosbox_session.py`
-checks the revision before importing it. Its named pipe is unique to the probe.
+checkout supplies JSON-RPC transport and models. The hash-pinned
+`dinorefurb-dosbox-session` package owns checkout verification, the run lock,
+private C: preparation, endpoint, readiness, operation observation and cleanup.
+`tools/shared_dosbox_runtime.py` adapts its API to the game recorder; mapping
+and supported input contracts remain local. Its named pipe is unique to the probe.
 
 Clone the official repository into the ignored directory
 `artifacts/runtime-tools/dosbox-x-agent-source`, selecting that tag and verifying
@@ -137,7 +140,20 @@ availability alone does not prove AUTOEXEC has finished. An observation timeout
 preserves the pending operation, and cleanup failure retains the run lock while
 the owned process is still live.
 
-Run `python -B tools/test_dosbox_session.py` for synthetic lifecycle checks.
+Install `requirements-evidence.txt` with `--require-hashes` in a private Python
+environment. The default development interpreter may contain editable toolkit
+packages and is unsuitable for release verification. Run
+`artifacts/validation-python/Scripts/python.exe -B tools/test_shared_dosbox_runtime.py`
+for synthetic adapter checks. Guarded input uses the released session's
+`FieldContract` and `write` API; a failed write prevents further continuation.
+The caller permits only supported event payloads and queue count, then checks
+the complete queue relationship before continuing.
+
+New probes default to normal core and fixed 10000 cycles. `--cpu-profile gog`
+selects GOG's `auto 30%` cycle setting while retaining normal core for debugger
+stepping. `--cpu-core auto` is experimental: a native comparison failed a
+recording guard. Faster traversal has not yet been verified. Record the chosen
+profile from probe-configuration.json rather than inferring it from defaults.
 For a bounded diagnostic, use a fresh output directory and a command-scoped
 GAME_DIR pointing to the owned installation:
 

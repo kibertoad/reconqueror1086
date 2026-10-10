@@ -5,6 +5,7 @@ The caller must first establish an appropriate observable input boundary.
 """
 import hashlib
 import struct
+from dinorefurb_dosbox_session import FieldContract, WritableField
 from rng_recording import RecordingError
 
 
@@ -49,15 +50,21 @@ def queue_primary_click(runtime, mapping, x=0, y=0):
         raise RecordingError('Observed pointer timing cannot produce the prescribed short click')
     queue_address = address('pointer_events', 40)
     old_queue = runtime.read(queue_address, 40)
+    # FMT-BATTLE-002 / FND-BATTLE-023: exclude unk_10 and all timing globals.
+    contract = FieldContract('FMT-BATTLE-002/primary-short-click', (
+        WritableField('press', address('pointer_events', 16), 16),
+        WritableField('release', address('pointer_events', 16, 20), 16),
+        WritableField('count', count_address, 4),
+    ))
     expected = bytearray(old_queue)
     for displacement, kind in ((0, 0), (20, 1)):
         data = struct.pack('<Iiii', clock, x, y, kind)
         expected[displacement:displacement + 16] = data
-        runtime.agent.write_memory(runtime.session.id, address('pointer_events', 16, displacement), data,
-                                   expected_sha256=hashlib.sha256(old_queue[displacement:displacement + 16]).hexdigest())
+        runtime.write(contract, 'press' if displacement == 0 else 'release', data,
+                      expected_sha256=hashlib.sha256(old_queue[displacement:displacement + 16]).hexdigest())
     # Publish only after both events are written; unk_10 in each record is untouched.
-    runtime.agent.write_memory(runtime.session.id, count_address, struct.pack('<I', 2),
-                               expected_sha256=hashlib.sha256(old_count).hexdigest())
+    runtime.write(contract, 'count', struct.pack('<I', 2),
+                  expected_sha256=hashlib.sha256(old_count).hexdigest())
     if runtime.read(queue_address, 40) != bytes(expected) or word('pointer_count') != 2:
         raise RecordingError('Supported pointer input readback differs from the prescribed fields')
     return {'action': 'primary-short-click', 'x': x, 'y': y, 'time': clock, 'event_count': 2}

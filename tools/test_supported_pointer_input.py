@@ -20,7 +20,14 @@ def fixture(clock=10, release=0, count=0, long_limit=4, double_limit=4):
                         ('double_click_limit', double_limit)]:
         struct.pack_into('<I', memory, LAYOUT[name], value)
     writes = []
-    def write(session, address, data, expected_sha256=None):
+    def write(contract, field, data, expected_sha256=None):
+        supported = contract.field(field)
+        address = supported.address
+        if len(data) != supported.length:
+            raise RuntimeError('Write outside contract')
+        if [(f.name, f.address, f.length) for f in contract.fields] != [
+                ('press', 0, 16), ('release', 20, 16), ('count', 40, 4)]:
+            raise RuntimeError('Contract includes unsupported bytes')
         if hashlib.sha256(memory[address:address + len(data)]).hexdigest() != expected_sha256:
             raise RuntimeError('Changed expected memory')
         writes.append((address, data))
@@ -30,7 +37,7 @@ def fixture(clock=10, release=0, count=0, long_limit=4, double_limit=4):
         registers=lambda: SimpleNamespace(cpu_mode='protected', segments={'ds': '2', 'ss': '2'}),
         MemoryAddress=SimpleNamespace(segmented=lambda selector, offset: offset),
         read=lambda address, length: bytes(memory[address:address + length]),
-        agent=SimpleNamespace(write_memory=write))
+        write=write)
     mapping = SimpleNamespace(data=SimpleNamespace(selector=2), data_address=lambda address, length: (2, address))
     return runtime, mapping, memory, writes
 

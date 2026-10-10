@@ -7,7 +7,7 @@ import os
 import re
 from pathlib import Path
 import shutil
-from dosbox_session import AgentRuntime, ObservationTimeout
+from shared_dosbox_runtime import AgentRuntime, ObservationTimeout
 from emu.le_image import load_image
 from live_mapping import validate_snapshot
 from native_rng_recorder import record
@@ -20,6 +20,10 @@ def main():
     parser.add_argument('--observation-ms', type=int, default=100)
     parser.add_argument('--rng-break', action='store_true')
     parser.add_argument('--cycles', type=int, default=10000)
+    parser.add_argument('--cpu-profile', choices=('fixed', 'gog'), default='fixed',
+                        help='Use fixed cycles or the shipped GOG auto/30%% cycle baseline')
+    parser.add_argument('--cpu-core', choices=('normal', 'auto'), default='normal',
+                        help='Normal core for recording; auto is an experimental GOG comparison')
     parser.add_argument('--debugger-build', choices=('heavy', 'no-heavy'), default='heavy')
     parser.add_argument('--trace-loader', action='store_true')
     parser.add_argument('--seed-check', action='store_true')
@@ -106,38 +110,41 @@ def main():
     # // needs: GAME_DIR
     installation = Path(os.environ['GAME_DIR']).resolve()
     root = args.output.resolve()
-    drive = root / 'drive'
+    drive = root / 'session' / 'drive-c'
     if drive.exists():
         raise RuntimeError('Use a fresh isolated drive for each survey')
     executable = Path('analysis/original/disc-root/CONQUER.EXE')
     if hashlib.sha256(executable.read_bytes()).hexdigest() != '5d7231758766204ad061e6b82cf2f0e0cbe28899b35d095f13e4aad75c8b79d6':
         raise RuntimeError('Wrong BLD-GOG-EN source identity')
-    drive.mkdir(parents=True)
-    tool_names = ('Probe-LiveMapping.py', 'dosbox_session.py', 'live_mapping.py',
+    root.mkdir(parents=True, exist_ok=True)
+    tool_names = ('Probe-LiveMapping.py', 'shared_dosbox_runtime.py', 'live_mapping.py',
                   'native_rng_recorder.py', 'rng_journal.py', 'rng_recording.py',
                   'supported_pointer_input.py', 'emu/le_image.py')
     (root / 'probe-source.json').write_text(json.dumps({
         'tool_sha256': {name: hashlib.sha256((Path(__file__).parent / name).read_bytes()).hexdigest()
                         for name in tool_names}
     }, indent=2))
-    for name in ('C1086.GOB', 'CONQUER.INI'):
-        shutil.copyfile(installation / name, drive / name)
-    shutil.copyfile(executable, drive / 'CONQUER.EXE')
-    (drive / 'SAVEGAME').mkdir()
-    # FMT-CONFIG-001: supported switches; modify only the private copy.
-    ini = (drive / 'CONQUER.INI').read_text()
-    ini = ini.replace('MOVIE=ON', 'MOVIE=OFF').replace('CREDITS=ON', 'CREDITS=OFF')
-    if args.animations_off:
-        # FMT-CONFIG-001: explicit controlled configuration, not a runtime patch.
-        lines = ini.splitlines()
-        if sum(line.split('=', 1)[0].strip() == 'ANIMATIONS' for line in lines) != 1:
-            raise RuntimeError('Expected exactly one private ANIMATIONS setting')
-        ini = '\n'.join('ANIMATIONS=OFF' if line.split('=', 1)[0].strip() == 'ANIMATIONS'
-                        else line for line in lines) + '\n'
-    (drive / 'CONQUER.INI').write_text(ini)
+    def prepare_drive(drive):
+        for name in ('C1086.GOB', 'CONQUER.INI'):
+            shutil.copyfile(installation / name, drive / name)
+        shutil.copyfile(executable, drive / 'CONQUER.EXE')
+        (drive / 'SAVEGAME').mkdir()
+        # FMT-CONFIG-001: supported switches; modify only the private copy.
+        ini = (drive / 'CONQUER.INI').read_text()
+        ini = ini.replace('MOVIE=ON', 'MOVIE=OFF').replace('CREDITS=ON', 'CREDITS=OFF')
+        if args.animations_off:
+            # FMT-CONFIG-001: explicit controlled configuration, not a runtime patch.
+            lines = ini.splitlines()
+            if sum(line.split('=', 1)[0].strip() == 'ANIMATIONS' for line in lines) != 1:
+                raise RuntimeError('Expected exactly one private ANIMATIONS setting')
+            ini = '\n'.join('ANIMATIONS=OFF' if line.split('=', 1)[0].strip() == 'ANIMATIONS'
+                            else line for line in lines) + '\n'
+        (drive / 'CONQUER.INI').write_text(ini)
     (root / 'probe-configuration.json').write_text(json.dumps({
         'movie': 'OFF', 'credits': 'OFF', 'animations_off': args.animations_off,
         'sound_investigation': args.sound_investigation,
+        'cpu_profile': args.cpu_profile, 'fixed_cycles': args.cycles if args.cpu_profile == 'fixed' else None,
+        'cpu_core': args.cpu_core,
         'startup_checkpoints': args.startup_checkpoints, 'startup_click': args.startup_click,
         'continue_after_screen': args.continue_after_screen, 'title_click': args.title_click,
         'screen_checkpoints': args.screen_checkpoints, 'stop_after_screen_id': args.stop_after_screen_id,
@@ -159,7 +166,9 @@ def main():
     native_recording_started = False
     try:
         with AgentRuntime(source, emulator, root, drive, 'CONQUER.EXE', installation / 'game.ins',
-                          args.cycles, sound_investigation=args.sound_investigation) as runtime:
+                          args.cycles, sound_investigation=args.sound_investigation,
+                          cpu_profile=args.cpu_profile, cpu_core=args.cpu_core,
+                          prepare_drive=prepare_drive) as runtime:
             print('startup', runtime.registers())
             for attempt in range(args.samples):
                 operation = runtime.agent.continue_(runtime.session.id)
