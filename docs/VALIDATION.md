@@ -1738,3 +1738,14 @@ Repository/configuration, documentation, tooling tests, evidence pins, build,
 implementation tests and executable specifications passed. The detailed log is
 local at artifacts/wrapup-20261010-validation.log. This gate does not establish
 full-game recorder completion; the owner's paused goal retains that unfinished work.
+
+### 2026-10-13 runtime package and session adoption
+
+RefurbishedDinosaurs.* moved from 11.2.0 to 12.0.0 and dinorefurb-dosbox-session
+from 0.4.0 to 0.8.0 (toolkit revision `ae2946a591bf946c4e1a3ac65f6b8c5739f616b8`).
+The session's DOSBox-X revision pin is unchanged. The solution built, and
+Invoke-Validation.ps1 with a filter over the resource, import, settings and
+shared-runtime tests passed 527 .NET tests and 146 executable specifications.
+The session-dependent tool tests passed under unittest discovery. The rust-dos
+native check that docs/RUNTIME.md describes passed in normal and deterministic
+mode with no game file.

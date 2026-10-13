@@ -7,7 +7,7 @@
   },
   "engine": "18.3.0",
   "dosbox_session": {
-    "version": "0.4.0",
-    "revision": "884a3cc755b7069e3f87a38f189b77fefb88a1f8"
+    "version": "0.8.0",
+    "revision": "ae2946a591bf946c4e1a3ac65f6b8c5739f616b8"
   }
 }

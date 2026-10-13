@@ -149,6 +149,22 @@ for synthetic adapter checks. Guarded input uses the released session's
 The caller permits only supported event payloads and queue count, then checks
 the complete queue relationship before continuing.
 
+### rust-dos backend
+
+`dinorefurb-dosbox-session` 0.8.0 also offers `RustDosSession`, which runs
+[rust-dos](https://github.com/dividebysandwich/rust-dos) v1.7.1 through its
+HTTP debug server under the same run lock, private C:, read-only media, muted
+host audio, guarded writes and event log. `./tools/Install-RustDos.ps1` installs
+the pinned Windows x86-64 build into the ignored `artifacts/rust-dos/`, and
+refuses an archive or executable whose SHA-256 differs from the package's pins.
+On 2026-10-13 the toolkit's `native/verify_rustdos.py` at
+`dinorefurb-dosbox-session@0.8.0` passed with that build here in a normal and a
+deterministic run: a synthetic `.COM` stopped at its entry and a breakpoint,
+registers read back, a stale write was refused with 409 (`precondition: state`),
+a guarded write verified and the program exited with code 0. No game file was
+used. Whether CONQUER.EXE runs under rust-dos is not tried, so every probe and
+recording above still uses the DOSBox-X build.
+
 New probes default to normal core and fixed 10000 cycles. `--cpu-profile gog`
 selects GOG's `auto 30%` cycle setting while retaining normal core for debugger
 stepping. `--cpu-core auto` is experimental: a native comparison failed a
